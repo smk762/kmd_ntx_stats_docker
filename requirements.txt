@@ -1,2 +1,9 @@
-Django>=2.0,<3.0
+Django==2.2
 psycopg2>=2.7,<3.0
+djangorestframework
+markdown
+django-filter
+slick-bitcoinrpc==0.1.4
+requests==2.23.0
+python-bitcoinlib==0.10.2
+python-dotenv
