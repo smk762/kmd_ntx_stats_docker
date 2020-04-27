@@ -2,6 +2,7 @@
 import os
 import json
 import binascii
+import time
 import logging
 import logging.handlers
 from notary_pubkeys import known_addresses
@@ -9,6 +10,7 @@ from rpclib import def_credentials
 from os.path import expanduser
 from dotenv import load_dotenv
 import psycopg2
+
 
 def get_max_col_val_in_table(col, table):
     sql = "SELECT MAX("+col+") FROM "+table+";"
@@ -19,8 +21,8 @@ def get_max_col_val_in_table(col, table):
 
 def add_row_to_ntx_tbl(row_data):
     try:
-        sql = "INSERT INTO kmd_ntx_api_notarisations"
-        sql = sql+" (chain, block_height, block_hash, notaries, prev_block_hash, prev_block_height, txid)"
+        sql = "INSERT INTO notarised"
+        sql = sql+" (chain, block_ht, block_hash, notaries, prev_block_hash, prev_block_ht, txid)"
         sql = sql+" VALUES (%s, %s, %s, %s, %s, %s, %s)"
         cursor.execute(sql, row_data)
         conn.commit()
@@ -29,7 +31,9 @@ def add_row_to_ntx_tbl(row_data):
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
+        conn.rollback()
         return 0
+
 
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
@@ -108,11 +112,9 @@ def get_ntx_data():
                         "notaries": notary_list
                     }
                 })
-            row_data = (chain, this_block_ht, this_block_hash, str(notary_list), prev_block_hash, prev_block_ht, txid)
+            row_data = (chain, this_block_ht, this_block_hash, notary_list, prev_block_hash, prev_block_ht, txid)
             add_row_to_ntx_tbl(row_data)
-    logger.info("Finished...")
-    with open('ntx_data.json', 'w') as f:
-        f.write(json.dumps(ntx_data, sort_keys=True, indent=4))
+    logger.info("Finished... Aggregating results....")
     return ntx_data
 
 def count_ntx(ntx_data):
@@ -127,9 +129,28 @@ def count_ntx(ntx_data):
                 else:
                     count = ntx_counts[notary][chain]+1
                     ntx_counts[notary].update({chain:count})
-    with open('ntx_counts.json', 'w') as f:
-        f.write(json.dumps(ntx_counts, sort_keys=True, indent=4))
+    timestamp = time.time()
+    for notary in ntx_counts:
+        for chain in ntx_counts[notary]:
+            row_data = [notary, chain, ntx_counts[notary][chain], timestamp]
+            add_row_to_ntx_count_tbl(row_data)            
+
     return ntx_counts
+
+def add_row_to_ntx_count_tbl(row_data):
+    try:
+        sql = "INSERT INTO notarised_count"
+        sql = sql+" (notary, chain, count, timestamp)"
+        sql = sql+" VALUES (%s, %s, %s, %s)"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
 
 home = expanduser("~")
 
@@ -151,22 +172,41 @@ conn = psycopg2.connect(
 
 cursor = conn.cursor()
 
+
+
 rpc = {}
 rpc["KMD"] = def_credentials("KMD")
 
 ntx_data = {}
 ntx_addr = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 try:
-    startblock = get_max_col_val_in_table("block_height", "kmd_ntx_api_notarisations")
+    startblock = get_max_col_val_in_table("block_ht", "notarised")-1
 except:
     startblock = 1444000 # season start block
+if startblock is None:
+    startblock = 1444000
 endblock = 7113400 # season end block (or tip if mid season)
 tip = int(rpc["KMD"].getblockcount())
-if endblock > tip:
-    endblock = tip
+logger.info("block at chain tip is "+str(tip))
+
 kmdfilter = 1525032458
 acfilter = 1525513998
 noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
 
+if endblock > tip:
+    endblock = tip
+while endblock - startblock > 5000:
+    logger.info("Processing blocks "+str(startblock)+" to "+str(endblock))
+    endblock = startblock + 4000
+    ntx_data = get_ntx_data()
+    if startblock > tip:
+        break
+    startblock = endblock
+    endblock = startblock + 6000
+
 ntx_data = get_ntx_data()
 count_ntx(ntx_data)
+
+cursor.close();
+
+conn.close();

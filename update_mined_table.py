@@ -19,7 +19,7 @@ def get_max_col_val_in_table(col, table):
 
 def add_row_to_mined_tbl(row_data):
     try:
-        sql = "INSERT INTO kmd_ntx_api_mined"
+        sql = "INSERT INTO mined"
         sql = sql+" (block, value, address, name)"
         sql = sql+" VALUES (%s, %s, %s, %s)"
         cursor.execute(sql, row_data)
@@ -76,7 +76,7 @@ rpc["KMD"] = def_credentials("KMD")
 ntx_data = {}
 ntx_addr = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 try:
-    startblock = get_max_col_val_in_table("block", "kmd_ntx_api_mined")+1
+    startblock = get_max_col_val_in_table("block", "mined")-1
 except:
     startblock = 1444000 # season start block
 endblock = 7113400 # season end block (or tip if mid season)

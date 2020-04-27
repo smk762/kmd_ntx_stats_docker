@@ -31,5 +31,7 @@ services:
       - db
 
 # to run migrations, use "docker-compose run web python3 manage.py migrate"
+# to run migrations, use "docker-compose run web python3 makemigrations"
+
 # docker-compose run web python3 manage.py createsuperuser --email admin@notary.earth --username admin
 # Conane Barbarian 

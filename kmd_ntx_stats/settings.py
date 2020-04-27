@@ -31,13 +31,14 @@ ALLOWED_HOSTS = ['116.203.120.91', 'notary.earth']
 # Application definition
 
 INSTALLED_APPS = [
-    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'kmd_ntx_api',
 ]
 
 MIDDLEWARE = [
@@ -137,5 +138,5 @@ REST_FRAMEWORK = {
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 100
 }
