@@ -55,7 +55,7 @@ class ntxViewSet(viewsets.ModelViewSet):
 
 class MinedCountViewSet(viewsets.ModelViewSet):
     """
-    API endpoint showing mining table data
+    API endpoint showing mining max and sum data
     """
     q = mined_count.objects.all().order_by("-timestamp").first()
     queryset = mined_count.objects.filter(timestamp=q.timestamp)
@@ -66,7 +66,7 @@ class MinedCountViewSet(viewsets.ModelViewSet):
 
 class ntxCountViewSet(viewsets.ModelViewSet):
     """
-    API endpoint showing notarisations table data
+    API endpoint showing notarisations count data
     """
     q = notarised_count.objects.all().order_by("-timestamp").first()
     queryset = notarised_count.objects.filter(timestamp=q.timestamp)
