@@ -10,6 +10,7 @@ router.register(r'mined', views.MinedViewSet)
 router.register(r'notarised', views.ntxViewSet)
 router.register(r'mined_count', views.MinedCountViewSet)
 router.register(r'notarised_count', views.ntxCountViewSet)
+router.register(r'notarised_chains', views.ntxChainsCountViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

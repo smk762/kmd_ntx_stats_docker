@@ -74,6 +74,16 @@ class ntxCountViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = None
 
+class ntxChainsCountViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing notarisations count data
+    """
+    q = notarised_count.objects.all().order_by("-timestamp").first()
+    queryset = notarised_count.objects.filter(timestamp=q.timestamp)
+    serializer_class = ntxChainsCountSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    pagination_class = None
+
 @api_view()
 def hello_world(request):
     return Response({"message": "Hello, world!"})
