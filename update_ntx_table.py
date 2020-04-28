@@ -11,6 +11,16 @@ from os.path import expanduser
 from dotenv import load_dotenv
 import psycopg2
 
+startblock = 1444000
+
+third_party_coins = ["AYA", "CHIPS", "EMC2", "GAME", "GIN", 'HUSH3']
+antara_coins = ["AXO", "BET", "BOTS", "BTCH", "CCL", "COQUICASH", "CRYPTO", "DEX", "ETOMIC", "HODL", "ILN", "JUMBLR",
+                "K64", "KOIN", "KSB", "KV", "MESH", "MGW", "MORTY", "MSHARK", "NINJA", "OOT", "OUR", "PANGEA", "PGT",
+                "PIRATE", "REVS", "RFOX", "RICK", "SEC", "SUPERNET", "THC", "VOTE2020", "VRSC", "WLC", "WLC21", "ZEXO",
+                "ZILLA", "STBL"]
+ex_antara_coins = ['CHAIN', 'GLXT', 'MCL', 'PRLPAY', 'COMMOD', 'DION',
+                   'EQL', 'CEAL', 'BNTN', 'KMDICE', 'DSEC']
+all_antara_coins = antara_coins + ex_antara_coins
 
 def get_max_col_val_in_table(col, table):
     sql = "SELECT MAX("+col+") FROM "+table+";"
@@ -117,31 +127,73 @@ def get_ntx_data():
     logger.info("Finished... Aggregating results....")
     return ntx_data
 
-def count_ntx(ntx_data):
-    ntx_counts = {}
-    for chain in ntx_data:
-        for block in ntx_data[chain]:
-            for notary in ntx_data[chain][block]["notaries"]:
-                if notary not in ntx_counts:
-                    ntx_counts.update({notary:{}})
-                if chain not in ntx_counts[notary]:
-                    ntx_counts[notary].update({chain:1})
-                else:
-                    count = ntx_counts[notary][chain]+1
-                    ntx_counts[notary].update({chain:count})
-    timestamp = time.time()
-    for notary in ntx_counts:
-        for chain in ntx_counts[notary]:
-            row_data = [notary, chain, ntx_counts[notary][chain], timestamp]
-            add_row_to_ntx_count_tbl(row_data)            
 
-    return ntx_counts
+def get_notarised_counts():
+    sql = "SELECT chain, notaries FROM notarised WHERE block_ht >= "+str(startblock)+";"
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    results_list = []
+    timestamp = int(time.time())
+    for item in results:
+        results_list.append({
+                "chain":item[0],
+                "notaries":item[1]
+            })
+    json_count = {}
+    print("Aggregating "+str(len(results_list))+" rows from notarised table")
+    for item in results_list:
+        notaries = item['notaries']
+        chain = item['chain']
+        for notary in notaries:
+            if notary not in json_count:
+                json_count.update({notary:{}})
+            if chain not in json_count[notary]:
+                json_count[notary].update({chain:1})
+            else:
+                count = json_count[notary][chain]+1
+                json_count[notary].update({chain:count})
+    print(json_count)
+    node_counts = {}
+    other_coins = []
+    for notary in json_count:
+        node_counts.update({notary:{
+                "btc_count":0,
+                "antara_count":0,
+                "third_party_count":0,
+                "other_count":0,
+                "total_ntx_count":0
+            }})
+        for chain in json_count[notary]:
+            if chain == "KMD":
+                count = node_counts[notary]["btc_count"]+json_count[notary][chain]
+                node_counts[notary].update({"btc_count":count})
+            elif chain in all_antara_coins:
+                count = node_counts[notary]["antara_count"]+json_count[notary][chain]
+                node_counts[notary].update({"antara_count":count})
+            elif chain in third_party_coins:
+                count = node_counts[notary]["third_party_count"]+json_count[notary][chain]
+                node_counts[notary].update({"third_party_count":count})
+            else:
+                count = node_counts[notary]["other_count"]+json_count[notary][chain]
+                node_counts[notary].update({"other_count":count})
+                other_coins.append(chain)
 
-def add_row_to_ntx_count_tbl(row_data):
+            count = node_counts[notary]["total_ntx_count"]+json_count[notary][chain]
+            node_counts[notary].update({"total_ntx_count":count})
+
+        row_data = (notary, node_counts[notary]['btc_count'], node_counts[notary]['antara_count'], 
+                    node_counts[notary]['third_party_count'], node_counts[notary]['other_count'], 
+                    node_counts[notary]['total_ntx_count'], json.dumps(json_count[notary]), timestamp)
+        print("Adding counts for "+notary+" to notarised_count table")
+        add_row_to_notarised_count_tbl(row_data)
+
+
+def add_row_to_notarised_count_tbl(row_data):
+    print("inserting")
     try:
         sql = "INSERT INTO notarised_count"
-        sql = sql+" (notary, chain, count, timestamp)"
-        sql = sql+" VALUES (%s, %s, %s, %s)"
+        sql = sql+" (notary, btc_count, antara_count, third_party_count, other_count, total_ntx_count, json_count, timestamp)"
+        sql = sql+" VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
@@ -205,7 +257,8 @@ while endblock - startblock > 5000:
     endblock = startblock + 6000
 
 ntx_data = get_ntx_data()
-count_ntx(ntx_data)
+
+get_notarised_counts()
 
 cursor.close();
 
