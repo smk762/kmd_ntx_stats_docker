@@ -32,8 +32,8 @@ def get_max_col_val_in_table(col, table):
 def add_row_to_ntx_tbl(row_data):
     try:
         sql = "INSERT INTO notarised"
-        sql = sql+" (chain, block_ht, block_hash, notaries, prev_block_hash, prev_block_ht, txid)"
-        sql = sql+" VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        sql = sql+" (chain, block_ht, block_time, block_hash, notaries, prev_block_hash, prev_block_ht, txid)"
+        sql = sql+" VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
@@ -52,7 +52,6 @@ def get_ntx_txids(ntx_addr, start, end):
     return rpc["KMD"].getaddresstxids({"addresses": [ntx_addr], "start":start, "end":end})
     
 def get_ticker(scriptPubKeyBinary):
-    ntx_data = []
     chain = ''
     while len(chain) < 1:
         for i in range(len(scriptPubKeyBinary)):
@@ -82,6 +81,7 @@ def get_ntx_data():
         if len(dest_addrs) > 0 and ntx_addr in dest_addrs and len(raw_tx['vin']) >= 13:
             scriptPubKey_asm = raw_tx['vout'][1]['scriptPubKey']['asm'].replace("OP_RETURN ","")
             this_block_hash = raw_tx['blockhash']
+            this_block_time = raw_tx['blocktime']
             this_block_ht = raw_tx['height']
             prev_block_hash = lil_endian(scriptPubKey_asm[:64])
             prev_block_ht = int(lil_endian(scriptPubKey_asm[64:72]),16)
@@ -108,24 +108,9 @@ def get_ntx_data():
                         notary_list.append(notary)
                     else:
                         notary_list.append(item['address'])
-            if chain not in ntx_data:
-                ntx_data.update({
-                        chain:{}
-                    })
             notary_list.sort()
-            ntx_data[chain].update({
-                    this_block_ht:{
-                        "block_hash":this_block_hash,
-                        "prev_block_hash":prev_block_hash,
-                        "prev_block_ht":prev_block_ht,
-                        "txid":txid,
-                        "notaries": notary_list
-                    }
-                })
-            row_data = (chain, this_block_ht, this_block_hash, notary_list, prev_block_hash, prev_block_ht, txid)
+            row_data = (chain, this_block_ht, this_block_time, this_block_hash, notary_list, prev_block_hash, prev_block_ht, txid)
             add_row_to_ntx_tbl(row_data)
-    logger.info("Finished... Aggregating results....")
-    return ntx_data
 
 
 def get_notarised_counts():
@@ -189,7 +174,6 @@ def get_notarised_counts():
 
 
 def add_row_to_notarised_count_tbl(row_data):
-    print("inserting")
     try:
         sql = "INSERT INTO notarised_count"
         sql = sql+" (notary, btc_count, antara_count, third_party_count, other_count, total_ntx_count, json_count, timestamp)"
@@ -229,7 +213,6 @@ cursor = conn.cursor()
 rpc = {}
 rpc["KMD"] = def_credentials("KMD")
 
-ntx_data = {}
 ntx_addr = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 try:
     startblock = get_max_col_val_in_table("block_ht", "notarised")-1
@@ -250,13 +233,13 @@ if endblock > tip:
 while endblock - startblock > 5000:
     logger.info("Processing blocks "+str(startblock)+" to "+str(endblock))
     endblock = startblock + 4000
-    ntx_data = get_ntx_data()
+    get_ntx_data()
     if startblock > tip:
         break
     startblock = endblock
     endblock = startblock + 6000
 
-ntx_data = get_ntx_data()
+get_ntx_data()
 
 get_notarised_counts()
 

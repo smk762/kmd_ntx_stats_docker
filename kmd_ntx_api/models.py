@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import ArrayField, JSONField
 
 class mined(models.Model):
     block = models.PositiveIntegerField()
+    block_time = models.PositiveIntegerField()
     value = models.DecimalField(max_digits=14, decimal_places=8)
     address = models.CharField(max_length=34)
     name = models.CharField(max_length=34)
@@ -19,6 +20,7 @@ class notarised(models.Model):
     txid = models.CharField(max_length=64)
     chain = models.CharField(max_length=12)
     block_hash = models.CharField(max_length=64)
+    block_time = models.PositiveIntegerField()
     block_ht = models.PositiveIntegerField()
     notaries = ArrayField(models.CharField(max_length=34),size=13)
     prev_block_hash = models.CharField(max_length=64)
@@ -48,6 +50,7 @@ class mined_count(models.Model):
     sum_mined = models.DecimalField(max_digits=18, decimal_places=8)
     max_mined = models.DecimalField(max_digits=18, decimal_places=8)
     timestamp = models.PositiveIntegerField()
+    last_mined = models.PositiveIntegerField()
 
     class Meta:
         db_table = 'mined_count'
