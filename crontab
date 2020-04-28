@@ -1,1 +1,3 @@
-*/5 * * * * docker run --rm your-container /root/update_table.py
+*/5 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/update_mined_table.py
+*/5 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/update_ntx_table.py
+# Add the lines above to your host machine's crontab

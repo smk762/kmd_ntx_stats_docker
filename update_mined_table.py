@@ -23,8 +23,8 @@ def get_max_col_val_in_table(col, table):
 def add_row_to_mined_tbl(row_data):
     try:
         sql = "INSERT INTO mined"
-        sql = sql+" (block, value, address, name)"
-        sql = sql+" VALUES (%s, %s, %s, %s)"
+        sql = sql+" (block, block_time, value, address, name)"
+        sql = sql+" VALUES (%s, %s, %s, %s, %s)"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
@@ -39,7 +39,9 @@ def add_row_to_mined_tbl(row_data):
 def get_miners(start, end):
     count = 0
     for block in range(start, end):
-        for tx in rpc["KMD"].getblock(str(block), 2)['tx']:
+        blockinfo = rpc["KMD"].getblock(str(block), 2)
+        blocktime = blockinfo['time']
+        for tx in blockinfo['tx']:
             if 'coinbase' in tx['vin'][0]:
                 if 'addresses' in tx['vout'][0]['scriptPubKey']:
                     address = tx['vout'][0]['scriptPubKey']['addresses'][0]
@@ -52,35 +54,27 @@ def get_miners(start, end):
                     name = "non-standard"
 
                 value = tx['vout'][0]['value']
-                logger.info(str(value)+" KMD mined by ["+name+"] in block "+str(block))
-                row_data = (block, value, address, name)
+                logger.info(str(value)+" KMD mined by ["+name+"] in block "+str(block)+" at "+str(blocktime))
+                row_data = (block, blocktime, value, address, name)
                 count += add_row_to_mined_tbl(row_data)
-    logger.info(str(count)+" records added to table")
 
 def get_mined_counts():
-    sql = "SELECT name, SUM(value), MAX(value) FROM mined WHERE block >= "+str(startblock)+" GROUP BY name;"
+    sql = "SELECT name, SUM(value), MAX(value), max(block_time) FROM mined WHERE block >= "+str(startblock)+" GROUP BY name;"
     cursor.execute(sql)
     results = cursor.fetchall()
     results_list = []
     print("Aggregating "+str(len(results))+" rows from mined table")
-    for item in results:
-        results_list.append({
-                "name":item[0],
-                "sum":float(item[1]),
-                "max":float(item[2]),
-            })
-    logger.info("Results: "+str(results_list))
     timestamp = int(time.time())
-    for item in results_list:
-        row_data = (item['name'], item['sum'], item['max'], timestamp)
-        print("Adding "+item['name']+" to get_mined_counts table")
+    for item in results:
+        row_data = (item[0], float(item[1]), float(item[2]), int(item[3]), int(timestamp))
+        print("Adding "+item[0]+" to get_mined_counts table")
         add_row_to_mined_count_tbl(row_data)
 
 def add_row_to_mined_count_tbl(row_data):
     try:
         sql = "INSERT INTO mined_count"
-        sql = sql+" (notary, sum_mined, max_mined, timestamp)"
-        sql = sql+" VALUES (%s, %s, %s, %s);"
+        sql = sql+" (notary, sum_mined, max_mined, last_mined, timestamp)"
+        sql = sql+" VALUES (%s, %s, %s, %s, %s);"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
