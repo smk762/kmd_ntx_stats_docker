@@ -2,6 +2,7 @@
 import os
 import json
 import binascii
+import time
 import logging
 import logging.handlers
 from notary_pubkeys import known_addresses
@@ -9,6 +10,8 @@ from rpclib import def_credentials
 from os.path import expanduser
 from dotenv import load_dotenv
 import psycopg2
+
+startblock = 1444000
 
 def get_max_col_val_in_table(col, table):
     sql = "SELECT MAX("+col+") FROM "+table+";"
@@ -29,6 +32,7 @@ def add_row_to_mined_tbl(row_data):
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
+        conn.rollback()
         return 0
 
 
@@ -52,6 +56,40 @@ def get_miners(start, end):
                 row_data = (block, value, address, name)
                 count += add_row_to_mined_tbl(row_data)
     logger.info(str(count)+" records added to table")
+
+def get_mined_counts():
+    sql = "SELECT name, SUM(value), MAX(value) FROM mined WHERE block >= "+str(startblock)+" GROUP BY name;"
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    results_list = []
+    print("Aggregating "+str(len(results))+" rows from mined table")
+    for item in results:
+        results_list.append({
+                "name":item[0],
+                "sum":float(item[1]),
+                "max":float(item[2]),
+            })
+    logger.info("Results: "+str(results_list))
+    timestamp = int(time.time())
+    for item in results_list:
+        row_data = (item['name'], item['sum'], item['max'], timestamp)
+        print("Adding "+item['name']+" to get_mined_counts table")
+        add_row_to_mined_count_tbl(row_data)
+
+def add_row_to_mined_count_tbl(row_data):
+    try:
+        sql = "INSERT INTO mined_count"
+        sql = sql+" (notary, sum_mined, max_mined, timestamp)"
+        sql = sql+" VALUES (%s, %s, %s, %s);"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -86,3 +124,4 @@ if endblock > tip:
     endblock = tip
 
 get_miners(startblock, endblock)
+get_mined_counts()
