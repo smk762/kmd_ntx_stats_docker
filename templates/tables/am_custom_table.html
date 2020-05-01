@@ -1,0 +1,48 @@
+		<div class="card-deck" style="margin:auto;">	
+			<div class="card text-white bg-dark mb-3" style="min-height: 333px;">
+				<div class="card-header">Source Data</div>
+				<div class="card-body">
+					<table id="table_id" class="display">
+					    <thead>
+					        <tr>
+					        	{% if x_field %}
+					            	<th>{{ x_field }}</th>
+					        	{% else %}
+					            	<th>?</th>
+					        	{% endif %}
+					            <th>Total Swaps</th>
+					            <th>Succesful Swaps</th>
+					            <th>Failed Swaps</th>
+					            <th>Success Rate (%)</th>
+					        </tr>
+					    </thead>
+					    <tbody>
+							{% for k in am_graph_data %}
+					        <tr>
+					        	{% if x_field == 'Date' %}
+					            	<td>{{ k.Date }}</td>
+					        	{% elif x_field == 'GUI' %}
+					            	<td>{{ k.GUI }}</td>
+					        	{% elif x_field == 'Coin' %}
+					            	<td>{{ k.Coin }}</td>
+					            {% else %}
+					            	<td>?</td>
+					            {% endif %}
+					            {% if graph_title == "Swaps per day (cumulative)" %}
+						            <td>{{ k.Cumulative_Swaps }}</td>
+						            <td>{{ k.Cumulative_Success }}</td>
+						            <td>{{ k.Cumulative_Fail }}</td>
+						            <td>{{ k.Cumulative_Rate }}</td>
+						        {% else %}
+						            <td>{{ k.Swaps }}</td>
+						            <td>{{ k.Success }}</td>
+						            <td>{{ k.Fail }}</td>
+						            <td>{{ k.Rate }}</td>
+						        {% endif %}
+					   	     </tr>
+					         {% endfor %}
+					    </tbody>
+					</table> 
+				</div>
+			</div>	
+		</div>
