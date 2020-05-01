@@ -1,0 +1,34 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  {% include "dashboard/am_cdn_includes.html" %}
+  {% include "dashboard/am_css.html" %}
+
+  <title>AtomicDEX Stats Dashboard</title>
+  </head>
+  <body>
+  {% include "dashboard/am_top_nav.html" %}
+
+    <div class="container Absolute-Center is-Responsive my-12" style="max-width:100% !important; height: 98% !important; width: 98% !important;">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-warning alert-dismissable" role="alert" style="pointer-events: all;">
+            <button class="close" data-dismiss="alert">
+              <small><sup>x</sup></small>                
+            </button>
+          {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block content %}
+
+      {% endblock %}
+    </div>
+  </body>
+</html>

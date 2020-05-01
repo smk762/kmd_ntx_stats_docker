@@ -6,12 +6,13 @@ import time
 import logging
 import logging.handlers
 from notary_pubkeys import known_addresses
+from notary_info import notary_info, address_info, seasons_info
 from rpclib import def_credentials
 from os.path import expanduser
 from dotenv import load_dotenv
 import psycopg2
 
-startblock = 1444000
+season_startblock = 1444000
 
 third_party_coins = ["AYA", "CHIPS", "EMC2", "GAME", "GIN", 'HUSH3']
 antara_coins = ["AXO", "BET", "BOTS", "BTCH", "CCL", "COQUICASH", "CRYPTO", "DEX", "ETOMIC", "HODL", "ILN", "JUMBLR",
@@ -114,7 +115,7 @@ def get_ntx_data():
 
 
 def get_notarised_counts():
-    sql = "SELECT chain, notaries FROM notarised WHERE block_ht >= "+str(startblock)+";"
+    sql = "SELECT chain, notaries FROM notarised WHERE block_ht >= "+str(season_startblock)+";"
     cursor.execute(sql)
     results = cursor.fetchall()
     results_list = []
@@ -217,9 +218,9 @@ ntx_addr = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 try:
     startblock = get_max_col_val_in_table("block_ht", "notarised")-1
 except:
-    startblock = 1444000 # season start block
+    startblock = season_startblock # season start block
 if startblock is None:
-    startblock = 1444000
+    startblock = season_startblock
 endblock = 7113400 # season end block (or tip if mid season)
 tip = int(rpc["KMD"].getblockcount())
 logger.info("block at chain tip is "+str(tip))
@@ -243,6 +244,6 @@ get_ntx_data()
 
 get_notarised_counts()
 
-cursor.close();
+cursor.close()
 
-conn.close();
+conn.close()
