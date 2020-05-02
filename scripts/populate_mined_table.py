@@ -78,8 +78,10 @@ for block in unrecorded_blocks:
     records.append(get_miner(block))
     if len(records) == 10080:
         now = time.time()
-        pct = str(round(len(records)*i/len(unrecorded_blocks)*100,3))+"%"
-        logger.info(pct+" :"+str(len(records)*i)+"/"+str(len(unrecorded_blocks))+" records added to db ["+str(int(now-start))+" sec]")
+        pct = round(len(records)*i/len(unrecorded_blocks)*100,3)
+        runtime = int(now-start)
+        est_end = int(100/pct*runtime)
+        logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_blocks))+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
         execute_values(cursor, "INSERT INTO mined (block, block_time, value, address, name, txid) VALUES %s", records)
         conn.commit()
         records = []
@@ -87,7 +89,7 @@ for block in unrecorded_blocks:
         if i%5 == 0:
             cursor.execute("SELECT COUNT(*) from mined;")
             block_count = cursor.fetchone()
-            logger.info("Blocks in database: "+str(block_count))
+            logger.info("Blocks in database: "+str(block_count[0])+"/"+str(len(all_blocks)))
 
 execute_values(cursor, "INSERT INTO mined (block, block_time, value, address, name, txid) VALUES %s", records)
 conn.commit()

@@ -104,6 +104,11 @@ class MinedViewSet(viewsets.ModelViewSet):
     queryset = mined.objects.all()
     serializer_class = MinedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ['name']
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['block']
+    ordering = ['block']
+
 
 class ntxViewSet(viewsets.ModelViewSet):
     """
@@ -112,6 +117,10 @@ class ntxViewSet(viewsets.ModelViewSet):
     queryset = notarised.objects.all()
     serializer_class = ntxSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ['chain']
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['block_time']
+    ordering = ['block_time']
 
 class MinedCountViewSet(viewsets.ModelViewSet):
     """
@@ -120,14 +129,14 @@ class MinedCountViewSet(viewsets.ModelViewSet):
     queryset = mined_count.objects.all()
     serializer_class = MinedCountSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    pagination_class = None
 
 class ntxCountList(generics.ListAPIView):
     queryset = notarised_count.objects.all()
     serializer_class = ntxCountSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['notary']
-    ordering_fields = ['timestamp']
+    ordering_fields = ['time_stamp']
+    ordering = ['time_stamp']
 
 class ntxCountViewSet(viewsets.ModelViewSet):
     """
@@ -136,11 +145,15 @@ class ntxCountViewSet(viewsets.ModelViewSet):
     queryset = notarised_count.objects.all()
     serializer_class = ntxCountSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    pagination_class = None
+    filterset_fields = ['notary']
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['time_stamp']
+    ordering = ['time_stamp']
 
 class decodeOpRetViewSet(viewsets.ViewSet):
     """
-    Decodes notarization OP_RETURN strings
+    Decodes notarization OP_RETURN strings.
+    USAGE: decode_opret/?OP_RETURN=<OP_RETURN>
     """    
     # renderer_classes = [TemplateHTMLRenderer]
     # template_name = 'decode_opret.html' 

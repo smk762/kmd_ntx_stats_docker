@@ -1,10 +1,10 @@
 Django==2.2
 psycopg2>=2.7,<3.0
-djangorestframework
+djangorestframework==3.10
 markdown
-django-filter
 slick-bitcoinrpc==0.1.4
 requests==2.23.0
 python-bitcoinlib==0.10.2
 python-dotenv
 django-filter
+dynamic-rest

@@ -21,7 +21,9 @@ def get_mined_counts(season):
         row_data = (item[0], season, int(item[1]), float(item[2]), float(item[3]), int(item[4]), int(item[5]), int(time_stamp))
         if item[0] in notary_info:
             print("Adding "+str(row_data)+" to get_mined_counts table")
-        add_row_to_mined_count_tbl(row_data)
+        result = add_row_to_mined_count_tbl(row_data)
+    return result
+
 
 def add_row_to_mined_count_tbl(row_data):
     try:
@@ -55,8 +57,11 @@ conn = psycopg2.connect(
 )
 cursor = conn.cursor()
 
+count = 0
 for season in seasons_info:
-    get_mined_counts(season)
+    count += get_mined_counts(season)
+logging.info("Finished!")
+logging.info(str(count)+" records added to mined count table ")
 
 cursor.close()
 
