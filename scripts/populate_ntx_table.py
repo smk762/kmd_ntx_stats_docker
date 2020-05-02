@@ -161,10 +161,14 @@ for txid in unrecorded_txids:
     row_data = get_ntx_data(txid)
     records.append(row_data)
 
-    if len(records) == 10080:
+    if len(records) == 2:
         now = time.time()
-        pct = str(round(len(records)*i/len(unrecorded_txids)*100,3))+"%"
-        logger.info(pct+" :"+str(len(records)*i)+"/"+str(len(unrecorded_txids))+" records added to db ["+str(int(now-start))+" sec]")
+        pct = round(len(records)*i/len(unrecorded_txids)*100,3)
+        runtime = int(now-start)
+        est_end = int(100/pct*runtime)
+        logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_txids))+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
+        logger.info(records)
+        logger.info("-----------------------------")
         execute_values(cursor, "INSERT INTO notarised (chain, block_ht, block_time, block_hash, notaries, prev_block_hash, prev_block_ht, txid, opret) VALUES %s", records)
         conn.commit()
         records = []
@@ -172,7 +176,7 @@ for txid in unrecorded_txids:
         if i%5 == 0:
             cursor.execute("SELECT COUNT(*) from notarised;")
             block_count = cursor.fetchone()
-            logger.info("notarisations in database: "+str(block_count[0]))
+            logger.info("notarisations in database: "+str(block_count[0])+"/"+str(len(all_txids)))
 
 execute_values(cursor, "INSERT INTO notarised (chain, block_ht, block_time, block_hash, notaries, prev_block_hash, prev_block_ht, txid, opret) VALUES %s", records)
 

@@ -17,26 +17,29 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class MinedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = mined
-        fields = ['block', 'block_time', 'value', 'address', 'name']
+        fields = ['block', 'block_time', 'value', 'address', 'name', 'txid']
 
 class ntxSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = notarised
-        fields = ['txid', 'chain', 'block_ht', 'block_time', 'prev_block_hash', 'prev_block_ht', 'opret', 'notaries']
+        fields = ['txid', 'chain', 'block_ht', 'block_time', 'block_hash', 'prev_block_hash', 'prev_block_ht', 'opret', 'notaries']
 
 class MinedCountSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = mined_count
-        fields = ['notary', 'sum_mined', 'max_mined', 'last_mined', 'timestamp']
+        fields = ['notary', 'count_mined', 'sum_mined', 'max_mined', 'last_mined', 'max_block', 'time_stamp']
 
 class ntxCountSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = notarised_count
-        fields = ['notary', 'btc_count', 'antara_count', 'third_party_count', 'total_ntx_count', 'json_count', 'timestamp']
+        fields = ['notary', 'btc_count', 'antara_count', 'third_party_count', 'total_ntx_count', 'json_count', 'time_stamp']
 
 
 class decodeOpRetSerializer(serializers.Serializer):
+    OP_RETURN = serializers.CharField(style={'placeholder': 'OP_RETURN', 'autofocus': True})
     chain = serializers.CharField()
     prevblock = serializers.IntegerField()
     prevhash = serializers.CharField()
     fields = ['chain', 'prevblock', 'prevhash']
+
+        
