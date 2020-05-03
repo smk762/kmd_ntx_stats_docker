@@ -351,6 +351,7 @@ season_addresses = {}
 for season in notary_pubkeys:
     notary_id = 0
     season_addresses.update({season:[]})
+    address_info.update({season:{}})
     for notary in notary_pubkeys[season]:
         if notary not in notary_info:
             notary_info.update({
@@ -362,10 +363,9 @@ for season in notary_pubkeys:
                 }})
         addr = str(P2PKHBitcoinAddress.from_pubkey(x(notary_pubkeys[season][notary])))
         season_addresses[season].append(addr)
-        address_info.update({
+        address_info[season].update({
             addr:{
                 "Notary":notary,
-                "Season":season,
                 "Notary_id":notary_id,
                 "Pubkey":notary_pubkeys[season][notary]
             }})

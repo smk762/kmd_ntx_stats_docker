@@ -7,11 +7,17 @@ router = routers.DefaultRouter()
 
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'mined', views.MinedViewSet)
-router.register(r'notarised', views.ntxViewSet)
-router.register(r'mined_count', views.MinedCountViewSet)
-router.register(r'notarised_count', views.ntxCountViewSet)
-router.register(r'decode_opret', views.decodeOpRetViewSet, basename='decode_opret')
+router.register(r'notarisation/notarised', views.ntxViewSet)
+router.register(r'notarisation/notarised_count', views.ntxCountViewSet)
+router.register(r'notarisation/notarised_chains', views.notarised_chains, basename='notarised_chains')
+router.register(r'notarisation/ntx_chain_counts', views.ntx_chain_counts, basename='ntx_chain_counts')
+router.register(r'notarisation/ntx_notary_counts', views.ntx_notary_counts, basename='ntx_notary_counts')
+#	router.register(r'notarisation/ntx_chain_counts/{chain}', views.ntx_chain_counts, basename='ntx_chain_counts')
+router.register(r'mining/mined', views.MinedViewSet)
+router.register(r'mining/mined_count', views.MinedCountViewSet)
+router.register(r'mining/season3_mining_stats', views.season3_mining_stats, basename='season3_mining_stats')
+router.register(r'info/notary_addresses', views.notary_addresses, basename='notary_addresses')
+router.register(r'tools/decode_opret', views.decodeOpRetViewSet, basename='decode_opret')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

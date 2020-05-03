@@ -28,7 +28,7 @@ def get_mined_counts(season):
 def add_row_to_mined_count_tbl(row_data):
     try:
         sql = "INSERT INTO mined_count"
-        sql = sql+" (notary, season, count_mined, sum_mined, max_mined, max_block, last_mined, time_stamp)"
+        sql = sql+" (notary, season, blocks_mined, sum_value_mined, max_value_mined, last_mined_blocktime, last_mined_block, time_stamp)"
         sql = sql+" VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
         cursor.execute(sql, row_data)
         conn.commit()

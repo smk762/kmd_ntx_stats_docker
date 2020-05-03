@@ -38,8 +38,10 @@ conn = psycopg2.connect(
 )
 cursor = conn.cursor()
 
-for address in address_info:
-    row_data = (address['Notary_id'], address['Notary'], address, address['Pubkey'], address['Season'])
+for season in address_info:
+  for address in address_info[season]:
+    print(address_info[season][address]['Notary'])
+    row_data = (address_info[season][address]['Notary_id'], address_info[season][address]['Notary'], address, address_info[season][address]['Pubkey'], season)
     add_row_to_addresses_tbl(row_data)
 
 cursor.close()
