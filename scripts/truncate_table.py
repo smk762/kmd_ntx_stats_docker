@@ -10,7 +10,7 @@ conn = psycopg2.connect(
 )
 cursor = conn.cursor()
 
-table = 'notarised'
+table = 'addresses'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())

@@ -11,7 +11,7 @@ class addresses(models.Model):
     class Meta:
         db_table = 'addresses'
         constraints = [
-            models.UniqueConstraint(fields=['address'], name='unique_address')
+            models.UniqueConstraint(fields=['address', "season"], name='unique_season_address')
         ]
 
 class notarised(models.Model):
@@ -23,7 +23,7 @@ class notarised(models.Model):
     notaries = ArrayField(models.CharField(max_length=34),size=13)
     prev_block_hash = models.CharField(max_length=64)
     prev_block_ht = models.PositiveIntegerField()
-    opret = models.CharField(max_length=1024)
+    opret = models.CharField(max_length=2048)
 
     class Meta:
         db_table = 'notarised'
@@ -62,12 +62,12 @@ class mined(models.Model):
 
 class mined_count(models.Model):
     notary = models.CharField(max_length=64)
-    sum_mined = models.DecimalField(max_digits=18, decimal_places=8)
-    max_mined = models.DecimalField(max_digits=18, decimal_places=8)
-    max_block = models.PositiveIntegerField()
-    count_mined = models.PositiveIntegerField()
+    blocks_mined = models.PositiveIntegerField()
+    sum_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
+    max_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
+    last_mined_block = models.PositiveIntegerField()
+    last_mined_blocktime = models.PositiveIntegerField()
     time_stamp = models.PositiveIntegerField()
-    last_mined = models.PositiveIntegerField()
     season = models.CharField(max_length=34)
 
     class Meta:

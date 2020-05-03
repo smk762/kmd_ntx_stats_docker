@@ -45,7 +45,7 @@ def get_ticker(scriptPubKeyBinary):
                 break
     if chr(scriptPubKeyBinary[-4])+chr(scriptPubKeyBinary[-3])+chr(scriptPubKeyBinary[-2]) =="KMD":
         chain = "KMD"
-    return chain
+    return str(chain)
 
 def get_ntx_data(txid):
     raw_tx = rpc["KMD"].getrawtransaction(txid,1)
@@ -89,6 +89,9 @@ def get_ntx_data(txid):
                             MoM_depth = int(lil_endian(scriptPubKey_asm[end:]),16)
                         except Exception as e:
                             logger.debug(e)
+                    # some decodes have a null char error, this gets rid of that so populate script doesnt error out (but the seem to be decoding differently/wrong)
+                    if chain.find('\x00') != -1:
+                        chain = chain.replace('\x00','')
                     row_data = (chain, this_block_ht, this_block_time, this_block_hash, notary_list, prev_block_hash, prev_block_ht, txid, opret)
                 else:
                     row_data = ("not_opret", this_block_ht, this_block_time, this_block_hash, notary_list, "unknown", 0, txid, "unknown")
