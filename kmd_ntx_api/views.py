@@ -139,18 +139,6 @@ class ntxCountList(generics.ListAPIView):
     ordering_fields = ['time_stamp']
     ordering = ['-time_stamp']
 
-class ntxCountViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint showing notarisations count data
-    """
-    queryset = notarised_count.objects.all()
-    serializer_class = ntxCountSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['notary']
-    ordering_fields = ['time_stamp']
-    ordering = ['-time_stamp']
-
 class decodeOpRetViewSet(viewsets.ViewSet):
     """
     Decodes notarization OP_RETURN strings.
@@ -198,7 +186,12 @@ class season3_mining_stats(viewsets.ViewSet):
                                                    mined_count=Count('value'), mined_sum=Sum('value'), 
                                                    first_mined_block=Min('block'), first_mined_blocktime=Min('block_time'),
                                                    last_mined_block=Max('block'), last_mined_blocktime=Max('block_time'))
-        return Response(s3_mined_aggregates)
+        s3_notary_mined_aggregates = []
+        for item in s3_mined_aggregates:
+            if item['name'] in s3_notaries:
+                s3_notary_mined_aggregates.append(item)
+
+        return Response(s3_notary_mined_aggregates)
 
 class notary_addresses(viewsets.ViewSet):
     """
@@ -220,6 +213,32 @@ class notary_addresses(viewsets.ViewSet):
         """
         notary_addresses = addresses.objects.values('season', 'notary_name', 'notary_id', 'address', 'pubkey')
         return Response(notary_addresses)
+
+class notary_names(viewsets.ViewSet):
+    """
+    API endpoint showing mining max and sum data
+    """
+    serializer_class = AddressesSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['season']
+    ordering_fields = ['season', 'notary_name']
+    ordering = ['-season']
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        Returns decoded notarisation information from OP_RETURN strings
+        """
+        notary_addresses = addresses.objects.values('notary_name', 'season')
+        notaries_list = {}
+        for item in notary_addresses:
+            if item['season'] not in notaries_list:
+                notaries_list[item['season']] = []
+            notaries_list[item['season']].append(item['notary_name'])
+        return Response(notaries_list)
 
 class notarised_chains(viewsets.ViewSet):
     """
@@ -243,7 +262,7 @@ class notarised_chains(viewsets.ViewSet):
 
 class ntx_chain_counts(viewsets.ViewSet):
     """
-    API endpoint showing mining max and sum data
+    API endpoint showing Season 3 notarisations count for each chain. Use notarisations/ntx_chain_counts?chain=[chain_tag] (defaults to KMD)
     """
     serializer_class = ntxSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -257,13 +276,12 @@ class ntx_chain_counts(viewsets.ViewSet):
 
     def get(self, request, format=None):
         """
-        Returns decoded notarisation information from OP_RETURN strings
         """
         if 'chain' in request.GET:
             chain = request.GET['chain']
         else:
             chain = "KMD"
-        ntx_data = notarised.objects.exclude(opret="unknown").filter(block_time__gte=1563148800).values('txid', 'chain', 'block_hash', 'block_time', 'block_ht', 'notaries', 'prev_block_hash', 'prev_block_ht', 'opret')
+        ntx_data = notarised.objects.exclude(opret="unknown").filter(block_time__gte=1563148800, chain=chain).values('txid', 'chain', 'block_hash', 'block_time', 'block_ht', 'notaries', 'prev_block_hash', 'prev_block_ht', 'opret')
         ntx_counts = {}
         for item in ntx_data:
             chain = item['chain']
@@ -298,7 +316,7 @@ class ntx_chain_counts(viewsets.ViewSet):
 
 class ntx_notary_counts(viewsets.ViewSet):
     """
-    API endpoint showing mining max and sum data
+    API endpoint showing Season 3 notarisations count for each notary for a chain. Use notarisations/ntx_notary_counts?notary=[notary_name] (Required)
     """
     serializer_class = ntxSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -312,40 +330,47 @@ class ntx_notary_counts(viewsets.ViewSet):
 
     def get(self, request, format=None):
         """
-        Returns decoded notarisation information from OP_RETURN strings
         """
-        if 'chain' in request.GET:
-            chain = request.GET['chain']
+        if 'notary' in request.GET:
+            notary_name = request.GET['notary']
         else:
-            chain = "KMD"
-        ntx_data = notarised.objects.exclude(opret="unknown").filter(block_time__gte=1563148800, chain=chain).values('notaries').annotate(
-                                                   ntx_count=Count('block_ht'), 
-                                                   first_ntx_block=Min('block_ht'), first_ntx_blocktime=Min('block_time'),
-                                                   last_ntx_block=Max('block_ht'), last_ntx_blocktime=Max('block_time'))
+            return Response({"error":"requires ?notary=notary_name parameter, e.g. /notarisations/ntx_notary_counts/?notary=dragonhound_NA"})
+
+        ntx_data = notarised.objects.exclude(opret="unknown").filter(block_time__gte=1563148800).values('notaries', 'chain', 'block_time', 'block_ht')
         ntx_resp = {}
         for item in ntx_data:
             for notary in item['notaries']:
-                if notary not in ntx_resp:
-                   ntx_resp.update({notary:{
-                        "count":item['ntx_count'],
-                        "first_block":99999999999999,
-                        "last_block":0,
-                        "first_block_time":99999999999999,
-                        "last_block_time":0,
-                    }})
-                else:
-                    count = item['ntx_count']+ntx_resp[notary]["count"]
-                    ntx_resp[notary].update({"count":count})
+                if notary == notary_name:
+                    chain = item['chain']
+                    if notary not in ntx_resp:
+                        ntx_resp.update({notary:{}})
+                    if chain not in ntx_resp[notary]:
+                        ntx_resp[notary].update({
+                            chain:{
+                                "count":1,
+                                "first_block":99999999999999,
+                                "last_block":0,
+                                "first_block_time":99999999999999,
+                                "last_block_time":0,
+                            }
+                        })
+                    else:
+                        count = ntx_resp[notary][chain]["count"]+1
+                        ntx_resp[notary][chain].update({"count":count})
 
-                if item['first_ntx_blocktime'] < ntx_resp[notary]['first_block_time']:
-                    ntx_resp[notary].update({"first_block_time":item['first_ntx_blocktime']})
-                if item['last_ntx_blocktime'] > ntx_resp[notary]['last_block_time']:
-                    ntx_resp[notary].update({"last_block_time":item['last_ntx_blocktime']})
+                    if item['block_time'] < ntx_resp[notary][chain]['first_block_time']:
+                        ntx_resp[notary][chain].update({"first_block_time":item['block_time']})
+                    if item['block_time'] > ntx_resp[notary][chain]['last_block_time']:
+                        ntx_resp[notary][chain].update({"last_block_time":item['block_time']})
 
-                if item['first_ntx_block'] < ntx_resp[notary]['first_block']:
-                    ntx_resp[notary].update({"first_block":item['first_ntx_block']})
-                if item['last_ntx_block'] > ntx_resp[notary]['last_block']:
-                    ntx_resp[notary].update({"last_block":item['last_ntx_block']})
+                    if item['block_ht'] < ntx_resp[notary][chain]['first_block']:
+                        ntx_resp[notary][chain].update({"first_block":item['block_ht']})
+                    if item['block_ht'] > ntx_resp[notary][chain]['last_block']:
+                        ntx_resp[notary][chain].update({"last_block":item['block_ht']})
 
 
-        return Response({chain:ntx_resp})
+        return Response(ntx_resp)
+
+# List chains
+# List notaries
+# list addresses
