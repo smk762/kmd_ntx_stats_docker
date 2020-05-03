@@ -38,11 +38,25 @@ conn = psycopg2.connect(
 )
 cursor = conn.cursor()
 
+table = 'addresses'
+
+cursor.execute("SELECT COUNT(*) FROM "+table+";")
+print(cursor.fetchall())
+
+cursor.execute("TRUNCATE "+table+";")
+conn.commit()
+
+cursor.execute("SELECT COUNT(*) FROM "+table+";")
+print(cursor.fetchall())
+
 for season in address_info:
   for address in address_info[season]:
     print(address_info[season][address]['Notary'])
     row_data = (address_info[season][address]['Notary_id'], address_info[season][address]['Notary'], address, address_info[season][address]['Pubkey'], season)
     add_row_to_addresses_tbl(row_data)
+
+cursor.execute("SELECT COUNT(*) FROM "+table+";")
+print(cursor.fetchall())
 
 cursor.close()
 

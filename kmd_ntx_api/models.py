@@ -45,6 +45,22 @@ class notarised_count(models.Model):
     class Meta:
         db_table = 'notarised_count'
 
+class notarised_chain(models.Model):
+    chain = models.CharField(max_length=64)
+    ntx_count = models.PositiveIntegerField()
+    kmd_ntx_height = models.PositiveIntegerField()
+    kmd_ntx_blockhash = models.CharField(max_length=64)
+    kmd_ntx_txid = models.CharField(max_length=64)
+    lastnotarization = models.PositiveIntegerField()
+    opret = models.CharField(max_length=2048)
+    ac_ntx_block_hash = models.CharField(max_length=64)
+    ac_ntx_height = models.PositiveIntegerField()
+    ac_block_height = models.CharField(max_length=34)
+    ntx_lag = models.CharField(max_length=34)
+
+    class Meta:
+        db_table = 'notarised_chain'
+
 
 class mined(models.Model):
     block = models.PositiveIntegerField()

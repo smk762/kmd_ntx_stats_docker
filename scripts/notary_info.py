@@ -385,17 +385,26 @@ seasons_info = {
             "end_block":1,
             "start_time":1,
             "end_time":1530921600,
+            "notaries":[]
         },
     "Season_2": {
             "start_block":1,
             "end_block":1,
             "start_time":1530921600,
             "end_time":1563148799,
+            "notaries":[]
         },
     "Season_3": {
             "start_block":1,
             "end_block":1,
             "start_time":1563148800,
             "end_time":1751328000,
-        },
+            "notaries":[]
+        }
 }
+for season in notary_pubkeys:
+    for notary in notary_pubkeys[season]:
+        if season.find("Season_3") != -1:
+            seasons_info["Season_3"]['notaries'].append(notary)
+        else:
+            seasons_info[season]['notaries'].append(notary)
