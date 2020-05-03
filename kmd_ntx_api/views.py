@@ -4,6 +4,7 @@ import sys
 import json
 import binascii
 import time
+import requests
 import logging
 import logging.handlers
 from django.db.models import Count, Min, Max, Sum
@@ -64,6 +65,18 @@ def decode_opret(scriptPubKey_asm):
     return { "chain":chain, "prevblock":prev_block_ht, "prevhash":prev_block_hash }
 
 
+third_party_coins = ["AYA", "CHIPS", "EMC2", "GAME", "GIN", 'HUSH3']
+
+antara_coins = ["AXO", "BET", "BOTS", "BTCH", "CCL", "COQUICASH", "CRYPTO", "DEX", "ETOMIC", "HODL", "ILN", "JUMBLR",
+                "K64", "KOIN", "KSB", "KV", "MESH", "MGW", "MORTY", "MSHARK", "NINJA", "OOT", "OUR", "PANGEA", "PGT",
+                "PIRATE", "REVS", "RFOX", "RICK", "SEC", "SUPERNET", "THC", "VOTE2020", "VRSC", "WLC21", "ZEXO",
+                "ZILLA", "STBL"]
+
+ex_antara_coins = ['CHAIN', 'GLXT', 'MCL', 'PRLPAY', 'COMMOD', 'DION',
+                   'EQL', 'CEAL', 'BNTN', 'KMDICE', 'DSEC', "WLC"]
+
+all_antara_coins = antara_coins + ex_antara_coins
+
 s3_notaries = ['alien_AR', 'alien_EU', 'alright_AR', 'and1-89_EU', 'blackjok3r_SH',
                'ca333_DEV', 'chainmakers_EU', 'chainmakers_NA', 'chainstrike_SH',
                'chainzilla_SH', 'chmex_EU', 'cipi_AR', 'cipi_NA', 'computergenie_NA',
@@ -80,6 +93,17 @@ s3_notaries = ['alien_AR', 'alien_EU', 'alright_AR', 'and1-89_EU', 'blackjok3r_S
                'titomane_EU', 'titomane_SH', 'tonyl_AR', 'voskcoin_EU',
                'webworker01_NA', 'webworker01_SH', 'zatjum_SH']
 
+def get_ac_block_heights():
+    ac_block_ht = {}
+    for chain in antara_coins:
+      try:
+        url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/sync'
+        r = requests.get(url)
+        ac_block_ht.update({chain:r.json()['blockChainHeight']})
+      except Exception as e:
+        print(chain+" failed")
+        print(e)
+    return ac_block_ht
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -331,12 +355,13 @@ class ntx_notary_counts(viewsets.ViewSet):
     def get(self, request, format=None):
         """
         """
+        ac_block_ht = get_ac_block_heights()
         if 'notary' in request.GET:
             notary_name = request.GET['notary']
         else:
             return Response({"error":"requires ?notary=notary_name parameter, e.g. /notarisations/ntx_notary_counts/?notary=dragonhound_NA"})
 
-        ntx_data = notarised.objects.exclude(opret="unknown").filter(block_time__gte=1563148800).values('notaries', 'chain', 'block_time', 'block_ht')
+        ntx_data = notarised.objects.exclude(opret="unknown").filter(block_time__gte=1563148800).values('notaries', 'chain', 'block_time', 'block_ht','prev_block_hash', 'prev_block_ht')
         ntx_resp = {}
         for item in ntx_data:
             for notary in item['notaries']:
@@ -352,6 +377,8 @@ class ntx_notary_counts(viewsets.ViewSet):
                                 "last_block":0,
                                 "first_block_time":99999999999999,
                                 "last_block_time":0,
+                                "last_ntx_block_ht":'',
+                                "last_ntx_block_hash":'',
                             }
                         })
                     else:
@@ -362,11 +389,18 @@ class ntx_notary_counts(viewsets.ViewSet):
                         ntx_resp[notary][chain].update({"first_block_time":item['block_time']})
                     if item['block_time'] > ntx_resp[notary][chain]['last_block_time']:
                         ntx_resp[notary][chain].update({"last_block_time":item['block_time']})
+                        ntx_resp[notary][chain].update({"last_ntx_block_ht":item['prev_block_ht']})
+                        ntx_resp[notary][chain].update({"last_ntx_block_hash":item['prev_block_hash']})
+                        try:
+                            ntx_resp[notary][chain].update({"ntx_lag":ac_block_ht[chain]-item['prev_block_ht']})
+                        except:
+                            ntx_resp[notary][chain].update({"ntx_lag":"No data"})
 
                     if item['block_ht'] < ntx_resp[notary][chain]['first_block']:
                         ntx_resp[notary][chain].update({"first_block":item['block_ht']})
                     if item['block_ht'] > ntx_resp[notary][chain]['last_block']:
                         ntx_resp[notary][chain].update({"last_block":item['block_ht']})
+
 
 
         return Response(ntx_resp)
