@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-import logging
-import logging.handlers
-from notary_info import address_info
-from dotenv import load_dotenv
-import psycopg2
 import bitcoin
 from bitcoin.core import x
 from bitcoin.core import CoreMainParams
@@ -62,78 +57,17 @@ coin_params = {
 }
 third_party = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA', 'KMD']
 
-
-# http://kmd.explorer.dexstats.info/insight-api-komodo/addr/RNJmgYaFF5DbnrNUX6pMYz9rcnDKC2tuAc
-
-def add_row_to_addresses_tbl(row_data):
-    try:
-        sql = "INSERT INTO addresses"
-        sql = sql+" (season, notary_name, notary_id, coin, pubkey, address)"
-        sql = sql+" VALUES (%s, %s, %s, %s, %s, %s)"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        logger.debug(e)
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-logger = logging.getLogger()
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
-load_dotenv()
-
-conn = psycopg2.connect(
-  host='localhost',
-  user='postgres',
-  password='postgres',
-  port = "7654",
-  database='postgres'
-)
-cursor = conn.cursor()
-
-table = 'addresses'
-
-cursor.execute("SELECT COUNT(*) FROM "+table+";")
-print(cursor.fetchall())
-
-cursor.execute("TRUNCATE "+table+";")
-conn.commit()
-
-cursor.execute("SELECT COUNT(*) FROM "+table+";")
-print(cursor.fetchall())
-
 addresses = {}
-
 for season in notary_pubkeys:
     addresses.update({season:{}})
-    notary_id = 0
     for notary in notary_pubkeys[season]:
         if notary not in addresses:
             addresses[season].update({notary:{}})
         for coin in coin_params:
             bitcoin.params = coin_params[coin]
-            pubkey = notary_pubkeys[season][notary]
-            address = str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
-            addresses[season][notary].update({coin:address})
-for season in addresses:
-    for notary in addresses[season]:
-        for coin in addresses[season][notary]:
-            address = addresses[season][notary][coin]
-            kmd_addr = addresses[season][notary]["KMD"]
-            notary_id = address_info[season][kmd_addr]['Notary_id']
-            row_data = (season, notary, notary_id, coin, pubkey, address)
-            add_row_to_addresses_tbl(row_data)
+            addr = str(P2PKHBitcoinAddress.from_pubkey(x(notary_pubkeys[season][notary])))
+            addresses[season][notary].update({coin:addr})
+            
+print(addresses["Season_3"]["dragonhound_NA"])
+print(addresses["Season_3_Third_Party"]["dragonhound_NA"])
 
-cursor.execute("SELECT COUNT(*) FROM "+table+";")
-print(cursor.fetchall())
-
-cursor.close()
-
-conn.close()

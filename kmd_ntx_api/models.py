@@ -2,16 +2,17 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField, JSONField
 
 class addresses(models.Model):
-    notary_id = models.PositiveIntegerField()
+    season = models.CharField(max_length=34)
     notary_name = models.CharField(max_length=34)
+    notary_id = models.PositiveIntegerField()
+    coin = models.CharField(max_length=34)
     address = models.CharField(max_length=34)
     pubkey = models.CharField(max_length=66)
-    season = models.CharField(max_length=34)
 
     class Meta:
         db_table = 'addresses'
         constraints = [
-            models.UniqueConstraint(fields=['address', "season"], name='unique_season_address')
+            models.UniqueConstraint(fields=['address', "season", "coin"], name='unique_season_coin_address')
         ]
 
 class notarised(models.Model):
