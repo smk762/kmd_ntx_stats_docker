@@ -1,39 +1,16 @@
 #!/usr/bin/env python3
-import os
-import json
-import binascii
 import time
+import json
 import logging
 import logging.handlers
-from notary_info import season_addresses, seasons_info
-from rpclib import def_credentials
-from os.path import expanduser
-from dotenv import load_dotenv
-import psycopg2
-
-startblock = 1444000
-
-third_party_coins = ["AYA", "CHIPS", "EMC2", "GAME", "GIN", 'HUSH3']
-antara_coins = ["AXO", "BET", "BOTS", "BTCH", "CCL", "COQUICASH", "CRYPTO", "DEX", "ETOMIC", "HODL", "ILN", "JUMBLR",
-                "K64", "KOIN", "KSB", "KV", "MESH", "MGW", "MORTY", "MSHARK", "NINJA", "OOT", "OUR", "PANGEA", "PGT",
-                "PIRATE", "REVS", "RFOX", "RICK", "SEC", "SUPERNET", "THC", "VOTE2020", "VRSC", "WLC", "WLC21", "ZEXO",
-                "ZILLA", "STBL"]
-ex_antara_coins = ['CHAIN', 'GLXT', 'MCL', 'PRLPAY', 'COMMOD', 'DION',
-                   'EQL', 'CEAL', 'BNTN', 'KMDICE', 'DSEC']
-all_antara_coins = antara_coins + ex_antara_coins
-
-
-def get_max_col_val_in_table(col, table):
-    sql = "SELECT MAX("+col+") FROM "+table+";"
-    cursor.execute(sql)
-    max_val = cursor.fetchone()
-    logger.info("Max "+col+" value is "+str(max_val))
-    return max_val
+from address_lib import seasons_info
+from coins_lib import third_party_coins, all_antara_coins
+import table_lib
 
 def get_notarised_counts(season):
-    sql = "SELECT chain, notaries FROM notarised WHERE block_time >= "+str(seasons_info[season]['start_time'])+" AND block_time <= "+str(seasons_info[season]['end_time'])+";"
-    cursor.execute(sql)
-    results = cursor.fetchall()
+    results = table_lib.select_from_table(cursor, "notarised", "chain, notaries",
+              "block_time >= "+str(seasons_info[season]['start_time'])+" \
+               AND block_time <= "+str(seasons_info[season]['end_time']))
     results_list = []
     time_stamp = int(time.time())
     for item in results:
@@ -87,18 +64,7 @@ def get_notarised_counts(season):
                     node_counts[notary]['third_party_count'], node_counts[notary]['other_count'], 
                     node_counts[notary]['total_ntx_count'], json.dumps(json_count[notary]), time_stamp, season)
         print("Adding counts for "+notary+" to notarised_count table")
-        add_row_to_notarised_count_tbl(row_data)
-
-
-
-def add_row_to_notarised_count_tbl(row_data):
-        sql = "INSERT INTO notarised_count"
-        sql = sql+" (notary, btc_count, antara_count, third_party_count, other_count, total_ntx_count, json_count, time_stamp, season)"
-        sql = sql+" VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
-        cursor.execute(sql, row_data)
-        conn.commit()
-
-home = expanduser("~")
+        table_lib.add_row_to_notarised_count_tbl(conn, cursor, row_data)
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -106,40 +72,12 @@ formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
-load_dotenv()
 
-conn = psycopg2.connect(
-  host='localhost',
-  user='postgres',
-  password='postgres',
-  port = "7654",
-  database='postgres'
-)
-
+conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-table = 'notarised_count'
-
-cursor.execute("SELECT COUNT(*) FROM "+table+";")
-print(cursor.fetchall())
-
-cursor.execute("TRUNCATE "+table+";")
-conn.commit()
-
-cursor.execute("SELECT COUNT(*) FROM "+table+";")
-print(cursor.fetchall())
-
-for season in seasons_info:
-    results_list = get_notarised_counts(season)
+results_list = get_notarised_counts("Season_3")
 #update_table(results_list)
 
-sql = "SELECT * FROM notarised_count"
-cursor.execute(sql)
-print(cursor.fetchall())
-
-cursor.execute("SELECT COUNT(*) FROM "+table+";")
-print(cursor.fetchall())
-
-cursor.close();
-
-conn.close();
+cursor.close()
+conn.close()

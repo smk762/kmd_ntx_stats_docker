@@ -6,24 +6,14 @@ import binascii
 import time
 import logging
 import logging.handlers
-from notary_pubkeys import known_addresses
-from notary_info import notary_info, address_info, seasons_info
+from address_lib import notary_info, seasons_info, known_addresses
 from rpclib import def_credentials
 from os.path import expanduser
 from dotenv import load_dotenv
 import psycopg2
 from decimal import *
 from psycopg2.extras import execute_values
-
-
-third_party_coins = ["AYA", "CHIPS", "EMC2", "GAME", "GIN", 'HUSH3']
-antara_coins = ["AXO", "BET", "BOTS", "BTCH", "CCL", "COQUICASH", "CRYPTO", "DEX", "ETOMIC", "HODL", "ILN", "JUMBLR",
-                "K64", "KOIN", "KSB", "KV", "MESH", "MGW", "MORTY", "MSHARK", "NINJA", "OOT", "OUR", "PANGEA", "PGT",
-                "PIRATE", "REVS", "RFOX", "RICK", "SEC", "SUPERNET", "THC", "VOTE2020", "VRSC", "WLC", "WLC21", "ZEXO",
-                "ZILLA", "STBL"]
-ex_antara_coins = ['CHAIN', 'GLXT', 'MCL', 'PRLPAY', 'COMMOD', 'DION',
-                   'EQL', 'CEAL', 'BNTN', 'KMDICE', 'DSEC']
-all_antara_coins = antara_coins + ex_antara_coins
+from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
 
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])

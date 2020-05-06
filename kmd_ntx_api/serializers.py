@@ -19,6 +19,16 @@ class AddressesSerializer(serializers.HyperlinkedModelSerializer):
         model = addresses
         fields = ['notary_id', 'notary_name', 'address', 'pubkey', 'season']
 
+class RewardsSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = rewards
+        fields = ['address', 'notary', 'utxo_count', 'eligible_utxo_count', 'oldest_utxo_block', 'balance', 'rewards', 'update_time']
+
+class BalancesSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = balances
+        fields = ['notary', 'chain', 'balance', 'address', 'update_time']
+
 class MinedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = mined

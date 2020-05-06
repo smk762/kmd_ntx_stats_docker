@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import ArrayField, JSONField
 class addresses(models.Model):
     season = models.CharField(max_length=34)
     notary_name = models.CharField(max_length=34)
-    notary_id = models.PositiveIntegerField()
+    notary_id = models.CharField(max_length=34)
     coin = models.CharField(max_length=34)
     address = models.CharField(max_length=34)
     pubkey = models.CharField(max_length=66)
@@ -45,6 +45,10 @@ class notarised_count(models.Model):
 
     class Meta:
         db_table = 'notarised_count'
+        constraints = [
+            models.UniqueConstraint(fields=['notary', "season"], name='unique_notary_season')
+        ]
+
 
 class notarised_chain(models.Model):
     chain = models.CharField(max_length=64)
@@ -61,6 +65,9 @@ class notarised_chain(models.Model):
 
     class Meta:
         db_table = 'notarised_chain'
+        constraints = [
+            models.UniqueConstraint(fields=['chain'], name='unique_chain')
+        ]
 
 
 class mined(models.Model):
@@ -89,6 +96,38 @@ class mined_count(models.Model):
 
     class Meta:
         db_table = 'mined_count'
+        constraints = [
+            models.UniqueConstraint(fields=['notary', 'season'], name='unique_notary_season_mined')
+        ]
+
+class balances(models.Model):
+    notary = models.CharField(max_length=34)
+    chain = models.CharField(max_length=34)
+    balance = models.DecimalField(max_digits=18, decimal_places=8)
+    address = models.CharField(max_length=34)
+    update_time = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = 'balances'
+        constraints = [
+            models.UniqueConstraint(fields=['notary', 'chain', 'address'], name='unique_notary_chain_addr_balance')
+        ]
+
+class rewards(models.Model):
+    address = models.CharField(max_length=34)
+    notary = models.CharField(max_length=34)
+    utxo_count = models.PositiveIntegerField()
+    eligible_utxo_count = models.PositiveIntegerField()
+    oldest_utxo_block = models.PositiveIntegerField()
+    balance = models.DecimalField(max_digits=18, decimal_places=8)
+    rewards = models.DecimalField(max_digits=18, decimal_places=8)
+    update_time = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = 'rewards'
+        constraints = [
+            models.UniqueConstraint(fields=['address'], name='unique_reward_address')
+        ]
 
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"

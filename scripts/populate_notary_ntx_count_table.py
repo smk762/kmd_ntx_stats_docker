@@ -5,7 +5,7 @@ import binascii
 import time
 import logging
 import logging.handlers
-from notary_info import season_addresses, seasons_info
+from address_lib import seasons_info
 from rpclib import def_credentials
 from os.path import expanduser
 from dotenv import load_dotenv

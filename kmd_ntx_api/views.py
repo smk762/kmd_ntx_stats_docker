@@ -19,6 +19,31 @@ from rest_framework.response import Response
 from rest_framework import filters, generics, viewsets, permissions, authentication, mixins
 from rest_framework.renderers import TemplateHTMLRenderer
 
+# Need to confirm and fill this in correctly later...
+seasons_info = {
+    "Season_1": {
+            "start_block":1,
+            "end_block":1,
+            "start_time":1,
+            "end_time":1530921600,
+            "notaries":[]
+        },
+    "Season_2": {
+            "start_block":1,
+            "end_block":1,
+            "start_time":1530921600,
+            "end_time":1563148799,
+            "notaries":[]
+        },
+    "Season_3": {
+            "start_block":1,
+            "end_block":1,
+            "start_time":1563148800,
+            "end_time":1751328000,
+            "notaries":[]
+        }
+}
+
 noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
 
 def get_ticker(scriptPubKeyBinary):
@@ -148,6 +173,65 @@ class ntxViewSet(viewsets.ModelViewSet):
     ordering_fields = ['block_time']
     ordering = ['-block_time']
 
+class balancesViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint Notary balances 
+    """
+    queryset = balances.objects.all()
+    serializer_class = BalancesSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['chain', 'notary']
+    ordering_fields = ['chain', 'notary']
+    ordering = ['notary']
+
+class s3_notary_balances(viewsets.ViewSet):
+    """
+    API endpoint showing mining max and sum data
+    """
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        Returns decoded notarisation information from OP_RETURN strings
+        """
+        balances_resp = {}
+        s3_notaries = addresses.objects.filter(season="Season_3").values('notary_name')
+        notary_list = []
+
+        for item in s3_notaries:
+            notary_list.append(item['notary_name'])
+
+        notary_balances = balances.objects.values()
+        for item in notary_balances:
+            notary = item['notary']
+            if notary in notary_list:
+                if notary not in balances_resp:
+                    balances_resp.update({notary:{}})
+                address = item['address']
+                if address not in balances_resp[notary]:
+                    balances_resp[notary].update({address:{}})
+                chain = item['chain']
+                balance = item['balance']
+                balances_resp[notary][address].update({chain:balance})
+        return Response(balances_resp)
+
+class rewardsViewSet(viewsets.ModelViewSet):
+    """
+    API pending KMD rewards for notaries
+    """
+    queryset = rewards.objects.all()
+    serializer_class = RewardsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['notary']
+    ordering_fields = ['notary']
+    ordering = ['notary']
+
+
 class decodeOpRetViewSet(viewsets.ViewSet):
     """
     Decodes notarization OP_RETURN strings.
@@ -191,11 +275,11 @@ class s3_mining_stats(viewsets.ViewSet):
         """
         Returns decoded notarisation information from OP_RETURN strings
         """
-        s3_mined_aggregates = mined.objects.filter(block_time__gte=1563148800).values('name').annotate(
+        s3_mined_aggregates = mined.objects.filter(block_time__gte=seasons_info["Season_3"]['start_time']).values('name').annotate(
                                                    mined_count=Count('value'), mined_sum=Sum('value'), 
                                                    first_mined_block=Min('block'), first_mined_blocktime=Min('block_time'),
                                                    last_mined_block=Max('block'), last_mined_blocktime=Max('block_time'))
-        s3_addresses = addresses.objects.filter(season="Season_3").values("notary_name","address")
+        s3_addresses = addresses.objects.filter(season="Season_3", coin="KMD").values("notary_name","address")
 
         s3_notary_addr = {}
         for item in s3_addresses:
@@ -217,6 +301,24 @@ class s3_mining_stats(viewsets.ViewSet):
                 })
 
         return Response(s3_notary_mined_json)
+
+class s3_mining_stats_db(viewsets.ViewSet):
+    """
+    API endpoint showing mining max and sum data
+    """
+    serializer_class = MinedCountSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        Returns decoded notarisation information from OP_RETURN strings
+        """
+        s3_mined_aggregates = mined_count.objects.filter(blocks_mined__gt=10).values()
+
+        return Response(s3_mined_aggregates)
 
 class notary_addresses_list(viewsets.ViewSet):
     """
@@ -364,7 +466,7 @@ class s3_ntx_notary_counts(viewsets.ViewSet):
         ntx_data = notarised_count.objects.filter(season="Season_3").values()
         return Response(ntx_data)
 
-# List chains
-# List notaries
-# list addresses (include 3P)
 # list balances (via electrum incl. 3P)
+# calc notary ntx percentage
+# daily notary summary (ntx and mining)
+
