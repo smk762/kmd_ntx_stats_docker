@@ -17,7 +17,12 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class AddressesSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = addresses
-        fields = ['notary_id', 'notary_name', 'address', 'pubkey', 'season']
+        fields = ['notary_id', 'notary_name', 'address', 'chain', 'pubkey', 'season']
+
+class CoinsSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = coins
+        fields = ['chain', 'coins_info', 'electrums', 'electrums_ssl', 'explorers', 'dpow']
 
 class RewardsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

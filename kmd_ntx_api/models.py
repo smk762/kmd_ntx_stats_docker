@@ -5,14 +5,14 @@ class addresses(models.Model):
     season = models.CharField(max_length=34)
     notary_name = models.CharField(max_length=34)
     notary_id = models.CharField(max_length=34)
-    coin = models.CharField(max_length=34)
+    chain = models.CharField(max_length=34)
     address = models.CharField(max_length=34)
     pubkey = models.CharField(max_length=66)
 
     class Meta:
         db_table = 'addresses'
         constraints = [
-            models.UniqueConstraint(fields=['address', "season", "coin"], name='unique_season_coin_address')
+            models.UniqueConstraint(fields=['address', "season", "chain"], name='unique_season_chain_address')
         ]
 
 class notarised(models.Model):
@@ -127,6 +127,21 @@ class rewards(models.Model):
         db_table = 'rewards'
         constraints = [
             models.UniqueConstraint(fields=['address'], name='unique_reward_address')
+        ]
+
+class coins(models.Model):
+    chain = models.CharField(max_length=34)
+    coins_info = JSONField()
+    electrums = JSONField()
+    electrums_ssl = JSONField()
+    explorers = JSONField()
+    dpow = JSONField()
+
+
+    class Meta:
+        db_table = 'coins'
+        constraints = [
+            models.UniqueConstraint(fields=['chain'], name='unique_chain_coin')
         ]
 
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"

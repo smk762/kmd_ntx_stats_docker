@@ -92,8 +92,11 @@ def add_row_to_notarised_chain_tbl(conn, cursor, row_data):
 def add_row_to_addresses_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO addresses \
-              (season, notary_name, notary_id, coin, pubkey, address) \
-               VALUES (%s, %s, %s, %s, %s, %s)"
+              (season, notary_name, notary_id, chain, pubkey, address) \
+               VALUES (%s, %s, %s, %s, %s, %s) \
+               ON CONFLICT ON CONSTRAINT unique_season_chain_address DO UPDATE SET \
+               notary_name='"+str(row_data[1])+"', pubkey='"+str(row_data[4])+"', \
+               address='"+str(row_data[5])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
@@ -185,6 +188,27 @@ def update_balances_tbl(conn, cursor, row_data):
             ON CONFLICT ON CONSTRAINT unique_notary_chain_addr_balance DO UPDATE SET \
             balance="+str(row_data[2])+", \
             update_time="+str(row_data[4])+";"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_coins_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO coins \
+            (chain, coins_info, electrums, electrums_ssl, explorers, dpow) \
+            VALUES (%s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_coin DO UPDATE SET \
+            coins_info='"+str(row_data[1])+"', \
+            electrums='"+str(row_data[2])+"', \
+            electrums_ssl='"+str(row_data[3])+"', \
+            explorers='"+str(row_data[4])+"', \
+            dpow='"+str(row_data[5])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
