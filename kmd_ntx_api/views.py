@@ -236,7 +236,7 @@ class s3_notary_balances(viewsets.ViewSet):
         """
         balances_resp = {}
         s3_notaries = addresses.objects.filter(
-                                        season="Season_3"
+                                        season="Season_3.5"
                                         ).order_by(
                                         'notary_name'
                                         ).values(
@@ -248,7 +248,7 @@ class s3_notary_balances(viewsets.ViewSet):
             notary_list.append(item['notary_name'])
 
         notary_balances = balances.objects.all().order_by(
-                                    'notary', 'address', 'chain'
+                                    'notary', 'chain', 'balance'
                                     ).values()
         for item in notary_balances:
             notary = item['notary']
@@ -256,11 +256,11 @@ class s3_notary_balances(viewsets.ViewSet):
                 if notary not in balances_resp:
                     balances_resp.update({notary:{}})
                 address = item['address']
-                if address not in balances_resp[notary]:
-                    balances_resp[notary].update({address:{}})
                 chain = item['chain']
                 balance = item['balance']
-                balances_resp[notary][address].update({chain:balance})
+                if chain not in balances_resp[notary]:
+                    balances_resp[notary].update({chain:{}})
+                balances_resp[notary][chain].update({address:balance})
         return Response(balances_resp)
 
 class rewardsViewSet(viewsets.ModelViewSet):
@@ -346,24 +346,6 @@ class s3_mining_stats(viewsets.ViewSet):
 
         return Response(s3_notary_mined_json)
 
-class s3_mining_stats_db(viewsets.ViewSet):
-    """
-    API endpoint showing mining max and sum data
-    """
-    serializer_class = MinedCountSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def create(self, validated_data):
-        return Task(id=None, **validated_data)
-
-    def get(self, request, format=None):
-        """
-        Returns decoded notarisation information from OP_RETURN strings
-        """
-        s3_mined_aggregates = mined_count.objects.filter(blocks_mined__gt=10).values()
-
-        return Response(s3_mined_aggregates)
-
 class notary_addresses_list(viewsets.ViewSet):
     """
     API endpoint showing mining max and sum data
@@ -409,6 +391,52 @@ class notary_addresses_list(viewsets.ViewSet):
                 notary_json[season][notary]["addresses"].update({chain:address})
         return Response(notary_json)
 
+class s3_notary_addresses_list(viewsets.ViewSet):
+    """
+    API endpoint showing mining max and sum data
+    """
+    serializer_class = AddressesSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['notary_name', 'season', 'chain']
+    ordering_fields = ['season', 'notary_name', 'chain']
+    ordering = ['-season', 'notary_name', 'chain']
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        Returns notary addresses grouped by season > notary > chain
+        """
+
+        notary_addresses = addresses.objects.all().order_by(
+                            "-season", "notary_name", "chain"
+                            ).values(
+                            'season', 'notary_name', 'notary_id', 
+                            'chain', 'address', 'pubkey'
+                            )
+        notary_json = {}
+        for item in notary_addresses:
+            season = item["season"]
+            if season.find("_3") != -1:
+                notary = item["notary_name"]
+                notary_id = item["notary_id"]
+                pubkey = item["pubkey"]
+                chain = item["chain"]
+                address = item["address"]
+                if season not in notary_json:
+                    notary_json.update({season:{}})
+                if notary not in notary_json[season]:
+                    notary_json[season].update({notary:{
+                        "notary_id":notary_id,
+                        "pubkey":pubkey,
+                        "addresses":{chain:address}
+                    }})
+                else:
+                    notary_json[season][notary]["addresses"].update({chain:address})
+        return Response(notary_json)
+
 class notary_names_list(viewsets.ViewSet):
     """
     API endpoint showing mining max and sum data
@@ -432,7 +460,38 @@ class notary_names_list(viewsets.ViewSet):
         for item in notary_addresses:
             if item['season'] not in notaries_list:
                 notaries_list[item['season']] = []
-            notaries_list[item['season']].append(item['notary_name'])
+            if item['notary_name'] not in notaries_list[item['season']]:
+                notaries_list[item['season']].append(item['notary_name'])
+            
+        return Response(notaries_list)
+
+class s3_notary_names_list(viewsets.ViewSet):
+    """
+    API endpoint showing mining max and sum data
+    """
+    serializer_class = AddressesSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['season']
+    ordering_fields = ['season', 'notary_name']
+    ordering = ['-season']
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        Returns decoded notarisation information from OP_RETURN strings
+        """
+        notary_addresses = addresses.objects.values('notary_name', 'season')
+        notaries_list = {}
+        for item in notary_addresses:
+            if item['season'].find("Season_3") != -1:
+                if item['season'] not in notaries_list:
+                    notaries_list[item['season']] = []
+                if item['notary_name'] not in notaries_list[item['season']]:
+                    notaries_list[item['season']].append(item['notary_name'])
+            
         return Response(notaries_list)
 
 class s3_ntx_chain_counts(viewsets.ViewSet):
@@ -470,34 +529,6 @@ class s3_ntx_chain_counts(viewsets.ViewSet):
 
         return Response(ntx_json)
 
-class s3_ntx_chains_list(viewsets.ViewSet):
-    """
-    API endpoint listing Season 3 chains categorised by server
-    """
-    serializer_class = ntxSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-
-    def create(self, validated_data):
-        return Task(id=None, **validated_data)
-
-    def get(self, request, format=None):
-        """
-        """
-        ntx_data = notarised_chain.objects.exclude(chain="no_vin").values()
-        ntx_json = {
-            "main_server":[],
-            "third_party_server":[]
-        }
-
-        for item in ntx_data:
-            if item['chain'] in third_party_chains:
-                ntx_json["third_party_server"].append(item['chain'])
-            else:
-                ntx_json["main_server"].append(item['chain'])
-
-        return Response(ntx_json)
-
 class s3_ntx_notary_counts(viewsets.ViewSet):
     """
     API endpoint showing Season 3 notarisations count for each chain. Use notarisations/ntx_chain_counts?chain=[chain_tag] (defaults to KMD)
@@ -529,8 +560,19 @@ class s3_dpow_coins(viewsets.ViewSet):
     def get(self, request, format=None):
         """
         """
+        coins_resp = {}
         coins_data = coins.objects.exclude(dpow={}).values()
-        return Response(coins_data)
+        for item in coins_data:
+            coins_resp.update({
+                item["chain"]:{
+                    "coins_info":item["coins_info"],
+                    "dpow":item["dpow"],
+                    "explorers":item["explorers"],
+                    "electrums":item["electrums"],
+                    "electrums_ssl":item["electrums_ssl"]
+                }
+            })
+        return Response(coins_resp)
 
 class mm2_coins(viewsets.ViewSet):
     """
@@ -546,14 +588,22 @@ class mm2_coins(viewsets.ViewSet):
     def get(self, request, format=None):
         """
         """
-        mm2_data = []
+        coins_resp = {}
         coins_data = coins.objects.values()
         for item in coins_data:
             if 'mm2' in item["coins_info"]:
                 if item["coins_info"]['mm2'] == 1:
-                    mm2_data.append(item)
+                    coins_resp.update({
+                        item["chain"]:{
+                            "coins_info":item["coins_info"],
+                            "dpow":item["dpow"],
+                            "explorers":item["explorers"],
+                            "electrums":item["electrums"],
+                            "electrums_ssl":item["electrums_ssl"]
+                        }
+                    })
 
-        return Response(mm2_data)
+        return Response(coins_resp)
 
 class coin_electrums(viewsets.ViewSet):
     """
@@ -569,8 +619,22 @@ class coin_electrums(viewsets.ViewSet):
     def get(self, request, format=None):
         """
         """
+        coins_resp = {}
         coins_data = coins.objects.exclude(electrums=[], electrums_ssl=[], ).values()
-        return Response(coins_data)
+        for item in coins_data:
+            if 'mm2' in item["coins_info"]:
+                if item["coins_info"]['mm2'] == 1:
+                    coins_resp.update({
+                        item["chain"]:{
+                            "coins_info":item["coins_info"],
+                            "dpow":item["dpow"],
+                            "explorers":item["explorers"],
+                            "electrums":item["electrums"],
+                            "electrums_ssl":item["electrums_ssl"]
+                        }
+                    })
+
+        return Response(coins_resp)
 
 
 class coin_explorers(viewsets.ViewSet):
@@ -587,8 +651,22 @@ class coin_explorers(viewsets.ViewSet):
     def get(self, request, format=None):
         """
         """
+        coins_resp = {}
         coins_data = coins.objects.exclude(explorers=[]).values()
-        return Response(coins_data)
+        for item in coins_data:
+            if 'mm2' in item["coins_info"]:
+                if item["coins_info"]['mm2'] == 1:
+                    coins_resp.update({
+                        item["chain"]:{
+                            "coins_info":item["coins_info"],
+                            "dpow":item["dpow"],
+                            "explorers":item["explorers"],
+                            "electrums":item["electrums"],
+                            "electrums_ssl":item["electrums_ssl"]
+                        }
+                    })
+
+        return Response(coins_resp)
 
 # list balances (via electrum incl. 3P)
 # calc notary ntx percentage
