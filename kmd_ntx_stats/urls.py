@@ -21,6 +21,8 @@ router.register(r'info/s3_notary_balances', views.s3_notary_balances, basename='
 router.register(r'info/coins', views.coinsViewSet)
 router.register(r'info/s3_dpow_coins', views.s3_dpow_coins, basename='s3_dpow_coins')
 router.register(r'info/mm2_coins', views.mm2_coins, basename='mm2_coins')
+router.register(r'info/coin_electrums', views.coin_electrums, basename='coin_electrums')
+router.register(r'info/coin_explorers', views.coin_explorers, basename='coin_explorers')
 router.register(r'info/notary_kmd_rewards', views.rewardsViewSet)
 router.register(r'info/notary_names_list', views.notary_names_list, basename='notary_names_list')
 router.register(r'tools/decode_opret', views.decodeOpRetViewSet, basename='decode_opret')
