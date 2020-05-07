@@ -3,6 +3,7 @@ import bitcoin
 from bitcoin.core import x
 from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
+from coins_lib import antara_coins
 
 class KMD_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
@@ -55,6 +56,9 @@ coin_params = {
     "GAME": GAME_CoinParams,
     "GIN": GIN_CoinParams,
 }
+
+for coin in antara_coins:
+    coin_params.update({coin:KMD_CoinParams})
 
 # Update this each season change
 notary_pubkeys = {

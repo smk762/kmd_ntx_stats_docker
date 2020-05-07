@@ -19,6 +19,19 @@ from rest_framework.response import Response
 from rest_framework import filters, generics, viewsets, permissions, authentication, mixins
 from rest_framework.renderers import TemplateHTMLRenderer
 
+def filter_include_timespan(table, start, end):
+    return table.objects.filter(block_time__gte=start, block_time__lte=end)
+
+def filter_exclude_timespan(table, start, end):
+    return table.objects.exclude(block_time__gte=start, block_time__lte=end)
+
+def filter_include_blocks(table, start, end):
+    return table.objects.filter(block_ht__gte=start, block_ht__lte=end)
+
+def filter_exclude_blocks(table, start, end):
+    return table.objects.exclude(block_ht__gte=start, block_ht__lte=end)
+
+
 # Need to confirm and fill this in correctly later...
 seasons_info = {
     "Season_1": {
@@ -90,17 +103,17 @@ def decode_opret(scriptPubKey_asm):
     return { "chain":chain, "prevblock":prev_block_ht, "prevhash":prev_block_hash }
 
 
-third_party_coins = ["AYA", "CHIPS", "EMC2", "GAME", "GIN", 'HUSH3']
+third_party_chains = ["AYA", "CHIPS", "EMC2", "GAME", "GIN", 'HUSH3']
 
-antara_coins = ["AXO", "BET", "BOTS", "BTCH", "CCL", "COQUICASH", "CRYPTO", "DEX", "ETOMIC", "HODL", "ILN", "JUMBLR",
+antara_chains = ["AXO", "BET", "BOTS", "BTCH", "CCL", "COQUICASH", "CRYPTO", "DEX", "ETOMIC", "HODL", "ILN", "JUMBLR",
                 "K64", "KOIN", "KSB", "KV", "MESH", "MGW", "MORTY", "MSHARK", "NINJA", "OOT", "OUR", "PANGEA", "PGT",
                 "PIRATE", "REVS", "RFOX", "RICK", "SEC", "SUPERNET", "THC", "VOTE2020", "VRSC", "WLC21", "ZEXO",
                 "ZILLA", "STBL"]
 
-ex_antara_coins = ['CHAIN', 'GLXT', 'MCL', 'PRLPAY', 'COMMOD', 'DION',
+ex_antara_chains = ['CHAIN', 'GLXT', 'MCL', 'PRLPAY', 'COMMOD', 'DION',
                    'EQL', 'CEAL', 'BNTN', 'KMDICE', 'DSEC', "WLC"]
 
-all_antara_coins = antara_coins + ex_antara_coins
+all_antara_chains = antara_chains + ex_antara_chains
 
 s3_notaries = ['alien_AR', 'alien_EU', 'alright_AR', 'and1-89_EU', 'blackjok3r_SH',
                'ca333_DEV', 'chainmakers_EU', 'chainmakers_NA', 'chainstrike_SH',
@@ -121,7 +134,7 @@ s3_notaries = ['alien_AR', 'alien_EU', 'alright_AR', 'and1-89_EU', 'blackjok3r_S
 def get_ac_block_heights():
     print("Getting AC block heights from electrum")
     ac_block_ht = {}
-    for chain in antara_coins:
+    for chain in antara_chains:
       try:
         url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/sync'
         r = requests.get(url)
@@ -160,7 +173,6 @@ class MinedViewSet(viewsets.ModelViewSet):
     ordering_fields = ['block']
     ordering = ['-block']
 
-
 class ntxViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing notarisations table data
@@ -172,6 +184,30 @@ class ntxViewSet(viewsets.ModelViewSet):
     filterset_fields = ['chain']
     ordering_fields = ['block_time']
     ordering = ['-block_time']
+
+class coinsViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing notarisations table data
+    """
+    queryset = coins.objects.all()
+    serializer_class = CoinsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['chain']
+    ordering_fields = ['chain']
+    ordering = ['chain']
+
+class addressesViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing notarisations table data
+    """
+    queryset = addresses.objects.all()
+    serializer_class = AddressesSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['chain', 'notary_name', 'season']
+    ordering_fields = ['chain', 'notary_name', 'season']
+    ordering = ['-season', 'notary_name', 'chain']
 
 class balancesViewSet(viewsets.ModelViewSet):
     """
@@ -199,13 +235,21 @@ class s3_notary_balances(viewsets.ViewSet):
         Returns decoded notarisation information from OP_RETURN strings
         """
         balances_resp = {}
-        s3_notaries = addresses.objects.filter(season="Season_3").values('notary_name')
+        s3_notaries = addresses.objects.filter(
+                                        season="Season_3"
+                                        ).order_by(
+                                        'notary_name'
+                                        ).values(
+                                        'notary_name'
+                                        )
         notary_list = []
 
         for item in s3_notaries:
             notary_list.append(item['notary_name'])
 
-        notary_balances = balances.objects.values()
+        notary_balances = balances.objects.all().order_by(
+                                    'notary', 'address', 'chain'
+                                    ).values()
         for item in notary_balances:
             notary = item['notary']
             if notary in notary_list:
@@ -279,7 +323,7 @@ class s3_mining_stats(viewsets.ViewSet):
                                                    mined_count=Count('value'), mined_sum=Sum('value'), 
                                                    first_mined_block=Min('block'), first_mined_blocktime=Min('block_time'),
                                                    last_mined_block=Max('block'), last_mined_blocktime=Max('block_time'))
-        s3_addresses = addresses.objects.filter(season="Season_3", coin="KMD").values("notary_name","address")
+        s3_addresses = addresses.objects.filter(season="Season_3", chain="KMD").values("notary_name","address")
 
         s3_notary_addr = {}
         for item in s3_addresses:
@@ -327,26 +371,31 @@ class notary_addresses_list(viewsets.ViewSet):
     serializer_class = AddressesSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['notary_name', 'season']
-    ordering_fields = ['season', 'notary_name']
-    ordering = ['-season']
+    filterset_fields = ['notary_name', 'season', 'chain']
+    ordering_fields = ['season', 'notary_name', 'chain']
+    ordering = ['-season', 'notary_name', 'chain']
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
 
     def get(self, request, format=None):
         """
-        Returns decoded notarisation information from OP_RETURN strings
+        Returns notary addresses grouped by season > notary > chain
         """
 
-        notary_addresses = addresses.objects.values('season', 'notary_name', 'notary_id', 'coin', 'address', 'pubkey')
+        notary_addresses = addresses.objects.all().order_by(
+                            "-season", "notary_name", "chain"
+                            ).values(
+                            'season', 'notary_name', 'notary_id', 
+                            'chain', 'address', 'pubkey'
+                            )
         notary_json = {}
         for item in notary_addresses:
             season = item["season"]
             notary = item["notary_name"]
             notary_id = item["notary_id"]
             pubkey = item["pubkey"]
-            coin = item["coin"]
+            chain = item["chain"]
             address = item["address"]
             if season not in notary_json:
                 notary_json.update({season:{}})
@@ -354,10 +403,10 @@ class notary_addresses_list(viewsets.ViewSet):
                 notary_json[season].update({notary:{
                     "notary_id":notary_id,
                     "pubkey":pubkey,
-                    "addresses":{coin:address}
+                    "addresses":{chain:address}
                 }})
             else:
-                notary_json[season][notary]["addresses"].update({coin:address})
+                notary_json[season][notary]["addresses"].update({chain:address})
         return Response(notary_json)
 
 class notary_names_list(viewsets.ViewSet):
@@ -423,7 +472,7 @@ class s3_ntx_chain_counts(viewsets.ViewSet):
 
 class s3_ntx_chains_list(viewsets.ViewSet):
     """
-    API endpoint listing Season 3 Coins categorised by server
+    API endpoint listing Season 3 chains categorised by server
     """
     serializer_class = ntxSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -442,7 +491,7 @@ class s3_ntx_chains_list(viewsets.ViewSet):
         }
 
         for item in ntx_data:
-            if item['chain'] in third_party_coins:
+            if item['chain'] in third_party_chains:
                 ntx_json["third_party_server"].append(item['chain'])
             else:
                 ntx_json["main_server"].append(item['chain'])
@@ -465,6 +514,46 @@ class s3_ntx_notary_counts(viewsets.ViewSet):
         """
         ntx_data = notarised_count.objects.filter(season="Season_3").values()
         return Response(ntx_data)
+
+class s3_dpow_coins(viewsets.ViewSet):
+    """
+    API endpoint showing Season 3 notarisations count for each chain. Use notarisations/ntx_chain_counts?chain=[chain_tag] (defaults to KMD)
+    """
+    serializer_class = CoinsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        coins_data = coins.objects.exclude(dpow={}).values()
+        return Response(coins_data)
+
+class mm2_coins(viewsets.ViewSet):
+    """
+    API endpoint showing Season 3 notarisations count for each chain. Use notarisations/ntx_chain_counts?chain=[chain_tag] (defaults to KMD)
+    """
+    serializer_class = CoinsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        mm2_data = []
+        coins_data = coins.objects.values()
+        for item in coins_data:
+            if 'mm2' in item["coins_info"]:
+                if item["coins_info"]['mm2'] == 1:
+                    mm2_data.append(item)
+
+        return Response(mm2_data)
 
 # list balances (via electrum incl. 3P)
 # calc notary ntx percentage

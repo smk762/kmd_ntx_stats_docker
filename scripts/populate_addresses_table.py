@@ -19,17 +19,17 @@ cursor = conn.cursor()
 for season in notary_addresses:
     for notary in notary_addresses[season]:
         pubkey = notary_pubkeys[season][notary]
-        for coin in notary_addresses[season][notary]:
-            address = notary_addresses[season][notary][coin]
+        for chain in notary_addresses[season][notary]:
+            address = notary_addresses[season][notary][chain]
             kmd_addr = notary_addresses[season][notary]["KMD"]
             notary_id = address_info[season][kmd_addr]['Notary_id']
-            row_data = (season, notary, notary_id, coin, pubkey, address)
+            row_data = (season, notary, notary_id, chain, pubkey, address)
             result = table_lib.add_row_to_addresses_tbl(conn, cursor, row_data)
             if result == 0:
                 result = "[FAILED]"
             else:
                 result = "[SUCCESS]"
-            print(" | "+result+" | "+pubkey+" | "+address+" | "+season+" | "+notary+" | ")
+            print(" | "+result+" | "+pubkey+" | "+address+" | "+season+" | "+notary+" | "+chain+" | ")
 
 cursor.close()
 
