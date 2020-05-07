@@ -555,6 +555,41 @@ class mm2_coins(viewsets.ViewSet):
 
         return Response(mm2_data)
 
+class coin_electrums(viewsets.ViewSet):
+    """
+    API endpoint showing Season 3 notarisations count for each chain. Use notarisations/ntx_chain_counts?chain=[chain_tag] (defaults to KMD)
+    """
+    serializer_class = CoinsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        coins_data = coins.objects.exclude(electrums=[], electrums_ssl=[], ).values()
+        return Response(coins_data)
+
+
+class coin_explorers(viewsets.ViewSet):
+    """
+    API endpoint showing Season 3 notarisations count for each chain. Use notarisations/ntx_chain_counts?chain=[chain_tag] (defaults to KMD)
+    """
+    serializer_class = CoinsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        coins_data = coins.objects.exclude(explorers=[]).values()
+        return Response(coins_data)
+
 # list balances (via electrum incl. 3P)
 # calc notary ntx percentage
 # daily notary summary (ntx and mining)
