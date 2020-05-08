@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'dynamic_rest',
+    'crispy_forms',
     'kmd_ntx_api',
 ]
 

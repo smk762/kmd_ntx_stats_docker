@@ -75,7 +75,7 @@ for block in unrecorded_blocks:
         est_end = int(100/pct*runtime)
         logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_blocks))+" records added to db \
                  ["+str(runtime)+"/"+str(est_end)+" sec]")
-        execute_values(cursor, "INSERT INTO mined (block, block_time, value, address, name, txid, season) VALUES %s", records)
+        execute_values(cursor, "INSERT INTO mined (block, block_time, block_datetime, value, address, name, txid, season) VALUES %s", records)
         conn.commit()
         records = []
         i += 1
@@ -84,7 +84,7 @@ for block in unrecorded_blocks:
             block_count = cursor.fetchone()
             logger.info("Blocks in database: "+str(block_count[0])+"/"+str(len(all_blocks)))
 
-execute_values(cursor, "INSERT INTO mined (block, block_time, value, address, name, txid, season) VALUES %s", records)
+execute_values(cursor, "INSERT INTO mined (block, block_time, block_datetime, value, address, name, txid, season) VALUES %s", records)
 conn.commit()
 logger.info("Finished!")
 logger.info(str(len(unrecorded_blocks))+" mined blocks added to table")
