@@ -131,6 +131,13 @@ s3_notaries = ['alien_AR', 'alien_EU', 'alright_AR', 'and1-89_EU', 'blackjok3r_S
                'titomane_EU', 'titomane_SH', 'tonyl_AR', 'voskcoin_EU',
                'webworker01_NA', 'webworker01_SH', 'zatjum_SH']
 
+def wrap_api(resp):
+    api_resp = {
+        "count":len(resp),
+        "results":[resp]
+    }
+    return api_resp
+
 def get_ac_block_heights():
     print("Getting AC block heights from electrum")
     ac_block_ht = {}
@@ -152,7 +159,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
 class GroupViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -173,12 +179,48 @@ class MinedViewSet(viewsets.ModelViewSet):
     ordering_fields = ['block']
     ordering = ['-block']
 
+class MinedCountViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing mining table data
+    """
+    queryset = mined_count.objects.all()
+    serializer_class = MinedCountSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['notary', 'season']
+    ordering_fields = ['block']
+    ordering = ['notary']
+
 class ntxViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing notarisations table data
     """
     queryset = notarised.objects.all()
     serializer_class = ntxSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['chain']
+    ordering_fields = ['block_time']
+    ordering = ['-block_time']
+
+class ntxCountViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing notarisations table data
+    """
+    queryset = notarised_count.objects.all()
+    serializer_class = ntxCountSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['chain']
+    ordering_fields = ['block_time']
+    ordering = ['-block_time']
+
+class ntxChainCountViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing notarisations table data
+    """
+    queryset = notarised_chain.objects.all()
+    serializer_class = ntxChainCountSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['chain']
@@ -221,6 +263,18 @@ class balancesViewSet(viewsets.ModelViewSet):
     ordering_fields = ['chain', 'notary']
     ordering = ['notary']
 
+class rewardsViewSet(viewsets.ModelViewSet):
+    """
+    API pending KMD rewards for notaries
+    """
+    queryset = rewards.objects.all()
+    serializer_class = RewardsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['notary']
+    ordering_fields = ['notary']
+    ordering = ['notary']
+
 class s3_notary_balances(viewsets.ViewSet):
     """
     API endpoint showing mining max and sum data
@@ -261,20 +315,8 @@ class s3_notary_balances(viewsets.ViewSet):
                 if chain not in balances_resp[notary]:
                     balances_resp[notary].update({chain:{}})
                 balances_resp[notary][chain].update({address:balance})
-        return Response(balances_resp)
-
-class rewardsViewSet(viewsets.ModelViewSet):
-    """
-    API pending KMD rewards for notaries
-    """
-    queryset = rewards.objects.all()
-    serializer_class = RewardsSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['notary']
-    ordering_fields = ['notary']
-    ordering = ['notary']
-
+        api_resp = wrap_api(balances_resp)
+        return Response(api_resp)
 
 class decodeOpRetViewSet(viewsets.ViewSet):
     """
@@ -305,7 +347,7 @@ class decodeOpRetViewSet(viewsets.ViewSet):
         print("DECODED: "+str(type(decoded)))
         return Response(decoded)
 
-class s3_mining_stats(viewsets.ViewSet):
+class s3_mining(viewsets.ViewSet):
     """
     API endpoint showing mining max and sum data
     """
@@ -341,12 +383,79 @@ class s3_mining_stats(viewsets.ViewSet):
                         "first_mined_blocktime": item['first_mined_blocktime'],
                         "last_mined_block": item['last_mined_block'],
                         "last_mined_blocktime": item['last_mined_blocktime']                        
-                    }
+                    }   
                 })
+        api_resp = wrap_api(s3_notary_mined_json)
+        return Response(api_resp)
 
-        return Response(s3_notary_mined_json)
+def apply_filters(request, serializer, queryset):
+    filter_kwargs = {}
+    for field in serializer.Meta.fields:
+        print(field)
+        print(request.GET)
+        print(str(request.query_params)+"=-=-")
+        print(str(request.query_params.get("name"))+"---")
+        print(str(request.query_params.get(field))+"-+-")
+        print(field)
+        val = request.query_params.get(field, None)
+        if val is not None:
+            filter_kwargs.update({field:val})    
+    print(filter_kwargs)
+    queryset = queryset.filter(**filter_kwargs)
+    return queryset
 
-class notary_addresses_list(viewsets.ViewSet):
+def apply_annotation(request, queryset, **kwargs):
+    return queryset.annotate(**kwargs)
+
+class filter_mined_count(viewsets.ViewSet):
+    """
+    API endpoint showing mining max and sum data
+    """
+    serializer_class = MinedSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        Returns decoded notarisation information from OP_RETURN strings
+        """
+        mined_blocks = mined.objects.all()
+        mined_filtered = apply_filters(request, MinedSerializer, mined_blocks)
+        mined_values = mined_filtered.values('name')
+        mined_aggregates = apply_annotation(request, mined_values, mined_count=Count('value'), mined_sum=Sum('value'), 
+                                                   first_mined_block=Min('block'), first_mined_blocktime=Min('block_time'),
+                                                   last_mined_block=Max('block'), last_mined_blocktime=Max('block_time'))
+        '''
+        .values('name').annotate(
+                                                   mined_count=Count('value'), mined_sum=Sum('value'), 
+                                                   first_mined_block=Min('block'), first_mined_blocktime=Min('block_time'),
+                                                   last_mined_block=Max('block'), last_mined_blocktime=Max('block_time'))'''
+        known_addresses = addresses.objects.filter(chain="KMD").values("notary_name","address")
+
+        notary_addr = {}
+        for item in known_addresses:
+            notary_addr.update({item["notary_name"]:item["address"]})
+
+        notary_mined_json = {}
+        for item in mined_aggregates:
+            if item['name'] in notary_addr:
+                notary_mined_json.update({
+                    item['name']: {
+                        "address": notary_addr[item["name"]],
+                        "mined_count": item['mined_count'],
+                        "mined_sum": item['mined_sum'],
+                        "first_mined_block": item['first_mined_block'],
+                        "first_mined_blocktime": item['first_mined_blocktime'],
+                        "last_mined_block": item['last_mined_block'],
+                        "last_mined_blocktime": item['last_mined_blocktime']                        
+                    }   
+                })
+        api_resp = wrap_api(notary_mined_json)
+        return Response(api_resp)
+
+class notary_addresses(viewsets.ViewSet):
     """
     API endpoint showing mining max and sum data
     """
@@ -389,9 +498,10 @@ class notary_addresses_list(viewsets.ViewSet):
                 }})
             else:
                 notary_json[season][notary]["addresses"].update({chain:address})
-        return Response(notary_json)
+        api_resp = wrap_api(notary_json)
+        return Response(api_resp)
 
-class s3_notary_addresses_list(viewsets.ViewSet):
+class s3_notary_addresses(viewsets.ViewSet):
     """
     API endpoint showing mining max and sum data
     """
@@ -435,9 +545,10 @@ class s3_notary_addresses_list(viewsets.ViewSet):
                     }})
                 else:
                     notary_json[season][notary]["addresses"].update({chain:address})
-        return Response(notary_json)
+        api_resp = wrap_api(notary_json)
+        return Response(api_resp)
 
-class notary_names_list(viewsets.ViewSet):
+class notary_names(viewsets.ViewSet):
     """
     API endpoint showing mining max and sum data
     """
@@ -462,10 +573,10 @@ class notary_names_list(viewsets.ViewSet):
                 notaries_list[item['season']] = []
             if item['notary_name'] not in notaries_list[item['season']]:
                 notaries_list[item['season']].append(item['notary_name'])
+        api_resp = wrap_api(notaries_list)
+        return Response(api_resp)
             
-        return Response(notaries_list)
-
-class s3_notary_names_list(viewsets.ViewSet):
+class s3_notary_names(viewsets.ViewSet):
     """
     API endpoint showing mining max and sum data
     """
@@ -491,14 +602,14 @@ class s3_notary_names_list(viewsets.ViewSet):
                     notaries_list[item['season']] = []
                 if item['notary_name'] not in notaries_list[item['season']]:
                     notaries_list[item['season']].append(item['notary_name'])
-            
-        return Response(notaries_list)
+        api_resp = wrap_api(notaries_list)
+        return Response(api_resp)
 
-class s3_ntx_chain_counts(viewsets.ViewSet):
+class s3_chain_notarisation(viewsets.ViewSet):
     """
     API endpoint showing Season 3 notarisations count for each chain. Use notarisations/ntx_chain_counts?chain=[chain_tag] (defaults to KMD)
     """
-    serializer_class = ntxSerializer
+    serializer_class = ntxChainCountSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
 
@@ -508,7 +619,10 @@ class s3_ntx_chain_counts(viewsets.ViewSet):
     def get(self, request, format=None):
         """
         """
-        ntx_data = notarised_chain.objects.values()
+        ntx_data = notarised_chain.objects.values(
+                                         'chain','ntx_count','kmd_ntx_height','kmd_ntx_blockhash',
+                                         'kmd_ntx_txid','lastnotarization','opret','ac_ntx_block_hash',
+                                         'ac_ntx_height','ac_block_height','ntx_lag')
         ntx_json = {}
         for item in ntx_data:
             ntx_json.update({
@@ -525,11 +639,10 @@ class s3_ntx_chain_counts(viewsets.ViewSet):
                     "ntx_lag": item['ntx_lag']
                 }
             })
+        api_resp = wrap_api(ntx_json)
+        return Response(api_resp)
 
-
-        return Response(ntx_json)
-
-class s3_ntx_notary_counts(viewsets.ViewSet):
+class s3_notarisation(viewsets.ViewSet):
     """
     API endpoint showing Season 3 notarisations count for each chain. Use notarisations/ntx_chain_counts?chain=[chain_tag] (defaults to KMD)
     """
@@ -543,8 +656,12 @@ class s3_ntx_notary_counts(viewsets.ViewSet):
     def get(self, request, format=None):
         """
         """
-        ntx_data = notarised_count.objects.filter(season="Season_3").values()
-        return Response(ntx_data)
+        ntx_data = notarised_count.objects.filter(season="Season_3").order_by('notary').values(
+                                                 'notary','btc_count','antara_count','third_party_count',
+                                                 'other_count','total_ntx_count','chain_ntx_counts',
+                                                 'chain_ntx_pct','time_stamp')
+        api_resp = wrap_api(ntx_data)
+        return Response(api_resp)
 
 class s3_dpow_coins(viewsets.ViewSet):
     """
@@ -572,7 +689,8 @@ class s3_dpow_coins(viewsets.ViewSet):
                     "electrums_ssl":item["electrums_ssl"]
                 }
             })
-        return Response(coins_resp)
+        api_resp = wrap_api(coins_resp)
+        return Response(api_resp)
 
 class mm2_coins(viewsets.ViewSet):
     """
@@ -602,8 +720,8 @@ class mm2_coins(viewsets.ViewSet):
                             "electrums_ssl":item["electrums_ssl"]
                         }
                     })
-
-        return Response(coins_resp)
+        api_resp = wrap_api(coins_resp)
+        return Response(api_resp)
 
 class coin_electrums(viewsets.ViewSet):
     """
@@ -634,8 +752,8 @@ class coin_electrums(viewsets.ViewSet):
                         }
                     })
 
-        return Response(coins_resp)
-
+        api_resp = wrap_api(coins_resp)
+        return Response(api_resp)
 
 class coin_explorers(viewsets.ViewSet):
     """
@@ -666,7 +784,8 @@ class coin_explorers(viewsets.ViewSet):
                         }
                     })
 
-        return Response(coins_resp)
+        api_resp = wrap_api(coins_resp)
+        return Response(api_resp)
 
 # list balances (via electrum incl. 3P)
 # calc notary ntx percentage

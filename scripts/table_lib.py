@@ -2,9 +2,11 @@
 import time
 from dotenv import load_dotenv
 import psycopg2
+from decimal import *
+from rpclib import def_credentials
 import logging
 import logging.handlers
-from address_lib import seasons_info, notary_info
+from address_lib import seasons_info, notary_info, known_addresses
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +22,12 @@ def connect_db():
     )
     return conn
 
-def get_max_col_val_in_table(col, table):
+def get_max_col_val_in_table(cursor, col, table):
     sql = "SELECT MAX("+col+") FROM "+table+";"
     cursor.execute(sql)
     max_val = cursor.fetchone()
-    logger.info("Max "+col+" value is "+str(max_val))
-    return max_val
+    logger.info("Max "+col+" value is "+str(max_val[0]))
+    return max_val[0]
 
 def select_from_table(cursor, table, cols, conditions=None):
     sql = "SELECT "+cols+" FROM "+table
@@ -63,7 +65,7 @@ def delete_from_table(conn, cursor, table, condition=None):
     cursor.execute()
     conn.commit()
 
-def get_latest_chain_ntx_aggregates(cursor):
+def get_s3_chain_ntx_aggregates(cursor):
     sql = "SELECT chain, MAX(block_ht), MAX(block_time), COUNT(*) FROM notarised WHERE block_time >= "+str(seasons_info["Season_3"]["start_time"])+" GROUP BY chain;"
     cursor.execute(sql)
     return cursor.fetchall()
@@ -108,19 +110,22 @@ def add_row_to_addresses_tbl(conn, cursor, row_data):
         conn.rollback()
         return 0
 
-
-def add_row_to_notarised_count_tbl(conn, cursor, row_data):
+def add_row_to_notarised_count_tbl(conn, cursor, row_data): 
+    conf = "btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
+        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
+        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
+        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
     sql = "INSERT INTO notarised_count \
         (notary, btc_count, antara_count, \
         third_party_count, other_count, \
-        total_ntx_count, json_count, \
-        time_stamp, season) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) \
+        total_ntx_count, chain_ntx_counts, \
+        chain_ntx_pct, time_stamp, season) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_notary_season DO UPDATE SET \
         btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
         third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
-        total_ntx_count="+str(row_data[5])+", json_count='"+str(row_data[6])+"', \
-        time_stamp="+str(row_data[7])+";"
+        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
+        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
     cursor.execute(sql, row_data)
     conn.commit()
 
@@ -218,3 +223,52 @@ def update_coins_tbl(conn, cursor, row_data):
             logger.debug(row_data)
         conn.rollback()
         return 0
+
+def update_mined_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO mined \
+            (block, block_time, value, address, name, txid, season) \
+            VALUES (%s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_block DO UPDATE SET \
+            block_time='"+str(row_data[1])+"', \
+            value='"+str(row_data[2])+"', \
+            address='"+str(row_data[3])+"', \
+            name='"+str(row_data[4])+"', \
+            txid='"+str(row_data[5])+"', \
+            season='"+str(row_data[6])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        logger.debug(e)
+        if str(e).find('Duplicate') == -1:
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+
+def get_miner(block):
+    rpc = {}
+    rpc["KMD"] = def_credentials("KMD")
+    blockinfo = rpc["KMD"].getblock(str(block), 2)
+    blocktime = blockinfo['time']
+    for tx in blockinfo['tx']:
+        if len(tx['vin']) > 0:
+            if 'coinbase' in tx['vin'][0]:
+                if 'addresses' in tx['vout'][0]['scriptPubKey']:
+                    address = tx['vout'][0]['scriptPubKey']['addresses'][0]
+                    if address in known_addresses:
+                        name = known_addresses[address]
+                    else:
+                        name = address
+                else:
+                    address = "N/A"
+                    name = "non-standard"
+                for season_num in seasons_info:
+                    if blocktime < seasons_info[season_num]['end_time']:
+                        season = season_num
+                        break
+
+                value = tx['vout'][0]['value']
+                row_data = (block, blocktime, Decimal(value), address, name, tx['txid'], season)
+                return row_data

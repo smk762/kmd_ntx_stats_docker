@@ -39,7 +39,8 @@ class notarised_count(models.Model):
     third_party_count = models.PositiveIntegerField()
     other_count = models.PositiveIntegerField()
     total_ntx_count = models.PositiveIntegerField()
-    json_count = JSONField()
+    chain_ntx_counts = JSONField()
+    chain_ntx_pct = JSONField()
     time_stamp = models.PositiveIntegerField()
     season = models.CharField(max_length=34)
 
@@ -48,7 +49,6 @@ class notarised_count(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['notary', "season"], name='unique_notary_season')
         ]
-
 
 class notarised_chain(models.Model):
     chain = models.CharField(max_length=64)
@@ -69,7 +69,6 @@ class notarised_chain(models.Model):
             models.UniqueConstraint(fields=['chain'], name='unique_chain')
         ]
 
-
 class mined(models.Model):
     block = models.PositiveIntegerField()
     block_time = models.PositiveIntegerField()
@@ -77,6 +76,7 @@ class mined(models.Model):
     address = models.CharField(max_length=34)
     name = models.CharField(max_length=34)
     txid = models.CharField(max_length=64)
+    season = models.CharField(max_length=34)
 
     class Meta:
         db_table = 'mined'
