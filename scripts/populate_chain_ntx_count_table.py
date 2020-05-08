@@ -16,7 +16,7 @@ logger.setLevel(logging.INFO)
 def calc_chain_notarised_counts():
     conn = table_lib.connect_db()
     cursor = conn.cursor()
-    chains_aggr_resp = table_lib.get_latest_chain_ntx_aggregates(cursor)
+    chains_aggr_resp = table_lib.get_s3_chain_ntx_aggregates(cursor)
 
     ac_block_heights = get_ac_block_heights()
 

@@ -17,7 +17,6 @@ logger.setLevel(logging.INFO)
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 update_time = int(time.time())
-print(notary_addresses)
 for season in notary_addresses:
     for notary in notary_addresses[season]:
         for chain in notary_addresses[season][notary]:

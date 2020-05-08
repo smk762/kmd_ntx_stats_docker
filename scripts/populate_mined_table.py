@@ -16,48 +16,50 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-def get_miner(block):
-    blockinfo = rpc["KMD"].getblock(str(block), 2)
-    blocktime = blockinfo['time']
-    for tx in blockinfo['tx']:
-        if len(tx['vin']) > 0:
-            if 'coinbase' in tx['vin'][0]:
-                if 'addresses' in tx['vout'][0]['scriptPubKey']:
-                    address = tx['vout'][0]['scriptPubKey']['addresses'][0]
-                    if address in known_addresses:
-                        name = known_addresses[address]
-                    else:
-                        name = address
-                else:
-                    address = "N/A"
-                    name = "non-standard"
+''' 
+This script is intended to run as a cronjob every 5-15 minutes.
+It rescans the last 100 blocks in the database (configurable with "scan_depth" variable) to realign potential orphaned blocks in the database
+Next, it retrieves info from the block chain for blocks not yet in the database and updates the mined table.
+Lastly, it updates the mined_counts table with aggregated stats for each notar season.
 
-                value = tx['vout'][0]['value']
-                row_data = (block, blocktime, Decimal(value), address, name, tx['txid'])
-                return row_data
+'''
+scan_depth = 100
 
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-
-
 rpc = {}
 rpc["KMD"] = def_credentials("KMD")
 
-recorded_blocks = []
-cursor.execute("SELECT block from mined;")
-existing_blocks = cursor.fetchall()
-cursor.execute("SELECT MAX(block) from mined;")
-max_block = cursor.fetchone()
+# Scanning recently added blocks to recify orphans
+recorded_txids = []
+db_txids =  table_lib.select_from_table(cursor, 'mined', 'txid')
+for txid in db_txids:
+    recorded_txids.append(txid[0])
+    
+tip = int(rpc["KMD"].getblockcount())
+max_block_in_db = table_lib.get_max_col_val_in_table(cursor, 'block', 'mined')
+scan_blocks = [*range(max_block_in_db-scan_depth,max_block_in_db,1)]
+for block in scan_blocks:
+    logger.info("scanning block "+str(block)+"...")
+    row_data = table_lib.get_miner(block)
+    if row_data[5] not in recorded_txids:
+        logger.info("UPDATING BLOCK: "+str(block))
+        table_lib.update_mined_tbl(conn, cursor, row_data)
+
+# adding new blocks...
+existing_blocks = table_lib.select_from_table(cursor, 'mined', 'block')
+max_block =  table_lib.get_max_col_val_in_table(cursor, 'block', 'mined')
 tip = int(rpc["KMD"].getblockcount())
 all_blocks = [*range(0,tip,1)]
+recorded_blocks = []
 for block in existing_blocks:
     recorded_blocks.append(block[0])
 unrecorded_blocks = set(all_blocks) - set(recorded_blocks)
 logger.info("Blocks in chain: "+str(len(all_blocks)))
 logger.info("Blocks in database: "+str(len(recorded_blocks)))
 logger.info("Blocks not in database: "+str(len(unrecorded_blocks)))
-logger.info("Max Block in database: "+str(max_block[0]))
+logger.info("Max Block in database: "+str(max_block))
 
 
 records = []
@@ -65,7 +67,7 @@ records = []
 start = time.time()
 i = 1
 for block in unrecorded_blocks:
-    records.append(get_miner(block))
+    records.append(table_lib.get_miner(block))
     if len(records) == 10080:
         now = time.time()
         pct = round(len(records)*i/len(unrecorded_blocks)*100,3)
@@ -73,7 +75,7 @@ for block in unrecorded_blocks:
         est_end = int(100/pct*runtime)
         logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_blocks))+" records added to db \
                  ["+str(runtime)+"/"+str(est_end)+" sec]")
-        execute_values(cursor, "INSERT INTO mined (block, block_time, value, address, name, txid) VALUES %s", records)
+        execute_values(cursor, "INSERT INTO mined (block, block_time, value, address, name, txid, season) VALUES %s", records)
         conn.commit()
         records = []
         i += 1
@@ -82,11 +84,12 @@ for block in unrecorded_blocks:
             block_count = cursor.fetchone()
             logger.info("Blocks in database: "+str(block_count[0])+"/"+str(len(all_blocks)))
 
-execute_values(cursor, "INSERT INTO mined (block, block_time, value, address, name, txid) VALUES %s", records)
+execute_values(cursor, "INSERT INTO mined (block, block_time, value, address, name, txid, season) VALUES %s", records)
 conn.commit()
 logger.info("Finished!")
 logger.info(str(len(unrecorded_blocks))+" mined blocks added to table")
 
+# updating mined count aggregate table
 for season in seasons_info:
     table_lib.get_mined_counts(conn, cursor, season)
 logging.info("Finished!")
