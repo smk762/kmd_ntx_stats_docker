@@ -12,6 +12,7 @@ from os.path import expanduser
 from dotenv import load_dotenv
 import psycopg2
 from decimal import *
+from datetime import datetime
 from psycopg2.extras import execute_values
 from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
 
@@ -42,6 +43,7 @@ def get_ntx_data(txid):
     this_block_hash = raw_tx['blockhash']
     dest_addrs = raw_tx["vout"][0]['scriptPubKey']['addresses']
     this_block_time = raw_tx['blocktime']
+    block_datetime = datetime.utcfromtimestamp(raw_tx['blocktime'])
     this_block_ht = raw_tx['height']
     if len(dest_addrs) > 0:
         if ntx_addr in dest_addrs:
@@ -82,19 +84,19 @@ def get_ntx_data(txid):
                     # some decodes have a null char error, this gets rid of that so populate script doesnt error out (but the seem to be decoding differently/wrong)
                     if chain.find('\x00') != -1:
                         chain = chain.replace('\x00','')
-                    row_data = (chain, this_block_ht, this_block_time, this_block_hash, notary_list, prev_block_hash, prev_block_ht, txid, opret)
+                    row_data = (chain, this_block_ht, this_block_time, block_datetime, this_block_hash, notary_list, prev_block_hash, prev_block_ht, txid, opret)
                 else:
-                    row_data = ("not_opret", this_block_ht, this_block_time, this_block_hash, notary_list, "unknown", 0, txid, "unknown")
+                    row_data = ("not_opret", this_block_ht, this_block_time, block_datetime, this_block_hash, notary_list, "unknown", 0, txid, "unknown")
                 
             else:
                 # logger.info("["+txid+"] only has "+str(len(raw_tx['vin']))+" vins!")
-                row_data = ("low_vin", this_block_ht, this_block_time, this_block_hash, [], "unknown", 0, txid, "unknown")
+                row_data = ("low_vin", this_block_ht, this_block_time, block_datetime, this_block_hash, [], "unknown", 0, txid, "unknown")
         else:
             # logger.info("["+txid+"] ntx_address not in destination addresses!")
-            row_data = ("not_dest", this_block_ht, this_block_time, this_block_hash, [], "unknown", 0, txid, "unknown")
+            row_data = ("not_dest", this_block_ht, this_block_time, block_datetime, this_block_hash, [], "unknown", 0, txid, "unknown")
     else:
         # logger.info("["+txid+"] has no destination addresses!")
-        row_data = ("no_dest", this_block_ht, this_block_time, this_block_hash, [], "unknown", 0, txid, "unknown") 
+        row_data = ("no_dest", this_block_ht, this_block_time, block_datetime, this_block_hash, [], "unknown", 0, txid, "unknown") 
     return row_data
 
 home = expanduser("~")
@@ -162,7 +164,7 @@ for txid in unrecorded_txids:
         logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_txids))+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
         logger.info(records)
         logger.info("-----------------------------")
-        execute_values(cursor, "INSERT INTO notarised (chain, block_ht, block_time, block_hash, notaries, prev_block_hash, prev_block_ht, txid, opret) VALUES %s", records)
+        execute_values(cursor, "INSERT INTO notarised (chain, block_ht, block_time, block_datetime, block_hash, notaries, prev_block_hash, prev_block_ht, txid, opret) VALUES %s", records)
         conn.commit()
         records = []
         i += 1
@@ -171,7 +173,7 @@ for txid in unrecorded_txids:
             block_count = cursor.fetchone()
             logger.info("notarisations in database: "+str(block_count[0])+"/"+str(len(all_txids)))
 
-execute_values(cursor, "INSERT INTO notarised (chain, block_ht, block_time, block_hash, notaries, prev_block_hash, prev_block_ht, txid, opret) VALUES %s", records)
+execute_values(cursor, "INSERT INTO notarised (chain, block_ht, block_time, block_datetime, block_hash, notaries, prev_block_hash, prev_block_ht, txid, opret) VALUES %s", records)
 
 conn.commit()
 logger.info("Finished!")

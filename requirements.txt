@@ -8,3 +8,4 @@ python-bitcoinlib==0.10.2
 python-dotenv
 django-filter
 dynamic-rest
+django-crispy-forms

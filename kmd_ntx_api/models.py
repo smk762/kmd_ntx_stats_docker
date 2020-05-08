@@ -20,6 +20,7 @@ class notarised(models.Model):
     chain = models.CharField(max_length=32)
     block_hash = models.CharField(max_length=64)
     block_time = models.PositiveIntegerField()
+    block_datetime = models.DateTimeField()
     block_ht = models.PositiveIntegerField()
     notaries = ArrayField(models.CharField(max_length=34),size=13)
     prev_block_hash = models.CharField(max_length=64)
@@ -72,6 +73,7 @@ class notarised_chain(models.Model):
 class mined(models.Model):
     block = models.PositiveIntegerField()
     block_time = models.PositiveIntegerField()
+    block_datetime = models.DateTimeField()
     value = models.DecimalField(max_digits=18, decimal_places=8)
     address = models.CharField(max_length=34)
     name = models.CharField(max_length=34)

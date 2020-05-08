@@ -38,7 +38,7 @@ class BalancesSerializer(serializers.HyperlinkedModelSerializer):
 class MinedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = mined
-        fields = ['block', 'block_time', 'value', 'address', 'name', 'txid', 'season']
+        fields = ['block', 'block_time', 'block_datetime', 'value', 'address', 'name', 'txid', 'season']
 
 class MinedCountSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -51,8 +51,9 @@ class MinedCountSerializer(serializers.HyperlinkedModelSerializer):
 class ntxSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = notarised
-        fields = ['txid', 'chain', 'block_ht', 'block_time', 'block_hash',
-                  'prev_block_hash', 'prev_block_ht', 'opret', 'notaries']
+        fields = ['txid', 'chain', 'block_ht', 'block_time', 'block_datetime', 
+                  'block_hash', 'prev_block_hash', 'prev_block_ht',
+                  'opret', 'notaries']
 
 class ntxCountSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

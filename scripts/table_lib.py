@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import time
+from datetime import datetime
 from dotenv import load_dotenv
 import psycopg2
 from decimal import *
@@ -227,15 +228,16 @@ def update_coins_tbl(conn, cursor, row_data):
 def update_mined_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO mined \
-            (block, block_time, value, address, name, txid, season) \
-            VALUES (%s, %s, %s, %s, %s, %s) \
+            (block, block_time, block_datetime, value, address, name, txid, season) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_block DO UPDATE SET \
             block_time='"+str(row_data[1])+"', \
-            value='"+str(row_data[2])+"', \
-            address='"+str(row_data[3])+"', \
-            name='"+str(row_data[4])+"', \
-            txid='"+str(row_data[5])+"', \
-            season='"+str(row_data[6])+"';"
+            block_datetime='"+str(row_data[2])+"', \
+            value='"+str(row_data[3])+"', \
+            address='"+str(row_data[4])+"', \
+            name='"+str(row_data[5])+"', \
+            txid='"+str(row_data[6])+"', \
+            season='"+str(row_data[7])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
@@ -252,6 +254,7 @@ def get_miner(block):
     rpc["KMD"] = def_credentials("KMD")
     blockinfo = rpc["KMD"].getblock(str(block), 2)
     blocktime = blockinfo['time']
+    block_datetime = datetime.utcfromtimestamp(blockinfo['time'])
     for tx in blockinfo['tx']:
         if len(tx['vin']) > 0:
             if 'coinbase' in tx['vin'][0]:
@@ -270,5 +273,12 @@ def get_miner(block):
                         break
 
                 value = tx['vout'][0]['value']
-                row_data = (block, blocktime, Decimal(value), address, name, tx['txid'], season)
+                row_data = (block, blocktime, block_datetime, Decimal(value), address, name, tx['txid'], season)
                 return row_data
+
+def ts_col_to_dt_col(conn, cursor, ts_col, dt_col, table):
+    sql = "UPDATE "+table+" SET "+dt_col+"=to_timestamp("+ts_col+");"
+    cursor.execute(sql)
+    conn.commit()
+
+
