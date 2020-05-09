@@ -16,16 +16,16 @@ def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
 
 def get_ac_block_heights():
-    ac_block_ht = {}
+    ac_block_height = {}
     for chain in antara_coins:
       try:
         url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/sync'
         r = requests.get(url)
-        ac_block_ht.update({chain:r.json()['blockChainHeight']})
+        ac_block_height.update({chain:r.json()['blockChainHeight']})
       except Exception as e:
         print(chain+" failed")
         print(e)
-    return ac_block_ht
+    return ac_block_height
 
 # http://explorer.chips.cash/api/getblockcount
 # http://chips.komodochainz.info/ext/getbalance/RSAzPFzgTZHNcxLNLdGyVPbjbMA8PRY7Ss

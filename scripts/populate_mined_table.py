@@ -38,7 +38,7 @@ for txid in db_txids:
     recorded_txids.append(txid[0])
     
 tip = int(rpc["KMD"].getblockcount())
-max_block_in_db = table_lib.get_max_col_val_in_table(cursor, 'block', 'mined')
+max_block_in_db = table_lib.get_max_col_val_in_table(cursor, 'block_height', 'mined')
 scan_blocks = [*range(max_block_in_db-scan_depth,max_block_in_db,1)]
 for block in scan_blocks:
     logger.info("scanning block "+str(block)+"...")
@@ -48,8 +48,8 @@ for block in scan_blocks:
         table_lib.update_mined_tbl(conn, cursor, row_data)
 
 # adding new blocks...
-existing_blocks = table_lib.select_from_table(cursor, 'mined', 'block')
-max_block =  table_lib.get_max_col_val_in_table(cursor, 'block', 'mined')
+existing_blocks = table_lib.select_from_table(cursor, 'mined', 'block_height')
+max_block =  table_lib.get_max_col_val_in_table(cursor, 'block_height', 'mined')
 tip = int(rpc["KMD"].getblockcount())
 all_blocks = [*range(0,tip,1)]
 recorded_blocks = []
@@ -75,7 +75,7 @@ for block in unrecorded_blocks:
         est_end = int(100/pct*runtime)
         logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_blocks))+" records added to db \
                  ["+str(runtime)+"/"+str(est_end)+" sec]")
-        execute_values(cursor, "INSERT INTO mined (block, block_time, block_datetime, value, address, name, txid, season) VALUES %s", records)
+        execute_values(cursor, "INSERT INTO mined (block_height, block_time, block_datetime, value, address, name, txid, season) VALUES %s", records)
         conn.commit()
         records = []
         i += 1
@@ -84,7 +84,7 @@ for block in unrecorded_blocks:
             block_count = cursor.fetchone()
             logger.info("Blocks in database: "+str(block_count[0])+"/"+str(len(all_blocks)))
 
-execute_values(cursor, "INSERT INTO mined (block, block_time, block_datetime, value, address, name, txid, season) VALUES %s", records)
+execute_values(cursor, "INSERT INTO mined (block_height, block_time, block_datetime, value, address, name, txid, season) VALUES %s", records)
 conn.commit()
 logger.info("Finished!")
 logger.info(str(len(unrecorded_blocks))+" mined blocks added to table")

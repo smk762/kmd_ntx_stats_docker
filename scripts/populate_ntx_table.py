@@ -40,11 +40,15 @@ def get_ticker(scriptPubKeyBinary):
 
 def get_ntx_data(txid):
     raw_tx = rpc["KMD"].getrawtransaction(txid,1)
-    this_block_hash = raw_tx['blockhash']
+    block_hash = raw_tx['blockhash']
     dest_addrs = raw_tx["vout"][0]['scriptPubKey']['addresses']
-    this_block_time = raw_tx['blocktime']
+    block_time = raw_tx['blocktime']
     block_datetime = datetime.utcfromtimestamp(raw_tx['blocktime'])
-    this_block_ht = raw_tx['height']
+    this_block_height = raw_tx['height']
+    for season_num in seasons_info:
+        if block_time < seasons_info[season_num]['end_time']:
+            season = season_num
+            break
     if len(dest_addrs) > 0:
         if ntx_addr in dest_addrs:
             if len(raw_tx['vin']) >= 13:
@@ -62,7 +66,7 @@ def get_ntx_data(txid):
                     scriptPubKey_asm = opret.replace("OP_RETURN ","")
                     prev_block_hash = lil_endian(scriptPubKey_asm[:64])
                     try:
-                        prev_block_ht = int(lil_endian(scriptPubKey_asm[64:72]),16) 
+                        prev_block_height = int(lil_endian(scriptPubKey_asm[64:72]),16) 
                     except:
                         print(scriptPubKey_asm)
                         sys.exit()
@@ -81,22 +85,29 @@ def get_ntx_data(txid):
                             MoM_depth = int(lil_endian(scriptPubKey_asm[end:]),16)
                         except Exception as e:
                             logger.debug(e)
-                    # some decodes have a null char error, this gets rid of that so populate script doesnt error out (but the seem to be decoding differently/wrong)
+                    # some decodes have a null char error, this gets rid of that so populate script doesnt error out 
+                    # (some s1 op_returns seem to be decoding differently/wrong)
                     if chain.find('\x00') != -1:
                         chain = chain.replace('\x00','')
-                    row_data = (chain, this_block_ht, this_block_time, block_datetime, this_block_hash, notary_list, prev_block_hash, prev_block_ht, txid, opret)
+                    row_data = (chain, this_block_height, block_time, block_datetime,
+                                block_hash, notary_list, prev_block_hash, prev_block_height,
+                                txid, opret, season)
                 else:
-                    row_data = ("not_opret", this_block_ht, this_block_time, block_datetime, this_block_hash, notary_list, "unknown", 0, txid, "unknown")
+                    row_data = ("not_opret", this_block_height, block_time, block_datetime,
+                                block_hash, notary_list, "unknown", 0, txid, "unknown", season)
                 
             else:
                 # logger.info("["+txid+"] only has "+str(len(raw_tx['vin']))+" vins!")
-                row_data = ("low_vin", this_block_ht, this_block_time, block_datetime, this_block_hash, [], "unknown", 0, txid, "unknown")
+                row_data = ("low_vin", this_block_height, block_time, block_datetime,
+                            block_hash, [], "unknown", 0, txid, "unknown", season)
         else:
             # logger.info("["+txid+"] ntx_address not in destination addresses!")
-            row_data = ("not_dest", this_block_ht, this_block_time, block_datetime, this_block_hash, [], "unknown", 0, txid, "unknown")
+            row_data = ("not_dest", this_block_height, block_time, block_datetime,
+                        block_hash, [], "unknown", 0, txid, "unknown", season)
     else:
         # logger.info("["+txid+"] has no destination addresses!")
-        row_data = ("no_dest", this_block_ht, this_block_time, block_datetime, this_block_hash, [], "unknown", 0, txid, "unknown") 
+        row_data = ("no_dest", this_block_height, block_time, block_datetime,
+                    block_hash, [], "unknown", 0, txid, "unknown", season) 
     return row_data
 
 home = expanduser("~")
@@ -164,7 +175,9 @@ for txid in unrecorded_txids:
         logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_txids))+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
         logger.info(records)
         logger.info("-----------------------------")
-        execute_values(cursor, "INSERT INTO notarised (chain, block_ht, block_time, block_datetime, block_hash, notaries, prev_block_hash, prev_block_ht, txid, opret) VALUES %s", records)
+        execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, \
+                                block_hash, notaries, prev_block_hash, prev_block_height, txid, opret, \
+                                season) VALUES %s", records)
         conn.commit()
         records = []
         i += 1
@@ -173,7 +186,8 @@ for txid in unrecorded_txids:
             block_count = cursor.fetchone()
             logger.info("notarisations in database: "+str(block_count[0])+"/"+str(len(all_txids)))
 
-execute_values(cursor, "INSERT INTO notarised (chain, block_ht, block_time, block_datetime, block_hash, notaries, prev_block_hash, prev_block_ht, txid, opret) VALUES %s", records)
+execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, block_hash, \
+                        notaries, prev_block_hash, prev_block_height, txid, opret, season) VALUES %s", records)
 
 conn.commit()
 logger.info("Finished!")

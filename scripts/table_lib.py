@@ -66,24 +66,30 @@ def delete_from_table(conn, cursor, table, condition=None):
     cursor.execute()
     conn.commit()
 
-def get_s3_chain_ntx_aggregates(cursor):
-    sql = "SELECT chain, MAX(block_ht), MAX(block_time), COUNT(*) FROM notarised WHERE block_time >= "+str(seasons_info["Season_3"]["start_time"])+" GROUP BY chain;"
+def get_chain_ntx_aggregates(cursor, season):
+    sql = "SELECT chain, MAX(block_height), MAX(block_time), COUNT(*) \
+           FROM notarised WHERE \
+           block_time >= "+str(seasons_info[season]["start_time"])+" \
+           AND block_time <= "+str(seasons_info[season]["end_time"])+" \
+           GROUP BY chain;"
     cursor.execute(sql)
     return cursor.fetchall()
 
 def get_latest_chain_ntx_info(cursor, chain, height):
-    sql = "SELECT prev_block_hash, prev_block_ht, opret, block_hash, txid FROM notarised WHERE chain = '"+chain+"' AND block_ht = "+str(height)+";"
+    sql = "SELECT prev_block_hash, prev_block_height, opret, block_hash, txid \
+           FROM notarised WHERE chain = '"+chain+"' AND block_height = "+str(height)+";"
     cursor.execute(sql)
     chains_resp = cursor.fetchone()
     return chains_resp
 
 def add_row_to_notarised_chain_tbl(conn, cursor, row_data):
     sql = "INSERT INTO notarised_chain \
-         (chain, ntx_count, kmd_ntx_height, kmd_ntx_blockhash,\
+         (chain, ntx_count, block_height, kmd_ntx_blockhash,\
           kmd_ntx_txid, lastnotarization, opret, ac_ntx_block_hash, \
-          ac_ntx_height, ac_block_height, ntx_lag) \
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-          ON CONFLICT (chain) DO UPDATE SET ntx_count="+str(row_data[1])+", kmd_ntx_height="+str(row_data[2])+", \
+          ac_ntx_height, ac_block_height, ntx_lag, season) \
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+          ON CONFLICT ON CONSTRAINT unique_notarised_chain_season DO UPDATE \
+          SET ntx_count="+str(row_data[1])+", block_height="+str(row_data[2])+", \
           kmd_ntx_blockhash='"+str(row_data[3])+"', kmd_ntx_txid='"+str(row_data[4])+"', \
           lastnotarization="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
           ac_ntx_block_hash='"+str(row_data[7])+"', ac_ntx_height="+str(row_data[8])+", \
@@ -95,10 +101,10 @@ def add_row_to_notarised_chain_tbl(conn, cursor, row_data):
 def add_row_to_addresses_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO addresses \
-              (season, notary_name, notary_id, chain, pubkey, address) \
+              (season, owner_name, notary_id, chain, pubkey, address) \
                VALUES (%s, %s, %s, %s, %s, %s) \
                ON CONFLICT ON CONSTRAINT unique_season_chain_address DO UPDATE SET \
-               notary_name='"+str(row_data[1])+"', pubkey='"+str(row_data[4])+"', \
+               owner_name='"+str(row_data[1])+"', pubkey='"+str(row_data[4])+"', \
                address='"+str(row_data[5])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
@@ -152,7 +158,7 @@ def add_row_to_mined_count_tbl(conn, cursor, row_data):
 
 def get_mined_counts(conn, cursor, season):
     sql = "SELECT name, COUNT(*), SUM(value), MAX(value), max(block_time), \
-           max(block) FROM mined WHERE block_time >= "+str(seasons_info[season]['start_time'])+" \
+           max(block_height) FROM mined WHERE block_time >= "+str(seasons_info[season]['start_time'])+" \
            AND block_time <= "+str(seasons_info[season]['end_time'])+" GROUP BY name;"
     cursor.execute(sql)
     results = cursor.fetchall()
@@ -189,11 +195,11 @@ def update_rewards_tbl(conn, cursor, row_data):
 def update_balances_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO balances \
-            (notary, chain, balance, address, update_time) \
-            VALUES (%s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_chain_addr_balance DO UPDATE SET \
+            (notary, chain, balance, address, season, update_time) \
+            VALUES (%s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_chain_season_balance DO UPDATE SET \
             balance="+str(row_data[2])+", \
-            update_time="+str(row_data[4])+";"
+            update_time="+str(row_data[5])+";"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
@@ -207,14 +213,16 @@ def update_balances_tbl(conn, cursor, row_data):
 def update_coins_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO coins \
-            (chain, coins_info, electrums, electrums_ssl, explorers, dpow) \
-            VALUES (%s, %s, %s, %s, %s, %s) \
+            (chain, coins_info, electrums, electrums_ssl, explorers, dpow, dpow_active, mm2_compatible) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_chain_coin DO UPDATE SET \
             coins_info='"+str(row_data[1])+"', \
             electrums='"+str(row_data[2])+"', \
             electrums_ssl='"+str(row_data[3])+"', \
             explorers='"+str(row_data[4])+"', \
-            dpow='"+str(row_data[5])+"';"
+            dpow='"+str(row_data[5])+"', \
+            dpow_active='"+str(row_data[6])+"', \
+            mm2_compatible='"+str(row_data[7])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
@@ -228,7 +236,7 @@ def update_coins_tbl(conn, cursor, row_data):
 def update_mined_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO mined \
-            (block, block_time, block_datetime, value, address, name, txid, season) \
+            (block_height, block_time, block_datetime, value, address, name, txid, season) \
             VALUES (%s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_block DO UPDATE SET \
             block_time='"+str(row_data[1])+"', \
@@ -280,5 +288,16 @@ def ts_col_to_dt_col(conn, cursor, ts_col, dt_col, table):
     sql = "UPDATE "+table+" SET "+dt_col+"=to_timestamp("+ts_col+");"
     cursor.execute(sql)
     conn.commit()
+
+
+
+def ts_col_to_season_col(conn, cursor, ts_col, season_col, table):
+    for season in seasons_info:
+        sql = "UPDATE "+table+" \
+               SET "+season_col+"='"+season+"' \
+               WHERE "+ts_col+" > "+str(seasons_info[season]['start_time'])+" \
+               AND "+ts_col+" < "+str(seasons_info[season]['end_time'])+";"
+        cursor.execute(sql)
+        conn.commit()
 
 

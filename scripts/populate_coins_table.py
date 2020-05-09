@@ -13,6 +13,12 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+'''
+This script scans the coins and dpow repositories and updates contexual info about the chains in the "coins" table.
+It should be run as a cronjob every 12-24 hours
+'''
+
+
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
@@ -42,6 +48,9 @@ coins_repo = r.json()
 coins_info = {}
 for item in coins_repo:
     coin = item['coin']
+    mm2_compatible = 0
+    if 'mm2' in item:
+        mm2_compatible = item['mm2']
     logger.info("Getting info for ["+coin+"]")
     print(item)
     coins_info.update({coin:{"coins_info":item}})
@@ -69,6 +78,7 @@ for item in coins_repo:
     except Exception as e:
         logger.info("GET "+coin+" EXPLORER ERROR: "+str(e)+" [RESPONSE]: "+r.text)
     if coin in dpow:
+        dpow_active = 1
         coins_info[coin].update({
                 "dpow":{
                     "src":dpow[coin]['src'],
@@ -77,10 +87,12 @@ for item in coins_repo:
                 }
             })
     else:
+        dpow_active = 0
         coins_info[coin].update({"dpow":{}})
     row_data = (coin, json.dumps(coins_info[coin]["coins_info"]),
                 json.dumps(coins_info[coin]['electrums']), json.dumps(coins_info[coin]['electrums_ssl']),
-                json.dumps(coins_info[coin]['explorers']), json.dumps(coins_info[coin]['dpow']))
+                json.dumps(coins_info[coin]['explorers']), json.dumps(coins_info[coin]['dpow']),
+                dpow_active, mm2_compatible)
     table_lib.update_coins_tbl(conn, cursor, row_data)
 
 logging.info("Finished!")

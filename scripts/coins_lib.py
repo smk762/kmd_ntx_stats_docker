@@ -7,4 +7,4 @@ antara_coins = ["AXO", "BET", "BOTS", "BTCH", "CCL", "COQUICASH", "CRYPTO", "DEX
 ex_antara_coins = ['CHAIN', 'GLXT', 'MCL', 'PRLPAY', 'COMMOD', "WLC", 'DION',
                    'EQL', 'CEAL', 'BNTN', 'KMDICE', 'DSEC']
 all_antara_coins = antara_coins + ex_antara_coins
-all_coins = all_antara_coins + third_party_coins + ['BTC']
+all_coins = all_antara_coins + third_party_coins + ['BTC', 'KMD']
