@@ -69,8 +69,7 @@ def delete_from_table(conn, cursor, table, condition=None):
 def get_chain_ntx_aggregates(cursor, season):
     sql = "SELECT chain, MAX(block_height), MAX(block_time), COUNT(*) \
            FROM notarised WHERE \
-           block_time >= "+str(seasons_info[season]["start_time"])+" \
-           AND block_time <= "+str(seasons_info[season]["end_time"])+" \
+           season = '"+str(season)+"' \
            GROUP BY chain;"
     cursor.execute(sql)
     return cursor.fetchall()

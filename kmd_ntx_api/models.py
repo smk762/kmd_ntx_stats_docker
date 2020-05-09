@@ -3,7 +3,7 @@ from django.contrib.postgres.fields import ArrayField, JSONField
 
 class addresses(models.Model):
     season = models.CharField(max_length=34)
-    notary_name = models.CharField(max_length=34)
+    owner_name = models.CharField(max_length=34)
     notary_id = models.CharField(max_length=34)
     chain = models.CharField(max_length=34)
     address = models.CharField(max_length=34)
@@ -21,11 +21,12 @@ class notarised(models.Model):
     block_hash = models.CharField(max_length=64)
     block_time = models.PositiveIntegerField()
     block_datetime = models.DateTimeField()
-    block_ht = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField()
     notaries = ArrayField(models.CharField(max_length=34),size=13)
     prev_block_hash = models.CharField(max_length=64)
-    prev_block_ht = models.PositiveIntegerField()
+    prev_block_height = models.PositiveIntegerField()
     opret = models.CharField(max_length=2048)
+    season = models.CharField(max_length=32)
 
     class Meta:
         db_table = 'notarised'
@@ -54,7 +55,7 @@ class notarised_count(models.Model):
 class notarised_chain(models.Model):
     chain = models.CharField(max_length=64)
     ntx_count = models.PositiveIntegerField()
-    kmd_ntx_height = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField()
     kmd_ntx_blockhash = models.CharField(max_length=64)
     kmd_ntx_txid = models.CharField(max_length=64)
     lastnotarization = models.PositiveIntegerField()
@@ -63,15 +64,16 @@ class notarised_chain(models.Model):
     ac_ntx_height = models.PositiveIntegerField()
     ac_block_height = models.CharField(max_length=34)
     ntx_lag = models.CharField(max_length=34)
+    season = models.CharField(max_length=34)
 
     class Meta:
         db_table = 'notarised_chain'
         constraints = [
-            models.UniqueConstraint(fields=['chain'], name='unique_chain')
+            models.UniqueConstraint(fields=['chain', 'season'], name='unique_notarised_chain_season')
         ]
 
 class mined(models.Model):
-    block = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField()
     block_time = models.PositiveIntegerField()
     block_datetime = models.DateTimeField()
     value = models.DecimalField(max_digits=18, decimal_places=8)
@@ -83,7 +85,7 @@ class mined(models.Model):
     class Meta:
         db_table = 'mined'
         constraints = [
-            models.UniqueConstraint(fields=['block'], name='unique_block')
+            models.UniqueConstraint(fields=['block_height'], name='unique_block')
         ]
 
 class mined_count(models.Model):
@@ -108,11 +110,12 @@ class balances(models.Model):
     balance = models.DecimalField(max_digits=18, decimal_places=8)
     address = models.CharField(max_length=34)
     update_time = models.PositiveIntegerField()
+    season = models.CharField(max_length=34)
 
     class Meta:
         db_table = 'balances'
         constraints = [
-            models.UniqueConstraint(fields=['notary', 'chain', 'address'], name='unique_notary_chain_addr_balance')
+            models.UniqueConstraint(fields=['notary', 'chain', 'season'], name='unique_notary_chain_season_balance')
         ]
 
 class rewards(models.Model):
@@ -138,7 +141,8 @@ class coins(models.Model):
     electrums_ssl = JSONField()
     explorers = JSONField()
     dpow = JSONField()
-
+    dpow_active = models.PositiveIntegerField()
+    mm2_compatible = models.PositiveIntegerField()
 
     class Meta:
         db_table = 'coins'
