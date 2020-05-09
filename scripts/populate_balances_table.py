@@ -14,6 +14,11 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+'''
+This script checks notary balance via electrum servers. 
+It should be run as a cronjob every 6 hours or so (takes about an hour to run).
+'''
+
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 update_time = int(time.time())
@@ -23,7 +28,7 @@ for season in notary_addresses:
             addr = notary_addresses[season][notary][chain]
             logger.info("Getting "+chain+" "+season+" balances for "+notary+" ["+addr+"]")
             balance = electrum_lib.get_electrum_balance(chain, addr)
-            row_data = (notary, chain, balance, addr, update_time)        
+            row_data = (notary, chain, balance, addr, season, update_time)        
             table_lib.update_balances_tbl(conn, cursor, row_data)
 
 cursor.close()

@@ -63,7 +63,7 @@ def get_notarised_counts(season):
             node_counts[notary].update({"total_ntx_count":count})
 
     chain_totals = {}
-    chains_aggr_resp = table_lib.get_s3_chain_ntx_aggregates(cursor)
+    chains_aggr_resp = table_lib.get_chain_ntx_aggregates(cursor, season)
     for item in chains_aggr_resp:
         chain = item[0]
         ntx_count = item[3]
@@ -89,9 +89,10 @@ logger.setLevel(logging.INFO)
 
 conn = table_lib.connect_db()
 cursor = conn.cursor()
-
-results_list = get_notarised_counts("Season_3")
-#update_table(results_list)
+for season in seasons_info:
+    # ignore S1 as some opret is not decoding chain correctly
+    if season != "Season_1":
+        results_list = get_notarised_counts(seasons)
 
 cursor.close()
 conn.close()
