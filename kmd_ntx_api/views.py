@@ -54,17 +54,18 @@ def apply_filters(request, serializer, queryset):
         print(field)
         val = request.query_params.get(field, None)
         if val is not None:
-            filter_kwargs.update({field:val})    
-    print(filter_kwargs)
-    queryset = queryset.filter(**filter_kwargs)
+            filter_kwargs.update({field:val}) 
     if 'from_block' in request.GET:
-        queryset = queryset.filter(block_height__gte=request.GET['from_block'])
+        filter_kwargs.update({'block_height__gte':request.GET['from_block']})  
     if 'to_block' in request.GET:
-        queryset = queryset.filter(block_height__gte=request.GET['to_block'])
+        filter_kwargs.update({'block_height__lte':request.GET['to_block']})  
     if 'from_timestamp' in request.GET:
-        queryset = queryset.filter(block_time__gte=request.GET['from_timestamp'])
+        filter_kwargs.update({'block_time__gte':request.GET['from_timestamp']})  
     if 'to_timestamp' in request.GET:
-        queryset = queryset.filter(block_time__gte=request.GET['to_timestamp'])
+        filter_kwargs.update({'block_time__lte':request.GET['to_timestamp']})     
+    print(request.GET)  
+    print(filter_kwargs) 
+    queryset = queryset.filter(**filter_kwargs)
     return queryset
 
 def wrap_api(resp):
@@ -502,7 +503,7 @@ class notarised_filter(viewsets.ViewSet):
         """
         """
         resp = {}
-        data = notarisation.objects.all()
+        data = notarised.objects.all()
         data = apply_filters(request, notarisationSerializer, data)
         data = data.order_by('season', 'chain', '-block_height')
         data = data.values()
