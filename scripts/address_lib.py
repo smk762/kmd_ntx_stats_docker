@@ -398,21 +398,21 @@ notary_pubkeys = {
 seasons_info = {
     "Season_1": {
             "start_block":1,
-            "end_block":1,
-            "start_time":1,
+            "end_block":813999,
+            "start_time":0,
             "end_time":1530921600,
             "notaries":[]
         },
     "Season_2": {
-            "start_block":1,
-            "end_block":1,
+            "start_block":814000,
+            "end_block":1443999,
             "start_time":1530921600,
             "end_time":1563148799,
             "notaries":[]
         },
     "Season_3": {
-            "start_block":1,
-            "end_block":1,
+            "start_block":1444000,
+            "end_block":2444000,
             "start_time":1563148800,
             "end_time":1751328000,
             "notaries":[]

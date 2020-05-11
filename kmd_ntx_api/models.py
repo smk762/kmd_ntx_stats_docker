@@ -1,19 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField, JSONField
 
-class addresses(models.Model):
-    season = models.CharField(max_length=34)
-    owner_name = models.CharField(max_length=34)
-    notary_id = models.CharField(max_length=34)
-    chain = models.CharField(max_length=34)
-    address = models.CharField(max_length=34)
-    pubkey = models.CharField(max_length=66)
 
-    class Meta:
-        db_table = 'addresses'
-        constraints = [
-            models.UniqueConstraint(fields=['address', "season", "chain"], name='unique_season_chain_address')
-        ]
+# NOTARISATION
 
 class notarised(models.Model):
     txid = models.CharField(max_length=64)
@@ -34,7 +23,7 @@ class notarised(models.Model):
             models.UniqueConstraint(fields=['txid'], name='unique_txid')
         ]
 
-class notarised_count(models.Model):
+class notarised_count_season(models.Model):
     notary = models.CharField(max_length=64)
     btc_count = models.PositiveIntegerField()
     antara_count = models.PositiveIntegerField()
@@ -47,12 +36,31 @@ class notarised_count(models.Model):
     season = models.CharField(max_length=34)
 
     class Meta:
-        db_table = 'notarised_count'
+        db_table = 'notarised_count_season'
         constraints = [
             models.UniqueConstraint(fields=['notary', "season"], name='unique_notary_season')
         ]
 
-class notarised_chain(models.Model):
+class notarised_count_daily(models.Model):
+    notarised_date = models.DateField()
+    notary = models.CharField(max_length=64)
+    btc_count = models.PositiveIntegerField()
+    antara_count = models.PositiveIntegerField()
+    third_party_count = models.PositiveIntegerField()
+    other_count = models.PositiveIntegerField()
+    total_ntx_count = models.PositiveIntegerField()
+    chain_ntx_counts = JSONField()
+    chain_ntx_pct = JSONField()
+    time_stamp = models.PositiveIntegerField()
+    season = models.CharField(max_length=34)
+
+    class Meta:
+        db_table = 'notarised_count_daily'
+        constraints = [
+            models.UniqueConstraint(fields=['notary', "notarised_date"], name='unique_notary_date')
+        ]
+
+class notarised_chain_season(models.Model):
     chain = models.CharField(max_length=64)
     ntx_count = models.PositiveIntegerField()
     block_height = models.PositiveIntegerField()
@@ -67,10 +75,23 @@ class notarised_chain(models.Model):
     season = models.CharField(max_length=34)
 
     class Meta:
-        db_table = 'notarised_chain'
+        db_table = 'notarised_chain_season'
         constraints = [
             models.UniqueConstraint(fields=['chain', 'season'], name='unique_notarised_chain_season')
         ]
+
+class notarised_chain_daily(models.Model):
+    notarised_date = models.DateField()
+    chain = models.CharField(max_length=64)
+    ntx_count = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = 'notarised_chain_daily'
+        constraints = [
+            models.UniqueConstraint(fields=['chain', 'notarised_date'], name='unique_notarised_chain_date')
+        ]
+
+# MINING
 
 class mined(models.Model):
     block_height = models.PositiveIntegerField()
@@ -88,7 +109,7 @@ class mined(models.Model):
             models.UniqueConstraint(fields=['block_height'], name='unique_block')
         ]
 
-class mined_count(models.Model):
+class mined_count_season(models.Model):
     notary = models.CharField(max_length=64)
     blocks_mined = models.PositiveIntegerField()
     sum_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
@@ -99,10 +120,25 @@ class mined_count(models.Model):
     season = models.CharField(max_length=34)
 
     class Meta:
-        db_table = 'mined_count'
+        db_table = 'mined_count_season'
         constraints = [
             models.UniqueConstraint(fields=['notary', 'season'], name='unique_notary_season_mined')
         ]
+
+class mined_count_daily(models.Model):
+    mined_date = models.DateField()
+    notary = models.CharField(max_length=64)
+    blocks_mined = models.PositiveIntegerField()
+    sum_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
+    time_stamp = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = 'mined_count_daily'
+        constraints = [
+            models.UniqueConstraint(fields=['notary', 'mined_date'], name='unique_notary_daily_mined')
+        ]
+
+# WALLET
 
 class balances(models.Model):
     notary = models.CharField(max_length=34)
@@ -133,6 +169,22 @@ class rewards(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['address'], name='unique_reward_address')
         ]
+
+class addresses(models.Model):
+    season = models.CharField(max_length=34)
+    owner_name = models.CharField(max_length=34)
+    notary_id = models.CharField(max_length=34)
+    chain = models.CharField(max_length=34)
+    address = models.CharField(max_length=34)
+    pubkey = models.CharField(max_length=66)
+
+    class Meta:
+        db_table = 'addresses'
+        constraints = [
+            models.UniqueConstraint(fields=['address', "season", "chain"], name='unique_season_chain_address')
+        ]
+
+# INFO
 
 class coins(models.Model):
     chain = models.CharField(max_length=34)

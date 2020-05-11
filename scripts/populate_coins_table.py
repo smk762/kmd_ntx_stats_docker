@@ -52,7 +52,7 @@ for item in coins_repo:
     if 'mm2' in item:
         mm2_compatible = item['mm2']
     logger.info("Getting info for ["+coin+"]")
-    print(item)
+    logger.info(item)
     coins_info.update({coin:{"coins_info":item}})
     try:
         coins_info[coin].update({"electrums":[]})

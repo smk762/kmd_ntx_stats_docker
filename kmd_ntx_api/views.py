@@ -7,6 +7,8 @@ import time
 import requests
 import logging
 import logging.handlers
+from datetime import datetime as dt
+import datetime
 from django.db.models import Count, Min, Max, Sum
 from django.shortcuts import render
 from django.contrib.auth.models import User, Group
@@ -149,12 +151,12 @@ class MinedViewSet(viewsets.ModelViewSet):
     ordering_fields = ['block_height']
     ordering = ['-block_height']
 
-class MinedCountViewSet(viewsets.ModelViewSet):
+class MinedCountSeasonViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing mining table data
     """
-    queryset = mined_count.objects.all()
-    serializer_class = MinedCountSerializer
+    queryset = mined_count_season.objects.all()
+    serializer_class = MinedCountSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['notary', 'season']
@@ -166,36 +168,36 @@ class ntxViewSet(viewsets.ModelViewSet):
     API endpoint showing notarisations table data
     """
     queryset = notarised.objects.all()
-    serializer_class = notarisationSerializer
+    serializer_class = NotarisedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['chain']
     ordering_fields = ['block_time']
     ordering = ['-block_time']
 
-class ntxCountViewSet(viewsets.ModelViewSet):
+class ntxCountSeasonViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing notarisations table data
     """
-    queryset = notarised_count.objects.all()
-    serializer_class = NotarisedCountSerializer
+    queryset = notarised_count_season.objects.all()
+    serializer_class = NotarisedCountSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['season', 'notary']
     ordering_fields = ['season', 'notary']
     ordering = ['-season', 'notary']
 
-class ntxChainViewSet(viewsets.ModelViewSet):
+class ntxChainSeasonViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing notarisations table data
     """
-    queryset = notarised_chain.objects.all()
-    serializer_class = NotarisedChainSerializer
+    queryset = notarised_chain_season.objects.all()
+    serializer_class = NotarisedChainSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['chain']
-    ordering_fields = ['block_time']
-    ordering = ['-block_time']
+    filterset_fields = ['chain', 'season']
+    ordering_fields = ['block_height']
+    ordering = ['-block_height']
 
 class coinsViewSet(viewsets.ModelViewSet):
     """
@@ -271,8 +273,8 @@ class notary_names(viewsets.ViewSet):
         for item in notary_addresses:
             if item['season'].find("Season_3") != -1:
                 if "Season_3" not in notaries_list:
-                    notaries_list[item['season']] = []
-                if item['owner_name'] not in notaries_list[item['season']]:
+                    notaries_list["Season_3"] = []
+                if item['owner_name'] not in notaries_list["Season_3"]:
                     notaries_list["Season_3"].append(item['owner_name'])
             else:
                 if item['season'] not in notaries_list:
@@ -383,7 +385,7 @@ class balances_filter(viewsets.ViewSet):
                 resp.update({season:{}})
 
             notary = item['notary']
-            if notary not in resp:
+            if notary not in resp[season]:
                 resp[season].update({notary:{}})
 
             chain = item['chain']
@@ -399,7 +401,8 @@ class balances_filter(viewsets.ViewSet):
 
 class mined_filter(viewsets.ViewSet):
     """
-    API endpoint showing notary node mined blocks
+    API endpoint showing notary node mined blocks. 
+    Use filters or be patient, this is a big dataset.
     """
     serializer_class = MinedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -440,11 +443,11 @@ class mined_filter(viewsets.ViewSet):
         api_resp = wrap_api(resp)
         return Response(api_resp)
 
-class mined_count_filter(viewsets.ViewSet):
+class mined_count_season_filter(viewsets.ViewSet):
     """
     API endpoint showing mined blocks by notary/address (minimum 10 blocks mined)
     """
-    serializer_class = MinedCountSerializer
+    serializer_class = MinedCountSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
 
@@ -455,8 +458,8 @@ class mined_count_filter(viewsets.ViewSet):
         """
         """
         resp = {}
-        data = mined_count.objects.all()
-        data = apply_filters(request, MinedCountSerializer, data)
+        data = mined_count_season.objects.all()
+        data = apply_filters(request, MinedCountSeasonSerializer, data)
         data = data.order_by('season', 'notary')
         data = data.values()
 
@@ -488,11 +491,56 @@ class mined_count_filter(viewsets.ViewSet):
         api_resp = wrap_api(resp)
         return Response(api_resp)
 
+class mined_count_date_filter(viewsets.ViewSet):
+    """
+    API endpoint showing mined blocks by notary/address (minimum 10 blocks mined)
+    Use a filter or be patient, this is a large dataset. E.g.
+    http://notary.earth:8762/mined_count_date/?mined_date=2019-07-16
+    """
+    serializer_class = MinedCountDailySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        resp = {}
+        today = datetime.date.today()
+        data = mined_count_daily.objects.filter(mined_date=today)
+        data = apply_filters(request, MinedCountDailySerializer, data)
+        data = data.order_by('mined_date', 'notary')
+        data = data.values()
+
+        for item in data:
+            blocks_mined = item['blocks_mined']
+            if blocks_mined > 10:
+                notary = item['notary']
+                sum_value_mined = item['sum_value_mined']
+                time_stamp = item['time_stamp']
+                mined_date = str(item['mined_date'])
+
+                if mined_date not in resp:
+                    resp.update({mined_date:{}})
+
+                resp[mined_date].update({
+                    notary:{
+                        "blocks_mined":blocks_mined,
+                        "sum_value_mined":sum_value_mined,
+                        "time_stamp":time_stamp
+                    }
+                })
+
+        api_resp = wrap_api(resp)
+        return Response(api_resp)
+
 class notarised_filter(viewsets.ViewSet):
     """
     API endpoint showing notary node mined blocks
     """
-    serializer_class = notarisationSerializer
+    serializer_class = NotarisedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
 
@@ -504,7 +552,7 @@ class notarised_filter(viewsets.ViewSet):
         """
         resp = {}
         data = notarised.objects.all()
-        data = apply_filters(request, notarisationSerializer, data)
+        data = apply_filters(request, NotarisedSerializer, data)
         data = data.order_by('season', 'chain', '-block_height')
         data = data.values()
 
@@ -517,6 +565,7 @@ class notarised_filter(viewsets.ViewSet):
             block_height = item['block_height']
             prev_block_hash = item['prev_block_hash']
             prev_block_height = item['prev_block_height']
+            season = item['season']
             opret = item['opret']
 
             if season not in resp:
@@ -540,11 +589,11 @@ class notarised_filter(viewsets.ViewSet):
         api_resp = wrap_api(resp)
         return Response(api_resp)
 
-class notarised_chain_filter(viewsets.ViewSet):
+class notarised_chain_season_filter(viewsets.ViewSet):
     """
     API endpoint showing notary node mined blocks
     """
-    serializer_class = NotarisedChainSerializer
+    serializer_class = NotarisedChainSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
 
@@ -555,8 +604,8 @@ class notarised_chain_filter(viewsets.ViewSet):
         """
         """
         resp = {}
-        data = notarised_chain.objects.all()
-        data = apply_filters(request, NotarisedChainSerializer, data)
+        data = notarised_chain_season.objects.all()
+        data = apply_filters(request, NotarisedChainSeasonSerializer, data)
         data = data.order_by('season', 'chain')
         data = data.values()
 
@@ -596,11 +645,11 @@ class notarised_chain_filter(viewsets.ViewSet):
         api_resp = wrap_api(resp)
         return Response(api_resp)
 
-class notarised_count_filter(viewsets.ViewSet):
+class notarised_count_season_filter(viewsets.ViewSet):
     """
     API endpoint showing notary node mined blocks
     """
-    serializer_class = NotarisedCountSerializer
+    serializer_class = NotarisedCountSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
 
@@ -611,8 +660,8 @@ class notarised_count_filter(viewsets.ViewSet):
         """
         """
         resp = {}
-        data = notarised_count.objects.all()
-        data = apply_filters(request, NotarisedCountSerializer, data)
+        data = notarised_count_season.objects.all()
+        data = apply_filters(request, NotarisedCountSeasonSerializer, data)
         data = data.order_by('season', 'notary')
         data = data.values()
 
@@ -644,6 +693,112 @@ class notarised_count_filter(viewsets.ViewSet):
             })
             for chain in chain_ntx_counts:
                 resp[season][notary]["chains"].update({
+                    chain:{
+                        "count":chain_ntx_counts[chain]
+                    }
+                })
+            print(chain_ntx_counts)
+            print(chain_ntx_pct)
+            print(notary)
+            for chain in chain_ntx_pct:
+                print(chain)
+                resp[season][notary]["chains"][chain].update({
+                    "percentage":chain_ntx_pct[chain]
+                }),
+
+
+        api_resp = wrap_api(resp)
+        return Response(api_resp)
+
+class notarised_chain_date_filter(viewsets.ViewSet):
+    """
+    API endpoint showing notary node mined blocks.
+    Defaults to filtering by todays date
+    Use a filter or be patient, this is a large dataset. E.g.
+    http://notary.earth:8762/notarised_count_date/?notarised_date=2020-02-26
+    """
+    serializer_class = NotarisedChainDailySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        resp = {}
+        today = datetime.date.today()
+        data = notarised_chain_daily.objects.filter(notarised_date=today)
+        data = apply_filters(request, NotarisedChainDailySerializer, data)
+        data = data.order_by('notarised_date', 'chain')
+        data = data.values()
+
+        for item in data:
+            notarised_date = str(item['notarised_date'])
+            chain = item['chain']
+            ntx_count = item['ntx_count']
+
+            if notarised_date not in resp:
+                resp.update({notarised_date:{}})
+
+            resp[notarised_date].update({
+                chain:ntx_count
+            })
+
+
+        api_resp = wrap_api(resp)
+        return Response(api_resp)
+
+class notarised_count_date_filter(viewsets.ViewSet):
+    """
+    API endpoint showing notary node mined blocks
+    """
+    serializer_class = NotarisedCountDailySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        resp = {}
+        today = datetime.date.today()
+        data = notarised_count_daily.objects.filter(notarised_date=today)
+        data = apply_filters(request, NotarisedCountDailySerializer, data)
+        data = data.order_by('notarised_date', 'notary')
+        data = data.values()
+
+        for item in data:
+            notarised_date = str(item['notarised_date'])
+            notary = item['notary']
+            btc_count = item['btc_count']
+            antara_count = item['antara_count']
+            third_party_count = item['third_party_count']
+            other_count = item['other_count']
+            total_ntx_count = item['total_ntx_count']
+            chain_ntx_counts = item['chain_ntx_counts']
+            chain_ntx_pct = item['chain_ntx_pct']
+            time_stamp = item['time_stamp']
+
+            if notarised_date not in resp:
+                resp.update({notarised_date:{}})
+
+            resp[notarised_date].update({
+                notary:{
+                    "btc_count":btc_count,
+                    "antara_count":antara_count,
+                    "third_party_count":third_party_count,
+                    "other_count":other_count,
+                    "total_ntx_count":total_ntx_count,
+                    "time_stamp":time_stamp,
+                    "chains":{}
+                }
+            })
+            for chain in chain_ntx_counts:
+                resp[notarised_date][notary]["chains"].update({
                     chain:{
                         "count":chain_ntx_counts[chain],
                         "percentage":chain_ntx_pct[chain]
@@ -751,5 +906,39 @@ class decodeOpRetViewSet(viewsets.ViewSet):
         print("DECODED: "+str(decoded)) 
         print("DECODED: "+str(type(decoded)))
         return Response(decoded)
+
+
+class tablesInfo(viewsets.ViewSet):
+    """
+    Decodes notarization OP_RETURN strings.
+    USAGE: decode_opret/?OP_RETURN=<OP_RETURN>
+    """    
+    # renderer_classes = [TemplateHTMLRenderer]
+    serializer_class = decodeOpRetSerializer
+    # template_name = 'rest_framework/horizontal/input.html' 
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        Returns decoded notarisation information from OP_RETURN strings
+        """
+        conn = table_lib.connect_db()
+        cursor = conn.cursor()
+
+        table_list = table_lib.get_table_names(cursor)
+        resp= {}
+        for table in table_list:
+            rowcount = table_lib.get_count_from_table(cursor, table, '*')
+            resp.update({table:{"rows":rowcount}})
+
+        cursor.close()
+
+        conn.close()
+
+        return Response(resp)
 
 # test time filters for daily notary summary (ntx and mining)

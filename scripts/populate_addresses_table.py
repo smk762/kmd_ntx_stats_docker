@@ -24,7 +24,7 @@ for season in notary_addresses:
             kmd_addr = notary_addresses[season][notary]["KMD"]
             notary_id = address_info[season][kmd_addr]['Notary_id']
             row_data = (season, notary, notary_id, chain, pubkey, address)
-            result = table_lib.add_row_to_addresses_tbl(conn, cursor, row_data)
+            result = table_lib.update_addresses_tbl(conn, cursor, row_data)
             if result == 0:
                 result = "[FAILED]"
             else:

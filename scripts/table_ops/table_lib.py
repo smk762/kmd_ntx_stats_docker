@@ -4,10 +4,10 @@ from datetime import datetime
 from dotenv import load_dotenv
 import psycopg2
 from decimal import *
-from rpclib import def_credentials
+#from rpclib import def_credentials
 import logging
 import logging.handlers
-from address_lib import seasons_info, notary_info, known_addresses
+#from address_lib import seasons_info, notary_info, known_addresses
 
 logger = logging.getLogger(__name__)
 
@@ -187,12 +187,14 @@ def update_season_notarised_count_tbl(conn, cursor, row_data):
 
 def update_daily_mined_count_tbl(conn, cursor, row_data):
     try:
-        sql = "INSERT INTO mined_count_daily \
-            (notary, blocks_mined, sum_value_mined, \
-            mined_date, time_stamp) VALUES (%s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_daily_mined DO UPDATE SET \
-            blocks_mined="+str(row_data[1])+", sum_value_mined="+str(row_data[2])+", \
-            time_stamp='"+str(row_data[7])+"';"
+        sql = "INSERT INTO  mined_count_season \
+            (notary, season, blocks_mined, sum_value_mined, \
+            max_value_mined, last_mined_blocktime, last_mined_block, \
+            time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_season_mined DO UPDATE SET \
+            blocks_mined="+str(row_data[2])+", sum_value_mined="+str(row_data[3])+", \
+            max_value_mined="+str(row_data[4])+", last_mined_blocktime="+str(row_data[5])+", \
+            last_mined_block="+str(row_data[6])+", time_stamp='"+str(row_data[7])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
@@ -205,10 +207,18 @@ def update_daily_mined_count_tbl(conn, cursor, row_data):
 
 def update_daily_notarised_chain_tbl(conn, cursor, row_data):
     sql = "INSERT INTO notarised_chain_daily \
-         (chain, ntx_count, notarised_date) \
-          VALUES (%s, %s, %s) \
+         (chain, ntx_count, block_height, kmd_ntx_blockhash,\
+          kmd_ntx_txid, lastnotarization, opret, ac_ntx_block_hash, \
+          ac_ntx_height, ac_block_height, ntx_lag, season, notarised_date) \
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
           ON CONFLICT ON CONSTRAINT unique_notarised_chain_date DO UPDATE \
-          SET ntx_count="+str(row_data[1])+";"
+          SET ntx_count="+str(row_data[1])+", block_height="+str(row_data[2])+", \
+          kmd_ntx_blockhash='"+str(row_data[3])+"', kmd_ntx_txid='"+str(row_data[4])+"', \
+          lastnotarization="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
+          ac_ntx_block_hash='"+str(row_data[7])+"', ac_ntx_height="+str(row_data[8])+", \
+          ac_block_height='"+str(row_data[9])+"', ntx_lag='"+str(row_data[10])+"' \
+          season='"+str(row_data[11])+"';"
+         
     cursor.execute(sql, row_data)
     conn.commit()
 
@@ -224,20 +234,19 @@ def update_daily_notarised_count_tbl(conn, cursor, row_data):
         third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
         total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
         chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+",  \
-        season='"+str(row_data[9])+"', notarised_date='"+str(row_data[10])+"';"
+        season='"+str(row_data[9])+"';"
     cursor.execute(sql, row_data)
     conn.commit()
+
+
 
 # NOTARISATION OPS
 
 def get_latest_chain_ntx_info(cursor, chain, height):
     sql = "SELECT prev_block_hash, prev_block_height, opret, block_hash, txid \
            FROM notarised WHERE chain = '"+chain+"' AND block_height = "+str(height)+";"
-    print(sql)
     cursor.execute(sql)
     chains_resp = cursor.fetchone()
-    print(len(chains_resp))
-    print(chains_resp)
     return chains_resp
 
 # MINED OPS
@@ -280,20 +289,10 @@ def get_season_mined_counts(conn, cursor, season):
         row_data = (item[0], season, int(item[1]), float(item[2]), float(item[3]),
                     int(item[4]), int(item[5]), int(time_stamp))
         if item[0] in notary_info:
-            logger.info("Adding "+str(row_data)+" to season_mined_counts table")
+            logger.info("Adding "+str(row_data)+" to get_season_mined_counts table")
         result = update_season_mined_count_tbl(conn, cursor, row_data)
     return result
 
-def get_daily_mined_counts(conn, cursor, day):
-    results = get_mined_date_aggregates(cursor, day)
-    time_stamp = int(time.time())
-    for item in results:
-        row_data = (item[0], int(item[1]), float(item[2]), float(item[3]),
-                    int(item[4]), int(item[5]), str(day), int(time_stamp))
-        if item[0] in notary_info:
-            logger.info("Adding "+str(row_data)+" to daily_mined_counts table")
-        result = update_daily_mined_count_tbl(conn, cursor, row_data)
-    return result
 
 # AGGREGATES
 
@@ -305,36 +304,27 @@ def get_chain_ntx_season_aggregates(cursor, season):
     cursor.execute(sql)
     return cursor.fetchall()
 
-def get_chain_ntx_date_aggregates(cursor, day):
+def get_chain_ntx_date_aggregates(cursor, notarised_date):
     sql = "SELECT chain, MAX(block_height), MAX(block_time), COUNT(*) \
            FROM notarised WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
+           notarised_date = '"+str(notarised_date)+"' \
            GROUP BY chain;"
-    print(sql)
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-def get_mined_date_aggregates(cursor, day):
-    sql = "SELECT name, COUNT(*), SUM(value), MAX(value), MAX(block_time), \
-           MAX(block_height) FROM mined WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
-           GROUP BY name;"
     cursor.execute(sql)
     return cursor.fetchall()
 
 # SEASON / DAY FILTERED
 
 def get_ntx_for_season(cursor, season):
-    sql = "SELECT chain, notaries \
+    sql = "SELECT * \
            FROM notarised WHERE \
            season = '"+str(season)+"';"
     cursor.execute(sql)
     return cursor.fetchall()
 
 def get_ntx_for_day(cursor, day):
-    sql = "SELECT chain, notaries \
+    sql = "SELECT * \
            FROM notarised WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
+           DATE_TRUNC('day', notarised_date) = '"+str(day)+"';"
     cursor.execute(sql)
     return cursor.fetchall()
 
@@ -357,18 +347,8 @@ def get_mined_for_day(cursor, day):
 
 def get_dates_list(cursor, table, date_col):
     sql = "SELECT DATE_TRUNC('day', "+date_col+") as day \
-           FROM "+table+" \
+           FROM notarised \
            GROUP BY day;"
-    cursor.execute(sql)
-    dates = cursor.fetchall()
-    date_list = []
-    for date in dates:
-        date_list.append(date[0])
-    return date_list
-
-def get_existing_dates_list(cursor, table, date_col):
-    sql = "SELECT "+date_col+" \
-           FROM "+table+";"
     cursor.execute(sql)
     dates = cursor.fetchall()
     date_list = []
