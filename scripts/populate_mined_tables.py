@@ -2,6 +2,8 @@
 import time
 import logging
 import logging.handlers
+from datetime import datetime as dt
+import datetime
 from address_lib import notary_info, known_addresses, seasons_info
 import psycopg2
 from rpclib import def_credentials
@@ -20,9 +22,14 @@ logger.setLevel(logging.INFO)
 This script is intended to run as a cronjob every 5-15 minutes.
 It rescans the last 100 blocks in the database (configurable with "scan_depth" variable) to realign potential orphaned blocks in the database
 Next, it retrieves info from the block chain for blocks not yet in the database and updates the mined table.
-Lastly, it updates the mined_counts table with aggregated stats for each notar season.
-
+Lastly, it updates the mined_count_season and mined_count_daily tables with aggregated stats for each notar season.
 '''
+
+# set this to false when originally populating the table, or rescanning
+skip_past_seasons = False
+# set this to false when originally populating the daily tables table, or rescanning
+start_daily_2days_ago = False
+
 scan_depth = 100
 
 conn = table_lib.connect_db()
@@ -38,7 +45,7 @@ for txid in db_txids:
     recorded_txids.append(txid[0])
     
 tip = int(rpc["KMD"].getblockcount())
-max_block_in_db = table_lib.get_max_col_val_in_table(cursor, 'block_height', 'mined')
+max_block_in_db = table_lib.get_max_from_table(cursor, 'mined', 'block_height')
 scan_blocks = [*range(max_block_in_db-scan_depth,max_block_in_db,1)]
 for block in scan_blocks:
     logger.info("scanning block "+str(block)+"...")
@@ -49,7 +56,7 @@ for block in scan_blocks:
 
 # adding new blocks...
 existing_blocks = table_lib.select_from_table(cursor, 'mined', 'block_height')
-max_block =  table_lib.get_max_col_val_in_table(cursor, 'block_height', 'mined')
+max_block =  table_lib.get_max_from_table(cursor, 'mined', 'block_height')
 tip = int(rpc["KMD"].getblockcount())
 all_blocks = [*range(0,tip,1)]
 recorded_blocks = []
@@ -89,9 +96,30 @@ conn.commit()
 logger.info("Finished!")
 logger.info(str(len(unrecorded_blocks))+" mined blocks added to table")
 
-# updating mined count aggregate table
-for season in seasons_info:
-    table_lib.get_mined_counts(conn, cursor, season)
+if skip_past_seasons:
+    season = list(seasons_info.keys())[-1]
+    table_lib.get_season_mined_counts(conn, cursor, season)
+else:
+    # updating season mined count aggregate table
+    for season in seasons_info:
+        table_lib.get_season_mined_counts(conn, cursor, season)
+
+# updating daily mined count aggregate table
+
+# start on date of most recent season
+season_start_time = seasons_info[season]["start_time"]
+season_start_dt = dt.fromtimestamp(season_start_time)
+start = season_start_dt.date()
+end = datetime.date.today()
+if start_daily_2days_ago:
+    start = end - datetime.timedelta(days=7)
+delta = datetime.timedelta(days=1)
+logger.info("Aggregating daily notary notarisations from "+str(start)+" to "+str(end))
+day = start
+
+while day <= end:
+    table_lib.get_daily_mined_counts(conn, cursor, day)
+    day += delta
 logging.info("Finished!")
 
 

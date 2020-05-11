@@ -9,7 +9,7 @@ import table_lib
 
 '''
 This script rescans the database against the blockchain to add newly mined blocks and update records for earlier mined block (in case of orphans).
-On completion, it will also populate the aggregate "mined_count" table.
+On completion, it will also populate the aggregate " mined_count_season" and "mined_count_daily" tables.
 
 Note: This script takes a long time to run, so you should use "populate_mined_table.py" unless you suspect orphans.
 The "populate_mined_table.py" script will be updated to autmatically scan back the last 20 blocks in next version
@@ -56,7 +56,7 @@ for block in all_blocks:
 logger.info("Finished!")
 
 for season in seasons_info:
-    table_lib.get_mined_counts(conn, cursor, season)
+    table_lib.get_season_mined_counts(conn, cursor, season)
 logging.info("Finished!")
 
 

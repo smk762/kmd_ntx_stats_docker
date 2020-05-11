@@ -1,16 +1,10 @@
 #!/usr/bin/env python3
-import psycopg2
+import table_lib
 
-conn = psycopg2.connect(
-  host='localhost',
-  user='postgres',
-  password='postgres',
-  port = "7654",
-  database='postgres'
-)
+conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-table = 'notarised_chain'
+table = 'notarised_count_season'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
