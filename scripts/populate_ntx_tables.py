@@ -19,8 +19,6 @@ from electrum_lib import get_ac_block_heights
 from address_lib import notary_info, seasons_info, known_addresses
 from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
 
-exitFlag = 0
-
 class daily_chain_thread(threading.Thread):
     def __init__(self, cursor, season, day):
         threading.Thread.__init__(self)
@@ -28,7 +26,7 @@ class daily_chain_thread(threading.Thread):
         self.cursor = cursor
         self.day = day
     def run(self):
-        thread_daily_aggregate(self.cursor, self.season, self.day)
+        thread_chain_ntx_daily_aggregate(self.cursor, self.season, self.day)
 '''
 This script scans the blockchain for notarisation txids that are not already recorded in the database.
 After updaing the "notarised" table, aggregations are performed to get counts for notaries and chains within each season.
@@ -37,9 +35,9 @@ Script runtime is around 5-10 mins sepending on number of seasons to aggregate
 '''
 
 # set this to false when originally populating the table, or rescanning
-skip_past_seasons = False
+skip_past_seasons = True
 # set this to false when originally populating the daily tables table, or rescanning
-start_daily_2days_ago = False
+start_daily_2days_ago = True
 
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
@@ -370,9 +368,8 @@ def update_daily_notarised_chains(season):
             thread.start()
     logger.info("Notarised blocks for daily chains aggregation complete!")
 
-def thread_daily_aggregate(cursor, season, day):
+def thread_chain_ntx_daily_aggregate(cursor, season, day):
     chains_aggr_resp = table_lib.get_chain_ntx_date_aggregates(cursor, day)
-
     for item in chains_aggr_resp:
         chain = item[0]
         ntx_count = item[3]

@@ -4,7 +4,9 @@ import table_lib
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-table = 'notarised_count_season'
+#table = 'balances'
+table = 'mined_count_daily'
+
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())

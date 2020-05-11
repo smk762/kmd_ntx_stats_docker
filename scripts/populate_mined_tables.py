@@ -26,9 +26,9 @@ Lastly, it updates the mined_count_season and mined_count_daily tables with aggr
 '''
 
 # set this to false when originally populating the table, or rescanning
-skip_past_seasons = False
+skip_past_seasons = True
 # set this to false when originally populating the daily tables table, or rescanning
-start_daily_2days_ago = False
+start_daily_2days_ago = True
 
 scan_depth = 100
 

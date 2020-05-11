@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import time
-from datetime import datetime
+from datetime import datetime as dt
+import datetime
 from dotenv import load_dotenv
 import psycopg2
 from decimal import *
@@ -50,7 +51,7 @@ def update_balances_tbl(conn, cursor, row_data):
         sql = "INSERT INTO balances \
             (notary, chain, balance, address, season, update_time) \
             VALUES (%s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_chain_season_balance DO UPDATE SET \
+            ON CONFLICT ON CONSTRAINT unique_chain_address_balance DO UPDATE SET \
             balance="+str(row_data[2])+", \
             update_time="+str(row_data[5])+";"
         cursor.execute(sql, row_data)
@@ -190,11 +191,15 @@ def update_daily_mined_count_tbl(conn, cursor, row_data):
         sql = "INSERT INTO mined_count_daily \
             (notary, blocks_mined, sum_value_mined, \
             mined_date, time_stamp) VALUES (%s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_daily_mined DO UPDATE SET \
-            blocks_mined="+str(row_data[1])+", sum_value_mined="+str(row_data[2])+", \
-            time_stamp='"+str(row_data[7])+"';"
+            ON CONFLICT ON CONSTRAINT unique_notary_daily_mined \
+            DO UPDATE SET \
+            blocks_mined="+str(row_data[1])+", \
+            sum_value_mined='"+str(row_data[2])+"';"
+        print(sql)
         cursor.execute(sql, row_data)
+        print("executed")
         conn.commit()
+        print("commited")
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
@@ -247,7 +252,7 @@ def get_miner(block):
     rpc["KMD"] = def_credentials("KMD")
     blockinfo = rpc["KMD"].getblock(str(block), 2)
     blocktime = blockinfo['time']
-    block_datetime = datetime.utcfromtimestamp(blockinfo['time'])
+    block_datetime = dt.utcfromtimestamp(blockinfo['time'])
     for tx in blockinfo['tx']:
         if len(tx['vin']) > 0:
             if 'coinbase' in tx['vin'][0]:
@@ -288,8 +293,7 @@ def get_daily_mined_counts(conn, cursor, day):
     results = get_mined_date_aggregates(cursor, day)
     time_stamp = int(time.time())
     for item in results:
-        row_data = (item[0], int(item[1]), float(item[2]), float(item[3]),
-                    int(item[4]), int(item[5]), str(day), int(time_stamp))
+        row_data = (item[0], int(item[1]), float(item[2]), str(day), int(time_stamp))
         if item[0] in notary_info:
             logger.info("Adding "+str(row_data)+" to daily_mined_counts table")
         result = update_daily_mined_count_tbl(conn, cursor, row_data)
@@ -315,8 +319,7 @@ def get_chain_ntx_date_aggregates(cursor, day):
     return cursor.fetchall()
 
 def get_mined_date_aggregates(cursor, day):
-    sql = "SELECT name, COUNT(*), SUM(value), MAX(value), MAX(block_time), \
-           MAX(block_height) FROM mined WHERE \
+    sql = "SELECT name, COUNT(*), SUM(value) FROM mined WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY name;"
     cursor.execute(sql)
