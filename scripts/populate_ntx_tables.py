@@ -87,9 +87,9 @@ def get_ntx_data(txid):
                 opret = raw_tx['vout'][1]['scriptPubKey']['asm']
                 if opret.find("OP_RETURN") != -1:
                     scriptPubKey_asm = opret.replace("OP_RETURN ","")
-                    prev_block_hash = lil_endian(scriptPubKey_asm[:64])
+                    ac_ntx_blockhash = lil_endian(scriptPubKey_asm[:64])
                     try:
-                        prev_block_height = int(lil_endian(scriptPubKey_asm[64:72]),16) 
+                        ac_ntx_height = int(lil_endian(scriptPubKey_asm[64:72]),16) 
                     except:
                         logger.info(scriptPubKey_asm)
                         sys.exit()
@@ -109,26 +109,30 @@ def get_ntx_data(txid):
                         except Exception as e:
                             logger.debug(e)
                     # some decodes have a null char error, this gets rid of that so populate script doesnt error out 
-                    # (some s1 op_returns seem to be decoding differently/wrong)
                     if chain.find('\x00') != -1:
                         chain = chain.replace('\x00','')
-                    row_data = (chain, this_block_height, block_time, block_datetime,
-                                block_hash, notary_list, prev_block_hash, prev_block_height,
-                                txid, opret, season)
+                    # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
+                    if chain.upper() != chain:
+                        row_data = (chain, this_block_height, block_time, block_datetime,
+                                    block_hash, notary_list, ac_ntx_blockhash, ac_ntx_height,
+                                    txid, opret, season)
+                        return row_data
                 else:
+                    # no opretrun in tx, and shouldnt polute the DB.
                     row_data = ("not_opret", this_block_height, block_time, block_datetime,
                                 block_hash, notary_list, "unknown", 0, txid, "unknown", season)
+                    return None
                 
             else:
+                # These are related to easy mining, and shouldnt polute the DB.
                 row_data = ("low_vin", this_block_height, block_time, block_datetime,
                             block_hash, [], "unknown", 0, txid, "unknown", season)
+                return None
         else:
+            # These are outgoing, and should not polute the DB.
             row_data = ("not_dest", this_block_height, block_time, block_datetime,
                         block_hash, [], "unknown", 0, txid, "unknown", season)
-    else:
-        row_data = ("no_dest", this_block_height, block_time, block_datetime,
-                    block_hash, [], "unknown", 0, txid, "unknown", season) 
-    return row_data
+            return None
 
 load_dotenv()
 
@@ -186,9 +190,10 @@ def update_notarisations():
     i = 1
     for txid in unrecorded_txids:
         row_data = get_ntx_data(txid)
-        records.append(row_data)
+        if row_data is not None:
+            records.append(row_data)
 
-        if len(records) == 2:
+        if len(records) == 10:
             now = time.time()
             pct = round(len(records)*i/len(unrecorded_txids)*100,3)
             runtime = int(now-start)
@@ -197,7 +202,7 @@ def update_notarisations():
             logger.info(records)
             logger.info("-----------------------------")
             execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, \
-                                    block_hash, notaries, prev_block_hash, prev_block_height, txid, opret, \
+                                    block_hash, notaries, ac_ntx_blockhash, ac_ntx_height, txid, opret, \
                                     season) VALUES %s", records)
             conn.commit()
             records = []
@@ -208,7 +213,7 @@ def update_notarisations():
                 logger.info("notarisations in database: "+str(block_count[0])+"/"+str(len(all_txids)))
 
     execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, block_hash, \
-                            notaries, prev_block_hash, prev_block_height, txid, opret, season) VALUES %s", records)
+                            notaries, ac_ntx_blockhash, ac_ntx_height, txid, opret, season) VALUES %s", records)
 
     conn.commit()
     logger.info("Notarised blocks updated!")
@@ -238,11 +243,11 @@ def update_season_notarised_chains(season):
                 chain:{
                     "ntx_count": ntx_count,
                     "block_height": block_height,
-                    "lastnotarization": kmd_ntx_time,
+                    "kmd_ntx_blocktime": kmd_ntx_time,
                     "kmd_ntx_blockhash": chains_resp[3],
                     "kmd_ntx_txid": chains_resp[4],
                     "opret": chains_resp[2],
-                    "ac_ntx_block_hash": chains_resp[0],
+                    "ac_ntx_blockhash": chains_resp[0],
                     "ac_ntx_height": chains_resp[1]
                 }
             })
@@ -257,12 +262,12 @@ def update_season_notarised_chains(season):
                     "ntx_lag": "no data"
                 })
             row_data = ( chain, ntx_count, block_height, chain_json[chain]['kmd_ntx_blockhash'], chain_json[chain]['kmd_ntx_txid'],
-                         chain_json[chain]['lastnotarization'], chain_json[chain]['opret'], chain_json[chain]['ac_ntx_block_hash'],
+                         chain_json[chain]['kmd_ntx_blocktime'], chain_json[chain]['opret'], chain_json[chain]['ac_ntx_blockhash'],
                          chain_json[chain]['ac_ntx_height'], chain_json[chain]['ac_block_height'],
                          chain_json[chain]['ntx_lag'], season)
-            logger.info("Adding counts for "+chain+" to season notarised_chain table")
+            logger.info("Adding counts for "+chain+" to "+season+" notarised_chain table")
             table_lib.update_season_notarised_chain_tbl(conn, cursor, row_data)
-    logger.info("Notarised blocks for season chains aggregation complete!")
+    logger.info("Notarised blocks for "+season+" chains aggregation complete!")
 
 def update_season_notarised_counts(season):
     # ignore S1 as some opret is not decoding chain correctly
@@ -339,7 +344,7 @@ def update_season_notarised_counts(season):
                         json.dumps(chain_ntx_pct[notary]), time_stamp, season)
             logger.info("Adding counts for "+notary+" to notarised_count_season table")
             table_lib.update_season_notarised_count_tbl(conn, cursor, row_data)
-    logger.info("Notarised blocks season aggregation for notaries finished...")
+    logger.info("Notarised blocks "+season+" aggregation for notaries finished...")
 
 def update_daily_notarised_chains(season):
     logger.info("Aggregating Notarised blocks for chains...")
@@ -375,7 +380,7 @@ def thread_chain_ntx_daily_aggregate(cursor, season, day):
         ntx_count = item[3]
         if ntx_count != 0:
             row_data = (chain, ntx_count, str(day))
-            logger.info("Adding daily counts for "+chain+" to notarised_chain table")
+            logger.info("Adding daily counts for "+chain+" on "+str(day)+" to notarised_chain table")
             table_lib.update_daily_notarised_chain_tbl(conn, cursor, row_data)
 
 def update_daily_notarised_counts(season):
@@ -467,7 +472,7 @@ def update_daily_notarised_counts(season):
                             node_counts[notary]['third_party_count'], node_counts[notary]['other_count'], 
                             node_counts[notary]['total_ntx_count'], json.dumps(notary_ntx_counts[notary]),
                             json.dumps(notary_ntx_pct[notary]), time_stamp, season, day)
-                logger.info("Adding counts for "+notary+" to notarised_count_daily table")
+                logger.info("Adding counts for "+notary+" for "+str(day)+" to notarised_count_daily table")
                 table_lib.update_daily_notarised_count_tbl(conn, cursor, row_data)
         day += delta
     logger.info("Notarised blocks daily aggregation for notaries finished...")

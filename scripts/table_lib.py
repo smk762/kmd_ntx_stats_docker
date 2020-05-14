@@ -30,10 +30,10 @@ def connect_db():
 def update_addresses_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO addresses \
-              (season, owner_name, notary_id, chain, pubkey, address) \
+              (season, notary, notary_id, chain, pubkey, address) \
                VALUES (%s, %s, %s, %s, %s, %s) \
                ON CONFLICT ON CONSTRAINT unique_season_chain_address DO UPDATE SET \
-               owner_name='"+str(row_data[1])+"', pubkey='"+str(row_data[4])+"', \
+               notary='"+str(row_data[1])+"', pubkey='"+str(row_data[4])+"', \
                address='"+str(row_data[5])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
@@ -154,14 +154,14 @@ def update_season_mined_count_tbl(conn, cursor, row_data):
 def update_season_notarised_chain_tbl(conn, cursor, row_data):
     sql = "INSERT INTO notarised_chain_season \
          (chain, ntx_count, block_height, kmd_ntx_blockhash,\
-          kmd_ntx_txid, lastnotarization, opret, ac_ntx_block_hash, \
+          kmd_ntx_txid, kmd_ntx_blocktime, opret, ac_ntx_blockhash, \
           ac_ntx_height, ac_block_height, ntx_lag, season) \
           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
           ON CONFLICT ON CONSTRAINT unique_notarised_chain_season DO UPDATE \
           SET ntx_count="+str(row_data[1])+", block_height="+str(row_data[2])+", \
           kmd_ntx_blockhash='"+str(row_data[3])+"', kmd_ntx_txid='"+str(row_data[4])+"', \
-          lastnotarization="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
-          ac_ntx_block_hash='"+str(row_data[7])+"', ac_ntx_height="+str(row_data[8])+", \
+          kmd_ntx_blocktime="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
+          ac_ntx_blockhash='"+str(row_data[7])+"', ac_ntx_height="+str(row_data[8])+", \
           ac_block_height='"+str(row_data[9])+"', ntx_lag='"+str(row_data[10])+"';"
          
     cursor.execute(sql, row_data)
@@ -195,11 +195,8 @@ def update_daily_mined_count_tbl(conn, cursor, row_data):
             DO UPDATE SET \
             blocks_mined="+str(row_data[1])+", \
             sum_value_mined='"+str(row_data[2])+"';"
-        print(sql)
         cursor.execute(sql, row_data)
-        print("executed")
         conn.commit()
-        print("commited")
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
@@ -236,13 +233,10 @@ def update_daily_notarised_count_tbl(conn, cursor, row_data):
 # NOTARISATION OPS
 
 def get_latest_chain_ntx_info(cursor, chain, height):
-    sql = "SELECT prev_block_hash, prev_block_height, opret, block_hash, txid \
+    sql = "SELECT ac_ntx_blockhash, ac_ntx_height, opret, block_hash, txid \
            FROM notarised WHERE chain = '"+chain+"' AND block_height = "+str(height)+";"
-    print(sql)
     cursor.execute(sql)
     chains_resp = cursor.fetchone()
-    print(len(chains_resp))
-    print(chains_resp)
     return chains_resp
 
 # MINED OPS
@@ -314,7 +308,6 @@ def get_chain_ntx_date_aggregates(cursor, day):
            FROM notarised WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY chain;"
-    print(sql)
     cursor.execute(sql)
     return cursor.fetchall()
 

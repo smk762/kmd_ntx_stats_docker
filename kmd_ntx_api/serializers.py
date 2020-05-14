@@ -17,7 +17,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class AddressesSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = addresses
-        fields = ['notary_id', 'owner_name', 'address', 'chain',
+        fields = ['notary_id', 'notary', 'address', 'chain',
                   'pubkey', 'season']
 
 class CoinsSerializer(serializers.HyperlinkedModelSerializer):
@@ -61,7 +61,7 @@ class NotarisedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = notarised
         fields = ['txid', 'chain', 'block_height', 'block_time', 'block_datetime', 
-                  'block_hash', 'prev_block_hash', 'prev_block_height',
+                  'block_hash', 'ac_ntx_blockhash', 'ac_ntx_height',
                   'opret', 'notaries', 'season']
 
 class NotarisedCountSeasonSerializer(serializers.HyperlinkedModelSerializer):
@@ -75,7 +75,7 @@ class NotarisedChainSeasonSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = notarised_chain_season
         fields = ['chain', 'ntx_count', 'block_height', 'kmd_ntx_blockhash',
-                  'kmd_ntx_txid', 'lastnotarization', 'opret', 'ac_ntx_block_hash',
+                  'kmd_ntx_txid', 'kmd_ntx_blocktime', 'opret', 'ac_ntx_blockhash',
                   'ac_ntx_height', 'ac_block_height', 'ntx_lag', 'season']
 
 class NotarisedCountDailySerializer(serializers.HyperlinkedModelSerializer):
@@ -99,9 +99,9 @@ class decodeOpRetSerializer(serializers.Serializer):
                                             },
                                         required=True)
     chain = serializers.CharField()
-    prevblock = serializers.IntegerField()
-    prevhash = serializers.CharField()
+    notarised_block = serializers.IntegerField()
+    notarised_blockhash = serializers.CharField()
     class Meta:
-        fields = ['OP_RETURN', 'chain', 'prevblock', 'prevhash']
+        fields = ['OP_RETURN', 'chain', 'notarised_block', 'notarised_blockhash']
 
         

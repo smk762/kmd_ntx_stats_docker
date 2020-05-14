@@ -29,9 +29,14 @@ lines = dpow_readme.splitlines()
 for line in lines:
     raw_info = line.split("|")
     info = [i.strip() for i in raw_info]
-    if info[0] in all_coins and len(info) == 5:
+    if info[0] in all_coins:
         coin = info[0]
-        src = info[1].split("(")[1].replace(")","")
+        print(coin)
+        try:
+            src = info[1].split("(")[1].replace(")","")
+        except:
+            logger.info(src)
+            src = info[1]
         version = info[2]
         server = info[4]
         dpow.update({
@@ -41,6 +46,24 @@ for line in lines:
                 "server":server            
             }
         })
+        logger.info(dpow[coin])
+
+r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/komodo/master/src/assetchains.json")
+ac_json = r.json()
+for item in ac_json:
+    chain = item['ac_name']
+    params = ""
+    for k,v in item.items():
+        if k == 'addnode':
+            for ip in v:
+                params += " -"+k+"="+ip
+        else:
+            params += " -"+k+"="+str(v)
+    if chain in dpow:
+        dpow[chain].update({"launch_params":params})
+    else:
+        logger.info(chain+" not in dpow list")
+
 
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/coins")
 coins_repo = r.json()
@@ -52,7 +75,6 @@ for item in coins_repo:
     if 'mm2' in item:
         mm2_compatible = item['mm2']
     logger.info("Getting info for ["+coin+"]")
-    logger.info(item)
     coins_info.update({coin:{"coins_info":item}})
     try:
         coins_info[coin].update({"electrums":[]})
@@ -68,7 +90,8 @@ for item in coins_repo:
             else:
                 coins_info[coin]['electrums'].append(item['url'])
     except Exception as e:
-        logger.info("GET "+coin+" ELECTRUM ERROR: "+str(e)+" [RESPONSE]: "+r.text)
+        if r.text != "404: Not Found":
+            logger.info("GET "+coin+" ELECTRUM ERROR: "+str(e)+" [RESPONSE]: "+r.text)
     try:
         coins_info[coin].update({"explorers":[]})
         r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/"+coin)
@@ -76,15 +99,12 @@ for item in coins_repo:
         for item in explorers:
             coins_info[coin]['explorers'].append(item)
     except Exception as e:
-        logger.info("GET "+coin+" EXPLORER ERROR: "+str(e)+" [RESPONSE]: "+r.text)
+        if r.text != "404: Not Found":
+            logger.info("GET "+coin+" EXPLORER ERROR: "+str(e)+" [RESPONSE]: "+r.text)
     if coin in dpow:
         dpow_active = 1
         coins_info[coin].update({
-                "dpow":{
-                    "src":dpow[coin]['src'],
-                    "version":dpow[coin]['version'],
-                    "server":dpow[coin]['server']
-                }
+                "dpow":dpow[coin]
             })
     else:
         dpow_active = 0

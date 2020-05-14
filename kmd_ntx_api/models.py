@@ -12,8 +12,8 @@ class notarised(models.Model):
     block_datetime = models.DateTimeField()
     block_height = models.PositiveIntegerField()
     notaries = ArrayField(models.CharField(max_length=34),size=13)
-    prev_block_hash = models.CharField(max_length=64)
-    prev_block_height = models.PositiveIntegerField()
+    ac_ntx_blockhash = models.CharField(max_length=64)
+    ac_ntx_height = models.PositiveIntegerField()
     opret = models.CharField(max_length=2048)
     season = models.CharField(max_length=32)
 
@@ -66,9 +66,9 @@ class notarised_chain_season(models.Model):
     block_height = models.PositiveIntegerField()
     kmd_ntx_blockhash = models.CharField(max_length=64)
     kmd_ntx_txid = models.CharField(max_length=64)
-    lastnotarization = models.PositiveIntegerField()
+    kmd_ntx_blocktime = models.PositiveIntegerField()
     opret = models.CharField(max_length=2048)
-    ac_ntx_block_hash = models.CharField(max_length=64)
+    ac_ntx_blockhash = models.CharField(max_length=64)
     ac_ntx_height = models.PositiveIntegerField()
     ac_block_height = models.CharField(max_length=34)
     ntx_lag = models.CharField(max_length=34)
@@ -151,7 +151,7 @@ class balances(models.Model):
     class Meta:
         db_table = 'balances'
         constraints = [
-            models.UniqueConstraint(fields=['notary', 'chain', 'season'], name='unique_notary_chain_season_balance')
+            models.UniqueConstraint(fields=['chain', 'address'], name='unique_chain_address_balance')
         ]
 
 class rewards(models.Model):
@@ -172,7 +172,7 @@ class rewards(models.Model):
 
 class addresses(models.Model):
     season = models.CharField(max_length=34)
-    owner_name = models.CharField(max_length=34)
+    notary = models.CharField(max_length=34)
     notary_id = models.CharField(max_length=34)
     chain = models.CharField(max_length=34)
     address = models.CharField(max_length=34)
