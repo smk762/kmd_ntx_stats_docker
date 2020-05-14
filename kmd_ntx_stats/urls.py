@@ -9,39 +9,46 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 
-# auto-filterable
-router.register(r'addresses', views.addresses_filter, basename='addresses_filter')
-router.register(r'balances', views.balances_filter, basename='balances_filter')
-router.register(r'coins', views.coins_filter, basename='coins_filter')
-router.register(r'mined', views.mined_filter, basename='mined_filter')
-router.register(r'mined_count_season', views.mined_count_season_filter, basename='mined_count_season_filter')
-router.register(r'mined_count_date', views.mined_count_date_filter, basename='mined_count_date_filter')
-router.register(r'notarised', views.notarised_filter, basename='notarised_filter')
-router.register(r'notarised_chain_season', views.notarised_chain_season_filter, basename='notarised_chain_season_filter')
-router.register(r'notarised_count_season', views.notarised_count_season_filter, basename='notarised_count_season_filter')
-router.register(r'notarised_chain_date', views.notarised_chain_date_filter, basename='notarised_chain_date_filter')
-router.register(r'notarised_count_date', views.notarised_count_date_filter, basename='notarised_count_date_filter')
-router.register(r'notary_rewards', views.rewards_filter, basename='rewards_filter')
+# info
+router.register(r'info/addresses', views.addresses_filter, basename='addresses_filter') # doc
+router.register(r'info/balances', views.balances_filter, basename='balances_filter') # doc
+router.register(r'info/coins', views.coins_filter, basename='coins_filter') # doc
+router.register(r'info/notary_rewards', views.rewards_filter, basename='rewards_filter') # doc
+router.register(r'info/notary_nodes', views.notary_nodes, basename='notary_nodes') # doc
 
-# simple lists
-router.register(r'notary_names', views.notary_names, basename='notary_names')
+# daily
+router.register(r'mined_stats/daily', views.mined_count_date_filter, basename='mined_count_date_filter') # doc
+router.register(r'chain_stats/daily', views.notarised_chain_date_filter, basename='notarised_chain_date_filter') # doc
+router.register(r'notary_stats/daily', views.notarised_count_date_filter, basename='notarised_count_date_filter') # doc
+
+# season
+router.register(r'mined_stats/season', views.mined_count_season_filter, basename='mined_count_season_filter') # doc
+router.register(r'chain_stats/season', views.notarised_chain_season_filter, basename='notarised_chain_season_filter') # doc
+router.register(r'notary_stats/season', views.notarised_count_season_filter, basename='notarised_count_season_filter') # doc
 
 # source
+router.register(r'source/mined', views.MinedViewSet) # doc
+router.register(r'source/notarised', views.ntxViewSet) # doc
+
+# unexposed source
 router.register(r'source/addresses', views.addressesViewSet)
 router.register(r'source/balances', views.balancesViewSet)
 router.register(r'source/coins', views.coinsViewSet)
-router.register(r'source/mined', views.MinedViewSet)
 router.register(r'source/mined_count_season', views.MinedCountSeasonViewSet)
-router.register(r'source/notarised', views.ntxViewSet)
+router.register(r'source/mined_count_date', views.MinedCountDayViewSet)
 router.register(r'source/notarised_chain_season', views.ntxChainSeasonViewSet)
 router.register(r'source/notarised_count_season', views.ntxCountSeasonViewSet)
+router.register(r'source/notarised_chain_date', views.ntxChainDateViewSet)
+router.register(r'source/notarised_count_date', views.ntxCountDateViewSet)
 router.register(r'source/notary_rewards', views.rewardsViewSet)
 
-# tools 
-router.register(r'tools/decode_opret', views.decodeOpRetViewSet, basename='decode_opret')
 
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
+# tools 
+router.register(r'tools/decode_opreturn', views.decode_op_return, basename='decode_opreturn')
+
+# TODO:
+#router.register(r'tools/pubkey_to_address', views.decode_op_return, basename='convert_pubkey')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),

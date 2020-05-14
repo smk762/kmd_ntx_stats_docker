@@ -4,10 +4,8 @@ from datetime import datetime
 from dotenv import load_dotenv
 import psycopg2
 from decimal import *
-from rpclib import def_credentials
 import logging
 import logging.handlers
-from address_lib import seasons_info, notary_info, known_addresses
 
 logger = logging.getLogger(__name__)
 
@@ -242,32 +240,6 @@ def get_latest_chain_ntx_info(cursor, chain, height):
 
 # MINED OPS
 
-def get_miner(block):
-    rpc = {}
-    rpc["KMD"] = def_credentials("KMD")
-    blockinfo = rpc["KMD"].getblock(str(block), 2)
-    blocktime = blockinfo['time']
-    block_datetime = datetime.utcfromtimestamp(blockinfo['time'])
-    for tx in blockinfo['tx']:
-        if len(tx['vin']) > 0:
-            if 'coinbase' in tx['vin'][0]:
-                if 'addresses' in tx['vout'][0]['scriptPubKey']:
-                    address = tx['vout'][0]['scriptPubKey']['addresses'][0]
-                    if address in known_addresses:
-                        name = known_addresses[address]
-                    else:
-                        name = address
-                else:
-                    address = "N/A"
-                    name = "non-standard"
-                for season_num in seasons_info:
-                    if blocktime < seasons_info[season_num]['end_time']:
-                        season = season_num
-                        break
-
-                value = tx['vout'][0]['value']
-                row_data = (block, blocktime, block_datetime, Decimal(value), address, name, tx['txid'], season)
-                return row_data
 
 def get_season_mined_counts(conn, cursor, season):
     sql = "SELECT name, COUNT(*), SUM(value), MAX(value), max(block_time), \
