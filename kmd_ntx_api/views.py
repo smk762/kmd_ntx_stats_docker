@@ -20,6 +20,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import filters, generics, viewsets, permissions, authentication, mixins
 from rest_framework.renderers import TemplateHTMLRenderer
+from django_filters import rest_framework as filters
+
+from rest_framework.filters import OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 
 logger = logging.getLogger("mylogger")
 
@@ -161,6 +165,18 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+class minedFilter(filters.FilterSet):
+    min_block = filters.NumberFilter(field_name="block_height", lookup_expr='gte')
+    max_block = filters.NumberFilter(field_name="block_height", lookup_expr='lte')
+    min_blocktime = filters.NumberFilter(field_name="block_time", lookup_expr='gte')
+    max_blocktime = filters.NumberFilter(field_name="block_time", lookup_expr='lte')
+
+    class Meta:
+        model = mined
+        fields = ['min_block', 'max_block', 'min_blocktime', 'max_blocktime', 
+                  'block_height', 'block_time', 'block_datetime', 
+                  'value', 'address', 'name', 'txid', 'season']
+
 class MinedViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing mining table data
@@ -168,11 +184,29 @@ class MinedViewSet(viewsets.ModelViewSet):
     queryset = mined.objects.all()
     serializer_class = MinedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields =  ['block_height', 'block_time', 'block_datetime',
-                         'value', 'address', 'name', 'txid', 'season']
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = minedFilter
+    #filterset_fields =  ['block_height', 'block_time', 'block_datetime',
+    #                     'value', 'address', 'name', 'txid', 'season']
     ordering_fields = ['block_height', 'address', 'season', 'name']
     ordering = ['-block_height']
+
+
+class ntxFilter(filters.FilterSet):
+    min_block = filters.NumberFilter(field_name="block_height", lookup_expr='gte')
+    max_block = filters.NumberFilter(field_name="block_height", lookup_expr='lte')
+    min_ac_block = filters.NumberFilter(field_name="ac_ntx_height", lookup_expr='gte')
+    max_ac_block = filters.NumberFilter(field_name="ac_ntx_height", lookup_expr='lte')
+    min_blocktime = filters.NumberFilter(field_name="block_time", lookup_expr='gte')
+    max_blocktime = filters.NumberFilter(field_name="block_time", lookup_expr='lte')
+
+    class Meta:
+        model = notarised
+        fields = ['min_block', 'max_block', 'min_ac_block',
+                  'max_ac_block', 'min_blocktime', 'max_blocktime', 
+                  'txid', 'chain', 'block_height', 'block_time',
+                  'block_datetime', 'block_hash', 'ac_ntx_blockhash',
+                  'ac_ntx_height', 'opret', 'season']
 
 class ntxViewSet(viewsets.ModelViewSet):
     """
@@ -181,12 +215,14 @@ class ntxViewSet(viewsets.ModelViewSet):
     queryset = notarised.objects.all()
     serializer_class = NotarisedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['txid', 'chain', 'block_height', 'block_time', 'block_datetime', 
-                        'block_hash', 'ac_ntx_blockhash', 'ac_ntx_height',
-                        'opret', 'season']
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = ntxFilter
+    #filterset_fields = ['txid', 'chain', 'block_height', 'block_time', 'block_datetime', 
+    #                    'block_hash', 'ac_ntx_blockhash', 'ac_ntx_height',
+    #                    'opret', 'season']
     ordering_fields = ['block_time', 'chain']
     ordering = ['-block_time', 'chain']
+
 
 class MinedCountSeasonViewSet(viewsets.ModelViewSet):
     """
@@ -195,7 +231,7 @@ class MinedCountSeasonViewSet(viewsets.ModelViewSet):
     queryset = mined_count_season.objects.all()
     serializer_class = MinedCountSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['notary', 'season']
     ordering_fields = ['block_height']
     ordering = ['notary']
@@ -207,7 +243,7 @@ class MinedCountDayViewSet(viewsets.ModelViewSet):
     queryset = mined_count_daily.objects.all()
     serializer_class = MinedCountDailySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['mined_date', 'notary']
     ordering_fields = ['mined_date','notary']
     ordering = ['-mined_date','notary']
@@ -219,7 +255,7 @@ class ntxCountSeasonViewSet(viewsets.ModelViewSet):
     queryset = notarised_count_season.objects.all()
     serializer_class = NotarisedCountSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['season', 'notary']
     ordering_fields = ['season', 'notary']
     ordering = ['-season', 'notary']
@@ -231,7 +267,7 @@ class ntxChainSeasonViewSet(viewsets.ModelViewSet):
     queryset = notarised_chain_season.objects.all()
     serializer_class = NotarisedChainSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['chain', 'season']
     ordering_fields = ['block_height']
     ordering = ['-block_height']
@@ -243,7 +279,7 @@ class ntxCountDateViewSet(viewsets.ModelViewSet):
     queryset = notarised_count_daily.objects.all()
     serializer_class = NotarisedCountDailySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['notarised_date', 'notary']
     ordering_fields = ['notarised_date', 'notary']
     ordering = ['-notarised_date', 'notary']
@@ -255,7 +291,7 @@ class ntxChainDateViewSet(viewsets.ModelViewSet):
     queryset = notarised_chain_daily.objects.all()
     serializer_class = NotarisedChainDailySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['notarised_date', 'chain']
     ordering_fields = ['notarised_date', 'chain']
     ordering = ['-notarised_date', 'chain']
@@ -267,7 +303,7 @@ class coinsViewSet(viewsets.ModelViewSet):
     queryset = coins.objects.all()
     serializer_class = CoinsSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['chain']
     ordering_fields = ['chain']
     ordering = ['chain']
@@ -279,7 +315,7 @@ class addressesViewSet(viewsets.ModelViewSet):
     queryset = addresses.objects.all()
     serializer_class = AddressesSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['chain', 'notary', 'season']
     ordering_fields = ['chain', 'notary', 'season']
     ordering = ['-season', 'notary', 'chain']
@@ -291,7 +327,7 @@ class balancesViewSet(viewsets.ModelViewSet):
     queryset = balances.objects.all()
     serializer_class = BalancesSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['chain', 'notary', 'season']
     ordering_fields = ['chain', 'notary', 'season']
     ordering = ['-season', 'notary', 'chain']
@@ -303,7 +339,7 @@ class rewardsViewSet(viewsets.ModelViewSet):
     queryset = rewards.objects.all()
     serializer_class = RewardsSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['notary','address']
     ordering_fields = ['notary','address']
     ordering = ['notary']
@@ -317,7 +353,7 @@ class notary_nodes(viewsets.ViewSet):
     """
     serializer_class = AddressesSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['season']
     ordering_fields = ['season', 'notary']
     ordering = ['-season', 'notary']
@@ -359,7 +395,7 @@ class coins_filter(viewsets.ViewSet):
     """
     serializer_class = CoinsSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -395,7 +431,7 @@ class addresses_filter(viewsets.ViewSet):
     """
     serializer_class = AddressesSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -433,7 +469,7 @@ class balances_filter(viewsets.ViewSet):
     """
     serializer_class = BalancesSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -474,7 +510,7 @@ class mined_count_season_filter(viewsets.ViewSet):
     """
     serializer_class = MinedCountSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -527,7 +563,7 @@ class mined_count_date_filter(viewsets.ViewSet):
     """
     serializer_class = MinedCountDailySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -573,7 +609,7 @@ class notarised_chain_season_filter(viewsets.ViewSet):
     """
     serializer_class = NotarisedChainSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -629,7 +665,7 @@ class notarised_count_season_filter(viewsets.ViewSet):
     """
     serializer_class = NotarisedCountSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -642,7 +678,7 @@ class notarised_count_season_filter(viewsets.ViewSet):
         data = apply_filters(request, NotarisedCountSeasonSerializer, data)
         # default filter if none set.
         if len(data) == notarised_count_season.objects.count() or len(data) == 0:
-            data = mined_count_daily.objects.filter(season='Season_3')
+            data = notarised_count_season.objects.filter(season='Season_3')
 
         data = data.order_by('season', 'notary').values()
 
@@ -696,7 +732,7 @@ class notarised_chain_date_filter(viewsets.ViewSet):
     """
     serializer_class = NotarisedChainDailySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -745,7 +781,7 @@ class notarised_count_date_filter(viewsets.ViewSet):
     """
     serializer_class = NotarisedCountDailySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -817,7 +853,7 @@ class rewards_filter(viewsets.ViewSet):
     """
     serializer_class = RewardsSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -922,7 +958,7 @@ class mined_filter(viewsets.ViewSet):
     """
     serializer_class = MinedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -969,7 +1005,7 @@ class notarised_filter(viewsets.ViewSet):
     """
     serializer_class = NotarisedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
     def create(self, validated_data):
         return Task(id=None, **validated_data)
@@ -1019,3 +1055,9 @@ class notarised_filter(viewsets.ViewSet):
 
         api_resp = wrap_api(resp)
         return Response(api_resp)
+
+## DASHBOARD        
+def dash_view(request, dash_name=None):
+    context = {}
+    print(dash_view)
+    return render(request, 'charts.html', context)
