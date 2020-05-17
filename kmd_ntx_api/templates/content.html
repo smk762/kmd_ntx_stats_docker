@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Page Title{% endblock %}
+
+{% block header %}
+<header class="c-header c-header-light px-3">
+  <a class="c-header-brand" href="#">
+    <img src="/images/brand/coreui-signet.svg" width="40" height="40" class="d-inline-block align-top" alt="CoreUI Logo">
+    CoreUI
+  </a>
+  <button class="c-header-toggler" type="button">
+    <span class="c-header-toggler-icon"></span>
+  </button>
+  <ul class="c-header-nav mr-auto">
+      <li class="c-header-nav-item active">
+        <a class="c-header-nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="c-header-nav-item">
+        <a class="c-header-nav-link" href="#">Link</a>
+      </li>
+      <li class="c-header-nav-item dropdown">
+        <a class="c-header-nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+          Dropdown
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#">Action</a>
+          <a class="dropdown-item" href="#">Another action</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </li>
+      <li class="c-header-nav-item">
+        <a class="c-header-nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+</header>
+{% endblock %}
+
+{% block sidebar %}
+<div class="c-sidebar c-sidebar-dark c-sidebar-show">
+  <ul class="c-sidebar-nav">
+    <li class="c-sidebar-nav-title">Nav Title</li>
+    <li class="c-sidebar-nav-item">
+      <a class="c-sidebar-nav-link" href="#">
+        <i class="c-sidebar-nav-icon cil-speedometer"></i> Nav item
+      </a>
+    </li>
+    <li class="c-sidebar-nav-item">
+      <a class="c-sidebar-nav-link" href="#">
+        <i class="c-sidebar-nav-icon cil-speedometer"></i> With badge
+        <span class="badge badge-primary">NEW</span>
+      </a>
+    </li>
+    <li class="c-sidebar-nav-item nav-dropdown">
+      <a class="c-sidebar-nav-link nav-dropdown-toggle" href="#">
+        <i class="c-sidebar-nav-icon cil-puzzle"></i> Nav dropdown
+      </a>
+      <ul class="c-sidebar-nav-dropdown-items">
+        <li class="c-sidebar-nav-item">
+          <a class="c-sidebar-nav-link" href="#">
+            <i class="c-sidebar-nav-icon cil-puzzle"></i> Nav dropdown item
+          </a>
+        </li>
+        <li class="c-sidebar-nav-item">
+          <a class="c-sidebar-nav-link" href="#">
+            <i class="c-sidebar-nav-icon cil-puzzle"></i> Nav dropdown item
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="c-sidebar-nav-item mt-auto">
+      <a class="c-sidebar-nav-link c-sidebar-nav-link-success" href="https://coreui.io">
+        <i class="c-sidebar-nav-icon cil-cloud-download"></i> Download CoreUI</a>
+    </li>
+    <li class="c-sidebar-nav-item">
+      <a class="c-sidebar-nav-link c-sidebar-nav-link-danger" href="https://coreui.io/pro/">
+        <i class="c-sidebar-nav-icon cil-layers"></i> Try CoreUI
+        <strong>PRO</strong>
+      </a>
+    </li>
+  </ul>
+  <button class="c-sidebar-minimizer c-brand-minimizer" type="button"></button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div>Content goes here.</div>
+{% endblock %}
+
+{% block footer %}
+<div class="d-flex flex-column">
+  <footer class="footer">
+    <div>
+      <a href="https://coreui.io">CoreUI</a>
+      <span>&copy; 2020 creativeLabs.</span>
+    </div>
+    <div class="ml-auto">
+      <span>Powered by</span>
+      <a href="https://coreui.io">CoreUI</a>
+    </div>
+  </footer>
+</div>
+{% endblock %}

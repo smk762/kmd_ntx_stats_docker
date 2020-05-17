@@ -42,15 +42,17 @@ router.register(r'source/notarised_chain_date', views.ntxChainDateViewSet)
 router.register(r'source/notarised_count_date', views.ntxCountDateViewSet)
 router.register(r'source/notary_rewards', views.rewardsViewSet)
 
-
 # tools 
 router.register(r'tools/decode_opreturn', views.decode_op_return, basename='decode_opreturn')
 
 # TODO:
-#router.register(r'tools/pubkey_to_address', views.decode_op_return, basename='convert_pubkey')
+# router.register(r'tools/pubkey_to_address', views.decode_op_return, basename='convert_pubkey')
+# path('posts/<int:post_id>/', post_detail_view)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('dash/', views.dash_view, name='index'),
+    path('dash/<str:dash_name>/', views.dash_view),
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
