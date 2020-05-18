@@ -1,0 +1,14 @@
+{% extends "base2.html" %}
+{% block content %}
+<table id="table_id" class="table table-striped table-bordered" style="width:100%" data-ajax="{% url 'balancesViewSet-list' %}?format=datatables">
+	<thead>
+		<tr>
+			<th data-data="notary">notary</th>
+			<th data-data="chain">chain</th>
+			<th data-data="address">address</th>
+			<th data-data="balance">balance</th>
+			<th data-data="season">season</th>
+		</tr>
+	</thead>
+</table>
+{% endblock %}

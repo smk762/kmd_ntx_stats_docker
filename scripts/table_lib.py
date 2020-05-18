@@ -10,7 +10,7 @@ import logging
 import logging.handlers
 from address_lib import seasons_info, notary_info, known_addresses
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 load_dotenv()
 

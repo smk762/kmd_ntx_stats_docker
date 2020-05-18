@@ -60,6 +60,79 @@ noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
 
 # Queryset manipulation
 
+def get_eco_data_link():
+    item = random.choice(eco_data)
+    ad = random.choice(item['ads'])
+    while ad['frequency'] == "never":
+        item = random.choice(eco_data)
+        ad = random.choice(item['ads'])
+    link = ad['data']['string1']+" <a href="+ad['data']['link']+"> " \
+          +ad['data']['anchorText']+"</a> "+ad['data']['string2']
+    return link
+
+def get_nn_health():
+
+    coins_data = coins.objects.filter(dpow_active=1).values('chain')
+    chains_list = []
+    for item in coins_data:
+        # ignore BTC, OP RETURN lists ntx to BTC as "KMD"
+        if item['chain'] not in chains_list and item['chain'] != 'BTC':
+            chains_list.append(item['chain'])
+
+    notaries = addresses.objects.filter(season="Season_3").values('notary')
+    notary_list = []
+    for item in notaries:
+        if item['notary'] not in notary_list:
+            notary_list.append(item['notary'])
+
+    timenow = int(time.time())
+    day_ago = timenow-60*60*24
+
+    filter_kwargs = {}
+    filter_kwargs.update({'block_time__gte':day_ago})  
+    filter_kwargs.update({'block_time__lte':timenow})
+
+    ntx_data = notarised.objects.filter(**filter_kwargs)
+    ntx_chain_24hr = ntx_data.values('chain') \
+                     .annotate(max_ntx_time=Max('block_time'))
+
+    ntx_chains = []
+    for item in ntx_chain_24hr:
+        ntx_chains.append(item['chain'])
+    ntx_chains = list(set(ntx_chains))
+
+    ntx_node_24hr = ntx_data.values('notaries')
+    ntx_nodes = []
+    for item in ntx_node_24hr:
+        ntx_nodes += item['notaries']
+    ntx_nodes = list(set(ntx_nodes))
+
+
+    mining_data = mined.objects.filter(**filter_kwargs) \
+                 .values('name') \
+                 .annotate(num_mined=Count('name'))
+    mining_nodes = []
+    for item in mining_data:
+        if item['name'] in notary_list:
+            mining_nodes.append(item['name'])
+
+    non_mining_nodes = list(set(notary_list)- set(mining_nodes))
+    non_ntx_nodes = list(set(notary_list).symmetric_difference(set(ntx_nodes)))
+    non_ntx_chains = list(set(chains_list).symmetric_difference(set(ntx_chains)))
+    nn_health = {
+        "mining_nodes":mining_nodes,
+        "non_mining_nodes":non_mining_nodes,
+        "mining_nodes_pct":round(len(mining_nodes)/len(notary_list)*100,2),
+        "ntx_nodes":ntx_nodes,
+        "non_ntx_nodes":non_ntx_nodes,
+        "ntx_nodes_pct":round(len(ntx_nodes)/len(notary_list)*100,2),
+        "chains_list":chains_list,
+        "ntx_chains":ntx_chains,
+        "non_ntx_chains":non_ntx_chains,
+        "ntx_chains_pct":round(len(ntx_chains)/len(chains_list)*100,2)
+    }
+    return nn_health
+
 def apply_filters(request, serializer, queryset, table=None):
     filter_kwargs = {}
     for field in serializer.Meta.fields:
@@ -1060,17 +1133,20 @@ class notarised_filter(viewsets.ViewSet):
         api_resp = wrap_api(resp)
         return Response(api_resp)
 
-def get_eco_data_link():
-    item = random.choice(eco_data)
-    ad = random.choice(item['ads'])
-    while ad['frequency'] == "never":
-        item = random.choice(eco_data)
-        ad = random.choice(item['ads'])
-    link = ad['data']['string1']+" <a href="+ad['data']['link']+"> " \
-          +ad['data']['anchorText']+"</a> "+ad['data']['string2']
-    return link
 
 ## DASHBOARD        
 def dash_view(request, dash_name=None):
-    context = {"eco_data_link":get_eco_data_link()}
-    return render(request, 'base2.html', context)
+    if dash_name == 'balances_table':
+        html = 'tables/balances.html'
+    else:
+        html = 'base2.html'
+    nn_health = get_nn_health()
+    context = {
+        "eco_data_link":get_eco_data_link(),
+        "nn_health":nn_health
+    }
+    return render(request, html, context)
+
+## DASHBOARD TABLES
+def balances_table(request):
+    pass

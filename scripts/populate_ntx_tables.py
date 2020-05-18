@@ -36,8 +36,8 @@ Script runtime is around 5-10 mins sepending on number of seasons to aggregate
 
 # set this to false when originally populating the table, or rescanning
 skip_past_seasons = True
-# set this to false when originally populating the daily tables table, or rescanning
-start_daily_2days_ago = True
+# set this to True to quickly update tables with most recent data
+skip_until_2days_ago = True
 
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
@@ -74,7 +74,7 @@ def get_ntx_data(txid):
             break
     if len(dest_addrs) > 0:
         if ntx_addr in dest_addrs:
-            if len(raw_tx['vin']) >= 13:
+            if len(raw_tx['vin']) == 13:
                 notary_list = []
                 for item in raw_tx['vin']:
                     if "address" in item:
@@ -85,6 +85,7 @@ def get_ntx_data(txid):
                             notary_list.append(item['address'])
                 notary_list.sort()
                 opret = raw_tx['vout'][1]['scriptPubKey']['asm']
+                logger.info(opret)
                 if opret.find("OP_RETURN") != -1:
                     scriptPubKey_asm = opret.replace("OP_RETURN ","")
                     ac_ntx_blockhash = lil_endian(scriptPubKey_asm[:64])
@@ -112,7 +113,7 @@ def get_ntx_data(txid):
                     if chain.find('\x00') != -1:
                         chain = chain.replace('\x00','')
                     # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
-                    if chain.upper() != chain:
+                    if chain.upper() == chain:
                         row_data = (chain, this_block_height, block_time, block_datetime,
                                     block_hash, notary_list, ac_ntx_blockhash, ac_ntx_height,
                                     txid, opret, season)
@@ -136,7 +137,7 @@ def get_ntx_data(txid):
 
 load_dotenv()
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)
@@ -153,13 +154,15 @@ ntx_addr = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 
 noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
 
+tip = int(rpc["KMD"].getblockcount())
 recorded_txids = []
 start_block = 0
 if skip_past_seasons:
     start_block = seasons_info[list(seasons_info.keys())[-1]]["start_block"]
+if skip_until_2days_ago:
+    start_block = tip - 24*7*60
 all_txids = []
 chunk_size = 100000
-tip = int(rpc["KMD"].getblockcount())
 
 logger.info("Getting existing TXIDs from database...")
 cursor.execute("SELECT txid from notarised;")
@@ -191,27 +194,26 @@ def update_notarisations():
     for txid in unrecorded_txids:
         row_data = get_ntx_data(txid)
         if row_data is not None:
+            logger.info(row_data)
             records.append(row_data)
-
-        if len(records) == 10:
-            now = time.time()
-            pct = round(len(records)*i/len(unrecorded_txids)*100,3)
-            runtime = int(now-start)
-            est_end = int(100/pct*runtime)
-            logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_txids))+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
-            logger.info(records)
-            logger.info("-----------------------------")
-            execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, \
-                                    block_hash, notaries, ac_ntx_blockhash, ac_ntx_height, txid, opret, \
-                                    season) VALUES %s", records)
-            conn.commit()
-            records = []
-            i += 1
-            if i%5 == 0:
-                cursor.execute("SELECT COUNT(*) from notarised;")
-                block_count = cursor.fetchone()
-                logger.info("notarisations in database: "+str(block_count[0])+"/"+str(len(all_txids)))
-
+            if len(records) == 10:
+                now = time.time()
+                pct = round(len(records)*i/len(unrecorded_txids)*100,3)
+                runtime = int(now-start)
+                est_end = int(100/pct*runtime)
+                logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_txids))+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
+                logger.info(records)
+                logger.info("-----------------------------")
+                execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, \
+                                        block_hash, notaries, ac_ntx_blockhash, ac_ntx_height, txid, opret, \
+                                        season) VALUES %s", records)
+                conn.commit()
+                records = []
+                i += 1
+                if i%5 == 0:
+                    cursor.execute("SELECT COUNT(*) from notarised;")
+                    block_count = cursor.fetchone()
+                    logger.info("notarisations in database: "+str(block_count[0])+"/"+str(len(all_txids)))
     execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, block_hash, \
                             notaries, ac_ntx_blockhash, ac_ntx_height, txid, opret, season) VALUES %s", records)
 
@@ -355,7 +357,7 @@ def update_daily_notarised_chains(season):
         season_start_dt = dt.fromtimestamp(season_start_time)
         start = season_start_dt.date()
         end = datetime.date.today()
-        if start_daily_2days_ago:
+        if skip_until_2days_ago:
             start = end - datetime.timedelta(days=2)
         delta = datetime.timedelta(days=1)
 
@@ -389,7 +391,7 @@ def update_daily_notarised_counts(season):
     season_start_dt = dt.fromtimestamp(season_start_time)
     start = season_start_dt.date()
     end = datetime.date.today()
-    if start_daily_2days_ago:
+    if skip_until_2days_ago:
         start = end - datetime.timedelta(days=7)
     delta = datetime.timedelta(days=1)
     logger.info("Aggregating daily notary notarisations from "+str(start)+" to "+str(end))

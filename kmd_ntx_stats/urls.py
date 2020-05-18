@@ -37,16 +37,16 @@ router.register(r'source/mined', views.MinedViewSet, basename='MinedViewSet') # 
 router.register(r'source/notarised', views.ntxViewSet, basename='ntxViewSet') # doc
 
 # unexposed source
-router.register(r'source/addresses', views.addressesViewSet)
-router.register(r'source/balances', views.balancesViewSet)
-router.register(r'source/coins', views.coinsViewSet)
-router.register(r'source/mined_count_season', views.MinedCountSeasonViewSet)
-router.register(r'source/mined_count_date', views.MinedCountDayViewSet)
-router.register(r'source/notarised_chain_season', views.ntxChainSeasonViewSet)
-router.register(r'source/notarised_count_season', views.ntxCountSeasonViewSet)
-router.register(r'source/notarised_chain_date', views.ntxChainDateViewSet)
-router.register(r'source/notarised_count_date', views.ntxCountDateViewSet)
-router.register(r'source/notary_rewards', views.rewardsViewSet)
+router.register(r'source/addresses', views.addressesViewSet, basename='addressesViewSet')
+router.register(r'source/balances', views.balancesViewSet, basename='balancesViewSet')
+router.register(r'source/coins', views.coinsViewSet, basename='coinsViewSet')
+router.register(r'source/mined_count_season', views.MinedCountSeasonViewSet, basename='MinedCountSeasonViewSet')
+router.register(r'source/mined_count_date', views.MinedCountDayViewSet, basename='MinedCountDayViewSet')
+router.register(r'source/notarised_chain_season', views.ntxChainSeasonViewSet, basename='ntxChainSeasonViewSet')
+router.register(r'source/notarised_count_season', views.ntxCountSeasonViewSet, basename='ntxCountSeasonViewSet')
+router.register(r'source/notarised_chain_date', views.ntxChainDateViewSet, basename='ntxChainDateViewSet')
+router.register(r'source/notarised_count_date', views.ntxCountDateViewSet, basename='ntxCountDateViewSet')
+router.register(r'source/notary_rewards', views.rewardsViewSet, basename='rewardsViewSet')
 
 # tools 
 router.register(r'tools/decode_opreturn', views.decode_op_return, basename='decode_opreturn')
