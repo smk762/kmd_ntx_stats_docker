@@ -4,6 +4,7 @@ import sys
 import json
 import binascii
 import time
+import random
 import requests
 import logging
 import logging.handlers
@@ -51,6 +52,9 @@ seasons_info = {
             "notaries":[]
         }
 }
+
+r = requests.get("https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json")
+eco_data = r.json()
 
 noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
 
@@ -1056,8 +1060,17 @@ class notarised_filter(viewsets.ViewSet):
         api_resp = wrap_api(resp)
         return Response(api_resp)
 
+def get_eco_data_link():
+    item = random.choice(eco_data)
+    ad = random.choice(item['ads'])
+    while ad['frequency'] == "never":
+        item = random.choice(eco_data)
+        ad = random.choice(item['ads'])
+    link = ad['data']['string1']+" <a href="+ad['data']['link']+"> " \
+          +ad['data']['anchorText']+"</a> "+ad['data']['string2']
+    return link
+
 ## DASHBOARD        
 def dash_view(request, dash_name=None):
-    context = {}
-    print(dash_view)
-    return render(request, 'charts.html', context)
+    context = {"eco_data_link":get_eco_data_link()}
+    return render(request, 'base2.html', context)
