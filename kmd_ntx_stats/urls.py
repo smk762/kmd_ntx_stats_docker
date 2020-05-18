@@ -17,18 +17,24 @@ router.register(r'info/notary_rewards', views.rewards_filter, basename='rewards_
 router.register(r'info/notary_nodes', views.notary_nodes, basename='notary_nodes') # doc
 
 # daily
-router.register(r'mined_stats/daily', views.mined_count_date_filter, basename='mined_count_date_filter') # doc
-router.register(r'chain_stats/daily', views.notarised_chain_date_filter, basename='notarised_chain_date_filter') # doc
-router.register(r'notary_stats/daily', views.notarised_count_date_filter, basename='notarised_count_date_filter') # doc
+router.register(r'mined_stats/daily', views.mined_count_date_filter,
+                  basename='mined_count_date_filter') # doc
+router.register(r'chain_stats/daily', views.notarised_chain_date_filter,
+                  basename='notarised_chain_date_filter') # doc
+router.register(r'notary_stats/daily', views.notarised_count_date_filter,
+                  basename='notarised_count_date_filter') # doc
 
 # season
-router.register(r'mined_stats/season', views.mined_count_season_filter, basename='mined_count_season_filter') # doc
-router.register(r'chain_stats/season', views.notarised_chain_season_filter, basename='notarised_chain_season_filter') # doc
-router.register(r'notary_stats/season', views.notarised_count_season_filter, basename='notarised_count_season_filter') # doc
+router.register(r'mined_stats/season', views.mined_count_season_filter,
+                  basename='mined_count_season_filter') # doc
+router.register(r'chain_stats/season', views.notarised_chain_season_filter,
+                  basename='notarised_chain_season_filter') # doc
+router.register(r'notary_stats/season', views.notarised_count_season_filter,
+                  basename='notarised_count_season_filter') # doc
 
 # source
-router.register(r'source/mined', views.MinedViewSet) # doc
-router.register(r'source/notarised', views.ntxViewSet) # doc
+router.register(r'source/mined', views.MinedViewSet, basename='MinedViewSet') # doc
+router.register(r'source/notarised', views.ntxViewSet, basename='ntxViewSet') # doc
 
 # unexposed source
 router.register(r'source/addresses', views.addressesViewSet)

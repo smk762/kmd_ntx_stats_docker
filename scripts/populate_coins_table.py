@@ -31,11 +31,9 @@ for line in lines:
     info = [i.strip() for i in raw_info]
     if info[0] in all_coins:
         coin = info[0]
-        print(coin)
         try:
             src = info[1].split("(")[1].replace(")","")
         except:
-            logger.info(src)
             src = info[1]
         version = info[2]
         server = info[4]
@@ -46,13 +44,12 @@ for line in lines:
                 "server":server            
             }
         })
-        logger.info(dpow[coin])
 
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/komodo/master/src/assetchains.json")
 ac_json = r.json()
 for item in ac_json:
     chain = item['ac_name']
-    params = ""
+    params = "~/komodo/src/komodod"
     for k,v in item.items():
         if k == 'addnode':
             for ip in v:
@@ -64,6 +61,20 @@ for item in ac_json:
     else:
         logger.info(chain+" not in dpow list")
 
+other_launch = {
+    "BTC":"~/bitcoin/src/bitcoin-cli",
+    "KMD":"~/komodo/src/komodod", 
+    "HUSH3":"~/hush3/src/hushd",   
+    "AYA":"~/AYAv2/src/aryacoind",
+    "CHIPS":"~/chips3/src/chipsd",
+    "GAME":"~/GameCredits/src/gamecreditsd",
+    "EMC2":"~/einsteinium/src/einsteiniumd",
+    "GIN":"~/gincoin-core/src/gincoind",  
+    "VRSC":"~/VerusCoin/src/verusd",   
+}
+
+for chain in other_launch:
+    dpow[chain].update({"launch_params":other_launch[chain]})
 
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/coins")
 coins_repo = r.json()
