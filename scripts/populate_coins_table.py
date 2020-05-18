@@ -126,6 +126,16 @@ for item in coins_repo:
                 dpow_active, mm2_compatible)
     table_lib.update_coins_tbl(conn, cursor, row_data)
 
+for coin in dpow:
+    if coin not in coins_info:
+        print("Adding "+coin+" (in dpow, but not in coins repo)")
+        row_data = (coin, json.dumps({}),
+                    json.dumps([]), json.dumps([]),
+                    json.dumps([]), json.dumps(dpow[coin]),
+                    1, 0)
+        table_lib.update_coins_tbl(conn, cursor, row_data)
+
+
 logging.info("Finished!")
 cursor.close()
 conn.close()

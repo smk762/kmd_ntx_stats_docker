@@ -9,3 +9,4 @@ python-dotenv
 django-filter
 dynamic-rest
 django-crispy-forms
+djangorestframework-datatables
