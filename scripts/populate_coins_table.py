@@ -58,11 +58,14 @@ for item in ac_json:
             params += " -"+k+"="+str(v)
     if chain in dpow:
         dpow[chain].update({"launch_params":params})
+        dpow[chain].update({"cli":'~/komodo/src/komodo-cli -ac_name='+chain})
+        dpow[chain].update({"conf_path":'~/.komodo/'+chain+'/'+chain+'.conf'})
+
     else:
         logger.info(chain+" not in dpow list")
 
 other_launch = {
-    "BTC":"~/bitcoin/src/bitcoin-cli",
+    "BTC":"~/bitcoin/src/bitcoind",
     "KMD":"~/komodo/src/komodod", 
     "HUSH3":"~/hush3/src/hushd",   
     "AYA":"~/AYAv2/src/aryacoind",
@@ -72,9 +75,35 @@ other_launch = {
     "GIN":"~/gincoin-core/src/gincoind",  
     "VRSC":"~/VerusCoin/src/verusd",   
 }
+other_conf = {
+    "BTC":"~/.bitcoin/bitcoin.conf",
+    "KMD":"~/.komodo/komodo.conf", 
+    "HUSH3":"~/.komodo/HUSH3/HUSH3.conf",   
+    "AYA":"~/.aryacoin/aryacoin.conf",
+    "CHIPS":"~/.chips/chips.conf",
+    "GAME":"~/.gamecredits/gamecredits.conf",
+    "EMC2":"~/.einsteinium/einsteinium.conf",
+    "GIN":"~/.gincoincore/gincoin.conf",  
+    "VRSC":"~/.komodo/VRSC/VRSC.conf",   
+}
+other_cli = {
+    "BTC":"~/bitcoin/src/bitcoin-cli",
+    "KMD":"~/komodo/src/komodo-cli", 
+    "HUSH3":"~/hush3/src/hush-cli",   
+    "AYA":"~/AYAv2/src/aryacoin-cli",
+    "CHIPS":"~/chips3/src/chips-cli",
+    "GAME":"~/GameCredits/src/gamecredits-cli",
+    "EMC2":"~/einsteinium/src/einsteinium-cli",
+    "GIN":"~/gincoin-core/src/gincoin-cli",  
+    "VRSC":"~/VerusCoin/src/verus",   
+}
 
 for chain in other_launch:
     dpow[chain].update({"launch_params":other_launch[chain]})
+for chain in other_conf:
+    dpow[chain].update({"conf_path":other_conf[chain]})
+for chain in other_cli:
+    dpow[chain].update({"cli":other_cli[chain]})
 
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/coins")
 coins_repo = r.json()

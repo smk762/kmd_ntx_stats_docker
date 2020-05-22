@@ -108,6 +108,18 @@ class mined(models.Model):
             models.UniqueConstraint(fields=['block_height'], name='unique_block')
         ]
 
+class chain_sync(models.Model):
+    chain = models.CharField(max_length=64)
+    block_height = models.PositiveIntegerField()
+    sync_hash = models.CharField(max_length=64)
+    explorer_hash = models.CharField(max_length=64)
+
+    class Meta:
+        db_table = 'chain_sync'
+        constraints = [
+            models.UniqueConstraint(fields=['chain'], name='unique_chain_sync')
+        ]
+
 class mined_count_season(models.Model):
     notary = models.CharField(max_length=64)
     blocks_mined = models.PositiveIntegerField()
@@ -146,11 +158,13 @@ class balances(models.Model):
     address = models.CharField(max_length=34)
     update_time = models.PositiveIntegerField()
     season = models.CharField(max_length=34)
+    node = models.CharField(max_length=34)
 
     class Meta:
         db_table = 'balances'
         constraints = [
-            models.UniqueConstraint(fields=['chain', 'address'], name='unique_chain_address_balance')
+            models.UniqueConstraint(fields=['chain', 'address', 'season'],
+                                    name='unique_chain_address_season_balance')
         ]
 
 class rewards(models.Model):
@@ -176,6 +190,7 @@ class addresses(models.Model):
     chain = models.CharField(max_length=34)
     address = models.CharField(max_length=34)
     pubkey = models.CharField(max_length=66)
+    node = models.CharField(max_length=34)
 
     class Meta:
         db_table = 'addresses'
@@ -201,5 +216,20 @@ class coins(models.Model):
             models.UniqueConstraint(fields=['chain'], name='unique_chain_coin')
         ]
 
+class nn_social(models.Model):
+    notary = models.CharField(max_length=128)
+    twitter = models.CharField(max_length=128)
+    youtube = models.CharField(max_length=128)
+    discord = models.CharField(max_length=128)
+    telegram = models.CharField(max_length=128)
+    github = models.CharField(max_length=128)
+    keybase = models.CharField(max_length=128)
+    website = models.CharField(max_length=128)
+
+    class Meta:
+        db_table = 'nn_social'
+        constraints = [
+            models.UniqueConstraint(fields=['notary'], name='unique_notary_social')
+        ]
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"
