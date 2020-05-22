@@ -10,7 +10,7 @@ import logging
 import logging.handlers
 from address_lib import seasons_info, notary_info, known_addresses
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -30,11 +30,11 @@ def connect_db():
 def update_addresses_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO addresses \
-              (season, notary, notary_id, chain, pubkey, address) \
-               VALUES (%s, %s, %s, %s, %s, %s) \
+              (season, node, notary, notary_id, chain, pubkey, address) \
+               VALUES (%s, %s, %s, %s, %s, %s, %s) \
                ON CONFLICT ON CONSTRAINT unique_season_chain_address DO UPDATE SET \
-               notary='"+str(row_data[1])+"', pubkey='"+str(row_data[4])+"', \
-               address='"+str(row_data[5])+"';"
+               node='"+str(row_data[1])+"', notary='"+str(row_data[2])+"', \
+               pubkey='"+str(row_data[5])+"', address='"+str(row_data[6])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
@@ -49,11 +49,12 @@ def update_addresses_tbl(conn, cursor, row_data):
 def update_balances_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO balances \
-            (notary, chain, balance, address, season, update_time) \
-            VALUES (%s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_address_balance DO UPDATE SET \
+            (notary, chain, balance, address, season, node, update_time) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_address_season_balance DO UPDATE SET \
             balance="+str(row_data[2])+", \
-            update_time="+str(row_data[5])+";"
+            node='"+str(row_data[5])+"', \
+            update_time="+str(row_data[6])+";"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1
@@ -442,3 +443,43 @@ def ts_col_to_season_col(conn, cursor, ts_col, season_col, table):
                AND "+ts_col+" < "+str(seasons_info[season]['end_time'])+";"
         cursor.execute(sql)
         conn.commit()
+
+def update_sync_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO chain_sync \
+            (chain, block_height, sync_hash, explorer_hash) \
+            VALUES (%s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_sync DO UPDATE SET \
+            block_height='"+str(row_data[1])+"', \
+            sync_hash='"+str(row_data[2])+"', \
+            explorer_hash='"+str(row_data[3])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_nn_social_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  nn_social \
+            (notary, twitter, youtube, discord, \
+            telegram, github, keybase, \
+            website) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_social DO UPDATE SET \
+            twitter='"+str(row_data[1])+"', \
+            youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
+            telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
+            keybase='"+str(row_data[6])+"', website='"+str(row_data[7])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0

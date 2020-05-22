@@ -1,0 +1,29 @@
+{% extends "base2.html" %}
+{% block content %}
+	<div class="container-fluid">
+		<div id="ui-view">
+			<div class="fade-in">			
+            {% for region, info in nn_health.regions_info.items %}
+            	{% for node in info.nodes %}
+            	<div class="card" style="width: 18rem;">
+					<img class="card-img-top" src="..." alt="Card image here">
+					<div class="card-body">
+						<p class="card-text">{{ node }}</p>
+					</div>
+				</div>	
+                {% endfor %}
+            {% endfor %}			
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+
+            <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ info.name }}</li>
+                {% for node in info.nodes %}
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="#"> {{ node }}
+                    </a>
+                </li>
+                {% endfor %}
+            {% endfor %}

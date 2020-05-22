@@ -51,18 +51,22 @@ for coin in coins_info['results'][0]:
                 }
             })
 
-def get_ac_block_heights():
-    ac_block_height = {}
+def get_ac_block_info():
+    ac_block_info = {}
     for chain in antara_coins:
       try:
         url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/sync'
         r = requests.get(url)
-        ac_block_height.update({chain:r.json()['blockChainHeight']})
+        ac_block_info.update({chain:{"height":r.json()['blockChainHeight']}})
+        url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/block-index/'+str(r.json()['blockChainHeight'])
+        r = requests.get(url) 
+        ac_block_info[chain].update({"hash":r.json()['blockHash']})
       except Exception as e:
         logger.info(chain+" failed")
         logger.info(e)
-    return ac_block_height
+    return ac_block_info
 
+# http://kmd.explorer.dexstats.info/insight-api-komodo/block-index/8888
 # http://explorer.chips.cash/api/getblockcount
 # http://chips.komodochainz.info/ext/getbalance/RSAzPFzgTZHNcxLNLdGyVPbjbMA8PRY7Ss
 # https://explorer.aryacoin.io/api/getblockcount

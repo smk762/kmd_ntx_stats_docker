@@ -8,7 +8,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ['url', 'username', 'email', 'groups']
 
-
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
@@ -18,7 +17,7 @@ class AddressesSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = addresses
         fields = ['notary_id', 'notary', 'address', 'chain',
-                  'pubkey', 'season']
+                  'pubkey', 'season', 'node']
 
 class CoinsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -35,7 +34,7 @@ class RewardsSerializer(serializers.HyperlinkedModelSerializer):
 class BalancesSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = balances
-        fields = ['notary', 'chain', 'balance', 'address', 'update_time', 'season']
+        fields = ['notary', 'chain', 'balance', 'address', 'update_time', 'season', 'node']
 
 class MinedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -89,6 +88,11 @@ class NotarisedChainDailySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = notarised_chain_daily
         fields = ['notarised_date', 'chain', 'ntx_count']
+
+class NNSocialSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = nn_social
+        fields = ['notary', 'twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase', 'website']
 
 class decodeOpRetSerializer(serializers.Serializer):
     OP_RETURN = serializers.CharField(max_length=1000,

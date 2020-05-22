@@ -39,13 +39,17 @@ class electrum_thread(threading.Thread):
                         self.chain, self.addr, self.season)
 
 def thread_electrum(conn, cursor, notary, chain, addr, season):
+    if season.lower().find("third") != -1:
+        node = 'third party'
+    else:
+        node = 'main'
     if season.find("Season_3") != -1:
         season = "Season_3"
         balance = electrum_lib.get_electrum_balance(chain, addr)
         if balance != -1:
-            row_data = (notary, chain, balance, addr, season, int(time.time()))        
+            row_data = (notary, chain, balance, addr, season, node, int(time.time()))        
             table_lib.update_balances_tbl(conn, cursor, row_data)
-            logger.info("["+chain+"] ["+season+"] ["+str(balance)+"] ["+notary+"] ["+addr+"]")
+            logger.info("["+chain+"] ["+season+"] ["+node+"] ["+str(balance)+"] ["+notary+"] ["+addr+"]")
 
 conn = table_lib.connect_db()
 cursor = conn.cursor()
@@ -124,6 +128,7 @@ def get_kmd_rewards():
 
 
 thread_list = {}
+print(notary_addresses.keys())
 for season in notary_addresses:
     if season.find("Season_3") != -1:
         for notary in notary_addresses[season]:
@@ -133,7 +138,7 @@ for season in notary_addresses:
                 thread_list[notary].append(electrum_thread(conn, cursor, notary, chain, addr, season))
             for thread in thread_list[notary]:
                 thread.start()
-            time.sleep(8) # 4 sec sleep = 15 min runtime.
+            time.sleep(10) # 4 sec sleep = 15 min runtime.
 
 get_kmd_rewards()
 cursor.close()

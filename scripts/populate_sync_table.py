@@ -6,7 +6,10 @@ import json
 import time
 import base58
 import logging
+import table_lib
 import logging.handlers
+from datetime import datetime as dt
+import datetime
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -114,26 +117,47 @@ def get_ac_block_info():
         logger.info(e)
     return ac_block_info
 
+conn = table_lib.connect_db()
+cursor = conn.cursor()
 
+r = requests.get('http://notary.earth:8762/info/coins/?dpow_active=1')
+coins_info = r.json()
+coins = coins_info['results'][0]
+
+ac_block_info = get_ac_block_info()
 sync_node_data = requests.get('http://138.201.207.24/show_sync_node_data').json()
-for chain in sync_node_data:
+
+for chain in coins:
+    sync_block = 0
+    sync_hash = 'no sync data'
+    exp_hash = 'no exp data'
     try:
         sync_hash = sync_node_data[chain]['last_longesthash']
-        block = sync_node_data[chain]['last_longestchain']
+        sync_block = sync_node_data[chain]['last_longestchain']
+        tip = ac_block_info[chain]['height']
+        lag = tip - sync_block
     except:
-        print(sync_node_data[chain])
+        print("NO SYNC DATA FOR "+chain)
     try:
-        url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/block-index/'+str(block)
+        url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/block-index/'+str(sync_block)
         r = requests.get(url) 
         exp_hash = r.json()['blockHash']
         if exp_hash == sync_hash:
-            print(chain+" block "+str(block)+" hash matching ["+sync_hash+"]")
+            print(chain+" block "+str(sync_block)+" hash matching ["+sync_hash+"]")
+            print("LAG: "+str(lag))
         else:
-            print(chain+" MISMATCH ON BLOCK "+str(block)+"!")
+            print(chain+" MISMATCH ON BLOCK "+str(sync_block)+"!")
             print("["+sync_hash+"] vs ["+exp_hash+"]")
         time.sleep(1)
-    except:
+    except Exception as e:
+        print(e)
         print("NO EXPLORER FOR "+chain)
+    row_data = (chain, sync_block, sync_hash, exp_hash)
+    table_lib.update_sync_tbl(conn, cursor, row_data)
 
+x = table_lib.select_from_table(cursor, 'chain_sync', '*')
+print(x)
 
-# http://kmd.explorer.dexstats.info/insight-api-komodo/block-index/8888
+cursor.close()
+
+conn.close()

@@ -10,15 +10,20 @@
 						</div>
 					</div>
 					<div class="card-body kmd_ui_dark1_bg">
-						<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%"  data-ajax="{% url 'balancesViewSet-list' %}?format=datatables">
+						<table id="table_id" class="table table-striped table-bordered" style="width:100%" data-ajax="{% url 'ntxViewSet-list' %}?format=datatables">
 							<thead>
 								<tr>
-									<th data-data="notary">NOTARY</th>
+									<th data-data="block_height">KMD BLOCK</th>
 									<th data-data="chain">CHAIN</th>
-									<th data-data="address">ADDRESS</th>
-									<th data-data="balance">BALANCE</th>
+									<th data-data="block_hash">KMD BLOCK HASH</th>
+									<th data-data="block_datetime">KMD BLOCK TIME</th>
+									<th data-data="chain">CHAIN</th>
+									<th data-data="notaries">NOTARIES</th>
+									<th data-data="ac_ntx_height">dPoW BLOCK</th>
+									<th data-data="ac_ntx_blockhash">dPoW BLOCK HASH</th>
+									<th data-data="txid">TXID</th>
+									<th data-data="opret">OP RETURN</th>
 									<th data-data="season">SEASON</th>
-									<th data-data="node">NODE</th>
 								</tr>
 							</thead>
 						</table>
@@ -32,7 +37,7 @@
 	<script type="text/javascript">
 	    $(document).ready(function() {
 	        $('#table_id').DataTable({
-        		order: [[ 4, 'desc' ], [ 0, 'asc' ], [ 1, 'asc' ]]
+        		order: [[ 0, 'desc' ], [ 1, 'asc' ]]
 	        });
 	    });
 	</script>

@@ -59,6 +59,42 @@ eco_data = r.json()
 noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
 
 # Queryset manipulation
+def get_regions_info(notary_list):
+    notary_list.sort()
+    regions_info = {
+        'AR':{ 
+            "name":"Asia and Russia",
+            "nodes":[]
+            },
+        'EU':{ 
+            "name":"Europe",
+            "nodes":[]
+            },
+        'NA':{ 
+            "name":"North America",
+            "nodes":[]
+            },
+        'SH':{ 
+            "name":"Southern Hemisphere",
+            "nodes":[]
+            },
+        'DEV':{ 
+            "name":"Developers",
+            "nodes":[]
+            }
+    }
+    for notary in notary_list:
+        region = notary.split('_')[-1]
+        regions_info[region]['nodes'].append(notary)
+    return regions_info
+
+def region_sort(notary_list):
+    new_list = []
+    for region in ['AR','EU','NA','SH','DEV']:
+        for notary in notary_list:
+            if notary.endswith(region):
+                new_list.append(notary)
+    return new_list
 
 def get_eco_data_link():
     item = random.choice(eco_data)
@@ -79,6 +115,33 @@ def get_nn_health():
         if item['chain'] not in chains_list and item['chain'] != 'BTC':
             chains_list.append(item['chain'])
 
+    sync_matches = []
+    sync_mismatches = []
+    sync_no_exp = []
+    sync_no_sync = []
+    sync = chain_sync.objects.all().values()
+    for item in sync:
+        if item['sync_hash'] == item['explorer_hash']:
+            sync_matches.append(item['chain'])
+        else:
+            if item['explorer_hash'] != 'no exp data' and item['sync_hash'] != 'no sync data':
+                sync_mismatches.append(item['chain'])
+            if item['sync_hash'] == 'no sync data':
+                sync_no_sync.append(item['chain'])
+            if item['explorer_hash'] == 'no exp data':
+                sync_no_exp.append(item['chain'])    
+    sync_count = len(sync_matches)
+    no_sync_count = len(sync_mismatches)
+    sync_pct = round(sync_count/(len(sync))*100,2)
+
+    sync_tooltip = "<h4 class='kmd_teal'>"+str(sync_count)+"/"+str(len(sync))+" ("+str(sync_pct)+"%) recent sync hashes matching</h4>\n"
+    if len(sync_mismatches) > 0:
+        sync_tooltip += "<h5 class='kmd_secondary_red'>"+str(sync_mismatches)+" have mismatched hashes </h5>\n"
+    if len(sync_no_sync) > 0:
+        sync_tooltip += "<h5 class='kmd_secondary_red'>"+str(sync_no_sync)+" are not syncing </h5>\n"
+    if len(sync_no_exp) > 0:
+        sync_tooltip += "<h5 class='kmd_secondary_red'>"+str(sync_no_exp)+" have no explorer </h5>\n"
+
     notaries = addresses.objects.filter(season="Season_3").values('notary')
     notary_list = []
     for item in notaries:
@@ -88,9 +151,10 @@ def get_nn_health():
     timenow = int(time.time())
     day_ago = timenow-60*60*24
 
-    filter_kwargs = {}
-    filter_kwargs.update({'block_time__gte':day_ago})  
-    filter_kwargs.update({'block_time__lte':timenow})
+    filter_kwargs = {
+        'block_time__gte':day_ago,
+        'block_time__lte':timenow
+    }
 
     ntx_data = notarised.objects.filter(**filter_kwargs)
     ntx_chain_24hr = ntx_data.values('chain') \
@@ -107,7 +171,6 @@ def get_nn_health():
         ntx_nodes += item['notaries']
     ntx_nodes = list(set(ntx_nodes))
 
-
     mining_data = mined.objects.filter(**filter_kwargs) \
                  .values('name') \
                  .annotate(num_mined=Count('name'))
@@ -116,27 +179,68 @@ def get_nn_health():
         if item['name'] in notary_list:
             mining_nodes.append(item['name'])
 
+    filter_kwargs = {'season':"Season_3"}
+    balances_dict = get_balances_data(filter_kwargs) 
+
+    # some chains do not have a working electrum, so balances ignored
+    ignore_chains = ['K64', 'PGT', 'GIN']
+    low_balances = get_low_balances(notary_list, balances_dict, ignore_chains)
+    low_balances_dict = low_balances[0]
+    low_balance_count = low_balances[1]
+    sufficient_balance_count = low_balances[2]
+    low_balances_tooltip = get_low_balance_tooltip(low_balances, ignore_chains)
+    low_balances_pct = round(sufficient_balance_count/(low_balance_count+sufficient_balance_count)*100,2)
+
     non_mining_nodes = list(set(notary_list)- set(mining_nodes))
     non_ntx_nodes = list(set(notary_list).symmetric_difference(set(ntx_nodes)))
     non_ntx_chains = list(set(chains_list).symmetric_difference(set(ntx_chains)))
+    mining_nodes_pct = round(len(mining_nodes)/len(notary_list)*100,2)
+    ntx_nodes_pct = round(len(ntx_nodes)/len(notary_list)*100,2)
+    ntx_chains_pct = round(len(ntx_chains)/len(chains_list)*100,2)
+
+
+    mining_tooltip = "<h4 class='kmd_teal'>"+str(len(mining_nodes))+"/"+str(len(non_mining_nodes)+len(mining_nodes))+" ("+str(mining_nodes_pct)+"%) mined 1+ block in last 24hrs</h4>\n"
+    mining_tooltip += "<h5 class='kmd_secondary_red'>"+str(non_mining_nodes)+" are not mining! </h5>\n"
+
+    ntx_nodes_tooltip = "<h4 class='kmd_teal'>"+str(len(ntx_nodes))+"/"+str(len(non_ntx_nodes)+len(ntx_nodes))+" ("+str(ntx_nodes_pct)+"%) notarised 1+ times in last 24hrs</h4>\n"
+    ntx_nodes_tooltip += "<h5 class='kmd_secondary_red'>"+str(non_ntx_nodes)+" are not notarising! </h5>\n"
+
+    ntx_chains_tooltip = "<h4 class='kmd_teal'>"+str(len(ntx_chains))+"/"+str(len(non_ntx_chains)+len(ntx_chains))+" ("+str(ntx_chains_pct)+"%) notarised 1+ times in last 24hrs</h4>\n"
+    ntx_chains_tooltip += "<h5 class='kmd_secondary_red'>"+str(non_ntx_chains)+" are not notarising! </h5>\n"
+
+    regions_info = get_regions_info(notary_list)
+    sync_no_exp = []
+    sync_no_sync = []
     nn_health = {
-        "mining_nodes":mining_nodes,
+        "sync_pct":sync_pct,
+        "regions_info":regions_info,
+        "sync_tooltip":sync_tooltip,
+        "low_balances_dict":low_balances_dict,
+        "low_balances_tooltip":low_balances_tooltip,
+        "low_balance_count":low_balance_count,
+        "sufficient_balance_count":sufficient_balance_count,
+        "balance_pct":low_balances_pct,
         "non_mining_nodes":non_mining_nodes,
-        "mining_nodes_pct":round(len(mining_nodes)/len(notary_list)*100,2),
+        "mining_nodes":mining_nodes,
+        "mining_tooltip":mining_tooltip,
+        "non_mining_nodes":non_mining_nodes,
+        "mining_nodes_pct":mining_nodes_pct,
         "ntx_nodes":ntx_nodes,
         "non_ntx_nodes":non_ntx_nodes,
-        "ntx_nodes_pct":round(len(ntx_nodes)/len(notary_list)*100,2),
+        "ntx_nodes_pct":ntx_nodes_pct,
+        "ntx_chains_tooltip":ntx_chains_tooltip,
         "chains_list":chains_list,
         "ntx_chains":ntx_chains,
         "non_ntx_chains":non_ntx_chains,
-        "ntx_chains_pct":round(len(ntx_chains)/len(chains_list)*100,2)
+        "ntx_chains_pct":ntx_chains_pct,
+        "ntx_nodes_tooltip":ntx_nodes_tooltip
     }
     return nn_health
 
-def apply_filters(request, serializer, queryset, table=None):
-    filter_kwargs = {}
+def apply_filters(request, serializer, queryset, table=None, filter_kwargs=None):
+    if not filter_kwargs:
+        filter_kwargs = {}
     for field in serializer.Meta.fields:
-        print(field)
         val = request.query_params.get(field, None)
         if val is not None:
             filter_kwargs.update({field:val}) 
@@ -158,8 +262,6 @@ def apply_filters(request, serializer, queryset, table=None):
             filter_kwargs.update({'notarised_date__gte':request.GET['from_date']})  
         if 'to_date' in request.GET:
             filter_kwargs.update({'notarised_date__lte':request.GET['to_date']})          
-    print(request.GET)  
-    print("filter_kwargs: "+str(filter_kwargs))
     if len(filter_kwargs) > 0:
         queryset = queryset.filter(**filter_kwargs)
     return queryset
@@ -179,6 +281,76 @@ def wrap_api(resp):
         "results":[resp]
     }
     return api_resp
+
+
+def get_balances_data(filter_kwargs):
+    balances_dict = {}
+    balances_data = balances.objects.filter(**filter_kwargs).order_by('notary', 'chain').values('notary', 'chain', 'balance')
+    for item in balances_data:
+        if item['notary'] not in balances_dict:
+            balances_dict.update({item['notary']:{}})
+        if item['chain'] not in balances_dict[item['notary']]:
+            balances_dict[item['notary']].update({item['chain']:item['balance']})
+        else:
+            bal = balances_dict[item['notary']][item['chain']] + item['balance']
+            balances_dict[item['notary']].update({item['chain']:bal})
+    return balances_dict  
+
+def get_low_balances(notary_list, balances_dict, ignore_chains):
+    low_balances_dict = {}
+    sufficient_balance_count = 0
+    low_balance_count = 0
+    for notary in notary_list:
+        if notary in balances_dict:
+            for chain in balances_dict[notary]:
+                if chain not in ignore_chains:
+                    bal = balances_dict[notary][chain]
+                    if bal < 0.03:
+                        if notary not in low_balances_dict:
+                            low_balances_dict.update({notary:{}})
+                        if chain not in low_balances_dict[notary]:
+                                low_balances_dict[notary].update({chain:str(round(bal.normalize(),4))})
+                        low_balance_count += 1
+                    else:
+                        sufficient_balance_count += 1
+    return low_balances_dict, low_balance_count, sufficient_balance_count
+
+def get_low_balance_tooltip(low_balances, ignore_chains):
+    low_balances_dict = low_balances[0]
+    low_balance_count = low_balances[1]
+    sufficient_balance_count = low_balances[2]
+    low_balances_pct = round(sufficient_balance_count/(low_balance_count+sufficient_balance_count)*100,2)
+    low_balances_tooltip = "<h4 class='kmd_teal'>"+str(sufficient_balance_count)+"/"+str(low_balance_count+sufficient_balance_count)+" ("+str(low_balances_pct)+"%)</h4>\n"
+    low_balances_tooltip += "<h6 class='kmd_ui_light1'>where balances < 0.03 </h6>\n"
+    low_balances_tooltip += "<h6 class='kmd_ui_light1'>"+str(ignore_chains)+" ignored (no electrum) </h6>\n"
+    # open container
+    low_balances_tooltip += "<div class='container m-auto' style='width:100%;'>\n"
+    i = 1
+    notaries = list(low_balances_dict.keys())
+    notaries.sort()
+    notaries = region_sort(notaries)
+    for notary in notaries:
+        if i == 1:
+            # open row
+            low_balances_tooltip += "<div class='row m-auto py-1' style='width:100%;'>\n"
+        # open col
+        low_balances_tooltip += "<div class='col'><b class='kmd_teal'>"+notary.upper()+"</b><br />"
+        if len(low_balances_dict[notary]) > 3:
+            low_balances_tooltip += "<b class='kmd_secondary_red'>>3 CHAINS<br /> LOW BALANCE!!!<br /></b>"
+        else:
+            for chain in low_balances_dict[notary]:
+                bal = low_balances_dict[notary][chain]
+                low_balances_tooltip += "<b>"+chain+": </b>"+bal+"<br />"
+        low_balances_tooltip += "</div>\n"
+        # close col
+        if i == 5 or notary == notaries[-1]:
+            i = 0
+            # close row
+            low_balances_tooltip += "</div>\n"
+        i += 1
+    # close container
+    low_balances_tooltip += "</div>"
+    return low_balances_tooltip
 
 # OP_RETURN functions
 def get_ticker(scriptPubKeyBinary):
@@ -205,7 +377,6 @@ def decode_opret(scriptPubKey_asm):
     try:
         ac_ntx_height = int(lil_endian(scriptPubKey_asm[64:72]),16) 
     except:
-        print(scriptPubKey_asm)
         return {"error":scriptPubKey_asm+ " is invalid and can not be decoded."}
     scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
     chain = get_ticker(scriptPubKeyBinary)
@@ -268,7 +439,6 @@ class MinedViewSet(viewsets.ModelViewSet):
     ordering_fields = ['block_height', 'address', 'season', 'name']
     ordering = ['-block_height']
 
-
 class ntxFilter(filters.FilterSet):
     min_block = filters.NumberFilter(field_name="block_height", lookup_expr='gte')
     max_block = filters.NumberFilter(field_name="block_height", lookup_expr='lte')
@@ -299,7 +469,6 @@ class ntxViewSet(viewsets.ModelViewSet):
     #                    'opret', 'season']
     ordering_fields = ['block_time', 'chain']
     ordering = ['-block_time', 'chain']
-
 
 class MinedCountSeasonViewSet(viewsets.ModelViewSet):
     """
@@ -397,6 +566,18 @@ class addressesViewSet(viewsets.ModelViewSet):
     ordering_fields = ['chain', 'notary', 'season']
     ordering = ['-season', 'notary', 'chain']
 
+class nn_socialViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing Node Operator social links
+    """
+    queryset = nn_social.objects.all()
+    serializer_class = NNSocialSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['notary']
+    ordering_fields = ['notary']
+    ordering = ['notary']
+
 class balancesViewSet(viewsets.ModelViewSet):
     """
     API endpoint Notary balances 
@@ -405,7 +586,7 @@ class balancesViewSet(viewsets.ModelViewSet):
     serializer_class = BalancesSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['chain', 'notary', 'season']
+    filterset_fields = ['chain', 'notary', 'season', 'node']
     ordering_fields = ['chain', 'notary', 'season']
     ordering = ['-season', 'notary', 'chain']
 
@@ -420,7 +601,6 @@ class rewardsViewSet(viewsets.ModelViewSet):
     filterset_fields = ['notary','address']
     ordering_fields = ['notary','address']
     ordering = ['notary']
-
 
 # simple_lists
             
@@ -868,7 +1048,6 @@ class notarised_count_date_filter(viewsets.ViewSet):
         """
         resp = {}
         data = notarised_count_daily.objects.all()
-        print("applying filters")
         data = apply_filters(request, NotarisedCountDailySerializer, data, 'daily_notarised_count')
         # default filter if none set.
         if len(data) == len(notarised_count_daily.objects.all()):
@@ -1011,15 +1190,11 @@ class decode_op_return(viewsets.ViewSet):
         """
         Returns decoded notarisation information from OP_RETURN strings
         """
-        print(request.query_params)
         if 'OP_RETURN' in request.GET:
 
-            print(request.GET['OP_RETURN'])
             decoded = decode_opret(request.GET['OP_RETURN'])
         else:
             decoded = {}
-        print("DECODED: "+str(decoded)) 
-        print("DECODED: "+str(type(decoded)))
         return Response(decoded)
 
 
@@ -1043,13 +1218,10 @@ class mined_filter(viewsets.ViewSet):
     def get(self, request, format=None):
         resp = {}
         data = mined.objects.all()
-        print("data len: "+str(len(data)))
         data = apply_filters(request, MinedSerializer, data)
-        print("data len after filter: "+str(len(data)))
         if len(data) == len(mined.objects.all()):
             yesterday = int(time.time() -60*60*24)
-            data = mined.objects.filter(block_time__gte=yesterday)
-            print("data len since yesterday: "+str(len(data))) \
+            data = mined.objects.filter(block_time__gte=yesterday) \
                 .order_by('season','name', 'block_height') \
                 .values()
         for item in data:
@@ -1090,13 +1262,10 @@ class notarised_filter(viewsets.ViewSet):
     def get(self, request, format=None):
         resp = {}
         data = notarised.objects.all()
-        print("data len: "+str(len(data)))
         data = apply_filters(request, NotarisedSerializer, data)
-        print("data len after filter: "+str(len(data)))
         if len(data) == len(notarised.objects.all()):
             yesterday = int(time.time()-60*60*24)
-            data = notarised.objects.filter(block_time__gte=yesterday)
-            print("data len default filter: "+str(len(data))) \
+            data = notarised.objects.filter(block_time__gte=yesterday) \
                 .order_by('season', 'chain', '-block_height') \
                 .values()
 
@@ -1136,17 +1305,271 @@ class notarised_filter(viewsets.ViewSet):
 
 ## DASHBOARD        
 def dash_view(request, dash_name=None):
-    if dash_name == 'balances_table':
-        html = 'tables/balances.html'
-    else:
-        html = 'base2.html'
+    # Table Views
+    gets = ''
+    html = 'dash_index.html'
+    if dash_name:
+        if dash_name.find('table') != -1:
+            if dash_name == 'balances_table':
+                html = 'tables/balances.html'
+            elif dash_name == 'addresses_table':
+                html = 'tables/addresses.html'
+            elif dash_name == 'rewards_table':
+                html = 'tables/rewards.html'
+            elif dash_name == 'mining_table':
+                html = 'tables/mining.html'
+            elif dash_name == 'mining_season_table':
+                html = 'tables/mining_season.html'
+            elif dash_name == 'mining_daily_table':
+                html = 'tables/mining_daily.html'
+            elif dash_name == 'ntx_table':
+                html = 'tables/ntx.html'
+            elif dash_name == 'ntx_chain_season_table':
+                html = 'tables/ntx_chain_season.html'
+            elif dash_name == 'ntx_chain_daily_table':
+                html = 'tables/ntx_chain_daily.html'
+            elif dash_name == 'ntx_node_season_table':
+                html = 'tables/ntx_node_season.html'
+            elif dash_name == 'ntx_node_daily_table':
+                html = 'tables/ntx_node_daily.html'
+        # Table Views
+        elif dash_name.find('graph') != -1:
+            getlist = []
+            for k in request.GET:
+                getlist.append(k+"="+request.GET[k])
+            gets = '&'.join(getlist)
+            if dash_name == 'balances_graph':
+                html = 'graphs/balances.html'
+            if dash_name == 'daily_ntx_graph':
+                html = 'graphs/daily_ntx_graph.html'
     nn_health = get_nn_health()
     context = {
+        "gets":gets,
         "eco_data_link":get_eco_data_link(),
         "nn_health":nn_health
     }
     return render(request, html, context)
 
-## DASHBOARD TABLES
-def balances_table(request):
+## DASHBOARD GRAPHS
+
+class balances_graph(viewsets.ViewSet): 
+    authentication_classes = [] 
+    permission_classes = [] 
+    serializer_class = BalancesSerializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['chain', 'notary', 'season']
+    ordering_fields = ['chain', 'notary', 'season']
+    ordering = ['-season', 'notary', 'chain']
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+   
+    def get(self, request, format = None): 
+        filter_kwargs = {'season':"Season_3"}
+        for field in BalancesSerializer.Meta.fields:
+            val = request.query_params.get(field, None)
+            if val is not None:
+                filter_kwargs.update({field:val}) 
+
+        if 'chain' in request.GET:
+            filter_kwargs.update({'chain':request.GET['chain']})
+        elif 'notary' in request.GET:
+            filter_kwargs.update({'notary':request.GET['notary']})
+        else:
+            filter_kwargs.update({'chain':'BTC'})
+
+        data = balances.objects.filter(**filter_kwargs).values('notary', 'chain', 'balance')
+        notary_list = []                                                                          
+        chain_list = []
+        balances_dict = {}
+        for item in data:
+            if item['notary'] not in notary_list:
+                notary_list.append(item['notary'])
+            if item['chain'] not in chain_list:
+                chain_list.append(item['chain'])
+            if item['notary'] not in balances_dict:
+                balances_dict.update({item['notary']:{}})
+            if item['chain'] not in balances_dict[item['notary']]:
+                balances_dict[item['notary']].update({item['chain']:item['balance']})
+            else:
+                bal = balances_dict[item['notary']][item['chain']] + item['balance']
+                balances_dict[item['notary']].update({item['chain']:bal})
+
+        chain_list.sort()
+        notary_list.sort()
+        notary_list = region_sort(notary_list)
+
+        bg_color = []
+        border_color = []
+
+        third_chains = []
+        main_chains = []
+        coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
+        for item in coins_data:
+            if item['dpow']['server'] == "dPoW-mainnet":
+                main_chains.append(item['chain'])
+            if item['dpow']['server'] == "dPoW-3P":
+                third_chains.append(item['chain'])
+
+        if len(chain_list) == 1:
+            chain = chain_list[0]
+            labels = notary_list
+            chartLabel = chain+ " Notary Balances"
+            for notary in notary_list:
+                if notary.endswith("_AR"):
+                    bg_color.append('#DC0333')
+                elif notary.endswith("_EU"):
+                    bg_color.append('#2FEA8B')
+                elif notary.endswith("_NA"):
+                    bg_color.append('#B541EA')
+                elif notary.endswith("_SH"):
+                    bg_color.append('#00E2FF')
+                else:
+                    bg_color.append('#F7931A')
+                border_color.append('#000')
+        else:
+            notary = notary_list[0]
+            labels = chain_list
+            chartLabel = notary+ " Notary Balances"
+            for chain in chain_list:
+                if chain in third_chains:
+                    bg_color.append('#DC0333')
+                elif chain in main_chains:
+                    bg_color.append('#2FEA8B')
+                else:
+                    bg_color.append('#F7931A')
+                border_color.append('#000')
+
+        chartdata = []
+        for notary in notary_list:
+            for chain in chain_list:
+                chartdata.append(balances_dict[notary][chain])
+        
+        data = { 
+            "labels":labels, 
+            "chartLabel":chartLabel, 
+            "chartdata":chartdata, 
+            "bg_color":bg_color, 
+            "border_color":border_color, 
+        } 
+        return Response(data) 
+
+class daily_ntx_graph(viewsets.ViewSet): 
+    queryset = notarised_count_daily.objects.all()
+    serializer_class = NotarisedCountDailySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['notarised_date', 'notary']
+    ordering_fields = ['notarised_date', 'notary']
+    ordering = ['-notarised_date', 'notary']
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+   
+    def get(self, request, format = None): 
+        filter_kwargs = {'season':"Season_3"}
+        for field in NotarisedCountDailySerializer.Meta.fields:
+            val = request.query_params.get(field, None)
+            if val is not None:
+                filter_kwargs.update({field:val}) 
+        
+        notary_list = []                                                                         
+        chain_list = []
+        ntx_dict = {}
+
+        if 'notarised_date' in request.GET:
+            filter_kwargs.update({'notarised_date':request.GET['notarised_date']})
+        else:
+            today = datetime.date.today()
+            filter_kwargs.update({'notarised_date':today})
+        if 'notary' in request.GET:
+            filter_kwargs.update({'notary':request.GET['notary']})
+        elif 'chain' not in request.GET:
+            filter_kwargs.update({'notary':'alien_AR'})
+
+        data = notarised_count_daily.objects.filter(**filter_kwargs) \
+                    .values('notary', 'notarised_date','chain_ntx_counts')
+
+        for item in data:
+            if item['notary'] not in notary_list:
+                notary_list.append(item['notary'])
+            chain_list += list(item['chain_ntx_counts'].keys())
+            ntx_dict.update({item['notary']:item['chain_ntx_counts']})
+
+        if 'chain' in request.GET:
+            chain_list = [request.GET['chain']]
+        else:
+            chain_list = list(set(chain_list))
+            chain_list.sort()
+
+        notary_list.sort()
+        notary_list = region_sort(notary_list)
+        bg_color = []
+        border_color = []
+        third_chains = []
+        main_chains = []
+        coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
+        for item in coins_data:
+            if item['dpow']['server'] == "dPoW-mainnet":
+                main_chains.append(item['chain'])
+            if item['dpow']['server'] == "dPoW-3P":
+                third_chains.append(item['chain'])
+
+        if len(chain_list) == 1:
+            chain = chain_list[0]
+            labels = notary_list
+            chartLabel = chain+ " Notarisations"
+            for notary in notary_list:
+                if notary.endswith("_AR"):
+                    bg_color.append('#DC0333')
+                elif notary.endswith("_EU"):
+                    bg_color.append('#2FEA8B')
+                elif notary.endswith("_NA"):
+                    bg_color.append('#B541EA')
+                elif notary.endswith("_SH"):
+                    bg_color.append('#00E2FF')
+                else:
+                    bg_color.append('#F7931A')
+                border_color.append('#000')
+        else:
+            notary = notary_list[0]
+            labels = chain_list
+            chartLabel = notary+ " Notarisations"
+            for chain in chain_list:
+                if chain in third_chains:
+                    bg_color.append('#00E2FF')
+                elif chain in main_chains:
+                    bg_color.append('#2FEA8B')
+                else:
+                    bg_color.append('#B541EA')
+                border_color.append('#000')
+
+        chartdata = []
+        for notary in notary_list:
+            for chain in chain_list:
+                print("---------------")
+                print("notary: "+notary)
+                print("chain: "+chain)
+                if chain in ntx_dict[notary]:
+                    chartdata.append(ntx_dict[notary][chain])
+                else:
+                    chartdata.append(0)
+        
+
+        data = { 
+            "labels":labels, 
+            "chartLabel":chartLabel, 
+            "chartdata":chartdata, 
+            "bg_color":bg_color, 
+            "border_color":border_color, 
+        } 
+        return Response(data) 
+
+def profile_view(request, notary_name=None):
+    # contains summary for a specific notary node.
     pass
+
+# sync lag graph
+# daily ntx category stack graph
+# monitor and detect suspicious NN fund exits. To other NN addr is ok, ntx is ok.
+# date range mining/ntx for nn/chain

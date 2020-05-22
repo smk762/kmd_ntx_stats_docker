@@ -40,6 +40,7 @@ router.register(r'source/notarised', views.ntxViewSet, basename='ntxViewSet') # 
 router.register(r'source/addresses', views.addressesViewSet, basename='addressesViewSet')
 router.register(r'source/balances', views.balancesViewSet, basename='balancesViewSet')
 router.register(r'source/coins', views.coinsViewSet, basename='coinsViewSet')
+router.register(r'source/nn_social', views.nn_socialViewSet, basename='nn_socialViewSet')
 router.register(r'source/mined_count_season', views.MinedCountSeasonViewSet, basename='MinedCountSeasonViewSet')
 router.register(r'source/mined_count_date', views.MinedCountDayViewSet, basename='MinedCountDayViewSet')
 router.register(r'source/notarised_chain_season', views.ntxChainSeasonViewSet, basename='ntxChainSeasonViewSet')
@@ -51,6 +52,9 @@ router.register(r'source/notary_rewards', views.rewardsViewSet, basename='reward
 # tools 
 router.register(r'tools/decode_opreturn', views.decode_op_return, basename='decode_opreturn')
 
+router.register(r'graph_json/balances', views.balances_graph, basename='balances_graph')
+router.register(r'graph_json/daily_ntx', views.daily_ntx_graph, basename='daily_ntx_graph')
+
 # TODO:
 # router.register(r'tools/pubkey_to_address', views.decode_op_return, basename='convert_pubkey')
 # path('posts/<int:post_id>/', post_detail_view)
@@ -59,6 +63,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('dash/', views.dash_view, name='index'),
     path('dash/<str:dash_name>/', views.dash_view),
+    path('profile/<str:notary_name>/', views.profile_view, name='profile_view'),
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
