@@ -60,7 +60,7 @@ seasons_info = {
 }
 def get_season(time_stamp):
     for season in seasons_info:
-        if time_stamp >= season['start_time'] and time_stamp <= season['end_time']:
+        if time_stamp >= seasons_info[season]['start_time'] and time_stamp <= seasons_info[season]['end_time']:
             return season
     return "season_undefined"
 
@@ -137,6 +137,41 @@ def get_nn_social(notary_name=None):
     for item in nn_social_data:
         nn_social_info.update(items_row_to_dict(item,'notary'))
     return nn_social_info
+
+def get_nn_mining_summary(notary):
+    season = get_season(int(time.time()))
+    now = int(time.time())
+    day_ago = now - 24*60*60
+    week_ago = now - 24*60*60*7
+
+    notary_mined = mined.objects.filter(season=season, name=notary)
+
+    mined_last_24hrs = notary_mined.filter(block_time__gte=str(day_ago), block_time__lte=str(now)) \
+                      .values('name').annotate(mined_24hrs=Sum('value'))
+
+    mined_this_week = notary_mined.filter(block_time__gte=str(week_ago), block_time__lte=str(now)) \
+                      .values('name').annotate(mined_this_week=Sum('value'))
+
+    mined_this_season = notary_mined.filter(block_time__gte=seasons_info[season]['start_time'],
+                                          block_time__lte=str(now)) \
+                                         .values('name').annotate(season_value_mined=Sum('value'),\
+                                                            season_blocks_mined=Count('value'),
+                                                            season_largest_block=Max('value'),
+                                                            last_mined_datetime=Max('block_datetime'),
+                                                            last_mined_time=Max('block_time'))
+    time_since_mined = int(time.time()) - int(mined_this_season[0]['last_mined_time'])
+    mining_summary = {
+        "mined_last_24hrs": float(mined_last_24hrs[0]['mined_24hrs']),
+        "mined_this_week": float(mined_this_week[0]['mined_this_week']),
+        "season_value_mined": float(mined_this_season[0]['season_value_mined']),
+        "season_blocks_mined": float(mined_this_season[0]['season_blocks_mined']),
+        "season_largest_block": float(mined_this_season[0]['season_largest_block']),
+        "largest_block_height": float(mined_this_season[0]['season_blocks_mined']),
+        "last_mined_datetime": mined_this_season[0]['last_mined_datetime'],
+        "time_since_mined": time_since_mined,
+    }
+    logger.info(mining_summary)
+    return mining_summary
 
 def get_nn_health():
     coins_data = coins.objects.filter(dpow_active=1).values('chain')
@@ -1405,6 +1440,7 @@ class balances_graph(viewsets.ViewSet):
         return Task(id=None, **validated_data)
    
     def get(self, request, format = None): 
+        season = get_season(int(time.time()))
         filter_kwargs = {'season':season}
         for field in BalancesSerializer.Meta.fields:
             val = request.query_params.get(field, None)
@@ -1507,6 +1543,7 @@ class daily_ntx_graph(viewsets.ViewSet):
         return Task(id=None, **validated_data)
    
     def get(self, request, format = None): 
+        season = get_season(int(time.time()))
         filter_kwargs = {'season':season}
         for field in NotarisedCountDailySerializer.Meta.fields:
             val = request.query_params.get(field, None)
@@ -1617,12 +1654,16 @@ def profile_view(request, notary_name=None):
     # Seasons served
     # Other project involvement
     if notary_name:
-        notary_addresses = addresses.objects.filter(notary=notary_name, season='Season_3').order_by('chain').values('chain','address')
+        season = get_season(int(time.time()))
+        mining_summary = get_nn_mining_summary(notary_name)
+        notary_addresses = addresses.objects.filter(notary=notary_name, season=season) \
+                           .order_by('chain').values('chain','address')
         context = {
             "eco_data_link":get_eco_data_link(),
             "nn_social":get_nn_social(notary_name),
             "nn_health":get_nn_health(),
             "notary_name":notary_name,
+            "mining_summary":mining_summary,
             "notary_addresses":notary_addresses
         }
         return render(request, 'profile.html', context)

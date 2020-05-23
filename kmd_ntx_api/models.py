@@ -231,7 +231,7 @@ class nn_social(models.Model):
     class Meta:
         db_table = 'nn_social'
         constraints = [
-            models.UniqueConstraint(fields=['notary'], name='unique_notary_social')
+            models.UniqueConstraint(fields=['notary', 'season'], name='unique_notary_season_social')
         ]
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"

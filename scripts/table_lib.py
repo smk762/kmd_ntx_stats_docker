@@ -470,7 +470,7 @@ def update_nn_social_tbl(conn, cursor, row_data):
             (notary, twitter, youtube, discord, \
             telegram, github, keybase, \
             website, icon,season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_social DO UPDATE SET \
+            ON CONFLICT ON CONSTRAINT unique_notary_season_social DO UPDATE SET \
             twitter='"+str(row_data[1])+"', \
             youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
             telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
