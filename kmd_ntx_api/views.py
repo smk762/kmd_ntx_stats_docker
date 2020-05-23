@@ -11,7 +11,7 @@ import logging.handlers
 from datetime import datetime as dt
 import datetime
 from django.db.models import Count, Min, Max, Sum
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User, Group
 from django_filters.rest_framework import DjangoFilterBackend
 from kmd_ntx_api.serializers import *
@@ -22,7 +22,6 @@ from rest_framework.response import Response
 from rest_framework import filters, generics, viewsets, permissions, authentication, mixins
 from rest_framework.renderers import TemplateHTMLRenderer
 from django_filters import rest_framework as filters
-
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 
@@ -45,13 +44,25 @@ seasons_info = {
             "notaries":[]
         },
     "Season_3": {
-            "start_block":1,
-            "end_block":1,
+            "start_block":1444000,
+            "end_block":1921999,
             "start_time":1563148800,
+            "end_time":1592146799,
+            "notaries":[]
+        },
+    "Season_4": {
+            "start_block":1922000,
+            "end_block":2444000,
+            "start_time":1592146800,
             "end_time":1751328000,
             "notaries":[]
         }
 }
+def get_season(time_stamp):
+    for season in seasons_info:
+        if time_stamp >= season['start_time'] and time_stamp <= season['end_time']:
+            return season
+    return "season_undefined"
 
 r = requests.get("https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json")
 eco_data = r.json()
@@ -106,8 +117,28 @@ def get_eco_data_link():
           +ad['data']['anchorText']+"</a> "+ad['data']['string2']
     return link
 
-def get_nn_health():
+# takes a row from queryset values, and returns a dict using a defined row value as top level key
+def items_row_to_dict(items_row, top_key):
+    key_list = list(items_row.keys())
+    nested_json = {}
+    nested_json.update({items_row[top_key]:{}})
+    for key in key_list:
+        if key != top_key:
+            nested_json[items_row[top_key]].update({key:items_row[key]})
+    return nested_json
 
+def get_nn_social(notary_name=None):
+    season = get_season(int(time.time()))
+    nn_social_info = {}
+    if notary_name:
+        nn_social_data = nn_social.objects.filter(season=season, notary=notary_name).values()
+    else:
+        nn_social_data = nn_social.objects.all().values()
+    for item in nn_social_data:
+        nn_social_info.update(items_row_to_dict(item,'notary'))
+    return nn_social_info
+
+def get_nn_health():
     coins_data = coins.objects.filter(dpow_active=1).values('chain')
     chains_list = []
     for item in coins_data:
@@ -142,7 +173,8 @@ def get_nn_health():
     if len(sync_no_exp) > 0:
         sync_tooltip += "<h5 class='kmd_secondary_red'>"+str(sync_no_exp)+" have no explorer </h5>\n"
 
-    notaries = addresses.objects.filter(season="Season_3").values('notary')
+    season = get_season(int(time.time()))
+    notaries = nn_social.objects.filter(season=season).values('notary')
     notary_list = []
     for item in notaries:
         if item['notary'] not in notary_list:
@@ -179,7 +211,8 @@ def get_nn_health():
         if item['name'] in notary_list:
             mining_nodes.append(item['name'])
 
-    filter_kwargs = {'season':"Season_3"}
+    season = get_season(int(time.time()))
+    filter_kwargs = {'season':season}
     balances_dict = get_balances_data(filter_kwargs) 
 
     # some chains do not have a working electrum, so balances ignored
@@ -574,9 +607,9 @@ class nn_socialViewSet(viewsets.ModelViewSet):
     serializer_class = NNSocialSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['notary']
-    ordering_fields = ['notary']
-    ordering = ['notary']
+    filterset_fields = ['notary', 'season']
+    ordering_fields = ['season', 'notary']
+    ordering = ['-season', 'notary']
 
 class balancesViewSet(viewsets.ModelViewSet):
     """
@@ -629,12 +662,13 @@ class notary_nodes(viewsets.ViewSet):
                .values('notary', 'season')
 
         notaries_list = {}
+        season = get_season(int(time.time()))
         for item in data:
-            if item['season'].find("Season_3") != -1:
-                if "Season_3" not in notaries_list:
-                    notaries_list["Season_3"] = []
-                if item['notary'] not in notaries_list["Season_3"]:
-                    notaries_list["Season_3"].append(item['notary'])
+            if item['season'].find(season) != -1:
+                if season not in notaries_list:
+                    notaries_list[season] = []
+                if item['notary'] not in notaries_list[season]:
+                    notaries_list[season].append(item['notary'])
             else:
                 if item['season'] not in notaries_list:
                     notaries_list[item['season']] = []
@@ -1127,7 +1161,7 @@ class rewards_filter(viewsets.ViewSet):
         address_season = {}
         for item in address_data:
             if item['address'] not in address_season:
-                if item['season'].find("Season_3") == -1:
+                if item['season'].find(season) == -1:
                     address_season.update({item['address']:item['season']})
                 else:
                     address_season.update({item['address']:'Season_3'})
@@ -1342,11 +1376,17 @@ def dash_view(request, dash_name=None):
                 html = 'graphs/balances.html'
             if dash_name == 'daily_ntx_graph':
                 html = 'graphs/daily_ntx_graph.html'
-    nn_health = get_nn_health()
+            if dash_name == 'daily_mining_graph':
+                html = 'graphs/mined.html'
+            if dash_name == 'season_ntx_graph':
+                html = 'graphs/daily_ntx_graph.html'
+            if dash_name == 'season_mining_graph':
+                html = 'graphs/daily_ntx_graph.html'
     context = {
         "gets":gets,
         "eco_data_link":get_eco_data_link(),
-        "nn_health":nn_health
+        "nn_health":get_nn_health(),
+        "nn_social":get_nn_social()
     }
     return render(request, html, context)
 
@@ -1365,7 +1405,7 @@ class balances_graph(viewsets.ViewSet):
         return Task(id=None, **validated_data)
    
     def get(self, request, format = None): 
-        filter_kwargs = {'season':"Season_3"}
+        filter_kwargs = {'season':season}
         for field in BalancesSerializer.Meta.fields:
             val = request.query_params.get(field, None)
             if val is not None:
@@ -1467,7 +1507,7 @@ class daily_ntx_graph(viewsets.ViewSet):
         return Task(id=None, **validated_data)
    
     def get(self, request, format = None): 
-        filter_kwargs = {'season':"Season_3"}
+        filter_kwargs = {'season':season}
         for field in NotarisedCountDailySerializer.Meta.fields:
             val = request.query_params.get(field, None)
             if val is not None:
@@ -1567,7 +1607,28 @@ class daily_ntx_graph(viewsets.ViewSet):
 
 def profile_view(request, notary_name=None):
     # contains summary for a specific notary node.
-    pass
+    # Mining Daily / season
+    # Ntx daily / season (and score)
+    # low balances
+    # addresses for each node / chain
+    # pending KMD rewards
+    # Social info
+    # Bio
+    # Seasons served
+    # Other project involvement
+    if notary_name:
+        notary_addresses = addresses.objects.filter(notary=notary_name, season='Season_3').order_by('chain').values('chain','address')
+        context = {
+            "eco_data_link":get_eco_data_link(),
+            "nn_social":get_nn_social(notary_name),
+            "nn_health":get_nn_health(),
+            "notary_name":notary_name,
+            "notary_addresses":notary_addresses
+        }
+        return render(request, 'profile.html', context)
+    else:
+        redirect('dash_view')
+
 
 # sync lag graph
 # daily ntx category stack graph

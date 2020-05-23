@@ -4,7 +4,7 @@ import logging
 import logging.handlers
 from datetime import datetime as dt
 import datetime
-from address_lib import notary_info, known_addresses, seasons_info
+from notary_lib import notary_info, known_addresses, seasons_info
 import psycopg2
 from rpclib import def_credentials
 from decimal import *

@@ -39,7 +39,7 @@ def addr_to_scripthash(addr):
     return scripthash
 
 electrums = {}
-r = requests.get('http://notary.earth:8762/info/coins/?dpow_active=1')
+r = requests.get('http://notary.earth:8762/api/info/coins/?dpow_active=1')
 coins_info = r.json()
 for coin in coins_info['results'][0]:
     if len(coins_info['results'][0][coin]['electrums']) > 0:

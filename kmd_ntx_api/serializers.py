@@ -92,7 +92,7 @@ class NotarisedChainDailySerializer(serializers.HyperlinkedModelSerializer):
 class NNSocialSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = nn_social
-        fields = ['notary', 'twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase', 'website']
+        fields = ['notary', 'twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase', 'website', 'icon', 'season']
 
 class decodeOpRetSerializer(serializers.Serializer):
     OP_RETURN = serializers.CharField(max_length=1000,

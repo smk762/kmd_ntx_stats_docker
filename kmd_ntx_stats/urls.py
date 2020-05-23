@@ -40,7 +40,7 @@ router.register(r'source/notarised', views.ntxViewSet, basename='ntxViewSet') # 
 router.register(r'source/addresses', views.addressesViewSet, basename='addressesViewSet')
 router.register(r'source/balances', views.balancesViewSet, basename='balancesViewSet')
 router.register(r'source/coins', views.coinsViewSet, basename='coinsViewSet')
-router.register(r'source/nn_social', views.nn_socialViewSet, basename='nn_socialViewSet')
+router.register(r'source/nn_social', views.nn_socialViewSet, basename='nn_socialViewSet/')
 router.register(r'source/mined_count_season', views.MinedCountSeasonViewSet, basename='MinedCountSeasonViewSet')
 router.register(r'source/mined_count_date', views.MinedCountDayViewSet, basename='MinedCountDayViewSet')
 router.register(r'source/notarised_chain_season', views.ntxChainSeasonViewSet, basename='ntxChainSeasonViewSet')
@@ -61,9 +61,11 @@ router.register(r'graph_json/daily_ntx', views.daily_ntx_graph, basename='daily_
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('dash/', views.dash_view, name='index'),
-    path('dash/<str:dash_name>/', views.dash_view),
+    path('', views.dash_view, name='index'),
+    path('dash/', views.dash_view, name='dash_index'),
+    path('dash/<str:dash_name>/', views.dash_view, name='dash_view'),
+    path('profile/', views.dash_view, name='profile'),
     path('profile/<str:notary_name>/', views.profile_view, name='profile_view'),
-    path('', include(router.urls)),
+    path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

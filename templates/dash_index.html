@@ -1,7 +1,7 @@
 {% extends "base2.html" %}
 {% load static %}
 {% block content %}
-	<div class="container" width='80%'>
+	<div class="container" width='90%'>
 		<div id="ui-view">
 			<div class="fade-in">	
             	{% for region, info in nn_health.regions_info.items %}	
@@ -14,25 +14,47 @@
 			            	{% for node in info.nodes %}
 			            	<div class="card kmd_ui_dark3_bg kmd_ui_light3 col-2 px-0 mx-1">
 			            		<a href="http://{{ request.get_host }}/profile/{{ node }}">
+
 				            		<div class="p-2">
-										<img class="card-img-top m-auto auto-width" height='96px' src="{% static 'img/notary/icon/' %}{{ node }}.png" alt="{{ node }} image here" style="border-radius: 50%;">
+									{% for nn, site_links in nn_social.items %}
+										{% if node == nn %}
+											{% if site_links.icon != '' %}
+												<img class="card-img-top m-auto auto-width" height='96px' src="{{ site_links.icon }}" alt="{{ node }} image here" style="border-radius: 50%;">
+											{% else %}
+												<img class="card-img-top m-auto auto-width" height='96px' src="{% static 'img/notary/icon/' %}{{ node }}.png" alt="{{ node }} image here" style="border-radius: 50%;">
+											{% endif %}
+										{% endif %}
+									{% endfor %}
 									</div>
 								</a>	
 								<div class="card-body kmd_ui_dark4_bg" style="padding: 1rem; ">
 									<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
-			            			<a href="http://{{ request.get_host }}/profile/{{ node }}">
-			            				{{ node }}
-									</a><br />
-									<i class="fab fa-twitter"> </i>
-									<i class="fab fa-github"></i>
-									<i class="fab fa-discord"></i>
-									<i class="fab fa-youtube"> </i>
-									<i class="fab fa-keybase"></i>
-									<i class="fab fa-telegram-plane"></i>
-									<i class="fas fa-desktop"></i>
+				            			<a href="http://{{ request.get_host }}/profile/{{ node }}">
+				            				{{ node }}
+										</a><br />
+										{% for nn, site_links in nn_social.items %}
+											{% if node == nn %}
+												{% for site, link in site_links.items %}
+													{% if site == 'twitter' and link != '' %}
+														<a href="{{ link }}"><i class="fab fa-twitter"></i></a>
+													{% elif site == 'discord' and link != '' %}
+														<a href="https://discordapp.com/users/{{ link }}"><i class="fab fa-discord"></i></a>
+													{% elif site == 'github' and link != '' %}
+														<a href="{{ link }}"><i class="fab fa-github"></i></a>
+													{% elif site == 'youtube' and link != '' %}
+														<a href="{{ link }}"><i class="fab fa-youtube"></i></a>
+													{% elif site == 'keybase' and link != '' %}
+														<a href="https://keybase.io/{{ link }}"><i class="fab fa-keybase"></i></a>
+													{% elif site == 'telegram' and link != '' %}
+														<a href="https://t.me/{{ link }}"><i class="fab fa-telegram-plane"></i></a>
+													{% elif site == 'website' and link != '' %}
+														<a href="{{ link }}"><i class="fas fa-desktop"></i></a>
+													{% endif %}
+												{% endfor %}
+											{% endif %}
+										{% endfor %}
 									</p>
 								</div>
-							</a>
 							</div>	
 			                {% endfor %}
 						</div>		
