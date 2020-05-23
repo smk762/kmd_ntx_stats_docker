@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import logging
 import logging.handlers
-from address_lib import address_info, notary_addresses, notary_pubkeys
+from notary_lib import address_info, notary_addresses, notary_pubkeys
 import table_lib
 
 ''' You should only need to run this once per season, unless notary pubkeys change. 
-Dont forget to update the pubkeys in address_lib.py
+Dont forget to update the pubkeys in notary_lib.py
 TODO: auto grab from repo?
 '''
 

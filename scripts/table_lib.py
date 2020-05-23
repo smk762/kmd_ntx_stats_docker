@@ -8,9 +8,9 @@ from decimal import *
 from rpclib import def_credentials
 import logging
 import logging.handlers
-from address_lib import seasons_info, notary_info, known_addresses
+from notary_lib import seasons_info, notary_info, known_addresses
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 load_dotenv()
 
@@ -297,7 +297,7 @@ def get_daily_mined_counts(conn, cursor, day):
 # AGGREGATES
 
 def get_chain_ntx_season_aggregates(cursor, season):
-    sql = "SELECT chain, MAX(block_height), MAX(block_time), COUNT(*) \
+    sql = "SELECT chain, MAX(block_height), MAX(block_time), COALESCE(COUNT(*), 0) \
            FROM notarised WHERE \
            season = '"+str(season)+"' \
            GROUP BY chain;"
@@ -305,7 +305,7 @@ def get_chain_ntx_season_aggregates(cursor, season):
     return cursor.fetchall()
 
 def get_chain_ntx_date_aggregates(cursor, day):
-    sql = "SELECT chain, MAX(block_height), MAX(block_time), COUNT(*) \
+    sql = "SELECT chain, COALESCE(MAX(block_height), 0), COALESCE(MAX(block_time), 0), COALESCE(COUNT(*), 0) \
            FROM notarised WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY chain;"
@@ -313,7 +313,7 @@ def get_chain_ntx_date_aggregates(cursor, day):
     return cursor.fetchall()
 
 def get_mined_date_aggregates(cursor, day):
-    sql = "SELECT name, COUNT(*), SUM(value) FROM mined WHERE \
+    sql = "SELECT name, COALESCE(COUNT(*),0), SUM(value) FROM mined WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY name;"
     cursor.execute(sql)
@@ -333,7 +333,8 @@ def get_ntx_for_day(cursor, day):
            FROM notarised WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
     cursor.execute(sql)
-    return cursor.fetchall()
+    resp = cursor.fetchall() 
+    return resp
 
 def get_mined_for_season(cursor, season):
     sql = "SELECT * \
@@ -399,7 +400,7 @@ def get_max_from_table(cursor, table, col):
     return cursor.fetchone()[0]
 
 def get_count_from_table(cursor, table, col):
-    sql = "SELECT COUNT("+col+") FROM "+table
+    sql = "SELECT COALESCE(COUNT("+col+"), 0) FROM "+table
     cursor.execute(sql)
     return cursor.fetchone()[0]
 
@@ -468,12 +469,13 @@ def update_nn_social_tbl(conn, cursor, row_data):
         sql = "INSERT INTO  nn_social \
             (notary, twitter, youtube, discord, \
             telegram, github, keybase, \
-            website) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
+            website, icon,season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_notary_social DO UPDATE SET \
             twitter='"+str(row_data[1])+"', \
             youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
             telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
-            keybase='"+str(row_data[6])+"', website='"+str(row_data[7])+"';"
+            keybase='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
+            icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1

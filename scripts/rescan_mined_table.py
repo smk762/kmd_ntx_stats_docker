@@ -2,7 +2,7 @@
 import time
 import logging
 import logging.handlers
-from address_lib import seasons_info
+from notary_lib import seasons_info
 import psycopg2
 from rpclib import def_credentials
 import table_lib

@@ -225,6 +225,8 @@ class nn_social(models.Model):
     github = models.CharField(max_length=128)
     keybase = models.CharField(max_length=128)
     website = models.CharField(max_length=128)
+    icon = models.CharField(max_length=128)
+    season = models.CharField(max_length=128)
 
     class Meta:
         db_table = 'nn_social'

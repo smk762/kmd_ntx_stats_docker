@@ -6,7 +6,7 @@ import table_lib
 import electrum_lib
 import logging
 import logging.handlers
-from address_lib import notary_addresses, known_addresses
+from notary_lib import notary_addresses, known_addresses
 from rpclib import def_credentials
 import threading
 

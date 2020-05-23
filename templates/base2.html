@@ -23,8 +23,10 @@
     <!-- Core UI -->
     <link rel="stylesheet" href="https://unpkg.com/@coreui/coreui@3.0.0-rc.0/dist/css/coreui.min.css">
     <link rel="stylesheet" href="https://unpkg.com/@coreui/icons/css/all.min.css">
-
     <link href="{% static 'vendors/@coreui/chartjs/css/coreui-chartjs.css' %}" rel="stylesheet">
+
+    <!-- Datepicker -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
 
     <!-- Datatables -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4-4.1.1/jq-3.3.1/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/b-print-1.6.2/sp-1.1.0/datatables.min.css"/>
@@ -53,10 +55,16 @@
             <li class="c-sidebar-nav-title">Wallet</li>
             <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/balances_graph/?chain=BTC"> Notary Chain Balances</a></li>
             <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/balances_graph/?notary=alien_AR"> Notary Node Balances</a></li>
+
             <li class="c-sidebar-nav-title">Mining</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_mining_graph/?chain=BTC"> Daily Mining</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/season_mining_graph/?notary=alien_AR"> Season Mining</a></li>
+
             <li class="c-sidebar-nav-title">Notarisations</li>
             <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?chain=BTC"> Daily Chain Notarisations</a></li>
             <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?notary=alien_AR"> Daily Node Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?chain=BTC"> Season Chain Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?notary=alien_AR"> Season Node Notarisations</a></li>
           </ul>
         </li>
         

@@ -5,7 +5,7 @@ conn = table_lib.connect_db()
 cursor = conn.cursor()
 
 #table = 'balances'
-table = 'mined_count_daily'
+table = 'nn_social'
 
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
