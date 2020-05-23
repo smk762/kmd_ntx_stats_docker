@@ -1,12 +1,10 @@
-# kmd_ntx_stats_docker
-Docker container for Komodo Notary stats API using Django / PGSQL
 # Komodo Earth API
 
-## /info/addresses/
+## /api/info/addresses/
 
 **notary addresses information**
 
-The `/info/addresses/` endpoint returns Notary Node addresses, nested by Name > Season > Chain 
+The `/api/info/addresses/` endpoint returns Notary Node addresses, nested by Name > Season > Chain 
     Default filter returns current NN Season 
 
 ### GET parameters
@@ -84,11 +82,11 @@ http://notary.earth:8762/info/addresses/?chain=KMD&notary=alien_AR
 </collapse-text>
 
 
-## /info/balances/
+## /api/info/balances/
 
 **notary balances information**
 
-The `/info/balances/` endpoint returns Notary Node balances, nested by Name > Season > Chain 
+The `/api/info/balances/` endpoint returns Notary Node balances, nested by Name > Season > Chain 
     Default filter returns current NN Season 
 
 ::: tip
@@ -145,11 +143,11 @@ http://notary.earth:8762/info/balances/?notary=pirate_AR&chain=OOT
 ```
 </collapse-text>
 
-## /info/coins/
+## /api/info/coins/
 
 **coins information**
 
-The `/info/coins/` endpoint shows information about coins from the [KomodoPlatform/coins](https://github.com/komodoplatform/coins) and [KomodoPlatform/dPoW](https://github.com/KomodoPlatform/dPoW) repositories.
+The `/api/info/coins/` endpoint shows information about coins from the [KomodoPlatform/coins](https://github.com/komodoplatform/coins) and [KomodoPlatform/dPoW](https://github.com/KomodoPlatform/dPoW) repositories.
 
 Information includes mm2 compatibility, electrum/explorer availability, and dPoW status.
 
@@ -239,11 +237,11 @@ http://notary.earth:8762/info/coins/?chain=RICK&mm2_compatible=1&dpow_active=1
 
 
 
-## /info/notary_rewards/
+## /api/info/notary_rewards/
 
 **rewards information**
 
-The `/info/notary_rewards/` endpoint shows the sum of unclaimed active user rewards pending for each notary address.
+The `/api/info/notary_rewards/` endpoint shows the sum of unclaimed active user rewards pending for each notary address.
 
 ::: tip
 The notary rewards endpoint also displays the block height of your oldest UTXO, which can be used import a private key without needing to rescan the whole blockchain (see [importprivkey](https://developers.komodoplatform.com/basic-docs/smart-chains/smart-chain-api/wallet.html#importprivkey))
@@ -316,11 +314,11 @@ http://notary.earth:8762/info/notary_rewards/?notary=dragonhound_NA
 
 
 
-## /info/notary_nodes/
+## /api/info/notary_nodes/
 
 **Notary Node Operator Names**
 
-The `/info/notary_nodes/` endpoint is a simple list of Notary Node Operator names for each season
+The `/api/info/notary_nodes/` endpoint is a simple list of Notary Node Operator names for each season
 
 ### GET parameters
 
@@ -425,11 +423,11 @@ http://notary.earth:8762/info/notary_nodes/?season=Season_3
 
 
 
-## /mined_stats/daily/
+## /api/mined_stats/daily/
 
 **Mining information by day**
 
-The `/mined_stats/daily/` endpoint
+The `/api/mined_stats/daily/` endpoint
 
 
 ::: tip
@@ -491,11 +489,11 @@ http://notary.earth:8762/mined_stats/daily/?mined_date=2020-05-11&notary=node-9_
 
 
 
-## /chain_stats/daily/
+## /api/chain_stats/daily/
 
 **Notarisation counts for each chain grouped by date**
 
-The `/chain_stats/daily/` endpoint
+The `/api/chain_stats/daily/` endpoint
 
 
 ::: tip
@@ -550,11 +548,11 @@ http://notary.earth:8762/chain_stats/daily/?notarised_date=2019-07-27&chain=CHIP
 </collapse-text>
 
 
-## /notary_stats/daily/
+## /api/notary_stats/daily/
 
 **notarised information**
 
-The `/notary_stats/daily/` endpoint
+The `/api/notary_stats/daily/` endpoint
 
 
 ### GET parameters
@@ -783,11 +781,11 @@ http://notary.earth:8762/notary_stats/daily/?notarised_date=2020-04-20&notary=co
 
 
 
-## /mined_stats/season/
+## /api/mined_stats/season/
 
 **Season aggregated mining data**
 
-The `/mined_stats/season/` endpoint shows aggregated mining information for each season and notary node.
+The `/api/mined_stats/season/` endpoint shows aggregated mining information for each season and notary node.
 
 
 ### GET parameters
@@ -863,11 +861,11 @@ http://notary.earth:8762/mined_stats/season/?notary=komodopioneers_SH
 ```
 </collapse-text>
 
-## /chain_stats/season/
+## /api/chain_stats/season/
 
 **Notarisation counts for each chain grouped by season**
 
-The `/chain_stats/season/` endpoint
+The `/api/chain_stats/season/` endpoint
 
 ### GET parameters
 
@@ -931,11 +929,11 @@ http://notary.earth:8762/chain_stats/season/?season=Season_3&chain=RFOX
 ```
 </collapse-text>
 
-## /notary_stats/season/
+## /api/notary_stats/season/
 
 **Notarisation counts for each notary node grouped by season**
 
-The `/notary_stats/season/` endpoint
+The `/api/notary_stats/season/` endpoint
 
 ### GET parameters
 
@@ -1242,11 +1240,11 @@ http://notary.earth:8762/notary_stats/season/?notary=alien_AR&season=Season_3
 
 
 
-## /source/notarised/
+## /api/source/notarised/
 
 **notarisation information**
 
-The `/source/notarised/` endpoint contains information decoded from OP_RETURN messages within notarisation transactions.
+The `/api/source/notarised/` endpoint contains information decoded from OP_RETURN messages within notarisation transactions.
 
 ### GET parameters
 
@@ -1323,11 +1321,11 @@ http://notary.earth:8762/source/notarised/?chain=DEX&block_height=1872716
 </collapse-text>
 
 
-## /source/mined/
+## /api/source/mined/
 
 **mining information**
 
-The `/source/mined/` endpoint returns the address / notary mining information
+The `/api/source/mined/` endpoint returns the address / notary mining information
 
 ### GET parameters
 
@@ -1405,11 +1403,11 @@ http://notary.earth:8762/source/mined/?block_height=1872522
 
 
 
-## /tools/decode_opreturn/
+## /api/tools/decode_opreturn/
 
 **Notarisation counts for each notary node grouped by season**
 
-The `/tools/decode_opreturn/` endpoint
+The `/api/tools/decode_opreturn/` endpoint
 
 ### GET parameters
 
