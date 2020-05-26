@@ -22,6 +22,33 @@ class notarised(models.Model):
             models.UniqueConstraint(fields=['txid'], name='unique_txid')
         ]
 
+class last_notarised(models.Model):
+    notary = models.CharField(max_length=64)
+    chain = models.CharField(max_length=32)
+    txid = models.CharField(max_length=64)
+    block_height = models.PositiveIntegerField()
+    block_time = models.PositiveIntegerField()
+    season = models.CharField(max_length=32)
+
+    class Meta:
+        db_table = 'last_notarised'
+        constraints = [
+            models.UniqueConstraint(fields=['notary','chain'], name='unique_notary_chain')
+        ]
+
+class last_btc_notarised(models.Model):
+    notary = models.CharField(max_length=64)
+    txid = models.CharField(max_length=64)
+    block_height = models.PositiveIntegerField()
+    block_time = models.PositiveIntegerField()
+    season = models.CharField(max_length=32)
+
+    class Meta:
+        db_table = 'last_btc_notarised'
+        constraints = [
+            models.UniqueConstraint(fields=['notary'], name='unique_notary_btc_ntx')
+        ]
+
 class notarised_count_season(models.Model):
     notary = models.CharField(max_length=64)
     btc_count = models.PositiveIntegerField()
@@ -156,9 +183,9 @@ class balances(models.Model):
     chain = models.CharField(max_length=34)
     balance = models.DecimalField(max_digits=18, decimal_places=8)
     address = models.CharField(max_length=34)
-    update_time = models.PositiveIntegerField()
     season = models.CharField(max_length=34)
     node = models.CharField(max_length=34)
+    update_time = models.PositiveIntegerField()
 
     class Meta:
         db_table = 'balances'

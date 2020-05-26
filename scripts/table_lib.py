@@ -423,6 +423,20 @@ def get_table_names(cursor):
         tables_list.append(table[0])
     return tables_list
 
+def update_table(conn, cursor, table, update_str, condition):
+    try:
+        sql = "UPDATE "+table+" \
+               SET "+update_str+" WHERE "+condition+";"
+        logger.info(sql)
+        cursor.execute(sql)
+        conn.commit()
+        return 1
+    except Exception as e:
+        logger.debug(e)
+        logger.debug(sql)
+        conn.rollback()
+        return 0
+
 def delete_from_table(conn, cursor, table, condition=None):
     sql = "TRUNCATE "+table
     if condition:
@@ -476,6 +490,46 @@ def update_nn_social_tbl(conn, cursor, row_data):
             telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
             keybase='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
             icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_last_ntx_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  last_notarised \
+            (notary, chain, txid, block_height, \
+            block_time, season) VALUES (%s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_chain DO UPDATE SET \
+            txid='"+str(row_data[2])+"', \
+            block_height='"+str(row_data[3])+"', \
+            block_time='"+str(row_data[4])+"', \
+            season='"+str(row_data[5])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_last_btc_ntx_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  last_btc_notarised \
+            (notary, txid, block_height, \
+            block_time, season) VALUES (%s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_btc_ntx DO UPDATE SET \
+            txid='"+str(row_data[1])+"', \
+            block_height='"+str(row_data[2])+"', \
+            block_time='"+str(row_data[3])+"', \
+            season='"+str(row_data[4])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
         return 1

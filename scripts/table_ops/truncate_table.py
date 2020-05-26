@@ -4,8 +4,8 @@ import table_lib
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-#table = 'balances'
-table = 'nn_social'
+table = 'balances'
+#table = 'nn_social'
 
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
