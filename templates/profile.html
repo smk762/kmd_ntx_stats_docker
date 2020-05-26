@@ -6,142 +6,182 @@
 			<div class="fade-in">
 				<div class="row my-3">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-4 px-0">
-							<div class="card-header kmd_ui_dark3_bg">
-								Notarisations	
-							</div>
-							<div class="card-body kmd_ui_dark4_bg">
+						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0 mt-auto shadow-none">
+							<div class="card-body kmd_ui_dark2_bg p-0">
 								<p class="card-text">
 									<ul class="list-group">
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Notarised Today
-									    <span class="badge badge-primary badge-pill">12</span>
+									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+										    Notarised Today
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ ntx_summary.today.btc_ntx }}<br /> BTC
+										    </span>
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ ntx_summary.today.main_ntx }}<br /> Main
+										    </span>
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ ntx_summary.today.third_party_ntx }}<br /> 3rd Party
+										    </span>
+										</button>
 									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Notarised this Week
-									    <span class="badge badge-primary badge-pill">50</span>
+									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    	Notarised Season
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ ntx_summary.season.btc_ntx }}<br /> BTC
+										    </span>
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ ntx_summary.season.main_ntx }}<br /> Main
+										    </span>
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ ntx_summary.season.third_party_ntx }}<br /> 3rd Party
+										    </span>
+										</button>									    
 									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Notarised this Season
-									    <span class="badge badge-primary badge-pill">99</span>
+									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+										    Last Notarisation
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ ntx_summary.time_since_last_ntx }}<br />{{ ntx_summary.last_ntx_chain }}
+										    </span>
+										</button>
 									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Notarisation Score
-									    <span class="badge badge-primary badge-pill">99</span>
+									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    	Last BTC Notarisation
+										  	<span class="badge kmd_ui_dark4_bg">
+										  		{{ ntx_summary.time_since_last_kmd_ntx }}
+										  	</span>
+										</button>
 									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Region Rank
-									    <span class="badge badge-primary badge-pill">99</span>
-									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Last Notarisation
-									    <span class="badge badge-primary badge-pill">99</span>
-									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Notarised this Season
-									    <span class="badge badge-primary badge-pill">99</span>
-									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Last BTC Notarisation
-									    <span class="badge badge-primary badge-pill">99</span>
-									  </li>
-									</ul> 
+										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+											<button type="button" class="btn btn-dark4 mx-auto">
+												<a href="http://{{ request.get_host }}/profile/{{ notary_name }}" class="">
+													{{ notary_name }} Notarisation Info
+												</a>
+											</button>
+										</li>
+									</ul> 							
 								</p>
 							</div>
-							<div class="card-footer text-muted kmd_ui_dark4_bg">
-								<div class="btn-group" role="group" aria-label="ntx-graph-links">
-									<button type="button" class="btn btn-dark">More Info</button>
-								</div>								
-							</div>
 						</div>
-		            	<div class="card kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0">
+		            	<div class="card kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0 mt-auto shadow-none">
 		            		<a href="http://{{ request.get_host }}/profile/{{ notary_name }}">
-			            		<div class="p-2">
-									{% for nn, site_links in nn_social.items %}
-										{% if notary_name == nn and site_links.icon != '' %}
-											<img class="card-img-top m-auto auto-width" height='96px' src="{{ site_links.icon }}" alt="{{ notary_name }} image here" style="border-radius: 50%;">
-				            				<a href="http://{{ request.get_host }}/profile/{{ notary_name }}" class="text-uppercase"><br />
-				            				<span class="m-2">{{ notary_name }}</span>
-										{% else %}
-											<img class="card-img-top m-auto auto-width" height='96px' src="{% static 'img/notary/icon/' %}{{ notary_name }}.png" alt="{{ notary_name }} image here" style="border-radius: 50%;">
-				            				<a href="http://{{ request.get_host }}/profile/{{ notary_name }}" class="text-uppercase"><br />
-				            				<span class="m-2">{{ notary_name }}</span>
-										{% endif %}
-									{% endfor %}
-									</a>
-								</div>
-							</a>	
-							<div class="card-body kmd_ui_dark4_bg">
-								<p class="card-text kmd_ui_light3">
-									<div class="text-left">
+		            			<div class="row d-flex justify-content-between align-items-center">
+				            		<div class="p-1 col-4">
+										{% for nn, site_links in nn_social.items %}
+											{% if notary_name == nn and site_links.icon != '' %}
+												<img class="card-img-top m-auto auto-width p-2" height='96px' src="{{ site_links.icon }}" alt="{{ notary_name }} image here" style="border-radius: 50%;">
+											{% else %}
+												<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/notary/icon/' %}{{ notary_name }}.png" alt="{{ notary_name }} image here" style="border-radius: 50%;">
+											{% endif %}
+						            			<a href="http://{{ request.get_host }}/profile/{{ notary_name }}" class="text-uppercase">
+						            				<br />
+						            				<span class="m-2">{{ notary_name }}</span>
+												</a>
+										{% endfor %}
+									</div>
+									<div class="text-left my-auto p-0 col-7">
 									{% for nn, site_links in nn_social.items %}
 										{% if notary_name == nn %}
 											{% for site, link in site_links.items %}
 												{% if site == 'twitter' and link != '' %}
-													<i class="fab fa-twitter"></i>  <a href="{{ link }}">{{ link }}</a><br />
+													<i class="fab fa-twitter mr-2"></i>  <a href="{{ link }}">{{ link }}</a><br />
 												{% elif site == 'discord' and link != '' %}
-													<i class="fab fa-discord"></i> <a href="https://discordapp.com/users/{{ link }}">{{ link }}</a><br />
+													<i class="fab fa-discord mr-2"></i> <a href="https://discordapp.com/users/{{ link }}">{{ link }}</a><br />
 												{% elif site == 'github' and link != '' %}
-													<i class="fab fa-github"></i> <a href="{{ link }}">{{ link }}</a><br />
+													<i class="fab fa-github mr-2"></i> <a href="{{ link }}">{{ link }}</a><br />
 												{% elif site == 'youtube' and link != '' %}
-													<i class="fab fa-youtube"></i> <a href="{{ link }}">{{ link }}</a><br />
+													<i class="fab fa-youtube mr-2"></i> <a href="{{ link }}">{{ link }}</a><br />
 												{% elif site == 'keybase' and link != '' %}
-													<i class="fab fa-keybase"></i> <a href="https://keybase.io/{{ link }}">{{ link }}</a><br />
+													<i class="fab fa-keybase mr-2"></i> <a href="https://keybase.io/{{ link }}">{{ link }}</a><br />
 												{% elif site == 'telegram' and link != '' %}
-													<i class="fab fa-telegram-plane"></i> <a href="https://t.me/{{ link }}">{{ link }}</a><br />
+													<i class="fab fa-telegram-plane mr-2"></i> <a href="https://t.me/{{ link }}">{{ link }}</a><br />
 												{% elif site == 'website' and link != '' %}
-													<i class="fas fa-desktop"></i> <a href="{{ link }}">{{ link }}</a><br />
+													<i class="fas fa-desktop mr-2"></i> <a href="{{ link }}">{{ link }}</a><br />
 												{% endif %}
 											{% endfor %}
 										{% endif %}
 									{% endfor %}
 									</div>
+									
+								</div>
+
+							</a>	
+							<div class="card-body kmd_ui_dark2_bg p-0">
+								<p class="card-text kmd_ui_light3">
+									<ul class="list-group">
+										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+											<button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+										    Notarisation Score
+										    	<span class="badge kmd_ui_dark4_bg">
+										    		{{ ntx_summary.premining_ntx_score|add:mining_summary.season_blocks_mined }}
+										    	</span>
+											</button>
+										</li>
+										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+											<button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+											    Region Rank
+											    <span class="badge kmd_ui_dark4_bg">TBA</span>
+											</button>
+										</li>
+										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+											<button type="button" class="btn btn-dark4 mx-auto">
+												<a href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season4/elected_nn_social.json">Update {{ notary_name }} details</a>
+											</button>												
+										</li>
+									</ul>
 								</p>
-							</div>
-							<div class="card-footer text-muted kmd_ui_dark4_bg">
-								<button type="button" class="btn btn-dark">
-									<a href="https://github.com/KomodoPlatform/NotaryNodes">Update Notary details</a>
-								</button>
 							</div>
 						</div>
-						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
-							<div class="card-header kmd_ui_dark3_bg">
-								Mining
-							</div>
-							<div class="card-body kmd_ui_dark4_bg">
+						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light1 col-12 px-0 mt-auto shadow-none">
+							<div class="card-body kmd_ui_dark2_bg p-0">
 								<p class="card-text">
 									<ul class="list-group">
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Mined today
-									    <span class="badge badge-primary badge-pill">99</span>
+									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+										    Mined
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ mining_summary.mined_last_24hrs|floatformat:-3 }} KMD<br />Today
+											</span>
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ mining_summary.season_value_mined|floatformat:-3 }} KMD<br />Season
+											</span>
+										</button>
 									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Mined this week
-									    <span class="badge badge-primary badge-pill">99</span>
+									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+										    Blocks Mined this Season
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ mining_summary.season_blocks_mined }}
+											</span>
+										</button>
 									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Mined this Season
-									    <span class="badge badge-primary badge-pill">99</span>
+									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+										    Largest Block Mined
+										    <span class="badge kmd_ui_dark4_bg">
+										    	{{ mining_summary.season_largest_block|floatformat:-3 }} KMD
+											</span>
+										</button>
 									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Mined per Notarisation
-									    <span class="badge badge-primary badge-pill">99</span>
-									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Largest Mined block
-									    <span class="badge badge-primary badge-pill">99</span>
-									  </li>
-									  <li class="list-group-item d-flex justify-content-between align-items-center">
-									    Last Mined block
-									    <span class="badge badge-primary badge-pill">99</span>
-									  </li>
+									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+										    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+											    Last Mined block
+											    <span class="badge kmd_ui_dark4_bg">
+											    	{{ mining_summary.time_since_mined }}
+												</span>
+											</button>
+									  	</li>
+										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+											<button type="button" class="btn btn-dark4 mx-auto">
+												<a href="http://{{ request.get_host }}/profile/{{ notary_name }}" class="">
+													{{ notary_name }} Mining Info
+												</a>
+											</button>
+										</li>
 									</ul> 
 								</p>
-							</div>
-							<div class="card-footer text-muted kmd_ui_dark4_bg">
-								<div class="btn-group" role="group" aria-label="mining-graph-links">
-									<button type="button" class="btn btn-dark">More Info</button>
-								</div>
 							</div>
 						</div>
 					</div>
@@ -150,7 +190,7 @@
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
 							<div class="card-header kmd_ui_dark3_bg">
-								Notary Wallet Balances
+								{{ notary_name }} Wallet Balances
 							</div>
 							<div class="card-body kmd_ui_dark1_bg">
 								<span id="graph_title"></span>
@@ -162,7 +202,7 @@
 				<div class="row my-3">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card kmd_ui_light4">
-							<div class="card-header kmd_ui_dark1_bg"> Address & Balances Table
+							<div class="card-header kmd_ui_dark1_bg"> {{ notary_name }} Addresses & Balances 
 								<div class="card-header-actions">
 									<a class="card-header-action" href="https://datatables.net" target="_blank"><small class="text-muted">docs</small></a>
 								</div>
@@ -200,7 +240,7 @@
 	      method: "GET", 
 	      url: 'http://notary.earth:8762/api/graph_json/balances/?notary={{ notary_name }}', 
 	      success: function(data) { 
-	      	document.getElementById('graph_title').innerHTML = data.chartLabel;
+	      	//document.getElementById('graph_title').innerHTML = data.chartLabel;
 	        //drawLineGraph(data, 'myChartline'); 
 	        drawBarGraph(data, 'myChartBar'); 
 	        console.log("drawing"); 

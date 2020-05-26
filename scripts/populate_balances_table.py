@@ -6,7 +6,8 @@ import table_lib
 import electrum_lib
 import logging
 import logging.handlers
-from notary_lib import notary_addresses, known_addresses
+from notary_lib import notary_addresses, known_addresses, season_pubkeys, notary_pubkeys
+from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
 from rpclib import def_credentials
 import threading
 
@@ -45,7 +46,7 @@ def thread_electrum(conn, cursor, notary, chain, addr, season):
         node = 'main'
     if season.find("Season_3") != -1:
         season = "Season_3"
-        balance = electrum_lib.get_electrum_balance(chain, addr)
+        balance = electrum_lib.get_electrum_balance(chain, addr, notary, node)
         if balance != -1:
             row_data = (notary, chain, balance, addr, season, node, int(time.time()))        
             table_lib.update_balances_tbl(conn, cursor, row_data)
@@ -138,7 +139,7 @@ for season in notary_addresses:
                 thread_list[notary].append(electrum_thread(conn, cursor, notary, chain, addr, season))
             for thread in thread_list[notary]:
                 thread.start()
-            time.sleep(10) # 4 sec sleep = 15 min runtime.
+            time.sleep(4) # 4 sec sleep = 15 min runtime.
 
 get_kmd_rewards()
 cursor.close()

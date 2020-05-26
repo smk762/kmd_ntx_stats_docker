@@ -36,6 +36,16 @@ class BalancesSerializer(serializers.HyperlinkedModelSerializer):
         model = balances
         fields = ['notary', 'chain', 'balance', 'address', 'update_time', 'season', 'node']
 
+class LastNotarisedSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = last_notarised
+        fields = ['notary', 'chain', 'txid', 'block_height', 'block_time', 'season']
+
+class LastBtcNotarisedSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = last_btc_notarised
+        fields = ['notary', 'txid', 'block_height', 'block_time', 'season']
+
 class MinedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = mined

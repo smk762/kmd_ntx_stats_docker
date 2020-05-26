@@ -4,7 +4,7 @@ import logging
 import logging.handlers
 from datetime import datetime as dt
 import datetime
-from notary_lib import notary_info, known_addresses, seasons_info
+from notary_lib import notary_info, known_addresses, seasons_info, get_season
 import psycopg2
 from rpclib import def_credentials
 from decimal import *
@@ -32,8 +32,12 @@ start_daily_2days_ago = True
 
 scan_depth = 100
 
+
 conn = table_lib.connect_db()
 cursor = conn.cursor()
+
+season = get_season(int(time.time()))
+
 
 rpc = {}
 rpc["KMD"] = def_credentials("KMD")
@@ -97,7 +101,6 @@ logger.info("Finished!")
 logger.info(str(len(unrecorded_blocks))+" mined blocks added to table")
 
 if skip_past_seasons:
-    season = list(seasons_info.keys())[-1]
     table_lib.get_season_mined_counts(conn, cursor, season)
 else:
     # updating season mined count aggregate table

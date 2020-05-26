@@ -4,6 +4,8 @@ from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_anta
 import socket
 import json
 import time
+import hashlib
+import codecs
 import base58
 import logging
 import logging.handlers
@@ -15,50 +17,9 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-'''
- rpc validateaddress > scriptpubkey
- 256_hash the scriptpubkey
- endian reverse -> electrum
-
-addr = 'RT2auNGywenHJW3iiEAQxfJfFwqzMvVCxy'
-scriptpubkey = '76a914c2af13fb5dc17581e42914887ef5c25317c7088388ac'
-'''
-import hashlib
-import codecs
-
-
 addr = 'RRfUCLxfT5NMpxsC9GHVbdfVy5WJnJFQLV'
 scriptpubkey = '76a914b3b89e3c87e3fed305f6656cfdd6e1c12ce6dbab88ac'
-pub = '0224a9d951d3a06d8e941cc7362b788bb1237bb0d56cc313e797eb027f37c2d375'
-
-def addr_to_script_pub(addr):
-    return "76a914"+base58.b58decode_check(addr).hex()[2:]+"88ac"
-
-def lil_endian(hex_str):
-    return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
-
-def pubkey_to_scripthash(pubkey):
-    publickey = codecs.decode(pubkey, 'hex')
-    s = hashlib.new('sha256', publickey).digest()
-    r = hashlib.new('ripemd160', s).digest()
-    # return codecs.encode(r, 'hex').decode("utf-8")
-    return "76a914"+codecs.encode(r, 'hex').decode("utf-8")+"88ac"
-
-def scripthash_to_p2sh(scripthash):
-    scripthex = codecs.decode(scripthash, 'hex')
-    s = hashlib.new('sha256', scripthex).digest()
-    return codecs.encode(s, 'hex').decode("utf-8")
-
-def addr_to_p2pkh():
-    pass
-
-def get_scripthash(script_pub):
-    print("script_pub: "+script_pub)
-    scriptpub_256 = hashlib.sha256(scriptpubkey.encode('utf-8')).hexdigest()
-    print("sha256 hash: "+scriptpub_256)
-    scripthash = lil_endian(scriptpub_256)
-    print("scripthash: "+scripthash)
-    return scripthash
+pubkey = '0224a9d951d3a06d8e941cc7362b788bb1237bb0d56cc313e797eb027f37c2d375'
 
 def get_from_electrum(url, port, method, params=[]):
     try:
@@ -73,18 +34,37 @@ def get_from_electrum(url, port, method, params=[]):
         print(e)
         print("==============================")
 
-'''
-print(scriptpubkey)
-print(addr_to_script_pub(addr))
-sh = pubkey_to_scripthash(pub)
-print(sh)
-p2sh = scripthash_to_p2sh(sh)
-print(p2sh)
-script_hash = lil_endian(p2sh)
-print(script_hash)
+
+def lil_endian(hex_str):
+    return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
+
+def get_scripthash_from_pubkey(pubkey):
+    scriptpubkey = '21' +pubkey+ 'ac'
+    scripthex = codecs.decode(scriptpubkey, 'hex')
+    s = hashlib.new('sha256', scripthex).digest()
+    sha256_scripthash = codecs.encode(s, 'hex').decode("utf-8")
+    script_hash = lil_endian(sha256_scripthash)
+    return script_hash
+
+def get_other_scripthash_from_pubkey(pubkey):
+    publickey = codecs.decode(pubkey, 'hex')
+    s = hashlib.new('sha256', publickey).digest()
+    r = hashlib.new('ripemd160', s).digest()
+    scriptpubkey = "76a914"+codecs.encode(r, 'hex').decode("utf-8")+"88ac"
+    h = codecs.decode(scriptpubkey, 'hex')
+    s = hashlib.new('sha256', h).digest()
+    sha256_scripthash = codecs.encode(s, 'hex').decode("utf-8")
+    script_hash = lil_endian(sha256_scripthash)
+    return script_hash
+
+scripthash = get_scripthash_from_pubkey(pubkey)
+other_scripthash = get_other_scripthash_from_pubkey(pubkey)
+
+print("script_hash: "+scripthash)
+print("other_scripthash: "+other_scripthash)
 print("---------------------------------------------------")
 
-r = requests.get('http://notary.earth:8762/info/coins/?dpow_active=1')
+r = requests.get('http://notary.earth:8762/api/info/coins/?dpow_active=1')
 coins_info = r.json()
 for coin in coins_info['results'][0]:
     if len(coins_info['results'][0][coin]['electrums']) > 0:
@@ -93,11 +73,12 @@ for coin in coins_info['results'][0]:
         url = electrum[0]
         port = electrum[1]
 
-        resp = get_from_electrum(url, port, 'blockchain.scripthash.get_balance', script_hash)
+        resp = get_from_electrum(url, port, 'blockchain.scripthash.get_balance', scripthash)
+        print(coin+": "+str(resp))
+        resp = get_from_electrum(url, port, 'blockchain.scripthash.get_balance', other_scripthash)
         print(coin+": "+str(resp))
     else:
         print("No electrums for "+coin)
-'''
 
 def get_ac_block_info():
     ac_block_info = {}
@@ -113,7 +94,6 @@ def get_ac_block_info():
         logger.info(chain+" failed")
         logger.info(e)
     return ac_block_info
-
 
 sync_node_data = requests.get('http://138.201.207.24/show_sync_node_data').json()
 for chain in sync_node_data:

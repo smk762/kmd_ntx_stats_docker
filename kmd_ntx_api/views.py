@@ -138,19 +138,170 @@ def get_nn_social(notary_name=None):
         nn_social_info.update(items_row_to_dict(item,'notary'))
     return nn_social_info
 
+intervals = (
+    ('wks', 604800),  # 60 * 60 * 24 * 7
+    ('days', 86400),    # 60 * 60 * 24
+    ('hrs', 3600),    # 60 * 60
+    ('mins', 60),
+    ('sec', 1),
+    )
+
+def day_hr_min_sec(seconds, granularity=2):
+    result = []
+    for name, count in intervals:
+        value = seconds // count
+        if value:
+            seconds -= value * count
+            if value == 1:
+                name = name.rstrip('s')
+            result.append("{} {}".format(value, name))
+    return ', '.join(result[:granularity])
+
+def get_premining_ntx_score(btc_ntx, main_ntx, third_party_ntx):
+    return btc_ntx*0.5 + main_ntx*0.25 + third_party_ntx*0.25
+
+
+def get_nn_ntx_summary(notary):
+    season = get_season(int(time.time()))
+    now = int(time.time())
+    day_ago = now - 24*60*60
+    week_ago = now - 24*60*60*7
+
+    today = datetime.date.today()
+    delta = datetime.timedelta(days=1)
+    week_ago = today-delta*7
+
+    ntx_summary = {
+        "today":{
+            "btc_ntx":0,
+            "main_ntx":0,
+            "third_party_ntx":0,
+            "most_ntx":str(0)+" ("+str('-')+")"
+        },
+        "season":{
+            "btc_ntx":0,
+            "main_ntx":0,
+            "third_party_ntx":0,
+            "most_ntx":str(0)+" ("+str('-')+")"
+        },
+        "time_since_last_kmd_ntx":-1,
+        "time_since_last_ntx":-1,
+        "last_ntx_chain":'-',
+        "premining_ntx_score":0,
+    }
+
+    # today's ntx stats
+    ntx_today = notarised.objects.filter()
+    ntx_today = notarised_count_daily.objects.filter(notarised_date=str(today), 
+                                             season=season, notary=notary) \
+                                            .values()
+    if len(ntx_today) > 0:
+        chains_ntx_today = ntx_today[0]['chain_ntx_counts']
+        today_max_chain = max(chains_ntx_today, key=chains_ntx_today.get) 
+        today_max_ntx = chains_ntx_today[today_max_chain]
+        ntx_summary['today'].update({
+            'most_ntx':today_max_chain+" ("+str(today_max_ntx)+")",
+            "btc_ntx":ntx_today[0]['btc_count'],
+            "main_ntx":ntx_today[0]['antara_count'],
+            "third_party_ntx":ntx_today[0]['third_party_count']
+        })
+
+    # season ntx stats
+    ntx_season = notarised_count_season.objects \
+                                    .filter(season=season, notary=notary) \
+                                    .values()
+    if len(ntx_season) > 0:
+        chains_ntx_season = ntx_season[0]['chain_ntx_counts']
+        season_max_chain = max(chains_ntx_season, key=chains_ntx_season.get) 
+        season_max_ntx = chains_ntx_season[season_max_chain]
+        if season_max_chain == 'KMD':
+            season_max_chain = 'BTC'
+
+        ntx_summary['season'].update({
+            "btc_ntx":ntx_season[0]['btc_count'],
+            "main_ntx":ntx_season[0]['antara_count'],
+            "third_party_ntx":ntx_season[0]['third_party_count'],
+            "most_ntx":season_max_chain+" ("+str(season_max_ntx)+")"
+        })
+        ntx_summary.update({
+            "premining_ntx_score":get_premining_ntx_score(
+                ntx_season[0]['btc_count'],
+                ntx_season[0]['antara_count'],
+                ntx_season[0]['third_party_count']
+            ),
+        })
+
+    #last ntx data
+    ntx_last = last_notarised.objects \
+                             .filter(season=season, notary=notary) \
+                             .values()
+    last_chain_ntx_times = {}
+    for item in ntx_last:
+        last_chain_ntx_times.update({item['chain']:item['block_time']})
+
+    if len(last_chain_ntx_times) > 0:
+        max_last_ntx_chain = max(last_chain_ntx_times, key=last_chain_ntx_times.get) 
+        max_last_ntx_time = last_chain_ntx_times[max_last_ntx_chain]
+        time_since_last_ntx = int(time.time()) - int(max_last_ntx_time)
+        time_since_last_ntx = day_hr_min_sec(time_since_last_ntx)
+        last_chain_ntx_times.update({item['chain']:item['block_time']})
+        if max_last_ntx_chain == 'KMD':
+            max_last_ntx_chain = 'BTC'
+        ntx_summary.update({
+            "time_since_last_ntx":time_since_last_ntx,
+            "last_ntx_chain":max_last_ntx_chain,
+        })
+
+    #last btc ntx data
+    btc_ntx_last = last_btc_notarised.objects \
+                             .filter(season=season, notary=notary) \
+                             .values()
+
+    max_kmd_ntx_time = 0
+    for item in btc_ntx_last:
+        max_kmd_ntx_time = item['block_time']
+
+    if max_kmd_ntx_time > 0:
+        time_since_last_kmd_ntx = int(time.time()) - int(max_kmd_ntx_time)
+        print(time.time())
+        print(max_kmd_ntx_time)
+        print(time_since_last_kmd_ntx)
+        time_since_last_kmd_ntx = day_hr_min_sec(time_since_last_kmd_ntx)
+        print(time_since_last_kmd_ntx)
+        ntx_summary.update({
+            "time_since_last_kmd_ntx":time_since_last_kmd_ntx,
+        })
+
+
+    logger.info(ntx_summary)
+    return ntx_summary
+
 def get_nn_mining_summary(notary):
     season = get_season(int(time.time()))
     now = int(time.time())
     day_ago = now - 24*60*60
     week_ago = now - 24*60*60*7
 
+    mining_summary = {
+        "mined_last_24hrs": 0,
+        "season_value_mined": 0,
+        "season_blocks_mined": 0,
+        "season_largest_block": 0,
+        "largest_block_height": 0,
+        "last_mined_datetime": -1,
+        "time_since_mined": -1,
+    }
     notary_mined = mined.objects.filter(season=season, name=notary)
 
     mined_last_24hrs = notary_mined.filter(block_time__gte=str(day_ago), block_time__lte=str(now)) \
                       .values('name').annotate(mined_24hrs=Sum('value'))
 
-    mined_this_week = notary_mined.filter(block_time__gte=str(week_ago), block_time__lte=str(now)) \
-                      .values('name').annotate(mined_this_week=Sum('value'))
+    if len(mined_last_24hrs) > 0:
+        mining_summary.update({
+            "mined_last_24hrs": float(mined_last_24hrs[0]['mined_24hrs'])
+        })
+
+
 
     mined_this_season = notary_mined.filter(block_time__gte=seasons_info[season]['start_time'],
                                           block_time__lte=str(now)) \
@@ -158,18 +309,19 @@ def get_nn_mining_summary(notary):
                                                             season_blocks_mined=Count('value'),
                                                             season_largest_block=Max('value'),
                                                             last_mined_datetime=Max('block_datetime'),
+                                                            last_mined_block=Max('block_height'),
                                                             last_mined_time=Max('block_time'))
-    time_since_mined = int(time.time()) - int(mined_this_season[0]['last_mined_time'])
-    mining_summary = {
-        "mined_last_24hrs": float(mined_last_24hrs[0]['mined_24hrs']),
-        "mined_this_week": float(mined_this_week[0]['mined_this_week']),
-        "season_value_mined": float(mined_this_season[0]['season_value_mined']),
-        "season_blocks_mined": float(mined_this_season[0]['season_blocks_mined']),
-        "season_largest_block": float(mined_this_season[0]['season_largest_block']),
-        "largest_block_height": float(mined_this_season[0]['season_blocks_mined']),
-        "last_mined_datetime": mined_this_season[0]['last_mined_datetime'],
-        "time_since_mined": time_since_mined,
-    }
+    if len(mined_last_24hrs) > 0:
+        time_since_mined = int(time.time()) - int(mined_this_season[0]['last_mined_time'])
+        time_since_mined = day_hr_min_sec(time_since_mined)
+        mining_summary.update({
+            "season_value_mined": float(mined_this_season[0]['season_value_mined']),
+            "season_blocks_mined": int(mined_this_season[0]['season_blocks_mined']),
+            "season_largest_block": float(mined_this_season[0]['season_largest_block']),
+            "last_mined_datetime": mined_this_season[0]['last_mined_datetime'],
+            "time_since_mined": time_since_mined,
+            "largest_block_height": int(mined_this_season[0]['last_mined_block']),
+        })
     logger.info(mining_summary)
     return mining_summary
 
@@ -609,6 +761,30 @@ class ntxChainDateViewSet(viewsets.ModelViewSet):
     filterset_fields = ['notarised_date', 'chain']
     ordering_fields = ['notarised_date', 'chain']
     ordering = ['-notarised_date', 'chain']
+
+class lastNtxViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing notarisations table data
+    """
+    queryset = last_notarised.objects.all()
+    serializer_class = LastNotarisedSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['notary', 'chain']
+    ordering_fields = ['notary', 'chain']
+    ordering = ['notary', 'chain']
+
+class lastBtcNtxViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing notarisations table data
+    """
+    queryset = last_btc_notarised.objects.all()
+    serializer_class = LastBtcNotarisedSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['notary']
+    ordering_fields = ['notary']
+    ordering = ['notary']
 
 class coinsViewSet(viewsets.ModelViewSet):
     """
@@ -1655,15 +1831,15 @@ def profile_view(request, notary_name=None):
     # Other project involvement
     if notary_name:
         season = get_season(int(time.time()))
-        mining_summary = get_nn_mining_summary(notary_name)
         notary_addresses = addresses.objects.filter(notary=notary_name, season=season) \
                            .order_by('chain').values('chain','address')
         context = {
             "eco_data_link":get_eco_data_link(),
             "nn_social":get_nn_social(notary_name),
             "nn_health":get_nn_health(),
+            "ntx_summary":get_nn_ntx_summary(notary_name),
             "notary_name":notary_name,
-            "mining_summary":mining_summary,
+            "mining_summary":get_nn_mining_summary(notary_name),
             "notary_addresses":notary_addresses
         }
         return render(request, 'profile.html', context)

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import bitcoin
+import time
+import json
 from bitcoin.core import x
 from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
@@ -60,6 +62,54 @@ coin_params = {
 
 for coin in antara_coins:
     coin_params.update({coin:KMD_CoinParams})
+
+# Need to confirm and fill this in correctly later...
+seasons_info = {
+    "Season_1": {
+            "start_block":1,
+            "end_block":813999,
+            "start_time":0,
+            "end_time":1530921600,
+            "notaries":[]
+        },
+    "Season_2": {
+            "start_block":814000,
+            "end_block":1443999,
+            "start_time":1530921600,
+            "end_time":1563148799,
+            "notaries":[]
+        },
+    "Season_3": {
+            "start_block":1444000,
+            "end_block":1921999,
+            "start_time":1563148800,
+            "end_time":1592146799,
+            "notaries":[]
+        },
+    "Season_4": {
+            "start_block":1922000,
+            "end_block":2444000,
+            "start_time":1592146800,
+            "end_time":1751328000,
+            "notaries":[]
+        }
+}
+
+now = int(time.time())
+
+if now > seasons_info['Season_3']['end_time']:
+    pubkey_file = 's4_nn_pubkeys.json'
+else:
+    pubkey_file = 's3_nn_pubkeys.json'
+
+with open(pubkey_file) as f:
+    season_pubkeys = json.load(f)
+
+def get_season(time_stamp):
+    for season in seasons_info:
+        if time_stamp >= seasons_info[season]['start_time'] and time_stamp <= seasons_info[season]['end_time']:
+            return season
+    return "season_undefined"
 
 # Update this each season change
 notary_pubkeys = {
@@ -461,43 +511,6 @@ notary_pubkeys = {
     }
 }
 
-# Need to confirm and fill this in correctly later...
-seasons_info = {
-    "Season_1": {
-            "start_block":1,
-            "end_block":813999,
-            "start_time":0,
-            "end_time":1530921600,
-            "notaries":[]
-        },
-    "Season_2": {
-            "start_block":814000,
-            "end_block":1443999,
-            "start_time":1530921600,
-            "end_time":1563148799,
-            "notaries":[]
-        },
-    "Season_3": {
-            "start_block":1444000,
-            "end_block":1921999,
-            "start_time":1563148800,
-            "end_time":1592146799,
-            "notaries":[]
-        },
-    "Season_4": {
-            "start_block":1922000,
-            "end_block":2444000,
-            "start_time":1592146800,
-            "end_time":1751328000,
-            "notaries":[]
-        }
-}
-
-def get_season(time_stamp):
-    for season in seasons_info:
-        if time_stamp >= season['start_time'] and time_stamp <= season['end_time']:
-            return season
-    return "season_undefined"
     
 # lists all season, name, address and id info for each notary
 notary_info = {}

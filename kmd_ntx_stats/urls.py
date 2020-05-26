@@ -47,6 +47,8 @@ router.register(r'source/notarised_chain_season', views.ntxChainSeasonViewSet, b
 router.register(r'source/notarised_count_season', views.ntxCountSeasonViewSet, basename='ntxCountSeasonViewSet')
 router.register(r'source/notarised_chain_date', views.ntxChainDateViewSet, basename='ntxChainDateViewSet')
 router.register(r'source/notarised_count_date', views.ntxCountDateViewSet, basename='ntxCountDateViewSet')
+router.register(r'source/last_notarised', views.lastNtxViewSet, basename='lastNtxViewSet')
+router.register(r'source/last_btc_notarised', views.lastBtcNtxViewSet, basename='lastBtcNtxViewSet')
 router.register(r'source/notary_rewards', views.rewardsViewSet, basename='rewardsViewSet')
 
 # tools 
