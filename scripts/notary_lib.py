@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import bitcoin
+import os
 import time
 import json
 from bitcoin.core import x
@@ -101,6 +102,8 @@ if now > seasons_info['Season_3']['end_time']:
     pubkey_file = 's4_nn_pubkeys.json'
 else:
     pubkey_file = 's3_nn_pubkeys.json'
+
+pubkey_file = os.path.join(os.path.dirname(__file__), pubkey_file)
 
 with open(pubkey_file) as f:
     season_pubkeys = json.load(f)
@@ -528,7 +531,9 @@ notary_addresses = {}
 for season in notary_pubkeys:
     notary_addresses.update({season:{}})
     notary_id = 0
-    for notary in notary_pubkeys[season]:
+    notaries = list(notary_pubkeys[season].keys())
+    notaries.sort()
+    for notary in notaries:
         if notary not in notary_addresses:
             notary_addresses[season].update({notary:{}})
         for coin in coin_params:
@@ -541,7 +546,9 @@ bitcoin.params = coin_params["KMD"]
 for season in notary_pubkeys:
     notary_id = 0    
     address_info.update({season:{}})
-    for notary in notary_pubkeys[season]:
+    notaries = list(notary_pubkeys[season].keys())
+    notaries.sort()
+    for notary in notaries:
         if notary not in notary_info:
             notary_info.update({
                 notary:{
@@ -565,7 +572,9 @@ for season in notary_pubkeys:
         notary_id += 1
 
 for season in notary_pubkeys:
-    for notary in notary_pubkeys[season]:
+    notaries = list(notary_pubkeys[season].keys())
+    notaries.sort()
+    for notary in notaries:
         if season.find("Season_3") != -1:
             seasons_info["Season_3"]['notaries'].append(notary)
         else:

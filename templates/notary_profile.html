@@ -188,8 +188,15 @@
 				<div class="row my-3">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
-							<div class="card-header kmd_ui_dark3_bg">
-								{{ notary_name }} Wallet Balances
+							<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
+								<div class="my-auto">
+									{{ notary_name }} WALLET BALANCES
+								</div>
+								<div>
+								    <span class="badge m-2 p-2 kmd_ui_dark1_bg">MAIN <i class="fa fa-circle" aria-hidden="true" style="color:#2fea8b"></i></span>
+								    <span class="badge m-2 p-2 kmd_ui_dark1_bg">3RD PARTY <i class="fa fa-circle" aria-hidden="true" style="color:#b541ea"></i></span>
+								    <span class="badge m-2 p-2 kmd_ui_dark1_bg">BTC / KMD <i class="fa fa-circle" aria-hidden="true" style="color:#f7931a"></i></span>
+								</div>
 							</div>
 							<div class="card-body kmd_ui_dark1_bg">
 								<span id="graph_title"></span>
@@ -201,10 +208,8 @@
 				<div class="row my-3">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card kmd_ui_light4">
-							<div class="card-header kmd_ui_dark1_bg"> {{ notary_name }} Addresses & Balances 
-								<div class="card-header-actions">
-									<a class="card-header-action" href="https://datatables.net" target="_blank"><small class="text-muted">docs</small></a>
-								</div>
+							<div class="card-header kmd_ui_dark1_bg">
+								{{ notary_name }} ADDRESSES & BALANCES
 							</div>
 							<div class="card-body kmd_ui_dark1_bg">
 								<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%"  data-ajax="{% url 'balancesViewSet-list' %}?format=datatables&notary={{ notary_name }}">
@@ -232,7 +237,21 @@
   	<script>  
 	    $(document).ready(function() {
 	        $('#table_id').DataTable({
-        		order: [[ 4, 'asc' ], [ 0, 'asc' ], [ 1, 'asc' ]]
+        		order: [[ 4, 'asc' ], [ 0, 'asc' ], [ 1, 'asc' ]],
+        		"columnDefs": [
+        			{
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='"+oData.address+"'>"+oData.address+"</a>");
+				        }
+			        },
+        			{
+			            "targets": 0,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");
+				        }
+        			}
+        		]
 	        });
 	    });
 	    $.ajax({ 
@@ -323,6 +342,7 @@
 				    },
 					scales: { 
 						yAxes: [{
+			                beginAtZero: true,
 						    scaleLabel: {
 						        display: true,
 						        labelString: 'Balance in Notary Wallets',
@@ -340,6 +360,7 @@
 						    },
 						    afterBuildTicks: function (chartObj) { //Build ticks labelling as per your need
 						        chartObj.ticks = [];
+						        chartObj.ticks.push(0);
 						        chartObj.ticks.push(0.1);
 						        chartObj.ticks.push(1);
 						        chartObj.ticks.push(10);

@@ -155,6 +155,8 @@ for item in coins_repo:
                 dpow_active, mm2_compatible)
     table_lib.update_coins_tbl(conn, cursor, row_data)
 
+no_electrums = []
+no_explorers = []
 for coin in dpow:
     if coin not in coins_info:
         print("Adding "+coin+" (in dpow, but not in coins repo)")
@@ -163,7 +165,16 @@ for coin in dpow:
                     json.dumps([]), json.dumps(dpow[coin]),
                     1, 0)
         table_lib.update_coins_tbl(conn, cursor, row_data)
+        no_electrums.append(coin)
+        no_explorers.append(coin)
+    else:
+        if len(coins_info[coin]['electrums']) == 0:
+            no_electrums.append(coin)
+        if len(coins_info[coin]['explorers']) == 0:
+            no_explorers.append(coin)
 
+print("no_electrums: "+str(no_electrums))
+print("no_explorers: "+str(no_explorers))
 
 logging.info("Finished!")
 cursor.close()

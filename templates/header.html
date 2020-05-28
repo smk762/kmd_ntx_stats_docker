@@ -1,0 +1,121 @@
+{% load static %}
+
+        <header class="c-header kmd_ui_dark3_bg kmd_ui_light1 c-header-fluid">          
+            <!-- Hamburger Menu Button-->
+            <button class="c-header-toggler c-class-toggler d-lg-none mfe-auto" type="button" data-target="#sidebar" data-class="c-sidebar-show">
+                <i class="cil-menu"></i>
+            </button>
+            <a class="c-header-brand d-lg-none c-header-brand-sm-up-center" href="#">
+                <img class="c-sidebar-brand-full"height="46" alt="Komodo Logo" src="{% static 'assets/kmd/KMD_Horiz_Light.png' %}" />
+            </a>
+            <button class="c-header-toggler c-class-toggler mfs-3 d-md-down-none" type="button" data-target="#sidebar" data-class="c-sidebar-lg-show" responsive="true">
+                <i class="cil-menu"></i>
+            </button>
+            <ul class="c-header-nav d-md-down-none">
+                <li class="c-header-nav-item px-1">
+                    <button class="btn btn-secondary dropdown-toggle" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> Docs
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" data-popper-placement="bottom-start">
+                        <a class="dropdown-item" href="https://developers.komodoplatform.com/"> Developer Docs</a>
+                        <a class="dropdown-item" href="https://docs.komodoplatform.com/notary/setup-Komodo-Notary-Node.html#nn-repo-quick-reference"> NN Setup Guide</a>
+                        <a class="dropdown-item" href="https://smk762.github.io/developer-docs/resources/notary-api.html">API Guide</a>
+                        <a class="dropdown-item" href="https://github.com/komodoplatform/dpow"> dPoW Guide</a>
+                        <a class="dropdown-item" href="https://github.com/KomodoPlatform/dPoW/blob/dev/doc/bible.md"> Notary Node Bible</a>
+                        
+                    </div>
+                </li>
+                <li class="c-header-nav-item px-1">
+                    <button class="btn btn-secondary dropdown-toggle" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> Tools
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" data-popper-placement="bottom-start">
+                        <a class="dropdown-item" href="https://github.com/MrMLynch/nnutils"> Mr Lynch's NN Utils</a>
+                        <a class="dropdown-item" href="https://github.com/KomodoPlatform/komodotools"> KomodoTools</a>
+                        <a class="dropdown-item" href="https://github.com/DeckerSU/komodo_scripts"> Decker's Komodo Scripts</a>
+                    </div>
+                </li>
+                <li class="c-header-nav-item px-1">
+                    <button class="btn btn-secondary dropdown-toggle kmd_dkteal_bg" id="dropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> Resources
+                    </button>
+                    <div class="dropdown-menu kmd_blue_bg" aria-labelledby="dropdownMenuButton" data-popper-placement="bottom-start">
+                        <a class="dropdown-item" href="https://www.dexstats.info/"> DexStats</a>
+                        <a class="dropdown-item" href="https://komodod.com/"> Komodod</a>
+                        <a class="dropdown-item" href="https://notarystats.info/"> Notary Stats</a>
+                        <a class="dropdown-item" href="https://komodostats.com/"> Komodo Stats</a>
+                    </div>
+                </li>
+            </ul>
+            <ul class="c-header-nav mfs-auto">
+                <li class="c-header-nav-item dropdown d-md-down-none mx-2">
+                    <a class="c-header-nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        <i class="cil-bell"></i>
+                        <span class="badge badge-pill badge-danger">5</span>
+                    </a>
+
+                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg pt-0">
+                        <div class="dropdown-header kmd_ui_dark4_bg kmd_ui_light3">
+                            <strong>Notary Node Network Health</strong>
+                        </div>
+
+                        <span data-toggle="tooltip" data-placement="left" data-html="true" title="{{ nn_health.ntx_chains_tooltip }}">
+                            <a class="dropdown-item d-block" href="#">
+                                <div class="mb-1">
+                                    <i class="fas fa-link"></i> Chain Notarisation
+                                </div>
+                                <span class="progress progress-xs">
+                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ nn_health.ntx_chains_pct }}%" aria-valuenow="{{ nn_health.ntx_chains_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </span>
+                                <small class="text-uppercase text-muted">Chains notarised 24hrs</small>
+                            </a>
+                        </span>
+
+                        <span data-html="true" data-toggle="tooltip" data-placement="left" title="{{ nn_health.ntx_nodes_tooltip }}">
+                            <a class="dropdown-item d-block" href="#">
+                                <div class="mb-1">
+                                    <i class="fas fa-gavel"></i> Node Notarisation
+                                </div>
+                                <span class="progress progress-xs">
+                                    <div class="progress-bar kmd_secondary_red_bg" role="progressbar" style="width: {{ nn_health.ntx_nodes_pct }}%" aria-valuenow="{{ nn_health.ntx_nodes_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </span>
+                                <small class="text-uppercase text-muted">Nodes notarised 24hrs</small>
+                            </a>
+                        </span>
+
+                        <span data-html="true" data-toggle="tooltip" data-placement="left" title="{{ nn_health.mining_tooltip }}">
+                        <a class="dropdown-item d-block" href="#">
+                            <div class="mb-1">
+                                <i class="fas fa-dragon"></i> Node Mining
+                            </div>
+                            <span class="progress progress-xs">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ nn_health.mining_nodes_pct }}%" aria-valuenow="{{ nn_health.mining_nodes_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </span>
+                            <small class="text-uppercase text-muted">Nodes mining 24hrs</small>
+                        </a>
+                        </span>
+
+                        <span data-html="true" data-toggle="tooltip" data-placement="left" title="{{ nn_health.low_balances_tooltip }}">
+                        <a class="dropdown-item d-block" href="#">
+                            <div class="mb-1">
+                                <i class="fab fa-btc"></i> Node Balances
+                            </div>
+                            <span class="progress progress-xs">
+                                <div class="progress-bar kmd_secondary_purple_bg" role="progressbar" style="width: {{ nn_health.balance_pct }}%" aria-valuenow="{{ nn_health.balance_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </span>
+                            <small class="text-uppercase text-muted">Balances available</small>
+                        </a>
+                        </span>
+
+                        <span data-html="true" data-toggle="tooltip" data-placement="left" title="{{ nn_health.sync_tooltip }}">
+                            <a class="dropdown-item d-block" href="#">
+                                <div class="mb-1">
+                                    <i class="fas fa-code-branch"></i> dPoW Sync
+                                </div>
+                                <span class="progress progress-xs">
+                                    <div class="progress-bar kmd_ltblue" role="progressbar" style="width: {{ nn_health.sync_pct }}%" aria-valuenow="{{ nn_health.sync_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </span>
+                                <small class="text-uppercase text-muted">Chain tips matching</small>
+                            </a>
+                        </span>
+                    </div>
+                </li>
+            </ul>
+        </header>
