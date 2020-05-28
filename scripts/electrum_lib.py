@@ -14,7 +14,7 @@ from bitcoin.wallet import P2PKHBitcoinAddress
 from notary_lib import notary_addresses, known_addresses, season_pubkeys, notary_pubkeys
 from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 class BTC_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
@@ -117,10 +117,18 @@ def get_from_electrum(url, port, method, params=[]):
     s.send(json.dumps({"id": 0, "method": method, "params": params}).encode() + b'\n')
     return json.loads(s.recv(99999)[:-1].decode())
 
-def get_electrum_balance(chain, addr, notary, node):
+def get_dexstats_balance(chain, addr):
+    url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/addr/'+addr
+    r = requests.get(url)
+    balance = r.json()['balance']
+    return balance
+
+def get_balance(chain, addr, notary, node):
     balance = -1
     check_bal = False
     try:
+        if chain == "GIN":
+            logger.warning("Getting "+chain+" {"+node+"}"+" {"+notary+"}")
         if node == 'main':
             if chain not in third_party_coins:
                 check_bal = True
@@ -130,18 +138,24 @@ def get_electrum_balance(chain, addr, notary, node):
             pubkey = notary_pubkeys["Season_3_Third_Party"][notary]
         if check_bal:
             if chain in electrums:
-                logger.info("** using electrum for "+chain+" **")
-                url = electrums[chain]["url"]
-                port = electrums[chain]["port"]
-                balance = get_full_electrum_balance(pubkey, url, port)
+                try:
+                    url = electrums[chain]["url"]
+                    port = electrums[chain]["port"]
+                    balance = get_full_electrum_balance(pubkey, url, port)
+                except Exception as e:
+                    logger.warning(">>>>> "+chain+" via ["+url+":"+str(port)+"] FAILED | addr: "+addr+" | "+str(e))
+                    try:
+                        balance = get_dexstats_balance(chain, addr)
+                        logger.warning(">>>>> "+chain+" via [DEXSTATS] OK | addr: "+addr+" | balance: "+str(balance))
+                    except Exception as e:
+                        logger.warning(">>>>> "+chain+" via [DEXSTATS] FAILED | addr: "+addr+" | "+str(e))
+
             elif chain in antara_coins or chain in ["HUSH3"]:
-                logger.info("** using dexstats for "+chain+" **")
-                url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/addr/'+addr
-                r = requests.get(url)
-                if 'balance' in r.json():
-                    balance = r.json()['balance']
-                else:
-                    logger.info(chain+" FAILED | addr: "+addr+" | "+str(r.text))
+                try:
+                    balance = get_dexstats_balance(chain, addr)
+                except Exception as e:
+                    logger.warning(">>>>> "+chain+" via [DEXSTATS] FAILED | addr: "+addr+" | "+str(e))
+
             elif chain == "GIN":
                 # Gin is dead.
                 # addr = addr_to_scripthash_256(addr)
@@ -154,8 +168,8 @@ def get_electrum_balance(chain, addr, notary, node):
                 if 'balance' in r.json():
                     balance = r.json()['balance']
                 else:
-                    logger.info(chain+" FAILED | addr: "+addr+" | "+str(r.text))
+                    logger.warning(">>>>> "+chain+" via explorer.aryacoin.io FAILED | addr: "+addr+" | "+str(r.text))
 
     except Exception as e:
-        logger.info(chain+" FAILED | addr: "+addr+" | "+str(e))
+        logger.warning(">>>>> "+chain+" FAILED | addr: "+addr+" | "+str(e))
     return balance

@@ -13,7 +13,7 @@
 						<div class="row m-1 d-flex justify-content-between">	
 			            	{% for node in info.nodes %}
 			            	<div class="card kmd_ui_dark3_bg kmd_ui_light3 col-2 px-0 mx-1">
-			            		<a href="http://{{ request.get_host }}/profile/{{ node }}">
+			            		<a href="http://{{ request.get_host }}/notary_profile/{{ node }}">
 
 				            		<div class="p-2">
 									{% for nn, site_links in nn_social.items %}
@@ -29,7 +29,7 @@
 								</a>	
 								<div class="card-body kmd_ui_dark4_bg" style="padding: 1rem; ">
 									<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
-				            			<a href="http://{{ request.get_host }}/profile/{{ node }}">
+				            			<a href="http://{{ request.get_host }}/notary_profile/{{ node }}">
 				            				{{ node }}
 										</a><br />
 										{% for nn, site_links in nn_social.items %}

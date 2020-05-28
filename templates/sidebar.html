@@ -1,0 +1,116 @@
+{% load static %}
+
+    <!-- Sidebar -->
+    <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show kmd_ui_dark3_bg" id="sidebar" style="border-right: 1px solid #000 !important;    ">
+      <div class="c-sidebar-brand d-md-down-none kmd_ui_dark1_bg">
+        <img class="c-sidebar-brand-full"height="46" alt="Komodo Logo" src="{% static 'assets/kmd/KMD_Horiz_Light.png' %}" />
+        <img class="c-sidebar-brand-minimized" width="46" height="46" alt="Komodo Logo" src="{% static 'assets/kmd/KMD_Mark_Color.png' %}" />
+      </div>
+      <ul class="c-sidebar-nav kmd_ui_dark1_bg">
+
+        <li class="c-sidebar-nav-dropdown">
+          <a class="c-sidebar-nav-dropdown-toggle" href="#">
+            <i class="cil-chart-line"></i>  <span style="padding-left: 12px;">GRAPHS</span>
+          </a>
+          <ul class="c-sidebar-nav-dropdown-items">
+            <li class="c-sidebar-nav-title">Wallet</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/balances_graph/?chain=BTC"> Notary Chain Balances</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/balances_graph/?notary=alien_AR"> Notary Node Balances</a></li>
+
+            <li class="c-sidebar-nav-title">Mining</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_mining_graph/?chain=BTC"> Daily Mining</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/season_mining_graph/?notary=alien_AR"> Season Mining</a></li>
+
+            <li class="c-sidebar-nav-title">Notarisations</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?chain=BTC"> Daily Chain Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?notary=alien_AR"> Daily Node Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?chain=BTC"> Season Chain Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?notary=alien_AR"> Season Node Notarisations</a></li>
+          </ul>
+        </li>
+        
+        <li class="c-sidebar-nav-dropdown">
+          <a class="c-sidebar-nav-dropdown-toggle" href="#">
+            <i class="cil-spreadsheet"></i>   <span style="padding-left: 12px;">TABLES</span>
+          </a>
+          <ul class="c-sidebar-nav-dropdown-items">
+            <li class="c-sidebar-nav-title">Wallet</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/balances_table/"> Balances</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/addresses_table/"> Addresses</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/rewards_table/"> Rewards</a></li>
+            <li class="c-sidebar-nav-title">Mining</li>
+           <!-- <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/mining_table/"> Mining</a></li> -->
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/mining_season_table/"> Season Mining</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/mining_daily_table/"> Daily Mining</a></li>
+            <li class="c-sidebar-nav-title">Notarisations</li>
+            <!-- <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/ntx_table/"> Notarisations</a></li> -->
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/ntx_chain_season_table/"> Season Chain Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/ntx_chain_daily_table/"> Daily Chain Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/ntx_node_season_table/"> Season Notary Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/ntx_node_daily_table/"> Daily Notary Notarisations</a></li>
+          </ul>
+        </li>
+        
+        <li class="c-sidebar-nav-dropdown">
+          <a class="c-sidebar-nav-dropdown-toggle" href="#">
+              <i class="cil-transfer"></i>  <span style="padding-left: 12px;">API</span>
+          </a>
+          <ul class="c-sidebar-nav-dropdown-items" >
+            <li class="c-sidebar-nav-title">Wallet</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'addresses_filter-list' %}"> Addresses</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'balances_filter-list' %}"> Balances</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'rewards_filter-list' %}"> Notary Rewards</a></li>
+
+            <li class="c-sidebar-nav-title">Mining</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'mined_count_date_filter-list' %}"> Daily Mining</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'mined_count_season_filter-list' %}"> Season Mining</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'MinedViewSet-list' %}"> All Mining</a></li>
+
+            <li class="c-sidebar-nav-title">Notarisations</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notarised_count_date_filter-list' %}"> Daily Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notarised_count_season_filter-list' %}"> Season Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'ntxViewSet-list' %}"> All Notarisations</a></li>
+            
+            <li class="c-sidebar-nav-title">Info</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'coins_filter-list' %}"> Coins</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notary_nodes-list' %}"> Notaries</a></li>
+          </ul>
+        </li>
+        <li class="c-sidebar-nav-dropdown">
+            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                <i class="cil-layers"></i> 
+                <span style="padding-left: 12px;">NOTARY PROFILES</span>
+            </a>
+            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            {% for section, info in sidebar_links.notaries_menu.items %}
+            <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ info.name }}</li>
+                {% for option in info.nodes %}
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/notary_profile/{{ option }}"> {{ option }}
+                    </a>
+                </li>
+                {% endfor %}
+            {% endfor %}
+            </ul>
+        </li>
+        <li class="c-sidebar-nav-dropdown">
+            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                <i class="cil-layers"></i> 
+                <span style="padding-left: 12px;">COIN PROFILES</span>
+            </a>
+            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            {% for section, info in sidebar_links.chains_menu.items %}
+            <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ section }}</li>
+                {% for option in info %}
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/coin_profile/{{ option }}"> {{ option }}
+                    </a>
+                </li>
+                {% endfor %}
+            {% endfor %}
+            </ul>
+        </li>
+      </ul>
+      <button class="c-sidebar-minimizer c-class-toggler" type="button" data-target="_parent" data-class="c-sidebar-unfoldable"></button>
+    </div>
+    <!-- End Sidebar -->

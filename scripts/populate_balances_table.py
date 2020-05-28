@@ -6,14 +6,15 @@ import table_lib
 import electrum_lib
 import logging
 import logging.handlers
-from notary_lib import notary_addresses, known_addresses, season_pubkeys, notary_pubkeys
-from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
+from notary_lib import *
+from coins_lib import *
 from rpclib import def_credentials
 import threading
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s',
+                               datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
@@ -46,11 +47,13 @@ def thread_electrum(conn, cursor, notary, chain, addr, season):
         node = 'main'
     if season.find("Season_3") != -1:
         season = "Season_3"
-        balance = electrum_lib.get_electrum_balance(chain, addr, notary, node)
+        balance = electrum_lib.get_balance(chain, addr, notary, node)
         if balance != -1:
-            row_data = (notary, chain, balance, addr, season, node, int(time.time()))        
+            row_data = (notary, chain, balance, addr,
+                        season, node, int(time.time()))
             table_lib.update_balances_tbl(conn, cursor, row_data)
-            logger.info("["+chain+"] ["+season+"] ["+node+"] ["+str(balance)+"] ["+notary+"] ["+addr+"]")
+            logger.info("["+chain+"] ["+season+"] ["+node+"] [" \
+                    +str(balance)+"] ["+notary+"] ["+addr+"]")
 
 conn = table_lib.connect_db()
 cursor = conn.cursor()
@@ -108,7 +111,6 @@ def get_kmd_rewards():
                         }
                     })
                     total_rewards += rewards/100000000
-                    #logger.info(nn_utxos[addr]['eligible_utxos'][txid])
         eligible_utxo_count = len(nn_utxos[addr]['eligible_utxos'])
         if oldest_utxo_block == 99999999999:
             oldest_utxo_block = 0
@@ -119,7 +121,8 @@ def get_kmd_rewards():
             "total_rewards":total_rewards
         })
         utxo_txids = list(nn_utxos[addr]['eligible_utxos'].keys())
-        logger.info(notary+": "+str(balance)+" KMD balance, "+str(total_rewards)+" rewards")
+        logger.info(notary+": "+str(balance)+" KMD balance, " \
+               +str(total_rewards)+" rewards")
         logger.info("Oldest block: "+str(oldest_utxo_block))
         row_data = (addr, notary, utxo_count, eligible_utxo_count,
                    oldest_utxo_block, balance, total_rewards,

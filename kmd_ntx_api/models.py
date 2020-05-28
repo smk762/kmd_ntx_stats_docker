@@ -19,7 +19,8 @@ class notarised(models.Model):
     class Meta:
         db_table = 'notarised'
         constraints = [
-            models.UniqueConstraint(fields=['txid'], name='unique_txid')
+            models.UniqueConstraint(fields=['txid'],
+                                 name='unique_txid')
         ]
 
 class last_notarised(models.Model):
@@ -33,7 +34,10 @@ class last_notarised(models.Model):
     class Meta:
         db_table = 'last_notarised'
         constraints = [
-            models.UniqueConstraint(fields=['notary','chain'], name='unique_notary_chain')
+            models.UniqueConstraint(
+                fields=['notary','chain'],
+                name='unique_notary_chain'
+            )
         ]
 
 class last_btc_notarised(models.Model):
@@ -46,7 +50,10 @@ class last_btc_notarised(models.Model):
     class Meta:
         db_table = 'last_btc_notarised'
         constraints = [
-            models.UniqueConstraint(fields=['notary'], name='unique_notary_btc_ntx')
+            models.UniqueConstraint(
+                fields=['notary'],
+                name='unique_notary_btc_ntx'
+            )
         ]
 
 class notarised_count_season(models.Model):
@@ -64,7 +71,10 @@ class notarised_count_season(models.Model):
     class Meta:
         db_table = 'notarised_count_season'
         constraints = [
-            models.UniqueConstraint(fields=['notary', "season"], name='unique_notary_season')
+            models.UniqueConstraint(
+                fields=['notary', "season"],
+                name='unique_notary_season'
+            )
         ]
 
 class notarised_count_daily(models.Model):
@@ -83,7 +93,10 @@ class notarised_count_daily(models.Model):
     class Meta:
         db_table = 'notarised_count_daily'
         constraints = [
-            models.UniqueConstraint(fields=['notary', "notarised_date"], name='unique_notary_date')
+            models.UniqueConstraint(
+                fields=['notary', "notarised_date"],
+                name='unique_notary_date'
+            )
         ]
 
 class notarised_chain_season(models.Model):
@@ -103,7 +116,10 @@ class notarised_chain_season(models.Model):
     class Meta:
         db_table = 'notarised_chain_season'
         constraints = [
-            models.UniqueConstraint(fields=['chain', 'season'], name='unique_notarised_chain_season')
+            models.UniqueConstraint(
+                fields=['chain', 'season'],
+                name='unique_notarised_chain_season'
+            )
         ]
 
 class notarised_chain_daily(models.Model):
@@ -114,7 +130,10 @@ class notarised_chain_daily(models.Model):
     class Meta:
         db_table = 'notarised_chain_daily'
         constraints = [
-            models.UniqueConstraint(fields=['chain', 'notarised_date'], name='unique_notarised_chain_date')
+            models.UniqueConstraint(
+                fields=['chain', 'notarised_date'],
+                name='unique_notarised_chain_date'
+            )
         ]
 
 # MINING
@@ -132,7 +151,10 @@ class mined(models.Model):
     class Meta:
         db_table = 'mined'
         constraints = [
-            models.UniqueConstraint(fields=['block_height'], name='unique_block')
+            models.UniqueConstraint(
+                fields=['block_height'], 
+                name='unique_block'
+            )
         ]
 
 class chain_sync(models.Model):
@@ -144,7 +166,10 @@ class chain_sync(models.Model):
     class Meta:
         db_table = 'chain_sync'
         constraints = [
-            models.UniqueConstraint(fields=['chain'], name='unique_chain_sync')
+            models.UniqueConstraint(
+                fields=['chain'],
+                name='unique_chain_sync'
+            )
         ]
 
 class mined_count_season(models.Model):
@@ -160,7 +185,10 @@ class mined_count_season(models.Model):
     class Meta:
         db_table = 'mined_count_season'
         constraints = [
-            models.UniqueConstraint(fields=['notary', 'season'], name='unique_notary_season_mined')
+            models.UniqueConstraint(
+                fields=['notary', 'season'],
+                name='unique_notary_season_mined'
+            )
         ]
 
 class mined_count_daily(models.Model):
@@ -173,7 +201,10 @@ class mined_count_daily(models.Model):
     class Meta:
         db_table = 'mined_count_daily'
         constraints = [
-            models.UniqueConstraint(fields=['notary', 'mined_date'], name='unique_notary_daily_mined')
+            models.UniqueConstraint(
+                fields=['notary', 'mined_date'],
+                name='unique_notary_daily_mined'
+            )
         ]
 
 # WALLET
@@ -190,8 +221,10 @@ class balances(models.Model):
     class Meta:
         db_table = 'balances'
         constraints = [
-            models.UniqueConstraint(fields=['chain', 'address', 'season'],
-                                    name='unique_chain_address_season_balance')
+            models.UniqueConstraint(
+                fields=['chain', 'address', 'season'],
+                name='unique_chain_address_season_balance'
+            )
         ]
 
 class rewards(models.Model):
@@ -207,7 +240,10 @@ class rewards(models.Model):
     class Meta:
         db_table = 'rewards'
         constraints = [
-            models.UniqueConstraint(fields=['address'], name='unique_reward_address')
+            models.UniqueConstraint(
+                fields=['address'],
+                name='unique_reward_address'
+            )
         ]
 
 class addresses(models.Model):
@@ -222,7 +258,10 @@ class addresses(models.Model):
     class Meta:
         db_table = 'addresses'
         constraints = [
-            models.UniqueConstraint(fields=['address', "season", "chain"], name='unique_season_chain_address')
+            models.UniqueConstraint(
+                fields=['address', "season", "chain"],
+                name='unique_season_chain_address'
+            )
         ]
 
 # INFO
@@ -240,7 +279,10 @@ class coins(models.Model):
     class Meta:
         db_table = 'coins'
         constraints = [
-            models.UniqueConstraint(fields=['chain'], name='unique_chain_coin')
+            models.UniqueConstraint(
+                fields=['chain'],
+                name='unique_chain_coin'
+            )
         ]
 
 class nn_social(models.Model):
@@ -258,7 +300,10 @@ class nn_social(models.Model):
     class Meta:
         db_table = 'nn_social'
         constraints = [
-            models.UniqueConstraint(fields=['notary', 'season'], name='unique_notary_season_social')
+            models.UniqueConstraint(
+                fields=['notary', 'season'],
+                name='unique_notary_season_social'
+            )
         ]
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"
