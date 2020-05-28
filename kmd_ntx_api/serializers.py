@@ -109,6 +109,19 @@ class NNSocialSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['notary', 'twitter', 'youtube', 'discord', 'telegram',
                   'github', 'keybase', 'website', 'icon', 'season']
 
+class ExplorersSerializer(serializers.HyperlinkedModelSerializer):
+    chain = serializers.CharField()
+    explorer = serializers.CharField()
+    class Meta:
+        fields = ['chain', 'explorer']
+
+class ElectrumsSerializer(serializers.HyperlinkedModelSerializer):
+    chain = serializers.CharField()
+    electrums = serializers.CharField()
+    electrums_ssl = serializers.CharField()
+    class Meta:
+        fields = ['chain', 'explorer']
+
 class decodeOpRetSerializer(serializers.Serializer):
     OP_RETURN = serializers.CharField(
         max_length=1000,

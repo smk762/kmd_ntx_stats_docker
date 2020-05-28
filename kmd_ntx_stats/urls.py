@@ -25,6 +25,9 @@ router.register(r'info/notary_rewards',
 router.register(r'info/notary_nodes',
                 views.notary_nodes,
                 basename='notary_nodes')
+router.register(r'info/explorers',
+                views.explorers,
+                basename='explorers')
 
 # daily
 router.register(r'mined_stats/daily', views.mined_count_date_filter,
