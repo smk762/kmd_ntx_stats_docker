@@ -45,12 +45,22 @@ seasons_info = {
         }
 }
 
+def get_dpow_explorers():
+    resp = {}
+    coins_data = coins.objects.filter(dpow_active=1).values('chain','explorers')
+    for item in coins_data:
+        explorers = item['explorers']
+        if len(explorers) > 0:
+            chain = item['chain']
+            resp.update({chain:explorers[0].replace('tx/','')})
+    return resp
+
+
 def get_season(time_stamp):
     for season in seasons_info:
         if time_stamp >= seasons_info[season]['start_time'] and time_stamp <= seasons_info[season]['end_time']:
             return season
     return "season_undefined"
-
 
 def get_regions_info(notary_list):
     notary_list.sort()
@@ -591,8 +601,8 @@ def get_low_balance_tooltip(low_balances, ignore_chains):
 
 def get_server_chains(coins_data):
     server_chains = {
-        "Main":[],
-        "Third Party":[]
+        "main":[],
+        "third_party":[]
     }
     for item in coins_data:
         server = item['dpow']['server']

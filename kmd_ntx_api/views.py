@@ -485,6 +485,27 @@ class decode_op_return(viewsets.ViewSet):
             decoded = {}
         return Response(decoded)
 
+class explorers(viewsets.ViewSet):
+    """
+    Returns explorers sourced from coins repo
+    """    
+    serializer_class = ExplorersSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        resp = {}
+        coins_data = coins.objects.all().values('chain','explorers')
+        for item in coins_data:
+            explorers = item['explorers']
+            if len(explorers) > 0:
+                chains = item['chains']
+                resp.update({chain:explorers})
+        return Response(resp)
+
 # test time filters for daily notary summary (ntx and mining)
 
 # Slow, review. crash err 247. add paginate func?
@@ -567,13 +588,13 @@ def coin_profile_view(request, chain=None):
             if item['balance'] > max_tick:
                 max_tick = float(item['balance'])
 
-        notary_name = "dragonhound_NA"
         context = {
             "sidebar_links":get_sidebar_links(),
+            "explorers":get_dpow_explorers(),
             "eco_data_link":get_eco_data_link(),
-            "nn_social":{}, #get_coin_social(notary_name),
+            "coin_social":{}, #get_coin_social(notary_name),
             "nn_health":get_nn_health(),
-            "ntx_summary":get_coin_ntx_summary(chain),
+            "chain_ntx_summary":get_coin_ntx_summary(chain),
             "chain":chain,
             "max_tick": 10**(int(round(np.log10(max_tick))))
         }
