@@ -62,6 +62,14 @@ def get_notary_list(season):
             notary_list.append(item['notary'])
     return notary_list
 
+def get_dpow_coins_list():
+    dpow_chains = coins.objects.filter(dpow_active=1).values('chain')
+    chains_list = []
+    for item in dpow_chains:
+        if item['chain'] not in chains_list:
+            chains_list.append(item['chain'])
+    return chains_list
+
 def get_coins_data(request):
     resp = {}
     data = coins.objects.all()
@@ -462,7 +470,6 @@ def get_notarised_data(request):
         })
 
     return wrap_api(resp)
-
 
 def get_rewards_data(request):
     address_data = addresses.objects.filter(chain='KMD')
