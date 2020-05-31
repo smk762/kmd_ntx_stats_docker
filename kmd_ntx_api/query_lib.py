@@ -60,6 +60,7 @@ def get_notary_list(season):
     for item in notaries:
         if item['notary'] not in notary_list:
             notary_list.append(item['notary'])
+    notary_list.sort()
     return notary_list
 
 def get_dpow_coins_list():
@@ -68,6 +69,7 @@ def get_dpow_coins_list():
     for item in dpow_chains:
         if item['chain'] not in chains_list:
             chains_list.append(item['chain'])
+    chains_list.sort()
     return chains_list
 
 def get_coins_data(request):

@@ -34,6 +34,14 @@
 											    </span>
 											</button>
 									  	</li>
+									    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+										    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+											    STAT X
+											    <span class="badge kmd_ui_dark4_bg">
+											    	TBA
+											    </span>
+											</button>
+									    </li>
 										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 											<button type="button" class="btn btn-dark4 mx-auto">
 												<a href="http://{{ request.get_host }}/notary_profile/{{ chain }}" class="">
@@ -47,7 +55,7 @@
 						</div>
 		            	<div class="card kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0 mt-auto shadow-none">
 		            		<div class="row d-flex justify-content-between align-items-center">
-		            			<a href="http://{{ request.get_host }}/notary_profile/{{ chain }}">
+		            			<a href="http://{{ request.get_host }}/coin_profile/{{ chain }}">
 				            		<div class="p-1 col-4">
 										{% for nn, site_links in coin_social.items %}
 											{% if chain == nn and site_links.icon != '' %}
@@ -68,13 +76,13 @@
 												{% elif site == 'github' and link != '' %}
 													<i class="fab fa-github mr-2"></i> <a href="https://github.com/{{ link }}">{{ link }}</a><br />
 												{% elif site == 'youtube' and link != '' %}
-													<i class="fab fa-youtube mr-2"></i> <a href="https://www.youtube.com/{{ link }}">{{ link }}</a><br />
-												{% elif site == 'keybase' and link != '' %}
-													<i class="fab fa-keybase mr-2"></i> <a href="https://keybase.io/{{ link }}">{{ link }}</a><br />
+													<i class="fab fa-youtube mr-2"></i> <a href="https://www.youtube.com/channel{{ link }}"> Youtube Channel</a><br />
 												{% elif site == 'telegram' and link != '' %}
 													<i class="fab fa-telegram-plane mr-2"></i> <a href="https://t.me/{{ link }}">{{ link }}</a><br />
+												{% elif site == 'explorer' and link != '' %}
+													<i class="fas fa-search mr-2"></i> <a href="https://{{ link }}">{{ link }}</a><br />
 												{% elif site == 'website' and link != '' %}
-													<i class="fas fa-desktop mr-2"></i> <a href="{{ link }}">{{ link }}</a><br />
+													<i class="fas fa-desktop mr-2"></i> <a href="https://{{ link }}">{{ link }}</a><br />
 												{% endif %}
 											{% endfor %}
 										{% endif %}
@@ -84,20 +92,12 @@
 							</div>
 		            		<div class="row d-flex justify-content-between align-items-center m-auto">
 		            			<a href="http://{{ request.get_host }}/notary_profile/{{ chain }}" class="text-uppercase">
-		            				<h3 styl2="margin:0.75rem;" class="">{{ chain }}</h3>
+		            				<h3 style="margin:0.75rem;" class="">{{ chain }}</h3>
 								</a>								
 							</div>
 							<div class="card-body kmd_ui_dark2_bg kmd_ui_light3 p-0">
 								<p class="card-text ">
 									<ul class="list-group">
-										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-											<button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
-										    	STAT X
-										    	<span class="badge kmd_ui_dark4_bg">
-										    		TBA
-										    	</span>
-											</button>
-										</li>
 										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 											<button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
 											    STAT X
@@ -119,6 +119,14 @@
 							<div class="card-body kmd_ui_dark2_bg p-0">
 								<p class="card-text">
 									<ul class="list-group">
+									    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+										    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+											    STAT X
+											    <span class="badge kmd_ui_dark4_bg">
+											    	TBA
+											    </span>
+											</button>
+									    </li>
 									    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 										    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
 											    STAT X

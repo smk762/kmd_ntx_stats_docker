@@ -305,5 +305,26 @@ class nn_social(models.Model):
                 name='unique_notary_season_social'
             )
         ]
+
+class coin_social(models.Model):
+    chain = models.CharField(max_length=128)
+    twitter = models.CharField(max_length=128)
+    youtube = models.CharField(max_length=128)
+    discord = models.CharField(max_length=128)
+    telegram = models.CharField(max_length=128)
+    github = models.CharField(max_length=128)
+    website = models.CharField(max_length=128)
+    explorer = models.CharField(max_length=128)
+    icon = models.CharField(max_length=128)
+    season = models.CharField(max_length=128)
+
+    class Meta:
+        db_table = 'coin_social'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['chain', 'season'],
+                name='unique_chain_season_social'
+            )
+        ]
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"

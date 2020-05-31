@@ -127,6 +127,30 @@ def get_eco_data_link():
 
 def get_premining_ntx_score(btc_ntx, main_ntx, third_party_ntx):
     return btc_ntx*0.5 + main_ntx*0.25 + third_party_ntx*0.25
+ 
+def get_coin_social(coin=None):
+    season = get_season(int(time.time()))
+    coin_social_info = {}
+    if coin:
+        coin_social_data = coin_social.objects.filter(season=season, chain=coin).values()
+    else:
+        coin_social_data = coin_social.objects.all().values()
+    for item in coin_social_data:
+        coin_social_info.update(items_row_to_dict(item,'chain'))
+    for coin in coin_social_info:
+        for item in coin_social_info[coin]:
+            if item in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'explorer', 'website']:
+                print(coin_social_info[coin][item])          
+                if coin_social_info[coin][item].endswith('/'):
+                    coin_social_info[coin][item] = coin_social_info[coin][item][:-1]
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://twitter.com/", "")
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://github.com/", "")
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://t.me/", "")
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://www.youtube.com/channel/", "")
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://", "")
+                print(coin_social_info[coin][item])
+
+    return coin_social_info
 
 def get_nn_social(notary_name=None):
     season = get_season(int(time.time()))
@@ -639,6 +663,8 @@ def get_server_chains(coins_data):
             server_chains['third_party'].append(chain)
         else:
             logger.warning("Chain not in 3P or main?")
+        server_chains['main'].sort()
+        server_chains['third_party'].sort()
     return server_chains
 
 def get_sidebar_links(notary_list, coins_data):

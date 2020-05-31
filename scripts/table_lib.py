@@ -501,6 +501,28 @@ def update_nn_social_tbl(conn, cursor, row_data):
         conn.rollback()
         return 0
 
+def update_coin_social_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  coin_social \
+            (chain, twitter, youtube, discord, \
+            telegram, github, explorer, \
+            website, icon, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_season_social DO UPDATE SET \
+            twitter='"+str(row_data[1])+"', \
+            youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
+            telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
+            explorer='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
+            icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
 def update_last_ntx_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO  last_notarised \
