@@ -630,7 +630,7 @@ def funding(request):
             ok_balance_notaries.append(notary)
 
     for chain in chain_list:
-        if chain not in low_nn_balances['low_balance_chains']:
+        if chain not in low_nn_balances['low_balance_chains'] and chain not in no_data_chains:
             ok_balance_chains.append(chain)
 
     chains_funded_pct = round(len(ok_balance_chains)/len(chain_list)*100,2)
