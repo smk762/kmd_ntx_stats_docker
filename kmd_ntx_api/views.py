@@ -560,6 +560,7 @@ def notary_profile_view(request, notary_name=None):
         coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
         season = get_season(int(time.time()))
         notary_list = get_notary_list(season)
+
         context = {
             "sidebar_links":get_sidebar_links(notary_list ,coins_data),
             "eco_data_link":get_eco_data_link(),
@@ -598,7 +599,7 @@ def coin_profile_view(request, chain=None):
             "sidebar_links":get_sidebar_links(notaries_list, coins_data),
             "explorers":get_dpow_explorers(),
             "eco_data_link":get_eco_data_link(),
-            "coin_social":{}, #get_coin_social(notary_name),
+            "coin_social": get_coin_social(chain),
             "nn_health":get_nn_health(),
             "chain_ntx_summary":get_coin_ntx_summary(chain),
             "chain":chain,
