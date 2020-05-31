@@ -45,6 +45,22 @@ seasons_info = {
         }
 }
 
+
+def get_low_nn_balances():
+    url = "http://138.201.207.24/nn_balances_report"
+    r = requests.get(url)
+    return r.json()
+
+def get_notary_funding():
+    url = "http://138.201.207.24/nn_funding"
+    r = requests.get(url)
+    return r.json()
+
+def get_bot_balance_deltas():
+    url = "http://138.201.207.24/nn_balances_deltas"
+    r = requests.get(url)
+    return r.json()
+
 def get_dpow_explorers():
     resp = {}
     coins_data = coins.objects.filter(dpow_active=1).values('chain','explorers')
@@ -121,6 +137,16 @@ def get_nn_social(notary_name=None):
         nn_social_data = nn_social.objects.all().values()
     for item in nn_social_data:
         nn_social_info.update(items_row_to_dict(item,'notary'))
+    for notary in nn_social_info:
+        for item in nn_social_info[notary]:
+            if item in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase']:
+                print(nn_social_info[notary][item])
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://twitter.com/", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://github.com/", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://www.youtube.com/", "")            
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("/", "")
+                print(nn_social_info[notary][item])
+
     return nn_social_info
 
 def get_nn_ntx_summary(notary):
@@ -615,10 +641,7 @@ def get_server_chains(coins_data):
             logger.warning("Chain not in 3P or main?")
     return server_chains
 
-def get_sidebar_links():
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    season = get_season(int(time.time()))
-    notary_list = get_notary_list(season)
+def get_sidebar_links(notary_list, coins_data):
     region_notaries = get_regions_info(notary_list)
     server_chains = get_server_chains(coins_data)
     sidebar_links = {

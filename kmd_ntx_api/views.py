@@ -557,9 +557,13 @@ def notary_profile_view(request, notary_name=None):
         season = get_season(int(time.time()))
         notary_addresses = addresses.objects.filter(notary=notary_name, season=season) \
                            .order_by('chain').values('chain','address')
+        coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+        season = get_season(int(time.time()))
+        notary_list = get_notary_list(season)
         context = {
-            "sidebar_links":get_sidebar_links(),
+            "sidebar_links":get_sidebar_links(notary_list ,coins_data),
             "eco_data_link":get_eco_data_link(),
+            "explorers":get_dpow_explorers(),
             "nn_social":get_nn_social(notary_name),
             "nn_health":get_nn_health(),
             "ntx_summary":get_nn_ntx_summary(notary_name),
@@ -587,9 +591,11 @@ def coin_profile_view(request, chain=None):
         for item in balance_data:
             if item['balance'] > max_tick:
                 max_tick = float(item['balance'])
+        notaries_list = get_notary_list(season)
+        coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
 
         context = {
-            "sidebar_links":get_sidebar_links(),
+            "sidebar_links":get_sidebar_links(notaries_list, coins_data),
             "explorers":get_dpow_explorers(),
             "eco_data_link":get_eco_data_link(),
             "coin_social":{}, #get_coin_social(notary_name),
@@ -602,6 +608,61 @@ def coin_profile_view(request, chain=None):
     else:
         redirect('dash_view')
 
+def funding(request):
+    # add extraa views for per chain or per notary
+    low_nn_balances = get_low_nn_balances()
+    last_balances_update = time.ctime(low_nn_balances['time'])
+    human_now = time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())
+
+    no_data_chains = list(low_nn_balances['sources']['failed'].keys())
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    chain_list = get_dpow_coins_list()
+
+    low_nn_balances['low_balance_chains'].sort()
+    low_nn_balances['low_balance_notaries'].sort()
+
+    ok_balance_notaries = []
+    ok_balance_chains = []
+    for notary in notaries_list:
+        if notary not in low_nn_balances['low_balance_notaries']:
+            ok_balance_notaries.append(notary)
+
+    for chain in chain_list:
+        if chain not in low_nn_balances['low_balance_chains']:
+            ok_balance_chains.append(chain)
+
+    chains_funded_pct = round(len(ok_balance_chains)/len(chain_list)*100,2)
+    notaries_funded_pct = round(len(ok_balance_notaries)/len(notaries_list)*100,2)
+
+
+    context = {
+        "chains_funded_pct":chains_funded_pct,
+        "notaries_funded_pct":notaries_funded_pct,
+        "low_balance_notaries":low_nn_balances['low_balance_notaries'],
+        "low_balance_chains":low_nn_balances['low_balance_chains'],
+        "ok_balance_notaries":ok_balance_notaries,
+        "ok_balance_chains":ok_balance_chains,
+        "no_data_chains":no_data_chains,
+        "chain_list":chain_list,
+        "notaries_list":notaries_list,
+        "last_balances_update":last_balances_update,
+        "sidebar_links":get_sidebar_links(notaries_list ,coins_data),
+        "explorers":get_dpow_explorers(),
+        "low_nn_balances":low_nn_balances['low_balances'],
+        "notary_funding":get_notary_funding(),
+        "bot_balance_deltas":get_bot_balance_deltas(),
+        "eco_data_link":get_eco_data_link(),
+        "nn_health":get_nn_health()
+    }
+    return render(request, 'notary_funding.html', context)
+
+def coin_funding(request):
+    pass
+
+def notary_funding(request):
+    pass
 
 ## DASHBOARD        
 def dash_view(request, dash_name=None):
@@ -648,9 +709,11 @@ def dash_view(request, dash_name=None):
                 html = 'graphs/daily_ntx_graph.html'
             if dash_name == 'season_mining_graph':
                 html = 'graphs/daily_ntx_graph.html'
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
     context = {
         "gets":gets,
-        "sidebar_links":get_sidebar_links(),
+        "sidebar_links":get_sidebar_links(notaries_list ,coins_data),
         "eco_data_link":get_eco_data_link(),
         "nn_health":get_nn_health(),
         "nn_social":get_nn_social()
