@@ -612,35 +612,74 @@ def coin_profile_view(request, chain=None):
 def funding(request):
     # add extraa views for per chain or per notary
     low_nn_balances = get_low_nn_balances()
-    last_balances_update = time.ctime(low_nn_balances['time'])
+    last_balances_update = day_hr_min_sec(int(time.time()) - low_nn_balances['time'])
     human_now = time.strftime("%a, %d %b %Y %H:%M:%S", time.gmtime())
 
-    no_data_chains = list(low_nn_balances['sources']['failed'].keys())
-    season = get_season(int(time.time()))
-    notaries_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    chain_list = get_dpow_coins_list()
-
-    low_nn_balances['low_balance_chains'].sort()
-    low_nn_balances['low_balance_notaries'].sort()
+    chain_low_balance_notary_counts = {}
+    notary_low_balance_chain_counts = {}
 
     ok_balance_notaries = []
     ok_balance_chains = []
-    for notary in notaries_list:
-        if notary not in low_nn_balances['low_balance_notaries']:
-            ok_balance_notaries.append(notary)
+    no_data_chains = list(low_nn_balances['sources']['failed'].keys())
+
+    low_balance_data = low_nn_balances['low_balances']
+    low_nn_balances['low_balance_chains'].sort()
+    low_nn_balances['low_balance_notaries'].sort()
+
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    chain_list = get_dpow_coins_list()
+
+    num_chains = len(chain_list)
+    num_notaries = len(notaries_list)
+    num_addresses = num_notaries*num_chains
+
+    # count addresses with low / sufficient balance
+    num_low_balance_addresses = 0
+    for notary in low_balance_data:
+        for chain in low_balance_data[notary]:
+            num_low_balance_addresses += 1
+    num_ok_balance_addresses = num_addresses-num_low_balance_addresses            
 
     for chain in chain_list:
+        chain_low_balance_notary_counts.update({chain:0})
         if chain not in low_nn_balances['low_balance_chains'] and chain not in no_data_chains:
             ok_balance_chains.append(chain)
 
+    for notary in notaries_list:
+        notary_low_balance_chain_counts.update({notary:0})
+        if notary in low_balance_data:
+            notary_low_balance_chain_counts.update({notary:len(low_balance_data[notary])})
+            for chain in low_balance_data[notary]:
+                if chain == 'KMD_3P':
+                    val = chain_low_balance_notary_counts["KMD"] + 1
+                    chain_low_balance_notary_counts.update({"KMD":val})
+                else:
+                    val = chain_low_balance_notary_counts[chain] + 1
+                    chain_low_balance_notary_counts.update({chain:val})
+        if notary not in low_nn_balances['low_balance_notaries']:
+            ok_balance_notaries.append(notary)
+
+    chain_balance_graph_data = prepare_chain_balance_graph_data(notary_low_balance_chain_counts)
+    notary_balance_graph_data = prepare_notary_balance_graph_data(chain_low_balance_notary_counts)
+
     chains_funded_pct = round(len(ok_balance_chains)/len(chain_list)*100,2)
     notaries_funded_pct = round(len(ok_balance_notaries)/len(notaries_list)*100,2)
-
+    addresses_funded_pct = round((num_addresses-num_low_balance_addresses)/num_addresses*100,2)
 
     context = {
         "chains_funded_pct":chains_funded_pct,
         "notaries_funded_pct":notaries_funded_pct,
+        "addresses_funded_pct":addresses_funded_pct,
+        "num_ok_balance_addresses":num_ok_balance_addresses,
+        "num_low_balance_addresses":num_low_balance_addresses,
+        "num_addresses":num_addresses,
+        "chain_balance_graph_data":chain_balance_graph_data,
+        "notary_balance_graph_data":notary_balance_graph_data,
+        "chain_low_balance_notary_counts":chain_low_balance_notary_counts,
+        "notary_low_balance_chain_counts":notary_low_balance_chain_counts,
         "low_balance_notaries":low_nn_balances['low_balance_notaries'],
         "low_balance_chains":low_nn_balances['low_balance_chains'],
         "ok_balance_notaries":ok_balance_notaries,
@@ -710,6 +749,7 @@ def dash_view(request, dash_name=None):
                 html = 'graphs/daily_ntx_graph.html'
             if dash_name == 'season_mining_graph':
                 html = 'graphs/daily_ntx_graph.html'
+    season = get_season(int(time.time()))
     notaries_list = get_notary_list(season)
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
     context = {

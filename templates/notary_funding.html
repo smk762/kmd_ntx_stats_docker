@@ -16,6 +16,21 @@
 									<ul class="list-group">
 									  <li class="list-group-item border-0">
 									  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
+									  	<h4 class='kmd_teal'>{{ num_ok_balance_addresses }}/{{ num_addresses }} ({{ addresses_funded_pct }}%) chains are sufficiently funded</h4>
+										<h5 class='kmd_secondary_red'>{{ num_low_balance_addresses }} addresses have a low balance </h5>">
+				                            <a class="dropdown-item d-block" href="#">
+				                                <div class="mb-1">
+				                                    <i class="cil-layers"></i> Addresses Funding
+				                                </div>
+				                                <span class="progress">
+				                                    <div class="progress-bar kmd_dkteal" role="progressbar" style="width: {{ addresses_funded_pct }}%" aria-valuenow="{{ addresses_funded_pct }}" aria-valuemin="0" aria-valuemax="100">{{ addresses_funded_pct }}%</div>
+				                                </span>
+				                                <small class="text-uppercase text-muted">{{ addresses_funded_pct }}% notary addresses with sufficient funding</small>
+				                            </a>
+				                        </span>								    
+									  </li>
+									  <li class="list-group-item border-0">
+									  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
 									  	<h4 class='kmd_teal'>{{ ok_balance_chains|length }}/{{ chain_list|length }} ({{ chains_funded_pct }}%) chains are sufficiently funded</h4>
 										<h5 class='kmd_secondary_green'>{{ ok_balance_chains }}<br /> are sufficiently funded with all notaries</h5>
 										<h5 class='kmd_secondary_orange'>{{ no_data_chains }}<br /> are not returning data</h5>
@@ -47,7 +62,10 @@
 				                            </a>
 				                        </span>								    
 									  </li>
-									</ul> 							
+									  <li class="list-group-item border-0">
+										<span class='kmd_secondary_orange'>{{ no_data_chains }} are not returning data</span>
+									  </li>
+									</ul> 						
 								</p>
 							</div>
 						</div>
@@ -94,6 +112,49 @@
 						</div>	
 					</div>
 				</div>
+				<div class="row my-3">
+					<div class="card-deck d-flex justify-content-between col-12 m-auto">
+						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
+							<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
+								<div class="my-auto">
+									Number of chains with low balance
+								</div>
+								<div>
+								    <span class="badge kmd_ui_dark1_bg m-2 p-2">AR <i class="fa fa-circle" aria-hidden="true" style="color:#dc0333"></i></span>
+								    <span class="badge kmd_ui_dark1_bg m-2 p-2">EU <i class="fa fa-circle" aria-hidden="true" style="color:#2fea8b"></i></span>
+								    <span class="badge kmd_ui_dark1_bg m-2 p-2">NA <i class="fa fa-circle" aria-hidden="true" style="color:#b541ea"></i></span>
+								    <span class="badge kmd_ui_dark1_bg m-2 p-2">SH <i class="fa fa-circle" aria-hidden="true" style="color:#00e2ff"></i></span>
+								    <span class="badge kmd_ui_dark1_bg m-2 p-2">DEV <i class="fa fa-circle" aria-hidden="true" style="color:#f7931a"></i></span>
+								</div>
+							</div>
+							<div class="card-body kmd_ui_dark1_bg">
+								<span id="graph_title"></span>
+							    <canvas id="ChainsBarGraph"></canvas> 
+							</div>	
+						</div>	
+					</div>	
+				</div>	
+				<div class="row my-3">
+					<div class="card-deck d-flex justify-content-between col-12 m-auto">
+						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
+							<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
+								<div class="my-auto">
+									Number of Notaries with low balance
+								</div>
+								<div>
+								    <span class="badge m-2 p-2 kmd_ui_dark1_bg">MAIN <i class="fa fa-circle" aria-hidden="true" style="color:#2fea8b"></i></span>
+								    <span class="badge m-2 p-2 kmd_ui_dark1_bg">3RD PARTY <i class="fa fa-circle" aria-hidden="true" style="color:#b541ea"></i></span>
+								    <span class="badge m-2 p-2 kmd_ui_dark1_bg">BTC / KMD <i class="fa fa-circle" aria-hidden="true" style="color:#f7931a"></i></span>
+								</div>
+							</div>
+							<div class="card-body kmd_ui_dark1_bg">
+								<span id="graph_title"></span>
+							    <canvas id="NotaryBarGraph"></canvas> 
+							</div>	
+						</div>	
+					</div>	
+				</div>	
+
 			</div>	
 		</div>
 	</div>
@@ -102,10 +163,13 @@
   	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     {{ explorers|json_script:"explorers-data" }}
+    {{ chain_low_balance_notary_counts|json_script:"low_chain-data" }}
+    {{ notary_low_balance_chain_counts|json_script:"low_notary-data" }}
 
   	<script>  
 	    $(document).ready(function() {
 	       	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
+
 	        $('#table_id').DataTable({
 	        	"columns": [
 			        { "data": "notary" },
@@ -135,7 +199,144 @@
         			}
         		]
 	        });
+	       	var chains_data = JSON.parse(document.getElementById('low_chain-data').textContent);
+   	        drawChainsBarGraph(chains_data, 'ChainsBarGraph'); 
+
+	       	var notary_data = JSON.parse(document.getElementById('low_notary-data').textContent);
+   	        drawNotaryBarGraph(notary_data, 'NotaryBarGraph'); 
+
 	    });
+
+		Chart.defaults.global.defaultFontColor = 'white';
+		Chart.defaults.global.defaultFontSize = 14;
+
+	    function drawNotaryBarGraph(data, id) { 
+          {% autoescape off %}
+			var labels = {{ notary_balance_graph_data.labels }}; 
+			var chartLabel = ''; 
+			var chartdata = {{ notary_balance_graph_data.chartdata }}; 
+			var bg_color = {{ notary_balance_graph_data.bg_color }}; 
+			var border_color = {{ notary_balance_graph_data.border_color }};
+          {% endautoescape %}
+
+			var ctx = document.getElementById(id).getContext('2d'); 
+			var myChart = new Chart(ctx, { 
+				type: 'bar', 
+				data: { 
+				  labels: labels, 
+				  datasets: [{ 
+				    label: chartLabel, 
+				    data: chartdata, 
+				    backgroundColor: bg_color,
+				    borderColor: border_color, 
+				    borderWidth: 1 
+				  }] 
+				}, 
+				options: { 
+	    			responsive: true,
+					tooltips: {
+						position: 'nearest',
+						mode: 'index',
+						intersect: true,
+					},
+				    legend: {
+				    	display: false,
+				        labels: {
+				            fontColor: '#B7BBBF'
+				        }
+				    },
+					scales: { 
+						yAxes: [{
+						    scaleLabel: {
+						        display: true,
+						        labelString: 'Number of Notaries with a low balance',
+				            	fontColor: '#B7BBBF'
+						    },
+						    position: 'left',
+						    ticks: {
+							    fontColor: '#41EAD4',
+								min: 0, //minimum tick
+								max: 64, //maximum tick
+								callback: function (value, index, values) {
+									return Number(value.toString());//pass tick values as a string into Number function
+								}
+						    }
+						}],
+						xAxes: [{
+							position: 'nearest',
+							padding: 0,
+							ticks: {
+							    fontColor: '#41EAD4'
+							}
+						}]
+				  	} 
+				} 
+			}); 
+	    } 
+	    function drawChainsBarGraph(data, id) { 
+          {% autoescape off %}
+
+			var labels = {{ chain_balance_graph_data.labels }}; 
+			//var chartLabel = {{ chain_balance_graph_data.chartLabel }};
+			var chartLabel = ''; 
+			var chartdata = {{ chain_balance_graph_data.chartdata }}; 
+			var bg_color = {{ chain_balance_graph_data.bg_color }}; 
+			var border_color = {{ chain_balance_graph_data.border_color }};
+          {% endautoescape %}
+			var ctx = document.getElementById(id).getContext('2d'); 
+			var myChart = new Chart(ctx, { 
+				type: 'bar', 
+				data: { 
+				  labels: labels, 
+				  datasets: [{ 
+				    label: chartLabel, 
+				    data: chartdata, 
+				    backgroundColor: bg_color,
+				    borderColor: border_color, 
+				    borderWidth: 1 
+				  }] 
+				}, 
+				options: { 
+	    			responsive: true,
+					tooltips: {
+						position: 'nearest',
+						mode: 'index',
+						intersect: true,
+					},
+				    legend: {
+				    	display: false,
+				        labels: {
+				            fontColor: '#B7BBBF'
+				        }
+				    },
+					scales: { 
+						yAxes: [{
+						    scaleLabel: {
+						        display: true,
+						        labelString: 'Number of chains with a low balance',
+				            	fontColor: '#B7BBBF'
+						    },
+						    position: 'left',
+						    ticks: {
+							    fontColor: '#41EAD4',
+								min: 0, //minimum tick
+								max: 64, //maximum tick
+								callback: function (value, index, values) {
+									return Number(value.toString());//pass tick values as a string into Number function
+								}
+						    }
+						}],
+						xAxes: [{
+							position: 'nearest',
+							padding: 0,
+							ticks: {
+							    fontColor: '#41EAD4'
+							}
+						}]
+				  	} 
+				} 
+			}); 
+	    } 
   </script> 
 
 {% endblock %}
