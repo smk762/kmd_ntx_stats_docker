@@ -15,32 +15,38 @@ logger.setLevel(logging.INFO)
 
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/season4/elected_nn_social.json")
 nn_social = r.json()
-season = "Season_4"
 
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-for notary in nn_social:
+season = "Season_4"
+for notary in notary_lib.notary_pubkeys['Season_4']:
     row_list = [notary]
-    for social in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase', 'website', 'icon']:
-        if social in nn_social[notary]:
-            row_list.append(nn_social[notary][social])
-        else:
-            row_list.append("")
-    row_list.append(season)
-    row_data = tuple(row_list)
+    notary_name = notary.split("_")[0]
+    for region in nn_social[notary_name]:
+        row_list = [notary+"_"+region]
+        for social in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase', 'website', 'icon']:
+            if social in nn_social[notary_name]:
+                row_list.append(nn_social[notary_name][social])
+            else:
+                row_list.append("")
+        row_list.append(season)
+        row_data = tuple(row_list)
 
-    table_lib.update_nn_social_tbl(conn, cursor, row_data)
+        table_lib.update_nn_social_tbl(conn, cursor, row_data)
     
 season = "Season_3"
-for notary in nn_social:
-  if notary in notary_lib.notary_pubkeys['Season_3']:
+for notary in notary_lib.notary_pubkeys['Season_3.5']:
     row_list = [notary]
+    notary_name = notary.split("_")[0]
     for social in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase', 'website', 'icon']:
-        if social in nn_social[notary]:
-            row_list.append(nn_social[notary][social])
+        if notary_name in nn_social: 
+            if social in nn_social[notary_name]:
+                row_list.append(nn_social[notary_name][social])
+            else:
+                row_list.append("")
         else:
-            row_list.append("")
+            row_list = [notary, '', '', '', '', '', '', '', '']
     row_list.append(season)
     row_data = tuple(row_list)
 

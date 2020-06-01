@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import logging
 import binascii
+from .info_lib import *
 logger = logging.getLogger("mylogger")
 
 # takes a row from queryset values, and returns a dict using a defined row value as top level key
@@ -75,3 +76,79 @@ def decode_opret(scriptPubKey_asm):
         except Exception as e:
             logger.debug(e)
     return { "chain":chain, "notarised_block":ac_ntx_height, "notarised_blockhash":ac_ntx_blockhash }
+
+def prepare_notary_balance_graph_data(chain_low_balance_notary_counts):
+    bg_color = []
+    border_color = []
+    chartdata = []
+    chartLabel = ""
+
+    labels = list(chain_low_balance_notary_counts.keys())
+    labels.sort()
+        
+    third_chains = []
+    main_chains = []
+    coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
+    for item in coins_data:
+        if item['dpow']['server'] == "dPoW-mainnet":
+            main_chains.append(item['chain'])
+        if item['dpow']['server'] == "dPoW-3P":
+            third_chains.append(item['chain'])
+
+    for label in labels:
+        if label in third_chains:
+            bg_color.append('#b541ea')
+        elif label in main_chains:
+            bg_color.append('#2fea8b')
+        else:
+            bg_color.append('#f7931a')
+        border_color.append('#000')
+
+    chartdata = []
+    for label in labels:
+        chartdata.append(chain_low_balance_notary_counts[label])
+    
+    data = { 
+        "labels":labels, 
+        "chartLabel":chartLabel, 
+        "chartdata":chartdata, 
+        "bg_color":bg_color, 
+        "border_color":border_color, 
+    } 
+    return data
+
+def prepare_chain_balance_graph_data(notary_low_balance_chain_counts):
+    bg_color = []
+    border_color = []
+    chartdata = []
+    chartLabel = ""
+
+    labels = list(notary_low_balance_chain_counts.keys())
+    labels.sort()
+    labels = region_sort(labels)
+
+    for label in labels:
+        if label.endswith("_AR"):
+            bg_color.append('#DC0333')
+        elif label.endswith("_EU"):
+            bg_color.append('#2FEA8B')
+        elif label.endswith("_NA"):
+            bg_color.append('#B541EA')
+        elif label.endswith("_SH"):
+            bg_color.append('#00E2FF')
+        else:
+            bg_color.append('#F7931A')
+        border_color.append('#000')
+
+    chartdata = []
+    for label in labels:
+        chartdata.append(notary_low_balance_chain_counts[label])
+    
+    data = { 
+        "labels":labels, 
+        "chartLabel":chartLabel, 
+        "chartdata":chartdata, 
+        "bg_color":bg_color, 
+        "border_color":border_color, 
+    } 
+    return data
