@@ -50,6 +50,10 @@ for txid in db_txids:
     
 tip = int(rpc["KMD"].getblockcount())
 max_block_in_db = table_lib.get_max_from_table(cursor, 'mined', 'block_height')
+if max_block_in_db is None:
+    max_block_in_db = scan_depth
+if start_daily_2days_ago:
+    max_block_in_db = 24*60*14
 scan_blocks = [*range(max_block_in_db-scan_depth,max_block_in_db,1)]
 for block in scan_blocks:
     logger.info("scanning block "+str(block)+"...")

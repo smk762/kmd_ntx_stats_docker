@@ -579,3 +579,12 @@ for season in notary_pubkeys:
             seasons_info["Season_3"]['notaries'].append(notary)
         else:
             seasons_info[season]['notaries'].append(notary)
+
+# other known addresses
+known_addresses.update({"RKrMB4guHxm52Tx9LG8kK3T5UhhjVuRand":"funding bot"})
+
+
+def get_notary_from_address(address):
+    if address in known_addresses:
+        return known_addresses[address]
+    return "unknown"

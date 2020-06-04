@@ -7,7 +7,6 @@ import logging
 import logging.handlers
 import psycopg2
 import threading
-import table_lib
 from decimal import *
 from datetime import datetime as dt
 import datetime
@@ -15,8 +14,9 @@ from dotenv import load_dotenv
 from rpclib import def_credentials
 from psycopg2.extras import execute_values
 import ntx_lib 
+import table_lib
 from electrum_lib import get_ac_block_info
-from notary_lib import notary_info, seasons_info, known_addresses
+from notary_lib import *
 from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
 
 '''
@@ -27,7 +27,7 @@ Script runtime is around 5-10 mins sepending on number of seasons to aggregate
 '''
 
 # set this to True to quickly update tables with most recent data
-skip_until_yesterday = True
+skip_until_yesterday = False
 
 load_dotenv()
 
@@ -46,10 +46,10 @@ rpc["KMD"] = def_credentials("KMD")
 
 ntx_addr = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 
-
+season = get_season(time.time())
 tip = int(rpc["KMD"].getblockcount())
 recorded_txids = []
-start_block = 0
+start_block = seasons_info[season]["start_block"]
 if skip_until_yesterday:
     start_block = tip - 24*60*1
 all_txids = []
@@ -146,9 +146,10 @@ def update_notarisations():
             records.append(row_data)
             if len(records) == 10:
                 now = time.time()
-                pct = round(len(records)*i/len(unrecorded_txids)*100,3)
+                pct = len(records)*i/len(unrecorded_txids)*100
                 runtime = int(now-start)
                 est_end = int(100/pct*runtime)
+                pct = round(len(records)*i/len(unrecorded_txids)*100,3)
                 logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_txids))+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
                 # logger.info("records: "+str(records))
                 logger.info("-----------------------------")

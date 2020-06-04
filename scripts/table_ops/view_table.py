@@ -5,8 +5,8 @@ conn = table_lib.connect_db()
 cursor = conn.cursor()
 
 #table = 'balances'
-table = 'coin_social'
-
+#table = 'coin_social'
+table = 'funding_transactions'
 
 cursor.execute("SELECT * FROM "+table+";")
 print(cursor.fetchall())

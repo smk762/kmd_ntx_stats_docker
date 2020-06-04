@@ -119,7 +119,23 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/funding/"> Funding Overview
+                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/funding"> Funding Overview
+                    </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/funds_sent"> Funds Sent
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="c-sidebar-nav-dropdown">
+            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                <i class="cil-check-circle"></i>  
+                <span style="padding-left: 12px;">SYNC</span>
+            </a>
+            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/chain_sync"> Block Hash Comparison
                     </a>
                 </li>
             </ul>

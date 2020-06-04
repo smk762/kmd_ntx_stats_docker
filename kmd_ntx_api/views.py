@@ -8,8 +8,10 @@ import logging.handlers
 import datetime
 from datetime import datetime as dt
 
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User, Group
+from django.contrib import messages
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet, \
                                           NumberFilter
 from rest_framework import filters, generics, viewsets, permissions, \
@@ -25,6 +27,14 @@ from kmd_ntx_api.models import *
 from kmd_ntx_api.helper_lib import *
 from kmd_ntx_api.info_lib import *
 from kmd_ntx_api.query_lib import *
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
 
 logger = logging.getLogger("mylogger")
 
@@ -459,6 +469,13 @@ class rewards_filter(viewsets.ViewSet):
         api_resp = get_rewards_data(request)
         return Response(api_resp)
 
+def chain_sync_api(request):
+    r = requests.get('http://138.201.207.24/show_sync_node_data')
+    try:
+        return JsonResponse(r.json())
+    except:
+        return JsonResponse({})
+
 # Tool views
 class decode_op_return(viewsets.ViewSet):
     """
@@ -594,7 +611,6 @@ def coin_profile_view(request, chain=None):
                 max_tick = float(item['balance'])
         notaries_list = get_notary_list(season)
         coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-
         context = {
             "sidebar_links":get_sidebar_links(notaries_list, coins_data),
             "explorers":get_dpow_explorers(),
@@ -703,6 +719,91 @@ def coin_funding(request):
 
 def notary_funding(request):
     pass
+
+def funds_sent(request):
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    funding_data = funding_transactions.objects.filter(season=season).values()
+
+    funding_totals = {"fees":{}}
+    now = int(time.time())
+    for item in funding_data:
+        tx_time = day_hr_min_sec(now - item['block_time'])
+        item.update({"time": tx_time})
+        if item["notary"] not in ["unknown", "funding bot"]:
+            if item["notary"] not in funding_totals:
+                funding_totals.update({item["notary"]:{}})
+
+            if item["chain"] not in funding_totals[item["notary"]]:
+                funding_totals[item["notary"]].update({item["chain"]:-item["amount"]})
+            else:
+                val = funding_totals[item["notary"]][item["chain"]]-item["amount"]
+                funding_totals[item["notary"]].update({item["chain"]:val})
+
+            if item["chain"] not in funding_totals["fees"]:
+                funding_totals["fees"].update({item["chain"]:-item["fee"]})
+            else:
+                val = funding_totals["fees"][item["chain"]]-item["fee"]
+                funding_totals["fees"].update({item["chain"]:val})
+
+    context = {
+        "sidebar_links":get_sidebar_links(notaries_list, coins_data),
+        "explorers":get_dpow_explorers(),
+        "eco_data_link":get_eco_data_link(),
+        "funding_data":funding_data,
+        "funding_totals":funding_totals,
+    }  
+    return render(request, 'funding_sent.html', context)
+
+def chain_sync(request):
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    context = {
+        "sidebar_links":get_sidebar_links(notaries_list, coins_data),
+        "explorers":get_dpow_explorers(),
+        "eco_data_link":get_eco_data_link(),
+    }
+    r = requests.get('http://138.201.207.24/show_sync_node_data')
+    try:
+        chain_sync_data = r.json()
+        sync_data_keys = list(chain_sync_data.keys())
+        chain_count = 0
+        sync_count = 0
+        for chain in sync_data_keys:
+            if chain == 'last_updated':
+                last_data_update = day_hr_min_sec(
+                    int(time.time()) - int(chain_sync_data['last_updated'])
+                )
+                chain_sync_data.update({
+                    "last_data_update": last_data_update
+                })
+            elif chain.find('last') == -1:
+                chain_count += 1
+                if "last_sync_blockhash" in chain_sync_data[chain]:
+                    if chain_sync_data[chain]["last_sync_blockhash"] == chain_sync_data[chain]["last_sync_dexhash"]:
+                        sync_count += 1
+                if 'last_sync_timestamp' in chain_sync_data[chain] :
+                    last_sync_update = day_hr_min_sec(
+                        int(time.time()) - int(chain_sync_data[chain]['last_sync_timestamp'])
+                    )
+                else:
+                    last_sync_update = "-"
+                chain_sync_data[chain].update({
+                    "last_sync_update": last_sync_update
+                })
+        sync_pct = round(sync_count/chain_count*100,3)
+        context.update({
+            "chain_sync_data":chain_sync_data,
+            "sync_count":sync_count,
+            "sync_pct":sync_pct,
+            "chain_count":chain_count
+        })
+    except Exception as e:
+        print(e)
+        messages.error(request, 'Sync Node API not Responding!')    
+    return render(request, 'chain_sync.html', context)
 
 ## DASHBOARD        
 def dash_view(request, dash_name=None):

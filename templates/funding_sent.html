@@ -6,103 +6,28 @@
 			<div class="fade-in">
 				<div class="row my-3">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mt-auto shadow-none">
-							<div class="card-body kmd_ui_dark2_bg p-0">
-								<p class="card-text">
-									<!--
-									<p>{{ notary_funding }}</p>
-									<p>{{ bot_balance_deltas }}</p>
-									-->
-									<ul class="list-group">
-									  <li class="list-group-item border-0">
-									  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
-									  	<h4 class='kmd_teal'>{{ num_ok_balance_addresses }}/{{ num_addresses }} ({{ addresses_funded_pct }}%) chains are sufficiently funded</h4>
-										<h5 class='kmd_secondary_red'>{{ num_low_balance_addresses }} addresses have a low balance </h5>">
-				                            <a class="dropdown-item d-block" href="#">
-				                                <div class="mb-1">
-				                                    <i class="cil-layers"></i> Addresses Funding
-				                                </div>
-				                                <span class="progress">
-				                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ addresses_funded_pct }}%" aria-valuenow="{{ addresses_funded_pct }}" aria-valuemin="0" aria-valuemax="100">{{ addresses_funded_pct }}%</div>
-				                                </span>
-				                                <small class="text-uppercase text-muted">{{ num_ok_balance_addresses }}/{{ num_addresses }} notary addresses with sufficient funding</small>
-				                            </a>
-				                        </span>								    
-									  </li>
-									  <li class="list-group-item border-0">
-									  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
-									  	<h4 class='kmd_teal'>{{ ok_balance_chains|length }}/{{ chain_list|length }} ({{ chains_funded_pct }}%) chains are sufficiently funded</h4>
-										<h5 class='kmd_secondary_green'>{{ ok_balance_chains }}<br /> are sufficiently funded with all notaries</h5>
-										<h5 class='kmd_secondary_orange'>{{ no_data_chains }}<br /> are not returning data</h5>
-										<h5 class='kmd_secondary_red'>{{ low_balance_chains }}<br /> have at least 1 notary with a low balance </h5>">
-				                            <a class="dropdown-item d-block" href="#">
-				                                <div class="mb-1">
-				                                    <i class="cil-layers"></i> dPoW Chains Funding
-				                                </div>
-				                                <span class="progress">
-				                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ chains_funded_pct }}%" aria-valuenow="{{ chains_funded_pct }}" aria-valuemin="0" aria-valuemax="100">{{ chains_funded_pct }}%</div>
-				                                </span>
-				                                <small class="text-uppercase text-muted">{{ ok_balance_chains|length }}/{{ chain_list|length }} dPoW chains with sufficient funding for all notaries</small>
-				                            </a>
-				                        </span>								    
-									  </li>
-									  <li class="list-group-item border-0">
-									  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
-									  	<h4 class='kmd_teal'>{{ ok_balance_notaries|length }}/{{ notaries_list|length }} ({{ notaries_funded_pct }}%) chains are sufficiently funded</h4>
-										<h5 class='kmd_secondary_green'>{{ ok_balance_notaries }}<br /> have sufficient balance on all chains</h5>
-										<h5 class='kmd_secondary_red'>{{ low_balance_notaries }}<br /> have a low balance on at least 1 chain</h5>">
-				                            <a class="dropdown-item d-block" href="#">
-				                                <div class="mb-1">
-				                                    <i class="cil-balance-scale"></i> Notary Funding
-				                                </div>
-				                                <span class="progress">
-				                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ notaries_funded_pct }}%" aria-valuenow="{{ notaries_funded_pct }}" aria-valuemin="0" aria-valuemax="100">{{ notaries_funded_pct }}%</div>
-				                                </span>
-				                                <small class="text-uppercase text-muted">{{ ok_balance_notaries|length }}/{{ notaries_list|length }} Notaries with sufficient funding on all chains</small>
-				                            </a>
-				                        </span>								    
-									  </li>
-									  <li class="list-group-item border-0">
-										<span class='kmd_secondary_orange'>{{ no_data_chains }} are not returning data</span>
-									  </li>
-									</ul> 						
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>	
-				<div class="row my-3">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card kmd_ui_light4">
 							<div class="card-header kmd_ui_dark1_bg">
-								{{ notary_name }} LOW BALANCE ADDRESSES<br />
-								Last updated: {{ last_balances_update }} ago
+								Notary Funding 
 							</div>
 							<div class="card-body kmd_ui_dark1_bg">
-								<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+								<table id="totals_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
 									<thead>
 										<tr>
-											<th>NOTARY</th>
-											<th>CHAIN</th>
-											<th>ADDRESS</th>
-											<th>BALANCE</th>
+											<th>Chain</th>
+											<th>notary</th>
+											<th>Received</th>
+											<th>Reserved</th>
 										</tr>
 									</thead>
 									<tbody>
-										{% for notary, notary_data in low_nn_balances.items %}
-											{% for chain, chain_data in notary_data.items %}
+										{% for notary, notary_chains in funding_totals.items %}
+											{% for chain, value in notary_chains.items %}
 												<tr>
-													{% if chain == "KMD_3P" %}
-													<td>{{ notary }}</td>
-													<td>KMD</td>
-													<td style="text-transform: none;">{{ chain_data.address }}</td>
-													<td>{{ chain_data.balance }} (3P)</td>
-													{% else %}
-													<td>{{ notary }}</td>
 													<td>{{ chain }}</td>
-													<td style="text-transform: none;">{{ chain_data.address }}</td>
-													<td>{{ chain_data.balance }}</td>
-													{% endif %}
+													<td>{{ notary }}</td>
+													<td>{{ value }}</td>
+													<td>{{ reserved }}</td>
 												</tr>
 											{% endfor %}
 										{% endfor %}
@@ -112,6 +37,46 @@
 						</div>	
 					</div>
 				</div>
+				<!-- Table to large and loads slow
+				<div class="row my-3">
+					<div class="card-deck d-flex justify-content-between col-12 m-auto">
+						<div class="card kmd_ui_light4">
+							<div class="card-header kmd_ui_dark1_bg">
+								Notary Funding Transactions
+							</div>
+							<div class="card-body kmd_ui_dark1_bg">
+								<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+									<thead>
+										<tr>
+											<th>Chain</th>
+											<th>notary</th>
+											<th>txid</th>
+											<th>amount</th>
+											<th>fee</th>
+											<th>block</th>
+											<th>time</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for item in funding_data %}
+											{% if item.notary != 'unknown' and item.notary != 'funding bot' %}
+												<tr>
+													<td>{{ item.chain }}</td>
+													<td>{{ item.notary }}</td>
+													<td>{{ item.txid }}</td>
+													<td>{{ item.amount }}</td>
+													<td>{{ item.fee }}</td>
+													<td>{{ item.block_height }}</td>
+													<td>{{ item.time }}</td>
+												</tr>
+											{% endif %}
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>	
+					</div>
+				</div> -->
 				<div class="row my-3">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
@@ -172,44 +137,70 @@
 
 	        $('#table_id').DataTable({
 	        	"columns": [
-			        { "data": "notary" },
 			        { "data": "chain" },
-			        { "data": "address" },
-			        { "data": "balance" }
+			        { "data": "notary" },
+			        { "data": "txid" },
+			        { "data": "amount" },
+			        { "data": "fee" },
+			        { "data": "block_height" },
+			        { "data": "block_time" }
 			    ],
         		order: [[ 0, 'asc' ], [ 0, 'asc' ], [ 1, 'asc' ]],
         		"columnDefs": [
         			{
-			            "targets": 2,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='"+explorers[oData.chain]+'address/'+oData.address+"'>"+oData.address+"</a>");
-				        }
-			        },
-        			{
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='http://{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+				            $(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");
 				        }
         			},
         			{
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='http://{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+				        }
+        			},
+        			{
+			            "targets": 2,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='"+explorers[oData.chain]+'tx/'+oData.txid+"'>"+oData.txid.slice(0, 3)+"..."+oData.txid.slice(-3)+"</a>");
+				        }
+			        },
+        		]
+	        });
+	        $('#totals_table').DataTable({
+	        	"columns": [
+			        { "data": "chain" },
+			        { "data": "notary" },
+			        { "data": "amount" }
+			    ],
+        		order: [[ 0, 'asc' ], [ 1, 'asc' ], [ 2, 'desc' ]],
+        		"columnDefs": [
+        			{
+			            "targets": 0,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            $(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");
+				        }
+        			},
+        			{
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='http://{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
 				        }
         			}
         		]
 	        });
+	       	/*
 	       	var chains_data = JSON.parse(document.getElementById('low_chain-data').textContent);
    	        drawChainsBarGraph(chains_data, 'ChainsBarGraph'); 
 
 	       	var notary_data = JSON.parse(document.getElementById('low_notary-data').textContent);
    	        drawNotaryBarGraph(notary_data, 'NotaryBarGraph'); 
-
+			*/
 	    });
 
 		Chart.defaults.global.defaultFontColor = 'white';
 		Chart.defaults.global.defaultFontSize = 14;
-
+/*
 	    function drawNotaryBarGraph(data, id) { 
           {% autoescape off %}
 			var labels = {{ notary_balance_graph_data.labels }}; 
@@ -333,6 +324,7 @@
 				} 
 			}); 
 	    } 
+	    */
   </script> 
 
 {% endblock %}
