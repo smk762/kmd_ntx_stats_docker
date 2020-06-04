@@ -29,6 +29,7 @@ router.register(r'info/explorers',
                 views.explorers,
                 basename='explorers')
 
+
 # daily
 router.register(r'mined_stats/daily', views.mined_count_date_filter,
                   basename='mined_count_date_filter') # doc
@@ -128,6 +129,9 @@ urlpatterns = [
     path('funding/',
           views.funding,
           name='funding'),
+    path('funds_sent/',
+          views.funds_sent,
+          name='funds_sent'),
     path('coin_funding/',
           views.coin_funding,
           name='coin_funding'),
@@ -142,12 +146,18 @@ urlpatterns = [
           name='notary_profile_view'),
     path('coin_profile/',
           views.dash_view,
-          name='coin_profile'),
+          name='coin_profile'),                       
     path('coin_profile/<str:chain>/',
           views.coin_profile_view,
           name='coin_profile_view'),
     path('api/',
          include(router.urls)),
+    path('api/info/chain_sync',
+          views.chain_sync_api,
+          name='chain_sync_api'),
+    path('chain_sync/',
+          views.chain_sync,
+          name='chain_sync'),
     path('api-auth/',
          include('rest_framework.urls',
             namespace='rest_framework')),

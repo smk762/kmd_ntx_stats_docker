@@ -9,10 +9,7 @@
 						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mt-auto shadow-none">
 							<div class="card-body kmd_ui_dark2_bg p-0">
 								<p class="card-text">
-									<!--
-									<p>{{ notary_funding }}</p>
-									<p>{{ bot_balance_deltas }}</p>
-									-->
+									<p>{{ funding_data }}</p>
 									<ul class="list-group">
 									  <li class="list-group-item border-0">
 									  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
@@ -82,29 +79,23 @@
 								<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
 									<thead>
 										<tr>
-											<th>NOTARY</th>
-											<th>CHAIN</th>
-											<th>ADDRESS</th>
-											<th>BALANCE</th>
+											<th>Chain</th>
+											<th>block</th>
+											<th>txid</th>
+											<th>fee</th>
+											<th>amount</th>
+											<th>address</th>
+											<th>time</th>
 										</tr>
 									</thead>
 									<tbody>
-										{% for notary, notary_data in low_nn_balances.items %}
-											{% for chain, chain_data in notary_data.items %}
+										{% for k, v in funding_data.items %}
 												<tr>
-													{% if chain == "KMD_3P" %}
-													<td>{{ notary }}</td>
-													<td>KMD</td>
-													<td style="text-transform: none;">{{ chain_data.address }}</td>
-													<td>{{ chain_data.balance }} (3P)</td>
-													{% else %}
 													<td>{{ notary }}</td>
 													<td>{{ chain }}</td>
 													<td style="text-transform: none;">{{ chain_data.address }}</td>
 													<td>{{ chain_data.balance }}</td>
-													{% endif %}
 												</tr>
-											{% endfor %}
 										{% endfor %}
 									</tbody>
 								</table>

@@ -562,3 +562,29 @@ def update_last_btc_ntx_tbl(conn, cursor, row_data):
             logger.debug(row_data)
         conn.rollback()
         return 0
+
+def update_funding_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  funding_transactions \
+            (chain, txid, vout, amount, \
+            block_hash, block_height, block_time, \
+            category, fee, address, notary, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_category_vout_txid_funding DO UPDATE SET \
+            chain='"+str(row_data[0])+"', \
+            amount='"+str(row_data[3])+"', \
+            block_hash='"+str(row_data[4])+"', \
+            block_height='"+str(row_data[5])+"', \
+            block_time='"+str(row_data[6])+"', \
+            fee='"+str(row_data[8])+"', \
+            address='"+str(row_data[9])+"', \
+            notary='"+str(row_data[10])+"', \
+            season='"+str(row_data[11])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0

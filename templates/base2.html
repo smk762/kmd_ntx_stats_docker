@@ -43,6 +43,16 @@
             {% include "header.html" %}
             <div class="c-body kmd_ui_dark2_bg">
               <main class="c-main">
+                {% if messages %}
+                    {% for message in messages %}
+                      <div class="m-auto col-8 alert {{ message.tags }} alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message }}
+                      </div>
+                    {% endfor %}
+                {% endif %}
                 <!-- Main content here -->
                 {% block content %}
                 {% endblock %}

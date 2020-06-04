@@ -108,36 +108,49 @@ for chain in other_cli:
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/coins")
 coins_repo = r.json()
 
+# Some coins are named differently between dpow and coins repo...
+translate_coins = { 'COQUI':'COQUICASH','HUSH':'HUSH3','OURC':'OUR','WLC':'WLC21' }
+
 coins_info = {}
 for item in coins_repo:
     coin = item['coin']
+    if coin in translate_coins:
+        coin = translate_coins[coin]
+    coins_info.update({coin:{"coins_info":item}})
+    coins_info[coin].update({"electrums":[]})
+    coins_info[coin].update({"electrums_ssl":[]})
     mm2_compatible = 0
     if 'mm2' in item:
         mm2_compatible = item['mm2']
     logger.info("Getting info for ["+coin+"]")
-    coins_info.update({coin:{"coins_info":item}})
+
     try:
-        coins_info[coin].update({"electrums":[]})
-        coins_info[coin].update({"electrums_ssl":[]})
-        r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+coin)
+        if coin in ['COQUICASH', 'HUSH3', 'WLC21', 'OUR']:
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+item['coin'])
+        else:
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+coin)
         electrums = r.json()
-        for item in electrums:
-            if "protocol" in item:
-                if item['protocol'] == "SSL":
-                    coins_info[coin]['electrums_ssl'].append(item['url'])
+        for electrum in electrums:
+            if "protocol" in electrum:
+                if electrum['protocol'] == "SSL":
+                    coins_info[coin]['electrums_ssl'].append(electrum['url'])
                 else:
-                    coins_info[coin]['electrums'].append(item['url'])
+                    coins_info[coin]['electrums'].append(electrum['url'])
             else:
-                coins_info[coin]['electrums'].append(item['url'])
+                coins_info[coin]['electrums'].append(electrum['url'])
     except Exception as e:
         if r.text != "404: Not Found":
             logger.info("GET "+coin+" ELECTRUM ERROR: "+str(e)+" [RESPONSE]: "+r.text)
+
     try:
         coins_info[coin].update({"explorers":[]})
-        r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/"+coin)
+        if coin in ['COQUICASH', 'HUSH3', 'WLC21', 'OUR']:
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/"+item['coin'])
+        else:
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/"+coin)
         explorers = r.json()
-        for item in explorers:
-            coins_info[coin]['explorers'].append(item)
+        for explorer in explorers:
+            coins_info[coin]['explorers'].append(explorer)
     except Exception as e:
         if r.text != "404: Not Found":
             logger.info("GET "+coin+" EXPLORER ERROR: "+str(e)+" [RESPONSE]: "+r.text)

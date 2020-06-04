@@ -326,5 +326,30 @@ class coin_social(models.Model):
                 name='unique_chain_season_social'
             )
         ]
+
+class funding_transactions(models.Model):
+    chain = models.CharField(max_length=128)
+    txid = models.CharField(max_length=128)
+    vout = models.PositiveIntegerField()
+    amount = models.DecimalField(max_digits=18, decimal_places=8)
+
+    address = models.CharField(max_length=128)
+    notary = models.CharField(max_length=128)
+    block_hash = models.CharField(max_length=128)
+    block_height = models.PositiveIntegerField()
+    block_time = models.PositiveIntegerField()
+
+    category = models.CharField(max_length=128)
+    fee = models.DecimalField(max_digits=18, decimal_places=8)
+    season = models.CharField(max_length=128)
+
+    class Meta:
+        db_table = 'funding_transactions'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['txid', 'vout', 'category'],
+                name='unique_category_vout_txid_funding'
+            )
+        ]
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"
