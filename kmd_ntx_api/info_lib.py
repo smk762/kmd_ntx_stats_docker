@@ -156,6 +156,9 @@ def get_eco_data_link():
 
 def get_premining_ntx_score(btc_ntx, main_ntx, third_party_ntx):
     return btc_ntx*0.5 + main_ntx*0.25 + third_party_ntx*0.25
+
+def get_ntx_score(btc_ntx, main_ntx, third_party_ntx, mining):
+    return btc_ntx*0.5 + main_ntx*0.25 + third_party_ntx*0.25 + mining * 1
  
 def get_coin_social(coin=None):
     season = get_season(int(time.time()))
@@ -232,7 +235,6 @@ def get_nn_ntx_summary(notary):
     }
 
     # today's ntx stats
-    ntx_today = notarised.objects.filter()
     ntx_today = notarised_count_daily.objects.filter(notarised_date=str(today), 
                                              season=season, notary=notary) \
                                             .values()
@@ -500,48 +502,28 @@ def get_nn_health():
         return {}
 
 def get_coin_ntx_summary(coin):
-    season = get_season(int(time.time()))
     now = int(time.time())
-    day_ago = now - 24*60*60
-    week_ago = now - 24*60*60*7
-
-    today = datetime.date.today()
-    delta = datetime.timedelta(days=1)
-    week_ago = today-delta*7
+    season = get_season(now)
 
     ntx_summary = {
-        "today":{
-            "btc_ntx":0,
-            "main_ntx":0,
-            "third_party_ntx":0,
-            "most_ntx":str(0)+" ("+str('-')+")"
-        },
-        "season":{
-            "btc_ntx":0,
-            "main_ntx":0,
-            "third_party_ntx":0,
-            "most_ntx":str(0)+" ("+str('-')+")"
-        },
-        "time_since_last_kmd_ntx":-1,
-        "time_since_last_ntx":-1,
-        "last_ntx_chain":'-',
-        "premining_ntx_score":0,
+            'chain_ntx_today':0,
+            'chain_ntx_season':0,
+            'last_ntx_time':'',
+            'time_since_ntx':'',
+            'last_ntx_block':'',
+            'last_ntx_hash':'',
+            'last_ntx_ac_block':'',
+            'last_ntx_ac_hash':'',
+            'ntx_lag':-1
     }
-    '''
+    
     # today's ntx stats
-    ntx_today = notarised.objects.filter()
+    today = datetime.date.today()
     ntx_today = notarised_chain_daily.objects.filter(notarised_date=str(today), 
-                                             season=season, chain=coin) \
-                                            .values()
+                                                     chain=coin).values()
     if len(ntx_today) > 0:
-        chains_ntx_today = ntx_today[0]['chain_ntx_counts']
-        today_max_chain = max(chains_ntx_today, key=chains_ntx_today.get) 
-        today_max_ntx = chains_ntx_today[today_max_chain]
-        ntx_summary['today'].update({
-            'most_ntx':today_max_chain+" ("+str(today_max_ntx)+")",
-            "btc_ntx":ntx_today[0]['btc_count'],
-            "main_ntx":ntx_today[0]['antara_count'],
-            "third_party_ntx":ntx_today[0]['third_party_count']
+        ntx_summary.update({
+            'chain_ntx_today':ntx_today[0]['ntx_count']
         })
 
     # season ntx stats
@@ -549,69 +531,19 @@ def get_coin_ntx_summary(coin):
                                     .filter(season=season, chain=coin) \
                                     .values()
     if len(ntx_season) > 0:
-        chains_ntx_season = ntx_season[0]['chain_ntx_counts']
-        season_max_chain = max(chains_ntx_season, key=chains_ntx_season.get) 
-        season_max_ntx = chains_ntx_season[season_max_chain]
-        if season_max_chain == 'KMD':
-            season_max_chain = 'BTC'
-
-        ntx_summary['season'].update({
-            "btc_ntx":ntx_season[0]['btc_count'],
-            "main_ntx":ntx_season[0]['antara_count'],
-            "third_party_ntx":ntx_season[0]['third_party_count'],
-            "most_ntx":season_max_chain+" ("+str(season_max_ntx)+")"
-        })
-        ntx_summary.update({
-            "premining_ntx_score":get_premining_ntx_score(
-                ntx_season[0]['btc_count'],
-                ntx_season[0]['antara_count'],
-                ntx_season[0]['third_party_count']
-            ),
-        })cou
-
-    #last ntx data
-    ntx_last = last_notarised.objects \
-                             .filter(season=season, chain=coin) \
-                             .values()
-    last_chain_ntx_times = {}
-    for item in ntx_last:
-        last_chain_ntx_times.update({item['chain']:item['block_time']})
-
-    if len(last_chain_ntx_times) > 0:
-        max_last_ntx_chain = max(last_chain_ntx_times, key=last_chain_ntx_times.get) 
-        max_last_ntx_time = last_chain_ntx_times[max_last_ntx_chain]
-        time_since_last_ntx = int(time.time()) - int(max_last_ntx_time)
+        time_since_last_ntx = now - int(ntx_season[0]['kmd_ntx_blocktime'])
         time_since_last_ntx = day_hr_min_sec(time_since_last_ntx)
-        last_chain_ntx_times.update({item['chain']:item['block_time']})
-        if max_last_ntx_chain == 'KMD':
-            max_last_ntx_chain = 'BTC'
         ntx_summary.update({
-            "time_since_last_ntx":time_since_last_ntx,
-            "last_ntx_chain":max_last_ntx_chain,
+            'chain_ntx_season':ntx_season[0]['ntx_count'],
+            'last_ntx_time':ntx_season[0]['kmd_ntx_blocktime'],
+            'time_since_ntx':time_since_last_ntx,
+            'last_ntx_block':ntx_season[0]['block_height'],
+            'last_ntx_hash':ntx_season[0]['kmd_ntx_blocktime'],
+            'last_ntx_ac_block':ntx_season[0]['ac_ntx_height'],
+            'last_ntx_ac_hash':ntx_season[0]['ac_ntx_blockhash'],
+            'ntx_lag':ntx_season[0]['ntx_lag']
         })
-
-    #last btc ntx data
-    btc_ntx_last = last_btc_notarised.objects \
-                             .filter(season=season) \
-                             .values()
-
-    max_kmd_ntx_time = 0
-    for item in btc_ntx_last:
-        max_kmd_ntx_time = item['block_time']
-
-    if max_kmd_ntx_time > 0:
-        time_since_last_kmd_ntx = int(time.time()) - int(max_kmd_ntx_time)
-        print(time.time())
-        print(max_kmd_ntx_time)
-        print(time_since_last_kmd_ntx)
-        time_since_last_kmd_ntx = day_hr_min_sec(time_since_last_kmd_ntx)
-        print(time_since_last_kmd_ntx)
-        ntx_summary.update({
-            "time_since_last_kmd_ntx":time_since_last_kmd_ntx,
-        })
-
-
-    logger.info(ntx_summary)'''
+    logger.info(ntx_summary)
     return ntx_summary
 
 def get_balances_dict(filter_kwargs):

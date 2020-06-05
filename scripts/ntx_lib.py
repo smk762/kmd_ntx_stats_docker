@@ -108,3 +108,58 @@ def get_ntx_data(txid):
             row_data = ("not_dest", this_block_height, block_time, block_datetime,
                         block_hash, [], "unknown", 0, txid, "unknown", season)
             return None
+
+def get_ntx_data_v2(txid):
+    raw_tx = rpc["KMD"].getrawtransaction(txid,1)
+    block_time = raw_tx['blocktime']
+    block_datetime = dt.utcfromtimestamp(block_time)
+    for season_num in seasons_info:
+        if block_time < seasons_info[season_num]['end_time']:
+            season = season_num
+            break
+    block_hash = raw_tx['blockhash']
+    dest_addrs = raw_tx["vout"][0]['scriptPubKey']['addresses']
+    this_block_height = raw_tx['height']
+    notary_list = []
+    for item in raw_tx['vin']:
+        if "address" in item:
+            if item['address'] in known_addresses:
+                notary = known_addresses[item['address']]
+                notary_list.append(notary)
+            else:
+                notary_list.append(item['address'])
+    notary_list.sort()
+    opret = raw_tx['vout'][1]['scriptPubKey']['asm']
+    logger.info(opret)
+    if opret.find("OP_RETURN") != -1:
+        scriptPubKey_asm = opret.replace("OP_RETURN ","")
+        ac_ntx_blockhash = lil_endian(scriptPubKey_asm[:64])
+        try:
+            ac_ntx_height = int(lil_endian(scriptPubKey_asm[64:72]),16) 
+        except:
+            logger.info(scriptPubKey_asm)
+            sys.exit()
+        scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
+        chain = get_ticker(scriptPubKeyBinary)
+        if chain.endswith("KMD"):
+            chain = "KMD"
+        if chain == "KMD":
+            btc_txid = lil_endian(scriptPubKey_asm[72:136])
+        elif chain not in noMoM:
+            # not sure about this bit, need another source to validate the data
+            try:
+                start = 72+len(chain)*2+4
+                end = 72+len(chain)*2+4+64
+                MoM_hash = lil_endian(scriptPubKey_asm[start:end])
+                MoM_depth = int(lil_endian(scriptPubKey_asm[end:]),16)
+            except Exception as e:
+                logger.debug(e)
+        # some decodes have a null char error, this gets rid of that so populate script doesnt error out 
+        if chain.find('\x00') != -1:
+            chain = chain.replace('\x00','')
+        # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
+        if chain.upper() == chain:
+            row_data = (chain, this_block_height, block_time, block_datetime,
+                        block_hash, notary_list, ac_ntx_blockhash, ac_ntx_height,
+                        txid, opret, season)
+            return row_data

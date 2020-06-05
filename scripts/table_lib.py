@@ -170,10 +170,6 @@ def update_season_notarised_chain_tbl(conn, cursor, row_data):
     conn.commit()
 
 def update_season_notarised_count_tbl(conn, cursor, row_data): 
-    conf = "btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
-        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
-        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
     sql = "INSERT INTO notarised_count_season \
         (notary, btc_count, antara_count, \
         third_party_count, other_count, \

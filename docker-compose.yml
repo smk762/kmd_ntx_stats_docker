@@ -5,7 +5,7 @@ services:
     image: komodoofficial/komodo:cd_release_cf872b5_dev
     volumes:
       - /home/smk762/.komodo:/root/.komodo:z
-      - /home/smk762/.zcash-params:/root/.zcash-params:z
+      - /home/smk762/.zcash-params:/root/.zcash-params
     ports:
       - "7770:7770"
       - "7771:7771"
@@ -13,7 +13,7 @@ services:
   db:
     image: postgres
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data:z
+      - ./postgres-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -26,7 +26,7 @@ services:
     build: .
     command: python manage.py runserver 0.0.0.0:8762
     volumes:
-      - .:/code:z
+      - .:/code
     ports:
       - "8762:8762"
     depends_on:

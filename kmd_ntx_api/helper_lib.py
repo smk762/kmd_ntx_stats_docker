@@ -77,6 +77,20 @@ def decode_opret(scriptPubKey_asm):
             logger.debug(e)
     return { "chain":chain, "notarised_block":ac_ntx_height, "notarised_blockhash":ac_ntx_blockhash }
 
+def get_mainnet_chains(coins_data):
+    main_chains = []
+    for item in coins_data:
+        if item['dpow']['server'] == "dPoW-mainnet":
+            main_chains.append(item['chain'])
+    return main_chains
+
+def get_third_party_chains(coins_data):
+    third_chains = []
+    for item in coins_data:
+        if item['dpow']['server'] == "dPoW-3P":
+            third_chains.append(item['chain'])
+    return third_chains
+
 def prepare_notary_balance_graph_data(chain_low_balance_notary_counts):
     bg_color = []
     border_color = []

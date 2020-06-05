@@ -27,7 +27,7 @@ Script runtime is around 5-10 mins, except for initial population which is up to
 '''
 
 # set this to True to quickly update tables with most recent data
-skip_until_yesterday = True
+skip_until_yesterday = False
 
 load_dotenv()
 
@@ -47,9 +47,9 @@ rpc["KMD"] = def_credentials("KMD")
 ntx_addr = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 
 season = get_season(time.time())
-tip = int(rpc["KMD"].getblockcount())
+tip = int(rpc["KMD"].getblockcount())- 100000
 recorded_txids = []
-start_block = seasons_info[season]["start_block"]
+start_block = tip - 200000
 if skip_until_yesterday:
     start_block = tip - 24*60*1
 all_txids = []
@@ -106,14 +106,12 @@ def update_notarisations():
     records = []
     start = time.time()
     i = 1
-    j = 0
     for txid in unrecorded_txids:
         row_data = ntx_lib.get_ntx_data(txid)
-        j += 1
-        num_unrecorded_txids = len(unrecorded_txids)
         if row_data is not None:
             chain = row_data[0]
             block_height = row_data[1]
+            print(block_height)
             block_time = row_data[2]
             txid = row_data[8]
             notaries = row_data[5]
@@ -126,7 +124,7 @@ def update_notarisations():
             for notary in notaries:
                 last_ntx_row_data = (notary, chain, txid, block_height,
                                      block_time, season)
-            
+            '''
                 if notary in notary_last_ntx:
                     if chain not in notary_last_ntx[notary]:
                         notary_last_ntx[notary].update({chain:0})
@@ -143,16 +141,16 @@ def update_notarisations():
                             table_lib.update_last_btc_ntx_tbl(conn, cursor, last_btc_ntx_row_data)
                     else:
                         table_lib.update_last_btc_ntx_tbl(conn, cursor, last_btc_ntx_row_data)
-            
+            '''
 
             records.append(row_data)
-            if len(records) == 1:
+            if len(records) == 10:
                 now = time.time()
-                pct = len(records)*j/num_unrecorded_txids*100
+                pct = len(records)*i/len(unrecorded_txids)*100
                 runtime = int(now-start)
                 est_end = int(100/pct*runtime)
-                pct = round(j/num_unrecorded_txids*100,3)
-                logger.info(str(pct)+"% :"+str(j)+"/"+str(num_unrecorded_txids)+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
+                pct = round(len(records)*i/len(unrecorded_txids)*100,3)
+                logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_txids))+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
                 # logger.info("records: "+str(records))
                 logger.info("-----------------------------")
                 execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, \
