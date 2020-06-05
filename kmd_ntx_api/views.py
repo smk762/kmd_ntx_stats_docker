@@ -575,7 +575,6 @@ def notary_profile_view(request, notary_name=None):
         notary_addresses = addresses.objects.filter(notary=notary_name, season=season) \
                            .order_by('chain').values('chain','address')
         coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-        season = get_season(int(time.time()))
         notary_list = get_notary_list(season)
 
         context = {
@@ -609,18 +608,39 @@ def coin_profile_view(request, chain=None):
         for item in balance_data:
             if item['balance'] > max_tick:
                 max_tick = float(item['balance'])
+        if max_tick > 0:
+            10**(int(round(np.log10(max_tick))))
+        else:
+            max_tick = 10
         notaries_list = get_notary_list(season)
         coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+
+        coin_notariser_ranks = get_coin_notariser_ranks(season)
+        top_region_notarisers = get_top_region_notarisers(coin_notariser_ranks)
+        top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
+
         context = {
             "sidebar_links":get_sidebar_links(notaries_list, coins_data),
             "explorers":get_dpow_explorers(),
             "eco_data_link":get_eco_data_link(),
             "coin_social": get_coin_social(chain),
-            "nn_health":get_nn_health(),
-            "chain_ntx_summary":get_coin_ntx_summary(chain),
-            "chain":chain,
-            "max_tick": 10**(int(round(np.log10(max_tick))))
+            "max_tick": max_tick
         }
+        context.update({"chain":chain})
+        if chain == "BTC":
+            top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, "KMD")
+            context.update({
+                "chain_ntx_summary":get_coin_ntx_summary("KMD"),
+                "top_coin_notarisers":top_coin_notarisers
+            })
+        else:
+            top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
+            context.update({
+                "chain_ntx_summary":get_coin_ntx_summary(chain),
+                "top_coin_notarisers":top_coin_notarisers
+            })
+            
+
         return render(request, 'coin_profile.html', context)
     else:
         redirect('dash_view')
@@ -719,6 +739,62 @@ def coin_funding(request):
 
 def notary_funding(request):
     pass
+
+def ntx_scoreboard(request):
+    season = get_season(int(time.time()))
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    mainnet_chains = get_mainnet_chains(coins_data)
+    third_party_chains = get_third_party_chains(coins_data)
+    notary_list = get_notary_list(season)
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "eco_data_link":get_eco_data_link()
+    }
+    # region > notary > coin
+    coin_notariser_ranks = get_coin_notariser_ranks(season)
+    notarisation_scores = {}
+    for region in coin_notariser_ranks:
+        notarisation_scores.update({region:{}})
+        for notary in coin_notariser_ranks[region]:
+            notarisation_scores[region].update({
+                notary:{
+                    "btc:":0,
+                    "main":0,
+                    "third_party":0,
+                    "mining":0
+                }
+            })
+            for chain in coin_notariser_ranks[region][notary]:
+                if chain in ["KMD", "BTC"]:
+                    val = notarisation_scores[region][notary]["btc"]
+                    notarisation_scores[region][notary].update({
+                        "btc":0
+                    })
+                elif chain in mainnet_chains:
+                    val = notarisation_scores[region][notary]["main"]
+                    notarisation_scores[region][notary].update({
+                        "main":0
+                    })
+                elif chain in third_party_chains:
+                    val = notarisation_scores[region][notary]["third_party"]
+                    notarisation_scores[region][notary].update({
+                        "third_party":0
+                    })
+    mined_season = notary_mined.filter(block_time__gte=seasons_info[season]['start_time'],
+                                            block_time__lte=str(now)).values('name') \
+                                           .annotate(season_blocks_mined=Count('value'))
+    for item in mined_season:
+        notary = item["name"]
+        blocks_mined = item["season_blocks_mined"]
+        for region in notarisation_scores:
+            if notary in notarisation_scores[region]:
+                notarisation_scores[region][notary].update({
+                    "mining": blocks_mined
+                })
+
+
+    return render(request, 'ntx_scoreboard.html', context)
+    
 
 def funds_sent(request):
     season = get_season(int(time.time()))

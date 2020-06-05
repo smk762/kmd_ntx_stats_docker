@@ -103,6 +103,7 @@ def get_ac_block_info():
         logger.info(e)
     return ac_block_info
 
+
 # http://kmd.explorer.dexstats.info/insight-api-komodo/block-index/8888
 # http://explorer.chips.cash/api/getblockcount
 # http://chips.komodochainz.info/ext/getbalance/RSAzPFzgTZHNcxLNLdGyVPbjbMA8PRY7Ss

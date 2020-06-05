@@ -8,7 +8,6 @@ from .helper_lib import *
 from kmd_ntx_api.serializers import *
 logger = logging.getLogger("mylogger")
 
-
 def apply_filters(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
         filter_kwargs = {}
@@ -62,6 +61,9 @@ def get_notary_list(season):
             notary_list.append(item['notary'])
     notary_list.sort()
     return notary_list
+
+def get_notary_region(notary):
+    return notary.split("_")[-1]
 
 def get_dpow_coins_list():
     dpow_chains = coins.objects.filter(dpow_active=1).values('chain')
@@ -180,6 +182,82 @@ def get_mined_count_season_data(request):
             })
 
     return wrap_api(resp)
+
+def get_coin_notariser_ranks(season):
+    # season ntx stats
+    ntx_season = notarised_count_season.objects \
+                                    .filter(season=season) \
+                                    .values()
+    region_notary_ranks = {
+        "AR":{},
+        "EU":{},
+        "NA":{},
+        "SH":{},
+        "DEV":{}
+    }
+    for item in ntx_season:
+        notary = item['notary']
+        for coin in item['chain_ntx_counts']:
+            if coin == "BTC":
+                coin = "KMD"
+            region = get_notary_region(notary)
+            if region in ["AR","EU","NA","SH", "DEV"]:
+                if notary not in region_notary_ranks[region]:
+                    region_notary_ranks[region].update({notary:{}})
+                region_notary_ranks[region][notary].update({
+                    coin:item['chain_ntx_counts'][coin]
+                })
+    return region_notary_ranks
+
+def get_top_region_notarisers(region_notary_ranks):
+    top_region_notarisers = {
+        "AR":{
+        },
+        "EU":{
+        },
+        "NA":{
+        },
+        "SH":{
+        },
+        "DEV":{
+        }
+    }
+    top_ntx_count = {}
+    for region in region_notary_ranks:
+        if region not in top_ntx_count:
+            top_ntx_count.update({region:{}})
+        for notary in region_notary_ranks[region]:
+            for chain in region_notary_ranks[region][notary]:
+                if chain not in top_ntx_count:
+                    top_ntx_count[region].update({chain:0})
+
+                if chain not in top_region_notarisers[region]:
+                    top_region_notarisers[region].update({chain:{}})
+
+                ntx_count = region_notary_ranks[region][notary][chain]
+                if ntx_count > top_ntx_count[region][chain]:
+                    top_notary = notary
+                    top_ntx_count[region]   .update({chain:ntx_count})
+                    top_region_notarisers[region][chain].update({
+                        "top_notary": top_notary,
+                        "top_ntx_count": top_ntx_count[region][chain]
+
+                    })
+    return top_region_notarisers
+
+def get_top_coin_notarisers(top_region_notarisers, chain):
+    top_coin_notarisers = {}
+    if chain == "BTC":
+        chain = "KMD"
+    for region in top_region_notarisers:
+        if chain in top_region_notarisers[region]:
+            top_coin_notarisers.update({
+                region:{
+                    "top_notary": top_region_notarisers[region][chain]["top_notary"],
+                    "top_ntx_count": top_region_notarisers[region][chain]["top_ntx_count"]
+                }
+            })
+    return top_coin_notarisers
 
 def get_mined_count_daily_data(request):
     resp = {}
