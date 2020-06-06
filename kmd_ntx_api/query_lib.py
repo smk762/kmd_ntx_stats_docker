@@ -183,6 +183,7 @@ def get_mined_count_season_data(request):
 
     return wrap_api(resp)
 
+# returns region > notary > chain > season ntx count
 def get_coin_notariser_ranks(season):
     # season ntx stats
     ntx_season = notarised_count_season.objects \

@@ -8,7 +8,7 @@ cursor = conn.cursor()
 #table = 'coin_social'
 #table = 'funding_transactions'
 table = 'last_notarised'
-table = 'notarised_chain_season'
+#table = 'notarised_chain_season'
 
 cursor.execute("SELECT * FROM "+table+";")
 print(cursor.fetchall())
