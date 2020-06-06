@@ -655,7 +655,6 @@ def get_coin_ntx_summary(coin):
         })
     return chain_ntx_summary
 
-
 def get_balances_dict(filter_kwargs):
     balances_dict = {}
     balances_data = balances.objects.filter(**filter_kwargs).order_by('notary', 'chain').values('notary', 'chain', 'balance')

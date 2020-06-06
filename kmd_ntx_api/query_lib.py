@@ -8,6 +8,38 @@ from .helper_lib import *
 from kmd_ntx_api.serializers import *
 logger = logging.getLogger("mylogger")
 
+ # Need to confirm and fill this in correctly later...
+seasons_info = {
+    "Season_1": {
+            "start_block":1,
+            "end_block":1,
+            "start_time":1,
+            "end_time":1530921600,
+            "notaries":[]
+        },
+    "Season_2": {
+            "start_block":1,
+            "end_block":1,
+            "start_time":1530921600,
+            "end_time":1563148799,
+            "notaries":[]
+        },
+    "Season_3": {
+            "start_block":1444000,
+            "end_block":1921999,
+            "start_time":1563148800,
+            "end_time":1592146799,
+            "notaries":[]
+        },
+    "Season_4": {
+            "start_block":1922000,
+            "end_block":2444000,
+            "start_time":1592146800,
+            "end_time":1751328000,
+            "notaries":[]
+        }
+}
+
 def apply_filters(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
         filter_kwargs = {}
@@ -65,6 +97,9 @@ def get_notary_list(season):
 def get_notary_region(notary):
     return notary.split("_")[-1]
 
+def get_ntx_score(btc_ntx, main_ntx, third_party_ntx, mining):
+    return btc_ntx*0.5 + main_ntx*0.25 + third_party_ntx*0.25 + mining * 1
+ 
 def get_dpow_coins_list():
     dpow_chains = coins.objects.filter(dpow_active=1).values('chain')
     chains_list = []
@@ -210,6 +245,79 @@ def get_coin_notariser_ranks(season):
                 })
     return region_notary_ranks
 
+
+def get_notarisation_scores(season, coin_notariser_ranks):
+    notarisation_scores = {}
+    for region in coin_notariser_ranks:
+        notarisation_scores.update({region:{}})
+        for notary in coin_notariser_ranks[region]:
+            notarisation_scores[region].update({
+                notary:{
+                    "btc":0,
+                    "main":0,
+                    "third_party":0,
+                    "mining":0
+                }
+            })
+
+            coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+
+            main_chains = []
+            for item in coins_data:
+                if item['dpow']['server'] == "dPoW-mainnet":
+                    main_chains.append(item['chain'])
+
+            third_chains = []
+            for item in coins_data:
+                if item['dpow']['server'] == "dPoW-3P":
+                    third_chains.append(item['chain'])
+
+            for chain in coin_notariser_ranks[region][notary]:
+                if chain in ["KMD", "BTC"]:
+                    val = notarisation_scores[region][notary]["btc"] \
+                        +coin_notariser_ranks[region][notary][chain]
+                    notarisation_scores[region][notary].update({
+                        "btc":val
+                    })
+                elif chain in main_chains:
+                    val = notarisation_scores[region][notary]["main"] \
+                        +coin_notariser_ranks[region][notary][chain]
+                    notarisation_scores[region][notary].update({
+                        "main":val
+                    })
+                elif chain in third_chains:
+                    val = notarisation_scores[region][notary]["third_party"] \
+                        +coin_notariser_ranks[region][notary][chain]
+                    notarisation_scores[region][notary].update({
+                        "third_party":val
+                    })
+
+    notary_mined = mined.objects.filter(season=season, name=notary)
+    mined_season = notary_mined.filter(block_time__gte=seasons_info[season]['start_time'],
+                                            block_time__lte=str(int(time.time()))).values('name') \
+                                           .annotate(season_blocks_mined=Count('value'))
+    for item in mined_season:
+        notary = item["name"]
+        blocks_mined = item["season_blocks_mined"]
+        for region in notarisation_scores:
+            if notary in notarisation_scores[region]:
+                notarisation_scores[region][notary].update({
+                    "mining": blocks_mined
+                })
+    for region in notarisation_scores:
+        for notary in notarisation_scores[region]:
+            score = get_ntx_score(
+                notarisation_scores[region][notary]["btc"],
+                notarisation_scores[region][notary]["main"],
+                notarisation_scores[region][notary]["third_party"],
+                notarisation_scores[region][notary]["mining"]
+            )
+            notarisation_scores[region][notary].update({
+                "score": score
+            })
+
+    return notarisation_scores
+
 def get_top_region_notarisers(region_notary_ranks):
     top_region_notarisers = {
         "AR":{
@@ -238,7 +346,7 @@ def get_top_region_notarisers(region_notary_ranks):
                 ntx_count = region_notary_ranks[region][notary][chain]
                 if ntx_count > top_ntx_count[region][chain]:
                     top_notary = notary
-                    top_ntx_count[region]   .update({chain:ntx_count})
+                    top_ntx_count[region].update({chain:ntx_count})
                     top_region_notarisers[region][chain].update({
                         "top_notary": top_notary,
                         "top_ntx_count": top_ntx_count[region][chain]
