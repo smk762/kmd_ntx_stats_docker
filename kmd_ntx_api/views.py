@@ -576,7 +576,10 @@ def notary_profile_view(request, notary_name=None):
                            .order_by('chain').values('chain','address')
         coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
         notary_list = get_notary_list(season)
-
+        coin_notariser_ranks = get_coin_notariser_ranks(season)
+        region = get_notary_region(notary_name)
+        notary_ntx_counts = coin_notariser_ranks[region][notary_name]
+        season_nn_chain_ntx_data = get_season_nn_chain_ntx_data(season)
         context = {
             "sidebar_links":get_sidebar_links(notary_list ,coins_data),
             "eco_data_link":get_eco_data_link(),
@@ -584,7 +587,9 @@ def notary_profile_view(request, notary_name=None):
             "nn_social":get_nn_social(notary_name),
             "nn_health":get_nn_health(),
             "ntx_summary":get_nn_ntx_summary(notary_name),
+            "season_nn_chain_ntx_data":season_nn_chain_ntx_data,
             "notary_name":notary_name,
+            "notary_ntx_counts":notary_ntx_counts,
             "mining_summary":get_nn_mining_summary(notary_name),
             "notary_addresses":notary_addresses
         }
@@ -618,6 +623,7 @@ def coin_profile_view(request, chain=None):
         coin_notariser_ranks = get_coin_notariser_ranks(season)
         top_region_notarisers = get_top_region_notarisers(coin_notariser_ranks)
         top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
+        season_chain_ntx_data = get_season_chain_ntx_data(season)
 
         context = {
             "sidebar_links":get_sidebar_links(notaries_list, coins_data),

@@ -184,7 +184,48 @@
 							</div>
 						</div>
 					</div>
-				</div>	
+				</div>		
+				<div class="row my-3">
+					<div class="card-deck d-flex justify-content-between col-12 m-auto">
+						<div class="card kmd_ui_light4">
+							<div class="card-header kmd_ui_dark1_bg">
+								{{ notary_name }} Last notarisations
+							</div>
+							<div class="card-body kmd_ui_dark1_bg">
+								<table id="ntx_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+									<thead>
+										<tr>
+											<th>CHAIN</th>
+											<th>Notarisations</th>
+											<th>Participation</th>
+											<th>Last ntx block</th>
+											<th>txid</th>
+											<th>Since last ntx</th>
+											<th>Ntx/funds</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for notary, chain_vals in season_nn_chain_ntx_data.items %}
+											{% if notary == notary_name %}
+												{% for chain, vals in chain_vals.items %}
+												<tr>
+													<td>{{ chain }}</td>
+													<td>{{ vals.num_nn_chain_ntx }}</td>
+													<td>{{ vals.participation_pct }}%</td>
+													<td>{{ vals.last_ntx_block }}</td>
+													<td>{{ vals.last_ntx_txid }}</td>
+													<td>{{ vals.time_since }}</td>
+													<td>TBA</td>
+												</tr>
+												{% endfor %}
+											{% endif %}
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>	
+					</div>
+				</div>
 				<div class="row my-3">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
@@ -253,6 +294,36 @@
 				            $(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");
 				        }
         			}
+        		]
+	        });
+	        $('#ntx_table').DataTable({
+        		order: [[ 5, 'asc' ], [ 0, 'asc' ]],
+	        	"columns": [
+			        { "data": "chain" },
+			        { "data": "count" },
+			        { "data": "pct" },
+			        { "data": "block" },	
+			        { "data": "txid" },
+			        { "data": "time" },
+			        { "data": "fund_ntx_ratio" }
+			    ],
+        		"columnDefs": [
+        			{
+			            "targets": 0,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");
+				        }
+        			},
+        			{
+			            "targets": 3,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='http://kmd.explorer.dexstats.info/tx/"+oData.txid+"'>"+oData.block+"</a>");
+				        }
+			        },
+        			{
+			            "targets": 4,
+			            "visible": false
+			        },
         		]
 	        });
 	    });

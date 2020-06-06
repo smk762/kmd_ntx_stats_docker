@@ -90,7 +90,6 @@ def get_dpow_explorers():
             resp.update({chain:explorers[0].replace('tx/','')})
     return resp
 
-
 # takes a row from queryset values, and returns a dict using a defined row value as top level key
 def items_row_to_dict(items_row, top_key):
     key_list = list(items_row.keys())
@@ -315,10 +314,121 @@ def get_nn_ntx_summary(notary):
             "time_since_last_kmd_ntx":time_since_last_kmd_ntx,
         })
 
-
     logger.info(ntx_summary)
     return ntx_summary
 
+# notary > chain > data
+def get_last_nn_chain_ntx(season):
+    ntx_last = last_notarised.objects \
+                             .filter(season=season) \
+                             .values()
+    last_nn_chain_ntx = {}
+    for item in ntx_last:
+        notary = item['notary']
+        if notary not in last_nn_chain_ntx:
+            last_nn_chain_ntx.update({notary:{}})
+        chain = item['chain']
+        time_since = int(time.time()) - int(item['block_time'])
+        time_since = day_hr_min_sec(time_since)
+        last_nn_chain_ntx[notary].update({
+            chain:{
+                "txid": item['txid'],
+                "block_height": item['block_height'],
+                "block_time": item['block_time'],
+                "time_since": time_since
+            }
+        })
+    return last_nn_chain_ntx
+
+# chain > data
+def get_season_chain_ntx_data(season):
+    ntx_season = notarised_chain_season.objects \
+                                    .filter(season=season) \
+                                    .values()
+    season_chain_ntx_data = {}
+    if len(ntx_season) > 0:
+        for item in ntx_season:
+            time_since_last_ntx = int(time.time()) - int(item['kmd_ntx_blocktime'])
+            time_since_last_ntx = day_hr_min_sec(time_since_last_ntx)
+            season_chain_ntx_data.update({
+                item['chain']: {
+                    'chain_ntx_season':item['ntx_count'],
+                    'last_ntx_time':item['kmd_ntx_blocktime'],
+                    'time_since_ntx':time_since_last_ntx,
+                    'last_ntx_block':item['block_height'],
+                    'last_ntx_hash':item['kmd_ntx_blocktime'],
+                    'last_ntx_ac_block':item['ac_ntx_height'],
+                    'last_ntx_ac_hash':item['ac_ntx_blockhash'],
+                    'ntx_lag':item['ntx_lag']
+                }
+            })
+    return season_chain_ntx_data
+
+# notary > chain > count
+def get_nn_season_ntx_counts(season):
+    ntx_season = notarised_count_season.objects \
+                                    .filter(season=season) \
+                                    .values()
+    nn_season_ntx_counts = {}
+    for item in ntx_season:
+        nn_season_ntx_counts.update({
+            item['notary']:item['chain_ntx_counts']
+        })
+    return nn_season_ntx_counts
+
+def get_season_nn_chain_ntx_data(season):
+    notary_list = get_notary_list(season)
+    coins_list = get_dpow_coins_list()
+    nn_season_ntx_counts = get_nn_season_ntx_counts(season)
+    season_chain_ntx_data = get_season_chain_ntx_data(season)
+    last_nn_chain_ntx = get_last_nn_chain_ntx(season)
+    season_nn_chain_ntx_data = {}
+    for notary in notary_list:
+        for chain in coins_list:
+            if chain == "BTC":
+                chain = "KMD"
+            total_chain_ntx = 0
+            last_ntx_block = 0
+            num_nn_chain_ntx = 0
+            time_since = "N/A"
+            participation_pct = 0
+            if chain in season_chain_ntx_data:
+                total_chain_ntx = season_chain_ntx_data[chain]['chain_ntx_season']
+
+            if notary in nn_season_ntx_counts:
+                num_nn_chain_ntx = nn_season_ntx_counts[notary]
+
+            if notary in last_nn_chain_ntx:
+                if chain in last_nn_chain_ntx[notary]:
+                    time_since = last_nn_chain_ntx[notary][chain]["time_since"]
+                    last_ntx_block = last_nn_chain_ntx[notary][chain]['block_height']
+                    last_ntx_txid = last_nn_chain_ntx[notary][chain]['txid']
+
+            if total_chain_ntx != 0 and not isinstance(num_nn_chain_ntx, int):
+                if chain in num_nn_chain_ntx:
+                    participation_pct = round(num_nn_chain_ntx[chain]/total_chain_ntx*100,2)
+
+            if notary not in season_nn_chain_ntx_data:
+                season_nn_chain_ntx_data.update({notary:{}})
+            if not isinstance(num_nn_chain_ntx, int):
+                if chain in num_nn_chain_ntx:
+                    num_ntx = num_nn_chain_ntx[chain]
+                else:
+                    num_ntx = 0
+            else:
+                num_ntx = 0
+
+            season_nn_chain_ntx_data[notary].update({
+                chain: {
+                    "num_nn_chain_ntx":num_ntx,
+                    "time_since":time_since,
+                    "last_ntx_block":last_ntx_block,
+                    "last_ntx_txid":last_ntx_txid,
+                    "participation_pct":participation_pct
+                }
+            })
+    return season_nn_chain_ntx_data
+                     
 def get_nn_mining_summary(notary):
     season = get_season(int(time.time()))
     now = int(time.time())
@@ -505,7 +615,7 @@ def get_coin_ntx_summary(coin):
     now = int(time.time())
     season = get_season(now)
 
-    ntx_summary = {
+    chain_ntx_summary = {
             'chain_ntx_today':0,
             'chain_ntx_season':0,
             'last_ntx_time':'',
@@ -522,7 +632,7 @@ def get_coin_ntx_summary(coin):
     ntx_today = notarised_chain_daily.objects.filter(notarised_date=str(today), 
                                                      chain=coin).values()
     if len(ntx_today) > 0:
-        ntx_summary.update({
+        chain_ntx_summary.update({
             'chain_ntx_today':ntx_today[0]['ntx_count']
         })
 
@@ -533,7 +643,7 @@ def get_coin_ntx_summary(coin):
     if len(ntx_season) > 0:
         time_since_last_ntx = now - int(ntx_season[0]['kmd_ntx_blocktime'])
         time_since_last_ntx = day_hr_min_sec(time_since_last_ntx)
-        ntx_summary.update({
+        chain_ntx_summary.update({
             'chain_ntx_season':ntx_season[0]['ntx_count'],
             'last_ntx_time':ntx_season[0]['kmd_ntx_blocktime'],
             'time_since_ntx':time_since_last_ntx,
@@ -543,8 +653,8 @@ def get_coin_ntx_summary(coin):
             'last_ntx_ac_hash':ntx_season[0]['ac_ntx_blockhash'],
             'ntx_lag':ntx_season[0]['ntx_lag']
         })
-    logger.info(ntx_summary)
-    return ntx_summary
+    return chain_ntx_summary
+
 
 def get_balances_dict(filter_kwargs):
     balances_dict = {}
