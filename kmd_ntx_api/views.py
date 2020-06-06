@@ -580,6 +580,23 @@ def notary_profile_view(request, notary_name=None):
         region = get_notary_region(notary_name)
         notary_ntx_counts = coin_notariser_ranks[region][notary_name]
         season_nn_chain_ntx_data = get_season_nn_chain_ntx_data(season)
+        notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
+        region_notarisation_scores = notarisation_scores[region]
+        notary_score = notarisation_scores[region][notary_name]['score']
+        higher_ranked_notaries = []
+        for notary in region_notarisation_scores:
+            score = region_notarisation_scores[notary]['score']
+            if score > notary_score:
+                higher_ranked_notaries.append(notary)
+        rank = len(higher_ranked_notaries)+1
+        if rank == 1:
+            rank = str(rank)+"st"
+        elif rank == 2:
+            rank = str(rank)+"nd"
+        elif rank == 3:
+            rank = str(rank)+"rd"
+        else:
+            rank = str(rank)+"th"
         context = {
             "sidebar_links":get_sidebar_links(notary_list ,coins_data),
             "eco_data_link":get_eco_data_link(),
@@ -588,6 +605,7 @@ def notary_profile_view(request, notary_name=None):
             "nn_health":get_nn_health(),
             "ntx_summary":get_nn_ntx_summary(notary_name),
             "season_nn_chain_ntx_data":season_nn_chain_ntx_data,
+            "rank":rank,
             "notary_name":notary_name,
             "notary_ntx_counts":notary_ntx_counts,
             "mining_summary":get_nn_mining_summary(notary_name),
@@ -752,53 +770,14 @@ def ntx_scoreboard(request):
     mainnet_chains = get_mainnet_chains(coins_data)
     third_party_chains = get_third_party_chains(coins_data)
     notary_list = get_notary_list(season)
-    context = {
-        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
-        "eco_data_link":get_eco_data_link()
-    }
     # region > notary > coin
     coin_notariser_ranks = get_coin_notariser_ranks(season)
-    notarisation_scores = {}
-    for region in coin_notariser_ranks:
-        notarisation_scores.update({region:{}})
-        for notary in coin_notariser_ranks[region]:
-            notarisation_scores[region].update({
-                notary:{
-                    "btc:":0,
-                    "main":0,
-                    "third_party":0,
-                    "mining":0
-                }
-            })
-            for chain in coin_notariser_ranks[region][notary]:
-                if chain in ["KMD", "BTC"]:
-                    val = notarisation_scores[region][notary]["btc"]
-                    notarisation_scores[region][notary].update({
-                        "btc":0
-                    })
-                elif chain in mainnet_chains:
-                    val = notarisation_scores[region][notary]["main"]
-                    notarisation_scores[region][notary].update({
-                        "main":0
-                    })
-                elif chain in third_party_chains:
-                    val = notarisation_scores[region][notary]["third_party"]
-                    notarisation_scores[region][notary].update({
-                        "third_party":0
-                    })
-    mined_season = notary_mined.filter(block_time__gte=seasons_info[season]['start_time'],
-                                            block_time__lte=str(now)).values('name') \
-                                           .annotate(season_blocks_mined=Count('value'))
-    for item in mined_season:
-        notary = item["name"]
-        blocks_mined = item["season_blocks_mined"]
-        for region in notarisation_scores:
-            if notary in notarisation_scores[region]:
-                notarisation_scores[region][notary].update({
-                    "mining": blocks_mined
-                })
-
-
+    notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "notarisation_scores":notarisation_scores
+    }
     return render(request, 'ntx_scoreboard.html', context)
     
 
