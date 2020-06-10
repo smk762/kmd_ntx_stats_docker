@@ -597,6 +597,7 @@ def notary_profile_view(request, notary_name=None):
             rank = str(rank)+"rd"
         else:
             rank = str(rank)+"th"
+
         context = {
             "sidebar_links":get_sidebar_links(notary_list ,coins_data),
             "eco_data_link":get_eco_data_link(),
@@ -766,11 +767,12 @@ def notary_funding(request):
 
 def ntx_scoreboard(request):
     season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+
     mainnet_chains = get_mainnet_chains(coins_data)
     third_party_chains = get_third_party_chains(coins_data)
-    notary_list = get_notary_list(season)
-    # region > notary > coin
+ 
     coin_notariser_ranks = get_coin_notariser_ranks(season)
     notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
     context = {
@@ -780,6 +782,22 @@ def ntx_scoreboard(request):
     }
     return render(request, 'ntx_scoreboard.html', context)
     
+
+def chains_last_ntx(request):
+    season = get_season(int(time.time()))
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    notary_list = get_notary_list(season)
+
+    season_chain_ntx_data = get_season_chain_ntx_data(season)
+
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "explorers":get_dpow_explorers(),
+        "season_chain_ntx_data":season_chain_ntx_data
+    }
+
+    return render(request, 'last_notarised.html', context)
 
 def funds_sent(request):
     season = get_season(int(time.time()))

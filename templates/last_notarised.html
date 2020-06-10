@@ -1,0 +1,94 @@
+{% extends "base2.html" %}
+{% load static %}
+{% block content %}
+	<div class="container text-center" width='90%'>
+		<div id="ui-view">
+			<div class="fade-in">
+				<div class="row my-3">
+					<div class="card-deck d-flex justify-content-between col-12 m-auto">
+						<div class="card kmd_ui_light4">
+							<div class="card-header kmd_ui_dark1_bg">
+								Latest Chain Notarisations
+							</div>
+							<div class="card-body kmd_ui_dark1_bg">
+								<table id="notarisations" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+									<thead>
+										<tr>
+											<th>Chain</th>
+											<th>Ntx Count</th>
+											<th>Ntx Block</th>
+											<th>Current Block</th>
+											<th>Ntx Hash</th>
+											<th>Lag</th>
+											<th>Time since</th>
+											<th>KMD block</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for chain, chain_data in season_chain_ntx_data.items %}
+										<tr>
+											<td data-data="chain">
+										  		
+										  			{{ chain }}
+										  		
+										  	</td>
+											<td data-data="ntx_count">{{ chain_data.chain_ntx_season }}</th>
+											<td data-data="last_ntx_ac_block">{{ chain_data.last_ntx_ac_block }}</th>
+											<td data-data="ac_block_height">{{ chain_data.ac_block_height }}</th>
+											<td data-data="ac_ntx_blockhash">{{ chain_data.ac_ntx_blockhash }}</th>
+											<td data-data="ntx_lag">{{ chain_data.ntx_lag }}</th>
+											<td data-data="time_since_ntx">{{ chain_data.time_since_ntx }}</th>
+											<td data-data="last_ntx_block">{{ chain_data.last_ntx_block }}</th>
+										</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>	
+					</div>
+				</div>
+			</div>	
+		</div>
+	</div>
+    <!-- jquery -->
+  
+  	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    {{ explorers|json_script:"explorers-data" }}
+  	<script>
+	    $(document).ready(function() {
+	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
+		        $('#notarisations').DataTable({
+	        		order: [[ 7, 'desc' ]],
+		        	"columns": [
+				        { "data": "chain" },
+				        { "data": "ntx_count" },
+				        { "data": "last_ntx_ac_block" },
+				        { "data": "ac_block_height" },
+				        { "data": "ac_ntx_blockhash" },
+				        { "data": "ntx_lag" },	
+				        { "data": "time_since_ntx" },
+				        { "data": "last_ntx_block" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 0,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a></span>");
+					        }
+				        },
+	        			{
+				            "targets": 4,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            	$(nTd).html("<a href='"+explorers[oData.chain]+"/block/"+oData.ac_ntx_blockhash+"'>"+oData.ac_ntx_blockhash.slice(0, 3)+"..."+oData.ac_ntx_blockhash.slice(-3)+"</a>");
+					        }
+				        }
+	        		]
+		        });
+	    });
+		Chart.defaults.global.defaultFontColor = 'white';
+		Chart.defaults.global.defaultFontSize = 14;
+
+  </script> 
+
+{% endblock %}
