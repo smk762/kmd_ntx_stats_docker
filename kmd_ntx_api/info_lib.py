@@ -171,16 +171,14 @@ def get_coin_social(coin=None):
     for coin in coin_social_info:
         for item in coin_social_info[coin]:
             if item in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'explorer', 'website']:
-                print(coin_social_info[coin][item])          
                 if coin_social_info[coin][item].endswith('/'):
                     coin_social_info[coin][item] = coin_social_info[coin][item][:-1]
-                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://twitter.com/", "")
-                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://github.com/", "")
-                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://t.me/", "")
-                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://www.youtube.com/channel/", "")
                 coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://", "")
-                print(coin_social_info[coin][item])
-
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("http://", "")
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("t.me/", "")
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("twitter.com/", "")
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("github.com/", "")
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("www.youtube.com/", "")
     return coin_social_info
 
 def get_nn_social(notary_name=None):
@@ -194,13 +192,15 @@ def get_nn_social(notary_name=None):
         nn_social_info.update(items_row_to_dict(item,'notary'))
     for notary in nn_social_info:
         for item in nn_social_info[notary]:
-            if item in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase']:
-                print(nn_social_info[notary][item])
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://twitter.com/", "")
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://github.com/", "")
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://www.youtube.com/", "")            
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("/", "")
-                print(nn_social_info[notary][item])
+            if item in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase']:   
+                if nn_social_info[notary][item].endswith('/'):
+                   nn_social_info[notary][item] = nn_social_info[notary][item][:-1]
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("http://", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("t.me/", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("twitter.com/", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("github.com/", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("www.youtube.com/", "")
 
     return nn_social_info
 
@@ -345,23 +345,26 @@ def get_season_chain_ntx_data(season):
     ntx_season = notarised_chain_season.objects \
                                     .filter(season=season) \
                                     .values()
+    dpow_coins_list = get_dpow_coins_list()
     season_chain_ntx_data = {}
     if len(ntx_season) > 0:
         for item in ntx_season:
             time_since_last_ntx = int(time.time()) - int(item['kmd_ntx_blocktime'])
             time_since_last_ntx = day_hr_min_sec(time_since_last_ntx)
-            season_chain_ntx_data.update({
-                item['chain']: {
-                    'chain_ntx_season':item['ntx_count'],
-                    'last_ntx_time':item['kmd_ntx_blocktime'],
-                    'time_since_ntx':time_since_last_ntx,
-                    'last_ntx_block':item['block_height'],
-                    'last_ntx_hash':item['kmd_ntx_blocktime'],
-                    'last_ntx_ac_block':item['ac_ntx_height'],
-                    'last_ntx_ac_hash':item['ac_ntx_blockhash'],
-                    'ntx_lag':item['ntx_lag']
-                }
-            })
+            if item['chain'] in dpow_coins_list:
+                season_chain_ntx_data.update({
+                    item['chain']: {
+                        'chain_ntx_season':item['ntx_count'],
+                        'last_ntx_time':item['kmd_ntx_blocktime'],
+                        'time_since_ntx':time_since_last_ntx,
+                        'last_ntx_block':item['block_height'],
+                        'last_ntx_hash':item['kmd_ntx_blocktime'],
+                        'last_ntx_ac_block':item['ac_ntx_height'],
+                        'ac_block_height':item['ac_block_height'],
+                        'ac_ntx_blockhash':item['ac_ntx_blockhash'],
+                        'ntx_lag':item['ntx_lag']
+                    }
+                })
     return season_chain_ntx_data
 
 # notary > chain > count

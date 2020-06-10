@@ -191,13 +191,13 @@
 											{% if notary == notary_name %}
 												{% for chain, vals in chain_vals.items %}
 												<tr>
-													<td>{{ chain }}</td>
-													<td>{{ vals.num_nn_chain_ntx }}</td>
-													<td>{{ vals.participation_pct }}%</td>
-													<td>{{ vals.last_ntx_block }}</td>
-													<td>{{ vals.last_ntx_txid }}</td>
-													<td>{{ vals.time_since }}</td>
-													<td>TBA</td>
+													<td data-data="chain">{{ chain }}</td>
+													<td data-data="count">{{ vals.num_nn_chain_ntx }}</td>
+													<td data-data="pct">{{ vals.participation_pct }}%</td>
+													<td data-data="block">{{ vals.last_ntx_block }}</td>
+													<td data-data="txid">{{ vals.last_ntx_txid }}</td>
+													<td data-data="time" data-order="{{ vals.last_ntx_block }}">{{ vals.time_since }}</td>
+													<td data-data="fund_ntx_ratio">TBA</td>
 												</tr>
 												{% endfor %}
 											{% endif %}
@@ -279,30 +279,24 @@
         		]
 	        });
 	        $('#ntx_table').DataTable({
-        		order: [[ 5, 'asc' ], [ 0, 'asc' ]],
-	        	"columns": [
-			        { "data": "chain" },
-			        { "data": "count" },
-			        { "data": "pct" },
-			        { "data": "block" },	
-			        { "data": "txid" },
-			        { "data": "time" },
-			        { "data": "fund_ntx_ratio" }
-			    ],
+        		order: [[ 3, 'desc' ], [ 0, 'asc' ]],
         		"columnDefs": [
         			{
+			            "data": 'chain',
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            $(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");
 				        }
         			},
         			{
+			            "data": 'block',
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            $(nTd).html("<a href='http://kmd.explorer.dexstats.info/tx/"+oData.txid+"'>"+oData.block+"</a>");
 				        }
 			        },
         			{
+			            "data": 'txid',
 			            "targets": 4,
 			            "visible": false
 			        },
