@@ -765,6 +765,19 @@ def coin_funding(request):
 def notary_funding(request):
     pass
 
+def mining_overview(request):
+    season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "explorers":get_dpow_explorers(),
+        "season":season.replace("_"," ")
+    }
+    return render(request, 'mining_overview.html', context)
+
 def ntx_scoreboard(request):
     season = get_season(int(time.time()))
     notary_list = get_notary_list(season)
@@ -782,7 +795,6 @@ def ntx_scoreboard(request):
     }
     return render(request, 'ntx_scoreboard.html', context)
     
-
 def chains_last_ntx(request):
     season = get_season(int(time.time()))
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
@@ -887,8 +899,12 @@ def chain_sync(request):
 ## DASHBOARD        
 def dash_view(request, dash_name=None):
     # Table Views
+    context = {}
     gets = ''
     html = 'dash_index.html'
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+    coins_list = get_dpow_coins_list()
     if dash_name:
         if dash_name.find('table') != -1:
             if dash_name == 'balances_table':
@@ -929,16 +945,35 @@ def dash_view(request, dash_name=None):
                 html = 'graphs/daily_ntx_graph.html'
             if dash_name == 'season_mining_graph':
                 html = 'graphs/daily_ntx_graph.html'
-    season = get_season(int(time.time()))
-    notaries_list = get_notary_list(season)
+    else:
+        coin_notariser_ranks = get_coin_notariser_ranks(season)
+        ntx_24hr = notarised.objects.filter(
+            block_time__gt=str(int(time.time()-24*60*60))
+            ).count()
+        mined_24hr = mined.objects.filter(
+            block_time__gt=str(int(time.time()-24*60*60))
+            ).values('season').annotate(sum_mined=Sum('value'))[0]['sum_mined']
+        biggest_block = mined.objects.filter(season=season).order_by('-value').first()
+        
+
+        notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
+        context.update({
+            "ntx_24hr":ntx_24hr,
+            "mined_24hr":mined_24hr,
+            "biggest_block":biggest_block,
+            "notarisation_scores":notarisation_scores,
+            "show_ticker":True
+        })
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    context = {
+    context.update({
         "gets":gets,
         "sidebar_links":get_sidebar_links(notaries_list ,coins_data),
         "eco_data_link":get_eco_data_link(),
         "nn_health":get_nn_health(),
+        "coins_list":coins_list,
+        "notaries_list":notaries_list,
         "nn_social":get_nn_social()
-    }
+    })
     return render(request, html, context)
 
 ## DASHBOARD GRAPHS
