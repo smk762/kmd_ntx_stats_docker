@@ -3,64 +3,142 @@
 {% block content %}
 	<div class="container" width='90%'>
 		<div id="ui-view">
-			<div class="fade-in">	
-            	{% for region, info in nn_health.regions_info.items %}	
-				<div class="card text-center">	
-					<div class="card-header kmd_ui_dark1_bg">
-						<h4 class="text-uppercase kmd_teal">{{ info.name }}</h4>
-					</div>		
-					<div class="card-body kmd_ui_dark1_bg">
-						<div class="row m-1 d-flex justify-content-between">	
-			            	{% for node in info.nodes %}
-			            	<div class="card kmd_ui_dark3_bg kmd_ui_light3 col-2 px-0 mx-1">
-			            		<a href="http://{{ request.get_host }}/notary_profile/{{ node }}">
+			<div class="fade-in">
 
-				            		<div class="p-2">
-									{% for nn, site_links in nn_social.items %}
-										{% if node == nn %}
-											{% if site_links.icon != '' %}
-												<img class="card-img-top m-auto auto-width" height='96px' src="{{ site_links.icon }}" alt="{{ node }} image here" style="border-radius: 50%;">
-											{% else %}
-												<img class="card-img-top m-auto auto-width" height='96px' src="{% static 'img/notary/icon/' %}{{ node }}.png" alt="{{ node }} image here" style="border-radius: 50%;">
-											{% endif %}
-										{% endif %}
-									{% endfor %}
-									</div>
-								</a>	
-								<div class="card-body kmd_ui_dark4_bg" style="padding: 1rem; ">
-									<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
-				            			<a href="http://{{ request.get_host }}/notary_profile/{{ node }}">
-				            				{{ node }}
-										</a><br />
-										{% for nn, site_links in nn_social.items %}
-											{% if node == nn %}
-												{% for site, link in site_links.items %}
-													{% if site == 'twitter' and link != '' %}
-														<a href="{{ link }}"><i class="fab fa-twitter"></i></a>
-													{% elif site == 'discord' and link != '' %}
-														<a href="https://discordapp.com/users/{{ link }}"><i class="fab fa-discord"></i></a>
-													{% elif site == 'github' and link != '' %}
-														<a href="{{ link }}"><i class="fab fa-github"></i></a>
-													{% elif site == 'youtube' and link != '' %}
-														<a href="{{ link }}"><i class="fab fa-youtube"></i></a>
-													{% elif site == 'keybase' and link != '' %}
-														<a href="https://keybase.io/{{ link }}"><i class="fab fa-keybase"></i></a>
-													{% elif site == 'telegram' and link != '' %}
-														<a href="https://t.me/{{ link }}"><i class="fab fa-telegram-plane"></i></a>
-													{% elif site == 'website' and link != '' %}
-														<a href="{{ link }}"><i class="fas fa-desktop"></i></a>
+				<div class="row m-3">
+					<div class="card-deck d-flex justify-content-between col-12 m-auto">
+						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mb-0">
+							<div class="card-body kmd_ui_dark1_bg">
+						    	<h3>Top Region Notarisation Scores</h3>
+									    <div class="col-12 d-flex justify-content-between align-items-center">
+											{% for region, region_data in notarisation_scores.items %}
+												{% for notary, notary_data in region_data.items %}
+													{% if notary_data.rank == 1 %}
+												    <div class="badge kmd_ui_dark4_bg m-2" style="width:16%; background-color: #26456B !important;">
+												    	<div class="col-12">
+												    		<i class="fas fa-trophy"></i>
+												    	</div>
+												    	<div class="col-12">
+												    		{{ notary }}<br />{{ notary_data.score }}
+												    	</div>
+												    	{% if region == 'AR' %}
+														<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
+															<a href="http://{{ request.get_host }}/ntx_scoreboard#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Asia and Russia</span></a>
+														</h5>
+														{% elif region == 'EU' %}
+														<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
+															<a href="http://{{ request.get_host }}/ntx_scoreboard#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>European Union</span></a>
+														</h5>
+														{% elif region == 'NA' %}
+														<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
+															<a href="http://{{ request.get_host }}/ntx_scoreboard#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>North America</span></a>
+														</h5>
+														{% elif region == 'SH' %}
+														<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
+															<a href="http://{{ request.get_host }}/ntx_scoreboard#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Southern Hemisphere</span></a>
+														</h5>
+														{% elif region == 'DEV' %}
+														<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
+															<a href="http://{{ request.get_host }}/ntx_scoreboard#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Development</span></a>
+														</h5>
+														{% endif %}
+												    </div>
 													{% endif %}
 												{% endfor %}
-											{% endif %}
-										{% endfor %}
-									</p>
-								</div>
-							</div>	
-			                {% endfor %}
-						</div>		
-					</div>		
-				</div>		
-            	{% endfor %}		
+											{% endfor %}
+										</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row m-3 kmd_ui_light3">
+					<div class="card-deck d-flex justify-content-between col-12 m-auto shadow-none">
+						<div class="card text-center" style="width: 18rem;">
+						  <div class="card-body kmd_ui_dark1_bg">
+						    <h1 class="card-title">{{ coins_list|length }}</h1>
+						    <a href="http://{{ request.get_host }}/coin_profiles">
+						    	<p class="card-text">Coins secured by dPoW</p>
+							</a>
+						  </div>
+						</div>
+
+						<div class="card text-center" style="width: 18rem;">
+						  <div class="card-body kmd_ui_dark1_bg">
+						    <h1 class="card-title">{{ ntx_24hr }}</h1>
+						    <a href="http://{{ request.get_host }}/notary_profiles">
+						    	<p class="card-text">Notarised last 24hrs</p>
+							</a>
+						  </div>
+						</div>
+
+
+						<div class="card text-center" style="width: 18rem;">
+						  <div class="card-body kmd_ui_dark1_bg">
+						    <h1 class="card-title">{{ notaries_list|length }}</h1>
+						    <a href="http://{{ request.get_host }}/notary_profiles">
+						    	<p class="card-text">Notary Nodes</p>
+							</a>
+						  </div>
+						</div>
+
+					</div>
+				</div>	
+
+				<div class="row m-3 kmd_ui_light3">
+					<div class="card-deck d-flex justify-content-between col-12 m-auto shadow-none">
+
+						<div class="card text-center" style="width: 18rem;">
+						  <div class="card-body kmd_ui_dark1_bg">
+						    <h1 class="card-title">{{ mined_24hr|floatformat:2 }} KMD</h1>
+						    <a href="http://{{ request.get_host }}/notary_profiles">
+						    	<p class="card-text">KMD Mined last 24hrs</p>
+						    </a>
+						  </div>
+						</div>
+						
+						<div class="card text-center" style="width: 18rem;">
+						  <div class="card-body kmd_ui_dark1_bg">
+						    <h1 class="card-title">{{ biggest_block.value|floatformat:2 }} KMD</h1>
+						    <p class="card-text">
+							    <a href="http://{{ request.get_host }}/mining_overview">
+							    	Season Largest KMD Block Mined
+								</a>
+						    </p>
+						  </div>
+						</div>
+
+					</div>
+				</div>	
+
+				<div class="row m-3 kmd_ui_light3">
+					<div class="card-deck d-flex justify-content-between col-12 m-auto shadow-none">
+
+						<div class="card text-center" style="width: 18rem;">
+						  <div class="card-body kmd_ui_dark1_bg">
+						    <h1 class="card-title"></h1>
+						    	<p class="card-text m-2">
+						    		<h4>Notary Resources</h4>
+							    	<a href="https://smk762.github.io/developer-docs/resources/notary-api.html" class="btn btn-dark4 m-2">API GUIDE</a>
+							    	<a href="https://developers.komodoplatform.com/" class="btn btn-dark4 kmd_teal_bg m-2">DEV DOCS</a>
+							    	<a href="https://github.com/komodoplatform/dpow" class="btn btn-dark4 kmd_teal_bg m-2">DPOW GUIDE</a>
+							    	<a href="https://github.com/KomodoPlatform/dPoW/blob/dev/doc/bible.md" class="btn btn-dark4 kmd_teal_bg m-2">DPOW BIBLE</a>
+							    	<a href="https://github.com/KomodoPlatform/kips" class="btn btn-dark4 kmd_teal m-2">KOMODO IMPROVEMENT PROPOSALS</a>
+						    	</p>
+						    	<p class="card-text m-2">
+						    		<h4>Community Websites</h4>
+						    		<a href="https://www.dexstats.info" class="btn btn-dark4 kmd_teal_bg m-2">DEXSTATS</a>
+							    	<a href="https://komodod.com/" class="btn btn-dark4 kmd_teal_bg m-2">KOMODOD EXPLORER</a>
+							    	<a href="https://notarystats.info/" class="btn btn-dark4 kmd_teal_bg m-2">NOTARYSTATS</a>
+							    	<a href="https://komodostats.com/" class="btn btn-dark4 kmd_teal_bg m-2">KOMODOSTATS</a>
+						    	</p>
+						    
+						  </div>
+						</div>
+
+					</div>
+				</div>	
+
 			</div>	
 		</div>
 	</div>

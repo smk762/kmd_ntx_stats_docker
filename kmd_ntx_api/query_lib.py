@@ -329,8 +329,6 @@ def get_notarisation_scores(season, coin_notariser_ranks):
                 "rank": rank
             })
 
-
-
     return notarisation_scores
 
 def get_top_region_notarisers(region_notary_ranks):
@@ -382,6 +380,7 @@ def get_top_coin_notarisers(top_region_notarisers, chain):
                 }
             })
     return top_coin_notarisers
+
 
 def get_mined_count_daily_data(request):
     resp = {}
