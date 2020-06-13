@@ -57,7 +57,7 @@
 						<div class="card text-center" style="width: 18rem;">
 						  <div class="card-body kmd_ui_dark1_bg">
 						    <h1 class="card-title">{{ coins_list|length }}</h1>
-						    <a href="http://{{ request.get_host }}/coin_profiles">
+						    <a href="http://{{ request.get_host }}/coin_profile">
 						    	<p class="card-text">Coins secured by dPoW</p>
 							</a>
 						  </div>
@@ -66,7 +66,7 @@
 						<div class="card text-center" style="width: 18rem;">
 						  <div class="card-body kmd_ui_dark1_bg">
 						    <h1 class="card-title">{{ ntx_24hr }}</h1>
-						    <a href="http://{{ request.get_host }}/notary_profiles">
+						    <a href="http://{{ request.get_host }}/chains_last_ntx">
 						    	<p class="card-text">Notarised last 24hrs</p>
 							</a>
 						  </div>
@@ -76,7 +76,7 @@
 						<div class="card text-center" style="width: 18rem;">
 						  <div class="card-body kmd_ui_dark1_bg">
 						    <h1 class="card-title">{{ notaries_list|length }}</h1>
-						    <a href="http://{{ request.get_host }}/notary_profiles">
+						    <a href="http://{{ request.get_host }}/notary_profile">
 						    	<p class="card-text">Notary Nodes</p>
 							</a>
 						  </div>
@@ -91,7 +91,7 @@
 						<div class="card text-center" style="width: 18rem;">
 						  <div class="card-body kmd_ui_dark1_bg">
 						    <h1 class="card-title">{{ mined_24hr|floatformat:2 }} KMD</h1>
-						    <a href="http://{{ request.get_host }}/notary_profiles">
+							<a href="http://{{ request.get_host }}/mining_24hrs">
 						    	<p class="card-text">KMD Mined last 24hrs</p>
 						    </a>
 						  </div>

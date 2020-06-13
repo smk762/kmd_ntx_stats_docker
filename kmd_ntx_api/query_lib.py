@@ -8,38 +8,6 @@ from .helper_lib import *
 from kmd_ntx_api.serializers import *
 logger = logging.getLogger("mylogger")
 
- # Need to confirm and fill this in correctly later...
-seasons_info = {
-    "Season_1": {
-            "start_block":1,
-            "end_block":1,
-            "start_time":1,
-            "end_time":1530921600,
-            "notaries":[]
-        },
-    "Season_2": {
-            "start_block":1,
-            "end_block":1,
-            "start_time":1530921600,
-            "end_time":1563148799,
-            "notaries":[]
-        },
-    "Season_3": {
-            "start_block":1444000,
-            "end_block":1921999,
-            "start_time":1563148800,
-            "end_time":1592146799,
-            "notaries":[]
-        },
-    "Season_4": {
-            "start_block":1922000,
-            "end_block":2444000,
-            "start_time":1592146800,
-            "end_time":1751328000,
-            "notaries":[]
-        }
-}
-
 def apply_filters(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
         filter_kwargs = {}
@@ -232,6 +200,10 @@ def get_coin_notariser_ranks(season):
         "DEV":{}
     }
     notary_list = get_notary_list(season)
+    for notary in notary_list:
+        region = get_notary_region(notary)
+        if region in ["AR","EU","NA","SH", "DEV"]:
+            region_notary_ranks[region].update({notary:{}})
     for item in ntx_season:
         notary = item['notary']
         if notary in notary_list:
@@ -240,8 +212,6 @@ def get_coin_notariser_ranks(season):
                     coin = "KMD"
                 region = get_notary_region(notary)
                 if region in ["AR","EU","NA","SH", "DEV"]:
-                    if notary not in region_notary_ranks[region]:
-                        region_notary_ranks[region].update({notary:{}})
                     region_notary_ranks[region][notary].update({
                         coin:item['chain_ntx_counts'][coin]
                     })

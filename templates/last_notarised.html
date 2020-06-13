@@ -37,7 +37,7 @@
 											<td data-data="ac_block_height">{{ chain_data.ac_block_height }}</th>
 											<td data-data="ac_ntx_blockhash">{{ chain_data.ac_ntx_blockhash }}</th>
 											<td data-data="ntx_lag">{{ chain_data.ntx_lag }}</th>
-											<td data-data="time_since_ntx">{{ chain_data.time_since_ntx }}</th>
+											<td data-data="last_ntx_time">{{ chain_data.last_ntx_time }}</th>
 											<td data-data="last_ntx_block">{{ chain_data.last_ntx_block }}</th>
 										</tr>
 										{% endfor %}
@@ -67,7 +67,7 @@
 				        { "data": "ac_block_height" },
 				        { "data": "ac_ntx_blockhash" },
 				        { "data": "ntx_lag" },	
-				        { "data": "time_since_ntx" },
+				        { "data": "last_ntx_time" },
 				        { "data": "last_ntx_block" }
 				    ],
 	        		"columnDefs": [
@@ -82,7 +82,30 @@
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            	$(nTd).html("<a href='"+explorers[oData.chain]+"/block/"+oData.ac_ntx_blockhash+"'>"+oData.ac_ntx_blockhash.slice(0, 3)+"..."+oData.ac_ntx_blockhash.slice(-3)+"</a>");
 					        }
-				        }
+				        },
+	        			{
+				            "targets": 6,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            	var time_now = Date.now()/1000;
+				            	totalSeconds = time_now-oData.last_ntx_time
+				            	days = Math.floor(totalSeconds / 86400);
+							    totalSeconds %= 86400;
+				            	hours = Math.floor(totalSeconds / 3600);
+							    totalSeconds %= 3600;
+							    minutes = Math.floor(totalSeconds / 60);
+							    seconds = totalSeconds % 60;
+							    if (oData.last_ntx_time == 0) {
+							    	timesince = "-"
+							    } else if (days == 0 & hours ==0) {
+							    	timesince = minutes+" min"
+							    } else if (days == 0) {
+							    	timesince = hours+" hrs, "+minutes+" min"
+							    } else {
+							    	timesince = days+" days, "+hours+" hrs"
+							    }
+					            $(nTd).html(timesince);
+					        }
+				        },
 	        		]
 		        });
 	    });
