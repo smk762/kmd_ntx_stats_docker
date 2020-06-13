@@ -66,7 +66,7 @@
 													{% else %}
 														<td class="kmd_secondary_red">Potential Fork!</td>
 													{% endif %}
-													<td>{{ data.last_sync_update }}</td>
+													<td>{{ data.last_sync_timestamp }}</td>
 												</tr>
 											{% endif %}
 										{% endfor %}
@@ -97,7 +97,7 @@
 			        { "data": "last_sync_blockhash" },
 			        { "data": "last_sync_dexhash" },
 			        { "data": "status" },
-			        { "data": "last_sync_time" },
+			        { "data": "last_sync_timestamp" },
 			        
 			    ],
         		"columnDefs": [
@@ -124,144 +124,32 @@
 				            }
 				        }
 			        },
+        			{
+			            "targets": 5,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	var time_now = Date.now()/1000;
+			            	totalSeconds = time_now-oData.last_sync_timestamp
+			            	days = Math.floor(totalSeconds / 86400);
+						    totalSeconds %= 86400;
+			            	hours = Math.floor(totalSeconds / 3600);
+						    totalSeconds %= 3600;
+						    minutes = Math.floor(totalSeconds / 60);
+						    seconds = totalSeconds % 60;
+						    if (oData.last_sync_timestamp == 0) {
+						    	timesince = "-"
+						    } else if (days == 0 & hours ==0) {
+						    	timesince = minutes+" min"
+						    } else if (days == 0) {
+						    	timesince = hours+" hrs, "+minutes+" min"
+						    } else {
+						    	timesince = days+" days, "+hours+" hrs"
+						    }
+				            $(nTd).html(timesince);
+				        }
+			        },
         		]
 	        });
-	        /*
-	       	var chains_data = JSON.parse(document.getElementById('low_chain-data').textContent);
-   	        drawChainsBarGraph(chains_data, 'ChainsBarGraph'); 
-
-	       	var notary_data = JSON.parse(document.getElementById('low_notary-data').textContent);
-   	        drawNotaryBarGraph(notary_data, 'NotaryBarGraph'); 
-			*/
 	    });
-
-		Chart.defaults.global.defaultFontColor = 'white';
-		Chart.defaults.global.defaultFontSize = 14;
-	/*
-	    function drawNotaryBarGraph(data, id) { 
-          {% autoescape off %}
-			var labels = {{ notary_balance_graph_data.labels }}; 
-			var chartLabel = ''; 
-			var chartdata = {{ notary_balance_graph_data.chartdata }}; 
-			var bg_color = {{ notary_balance_graph_data.bg_color }}; 
-			var border_color = {{ notary_balance_graph_data.border_color }};
-          {% endautoescape %}
-
-			var ctx = document.getElementById(id).getContext('2d'); 
-			var myChart = new Chart(ctx, { 
-				type: 'bar', 
-				data: { 
-				  labels: labels, 
-				  datasets: [{ 
-				    label: chartLabel, 
-				    data: chartdata, 
-				    backgroundColor: bg_color,
-				    borderColor: border_color, 
-				    borderWidth: 1 
-				  }] 
-				}, 
-				options: { 
-	    			responsive: true,
-					tooltips: {
-						position: 'nearest',
-						mode: 'index',
-						intersect: true,
-					},
-				    legend: {
-				    	display: false,
-				        labels: {
-				            fontColor: '#B7BBBF'
-				        }
-				    },
-					scales: { 
-						yAxes: [{
-						    scaleLabel: {
-						        display: true,
-						        labelString: 'Number of Notaries with a low balance',
-				            	fontColor: '#B7BBBF'
-						    },
-						    position: 'left',
-						    ticks: {
-							    fontColor: '#41EAD4',
-								callback: function (value, index, values) {
-									return Number(value.toString());//pass tick values as a string into Number function
-								}
-						    }
-						}],
-						xAxes: [{
-							position: 'nearest',
-							padding: 0,
-							ticks: {
-							    fontColor: '#41EAD4'
-							}
-						}]
-				  	} 
-				} 
-			}); 
-	    } 
-	    function drawChainsBarGraph(data, id) { 
-          {% autoescape off %}
-
-			var labels = {{ chain_balance_graph_data.labels }}; 
-			//var chartLabel = {{ chain_balance_graph_data.chartLabel }};
-			var chartLabel = ''; 
-			var chartdata = {{ chain_balance_graph_data.chartdata }}; 
-			var bg_color = {{ chain_balance_graph_data.bg_color }}; 
-			var border_color = {{ chain_balance_graph_data.border_color }};
-          {% endautoescape %}
-			var ctx = document.getElementById(id).getContext('2d'); 
-			var myChart = new Chart(ctx, { 
-				type: 'bar', 
-				data: { 
-				  labels: labels, 
-				  datasets: [{ 
-				    label: chartLabel, 
-				    data: chartdata, 
-				    backgroundColor: bg_color,
-				    borderColor: border_color, 
-				    borderWidth: 1 
-				  }] 
-				}, 
-				options: { 
-	    			responsive: true,
-					tooltips: {
-						position: 'nearest',
-						mode: 'index',
-						intersect: true,
-					},
-				    legend: {
-				    	display: false,
-				        labels: {
-				            fontColor: '#B7BBBF'
-				        }
-				    },
-					scales: { 
-						yAxes: [{
-						    scaleLabel: {
-						        display: true,
-						        labelString: 'Number of chains with a low balance',
-				            	fontColor: '#B7BBBF'
-						    },
-						    position: 'left',
-						    ticks: {
-							    fontColor: '#41EAD4',
-								callback: function (value, index, values) {
-									return Number(value.toString());//pass tick values as a string into Number function
-								}
-						    }
-						}],
-						xAxes: [{
-							position: 'nearest',
-							padding: 0,
-							ticks: {
-							    fontColor: '#41EAD4'
-							}
-						}]
-				  	} 
-				} 
-			}); 
-	    } 
-	*/
   </script> 
 
 {% endblock %}

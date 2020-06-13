@@ -168,19 +168,61 @@ for item in coins_repo:
                 dpow_active, mm2_compatible)
     table_lib.update_coins_tbl(conn, cursor, row_data)
 
+# This is to cover coins with explorer/electrum but not in "coins" file
+
 no_electrums = []
 no_explorers = []
 for coin in dpow:
     if coin not in coins_info:
         print("Adding "+coin+" (in dpow, but not in coins repo)")
+        if coin in translate_coins:
+            coin = translate_coins[coin]
+        coins_info.update({coin:{"coins_info":item}})
+        coins_info[coin].update({"electrums":[]})
+        coins_info[coin].update({"electrums_ssl":[]})
+        try:
+            if coin in ['COQUICASH', 'HUSH3', 'WLC21', 'OUR']:
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+item['coin'])
+            else:
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+coin)
+            electrums = r.json()
+            for electrum in electrums:
+                if "protocol" in electrum:
+                    if electrum['protocol'] == "SSL":
+                        coins_info[coin]['electrums_ssl'].append(electrum['url'])
+                    else:
+                        coins_info[coin]['electrums'].append(electrum['url'])
+                else:
+                    coins_info[coin]['electrums'].append(electrum['url'])
+        except Exception as e:
+            if r.text != "404: Not Found":
+                logger.info("GET "+coin+" ELECTRUM ERROR: "+str(e)+" [RESPONSE]: "+r.text)
+
+        try:
+            coins_info[coin].update({"explorers":[]})
+            if coin in ['COQUICASH', 'HUSH3', 'WLC21', 'OUR']:
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/"+item['coin'])
+            else:
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/"+coin)
+            explorers = r.json()
+            for explorer in explorers:
+                coins_info[coin]['explorers'].append(explorer)
+        except Exception as e:
+            if r.text != "404: Not Found":
+                logger.info("GET "+coin+" EXPLORER ERROR: "+str(e)+" [RESPONSE]: "+r.text)
+
+        if coin in dpow:
+            dpow_active = 1
+            coins_info[coin].update({
+                    "dpow":dpow[coin]
+                })
+
+
         row_data = (coin, json.dumps({}),
-                    json.dumps([]), json.dumps([]),
-                    json.dumps([]), json.dumps(dpow[coin]),
+                    json.dumps(coins_info[coin]['electrums']), json.dumps(coins_info[coin]['electrums_ssl']),
+                    json.dumps(coins_info[coin]['explorers']), json.dumps(coins_info[coin]['dpow']),
                     1, 0)
         table_lib.update_coins_tbl(conn, cursor, row_data)
-        no_electrums.append(coin)
-        no_explorers.append(coin)
-    else:
         if len(coins_info[coin]['electrums']) == 0:
             no_electrums.append(coin)
         if len(coins_info[coin]['explorers']) == 0:

@@ -99,8 +99,8 @@ def get_ac_block_info():
         r = requests.get(url) 
         ac_block_info[chain].update({"hash":r.json()['blockHash']})
       except Exception as e:
-        logger.info(chain+" failed")
-        logger.info(e)
+        logger.warning(chain+" failed in ac_block_info")
+        logger.warning(e)
     return ac_block_info
 
 
@@ -124,52 +124,44 @@ def get_dexstats_balance(chain, addr):
     balance = r.json()['balance']
     return balance
 
-def get_balance(chain, addr, notary, node):
+def get_balance(chain, pubkey, addr, notary, node):
     balance = -1
     check_bal = False
     try:
         if chain == "GIN":
             logger.warning("Getting "+chain+" {"+node+"}"+" {"+notary+"}")
-        if node == 'main':
-            if chain not in third_party_coins:
-                check_bal = True
-                pubkey = notary_pubkeys["Season_3"][notary]
-        elif chain in third_party_coins or chain == "KMD":
-            check_bal = True
-            pubkey = notary_pubkeys["Season_3_Third_Party"][notary]
-        if check_bal:
-            if chain in electrums:
-                try:
-                    url = electrums[chain]["url"]
-                    port = electrums[chain]["port"]
-                    balance = get_full_electrum_balance(pubkey, url, port)
-                except Exception as e:
-                    logger.warning(">>>>> "+chain+" via ["+url+":"+str(port)+"] FAILED | addr: "+addr+" | "+str(e))
-                    try:
-                        balance = get_dexstats_balance(chain, addr)
-                        logger.warning(">>>>> "+chain+" via [DEXSTATS] OK | addr: "+addr+" | balance: "+str(balance))
-                    except Exception as e:
-                        logger.warning(">>>>> "+chain+" via [DEXSTATS] FAILED | addr: "+addr+" | "+str(e))
-
-            elif chain in antara_coins or chain in ["HUSH3"]:
+        if chain in electrums:
+            try:
+                url = electrums[chain]["url"]
+                port = electrums[chain]["port"]
+                balance = get_full_electrum_balance(pubkey, url, port)
+            except Exception as e:
+                logger.warning(">>>>> "+chain+" via ["+url+":"+str(port)+"] FAILED | addr: "+addr+" | "+str(e))
                 try:
                     balance = get_dexstats_balance(chain, addr)
+                    logger.warning(">>>>> "+chain+" via [DEXSTATS] OK | addr: "+addr+" | balance: "+str(balance))
                 except Exception as e:
                     logger.warning(">>>>> "+chain+" via [DEXSTATS] FAILED | addr: "+addr+" | "+str(e))
 
-            elif chain == "GIN":
-                # Gin is dead.
-                # addr = addr_to_scripthash_256(addr)
-                # resp = get_from_electrum('electrum2.gincoin.io', 6001, 'blockchain.scripthash.get_balance', addr)
-                # balance = resp['result']['confirmed']
-                pass
-            elif chain == "AYA":
-                url = 'https://explorer.aryacoin.io/ext/getaddress/'+addr
-                r = requests.get(url)
-                if 'balance' in r.json():
-                    balance = r.json()['balance']
-                else:
-                    logger.warning(">>>>> "+chain+" via explorer.aryacoin.io FAILED | addr: "+addr+" | "+str(r.text))
+        elif chain in antara_coins or chain in ["HUSH3"]:
+            try:
+                balance = get_dexstats_balance(chain, addr)
+            except Exception as e:
+                logger.warning(">>>>> "+chain+" via [DEXSTATS] FAILED | addr: "+addr+" | "+str(e))
+
+        elif chain == "GIN":
+            # Gin is dead.
+            # addr = addr_to_scripthash_256(addr)
+            # resp = get_from_electrum('electrum2.gincoin.io', 6001, 'blockchain.scripthash.get_balance', addr)
+            # balance = resp['result']['confirmed']
+            pass
+        elif chain == "AYA":
+            url = 'https://explorer.aryacoin.io/ext/getaddress/'+addr
+            r = requests.get(url)
+            if 'balance' in r.json():
+                balance = r.json()['balance']
+            else:
+                logger.warning(">>>>> "+chain+" via explorer.aryacoin.io FAILED | addr: "+addr+" | "+str(r.text))
 
     except Exception as e:
         logger.warning(">>>>> "+chain+" FAILED | addr: "+addr+" | "+str(e))

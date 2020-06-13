@@ -13,58 +13,6 @@ url = "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.jso
 r = requests.get(url)
 eco_data = r.json()
 
- # Need to confirm and fill this in correctly later...
-seasons_info = {
-    "Season_1": {
-            "start_block":1,
-            "end_block":1,
-            "start_time":1,
-            "end_time":1530921600,
-            "notaries":[]
-        },
-    "Season_2": {
-            "start_block":1,
-            "end_block":1,
-            "start_time":1530921600,
-            "end_time":1563148799,
-            "notaries":[]
-        },
-    "Season_3": {
-            "start_block":1444000,
-            "end_block":1921999,
-            "start_time":1563148800,
-            "end_time":1592146799,
-            "notaries":[]
-        },
-    "Season_4": {
-            "start_block":1922000,
-            "end_block":2444000,
-            "start_time":1592146800,
-            "end_time":1751328000,
-            "notaries":[]
-        }
-}
-
-# convert timestamp to human time 
-intervals = (
-    ('wks', 604800),  # 60 * 60 * 24 * 7
-    ('days', 86400),    # 60 * 60 * 24
-    ('hrs', 3600),    # 60 * 60
-    ('mins', 60),
-    ('sec', 1),
-    )
-
-def day_hr_min_sec(seconds, granularity=2):
-    result = []
-    for name, count in intervals:
-        value = seconds // count
-        if value:
-            seconds -= value * count
-            if value == 1:
-                name = name.rstrip('s')
-            result.append("{} {}".format(value, name))
-    return ', '.join(result[:granularity])
-
 def get_low_nn_balances():
     url = "http://138.201.207.24/nn_balances_report"
     r = requests.get(url)
@@ -89,16 +37,6 @@ def get_dpow_explorers():
             chain = item['chain']
             resp.update({chain:explorers[0].replace('tx/','')})
     return resp
-
-# takes a row from queryset values, and returns a dict using a defined row value as top level key
-def items_row_to_dict(items_row, top_key):
-    key_list = list(items_row.keys())
-    nested_json = {}
-    nested_json.update({items_row[top_key]:{}})
-    for key in key_list:
-        if key != top_key:
-            nested_json[items_row[top_key]].update({key:items_row[key]})
-    return nested_json
     
 def get_season(time_stamp):
     for season in seasons_info:
@@ -134,14 +72,6 @@ def get_regions_info(notary_list):
         region = notary.split('_')[-1]
         regions_info[region]['nodes'].append(notary)
     return regions_info
-
-def region_sort(notary_list):
-    new_list = []
-    for region in ['AR','EU','NA','SH','DEV']:
-        for notary in notary_list:
-            if notary.endswith(region):
-                new_list.append(notary)
-    return new_list
 
 def get_eco_data_link():
     item = random.choice(eco_data)
@@ -397,19 +327,35 @@ def get_season_nn_chain_ntx_data(season):
             participation_pct = 0
             if chain in season_chain_ntx_data:
                 total_chain_ntx = season_chain_ntx_data[chain]['chain_ntx_season']
+            else:
+                total_chain_ntx = 0
 
             if notary in nn_season_ntx_counts:
                 num_nn_chain_ntx = nn_season_ntx_counts[notary]
+            else:
+                num_nn_chain_ntx = 0
 
             if notary in last_nn_chain_ntx:
                 if chain in last_nn_chain_ntx[notary]:
                     time_since = last_nn_chain_ntx[notary][chain]["time_since"]
                     last_ntx_block = last_nn_chain_ntx[notary][chain]['block_height']
                     last_ntx_txid = last_nn_chain_ntx[notary][chain]['txid']
+                else:
+                    time_since = ''
+                    last_ntx_block = ''
+                    last_ntx_txid = ''
+            else:
+                time_since = ''
+                last_ntx_block = ''
+                last_ntx_txid = ''
 
             if total_chain_ntx != 0 and not isinstance(num_nn_chain_ntx, int):
                 if chain in num_nn_chain_ntx:
                     participation_pct = round(num_nn_chain_ntx[chain]/total_chain_ntx*100,2)
+                else:
+                    participation_pct = 0
+            else:
+                participation_pct = 0
 
             if notary not in season_nn_chain_ntx_data:
                 season_nn_chain_ntx_data.update({notary:{}})
@@ -613,6 +559,17 @@ def get_nn_health():
         return nn_health
     else:
         return {}
+
+def get_nn_info():
+    # widget using this has been deprecated, but leaving code here for reference
+    # to use in potential replacement functions.
+    season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
+    regions_info = get_regions_info(notary_list)
+    nn_info = {
+        "regions_info":regions_info,
+    }
+    return nn_info
 
 def get_coin_ntx_summary(coin):
     now = int(time.time())

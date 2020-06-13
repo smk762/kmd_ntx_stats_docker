@@ -28,32 +28,35 @@ It should be run as a cronjob every hour or so (takes about an 10 min to run).
 '''
 
 class electrum_thread(threading.Thread):
-    def __init__(self, conn, cursor, notary, chain, addr, season):
+    def __init__(self, conn, cursor, notary, chain, pubkey, addr, season):
         threading.Thread.__init__(self)
         self.conn = conn
         self.cursor = cursor
         self.notary = notary
         self.chain = chain
+        self.pubkey = pubkey
         self.addr = addr
         self.season = season
     def run(self):
         thread_electrum(self.conn, self.cursor, self.notary,
-                        self.chain, self.addr, self.season)
+                        self.chain, self.pubkey, self.addr, self.season)
 
-def thread_electrum(conn, cursor, notary, chain, addr, season):
+def thread_electrum(conn, cursor, notary, chain, pubkey, addr, season):
     if season.lower().find("third") != -1:
         node = 'third party'
     else:
         node = 'main'
     if season.find("Season_3") != -1:
         season = "Season_3"
-        balance = electrum_lib.get_balance(chain, addr, notary, node)
-        if balance != -1:
-            row_data = (notary, chain, balance, addr,
-                        season, node, int(time.time()))
-            table_lib.update_balances_tbl(conn, cursor, row_data)
-            logger.info("["+chain+"] ["+season+"] ["+node+"] [" \
-                    +str(balance)+"] ["+notary+"] ["+addr+"]")
+    if season.find("Season_4") != -1:
+        season = "Season_4"
+    balance = electrum_lib.get_balance(chain, pubkey, addr, notary, node)
+    if balance != -1:
+        row_data = (notary, chain, balance, addr,
+                    season, node, int(time.time()))
+        table_lib.update_balances_tbl(conn, cursor, row_data)
+        logger.info("["+chain+"] ["+season+"] ["+node+"] [" \
+                +str(balance)+"] ["+notary+"] ["+addr+"]")
 
 conn = table_lib.connect_db()
 cursor = conn.cursor()
@@ -130,16 +133,23 @@ def get_kmd_rewards():
 
         table_lib.update_rewards_tbl(conn, cursor, row_data)
 
-
+this_season = get_season(int(time.time()))
 thread_list = {}
 print(notary_addresses.keys())
 for season in notary_addresses:
-    if season.find("Season_3") != -1:
+    if season.find(this_season) != -1:
         for notary in notary_addresses[season]:
             thread_list.update({notary:[]})
             for chain in notary_addresses[season][notary]:
                 addr = notary_addresses[season][notary][chain]
-                thread_list[notary].append(electrum_thread(conn, cursor, notary, chain, addr, season))
+                pubkey = notary_pubkeys[season][notary]
+                if season.find("third_party") == -1:
+                    if chain not in third_party_coins:
+                        check_bal = True
+                elif chain in third_party_coins or chain == "KMD":
+                    check_bal = True
+                if check_bal:
+                    thread_list[notary].append(electrum_thread(conn, cursor, notary, chain, pubkey, addr, season))
             for thread in thread_list[notary]:
                 thread.start()
             time.sleep(4) # 4 sec sleep = 15 min runtime.

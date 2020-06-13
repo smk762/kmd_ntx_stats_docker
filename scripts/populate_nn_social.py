@@ -21,13 +21,17 @@ cursor = conn.cursor()
 
 season = "Season_4"
 for notary in notary_lib.notary_pubkeys['Season_4']:
-    row_list = [notary]
     notary_name = notary.split("_")[0]
-    for region in nn_social[notary_name]:
-        row_list = [notary+"_"+region]
+    print(notary_name)
+    print(nn_social[notary_name])
+    for region in nn_social[notary_name]['regions']:
+        row_list = [notary_name+"_"+region]
         for social in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase', 'website', 'icon']:
             if social in nn_social[notary_name]:
-                row_list.append(nn_social[notary_name][social])
+                if social == 'icon' and notary_name == 'swisscertifiers':
+                    row_list.append('')
+                else:
+                    row_list.append(nn_social[notary_name][social])
             else:
                 row_list.append("")
         row_list.append(season)

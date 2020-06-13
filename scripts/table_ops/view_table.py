@@ -7,8 +7,10 @@ cursor = conn.cursor()
 #table = 'balances'
 #table = 'coin_social'
 #table = 'funding_transactions'
-table = 'last_notarised'
+#table = 'last_notarised'
 #table = 'notarised_chain_season'
+table = 'nn_social'
+
 
 cursor.execute("SELECT * FROM "+table+";")
 print(cursor.fetchall())

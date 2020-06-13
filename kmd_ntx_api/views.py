@@ -570,12 +570,18 @@ def notary_profile_view(request, notary_name=None):
     # Bio
     # Seasons served
     # Other project involvement
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+
+    context = {
+        "sidebar_links":get_sidebar_links(notaries_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "nn_health":get_nn_health()
+    }
     if notary_name:
-        season = get_season(int(time.time()))
         notary_addresses = addresses.objects.filter(notary=notary_name, season=season) \
                            .order_by('chain').values('chain','address')
-        coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-        notary_list = get_notary_list(season)
         coin_notariser_ranks = get_coin_notariser_ranks(season)
         region = get_notary_region(notary_name)
         notary_ntx_counts = coin_notariser_ranks[region][notary_name]
@@ -598,12 +604,9 @@ def notary_profile_view(request, notary_name=None):
         else:
             rank = str(rank)+"th"
 
-        context = {
-            "sidebar_links":get_sidebar_links(notary_list ,coins_data),
-            "eco_data_link":get_eco_data_link(),
+        context.update({
             "explorers":get_dpow_explorers(),
             "nn_social":get_nn_social(notary_name),
-            "nn_health":get_nn_health(),
             "ntx_summary":get_nn_ntx_summary(notary_name),
             "season_nn_chain_ntx_data":season_nn_chain_ntx_data,
             "rank":rank,
@@ -611,10 +614,14 @@ def notary_profile_view(request, notary_name=None):
             "notary_ntx_counts":notary_ntx_counts,
             "mining_summary":get_nn_mining_summary(notary_name),
             "notary_addresses":notary_addresses
-        }
+        })
         return render(request, 'notary_profile.html', context)
     else:
-        redirect('dash_view')
+        context.update({
+            "nn_social":get_nn_social(),
+            "nn_info":get_nn_info()
+        })
+        return render(request, 'notary_profile_index.html', context)
 
 def coin_profile_view(request, chain=None):
     # contains summary for a specific dPoW coin.
@@ -623,8 +630,14 @@ def coin_profile_view(request, chain=None):
     # addresses for each node / chain
     # Social info
     # Bio
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+
+    context = {
+        "sidebar_links":get_sidebar_links(notaries_list, coins_data)
+    }
     if chain:
-        season = get_season(int(time.time()))
         balance_data = balances.objects.filter(chain=chain, season=season) \
                                        .order_by('notary') \
                                        .values('notary','address', 'balance')
@@ -636,22 +649,18 @@ def coin_profile_view(request, chain=None):
             10**(int(round(np.log10(max_tick))))
         else:
             max_tick = 10
-        notaries_list = get_notary_list(season)
-        coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-
         coin_notariser_ranks = get_coin_notariser_ranks(season)
         top_region_notarisers = get_top_region_notarisers(coin_notariser_ranks)
         top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
         season_chain_ntx_data = get_season_chain_ntx_data(season)
 
-        context = {
-            "sidebar_links":get_sidebar_links(notaries_list, coins_data),
+        context.update({
+            "chain":chain,
             "explorers":get_dpow_explorers(),
             "eco_data_link":get_eco_data_link(),
-            "coin_social": get_coin_social(chain),
-            "max_tick": max_tick
-        }
-        context.update({"chain":chain})
+            "max_tick": max_tick,
+            "coin_social": get_coin_social(chain)
+        })
         if chain == "BTC":
             top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, "KMD")
             context.update({
@@ -668,7 +677,11 @@ def coin_profile_view(request, chain=None):
 
         return render(request, 'coin_profile.html', context)
     else:
-        redirect('dash_view')
+        context.update({
+            "coin_social": get_coin_social(),
+            "nn_health":get_nn_health()
+        })
+        return render(request, 'coin_profile_index.html', context)
 
 def funding(request):
     # add extraa views for per chain or per notary
@@ -761,9 +774,25 @@ def funding(request):
 
 def coin_funding(request):
     pass
-
 def notary_funding(request):
     pass
+
+def mining_24hrs(request):
+    season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    mined_24hrs = mined.objects.filter(
+        block_time__gt=str(int(time.time()-24*60*60))
+        ).values()
+
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "mined_24hrs":mined_24hrs,
+        "explorers":get_dpow_explorers(),
+        "season":season.replace("_"," ")
+    }
+    return render(request, 'mining_24hrs.html', context)
 
 def mining_overview(request):
     season = get_season(int(time.time()))
@@ -1192,6 +1221,7 @@ class daily_ntx_graph(viewsets.ViewSet):
             "border_color":border_color, 
         } 
         return Response(data) 
+
 
 # sync lag graph
 # daily ntx category stack graph
