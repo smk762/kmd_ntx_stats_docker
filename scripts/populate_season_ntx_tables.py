@@ -96,7 +96,7 @@ def update_season_notarised_counts(season):
         row_data = (notary, btc_count, antara_count, \
                     third_party_count, other_count, \
                     total_ntx_count, json.dumps(chain_ntx_counts), \
-                    json.dumps(notary_season_pct[chain]), time_stamp, season)
+                    json.dumps(notary_season_pct), time_stamp, season)
         table_lib.update_season_notarised_count_tbl(conn, cursor, row_data)
 
     results = table_lib.get_chain_ntx_season_aggregates(cursor, season)

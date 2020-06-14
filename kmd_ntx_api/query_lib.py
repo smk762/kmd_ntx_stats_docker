@@ -102,8 +102,9 @@ def get_addresses_data(request):
     data = addresses.objects.all()
     full_count = data.count()
     data = apply_filters(request, AddressesSerializer, data)
+    season = get_season(int(time.time()))
     if data.count() == full_count:
-        data = addresses.objects.filter(season='Season_3')
+        data = addresses.objects.filter(season=season)
     data = data.order_by('notary','season', 'chain').values()
     for item in data:
         if item["notary"] not in resp: 
@@ -127,8 +128,9 @@ def get_balances_data(request):
     resp = {}
     data = balances.objects.all()
     data = apply_filters(request, BalancesSerializer, data)
+    season = get_season(int(time.time()))
     if len(data) == len(balances.objects.all()):
-        data = balances.objects.filter(season='Season_3') 
+        data = balances.objects.filter(season=season) 
     data = data.order_by('-season','notary', 'chain', 'balance').values()
     for item in data:
         
@@ -155,8 +157,8 @@ def get_mined_count_season_data(request):
     data = mined_count_season.objects.all()
     data = apply_filters(request, MinedCountSeasonSerializer, data)
     if len(data) == len(mined_count_season.objects.all()):
-        yesterday = int(time.time()-60*60*24)
-        data = mined_count_season.objects.filter(season='Season_3')
+        season = get_season(int(time.time()))
+        data = mined_count_season.objects.filter(season=season)
     data = data.order_by('season', 'notary').values()
 
     for item in data:
@@ -434,7 +436,8 @@ def get_notarised_count_season_data(request):
     data = apply_filters(request, NotarisedCountSeasonSerializer, data)
     # default filter if none set.
     if len(data) == notarised_count_season.objects.count() or len(data) == 0:
-        data = notarised_count_season.objects.filter(season='Season_3')
+        season = get_season(int(time.time()))
+        data = notarised_count_season.objects.filter(season=season)
 
     data = data.order_by('season', 'notary').values()
 
@@ -647,14 +650,17 @@ def get_notarised_data(request):
 def get_rewards_data(request):
     address_data = addresses.objects.filter(chain='KMD')
     if 'season' in request.GET:
-        address_data = address_data.filter(season__contains=request.GET['season'])
+        season = request.GET['season']
+    else:
+        season = get_season(int(time.time()))
+    address_data = address_data.filter(season__contains=season)
     address_data = address_data.order_by('season','notary')
     address_data = address_data.values('address', 'season')
 
     address_season = {}
     for item in address_data:
         if item['address'] not in address_season:
-            address_season.update({item['address']:'Season_3'})
+            address_season.update({item['address']:season})
 
 
     resp = {}

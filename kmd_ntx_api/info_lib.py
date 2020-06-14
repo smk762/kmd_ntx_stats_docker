@@ -38,11 +38,6 @@ def get_dpow_explorers():
             resp.update({chain:explorers[0].replace('tx/','')})
     return resp
     
-def get_season(time_stamp):
-    for season in seasons_info:
-        if time_stamp >= seasons_info[season]['start_time'] and time_stamp <= seasons_info[season]['end_time']:
-            return season
-    return "season_undefined"
 
 def get_regions_info(notary_list):
     notary_list.sort()

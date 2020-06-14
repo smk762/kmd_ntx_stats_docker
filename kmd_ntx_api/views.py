@@ -38,7 +38,6 @@ MESSAGE_TAGS = {
 
 logger = logging.getLogger("mylogger")
 
-noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
 
 ## Custom Filter Sets
 class minedFilter(FilterSet):
@@ -770,12 +769,8 @@ def funding(request):
         "eco_data_link":get_eco_data_link(),
         "nn_health":get_nn_health()
     }
-    return render(request, 'notary_funding.html', context)
+    return render(request, 'funding.html', context)
 
-def coin_funding(request):
-    pass
-def notary_funding(request):
-    pass
 
 def mining_24hrs(request):
     season = get_season(int(time.time()))
