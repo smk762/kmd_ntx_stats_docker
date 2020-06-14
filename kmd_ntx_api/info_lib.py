@@ -158,7 +158,16 @@ def get_nn_ntx_summary(notary):
         "premining_ntx_score":0,
     }
 
+    # 24hr ntx 
+    ntx_24hr = notarised.objects.filter(
+        block_time__gt=str(int(time.time()-24*60*60))
+        ).values()
+
+    notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary)
+    ntx_summary.update({"today":notary_ntx_24hr_summary})
+
     # today's ntx stats
+    '''
     ntx_today = notarised_count_daily.objects.filter(notarised_date=str(today), 
                                              season=season, notary=notary) \
                                             .values()
@@ -172,6 +181,7 @@ def get_nn_ntx_summary(notary):
             "main_ntx":ntx_today[0]['antara_count'],
             "third_party_ntx":ntx_today[0]['third_party_count']
         })
+    '''
 
     # season ntx stats
     ntx_season = notarised_count_season.objects \

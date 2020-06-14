@@ -974,6 +974,7 @@ def dash_view(request, dash_name=None):
         ntx_24hr = notarised.objects.filter(
             block_time__gt=str(int(time.time()-24*60*60))
             ).count()
+        
         mined_24hr = mined.objects.filter(
             block_time__gt=str(int(time.time()-24*60*60))
             ).values('season').annotate(sum_mined=Sum('value'))[0]['sum_mined']

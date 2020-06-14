@@ -188,6 +188,52 @@ def get_mined_count_season_data(request):
 
     return wrap_api(resp)
 
+def get_notary_ntx_24hr_summary(ntx_24hr, notary):
+    notary_ntx_24hr = {
+            "btc_ntx":0,
+            "main_ntx":0,
+            "third_party_ntx":0,
+            "most_ntx":"N/A"
+        }
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    main_chains = get_mainnet_chains(coins_data)
+    third_party_chains = get_third_party_chains(coins_data)
+
+    notary_chain_ntx_counts = {}
+    for item in ntx_24hr:
+        notaries = item['notaries']
+        chain = item['chain']
+        if notary in notaries:
+            if chain not in notary_chain_ntx_counts:
+                notary_chain_ntx_counts.update({chain:1})
+            else:
+                val = notary_chain_ntx_counts[chain]+1
+                notary_chain_ntx_counts.update({chain:val})
+
+    max_ntx_count = 0
+    btc_ntx_count = 0
+    main_ntx_count = 0
+    third_party_ntx_count = 0
+    for chain in notary_chain_ntx_counts:
+        chain_ntx_count = notary_chain_ntx_counts[chain]
+        if chain_ntx_count > max_ntx_count:
+            max_chain = chain
+            max_ntx_count = chain_ntx_count
+        if chain == "KMD":
+            btc_ntx_count += chain_ntx_count
+        elif chain in main_chains:
+            main_ntx_count += chain_ntx_count
+        elif chain in third_party_chains:
+            third_party_ntx_count += chain_ntx_count
+    if max_ntx_count > 0:
+        notary_ntx_24hr.update({
+                "btc_ntx":btc_ntx_count,
+                "main_ntx":main_ntx_count,
+                "third_party_ntx":third_party_ntx_count,
+                "most_ntx":str(max_ntx_count)+" ("+str(max_chain)+")"
+            })
+    return notary_ntx_24hr
+
 # returns region > notary > chain > season ntx count
 def get_coin_notariser_ranks(season):
     # season ntx stats
