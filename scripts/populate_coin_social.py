@@ -37,19 +37,7 @@ for chain in coin_social:
     row_data = tuple(row_list)
 
     table_lib.update_coin_social_tbl(conn, cursor, row_data)
-    
-season = "Season_3"
-for chain in coin_social:
-    row_list = [chain]
-    for social in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'explorer', 'website', 'icon']:
-        if social in coin_social[chain]:
-            row_list.append(coin_social[chain][social])
-        else:
-            row_list.append("")
-    row_list.append(season)
-    row_data = tuple(row_list)
-
-    table_lib.update_coin_social_tbl(conn, cursor, row_data)
+   
 
 cursor.close()
 

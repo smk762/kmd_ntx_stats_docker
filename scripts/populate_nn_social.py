@@ -39,22 +39,6 @@ for notary in notary_lib.notary_pubkeys['Season_4']:
 
         table_lib.update_nn_social_tbl(conn, cursor, row_data)
     
-season = "Season_3"
-for notary in notary_lib.notary_pubkeys['Season_3.5']:
-    row_list = [notary]
-    notary_name = notary.split("_")[0]
-    for social in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase', 'website', 'icon']:
-        if notary_name in nn_social: 
-            if social in nn_social[notary_name]:
-                row_list.append(nn_social[notary_name][social])
-            else:
-                row_list.append("")
-        else:
-            row_list = [notary, '', '', '', '', '', '', '', '']
-    row_list.append(season)
-    row_data = tuple(row_list)
-
-    table_lib.update_nn_social_tbl(conn, cursor, row_data)
 
 cursor.close()
 

@@ -4,6 +4,8 @@ import binascii
 from .models import *
 logger = logging.getLogger("mylogger")
 
+noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
+
  # Need to confirm and fill this in correctly later...
 seasons_info = {
     "Season_1": {
@@ -36,6 +38,12 @@ seasons_info = {
         }
 }
 
+def get_season(time_stamp):
+    for season in seasons_info:
+        if time_stamp >= seasons_info[season]['start_time'] and time_stamp <= seasons_info[season]['end_time']:
+            return season
+    return "season_undefined"
+    
 # convert timestamp to human time 
 intervals = (
     ('wks', 604800),  # 60 * 60 * 24 * 7

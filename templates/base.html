@@ -38,9 +38,9 @@
 
     </head>
     <body class="c-app">
-        {% include "sidebar.html" %}
+        {% include "base_sidebar.html" %}
         <div class="c-wrapper">
-            {% include "header.html" %}
+            {% include "base_header.html" %}
             <div class="c-body kmd_ui_dark2_bg">
               <main class="c-main">
                 {% if messages %}
@@ -58,7 +58,7 @@
                 {% endblock %}
               </main>
             </div>
-            {% include "footer.html" %}        
+            {% include "base_footer.html" %}        
         </div> 
 
         <!-- jquery -->

@@ -9,52 +9,7 @@
         </a>
       </div>
       <ul class="c-sidebar-nav kmd_ui_dark1_bg">
-
-        <li class="c-sidebar-nav-dropdown">
-          <a class="c-sidebar-nav-dropdown-toggle" href="#">
-            <i class="cil-chart-line"></i>
-            <span style="padding-left: 12px;">GRAPHS</span>
-          </a>
-          <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
-            <li class="c-sidebar-nav-title">Wallet</li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/balances_graph/?chain=BTC"> Notary Chain Balances</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/balances_graph/?notary=alien_AR"> Notary Node Balances</a></li>
-
-            <li class="c-sidebar-nav-title">Mining</li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_mining_graph/?chain=BTC"> Daily Mining</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/season_mining_graph/?notary=alien_AR"> Season Mining</a></li>
-
-            <li class="c-sidebar-nav-title">Notarisations</li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?chain=BTC"> Daily Chain Notarisations</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?notary=alien_AR"> Daily Node Notarisations</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?chain=BTC"> Season Chain Notarisations</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/daily_ntx_graph/?notary=alien_AR"> Season Node Notarisations</a></li>
-          </ul>
-        </li>
-        
-        <li class="c-sidebar-nav-dropdown">
-          <a class="c-sidebar-nav-dropdown-toggle" href="#">
-            <i class="cil-spreadsheet"></i> 
-            <span style="padding-left: 12px;">TABLES</span>
-          </a>
-          <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
-            <li class="c-sidebar-nav-title">Wallet</li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/balances_table/"> Balances</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/addresses_table/"> Addresses</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/rewards_table/"> Rewards</a></li>
-            <li class="c-sidebar-nav-title">Mining</li>
-           <!-- <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/mining_table/"> Mining</a></li> -->
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/mining_season_table/"> Season Mining</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/mining_daily_table/"> Daily Mining</a></li>
-            <li class="c-sidebar-nav-title">Notarisations</li>
-            <!-- <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/ntx_table/"> Notarisations</a></li> -->
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/ntx_chain_season_table/"> Season Chain Notarisations</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/ntx_chain_daily_table/"> Daily Chain Notarisations</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/ntx_node_season_table/"> Season Notary Notarisations</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/dash/ntx_node_daily_table/"> Daily Notary Notarisations</a></li>
-          </ul>
-        </li>
-        
+       
         <li class="c-sidebar-nav-dropdown">
           <a class="c-sidebar-nav-dropdown-toggle" href="#">
               <i class="cil-transfer"></i>  <span style="padding-left: 12px;">API</span>
@@ -166,6 +121,10 @@
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
                     <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/mining_overview"> Mining Overview
+                    </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/mining_24hrs"> Mining last 24hrs
                     </a>
                 </li>
             </ul>
