@@ -37,7 +37,6 @@ def get_dpow_explorers():
             chain = item['chain']
             resp.update({chain:explorers[0].replace('tx/','')})
     return resp
-    
 
 def get_regions_info(notary_list):
     notary_list.sort()
@@ -67,6 +66,28 @@ def get_regions_info(notary_list):
         region = notary.split('_')[-1]
         regions_info[region]['nodes'].append(notary)
     return regions_info
+
+def get_server_info(coins_list):
+    coins_list.sort()
+    coins_info = {
+        'main':{ 
+            "name":"Main server",
+            "coins":[]
+            },
+        'third':{ 
+            "name":"Third Party Server",
+            "coins":[]
+            }
+    }
+    coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
+    server_chains = get_server_chains(coins_data)
+    for coin in coins_list:
+        if coin in server_chains['main']:
+            server = "main"
+        elif coin in server_chains['third_party']:
+            server = "third"
+        coins_info[server]['coins'].append(coin)
+    return coins_info
 
 def get_eco_data_link():
     item = random.choice(eco_data)
@@ -575,6 +596,17 @@ def get_nn_info():
         "regions_info":regions_info,
     }
     return nn_info
+
+def get_coin_info():
+    # widget using this has been deprecated, but leaving code here for reference
+    # to use in potential replacement functions.
+    season = get_season(int(time.time()))
+    coins_list = get_dpow_coins_list()
+    server_info = get_server_info(coins_list)
+    coins_info = {
+        "server_info":server_info,
+    }
+    return coins_info
 
 def get_coin_ntx_summary(coin):
     now = int(time.time())
