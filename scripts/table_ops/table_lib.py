@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import time
 from datetime import datetime
 from dotenv import load_dotenv
@@ -16,8 +17,8 @@ load_dotenv()
 def connect_db():
     conn = psycopg2.connect(
         host='localhost',
-        user='postgres',
-        password='postgres',
+        user=os.getenv("USER"),
+        password=os.getenv("PASSWORD"),
         port = "7654",
         database='postgres'
     )

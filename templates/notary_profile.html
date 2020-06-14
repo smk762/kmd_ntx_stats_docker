@@ -11,48 +11,48 @@
 								<p class="card-text">
 									<ul class="list-group">
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Notarised Today
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ ntx_summary.today.btc_ntx }}<br /> BTC
 										    </span>
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ ntx_summary.today.main_ntx }}<br /> Main
 										    </span>
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ ntx_summary.today.third_party_ntx }}<br /> 3rd Party
 										    </span>
-										</button>
+										</div>
 									  </li>
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 									    	Notarised Season
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ ntx_summary.season.btc_ntx }}<br /> BTC
 										    </span>
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ ntx_summary.season.main_ntx }}<br /> Main
 										    </span>
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ ntx_summary.season.third_party_ntx }}<br /> 3rd Party
 										    </span>
-										</button>									    
+										</div>									    
 									  </li>
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Last Notarisation
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ ntx_summary.time_since_last_ntx }}<br />{{ ntx_summary.last_ntx_chain }}
 										    </span>
-										</button>
+										</div>
 									  </li>
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 									    	Last BTC Notarisation
-										  	<span class="badge kmd_ui_dark4_bg">
+										  	<span class="badge kmd_ui_dark1_bg p-1">
 										  		{{ ntx_summary.time_since_last_kmd_ntx }}
 										  	</span>
-										</button>
+										</div>
 									  </li>
 									</ul> 							
 								</p>
@@ -105,18 +105,18 @@
 								<p class="card-text ">
 									<ul class="list-group">
 										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-											<button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
-										    Notarisation Score
-										    	<span class="badge kmd_ui_dark4_bg">
+									    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
+										    	Notarisation Score
+										    	<span class="badge kmd_ui_dark1_bg p-1">
 										    		{{ ntx_summary.premining_ntx_score|add:mining_summary.season_blocks_mined }}
 										    	</span>
-											</button>
+											</div>
 										</li>
 										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-											<button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 											    Region Rank
-											    <span class="badge kmd_ui_dark4_bg">{{ rank }}</span>
-											</button>
+											    <span class="badge kmd_ui_dark1_bg p-1">{{ rank }}</span>
+											</div>
 										</li>
 									</ul>
 								</p>
@@ -127,39 +127,39 @@
 								<p class="card-text">
 									<ul class="list-group">
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Mined
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ mining_summary.mined_last_24hrs|floatformat:-3 }} KMD<br />Today
 											</span>
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ mining_summary.season_value_mined|floatformat:-3 }} KMD<br />Season
 											</span>
-										</button>
+										</div>
 									  </li>
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Blocks Mined this Season
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ mining_summary.season_blocks_mined }}
 											</span>
-										</button>
+										</div>
 									  </li>
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Largest Block Mined
-										    <span class="badge kmd_ui_dark4_bg">
+										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ mining_summary.season_largest_block|floatformat:-3 }} KMD
 											</span>
-										</button>
+										</div>
 									  </li>
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-										    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+									    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 											    Last Mined block
-											    <span class="badge kmd_ui_dark4_bg">
+											    <span class="badge kmd_ui_dark1_bg p-1">
 											    	{{ mining_summary.time_since_mined }}
 												</span>
-											</button>
+											</div>
 									  	</li>
 									</ul> 
 								</p>
