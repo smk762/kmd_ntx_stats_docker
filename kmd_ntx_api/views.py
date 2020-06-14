@@ -676,9 +676,9 @@ def coin_profile_view(request, chain=None):
 
         return render(request, 'coin_profile.html', context)
     else:
-        context.update({
+        context.update({ 
             "coin_social": get_coin_social(),
-            "nn_health":get_nn_health()
+            "coin_info":get_coin_info()
         })
         return render(request, 'coin_profile_index.html', context)
 
@@ -788,6 +788,23 @@ def mining_24hrs(request):
         "season":season.replace("_"," ")
     }
     return render(request, 'mining_24hrs.html', context)
+
+def ntx_24hrs(request):
+    season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    ntx_24hrs = notarised.objects.filter(
+        block_time__gt=str(int(time.time()-24*60*60))
+        ).values()
+
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "ntx_24hrs":ntx_24hrs,
+        "explorers":get_dpow_explorers(),
+        "season":season.replace("_"," ")
+    }
+    return render(request, 'ntx_24hrs.html', context)
 
 def mining_overview(request):
     season = get_season(int(time.time()))
@@ -974,7 +991,7 @@ def dash_view(request, dash_name=None):
         ntx_24hr = notarised.objects.filter(
             block_time__gt=str(int(time.time()-24*60*60))
             ).count()
-        
+
         mined_24hr = mined.objects.filter(
             block_time__gt=str(int(time.time()-24*60*60))
             ).values('season').annotate(sum_mined=Sum('value'))[0]['sum_mined']
