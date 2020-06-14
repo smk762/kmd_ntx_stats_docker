@@ -594,12 +594,13 @@ def get_coin_ntx_summary(coin):
     
     # today's ntx stats
     today = datetime.date.today()
-    ntx_today = notarised_chain_daily.objects.filter(notarised_date=str(today), 
-                                                     chain=coin).values()
-    if len(ntx_today) > 0:
-        chain_ntx_summary.update({
-            'chain_ntx_today':ntx_today[0]['ntx_count']
-        })
+    # 24hr ntx 
+    chain_ntx_24hr = notarised.objects.filter(
+        block_time__gt=str(now-24*60*60), chain=coin).count()
+
+    chain_ntx_summary.update({
+        'chain_ntx_today':chain_ntx_24hr
+    })
 
     # season ntx stats
     ntx_season = notarised_chain_season.objects \
