@@ -19,4 +19,4 @@
 - setup .env files (script pending...)
 
 
-more to come... (need details on overcoming pgsql connection issues)
+more to come... (need details on overcoming pgsql connection issues - important to setup .env!)
