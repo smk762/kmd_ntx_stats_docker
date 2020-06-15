@@ -5,9 +5,9 @@ conn = table_lib.connect_db()
 cursor = conn.cursor()
 
 #table = 'balances'
-#table = 'notarised'
+table = 'notarised'
 #table = 'mined'
-table = 'mined_count_season'
+#table = 'mined_count_season'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())

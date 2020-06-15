@@ -99,12 +99,6 @@ def get_eco_data_link():
           +ad['data']['anchorText']+"</a> "+ad['data']['string2']
     return link
 
-def get_premining_ntx_score(btc_ntx, main_ntx, third_party_ntx):
-    return btc_ntx*0.5 + main_ntx*0.25 + third_party_ntx*0.25
-
-def get_ntx_score(btc_ntx, main_ntx, third_party_ntx, mining):
-    return btc_ntx*0.5 + main_ntx*0.25 + third_party_ntx*0.25 + mining * 1
- 
 def get_coin_social(coin=None):
     season = get_season(int(time.time()))
     coin_social_info = {}
@@ -222,7 +216,7 @@ def get_nn_ntx_summary(notary):
             "most_ntx":season_max_chain+" ("+str(season_max_ntx)+")"
         })
         ntx_summary.update({
-            "premining_ntx_score":get_premining_ntx_score(
+            "premining_ntx_score":get_ntx_score(
                 ntx_season[0]['btc_count'],
                 ntx_season[0]['antara_count'],
                 ntx_season[0]['third_party_count']

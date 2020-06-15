@@ -159,6 +159,12 @@ def get_third_party_chains(coins_data):
             third_chains.append(item['chain'])
     return third_chains
 
+def get_ntx_score(btc_ntx, main_ntx, third_party_ntx):
+    coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
+    third_party = get_third_party_chains(coins_data)
+    main = get_mainnet_chains(coins_data)  
+    return btc_ntx*0.0325 + main_ntx*0.8698/len(main) + third_party_ntx*0.0977/len(third_party)
+ 
 def prepare_notary_balance_graph_data(chain_low_balance_notary_counts):
     bg_color = []
     border_color = []

@@ -42,10 +42,6 @@ def get_ntx_data(txid):
     block_time = raw_tx['blocktime']
     block_datetime = dt.utcfromtimestamp(raw_tx['blocktime'])
     this_block_height = raw_tx['height']
-    for season_num in seasons_info:
-        if block_time < seasons_info[season_num]['end_time']:
-            season = season_num
-            break
     if len(dest_addrs) > 0:
         if ntx_addr in dest_addrs:
             if len(raw_tx['vin']) == 13:
@@ -88,6 +84,14 @@ def get_ntx_data(txid):
                         chain = chain.replace('\x00','')
                     # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
                     if chain.upper() == chain:
+                        if chain not in ['KMD', 'BTC']:
+                            for season_num in seasons_info:
+                                if block_time < seasons_info[season_num]['end_time'] and block_time >= seasons_info[season_num]['start_time']:
+                                    season = season_num
+                        else:
+                            for season_num in seasons_info:
+                                if this_block_height < seasons_info[season_num]['end_block'] and this_block_height >= seasons_info[season_num]['start_block']:
+                                    season = season_num
                         row_data = (chain, this_block_height, block_time, block_datetime,
                                     block_hash, notary_list, ac_ntx_blockhash, ac_ntx_height,
                                     txid, opret, season)
@@ -95,18 +99,18 @@ def get_ntx_data(txid):
                 else:
                     # no opretrun in tx, and shouldnt polute the DB.
                     row_data = ("not_opret", this_block_height, block_time, block_datetime,
-                                block_hash, notary_list, "unknown", 0, txid, "unknown", season)
+                                block_hash, notary_list, "unknown", 0, txid, "unknown", "N/A")
                     return None
                 
             else:
                 # These are related to easy mining, and shouldnt polute the DB.
                 row_data = ("low_vin", this_block_height, block_time, block_datetime,
-                            block_hash, [], "unknown", 0, txid, "unknown", season)
+                            block_hash, [], "unknown", 0, txid, "unknown", "N/A")
                 return None
         else:
             # These are outgoing, and should not polute the DB.
             row_data = ("not_dest", this_block_height, block_time, block_datetime,
-                        block_hash, [], "unknown", 0, txid, "unknown", season)
+                        block_hash, [], "unknown", 0, txid, "unknown", "N/A")
             return None
 
 def get_ntx_data_v2(txid):
