@@ -65,8 +65,6 @@ def get_notary_list(season):
 def get_notary_region(notary):
     return notary.split("_")[-1]
 
-def get_ntx_score(btc_ntx, main_ntx, third_party_ntx, mining):
-    return btc_ntx*0.5 + main_ntx*0.25 + third_party_ntx*0.25 + mining * 1
  
 def get_dpow_coins_list():
     dpow_chains = coins.objects.filter(dpow_active=1).values('chain')
@@ -268,6 +266,7 @@ def get_coin_notariser_ranks(season):
 
 def get_notarisation_scores(season, coin_notariser_ranks):
     notarisation_scores = {}
+    print(coin_notariser_ranks)
     for region in coin_notariser_ranks:
         notarisation_scores.update({region:{}})
         for notary in coin_notariser_ranks[region]:
@@ -312,27 +311,16 @@ def get_notarisation_scores(season, coin_notariser_ranks):
                         "third_party":val
                     })
 
-    mined_season = mined.objects.filter(block_time__gte=seasons_info[season]['start_time'],
-                                            block_time__lte=str(int(time.time()))).values('name') \
-                                           .annotate(season_blocks_mined=Count('value'))
-    for item in mined_season:
-        notary = item["name"]
-        region = get_notary_region(notary)
-        if region in ["AR","EU","NA","SH", "DEV"]:
-            blocks_mined = item["season_blocks_mined"]
-            if notary in notarisation_scores[region]:
-                notarisation_scores[region][notary].update({
-                    "mining": blocks_mined
-                })
-
     for region in notarisation_scores:
         for notary in notarisation_scores[region]:
+            print(notary)
+            print(notarisation_scores[region][notary])
             score = get_ntx_score(
                 notarisation_scores[region][notary]["btc"],
                 notarisation_scores[region][notary]["main"],
-                notarisation_scores[region][notary]["third_party"],
-                notarisation_scores[region][notary]["mining"]
+                notarisation_scores[region][notary]["third_party"]
             )
+            print(score)
             notarisation_scores[region][notary].update({
                 "score": score
             })

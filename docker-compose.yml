@@ -2,9 +2,9 @@ version: '3'
   
 services:
   kmd:
-    image: komodoofficial/komodo:cd_release_cf872b5_dev
+    image: komodoofficial/komodo:cd_release_e159b4e_dev
     volumes:
-      - /home/smk762/.komodo:/root/.komodo:z
+      - /home/smk762/.komodo:/root/.komodo
       - /home/smk762/.zcash-params:/root/.zcash-params
     ports:
       - "7770:7770"

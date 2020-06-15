@@ -117,10 +117,22 @@ def update_notarisations():
             block_time = row_data[2]
             txid = row_data[8]
             notaries = row_data[5]
-            for season_num in seasons_info:
-                if block_time < seasons_info[season_num]['end_time']:
-                    season = season_num
-                    break
+            if chain not in ['KMD', 'BTC']:
+                for season_num in seasons_info:
+                    if block_time < seasons_info[season_num]['end_time'] and block_time >= seasons_info[season_num]['start_time']:
+                        season = season_num
+            else:
+                for season_num in seasons_info:
+                    if block_height < seasons_info[season_num]['end_block'] and block_height >= seasons_info[season_num]['start_block']:
+                        season = season_num
+            if chain == 'KMD':
+                print(chain)
+                print(season)
+                print(block_height)
+                print(block_time)
+                print("-------------")
+            
+
             print("Scanning "+season)
             # update last ntx or last btc if newer than in tables.
             for notary in notaries:
