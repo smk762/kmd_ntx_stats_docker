@@ -12,7 +12,7 @@
 									<ul class="list-group">
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
-										    Notarised Today
+										    Notarised Last 24hrs
 										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ ntx_summary.today.btc_ntx }}<br /> BTC
 										    </span>
@@ -108,14 +108,14 @@
 									    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    	Notarisation Score
 										    	<span class="badge kmd_ui_dark1_bg p-1">
-										    		<!--{{ ntx_summary.premining_ntx_score }}--> TBA
+										    		{{ ntx_summary.premining_ntx_score|floatformat:-3 }}
 										    	</span>
 											</div>
 										</li>
 										<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 									    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 											    Region Rank
-											    <span class="badge kmd_ui_dark1_bg p-1"><!--{{ rank }}--> TBA</span>
+											    <span class="badge kmd_ui_dark1_bg p-1">{{ rank }}</span>
 											</div>
 										</li>
 									</ul>
@@ -130,7 +130,7 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Mined
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ mining_summary.mined_last_24hrs|floatformat:-3 }} KMD<br />Today
+										    	{{ mining_summary.mined_last_24hrs|floatformat:-3 }} KMD<br />Last 24hrs
 											</span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
 										    	{{ mining_summary.season_value_mined|floatformat:-3 }} KMD<br />Season
@@ -235,7 +235,7 @@
 								{{ notary_name }} ADDRESSES & BALANCES
 							</div>
 							<div class="card-body kmd_ui_dark1_bg">
-								<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%"  data-ajax="{% url 'balancesViewSet-list' %}?format=datatables&notary={{ notary_name }}">
+								<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%"  data-ajax="{% url 'balancesViewSet-list' %}?format=datatables&season=Season_4&notary={{ notary_name }}">
 									<thead>
 										<tr>
 											<th data-data="chain">CHAIN</th>
@@ -320,42 +320,6 @@
 		Chart.defaults.global.defaultFontColor = 'white';
 		Chart.defaults.global.defaultFontSize = 16;
 
-	    /*
-	    function drawLineGraph(data, id) { 
-			var labels = data.labels; 
-			var chartLabel = data.chartLabel; 
-			var chartdata = data.chartdata; 
-			var ctx = document.getElementById(id).getContext('2d'); 
-			var chart = new Chart(ctx, { 
-		        // The type of chart we want to create 
-		        type: 'line', 
-		  
-		        // The data for our dataset 
-		        data: { 
-		          labels: labels, 
-		          datasets: [{ 
-		            label: chartLabel, 
-		            backgroundColor: 'rgb(255, 100, 200)', 
-		            borderColor: 'rgb(55, 99, 132)', 
-		            data: chartdata, 
-		          }] 
-		        }, 
-		  
-		        // Configuration options go here 
-		        options: { 
-			        scales: { 
-			            xAxes: [{ 
-			                display: true 
-			            }], 
-			            yAxes: [{ 
-			                ticks: { 
-			                	beginAtZero: true 
-			                } 
-			            }] 
-		            } 
-		        } 
-	     	}); 
-	    } */
 	  
 	    function drawBarGraph(data, id) { 
 			var labels = data.labels; 

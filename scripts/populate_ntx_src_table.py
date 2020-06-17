@@ -13,11 +13,8 @@ import datetime
 from dotenv import load_dotenv
 from rpclib import def_credentials
 from psycopg2.extras import execute_values
-import ntx_lib 
-import table_lib
 from electrum_lib import get_ac_block_info
 from notary_lib import *
-from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
 
 '''
 This script scans the blockchain for notarisation txids that are not already recorded in the database.
@@ -27,7 +24,7 @@ Script runtime is around 5-10 mins, except for initial population which is up to
 '''
 
 # set this to True to quickly update tables with most recent data
-skip_until_yesterday = True
+skip_until_yesterday = False
 
 load_dotenv()
 
@@ -38,7 +35,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-conn = table_lib.connect_db()
+conn = connect_db()
 cursor = conn.cursor()
 
 rpc = {}
@@ -63,9 +60,9 @@ existing_txids = cursor.fetchall()
 while tip - start_block > chunk_size:
     logger.info("Getting notarization TXIDs from block chain data for blocks " \
            +str(start_block+1)+" to "+str(start_block+chunk_size)+"...")
-    all_txids += ntx_lib.get_ntx_txids(ntx_addr, start_block+1, start_block+chunk_size)
+    all_txids += get_ntx_txids(ntx_addr, start_block+1, start_block+chunk_size)
     start_block += chunk_size
-all_txids += ntx_lib.get_ntx_txids(ntx_addr, start_block+1, tip)
+all_txids += get_ntx_txids(ntx_addr, start_block+1, tip)
 
 for txid in existing_txids:
     recorded_txids.append(txid[0])
@@ -107,8 +104,9 @@ def update_notarisations():
     start = time.time()
     i = 1
     j = 0
+    
     for txid in unrecorded_txids:
-        row_data = ntx_lib.get_ntx_data(txid)
+        row_data = get_ntx_data(txid)
         j += 1
         num_unrecorded_txids = len(unrecorded_txids)
         if row_data is not None:
@@ -143,18 +141,18 @@ def update_notarisations():
                     if chain not in notary_last_ntx[notary]:
                         notary_last_ntx[notary].update({chain:0})
                     if block_height > notary_last_ntx[notary][chain]:
-                        table_lib.update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
+                        update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
                 else:
-                    table_lib.update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
+                    update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
                 if chain == 'KMD':
                     last_btc_ntx_row_data = (notary, txid, block_height,
                                          block_time, season)
 
                     if notary in notary_last_btc_ntx:
                         if block_height > notary_last_btc_ntx[notary]:
-                            table_lib.update_last_btc_ntx_tbl(conn, cursor, last_btc_ntx_row_data)
+                            update_last_btc_ntx_tbl(conn, cursor, last_btc_ntx_row_data)
                     else:
-                        table_lib.update_last_btc_ntx_tbl(conn, cursor, last_btc_ntx_row_data)
+                        update_last_btc_ntx_tbl(conn, cursor, last_btc_ntx_row_data)
             
 
             records.append(row_data)

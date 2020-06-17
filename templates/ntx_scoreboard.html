@@ -4,33 +4,17 @@
 	<div class="container text-center" width='90%'>
 		<div id="ui-view">
 			<div class="fade-in">
-				<div class="row">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#AR_table"><span class='badge kmd_ui_dark1_bg p-2'>Asia and Russia</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#EU_table"><span class='badge kmd_ui_dark1_bg p-2'>European Union</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#NA_table"><span class='badge kmd_ui_dark1_bg p-2'>North America</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#SH_table"><span class='badge kmd_ui_dark1_bg p-2'>Southern Hemisphere</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#DEV_table"><span class='badge kmd_ui_dark1_bg p-2'>Dev Nodes</span></a>
-						</h4>
-					</div>
-				</div>
+
+        		{% include "snippets/region_ntx_leaders_2.html" %}
+
 				{% for region, region_data in notarisation_scores.items %}
 				<div class="row my-3">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card kmd_ui_light4">
-							<a id="{{region}}_table" class="section-anchor">
 							<div class="card-header kmd_ui_dark1_bg">
-								{{ region }} Notarisation rankings
-							</div></a>
+								<h3>{{ region }} Notarisation rankings</h3>
+								<a id="{{region}}_table" class="section-anchor"></a>
+							</div>
 							<div class="card-body kmd_ui_dark1_bg">
 								<table id="{{ region }}_notarisations" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
 									<thead>
@@ -57,7 +41,7 @@
 											<td data-data="main">{{ notary_data.main }}</th>
 											<td data-data="third_party">{{ notary_data.third_party }}</th>
 											<td data-data="mining">{{ notary_data.mining }}</th>
-											<td data-data="score"><!--{{ notary_data.score }}--> TBA</th>
+											<td data-data="score">{{ notary_data.score|floatformat:-3 }}</th>
 										</tr>
 										{% endfor %}
 									</tbody>
@@ -78,7 +62,8 @@
   	<script>
 	    $(document).ready(function() {
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
-		        $('#AR_notarisations').DataTable({
+		        $('#AR_notarisations').DataTable({    
+		        	"paging": false,
 	        		order: [[ 0, 'asc' ]],
 		        	"columns": [
 				        { "data": "rank" },
@@ -100,6 +85,7 @@
 		        });
 		        $('#EU_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
 		        	"columns": [
 				        { "data": "rank" },
 				        { "data": "notary" },
@@ -120,6 +106,7 @@
 		        });
 		        $('#NA_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
 		        	"columns": [
 				        { "data": "rank" },
 				        { "data": "notary" },
@@ -140,6 +127,7 @@
 		        });
 		        $('#SH_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
 		        	"columns": [
 				        { "data": "rank" },
 				        { "data": "notary" },
@@ -160,6 +148,7 @@
 		        });
 		        $('#DEV_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
 		        	"columns": [
 				        { "data": "rank" },
 				        { "data": "notary" },

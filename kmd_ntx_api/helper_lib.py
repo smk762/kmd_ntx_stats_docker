@@ -119,6 +119,7 @@ def get_ticker(scriptPubKeyBinary):
         chain = "KMD"
     return chain
 
+
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
 
@@ -148,22 +149,43 @@ def decode_opret(scriptPubKey_asm):
 def get_mainnet_chains(coins_data):
     main_chains = []
     for item in coins_data:
-        if item['dpow']['server'] == "dPoW-mainnet":
+        if item['dpow']['server'].lower() == "dpow-mainnet":
             main_chains.append(item['chain'])
     return main_chains
 
 def get_third_party_chains(coins_data):
     third_chains = []
     for item in coins_data:
-        if item['dpow']['server'] == "dPoW-3P":
+        if item['dpow']['server'].lower() == "dpow-3p":
             third_chains.append(item['chain'])
     return third_chains
+
+def get_server_chains(coins_data):
+    server_chains = {
+        "main":get_mainnet_chains(coins_data),
+        "third_party":get_third_party_chains(coins_data)
+    }
+    return server_chains
 
 def get_ntx_score(btc_ntx, main_ntx, third_party_ntx):
     coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
     third_party = get_third_party_chains(coins_data)
-    main = get_mainnet_chains(coins_data)  
-    return btc_ntx*0.0325 + main_ntx*0.8698/len(main) + third_party_ntx*0.0977/len(third_party)
+    main_chains = get_mainnet_chains(coins_data)
+    if 'BTC' in main_chains:
+        main_chains.remove('BTC')
+    if 'KMD' in main_chains:
+        main_chains.remove('KMD')
+    '''
+    print(len(third_party))
+    print(third_party)
+    print(len(main_chains))
+    print(main_chains)
+    '''
+    print('main_ntx')
+    print(main_ntx)
+    print('third_party_ntx')
+    print(third_party_ntx)
+    return btc_ntx*0.0325 + main_ntx*0.8698/len(main_chains) + third_party_ntx*0.0977/len(third_party)
  
 def prepare_notary_balance_graph_data(chain_low_balance_notary_counts):
     bg_color = []

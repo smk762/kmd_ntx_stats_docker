@@ -8,7 +8,7 @@ import requests
 import psycopg2
 from decimal import *
 from psycopg2.extras import execute_values
-from notary_lib import notary_info, known_addresses, seasons_info, get_season, get_notary_from_address
+from notary_lib import *
 from rpclib import def_credentials
 import table_lib
 
@@ -25,7 +25,7 @@ try:
 except:
     funding_tx = []
 
-conn = table_lib.connect_db()
+conn = connect_db()
 cursor = conn.cursor()
 
 for item in funding_tx:
@@ -45,7 +45,7 @@ for item in funding_tx:
     row_list.append(get_season(int(item["block_time"])))
     row_data = tuple(row_list)
 
-    table_lib.update_funding_tbl(conn, cursor, row_data)
+    update_funding_tbl(conn, cursor, row_data)
 
 
 cursor.close()

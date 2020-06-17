@@ -8,7 +8,6 @@ import logging
 import logging.handlers
 import psycopg2
 import threading
-import table_lib
 from decimal import *
 from datetime import datetime as dt
 import datetime
@@ -16,8 +15,8 @@ from dotenv import load_dotenv
 from rpclib import def_credentials
 from psycopg2.extras import execute_values
 from electrum_lib import get_ac_block_info
-from notary_lib import notary_info, seasons_info, known_addresses
-from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
+from notary_lib import *
+
 
 '''
 This script scans the blockchain for notarisation txids that are not already recorded in the database.
@@ -28,8 +27,6 @@ Script runtime is around 5-10 mins sepending on number of seasons to aggregate
 
 # set this to false when originally populating the table, or rescanning
 skip_past_seasons = True
-# set this to True to quickly update tables with most recent data
-skip_until_yesterday = True
 
 load_dotenv()
 
@@ -40,12 +37,12 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-conn = table_lib.connect_db()
+conn = connect_db()
 cursor = conn.cursor()
 
 def update_season_notarised_counts(season):
     ac_block_heights = get_ac_block_info()
-    chain_season_ntx_result = table_lib.get_chain_ntx_season_aggregates(cursor, season)
+    chain_season_ntx_result = get_chain_ntx_season_aggregates(cursor, season)
     total_chain_season_ntx = {}
     for item in chain_season_ntx_result:
         chain = item[0]
@@ -55,7 +52,7 @@ def update_season_notarised_counts(season):
         })
     notary_season_counts = {}
     logger.info("Getting "+season+" notary notarisations")
-    results = table_lib.get_ntx_for_season(cursor, season)
+    results = get_ntx_for_season(cursor, season)
     for item in results:
         chain = item[0]
         notaries = item[1]
@@ -97,9 +94,9 @@ def update_season_notarised_counts(season):
                     third_party_count, other_count, \
                     total_ntx_count, json.dumps(chain_ntx_counts), \
                     json.dumps(notary_season_pct), time_stamp, season)
-        table_lib.update_season_notarised_count_tbl(conn, cursor, row_data)
+        update_season_notarised_count_tbl(conn, cursor, row_data)
 
-    results = table_lib.get_chain_ntx_season_aggregates(cursor, season)
+    results = get_chain_ntx_season_aggregates(cursor, season)
     for item in results:
         chain = item[0]
         block_height = item[1]
@@ -107,7 +104,7 @@ def update_season_notarised_counts(season):
         ntx_count = item[3]
         cols = 'block_hash, txid, block_time, opret, ac_ntx_blockhash, ac_ntx_height'
         conditions = "block_height="+str(block_height)+" AND chain='"+chain+"'"
-        last_ntx_result = table_lib.select_from_table(cursor, 'notarised', cols, conditions)[0]
+        last_ntx_result = select_from_table(cursor, 'notarised', cols, conditions)[0]
         kmd_ntx_blockhash = last_ntx_result[0]
         kmd_ntx_txid = last_ntx_result[1]
         kmd_ntx_blocktime = last_ntx_result[2]
@@ -124,14 +121,17 @@ def update_season_notarised_counts(season):
                     kmd_ntx_txid, kmd_ntx_blocktime, opret, ac_ntx_blockhash, \
                     ac_ntx_height, ac_block_height, ntx_lag, season)
 
-        table_lib.update_season_notarised_chain_tbl(conn, cursor, row_data)
+        update_season_notarised_chain_tbl(conn, cursor, row_data)
         
-
-for season in seasons_info:
-    # Some S1 OP_RETURNS are decoding incorrectly, so skip.
-    if season != "Season_1":
-        logger.info("Processing notarisations for "+season)
-        update_season_notarised_counts(season)
+if skip_past_seasons:
+    season = get_season(int(time.time()))
+    update_season_notarised_counts(season)
+else:
+    for season in seasons_info:
+        # Some S1 OP_RETURNS are decoding incorrectly, so skip.
+        if season != "Season_1":
+            logger.info("Processing notarisations for "+season)
+            update_season_notarised_counts(season)
 
 cursor.close()
 

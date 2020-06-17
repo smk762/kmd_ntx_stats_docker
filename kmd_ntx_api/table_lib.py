@@ -232,15 +232,11 @@ def update_daily_notarised_count_tbl(conn, cursor, row_data):
 def get_latest_chain_ntx_info(cursor, chain, height):
     sql = "SELECT prev_block_hash, prev_block_height, opret, block_hash, txid \
            FROM notarised WHERE chain = '"+chain+"' AND block_height = "+str(height)+";"
-    print(sql)
     cursor.execute(sql)
     chains_resp = cursor.fetchone()
-    print(len(chains_resp))
-    print(chains_resp)
     return chains_resp
 
 # MINED OPS
-
 
 def get_season_mined_counts(conn, cursor, season):
     sql = "SELECT name, COUNT(*), SUM(value), MAX(value), max(block_time), \
@@ -283,7 +279,6 @@ def get_chain_ntx_date_aggregates(cursor, day):
            FROM notarised WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY chain;"
-    print(sql)
     cursor.execute(sql)
     return cursor.fetchall()
 
