@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import json
 import requests
-import table_lib
 import logging
 import logging.handlers
-from coins_lib import all_coins
+from notary_lib import *
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -19,10 +18,16 @@ It should be run as a cronjob every 12-24 hours
 '''
 
 
-conn = table_lib.connect_db()
+conn = connect_db()
 cursor = conn.cursor()
 
+# Uncomment if chains removed from dpow readme
+#cursor.execute("DELETE FROM coins WHERE dpow_active = 1;")
+#conn.commit()
+
 dpow = {}
+dpow_main = []
+dpow_3p = []
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/master/README.md")
 dpow_readme = r.text
 lines = dpow_readme.splitlines()
@@ -36,7 +41,11 @@ for line in lines:
         except:
             src = info[1]
         version = info[2]
-        server = info[4]
+        server = info[4].lower()
+        if server == "dpow-mainnet":
+            dpow_main.append(coin)
+        elif server == "dpow-3p":
+            dpow_3p.append(coin)
         dpow.update({
             coin:{
                 "src":src,
@@ -45,7 +54,7 @@ for line in lines:
             }
         })
 
-r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/komodo/master/src/assetchains.json")
+r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/komodo/dev/src/assetchains.json")
 ac_json = r.json()
 for item in ac_json:
     chain = item['ac_name']
@@ -72,7 +81,6 @@ other_launch = {
     "CHIPS":"~/chips3/src/chipsd",
     "GAME":"~/GameCredits/src/gamecreditsd",
     "EMC2":"~/einsteinium/src/einsteiniumd",
-    "GIN":"~/gincoin-core/src/gincoind",  
     "VRSC":"~/VerusCoin/src/verusd",   
 }
 other_conf = {
@@ -83,7 +91,6 @@ other_conf = {
     "CHIPS":"~/.chips/chips.conf",
     "GAME":"~/.gamecredits/gamecredits.conf",
     "EMC2":"~/.einsteinium/einsteinium.conf",
-    "GIN":"~/.gincoincore/gincoin.conf",  
     "VRSC":"~/.komodo/VRSC/VRSC.conf",   
 }
 other_cli = {
@@ -94,16 +101,18 @@ other_cli = {
     "CHIPS":"~/chips3/src/chips-cli",
     "GAME":"~/GameCredits/src/gamecredits-cli",
     "EMC2":"~/einsteinium/src/einsteinium-cli",
-    "GIN":"~/gincoin-core/src/gincoin-cli",  
     "VRSC":"~/VerusCoin/src/verus",   
 }
 
 for chain in other_launch:
-    dpow[chain].update({"launch_params":other_launch[chain]})
+    if chain in dpow:
+        dpow[chain].update({"launch_params":other_launch[chain]})
 for chain in other_conf:
-    dpow[chain].update({"conf_path":other_conf[chain]})
+    if chain in dpow:
+        dpow[chain].update({"conf_path":other_conf[chain]})
 for chain in other_cli:
-    dpow[chain].update({"cli":other_cli[chain]})
+    if chain in dpow:
+        dpow[chain].update({"cli":other_cli[chain]})
 
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/coins")
 coins_repo = r.json()
@@ -166,7 +175,7 @@ for item in coins_repo:
                 json.dumps(coins_info[coin]['electrums']), json.dumps(coins_info[coin]['electrums_ssl']),
                 json.dumps(coins_info[coin]['explorers']), json.dumps(coins_info[coin]['dpow']),
                 dpow_active, mm2_compatible)
-    table_lib.update_coins_tbl(conn, cursor, row_data)
+    update_coins_tbl(conn, cursor, row_data)
 
 # This is to cover coins with explorer/electrum but not in "coins" file
 
@@ -222,7 +231,7 @@ for coin in dpow:
                     json.dumps(coins_info[coin]['electrums']), json.dumps(coins_info[coin]['electrums_ssl']),
                     json.dumps(coins_info[coin]['explorers']), json.dumps(coins_info[coin]['dpow']),
                     1, 0)
-        table_lib.update_coins_tbl(conn, cursor, row_data)
+        update_coins_tbl(conn, cursor, row_data)
         if len(coins_info[coin]['electrums']) == 0:
             no_electrums.append(coin)
         if len(coins_info[coin]['explorers']) == 0:
@@ -230,7 +239,10 @@ for coin in dpow:
 
 print("no_electrums: "+str(no_electrums))
 print("no_explorers: "+str(no_explorers))
-
+print("dpow_main: "+str(len(dpow_main)))
+print("dpow_main: "+str(dpow_main))
+print("dpow_3p: "+str(len(dpow_3p)))
+print("dpow_3p: "+str(dpow_3p))
 logging.info("Finished!")
 cursor.close()
 conn.close()

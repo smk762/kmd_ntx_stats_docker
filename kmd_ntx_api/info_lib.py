@@ -144,7 +144,7 @@ def get_nn_social(notary_name=None):
 
     return nn_social_info
 
-def get_nn_ntx_summary(notary):
+    def get_nn_ntx_summary(notary):
     season = get_season(int(time.time()))
     now = int(time.time())
     day_ago = now - 24*60*60
@@ -181,27 +181,15 @@ def get_nn_ntx_summary(notary):
     notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary)
     ntx_summary.update({"today":notary_ntx_24hr_summary})
 
-    # today's ntx stats
-    '''
-    ntx_today = notarised_count_daily.objects.filter(notarised_date=str(today), 
-                                             season=season, notary=notary) \
-                                            .values()
-    if len(ntx_today) > 0:
-        chains_ntx_today = ntx_today[0]['chain_ntx_counts']
-        today_max_chain = max(chains_ntx_today, key=chains_ntx_today.get) 
-        today_max_ntx = chains_ntx_today[today_max_chain]
-        ntx_summary['today'].update({
-            'most_ntx':today_max_chain+" ("+str(today_max_ntx)+")",
-            "btc_ntx":ntx_today[0]['btc_count'],
-            "main_ntx":ntx_today[0]['antara_count'],
-            "third_party_ntx":ntx_today[0]['third_party_count']
-        })
-    '''
 
     # season ntx stats
     ntx_season = notarised_count_season.objects \
                                     .filter(season=season, notary=notary) \
                                     .values()
+                                    
+    print(notary)
+    print(season)
+    print(ntx_season)
     if len(ntx_season) > 0:
         chains_ntx_season = ntx_season[0]['chain_ntx_counts']
         season_max_chain = max(chains_ntx_season, key=chains_ntx_season.get) 
@@ -255,11 +243,7 @@ def get_nn_ntx_summary(notary):
 
     if max_kmd_ntx_time > 0:
         time_since_last_kmd_ntx = int(time.time()) - int(max_kmd_ntx_time)
-        print(time.time())
-        print(max_kmd_ntx_time)
-        print(time_since_last_kmd_ntx)
         time_since_last_kmd_ntx = day_hr_min_sec(time_since_last_kmd_ntx)
-        print(time_since_last_kmd_ntx)
         ntx_summary.update({
             "time_since_last_kmd_ntx":time_since_last_kmd_ntx,
         })
@@ -716,23 +700,6 @@ def get_low_balance_tooltip(low_balances, ignore_chains):
     low_balances_tooltip += "</div>"
     return low_balances_tooltip
 
-def get_server_chains(coins_data):
-    server_chains = {
-        "main":[],
-        "third_party":[]
-    }
-    for item in coins_data:
-        server = item['dpow']['server']
-        chain = item['chain']
-        if server.lower() == 'dpow-mainnet':
-            server_chains['main'].append(chain)
-        elif server.lower() == 'dpow-3p':
-            server_chains['third_party'].append(chain)
-        else:
-            logger.warning("Chain not in 3P or main?")
-        server_chains['main'].sort()
-        server_chains['third_party'].sort()
-    return server_chains
 
 def get_sidebar_links(notary_list, coins_data):
     region_notaries = get_regions_info(notary_list)

@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import requests
-from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
+from notary_lib import *
 import socket
 import json
 import time
 import base58
 import logging
-import table_lib
 import logging.handlers
 from datetime import datetime as dt
 import datetime
@@ -117,7 +116,7 @@ def get_ac_block_info():
         logger.info(e)
     return ac_block_info
 
-conn = table_lib.connect_db()
+conn = connect_db()
 cursor = conn.cursor()
 
 r = requests.get('http://notary.earth:8762/info/coins/?dpow_active=1')
@@ -153,9 +152,9 @@ for chain in coins:
         print(e)
         print("NO EXPLORER FOR "+chain)
     row_data = (chain, sync_block, sync_hash, exp_hash)
-    table_lib.update_sync_tbl(conn, cursor, row_data)
+    update_sync_tbl(conn, cursor, row_data)
 
-x = table_lib.select_from_table(cursor, 'chain_sync', '*')
+x = select_from_table(cursor, 'chain_sync', '*')
 print(x)
 
 cursor.close()

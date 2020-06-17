@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 import time
 import math
-from coins_lib import antara_coins
-import table_lib
 import electrum_lib
 import logging
 import logging.handlers
 from notary_lib import *
-from coins_lib import *
 from rpclib import def_credentials
 import threading
 
@@ -54,11 +51,11 @@ def thread_electrum(conn, cursor, notary, chain, pubkey, addr, season):
     if balance != -1:
         row_data = (notary, chain, balance, addr,
                     season, node, int(time.time()))
-        table_lib.update_balances_tbl(conn, cursor, row_data)
+        update_balances_tbl(conn, cursor, row_data)
         logger.info("["+chain+"] ["+season+"] ["+node+"] [" \
                 +str(balance)+"] ["+notary+"] ["+addr+"]")
 
-conn = table_lib.connect_db()
+conn = connect_db()
 cursor = conn.cursor()
 
 KOMODO_ENDOFERA = 7777777
@@ -73,6 +70,7 @@ DEVISOR = 10512000
 tiptime = rpc.getinfo()['tiptime']
 def get_kmd_rewards():
     nn_utxos = {}
+    known_addresses = get_known_addr("KMD", "Season_4")
     for addr in known_addresses:
         utxos = rpc.getaddressutxos({"addresses": [addr]})
         notary = known_addresses[addr]
@@ -131,7 +129,7 @@ def get_kmd_rewards():
                    oldest_utxo_block, balance, total_rewards,
                    update_time)
 
-        table_lib.update_rewards_tbl(conn, cursor, row_data)
+        update_rewards_tbl(conn, cursor, row_data)
 
 this_season = get_season(int(time.time()))
 thread_list = {}

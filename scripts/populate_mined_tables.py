@@ -4,12 +4,11 @@ import logging
 import logging.handlers
 from datetime import datetime as dt
 import datetime
-from notary_lib import notary_info, known_addresses, seasons_info, get_season
+from notary_lib import *
 import psycopg2
 from rpclib import def_credentials
 from decimal import *
 from psycopg2.extras import execute_values
-import table_lib
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -33,7 +32,7 @@ start_daily_2days_ago = True
 scan_depth = 100
 
 
-conn = table_lib.connect_db()
+conn = connect_db()
 cursor = conn.cursor()
 
 season = get_season(int(time.time()))
@@ -44,27 +43,30 @@ rpc["KMD"] = def_credentials("KMD")
 
 # Scanning recently added blocks to recify orphans
 recorded_txids = []
-db_txids =  table_lib.select_from_table(cursor, 'mined', 'txid')
+db_txids =  select_from_table(cursor, 'mined', 'txid')
 for txid in db_txids:
     recorded_txids.append(txid[0])
     
 tip = int(rpc["KMD"].getblockcount())
-max_block_in_db = table_lib.get_max_from_table(cursor, 'mined', 'block_height')
+max_block_in_db = get_max_from_table(cursor, 'mined', 'block_height')
 if max_block_in_db is None:
     max_block_in_db = scan_depth
 if start_daily_2days_ago:
     max_block_in_db = 24*60*14
 scan_blocks = [*range(max_block_in_db-scan_depth,max_block_in_db,1)]
+
+known_addresses = get_known_addr("KMD", "Season_4")
+
 for block in scan_blocks:
     logger.info("scanning block "+str(block)+"...")
-    row_data = table_lib.get_miner(block)
+    row_data = get_miner(block, known_addresses)
     if row_data[5] not in recorded_txids:
         logger.info("UPDATING BLOCK: "+str(block))
-        table_lib.update_mined_tbl(conn, cursor, row_data)
+        update_mined_tbl(conn, cursor, row_data)
 
 # adding new blocks...
-existing_blocks = table_lib.select_from_table(cursor, 'mined', 'block_height')
-max_block =  table_lib.get_max_from_table(cursor, 'mined', 'block_height')
+existing_blocks = select_from_table(cursor, 'mined', 'block_height')
+max_block =  get_max_from_table(cursor, 'mined', 'block_height')
 tip = int(rpc["KMD"].getblockcount())
 all_blocks = [*range(0,tip,1)]
 recorded_blocks = []
@@ -82,7 +84,7 @@ records = []
 start = time.time()
 i = 1
 for block in unrecorded_blocks:
-    records.append(table_lib.get_miner(block))
+    records.append(get_miner(block, known_addresses))
     if len(records) == 10080:
         now = time.time()
         pct = round(len(records)*i/len(unrecorded_blocks)*100,3)
@@ -105,11 +107,11 @@ logger.info("Finished!")
 logger.info(str(len(unrecorded_blocks))+" mined blocks added to table")
 
 if skip_past_seasons:
-    table_lib.get_season_mined_counts(conn, cursor, season)
+    get_season_mined_counts(conn, cursor, season)
 else:
     # updating season mined count aggregate table
     for season in seasons_info:
-        table_lib.get_season_mined_counts(conn, cursor, season)
+        get_season_mined_counts(conn, cursor, season)
 
 # updating daily mined count aggregate table
 
@@ -125,7 +127,7 @@ logger.info("Aggregating daily notary notarisations from "+str(start)+" to "+str
 day = start
 
 while day <= end:
-    table_lib.get_daily_mined_counts(conn, cursor, day)
+    get_daily_mined_counts(conn, cursor, day)
     day += delta
 logging.info("Finished!")
 

@@ -8,7 +8,6 @@ import logging
 import logging.handlers
 import psycopg2
 import threading
-import table_lib
 from decimal import *
 from datetime import datetime as dt
 import datetime
@@ -16,8 +15,7 @@ from dotenv import load_dotenv
 from rpclib import def_credentials
 from psycopg2.extras import execute_values
 from electrum_lib import get_ac_block_info
-from notary_lib import notary_info, seasons_info, known_addresses
-from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
+from notary_lib import *
 
 class daily_chain_thread(threading.Thread):
     def __init__(self, cursor, season, day):
@@ -48,7 +46,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-conn = table_lib.connect_db()
+conn = connect_db()
 cursor = conn.cursor()
 
 def update_daily_notarised_chains(season):
@@ -87,7 +85,7 @@ def update_daily_notarised_chains(season):
     logger.info("Notarised daily aggregation for "+season+" chains finished...")
 
 def thread_chain_ntx_daily_aggregate(cursor, season, day):
-    chains_aggr_resp = table_lib.get_chain_ntx_date_aggregates(cursor, day)
+    chains_aggr_resp = get_chain_ntx_date_aggregates(cursor, day)
     for item in chains_aggr_resp:
         try:
             chain = item[0]
@@ -97,7 +95,7 @@ def thread_chain_ntx_daily_aggregate(cursor, season, day):
             if ntx_count != 0:
                 row_data = (chain, ntx_count, str(day))
                 logger.info("Adding daily counts for "+chain+" on "+str(day)+" to notarised_chain table")
-                table_lib.update_daily_notarised_chain_tbl(conn, cursor, row_data)
+                update_daily_notarised_chain_tbl(conn, cursor, row_data)
                 logger.info("OK in thread_chain_ntx_daily_aggregate: "+str(item)+" on "+str(day))
         except Exception as e:
             logger.warning("Error in thread_chain_ntx_daily_aggregate: "+str(e))

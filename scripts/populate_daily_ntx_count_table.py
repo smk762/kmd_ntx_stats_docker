@@ -8,7 +8,6 @@ import logging
 import logging.handlers
 import psycopg2
 import threading
-import table_lib
 from decimal import *
 from datetime import datetime as dt
 import datetime
@@ -16,8 +15,7 @@ from dotenv import load_dotenv
 from rpclib import def_credentials
 from psycopg2.extras import execute_values
 from electrum_lib import get_ac_block_info
-from notary_lib import notary_info, seasons_info, known_addresses
-from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
+from notary_lib import *
 
 '''
 This script scans the blockchain for notarisation txids that are not already recorded in the database.
@@ -40,7 +38,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-conn = table_lib.connect_db()
+conn = connect_db()
 cursor = conn.cursor()
 
 def update_daily_notarised_counts(season):
@@ -64,7 +62,7 @@ def update_daily_notarised_counts(season):
     while day <= end:
         if day >= season_start_dt.date() and day <= season_end_dt.date():
             logger.info("Getting daily "+season+" notary notarisations via get_ntx_for_day for "+str(day))
-            results = table_lib.get_ntx_for_day(cursor, day)
+            results = get_ntx_for_day(cursor, day)
             # Get list of chain/notary list dicts :p
             results_list = []
             time_stamp = int(time.time())
@@ -121,7 +119,7 @@ def update_daily_notarised_counts(season):
 
             # get daily ntx total for each chain
             chain_totals = {}
-            chains_aggr_resp = table_lib.get_chain_ntx_date_aggregates(cursor, day)
+            chains_aggr_resp = get_chain_ntx_date_aggregates(cursor, day)
             for item in chains_aggr_resp:
                 chain = item[0]
                 max_block = item[1]
@@ -142,7 +140,7 @@ def update_daily_notarised_counts(season):
                             node_counts[notary]['total_ntx_count'], json.dumps(notary_ntx_counts[notary]),
                             json.dumps(notary_ntx_pct[notary]), time_stamp, season, day)
                 logger.info("Adding counts for "+season+" "+notary+" for "+str(day)+" to notarised_count_daily table")
-                table_lib.update_daily_notarised_count_tbl(conn, cursor, row_data)
+                update_daily_notarised_count_tbl(conn, cursor, row_data)
         else:
             logger.info("Skipping "+str(day)+", ouside "+season+" range of "+str(season_start_dt)+" to "+str(season_end_dt))
         day += delta

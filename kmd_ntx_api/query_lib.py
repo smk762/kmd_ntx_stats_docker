@@ -246,6 +246,7 @@ def get_coin_notariser_ranks(season):
         "DEV":{}
     }
     notary_list = get_notary_list(season)
+    dpow_coins = get_dpow_coins_list()
     for notary in notary_list:
         region = get_notary_region(notary)
         if region in ["AR","EU","NA","SH", "DEV"]:
@@ -254,19 +255,25 @@ def get_coin_notariser_ranks(season):
         notary = item['notary']
         if notary in notary_list:
             for coin in item['chain_ntx_counts']:
-                if coin == "BTC":
-                    coin = "KMD"
-                region = get_notary_region(notary)
-                if region in ["AR","EU","NA","SH", "DEV"]:
-                    region_notary_ranks[region][notary].update({
-                        coin:item['chain_ntx_counts'][coin]
-                    })
+                if coin in dpow_coins:
+                    if coin == "BTC":
+                        coin = "KMD"
+                    region = get_notary_region(notary)
+                    if region in ["AR","EU","NA","SH", "DEV"]:
+                        region_notary_ranks[region][notary].update({
+                            coin:item['chain_ntx_counts'][coin]
+                        })
     return region_notary_ranks
 
 
 def get_notarisation_scores(season, coin_notariser_ranks):
     notarisation_scores = {}
-    print(coin_notariser_ranks)
+    # set coins lists
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    main_chains = get_mainnet_chains(coins_data)
+    third_chains = get_third_party_chains(coins_data)
+
+    # init scores dict
     for region in coin_notariser_ranks:
         notarisation_scores.update({region:{}})
         for notary in coin_notariser_ranks[region]:
@@ -278,19 +285,23 @@ def get_notarisation_scores(season, coin_notariser_ranks):
                     "mining":0
                 }
             })
+    # populate mining data
+    mined_season = mined.objects.filter(block_time__gte=seasons_info[season]['start_time'],
+                                            block_time__lte=str(int(time.time()))).values('name') \
+                                           .annotate(season_blocks_mined=Count('value'))
+    for item in mined_season:
+        notary = item["name"]
+        region = get_notary_region(notary)
+        if region in ["AR","EU","NA","SH", "DEV"]:
+            blocks_mined = item["season_blocks_mined"]
+            if notary in notarisation_scores[region]:
+                notarisation_scores[region][notary].update({
+                    "mining": blocks_mined
+                })
 
-            coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-
-            main_chains = []
-            for item in coins_data:
-                if item['dpow']['server'] == "dPoW-mainnet":
-                    main_chains.append(item['chain'])
-
-            third_chains = []
-            for item in coins_data:
-                if item['dpow']['server'] == "dPoW-3P":
-                    third_chains.append(item['chain'])
-
+    # update chain / server counts
+    for region in notarisation_scores:
+        for notary in notarisation_scores[region]:
             for chain in coin_notariser_ranks[region][notary]:
                 if chain in ["KMD", "BTC"]:
                     val = notarisation_scores[region][notary]["btc"] \
@@ -311,19 +322,18 @@ def get_notarisation_scores(season, coin_notariser_ranks):
                         "third_party":val
                     })
 
+    # calc scores
     for region in notarisation_scores:
         for notary in notarisation_scores[region]:
-            print(notary)
-            print(notarisation_scores[region][notary])
             score = get_ntx_score(
                 notarisation_scores[region][notary]["btc"],
                 notarisation_scores[region][notary]["main"],
                 notarisation_scores[region][notary]["third_party"]
             )
-            print(score)
             notarisation_scores[region][notary].update({
                 "score": score
             })
+        # determine ranks
         for notary in notarisation_scores[region]:
             rank = 1
             for other_notary in notarisation_scores[region]:

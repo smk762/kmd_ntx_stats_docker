@@ -9,10 +9,12 @@ cursor = conn.cursor()
 #table = 'funding_transactions'
 #table = 'last_notarised'
 #table = 'notarised_chain_season'
-table = 'nn_social'
+#table = 'nn_social'
+#table = 'notarised_count_season'
+table = 'coins'
 
 
-cursor.execute("SELECT * FROM "+table+";")
+cursor.execute("SELECT * FROM "+table+" WHERE dpow_active = 1;")
 print(cursor.fetchall())
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")

@@ -3,7 +3,6 @@ import os
 import json
 import time
 import requests
-import table_lib
 import logging
 import logging.handlers
 import notary_lib
@@ -22,7 +21,7 @@ with open(os.path.dirname(os.path.abspath(__file__))+'/coins_social.json', 'r') 
     coin_social = json.load(j)
 
 
-conn = table_lib.connect_db()
+conn = connect_db()
 cursor = conn.cursor()
 
 season = "Season_4"
@@ -36,7 +35,7 @@ for chain in coin_social:
     row_list.append(season)
     row_data = tuple(row_list)
 
-    table_lib.update_coin_social_tbl(conn, cursor, row_data)
+    update_coin_social_tbl(conn, cursor, row_data)
    
 
 cursor.close()

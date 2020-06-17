@@ -11,8 +11,7 @@ import bitcoin
 from bitcoin.core import x
 from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
-from notary_lib import notary_addresses, known_addresses, season_pubkeys, notary_pubkeys
-from coins_lib import third_party_coins, antara_coins, ex_antara_coins, all_antara_coins, all_coins
+from notary_lib import *
 
 logger = logging.getLogger()
 
