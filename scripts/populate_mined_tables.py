@@ -48,12 +48,13 @@ for txid in db_txids:
     recorded_txids.append(txid[0])
     
 tip = int(rpc["KMD"].getblockcount())
-max_block_in_db = get_max_from_table(cursor, 'mined', 'block_height')
-if max_block_in_db is None:
-    max_block_in_db = scan_depth
+max_block =  get_max_from_table(cursor, 'mined', 'block_height')
+max_block = get_max_from_table(cursor, 'mined', 'block_height')
+if max_block is None:
+    max_block = scan_depth
 if start_daily_2days_ago:
-    max_block_in_db = 24*60*14
-scan_blocks = [*range(max_block_in_db-scan_depth,max_block_in_db,1)]
+    max_block = tip - 24*60*14
+scan_blocks = [*range(max_block-scan_depth,max_block,1)]
 
 for block in scan_blocks:
     logger.info("scanning block "+str(block)+"...")
@@ -64,7 +65,6 @@ for block in scan_blocks:
 
 # adding new blocks...
 existing_blocks = select_from_table(cursor, 'mined', 'block_height')
-max_block =  get_max_from_table(cursor, 'mined', 'block_height')
 tip = int(rpc["KMD"].getblockcount())
 all_blocks = [*range(0,tip,1)]
 recorded_blocks = []

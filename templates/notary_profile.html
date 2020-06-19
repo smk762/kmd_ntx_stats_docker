@@ -306,11 +306,7 @@
 			            "data": 'txid',
 			            "targets": 4,
 			            "visible": false
-			        },
-        			{
-			            "data": 'time',
-			            "targets": 5
-			        },
+			        }
         		]
 	        });
 		    var data = ntxTable
@@ -322,13 +318,13 @@
 			for (var i = rows.length - 1; i >= 0; i--) {
 				if (rows[i].block > max_blk) {
 					max_blk = rows[i].block
-					document.getElementById("last_ntx").innerHTML = rows[i].time+"<br />"+rows[i].chain; 
+					document.getElementById("last_ntx").innerHTML = rows[i][5]+"<br />"+rows[i].chain; 
 				} 
 				if (rows[i].chain == "BTC") {
-					document.getElementById("last_btc_ntx").innerHTML = rows[i].time+"<br />"+rows[i].chain; 
+					document.getElementById("last_btc_ntx").innerHTML = rows[i][5]+"<br />"+rows[i].chain; 
 				} 
 			}
-			console.log(rows[j].time)
+			console.log(rows[j][5])
 			
 			
 	    });

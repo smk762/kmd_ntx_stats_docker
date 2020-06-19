@@ -6,7 +6,6 @@
 
 */6 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_season_ntx_tables.py
 0 */1 * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_balances_table.py
-*/15 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_coins_table.py
 
 
 # Add the lines above to your host machine's crontab
