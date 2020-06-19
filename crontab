@@ -1,11 +1,12 @@
-*/15 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/scripts/populate_mined_tables.py
-1,7,13,19,25,31,37,43,49,55 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/scripts/populate_ntx_src_table.py
-4,10,16,21,28,34,40,46,52,58 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/scripts/populate_daily_ntx_chain_table.py
-5,11,17,22,29,35,41,47,53,59 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/scripts/populate_daily_ntx_count_table.py
-45 */1 * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/scripts/populate_funding_table.py
-*/6 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/scripts/populate_season_ntx_tables.py
-0 */1 * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/scripts/populate_balances_table.py
-3 1 * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/scripts/populate_coins_table.py
+*/3 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_mined_tables.py
+1,7,13,19,25,31,37,43,49,55 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_ntx_src_table.py
+4,10,16,21,28,34,40,46,52,58 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_daily_ntx_chain_table.py
+5,11,17,22,29,35,41,47,53,59 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_daily_ntx_count_table.py
+45 */1 * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_funding_table.py
+
+*/6 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_season_ntx_tables.py
+0 */1 * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_balances_table.py
+*/15 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_coins_table.py
 
 
 # Add the lines above to your host machine's crontab

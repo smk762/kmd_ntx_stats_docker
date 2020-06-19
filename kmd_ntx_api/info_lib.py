@@ -144,7 +144,7 @@ def get_nn_social(notary_name=None):
 
     return nn_social_info
 
-    def get_nn_ntx_summary(notary):
+def get_nn_ntx_summary(notary):
     season = get_season(int(time.time()))
     now = int(time.time())
     day_ago = now - 24*60*60

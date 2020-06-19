@@ -24,785 +24,6 @@ logger = logging.getLogger(__name__)
 
 now = int(time.time())
 
-class KMD_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 60,
-                       'SCRIPT_ADDR': 85,
-                       'SECRET_KEY': 188}
-
-class BTC_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 0,
-                       'SCRIPT_ADDR': 5,
-                       'SECRET_KEY': 128}
-
-class AYA_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 23,
-                       'SCRIPT_ADDR': 5,
-                       'SECRET_KEY': 176}
-
-class EMC2_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 33,
-                       'SCRIPT_ADDR': 5,
-                       'SECRET_KEY': 176}
-
-class GAME_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 38,
-                       'SCRIPT_ADDR': 5,
-                       'SECRET_KEY': 166}
-
-class GIN_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 38,
-                       'SCRIPT_ADDR': 10,
-                       'SECRET_KEY': 198}
-
-def get_season(time_stamp):
-    for season in seasons_info:
-        if time_stamp >= seasons_info[season]['start_time'] and time_stamp <= seasons_info[season]['end_time']:
-            return season
-    return "season_undefined"
-
-def get_known_addr(coin, season):
-    # k:v dict for matching address to owner
-    # TODO: add pool addresses
-    known_addresses = {}
-    bitcoin.params = coin_params["KMD"]
-    for notary in notary_pubkeys[season]:
-        addr = str(P2PKHBitcoinAddress.from_pubkey(x(notary_pubkeys[season][notary])))
-        known_addresses.update({addr:notary})
-
-    # other known addresses
-    known_addresses.update({"RKrMB4guHxm52Tx9LG8kK3T5UhhjVuRand":"funding bot"})
-    return known_addresses
-
-def get_notary_from_address(address):
-    known_addresses = get_known_addr("KMD", "Season_4")
-    if address in known_addresses:
-        return known_addresses[address]
-    return "unknown"
-
-def lil_endian(hex_str):
-    return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
-
-def get_ntx_txids(ntx_addr, start, end):
-    return rpc["KMD"].getaddresstxids({"addresses": [ntx_addr], "start":start, "end":end})
-    
-def get_ticker(scriptPubKeyBinary):
-    chain = ''
-    while len(chain) < 1:
-        for i in range(len(scriptPubKeyBinary)):
-            if chr(scriptPubKeyBinary[i]).encode() == b'\x00':
-                j = i+1
-                while j < len(scriptPubKeyBinary)-1:
-                    chain += chr(scriptPubKeyBinary[j])
-                    j += 1
-                    if chr(scriptPubKeyBinary[j]).encode() == b'\x00':
-                        break
-                break
-    if chr(scriptPubKeyBinary[-4])+chr(scriptPubKeyBinary[-3])+chr(scriptPubKeyBinary[-2]) =="KMD":
-        chain = "KMD"
-    return str(chain)
-
-def get_ntx_data(txid):
-    known_addresses = get_known_addr("KMD", "Season_4")
-    raw_tx = rpc["KMD"].getrawtransaction(txid,1)
-    block_hash = raw_tx['blockhash']
-    dest_addrs = raw_tx["vout"][0]['scriptPubKey']['addresses']
-    block_time = raw_tx['blocktime']
-    block_datetime = dt.utcfromtimestamp(raw_tx['blocktime'])
-    this_block_height = raw_tx['height']
-    if len(dest_addrs) > 0:
-        if ntx_addr in dest_addrs:
-            if len(raw_tx['vin']) == 13:
-                notary_list = []
-                for item in raw_tx['vin']:
-                    if "address" in item:
-                        if item['address'] in known_addresses:
-                            notary = known_addresses[item['address']]
-                            notary_list.append(notary)
-                        else:
-                            notary_list.append(item['address'])
-                notary_list.sort()
-                opret = raw_tx['vout'][1]['scriptPubKey']['asm']
-                logger.info(opret)
-                if opret.find("OP_RETURN") != -1:
-                    scriptPubKey_asm = opret.replace("OP_RETURN ","")
-                    ac_ntx_blockhash = lil_endian(scriptPubKey_asm[:64])
-                    try:
-                        ac_ntx_height = int(lil_endian(scriptPubKey_asm[64:72]),16) 
-                    except:
-                        logger.info(scriptPubKey_asm)
-                        sys.exit()
-                    scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
-                    chain = get_ticker(scriptPubKeyBinary)
-                    if chain.endswith("KMD"):
-                        chain = "KMD"
-                    if chain == "KMD":
-                        btc_txid = lil_endian(scriptPubKey_asm[72:136])
-                    elif chain not in noMoM:
-                        # not sure about this bit, need another source to validate the data
-                        try:
-                            start = 72+len(chain)*2+4
-                            end = 72+len(chain)*2+4+64
-                            MoM_hash = lil_endian(scriptPubKey_asm[start:end])
-                            MoM_depth = int(lil_endian(scriptPubKey_asm[end:]),16)
-                        except Exception as e:
-                            logger.debug(e)
-                    # some decodes have a null char error, this gets rid of that so populate script doesnt error out 
-                    if chain.find('\x00') != -1:
-                        chain = chain.replace('\x00','')
-                    # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
-                    if chain.upper() == chain:
-                        if chain not in ['KMD', 'BTC']:
-                            for season_num in seasons_info:
-                                if block_time < seasons_info[season_num]['end_time'] and block_time >= seasons_info[season_num]['start_time']:
-                                    season = season_num
-                        else:
-                            for season_num in seasons_info:
-                                if this_block_height < seasons_info[season_num]['end_block'] and this_block_height >= seasons_info[season_num]['start_block']:
-                                    season = season_num
-                        row_data = (chain, this_block_height, block_time, block_datetime,
-                                    block_hash, notary_list, ac_ntx_blockhash, ac_ntx_height,
-                                    txid, opret, season)
-                        return row_data
-                else:
-                    # no opretrun in tx, and shouldnt polute the DB.
-                    row_data = ("not_opret", this_block_height, block_time, block_datetime,
-                                block_hash, notary_list, "unknown", 0, txid, "unknown", "N/A")
-                    return None
-                
-            else:
-                # These are related to easy mining, and shouldnt polute the DB.
-                row_data = ("low_vin", this_block_height, block_time, block_datetime,
-                            block_hash, [], "unknown", 0, txid, "unknown", "N/A")
-                return None
-        else:
-            # These are outgoing, and should not polute the DB.
-            row_data = ("not_dest", this_block_height, block_time, block_datetime,
-                        block_hash, [], "unknown", 0, txid, "unknown", "N/A")
-            return None
-
-
-def connect_db():
-    conn = psycopg2.connect(
-        host='localhost',
-        user=os.getenv("DB_USER"),
-        password=os.getenv("PASSWORD"),
-        port = "7654",
-        database='postgres'
-    )
-    return conn
-
-# TABLE UPDATES
-
-def get_dpow_coins():
-    conn = connect_db()
-    cursor = conn.cursor()
-    sql = "SELECT * \
-           FROM coins WHERE \
-           dpow_active = 1;"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-dpow_coins = get_dpow_coins()
-
-def update_addresses_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO addresses \
-              (season, node, notary, notary_id, chain, pubkey, address) \
-               VALUES (%s, %s, %s, %s, %s, %s, %s) \
-               ON CONFLICT ON CONSTRAINT unique_season_chain_address DO UPDATE SET \
-               node='"+str(row_data[1])+"', notary='"+str(row_data[2])+"', \
-               pubkey='"+str(row_data[5])+"', address='"+str(row_data[6])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        logger.debug(e)
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_balances_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO balances \
-            (notary, chain, balance, address, season, node, update_time) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_address_season_balance DO UPDATE SET \
-            balance="+str(row_data[2])+", \
-            node='"+str(row_data[5])+"', \
-            update_time="+str(row_data[6])+";"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_rewards_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO rewards \
-            (address, notary, utxo_count, eligible_utxo_count, \
-            oldest_utxo_block, balance, rewards, update_time) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_reward_address DO UPDATE SET \
-            notary='"+str(row_data[1])+"', utxo_count="+str(row_data[2])+", \
-            eligible_utxo_count="+str(row_data[3])+", oldest_utxo_block="+str(row_data[4])+", \
-            balance="+str(row_data[5])+", rewards="+str(row_data[6])+", \
-            update_time="+str(row_data[7])+";"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_coins_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO coins \
-            (chain, coins_info, electrums, electrums_ssl, explorers, dpow, dpow_active, mm2_compatible) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_coin DO UPDATE SET \
-            coins_info='"+str(row_data[1])+"', \
-            electrums='"+str(row_data[2])+"', \
-            electrums_ssl='"+str(row_data[3])+"', \
-            explorers='"+str(row_data[4])+"', \
-            dpow='"+str(row_data[5])+"', \
-            dpow_active='"+str(row_data[6])+"', \
-            mm2_compatible='"+str(row_data[7])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_mined_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO mined \
-            (block_height, block_time, block_datetime, value, address, name, txid, season) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_block DO UPDATE SET \
-            block_time='"+str(row_data[1])+"', \
-            block_datetime='"+str(row_data[2])+"', \
-            value='"+str(row_data[3])+"', \
-            address='"+str(row_data[4])+"', \
-            name='"+str(row_data[5])+"', \
-            txid='"+str(row_data[6])+"', \
-            season='"+str(row_data[7])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        logger.debug(e)
-        if str(e).find('Duplicate') == -1:
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_season_mined_count_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO  mined_count_season \
-            (notary, season, blocks_mined, sum_value_mined, \
-            max_value_mined, last_mined_blocktime, last_mined_block, \
-            time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_season_mined DO UPDATE SET \
-            blocks_mined="+str(row_data[2])+", sum_value_mined="+str(row_data[3])+", \
-            max_value_mined="+str(row_data[4])+", last_mined_blocktime="+str(row_data[5])+", \
-            last_mined_block="+str(row_data[6])+", time_stamp='"+str(row_data[7])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_season_notarised_chain_tbl(conn, cursor, row_data):
-    sql = "INSERT INTO notarised_chain_season \
-         (chain, ntx_count, block_height, kmd_ntx_blockhash,\
-          kmd_ntx_txid, kmd_ntx_blocktime, opret, ac_ntx_blockhash, \
-          ac_ntx_height, ac_block_height, ntx_lag, season) \
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_notarised_chain_season DO UPDATE \
-          SET ntx_count="+str(row_data[1])+", block_height="+str(row_data[2])+", \
-          kmd_ntx_blockhash='"+str(row_data[3])+"', kmd_ntx_txid='"+str(row_data[4])+"', \
-          kmd_ntx_blocktime="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
-          ac_ntx_blockhash='"+str(row_data[7])+"', ac_ntx_height="+str(row_data[8])+", \
-          ac_block_height='"+str(row_data[9])+"', ntx_lag='"+str(row_data[10])+"';"
-         
-    cursor.execute(sql, row_data)
-    conn.commit()
-
-def update_season_notarised_count_tbl(conn, cursor, row_data): 
-    sql = "INSERT INTO notarised_count_season \
-        (notary, btc_count, antara_count, \
-        third_party_count, other_count, \
-        total_ntx_count, chain_ntx_counts, \
-        chain_ntx_pct, time_stamp, season) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-        ON CONFLICT ON CONSTRAINT unique_notary_season DO UPDATE SET \
-        btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
-        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
-        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
-    cursor.execute(sql, row_data)
-    conn.commit()
-
-def update_daily_mined_count_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO mined_count_daily \
-            (notary, blocks_mined, sum_value_mined, \
-            mined_date, time_stamp) VALUES (%s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_daily_mined \
-            DO UPDATE SET \
-            blocks_mined="+str(row_data[1])+", \
-            sum_value_mined='"+str(row_data[2])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_daily_notarised_chain_tbl(conn, cursor, row_data):
-    sql = "INSERT INTO notarised_chain_daily \
-         (chain, ntx_count, notarised_date) \
-          VALUES (%s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_notarised_chain_date DO UPDATE \
-          SET ntx_count="+str(row_data[1])+";"
-    cursor.execute(sql, row_data)
-    conn.commit()
-
-def update_daily_notarised_count_tbl(conn, cursor, row_data): 
-    sql = "INSERT INTO notarised_count_daily \
-        (notary, btc_count, antara_count, \
-        third_party_count, other_count, \
-        total_ntx_count, chain_ntx_counts, \
-        chain_ntx_pct, time_stamp, season, notarised_date) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-        ON CONFLICT ON CONSTRAINT unique_notary_date DO UPDATE SET \
-        btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
-        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
-        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+",  \
-        season='"+str(row_data[9])+"', notarised_date='"+str(row_data[10])+"';"
-    cursor.execute(sql, row_data)
-    conn.commit()
-
-# NOTARISATION OPS
-
-def get_latest_chain_ntx_info(cursor, chain, height):
-    sql = "SELECT ac_ntx_blockhash, ac_ntx_height, opret, block_hash, txid \
-           FROM notarised WHERE chain = '"+chain+"' AND block_height = "+str(height)+";"
-    cursor.execute(sql)
-    chains_resp = cursor.fetchone()
-    return chains_resp
-
-# MINED OPS
-
-
-def get_miner(block, known_addresses):
-    rpc = {}
-    rpc["KMD"] = def_credentials("KMD")
-    blockinfo = rpc["KMD"].getblock(str(block), 2)
-    blocktime = blockinfo['time']
-    block_datetime = dt.utcfromtimestamp(blockinfo['time'])
-    for tx in blockinfo['tx']:
-        if len(tx['vin']) > 0:
-            if 'coinbase' in tx['vin'][0]:
-                if 'addresses' in tx['vout'][0]['scriptPubKey']:
-                    address = tx['vout'][0]['scriptPubKey']['addresses'][0]
-                    if address in known_addresses:
-                        name = known_addresses[address]
-                    else:
-                        name = address
-                else:
-                    address = "N/A"
-                    name = "non-standard"
-                for season_num in seasons_info:
-                    if blocktime < seasons_info[season_num]['end_time']:
-                        season = season_num
-                        break
-
-                value = tx['vout'][0]['value']
-                row_data = (block, blocktime, block_datetime, Decimal(value), address, name, tx['txid'], season)
-                return row_data
-
-def get_season_mined_counts(conn, cursor, season):
-    sql = "SELECT name, COUNT(*), SUM(value), MAX(value), max(block_time), \
-           max(block_height) FROM mined WHERE block_time >= "+str(seasons_info[season]['start_time'])+" \
-           AND block_time <= "+str(seasons_info[season]['end_time'])+" GROUP BY name;"
-    cursor.execute(sql)
-    results = cursor.fetchall()
-    time_stamp = int(time.time())
-    for item in results:
-        row_data = (item[0], season, int(item[1]), float(item[2]), float(item[3]),
-                    int(item[4]), int(item[5]), int(time_stamp))
-        if item[0] in notary_info:
-            logger.info("Adding "+str(row_data)+" to season_mined_counts table")
-        result = update_season_mined_count_tbl(conn, cursor, row_data)
-    return result
-
-def get_daily_mined_counts(conn, cursor, day):
-    results = get_mined_date_aggregates(cursor, day)
-    time_stamp = int(time.time())
-    for item in results:
-        row_data = (item[0], int(item[1]), float(item[2]), str(day), int(time_stamp))
-        if item[0] in notary_info:
-            logger.info("Adding "+str(row_data)+" to daily_mined_counts table")
-        result = update_daily_mined_count_tbl(conn, cursor, row_data)
-    return result
-
-# AGGREGATES
-
-def get_chain_ntx_season_aggregates(cursor, season):
-    sql = "SELECT chain, MAX(block_height), MAX(block_time), COALESCE(COUNT(*), 0) \
-           FROM notarised WHERE \
-           season = '"+str(season)+"' \
-           GROUP BY chain;"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-def get_chain_ntx_date_aggregates(cursor, day):
-    sql = "SELECT chain, COALESCE(MAX(block_height), 0), COALESCE(MAX(block_time), 0), COALESCE(COUNT(*), 0) \
-           FROM notarised WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
-           GROUP BY chain;"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-def get_mined_date_aggregates(cursor, day):
-    sql = "SELECT name, COALESCE(COUNT(*),0), SUM(value) FROM mined WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
-           GROUP BY name;"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-# SEASON / DAY FILTERED
-
-def get_ntx_for_season(cursor, season):
-    sql = "SELECT chain, notaries \
-           FROM notarised WHERE \
-           season = '"+str(season)+"';"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-def get_ntx_for_day(cursor, day):
-    sql = "SELECT chain, notaries \
-           FROM notarised WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
-    cursor.execute(sql)
-    resp = cursor.fetchall() 
-    return resp
-
-def get_mined_for_season(cursor, season):
-    sql = "SELECT * \
-           FROM mined WHERE \
-           season = '"+str(season)+"';"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-def get_mined_for_day(cursor, day):
-    sql = "SELECT * \
-           FROM mined WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-
-# QUICK QUERIES
-
-def get_dates_list(cursor, table, date_col):
-    sql = "SELECT DATE_TRUNC('day', "+date_col+") as day \
-           FROM "+table+" \
-           GROUP BY day;"
-    cursor.execute(sql)
-    dates = cursor.fetchall()
-    date_list = []
-    for date in dates:
-        date_list.append(date[0])
-    return date_list
-
-def get_existing_dates_list(cursor, table, date_col):
-    sql = "SELECT "+date_col+" \
-           FROM "+table+";"
-    cursor.execute(sql)
-    dates = cursor.fetchall()
-    date_list = []
-    for date in dates:
-        date_list.append(date[0])
-    return date_list
-
-def get_records_for_date(cursor, table, date_col, date):
-    sql = "SELECT * \
-           FROM "+table+" WHERE \
-           DATE_TRUNC('day',"+date_col+") = '"+str(date)+"';"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-def select_from_table(cursor, table, cols, conditions=None):
-    sql = "SELECT "+cols+" FROM "+table
-    if conditions:
-        sql = sql+" WHERE "+conditions
-    sql = sql+";"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-def get_min_from_table(cursor, table, col):
-    sql = "SELECT MIN("+col+") FROM "+table
-    cursor.execute(sql)
-    return cursor.fetchone()[0]
-
-def get_max_from_table(cursor, table, col):
-    sql = "SELECT MAX("+col+") FROM "+table
-    cursor.execute(sql)
-    return cursor.fetchone()[0]
-
-def get_count_from_table(cursor, table, col):
-    sql = "SELECT COALESCE(COUNT("+col+"), 0) FROM "+table
-    cursor.execute(sql)
-    return cursor.fetchone()[0]
-
-def get_sum_from_table(cursor, table, col):
-    sql = "SELECT SUM("+col+") FROM "+table
-    cursor.execute(sql)
-    return cursor.fetchone()[0]
-
-
-# MISC TABLE OPS
-
-def get_table_names(cursor):
-    sql = "SELECT tablename FROM pg_catalog.pg_tables \
-           WHERE schemaname != 'pg_catalog' \
-           AND schemaname != 'information_schema';"
-    cursor.execute(sql)
-    tables = cursor.fetchall()
-    tables_list = []
-    for table in tables:
-        tables_list.append(table[0])
-    return tables_list
-
-def update_table(conn, cursor, table, update_str, condition):
-    try:
-        sql = "UPDATE "+table+" \
-               SET "+update_str+" WHERE "+condition+";"
-        logger.info(sql)
-        cursor.execute(sql)
-        conn.commit()
-        return 1
-    except Exception as e:
-        logger.debug(e)
-        logger.debug(sql)
-        conn.rollback()
-        return 0
-
-def delete_from_table(conn, cursor, table, condition=None):
-    sql = "TRUNCATE "+table
-    if condition:
-        sql = sql+" WHERE "+condition
-    sql = sql+";"
-    cursor.execute()
-    conn.commit()
-
-def ts_col_to_dt_col(conn, cursor, ts_col, dt_col, table):
-    sql = "UPDATE "+table+" SET "+dt_col+"=to_timestamp("+ts_col+");"
-    cursor.execute(sql)
-    conn.commit()
-
-def ts_col_to_season_col(conn, cursor, ts_col, season_col, table):
-    for season in seasons_info:
-        sql = "UPDATE "+table+" \
-               SET "+season_col+"='"+season+"' \
-               WHERE "+ts_col+" > "+str(seasons_info[season]['start_time'])+" \
-               AND "+ts_col+" < "+str(seasons_info[season]['end_time'])+";"
-        cursor.execute(sql)
-        conn.commit()
-
-def update_sync_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO chain_sync \
-            (chain, block_height, sync_hash, explorer_hash) \
-            VALUES (%s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_sync DO UPDATE SET \
-            block_height='"+str(row_data[1])+"', \
-            sync_hash='"+str(row_data[2])+"', \
-            explorer_hash='"+str(row_data[3])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_nn_social_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO  nn_social \
-            (notary, twitter, youtube, discord, \
-            telegram, github, keybase, \
-            website, icon,season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_season_social DO UPDATE SET \
-            twitter='"+str(row_data[1])+"', \
-            youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
-            telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
-            keybase='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
-            icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_coin_social_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO  coin_social \
-            (chain, twitter, youtube, discord, \
-            telegram, github, explorer, \
-            website, icon, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_season_social DO UPDATE SET \
-            twitter='"+str(row_data[1])+"', \
-            youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
-            telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
-            explorer='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
-            icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_last_ntx_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO  last_notarised \
-            (notary, chain, txid, block_height, \
-            block_time, season) VALUES (%s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_chain DO UPDATE SET \
-            txid='"+str(row_data[2])+"', \
-            block_height='"+str(row_data[3])+"', \
-            block_time='"+str(row_data[4])+"', \
-            season='"+str(row_data[5])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_last_btc_ntx_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO  last_btc_notarised \
-            (notary, txid, block_height, \
-            block_time, season) VALUES (%s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_btc_ntx DO UPDATE SET \
-            txid='"+str(row_data[1])+"', \
-            block_height='"+str(row_data[2])+"', \
-            block_time='"+str(row_data[3])+"', \
-            season='"+str(row_data[4])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_funding_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO  funding_transactions \
-            (chain, txid, vout, amount, \
-            block_hash, block_height, block_time, \
-            category, fee, address, notary, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_category_vout_txid_funding DO UPDATE SET \
-            chain='"+str(row_data[0])+"', \
-            amount='"+str(row_data[3])+"', \
-            block_hash='"+str(row_data[4])+"', \
-            block_height='"+str(row_data[5])+"', \
-            block_time='"+str(row_data[6])+"', \
-            fee='"+str(row_data[8])+"', \
-            address='"+str(row_data[9])+"', \
-            notary='"+str(row_data[10])+"', \
-            season='"+str(row_data[11])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-# Update this if new third party coins added
-coin_params = {
-    "KMD": KMD_CoinParams,
-    "HUSH3": KMD_CoinParams,
-    "BTC": BTC_CoinParams,
-    "AYA": AYA_CoinParams,
-    "EMC2": EMC2_CoinParams,
-    "GAME": GAME_CoinParams,
-    "GIN": GIN_CoinParams,
-}
-
-third_party_coins = []
-antara_coins = []
-
-
-for item in dpow_coins:
-    if item[6]['server'] == 'dpow-mainnet':
-        if item[1] not in ['KMD', 'BTC']:
-            antara_coins.append(item[1])
-    elif item[6]['server'] == 'dpow-3p':
-        third_party_coins.append(item[1])
-                   
-all_coins = antara_coins + third_party_coins + ['BTC', 'KMD']
-all_antara_coins = antara_coins +[] # add retired smartchains here
-
-for coin in antara_coins:
-    coin_params.update({coin:KMD_CoinParams})
-
-# Need to confirm and fill this in correctly later...
 seasons_info = {
     "Season_1": {
             "start_block":1,
@@ -1310,6 +531,797 @@ notary_pubkeys = {
         "decker_DEV": "02fca8ee50e49f480de275745618db7b0b3680b0bdcce7dcae7d2e0fd5c3345744"
         }
 }
+
+class KMD_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 60,
+                       'SCRIPT_ADDR': 85,
+                       'SECRET_KEY': 188}
+
+class BTC_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 0,
+                       'SCRIPT_ADDR': 5,
+                       'SECRET_KEY': 128}
+
+class AYA_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 23,
+                       'SCRIPT_ADDR': 5,
+                       'SECRET_KEY': 176}
+
+class EMC2_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 33,
+                       'SCRIPT_ADDR': 5,
+                       'SECRET_KEY': 176}
+
+class GAME_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 38,
+                       'SCRIPT_ADDR': 5,
+                       'SECRET_KEY': 166}
+
+class GIN_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 38,
+                       'SCRIPT_ADDR': 10,
+                       'SECRET_KEY': 198}
+
+def get_season(time_stamp):
+    for season in seasons_info:
+        if time_stamp >= seasons_info[season]['start_time'] and time_stamp <= seasons_info[season]['end_time']:
+            return season
+    return "season_undefined"
+
+def get_known_addr(coin, season):
+    # k:v dict for matching address to owner
+    # TODO: add pool addresses
+    addresses = {}
+    bitcoin.params = coin_params[coin]
+    for notary in notary_pubkeys[season]:
+        addr = str(P2PKHBitcoinAddress.from_pubkey(x(notary_pubkeys[season][notary])))
+        addresses.update({addr:notary})
+
+    return addresses
+
+def get_notary_from_address(address):
+    if address in known_addresses:
+        return known_addresses[address]
+    return "unknown"
+
+def lil_endian(hex_str):
+    return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
+
+def get_ntx_txids(ntx_addr, start, end):
+    return rpc["KMD"].getaddresstxids({"addresses": [ntx_addr], "start":start, "end":end})
+    
+def get_ticker(scriptPubKeyBinary):
+    chain = ''
+    while len(chain) < 1:
+        for i in range(len(scriptPubKeyBinary)):
+            if chr(scriptPubKeyBinary[i]).encode() == b'\x00':
+                j = i+1
+                while j < len(scriptPubKeyBinary)-1:
+                    chain += chr(scriptPubKeyBinary[j])
+                    j += 1
+                    if chr(scriptPubKeyBinary[j]).encode() == b'\x00':
+                        break
+                break
+    if chr(scriptPubKeyBinary[-4])+chr(scriptPubKeyBinary[-3])+chr(scriptPubKeyBinary[-2]) =="KMD":
+        chain = "KMD"
+    return str(chain)
+
+def get_ntx_data(txid):
+    raw_tx = rpc["KMD"].getrawtransaction(txid,1)
+    block_hash = raw_tx['blockhash']
+    dest_addrs = raw_tx["vout"][0]['scriptPubKey']['addresses']
+    block_time = raw_tx['blocktime']
+    block_datetime = dt.utcfromtimestamp(raw_tx['blocktime'])
+    this_block_height = raw_tx['height']
+    if len(dest_addrs) > 0:
+        if ntx_addr in dest_addrs:
+            if len(raw_tx['vin']) == 13:
+                notary_list = []
+                for item in raw_tx['vin']:
+                    if "address" in item:
+                        if item['address'] in known_addresses:
+                            notary = known_addresses[item['address']]
+                            notary_list.append(notary)
+                        else:
+                            notary_list.append(item['address'])
+                notary_list.sort()
+                opret = raw_tx['vout'][1]['scriptPubKey']['asm']
+                logger.info(opret)
+                if opret.find("OP_RETURN") != -1:
+                    scriptPubKey_asm = opret.replace("OP_RETURN ","")
+                    ac_ntx_blockhash = lil_endian(scriptPubKey_asm[:64])
+                    try:
+                        ac_ntx_height = int(lil_endian(scriptPubKey_asm[64:72]),16) 
+                    except:
+                        logger.info(scriptPubKey_asm)
+                        sys.exit()
+                    scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
+                    chain = get_ticker(scriptPubKeyBinary)
+                    if chain.endswith("KMD"):
+                        chain = "KMD"
+                    if chain == "KMD":
+                        btc_txid = lil_endian(scriptPubKey_asm[72:136])
+                    elif chain not in noMoM:
+                        # not sure about this bit, need another source to validate the data
+                        try:
+                            start = 72+len(chain)*2+4
+                            end = 72+len(chain)*2+4+64
+                            MoM_hash = lil_endian(scriptPubKey_asm[start:end])
+                            MoM_depth = int(lil_endian(scriptPubKey_asm[end:]),16)
+                        except Exception as e:
+                            logger.debug(e)
+                    # some decodes have a null char error, this gets rid of that so populate script doesnt error out 
+                    if chain.find('\x00') != -1:
+                        chain = chain.replace('\x00','')
+                    # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
+                    if chain.upper() == chain:
+                        if chain not in ['KMD', 'BTC']:
+                            for season_num in seasons_info:
+                                if block_time < seasons_info[season_num]['end_time'] and block_time >= seasons_info[season_num]['start_time']:
+                                    season = season_num
+                        else:
+                            for season_num in seasons_info:
+                                if this_block_height < seasons_info[season_num]['end_block'] and this_block_height >= seasons_info[season_num]['start_block']:
+                                    season = season_num
+                        row_data = (chain, this_block_height, block_time, block_datetime,
+                                    block_hash, notary_list, ac_ntx_blockhash, ac_ntx_height,
+                                    txid, opret, season)
+                        return row_data
+                else:
+                    # no opretrun in tx, and shouldnt polute the DB.
+                    row_data = ("not_opret", this_block_height, block_time, block_datetime,
+                                block_hash, notary_list, "unknown", 0, txid, "unknown", "N/A")
+                    return None
+                
+            else:
+                # These are related to easy mining, and shouldnt polute the DB.
+                row_data = ("low_vin", this_block_height, block_time, block_datetime,
+                            block_hash, [], "unknown", 0, txid, "unknown", "N/A")
+                return None
+        else:
+            # These are outgoing, and should not polute the DB.
+            row_data = ("not_dest", this_block_height, block_time, block_datetime,
+                        block_hash, [], "unknown", 0, txid, "unknown", "N/A")
+            return None
+
+
+def connect_db():
+    conn = psycopg2.connect(
+        host='localhost',
+        user=os.getenv("DB_USER"),
+        password=os.getenv("PASSWORD"),
+        port = "7654",
+        database='postgres'
+    )
+    return conn
+
+# TABLE UPDATES
+
+def get_dpow_coins():
+    conn = connect_db()
+    cursor = conn.cursor()
+    sql = "SELECT * \
+           FROM coins WHERE \
+           dpow_active = 1;"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+dpow_coins = get_dpow_coins()
+
+# Update this if new third party coins added
+coin_params = {
+    "KMD": KMD_CoinParams,
+    "MCL": KMD_CoinParams,
+    "CHIPS": KMD_CoinParams,
+    "VRSC": KMD_CoinParams,
+    "HUSH3": KMD_CoinParams,
+    "BTC": BTC_CoinParams,
+    "AYA": AYA_CoinParams,
+    "EMC2": EMC2_CoinParams,
+    "GAME": GAME_CoinParams,
+    "GIN": GIN_CoinParams,
+}
+
+third_party_coins = []
+antara_coins = []
+
+
+for item in dpow_coins:
+    if item[6]['server'] == 'dpow-mainnet':
+        if item[1] not in ['KMD', 'BTC']:
+            antara_coins.append(item[1])
+    elif item[6]['server'] == 'dpow-3p':
+        third_party_coins.append(item[1])
+                   
+all_coins = antara_coins + third_party_coins + ['BTC', 'KMD']
+all_antara_coins = antara_coins +[] # add retired smartchains here
+
+for coin in antara_coins:
+    coin_params.update({coin:KMD_CoinParams})
+
+for coin in third_party_coins:
+    coin_params.update({coin:coin_params[coin]})
+
+known_addresses = {}
+for coin in all_coins:
+    for season in notary_pubkeys:
+        known_addresses.update(get_known_addr(coin, season))
+
+known_addresses.update({"RKrMB4guHxm52Tx9LG8kK3T5UhhjVuRand":"funding bot"})
+print(known_addresses)
+
+def update_addresses_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO addresses \
+              (season, node, notary, notary_id, chain, pubkey, address) \
+               VALUES (%s, %s, %s, %s, %s, %s, %s) \
+               ON CONFLICT ON CONSTRAINT unique_season_chain_address DO UPDATE SET \
+               node='"+str(row_data[1])+"', notary='"+str(row_data[2])+"', \
+               pubkey='"+str(row_data[5])+"', address='"+str(row_data[6])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        logger.debug(e)
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_balances_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO balances \
+            (notary, chain, balance, address, season, node, update_time) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_address_season_balance DO UPDATE SET \
+            balance="+str(row_data[2])+", \
+            node='"+str(row_data[5])+"', \
+            update_time="+str(row_data[6])+";"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_rewards_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO rewards \
+            (address, notary, utxo_count, eligible_utxo_count, \
+            oldest_utxo_block, balance, rewards, update_time) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_reward_address DO UPDATE SET \
+            notary='"+str(row_data[1])+"', utxo_count="+str(row_data[2])+", \
+            eligible_utxo_count="+str(row_data[3])+", oldest_utxo_block="+str(row_data[4])+", \
+            balance="+str(row_data[5])+", rewards="+str(row_data[6])+", \
+            update_time="+str(row_data[7])+";"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_coins_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO coins \
+            (chain, coins_info, electrums, electrums_ssl, explorers, dpow, dpow_active, mm2_compatible) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_coin DO UPDATE SET \
+            coins_info='"+str(row_data[1])+"', \
+            electrums='"+str(row_data[2])+"', \
+            electrums_ssl='"+str(row_data[3])+"', \
+            explorers='"+str(row_data[4])+"', \
+            dpow='"+str(row_data[5])+"', \
+            dpow_active='"+str(row_data[6])+"', \
+            mm2_compatible='"+str(row_data[7])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_mined_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO mined \
+            (block_height, block_time, block_datetime, value, address, name, txid, season) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_block DO UPDATE SET \
+            block_time='"+str(row_data[1])+"', \
+            block_datetime='"+str(row_data[2])+"', \
+            value='"+str(row_data[3])+"', \
+            address='"+str(row_data[4])+"', \
+            name='"+str(row_data[5])+"', \
+            txid='"+str(row_data[6])+"', \
+            season='"+str(row_data[7])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        logger.debug(e)
+        if str(e).find('Duplicate') == -1:
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_season_mined_count_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  mined_count_season \
+            (notary, season, blocks_mined, sum_value_mined, \
+            max_value_mined, last_mined_blocktime, last_mined_block, \
+            time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_season_mined DO UPDATE SET \
+            blocks_mined="+str(row_data[2])+", sum_value_mined="+str(row_data[3])+", \
+            max_value_mined="+str(row_data[4])+", last_mined_blocktime="+str(row_data[5])+", \
+            last_mined_block="+str(row_data[6])+", time_stamp='"+str(row_data[7])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_season_notarised_chain_tbl(conn, cursor, row_data):
+    sql = "INSERT INTO notarised_chain_season \
+         (chain, ntx_count, block_height, kmd_ntx_blockhash,\
+          kmd_ntx_txid, kmd_ntx_blocktime, opret, ac_ntx_blockhash, \
+          ac_ntx_height, ac_block_height, ntx_lag, season) \
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+          ON CONFLICT ON CONSTRAINT unique_notarised_chain_season DO UPDATE \
+          SET ntx_count="+str(row_data[1])+", block_height="+str(row_data[2])+", \
+          kmd_ntx_blockhash='"+str(row_data[3])+"', kmd_ntx_txid='"+str(row_data[4])+"', \
+          kmd_ntx_blocktime="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
+          ac_ntx_blockhash='"+str(row_data[7])+"', ac_ntx_height="+str(row_data[8])+", \
+          ac_block_height='"+str(row_data[9])+"', ntx_lag='"+str(row_data[10])+"';"
+         
+    cursor.execute(sql, row_data)
+    conn.commit()
+
+def update_season_notarised_count_tbl(conn, cursor, row_data): 
+    sql = "INSERT INTO notarised_count_season \
+        (notary, btc_count, antara_count, \
+        third_party_count, other_count, \
+        total_ntx_count, chain_ntx_counts, \
+        chain_ntx_pct, time_stamp, season) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+        ON CONFLICT ON CONSTRAINT unique_notary_season DO UPDATE SET \
+        btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
+        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
+        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
+        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
+    cursor.execute(sql, row_data)
+    conn.commit()
+
+def update_daily_mined_count_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO mined_count_daily \
+            (notary, blocks_mined, sum_value_mined, \
+            mined_date, time_stamp) VALUES (%s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_daily_mined \
+            DO UPDATE SET \
+            blocks_mined="+str(row_data[1])+", \
+            sum_value_mined='"+str(row_data[2])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_daily_notarised_chain_tbl(conn, cursor, row_data):
+    sql = "INSERT INTO notarised_chain_daily \
+         (chain, ntx_count, notarised_date) \
+          VALUES (%s, %s, %s) \
+          ON CONFLICT ON CONSTRAINT unique_notarised_chain_date DO UPDATE \
+          SET ntx_count="+str(row_data[1])+";"
+    cursor.execute(sql, row_data)
+    conn.commit()
+
+def update_daily_notarised_count_tbl(conn, cursor, row_data): 
+    sql = "INSERT INTO notarised_count_daily \
+        (notary, btc_count, antara_count, \
+        third_party_count, other_count, \
+        total_ntx_count, chain_ntx_counts, \
+        chain_ntx_pct, time_stamp, season, notarised_date) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+        ON CONFLICT ON CONSTRAINT unique_notary_date DO UPDATE SET \
+        btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
+        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
+        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
+        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+",  \
+        season='"+str(row_data[9])+"', notarised_date='"+str(row_data[10])+"';"
+    cursor.execute(sql, row_data)
+    conn.commit()
+
+# NOTARISATION OPS
+
+def get_latest_chain_ntx_info(cursor, chain, height):
+    sql = "SELECT ac_ntx_blockhash, ac_ntx_height, opret, block_hash, txid \
+           FROM notarised WHERE chain = '"+chain+"' AND block_height = "+str(height)+";"
+    cursor.execute(sql)
+    chains_resp = cursor.fetchone()
+    return chains_resp
+
+# MINED OPS
+
+
+def get_miner(block):
+    rpc = {}
+    rpc["KMD"] = def_credentials("KMD")
+    blockinfo = rpc["KMD"].getblock(str(block), 2)
+    blocktime = blockinfo['time']
+    block_datetime = dt.utcfromtimestamp(blockinfo['time'])
+    for tx in blockinfo['tx']:
+        if len(tx['vin']) > 0:
+            if 'coinbase' in tx['vin'][0]:
+                if 'addresses' in tx['vout'][0]['scriptPubKey']:
+                    address = tx['vout'][0]['scriptPubKey']['addresses'][0]
+                    if address in known_addresses:
+                        name = known_addresses[address]
+                    else:
+                        name = address
+                else:
+                    address = "N/A"
+                    name = "non-standard"
+                for season_num in seasons_info:
+                    if blocktime < seasons_info[season_num]['end_time']:
+                        season = season_num
+                        break
+
+                value = tx['vout'][0]['value']
+                row_data = (block, blocktime, block_datetime, Decimal(value), address, name, tx['txid'], season)
+                return row_data
+
+def get_season_mined_counts(conn, cursor, season):
+    sql = "SELECT name, COUNT(*), SUM(value), MAX(value), max(block_time), \
+           max(block_height) FROM mined WHERE block_time >= "+str(seasons_info[season]['start_time'])+" \
+           AND block_time <= "+str(seasons_info[season]['end_time'])+" GROUP BY name;"
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    time_stamp = int(time.time())
+    for item in results:
+        row_data = (item[0], season, int(item[1]), float(item[2]), float(item[3]),
+                    int(item[4]), int(item[5]), int(time_stamp))
+        if item[0] in notary_info:
+            logger.info("Adding "+str(row_data)+" to season_mined_counts table")
+        result = update_season_mined_count_tbl(conn, cursor, row_data)
+    return result
+
+def get_daily_mined_counts(conn, cursor, day):
+    results = get_mined_date_aggregates(cursor, day)
+    time_stamp = int(time.time())
+    for item in results:
+        row_data = (item[0], int(item[1]), float(item[2]), str(day), int(time_stamp))
+        if item[0] in notary_info:
+            logger.info("Adding "+str(row_data)+" to daily_mined_counts table")
+        result = update_daily_mined_count_tbl(conn, cursor, row_data)
+    return result
+
+# AGGREGATES
+
+def get_chain_ntx_season_aggregates(cursor, season):
+    sql = "SELECT chain, MAX(block_height), MAX(block_time), COALESCE(COUNT(*), 0) \
+           FROM notarised WHERE \
+           season = '"+str(season)+"' \
+           GROUP BY chain;"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+def get_chain_ntx_date_aggregates(cursor, day):
+    sql = "SELECT chain, COALESCE(MAX(block_height), 0), COALESCE(MAX(block_time), 0), COALESCE(COUNT(*), 0) \
+           FROM notarised WHERE \
+           DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
+           GROUP BY chain;"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+def get_mined_date_aggregates(cursor, day):
+    sql = "SELECT name, COALESCE(COUNT(*),0), SUM(value) FROM mined WHERE \
+           DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
+           GROUP BY name;"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+# SEASON / DAY FILTERED
+
+def get_ntx_for_season(cursor, season):
+    sql = "SELECT chain, notaries \
+           FROM notarised WHERE \
+           season = '"+str(season)+"';"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+def get_ntx_for_day(cursor, day):
+    sql = "SELECT chain, notaries \
+           FROM notarised WHERE \
+           DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
+    cursor.execute(sql)
+    resp = cursor.fetchall() 
+    return resp
+
+def get_mined_for_season(cursor, season):
+    sql = "SELECT * \
+           FROM mined WHERE \
+           season = '"+str(season)+"';"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+def get_mined_for_day(cursor, day):
+    sql = "SELECT * \
+           FROM mined WHERE \
+           DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+
+# QUICK QUERIES
+
+def get_dates_list(cursor, table, date_col):
+    sql = "SELECT DATE_TRUNC('day', "+date_col+") as day \
+           FROM "+table+" \
+           GROUP BY day;"
+    cursor.execute(sql)
+    dates = cursor.fetchall()
+    date_list = []
+    for date in dates:
+        date_list.append(date[0])
+    return date_list
+
+def get_existing_dates_list(cursor, table, date_col):
+    sql = "SELECT "+date_col+" \
+           FROM "+table+";"
+    cursor.execute(sql)
+    dates = cursor.fetchall()
+    date_list = []
+    for date in dates:
+        date_list.append(date[0])
+    return date_list
+
+def get_records_for_date(cursor, table, date_col, date):
+    sql = "SELECT * \
+           FROM "+table+" WHERE \
+           DATE_TRUNC('day',"+date_col+") = '"+str(date)+"';"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+def select_from_table(cursor, table, cols, conditions=None):
+    sql = "SELECT "+cols+" FROM "+table
+    if conditions:
+        sql = sql+" WHERE "+conditions
+    sql = sql+";"
+    cursor.execute(sql)
+    return cursor.fetchall()
+
+def get_min_from_table(cursor, table, col):
+    sql = "SELECT MIN("+col+") FROM "+table
+    cursor.execute(sql)
+    return cursor.fetchone()[0]
+
+def get_max_from_table(cursor, table, col):
+    sql = "SELECT MAX("+col+") FROM "+table
+    cursor.execute(sql)
+    return cursor.fetchone()[0]
+
+def get_count_from_table(cursor, table, col):
+    sql = "SELECT COALESCE(COUNT("+col+"), 0) FROM "+table
+    cursor.execute(sql)
+    return cursor.fetchone()[0]
+
+def get_sum_from_table(cursor, table, col):
+    sql = "SELECT SUM("+col+") FROM "+table
+    cursor.execute(sql)
+    return cursor.fetchone()[0]
+
+
+# MISC TABLE OPS
+
+def get_table_names(cursor):
+    sql = "SELECT tablename FROM pg_catalog.pg_tables \
+           WHERE schemaname != 'pg_catalog' \
+           AND schemaname != 'information_schema';"
+    cursor.execute(sql)
+    tables = cursor.fetchall()
+    tables_list = []
+    for table in tables:
+        tables_list.append(table[0])
+    return tables_list
+
+def update_table(conn, cursor, table, update_str, condition):
+    try:
+        sql = "UPDATE "+table+" \
+               SET "+update_str+" WHERE "+condition+";"
+        logger.info(sql)
+        cursor.execute(sql)
+        conn.commit()
+        return 1
+    except Exception as e:
+        logger.debug(e)
+        logger.debug(sql)
+        conn.rollback()
+        return 0
+
+def delete_from_table(conn, cursor, table, condition=None):
+    sql = "TRUNCATE "+table
+    if condition:
+        sql = sql+" WHERE "+condition
+    sql = sql+";"
+    cursor.execute()
+    conn.commit()
+
+def ts_col_to_dt_col(conn, cursor, ts_col, dt_col, table):
+    sql = "UPDATE "+table+" SET "+dt_col+"=to_timestamp("+ts_col+");"
+    cursor.execute(sql)
+    conn.commit()
+
+def ts_col_to_season_col(conn, cursor, ts_col, season_col, table):
+    for season in seasons_info:
+        sql = "UPDATE "+table+" \
+               SET "+season_col+"='"+season+"' \
+               WHERE "+ts_col+" > "+str(seasons_info[season]['start_time'])+" \
+               AND "+ts_col+" < "+str(seasons_info[season]['end_time'])+";"
+        cursor.execute(sql)
+        conn.commit()
+
+def update_sync_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO chain_sync \
+            (chain, block_height, sync_hash, explorer_hash) \
+            VALUES (%s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_sync DO UPDATE SET \
+            block_height='"+str(row_data[1])+"', \
+            sync_hash='"+str(row_data[2])+"', \
+            explorer_hash='"+str(row_data[3])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_nn_social_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  nn_social \
+            (notary, twitter, youtube, discord, \
+            telegram, github, keybase, \
+            website, icon,season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_season_social DO UPDATE SET \
+            twitter='"+str(row_data[1])+"', \
+            youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
+            telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
+            keybase='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
+            icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_coin_social_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  coin_social \
+            (chain, twitter, youtube, discord, \
+            telegram, github, explorer, \
+            website, icon, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_season_social DO UPDATE SET \
+            twitter='"+str(row_data[1])+"', \
+            youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
+            telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
+            explorer='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
+            icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_last_ntx_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  last_notarised \
+            (notary, chain, txid, block_height, \
+            block_time, season) VALUES (%s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_chain DO UPDATE SET \
+            txid='"+str(row_data[2])+"', \
+            block_height='"+str(row_data[3])+"', \
+            block_time='"+str(row_data[4])+"', \
+            season='"+str(row_data[5])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_last_btc_ntx_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  last_btc_notarised \
+            (notary, txid, block_height, \
+            block_time, season) VALUES (%s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_btc_ntx DO UPDATE SET \
+            txid='"+str(row_data[1])+"', \
+            block_height='"+str(row_data[2])+"', \
+            block_time='"+str(row_data[3])+"', \
+            season='"+str(row_data[4])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+def update_funding_tbl(conn, cursor, row_data):
+    try:
+        sql = "INSERT INTO  funding_transactions \
+            (chain, txid, vout, amount, \
+            block_hash, block_height, block_time, \
+            category, fee, address, notary, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_category_vout_txid_funding DO UPDATE SET \
+            chain='"+str(row_data[0])+"', \
+            amount='"+str(row_data[3])+"', \
+            block_hash='"+str(row_data[4])+"', \
+            block_height='"+str(row_data[5])+"', \
+            block_time='"+str(row_data[6])+"', \
+            fee='"+str(row_data[8])+"', \
+            address='"+str(row_data[9])+"', \
+            notary='"+str(row_data[10])+"', \
+            season='"+str(row_data[11])+"';"
+        cursor.execute(sql, row_data)
+        conn.commit()
+        return 1
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+        return 0
+
+
+# Need to confirm and fill this in correctly later...
 
 # lists all season, name, address and id info for each notary
 notary_info = {}

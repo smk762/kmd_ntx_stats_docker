@@ -55,11 +55,9 @@ if start_daily_2days_ago:
     max_block_in_db = 24*60*14
 scan_blocks = [*range(max_block_in_db-scan_depth,max_block_in_db,1)]
 
-known_addresses = get_known_addr("KMD", "Season_4")
-
 for block in scan_blocks:
     logger.info("scanning block "+str(block)+"...")
-    row_data = get_miner(block, known_addresses)
+    row_data = get_miner(block)
     if row_data[5] not in recorded_txids:
         logger.info("UPDATING BLOCK: "+str(block))
         update_mined_tbl(conn, cursor, row_data)
@@ -84,7 +82,7 @@ records = []
 start = time.time()
 i = 1
 for block in unrecorded_blocks:
-    records.append(get_miner(block, known_addresses))
+    records.append(get_miner(block))
     if len(records) == 10080:
         now = time.time()
         pct = round(len(records)*i/len(unrecorded_blocks)*100,3)
