@@ -610,7 +610,7 @@ def notary_profile_view(request, notary_name=None):
             "season_nn_chain_ntx_data":season_nn_chain_ntx_data,
             "rank":rank,
             "notary_name":notary_name,
-            "notary_ntx_counts":notary_ntx_counts,
+            #"notary_ntx_counts":notary_ntx_counts,
             "mining_summary":get_nn_mining_summary(notary_name),
             "notary_addresses":notary_addresses
         })
@@ -713,7 +713,8 @@ def funding(request):
     num_low_balance_addresses = 0
     for notary in low_balance_data:
         for chain in low_balance_data[notary]:
-            num_low_balance_addresses += 1
+            if chain in chain_list:
+                num_low_balance_addresses += 1
     num_ok_balance_addresses = num_addresses-num_low_balance_addresses            
 
     for chain in chain_list:
@@ -726,12 +727,13 @@ def funding(request):
         if notary in low_balance_data:
             notary_low_balance_chain_counts.update({notary:len(low_balance_data[notary])})
             for chain in low_balance_data[notary]:
-                if chain == 'KMD_3P':
-                    val = chain_low_balance_notary_counts["KMD"] + 1
-                    chain_low_balance_notary_counts.update({"KMD":val})
-                else:
-                    val = chain_low_balance_notary_counts[chain] + 1
-                    chain_low_balance_notary_counts.update({chain:val})
+                if chain in chain_list:
+                    if chain == 'KMD_3P':
+                        val = chain_low_balance_notary_counts["KMD"] + 1
+                        chain_low_balance_notary_counts.update({"KMD":val})
+                    else:
+                        val = chain_low_balance_notary_counts[chain] + 1
+                        chain_low_balance_notary_counts.update({chain:val})
         if notary not in low_nn_balances['low_balance_notaries']:
             ok_balance_notaries.append(notary)
 

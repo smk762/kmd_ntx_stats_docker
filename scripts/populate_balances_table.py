@@ -70,7 +70,6 @@ DEVISOR = 10512000
 tiptime = rpc.getinfo()['tiptime']
 def get_kmd_rewards():
     nn_utxos = {}
-    known_addresses = get_known_addr("KMD", "Season_4")
     for addr in known_addresses:
         utxos = rpc.getaddressutxos({"addresses": [addr]})
         notary = known_addresses[addr]

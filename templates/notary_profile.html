@@ -41,7 +41,7 @@
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Last Notarisation
-										    <span class="badge kmd_ui_dark1_bg p-1">
+										    <span id="last_ntx" class="badge kmd_ui_dark1_bg p-1">
 										    	{{ ntx_summary.time_since_last_ntx }}<br />{{ ntx_summary.last_ntx_chain }}
 										    </span>
 										</div>
@@ -49,7 +49,7 @@
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 									    	Last BTC Notarisation
-										  	<span class="badge kmd_ui_dark1_bg p-1">
+										  	<span  id="last_btc_ntx" class="badge kmd_ui_dark1_bg p-1">
 										  		{{ ntx_summary.time_since_last_kmd_ntx }}
 										  	</span>
 										</div>
@@ -171,7 +171,7 @@
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card kmd_ui_light4">
 							<div class="card-header kmd_ui_dark1_bg">
-								{{ notary_name }} Last notarisations
+								<h4>{{ notary_name }} Last notarisations</h4>
 							</div>
 							<div class="card-body kmd_ui_dark1_bg">
 								<table id="ntx_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
@@ -213,7 +213,7 @@
 						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
 							<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
 								<div class="my-auto">
-									{{ notary_name }} WALLET BALANCES
+									<h4>{{ notary_name }} WALLET BALANCES</h4>
 								</div>
 								<div>
 								    <span class="badge m-2 p-2 kmd_ui_dark1_bg">MAIN <i class="fa fa-circle" aria-hidden="true" style="color:#2fea8b"></i></span>
@@ -232,10 +232,10 @@
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card kmd_ui_light4">
 							<div class="card-header kmd_ui_dark1_bg">
-								{{ notary_name }} ADDRESSES & BALANCES
+								<h4>{{ notary_name }} ADDRESSES & BALANCES</h4>
 							</div>
 							<div class="card-body kmd_ui_dark1_bg">
-								<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%"  data-ajax="{% url 'balancesViewSet-list' %}?format=datatables&season=Season_4&notary={{ notary_name }}">
+								<table id="balances_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%"  data-ajax="{% url 'balancesViewSet-list' %}?format=datatables&season=Season_4&notary={{ notary_name }}">
 									<thead>
 										<tr>
 											<th data-data="chain">CHAIN</th>
@@ -261,7 +261,8 @@
   	<script>  
 	    $(document).ready(function() {
 	       	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
-	        $('#table_id').DataTable({
+	        var balTable = $('#balances_table').DataTable({  
+		        "paging": false,
         		order: [[ 4, 'asc' ], [ 0, 'asc' ], [ 1, 'asc' ]],
         		"columnDefs": [
         			{
@@ -278,14 +279,20 @@
         			}
         		]
 	        });
-	        $('#ntx_table').DataTable({
-        		order: [[ 3, 'desc' ], [ 0, 'asc' ]],
+	        var ntxTable = $('#ntx_table').DataTable({
+        		order: [[ 3, 'desc' ], [ 0, 'asc' ]],  
+		        "paging": false,
         		"columnDefs": [
         			{
 			            "data": 'chain',
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");
+			            	if (oData.chain == "KMD") {
+			            		$(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/BTC'>BTC</a>");
+			            	} else {
+			            		$(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");	
+			            	}
+				            
 				        }
         			},
         			{
@@ -300,9 +307,32 @@
 			            "targets": 4,
 			            "visible": false
 			        },
+        			{
+			            "data": 'time',
+			            "targets": 5
+			        },
         		]
 	        });
+		    var data = ntxTable
+					   .rows()
+					   .data();
+		    var rows = ntxTable.rows().data();
+		    var j = 0
+		    var max_blk = 0
+			for (var i = rows.length - 1; i >= 0; i--) {
+				if (rows[i].block > max_blk) {
+					max_blk = rows[i].block
+					document.getElementById("last_ntx").innerHTML = rows[i].time+"<br />"+rows[i].chain; 
+				} 
+				if (rows[i].chain == "BTC") {
+					document.getElementById("last_btc_ntx").innerHTML = rows[i].time+"<br />"+rows[i].chain; 
+				} 
+			}
+			console.log(rows[j].time)
+			
+			
 	    });
+  
 	    $.ajax({ 
 	      method: "GET", 
 	      url: 'http://notary.earth:8762/api/graph_json/balances/?notary={{ notary_name }}', 
