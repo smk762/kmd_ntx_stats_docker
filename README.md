@@ -20,7 +20,9 @@ Install Python Packages: `pip3 install -r requirements.txt`
 `sudo docker-compose up` (run to launch containers)
 
 # Setup
-- update settings.py (secret key, pgsql auth, allowed hosts)
+- update settings.py (allowed hosts)
+`ALLOWED_HOSTS = ['YOUR_IP_ADDR','your.domain.com']`
+
 - setup .env files (script pending...)
 
 
