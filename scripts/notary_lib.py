@@ -847,8 +847,9 @@ def update_coins_tbl(conn, cursor, row_data):
 def update_mined_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO mined \
-            (block_height, block_time, block_datetime, value, address, name, txid, season) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s) \
+            (block_height, block_time, block_datetime, \
+             value, address, name, txid, season) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_block DO UPDATE SET \
             block_time='"+str(row_data[1])+"', \
             block_datetime='"+str(row_data[2])+"', \
@@ -858,6 +859,7 @@ def update_mined_tbl(conn, cursor, row_data):
             txid='"+str(row_data[6])+"', \
             season='"+str(row_data[7])+"';"
         cursor.execute(sql, row_data)
+        print((row_data)+" added to db")
         conn.commit()
         return 1
     except Exception as e:

@@ -994,10 +994,13 @@ def dash_view(request, dash_name=None):
         ntx_24hr = notarised.objects.filter(
             block_time__gt=str(int(time.time()-24*60*60))
             ).count()
-
-        mined_24hr = mined.objects.filter(
-            block_time__gt=str(int(time.time()-24*60*60))
-            ).values('season').annotate(sum_mined=Sum('value'))[0]['sum_mined']
+        try:
+            mined_24hr = mined.objects.filter(
+                block_time__gt=str(int(time.time()-24*60*60))
+                ).values('season').annotate(sum_mined=Sum('value'))[0]['sum_mined']
+        except:
+            # no records returned
+            mined_24hr = 0
         biggest_block = mined.objects.filter(season=season).order_by('-value').first()
         print("coin_notariser_ranks")
         print(coin_notariser_ranks)

@@ -33,6 +33,9 @@ class last_notarised(models.Model):
 
     class Meta:
         db_table = 'last_notarised'
+        indexes = [
+            models.Index(fields=['block_time'])
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=['notary','chain'],
