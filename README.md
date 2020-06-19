@@ -25,5 +25,12 @@ Install Python Packages: `pip3 install -r requirements.txt`
 
 - setup .env files (script pending...)
 
+# Create Database Tables
+
+
+Make migrations: `"docker-compose run web python3 manage.py makemigrations"`
+Apply migrations: `"docker-compose run web python3 manage.py migrate"`
+Collect static files: `"docker-compose run web python3 manage.py collectstatic"`
+See https://docs.djangoproject.com/en/3.0/ref/django-admin/ for more django admin commands.
 
 more to come... (need details on overcoming pgsql connection issues - important to setup .env!)
