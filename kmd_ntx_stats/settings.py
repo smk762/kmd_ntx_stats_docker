@@ -30,7 +30,7 @@ SECRET_KEY = 'gy#x5-rfrs&7r=)+pq7i$=%s0mi5+^r1^s7@&v8m##8^7mc1g'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['116.203.120.91', 'notary.earth']
+ALLOWED_HOSTS = ['116.203.120.91', 'notary.earth', '95.217.208.193', 'kmd.stats.io']
 
 
 # Application definition
