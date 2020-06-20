@@ -21,9 +21,23 @@ It should be run as a cronjob every 12-24 hours
 conn = connect_db()
 cursor = conn.cursor()
 
-# Uncomment if chains removed from dpow readme
-#cursor.execute("DELETE FROM coins WHERE dpow_active = 1;")
-#conn.commit()
+# Uncomment if need to clear table
+# cursor.execute("DELETE FROM coins WHERE dpow_active = 1;")
+# conn.commit()
+
+dpow_coins = get_dpow_coins()
+third_party_coins = []
+antara_coins = []
+
+
+for item in dpow_coins:
+    if item[6]['server'] == 'dpow-mainnet':
+        if item[1] not in ['KMD', 'BTC']:
+            antara_coins.append(item[1])
+    elif item[6]['server'] == 'dpow-3p':
+        third_party_coins.append(item[1])
+                   
+before_coins = antara_coins + third_party_coins + ['BTC', 'KMD']
 
 dpow = {}
 dpow_main = []
@@ -34,8 +48,9 @@ lines = dpow_readme.splitlines()
 for line in lines:
     raw_info = line.split("|")
     info = [i.strip() for i in raw_info]
-    if info[0] in all_coins:
+    if len(info) > 4 and info[0].lower() not in ['coin', '--------']:
         coin = info[0]
+        logger.info("Adding "+coin+" to dpow")
         try:
             src = info[1].split("(")[1].replace(")","")
         except:
@@ -53,6 +68,14 @@ for line in lines:
                 "server":server            
             }
         })
+
+now_coins = list(dpow.keys())
+for coin in before_coins:
+    if coin not in now_coins:
+        cursor.execute("DELETE FROM coins WHERE chain = '"+coin+"';")
+        conn.commit()
+
+
 
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/komodo/dev/src/assetchains.json")
 ac_json = r.json()

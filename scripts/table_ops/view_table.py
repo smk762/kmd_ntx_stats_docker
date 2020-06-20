@@ -14,8 +14,11 @@ cursor = conn.cursor()
 table = 'coins'
 
 
-cursor.execute("SELECT * FROM "+table+" WHERE dpow_active = 1;")
-print(cursor.fetchall())
+cursor.execute("SELECT chain FROM "+table+" WHERE dpow_active = 1;")
+results = cursor.fetchall()
+print(results)
+print(len(results))
+
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
