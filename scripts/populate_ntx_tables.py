@@ -31,12 +31,12 @@ class daily_chain_thread(threading.Thread):
         self.day = day
     def run(self):
         thread_chain_ntx_daily_aggregate(self.cursor, self.season, self.day)
-        
+
 # set this to false when originally populating the table, or rescanning
 skip_past_seasons = True
 
 # set this to True to quickly update tables with most recent data
-skip_until_yesterday = False
+skip_until_yesterday = True
 
 load_dotenv()
 
@@ -166,26 +166,26 @@ def update_daily_notarised_chains(season):
     logger.info(season + " start: " + str(season_start_dt))
     logger.info(season + " end: " + str(season_end_dt))
 
-    start = season_start_dt.date()
+    day = season_start_dt.date()
     end = datetime.date.today()
+    delta = datetime.timedelta(days=1)
     if skip_until_yesterday:
         logger.info("Starting "+season+" scan from 24hrs ago...")
-        start = end - datetime.timedelta(days=1)
-    delta = datetime.timedelta(days=1)
-    day = start
+        day = end - delta
+    else:
+        logger.info("Starting "+season+" scan from start of "+season)
+        day = season_start_dt.date()
+
     while day <= end:
-        if day >= season_start_dt.date() and day <= season_end_dt.date():
-            thread_list = []
-            while day <= end:
-                logger.info("Aggregating chain notarisations for "+str(day))
-                thread_list.append(daily_chain_thread(cursor, season, day))
-                day += delta
-            for thread in thread_list:
-                time.sleep(10)
-                thread.start()
-            logger.info("Notarised blocks for daily chains aggregation complete!")
-        else:
-            logger.info("Skipping "+str(day)+", ouside "+season+" range of "+str(season_start_dt)+" to "+str(season_end_dt))
+        thread_list = []
+        while day <= end:
+            logger.info("Aggregating chain notarisations for "+str(day))
+            thread_list.append(daily_chain_thread(cursor, season, day))
+            day += delta
+        for thread in thread_list:
+            time.sleep(5)
+            thread.start()
+        logger.info("Notarised blocks for daily chains aggregation complete!")
         day += delta
     logger.info("Notarised daily aggregation for "+season+" chains finished...")
 
@@ -218,97 +218,97 @@ def update_daily_notarised_counts(season):
     logger.info(season + " start: " + str(season_start_dt))
     logger.info(season + " end: " + str(season_end_dt))
 
-    start = season_start_dt.date()
+    day = season_start_dt.date()
     end = datetime.date.today()
-    if skip_until_yesterday:
-        logger.info("Starting "+season+" scan from 24hrs ago...")
-        start = end - datetime.timedelta(days=1)
     delta = datetime.timedelta(days=1)
-    day = start
+    if skip_until_yesterday:
+        logger.warning("Starting "+season+" scan from 24hrs ago...")
+        day = end - delta
+    else:
+        logger.warning("Starting "+season+" scan from start of "+season)
+        day = season_start_dt.date()
+
     while day <= end:
-        if day >= season_start_dt.date() and day <= season_end_dt.date():
-            logger.info("Getting daily "+season+" notary notarisations via get_ntx_for_day for "+str(day))
-            results = get_ntx_for_day(cursor, day)
-            # Get list of chain/notary list dicts :p
-            results_list = []
-            time_stamp = int(time.time())
-            for item in results:
-                results_list.append({
-                        "chain":item[0],
-                        "notaries":item[1]
-                    })
-            # iterate over notaries list for each record and add to count for chain foreach notary
-            notary_ntx_counts = {}
-            logger.info("Aggregating "+str(len(results_list))+" rows from notarised table for "+str(day))
-            for item in results_list:
-                notaries = item['notaries']
-                chain = item['chain']
-                for notary in notaries:
-                    if notary not in notary_ntx_counts:
-                        notary_ntx_counts.update({notary:{}})
-                    if chain not in notary_ntx_counts[notary]:
-                        notary_ntx_counts[notary].update({chain:1})
-                    else:
-                        count = notary_ntx_counts[notary][chain]+1
-                        notary_ntx_counts[notary].update({chain:count})
+        logger.info("Getting daily "+season+" notary notarisations via get_ntx_for_day for "+str(day))
+        results = get_ntx_for_day(cursor, day)
+        # Get list of chain/notary list dicts :p
+        results_list = []
+        time_stamp = int(time.time())
+        for item in results:
+            results_list.append({
+                    "chain":item[0],
+                    "notaries":item[1]
+                })
+        # iterate over notaries list for each record and add to count for chain foreach notary
+        notary_ntx_counts = {}
+        logger.info("Aggregating "+str(len(results_list))+" rows from notarised table for "+str(day))
+        for item in results_list:
+            notaries = item['notaries']
+            chain = item['chain']
+            for notary in notaries:
+                if notary not in notary_ntx_counts:
+                    notary_ntx_counts.update({notary:{}})
+                if chain not in notary_ntx_counts[notary]:
+                    notary_ntx_counts[notary].update({chain:1})
+                else:
+                    count = notary_ntx_counts[notary][chain]+1
+                    notary_ntx_counts[notary].update({chain:count})
 
-            # iterate over notary chain counts to calculate scoring category counts.
-            node_counts = {}
-            other_coins = []
-            notary_ntx_pct = {}
-            for notary in notary_ntx_counts:
-                notary_ntx_pct.update({notary:{}})
-                node_counts.update({notary:{
-                        "btc_count":0,
-                        "antara_count":0,
-                        "third_party_count":0,
-                        "other_count":0,
-                        "total_ntx_count":0
-                    }})
-                for chain in notary_ntx_counts[notary]:
-                    if chain == "KMD":
-                        count = node_counts[notary]["btc_count"]+notary_ntx_counts[notary][chain]
-                        node_counts[notary].update({"btc_count":count})
-                    elif chain in all_antara_coins:
-                        count = node_counts[notary]["antara_count"]+notary_ntx_counts[notary][chain]
-                        node_counts[notary].update({"antara_count":count})
-                    elif chain in third_party_coins:
-                        count = node_counts[notary]["third_party_count"]+notary_ntx_counts[notary][chain]
-                        node_counts[notary].update({"third_party_count":count})
-                    else:
-                        count = node_counts[notary]["other_count"]+notary_ntx_counts[notary][chain]
-                        node_counts[notary].update({"other_count":count})
-                        other_coins.append(chain)
+        # iterate over notary chain counts to calculate scoring category counts.
+        node_counts = {}
+        other_coins = []
+        notary_ntx_pct = {}
+        for notary in notary_ntx_counts:
+            notary_ntx_pct.update({notary:{}})
+            node_counts.update({notary:{
+                    "btc_count":0,
+                    "antara_count":0,
+                    "third_party_count":0,
+                    "other_count":0,
+                    "total_ntx_count":0
+                }})
+            for chain in notary_ntx_counts[notary]:
+                if chain == "KMD":
+                    count = node_counts[notary]["btc_count"]+notary_ntx_counts[notary][chain]
+                    node_counts[notary].update({"btc_count":count})
+                elif chain in all_antara_coins:
+                    count = node_counts[notary]["antara_count"]+notary_ntx_counts[notary][chain]
+                    node_counts[notary].update({"antara_count":count})
+                elif chain in third_party_coins:
+                    count = node_counts[notary]["third_party_count"]+notary_ntx_counts[notary][chain]
+                    node_counts[notary].update({"third_party_count":count})
+                else:
+                    count = node_counts[notary]["other_count"]+notary_ntx_counts[notary][chain]
+                    node_counts[notary].update({"other_count":count})
+                    other_coins.append(chain)
 
-                    count = node_counts[notary]["total_ntx_count"]+notary_ntx_counts[notary][chain]
-                    node_counts[notary].update({"total_ntx_count":count})
+                count = node_counts[notary]["total_ntx_count"]+notary_ntx_counts[notary][chain]
+                node_counts[notary].update({"total_ntx_count":count})
 
-            # get daily ntx total for each chain
-            chain_totals = {}
-            chains_aggr_resp = get_chain_ntx_date_aggregates(cursor, day)
-            for item in chains_aggr_resp:
-                chain = item[0]
-                max_block = item[1]
-                max_blocktime = item[2]
-                ntx_count = item[3]
-                chain_totals.update({chain:ntx_count})
-            logger.info("chain_totals: "+str(chain_totals))
-            # calculate notary ntx percentage for chains and add row to db table.
-            for notary in node_counts:
-                for chain in notary_ntx_counts[notary]:
-                    logger.info(notary+" count for "+chain+": "+str(notary_ntx_counts[notary][chain]))
-                    logger.info("Total count for "+chain+": "+str(chain_totals[chain]))
-                    pct = round(notary_ntx_counts[notary][chain]/chain_totals[chain]*100,2)
-                    logger.info("Pct: "+str(pct))
-                    notary_ntx_pct[notary].update({chain:pct})
-                row_data = (notary, node_counts[notary]['btc_count'], node_counts[notary]['antara_count'], 
-                            node_counts[notary]['third_party_count'], node_counts[notary]['other_count'], 
-                            node_counts[notary]['total_ntx_count'], json.dumps(notary_ntx_counts[notary]),
-                            json.dumps(notary_ntx_pct[notary]), time_stamp, season, day)
-                logger.info("Adding counts for "+season+" "+notary+" for "+str(day)+" to notarised_count_daily table")
-                update_daily_notarised_count_tbl(conn, cursor, row_data)
-        else:
-            logger.info("Skipping "+str(day)+", ouside "+season+" range of "+str(season_start_dt)+" to "+str(season_end_dt))
+        # get daily ntx total for each chain
+        chain_totals = {}
+        chains_aggr_resp = get_chain_ntx_date_aggregates(cursor, day)
+        for item in chains_aggr_resp:
+            chain = item[0]
+            max_block = item[1]
+            max_blocktime = item[2]
+            ntx_count = item[3]
+            chain_totals.update({chain:ntx_count})
+        logger.info("chain_totals: "+str(chain_totals))
+        # calculate notary ntx percentage for chains and add row to db table.
+        for notary in node_counts:
+            for chain in notary_ntx_counts[notary]:
+                #logger.info(notary+" count for "+chain+": "+str(notary_ntx_counts[notary][chain]))
+                #logger.info("Total count for "+chain+": "+str(chain_totals[chain]))
+                pct = round(notary_ntx_counts[notary][chain]/chain_totals[chain]*100,2)
+                #logger.info("Pct: "+str(pct))
+                notary_ntx_pct[notary].update({chain:pct})
+            row_data = (notary, node_counts[notary]['btc_count'], node_counts[notary]['antara_count'], 
+                        node_counts[notary]['third_party_count'], node_counts[notary]['other_count'], 
+                        node_counts[notary]['total_ntx_count'], json.dumps(notary_ntx_counts[notary]),
+                        json.dumps(notary_ntx_pct[notary]), time_stamp, season, day)
+            logger.info("Adding counts for "+season+" "+notary+" for "+str(day)+" to notarised_count_daily table")
+            update_daily_notarised_count_tbl(conn, cursor, row_data)
         day += delta
     logger.info("Notarised blocks daily aggregation for "+season+" notaries finished...")
 
@@ -407,8 +407,6 @@ tip = int(rpc["KMD"].getblockcount())
 
 recorded_txids = []
 start_block = seasons_info[season]["start_block"]
-if skip_until_yesterday:
-    start_block = tip - 24*60
 if skip_until_yesterday:
     start_block = tip - 24*60
 all_txids = []
