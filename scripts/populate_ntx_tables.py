@@ -53,20 +53,6 @@ cursor = conn.cursor()
 
 # Seems to be two txids that are duplicate.
 # TODO: scan to find out what the duplicate txids are and which blocks they are in
-
-
-def get_season_from_notaries(notaries):
-    seasons = list(notary_addresses.keys())[::-1]
-    for season in seasons:
-        notary_seasons = []
-        for notary in notaries:
-            if season.find("Third") == -1 and season.find(".5") == -1:
-                season_notaries = list(notary_addresses[season].keys())
-                if notary in season_notaries:
-                    notary_seasons.append(season)
-        if len(notary_seasons) == 13:
-            return season
-    return None
     
 def update_notarisations():
     # Get chain and time of last ntx
@@ -107,7 +93,7 @@ def update_notarisations():
             block_time = row_data[2]
             txid = row_data[8]
             notaries = row_data[5]
-            season = get_season_from_notaries(notaries)
+            season = row_data[10]            
             if not season:
                 if chain not in ['KMD', 'BTC']:
                     for season_num in seasons_info:

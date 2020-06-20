@@ -618,6 +618,36 @@ def get_ticker(scriptPubKeyBinary):
         chain = "KMD"
     return str(chain)
 
+
+def get_season_from_notaries(notaries):
+    seasons = list(notary_addresses.keys())[::-1]
+    for season in seasons:
+        notary_seasons = []
+        for notary in notaries:
+            if season.find("Third") == -1 and season.find(".5") == -1:
+                season_notaries = list(notary_addresses[season].keys())
+                if notary in season_notaries:
+                    notary_seasons.append(season)
+        if len(notary_seasons) == 13:
+            return season
+    return None
+
+def get_season_from_addresses(notaries, address_list, chain):
+    seasons = list(notary_addresses.keys())[::-1]
+    for season in seasons:
+        notary_seasons = []
+        for notary in notaries:
+            season_notaries = list(notary_addresses[season].keys())
+            if notary in season_notaries:
+                if chain in notary_addresses[season][notary]:
+                    addr = notary_addresses[season][notary][chain]
+                    if addr in address_list:
+                        season_num = season[0:8]
+                        notary_seasons.append(season_num)
+        if len(notary_seasons) == 13:
+            return season_num
+    return None
+
 def get_ntx_data(txid):
     raw_tx = rpc["KMD"].getrawtransaction(txid,1)
     block_hash = raw_tx['blockhash']
@@ -629,8 +659,10 @@ def get_ntx_data(txid):
         if ntx_addr in dest_addrs:
             if len(raw_tx['vin']) == 13:
                 notary_list = []
+                address_list = []
                 for item in raw_tx['vin']:
                     if "address" in item:
+                        address_list.append(item['address'])
                         if item['address'] in known_addresses:
                             notary = known_addresses[item['address']]
                             notary_list.append(notary)
@@ -667,14 +699,16 @@ def get_ntx_data(txid):
                         chain = chain.replace('\x00','')
                     # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
                     if chain.upper() == chain:
-                        if chain not in ['KMD', 'BTC']:
-                            for season_num in seasons_info:
-                                if block_time < seasons_info[season_num]['end_time'] and block_time >= seasons_info[season_num]['start_time']:
-                                    season = season_num
-                        else:
-                            for season_num in seasons_info:
-                                if this_block_height < seasons_info[season_num]['end_block'] and this_block_height >= seasons_info[season_num]['start_block']:
-                                    season = season_num
+                        season = get_season_from_addresses(notary_list, address_list, chain)
+                        if not season:
+                            if chain not in ['KMD', 'BTC']:
+                                for season_num in seasons_info:
+                                    if block_time < seasons_info[season_num]['end_time'] and block_time >= seasons_info[season_num]['start_time']:
+                                        season = season_num
+                            else:
+                                for season_num in seasons_info:
+                                    if this_block_height < seasons_info[season_num]['end_block'] and this_block_height >= seasons_info[season_num]['start_block']:
+                                        season = season_num
                         row_data = (chain, this_block_height, block_time, block_datetime,
                                     block_hash, notary_list, ac_ntx_blockhash, ac_ntx_height,
                                     txid, opret, season)

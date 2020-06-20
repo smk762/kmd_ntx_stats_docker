@@ -75,19 +75,6 @@ logger.info("TXIDs in database (set): "+str(len(set(recorded_txids))))
 logger.info("TXIDs not in database: "+str(len(unrecorded_txids)))
 
 
-def get_season_from_notaries(notaries):
-    seasons = list(notary_addresses.keys())[::-1]
-    for season in seasons:
-        notary_seasons = []
-        for notary in notaries:
-            if season.find("Third") == -1 and season.find(".5") == -1:
-                season_notaries = list(notary_addresses[season].keys())
-                if notary in season_notaries:
-                    notary_seasons.append(season)
-        if len(notary_seasons) == 13:
-            return season
-    return None
-
 def update_notarisations():
     # Get chain and time of last ntx
     cursor.execute("SELECT notary, chain, block_height from last_notarised;")
@@ -128,7 +115,7 @@ def update_notarisations():
             block_time = row_data[2]
             txid = row_data[8]
             notaries = row_data[5]
-            season = get_season_from_notaries(notaries)
+            season = row_data[10]
             if not season:
                 if chain not in ['KMD', 'BTC']:
                     for season_num in seasons_info:
