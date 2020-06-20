@@ -80,7 +80,7 @@ def bulk_load_mined_clocks(conn, cursor, season):
         if block >= start_block:
             row_data = get_miner(block)
             records.append(row_data)
-            if len(records) == 10080:
+            if len(records) == 1000:
                 now = time.time()
                 pct = round(len(records)*i/len(unrecorded_blocks)*100,3)
                 runtime = int(now-start)
@@ -128,7 +128,7 @@ day = start
 while day <= end:
     get_daily_mined_counts(conn, cursor, day)
     day += delta
-logging.info("Finished!")
+logger.info("Finished!")
 
 
 cursor.close()

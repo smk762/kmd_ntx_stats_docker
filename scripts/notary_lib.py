@@ -976,6 +976,7 @@ def get_latest_chain_ntx_info(cursor, chain, height):
 
 
 def get_miner(block):
+    logger.info("Getting mining data for block "+str(block))
     rpc = {}
     rpc["KMD"] = def_credentials("KMD")
     blockinfo = rpc["KMD"].getblock(str(block), 2)
