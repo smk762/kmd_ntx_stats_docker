@@ -19,11 +19,10 @@ Install Python Packages: `pip3 install -r requirements.txt`
 `sudo docker-compose build`  (needs to be run to apply code changes)
 `sudo docker-compose up` (run to launch containers)
 
-# Setup
-- update settings.py (allowed hosts)
-`ALLOWED_HOSTS = ['YOUR_IP_ADDR','your.domain.com']`
-
-- setup .env files (script pending...)
+# Setup .env files (scripts pending...)
+- pgsql credentials
+- django secret key
+- allowed hosts
 
 # Create Database Tables
 
@@ -33,4 +32,9 @@ Apply migrations: `"docker-compose run web python3 manage.py migrate"`
 Collect static files: `"docker-compose run web python3 manage.py collectstatic"`
 See https://docs.djangoproject.com/en/3.0/ref/django-admin/ for more django admin commands.
 
-more to come... (need details on overcoming pgsql connection issues - important to setup .env!)
+
+# Applying code changes
+`cd ~/kmd_ntx_stats_docker`
+`docker-compose build`
+`sudo chown $USER:$USER /home/$USER/kmd_ntx_stats_docker/postgres-data -R`
+`docker-compose build`
