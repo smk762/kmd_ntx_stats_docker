@@ -26,15 +26,14 @@ Install Python Packages: `pip3 install -r requirements.txt`
 
 # Create Database Tables
 
-
 Make migrations: `"docker-compose run web python3 manage.py makemigrations"`
 Apply migrations: `"docker-compose run web python3 manage.py migrate"`
 Collect static files: `"docker-compose run web python3 manage.py collectstatic"`
 See https://docs.djangoproject.com/en/3.0/ref/django-admin/ for more django admin commands.
-
 
 # Applying code changes
 `cd ~/kmd_ntx_stats_docker`
 `docker-compose build`
 `sudo chown $USER:$USER /home/$USER/kmd_ntx_stats_docker/postgres-data -R`
 `docker-compose build`
+`sudo cp -R static /var/www/stats.kmd.io/html`
