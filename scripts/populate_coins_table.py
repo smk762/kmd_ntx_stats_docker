@@ -28,7 +28,7 @@ cursor = conn.cursor()
 dpow_coins = get_dpow_coins()
 third_party_coins = []
 antara_coins = []
-
+other_coins
 
 for item in dpow_coins:
     if item[6]['server'] == 'dpow-mainnet':
@@ -36,8 +36,11 @@ for item in dpow_coins:
             antara_coins.append(item[1])
     elif item[6]['server'] == 'dpow-3p':
         third_party_coins.append(item[1])
+    else:
+        other_coins.append(item[1])
+
                    
-before_coins = antara_coins + third_party_coins + ['BTC', 'KMD']
+before_coins = antara_coins + third_party_coins + other_coins + ['BTC', 'KMD']
 
 dpow = {}
 dpow_main = []
