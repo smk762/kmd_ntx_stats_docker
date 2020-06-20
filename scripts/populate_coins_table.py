@@ -28,7 +28,7 @@ cursor = conn.cursor()
 dpow_coins = get_dpow_coins()
 third_party_coins = []
 antara_coins = []
-other_coins
+other_coins = []
 
 for item in dpow_coins:
     if item[6]['server'] == 'dpow-mainnet':
