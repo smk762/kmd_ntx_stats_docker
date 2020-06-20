@@ -3,6 +3,7 @@ import os
 import sys
 import json
 import time
+import requests
 import logging
 import logging.handlers
 import psycopg2
@@ -48,7 +49,7 @@ tip = int(rpc["KMD"].getblockcount())
 recorded_txids = []
 start_block = seasons_info[season]["start_block"]
 if skip_until_yesterday:
-    start_block = tip - 24*60*3
+    start_block = tip - 24*60
 all_txids = []
 chunk_size = 100000
 
