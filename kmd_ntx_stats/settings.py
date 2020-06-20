@@ -32,7 +32,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['116.203.120.91', 'notary.earth', '95.217.208.193', 'kmd.stats.io']
 
-
 # Application definition
 
 INSTALLED_APPS = [
