@@ -124,16 +124,7 @@ def update_notarisations():
                 for season_num in seasons_info:
                     if block_height < seasons_info[season_num]['end_block'] and block_height >= seasons_info[season_num]['start_block']:
                         season = season_num
-            if chain == 'CHIPS':
-                print(notaries)
-                print(season)
-                print(block_height)
-                print(block_time)
-                print("-------------")
-            
-
-            print("Scanning "+season)
-            # update last ntx or last btc if newer than in tables.
+            print(season+" | "+chain+" | "+block_height+" | "+notaries+" | "+)            # update last ntx or last btc if newer than in tables.
             for notary in notaries:
                 last_ntx_row_data = (notary, chain, txid, block_height,
                                      block_time, season)

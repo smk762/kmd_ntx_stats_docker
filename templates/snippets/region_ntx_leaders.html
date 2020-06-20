@@ -1,4 +1,5 @@
 
+{% load static %}
 				<div class="row m-3">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mb-0">
@@ -10,7 +11,15 @@
 											{% if notary_data.rank == 1 %}
 										    <div class="badge kmd_ui_dark4_bg m-2" style="width:16%; background-color: #26456B !important;">
 										    	<div class="col-12">
-										    		<i class="fas fa-trophy" style="font-size:1.5em"></i>
+													{% for nn, site_links in nn_social.items %}
+														{% if notary == nn %}
+															{% if site_links.icon != '' %}
+																<img class="card-img-top m-auto auto-width p-2" height='96px' src="{{ site_links.icon }}" alt="{{ notary }} image here" style="border-radius: 50%;">
+															{% else %}
+																<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/notary/icon/' %}{{ notary }}.png" alt="{{ notary }} image here" style="border-radius: 50%;">
+															{% endif %}
+														{% endif %}
+													{% endfor %}
 										    	</div>
 										    	<div class="col-12">
 										    		<a class="badge kmd_ui_dark1_bg" style="font-size: 1.3em" href="http://{{ request.get_host }}/notary_profile/{{ notary }}"> {{ notary }} <br /><span style="font-size: 1.2em; line-height: 1.3em;">{{ notary_data.score|floatformat:-3 }}</span></a>
