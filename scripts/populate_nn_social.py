@@ -21,8 +21,6 @@ cursor = conn.cursor()
 season = "Season_4"
 for notary in notary_lib.notary_pubkeys['Season_4']:
     notary_name = notary.split("_")[0]
-    print(notary_name)
-    print(nn_social[notary_name])
     for region in nn_social[notary_name]['regions']:
         row_list = [notary_name+"_"+region]
         for social in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase', 'website', 'icon']:

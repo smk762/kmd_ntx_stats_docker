@@ -760,7 +760,6 @@ for coin in all_coins:
         known_addresses.update(get_known_addr(coin, season))
 
 known_addresses.update({"RKrMB4guHxm52Tx9LG8kK3T5UhhjVuRand":"funding bot"})
-print(known_addresses)
 
 def update_addresses_tbl(conn, cursor, row_data):
     try:

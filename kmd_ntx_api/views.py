@@ -827,15 +827,12 @@ def ntx_scoreboard(request):
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
  
     coin_notariser_ranks = get_coin_notariser_ranks(season)
-    print("coin_notariser_ranks")
-    print(coin_notariser_ranks)
     notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
-    print("notarisation_scores")
-    print(notarisation_scores)
     context = {
         "sidebar_links":get_sidebar_links(notary_list ,coins_data),
         "eco_data_link":get_eco_data_link(),
-        "notarisation_scores":notarisation_scores
+        "notarisation_scores":notarisation_scores,
+        "nn_social":get_nn_social()
     }
     return render(request, 'ntx_scoreboard.html', context)
     
@@ -1002,11 +999,7 @@ def dash_view(request, dash_name=None):
             # no records returned
             mined_24hr = 0
         biggest_block = mined.objects.filter(season=season).order_by('-value').first()
-        print("coin_notariser_ranks")
-        print(coin_notariser_ranks)
         notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
-        print("notarisation_scores")
-        print(notarisation_scores)
         context.update({
             "ntx_24hr":ntx_24hr,
             "mined_24hr":mined_24hr,
