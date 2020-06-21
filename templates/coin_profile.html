@@ -234,7 +234,7 @@
 	    });
 	    $.ajax({ 
 	      method: "GET", 
-	      url: 'http://notary.earth:8762/api/graph_json/balances/?chain={{ chain }}', 
+	      url: 'http://{{ request.get_host }}/api/graph_json/balances/?chain={{ chain }}', 
 	      success: function(data) { 
 	      	//document.getElementById('graph_title').innerHTML = data.chartLabel;
 	        //drawLineGraph(data, 'myChartline'); 

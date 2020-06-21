@@ -51,7 +51,7 @@ lines = dpow_readme.splitlines()
 for line in lines:
     raw_info = line.split("|")
     info = [i.strip() for i in raw_info]
-    if len(info) > 4 and info[0].lower() not in ['coin', '--------']:
+    if len(info) > 4 and info[0].lower() not in ['coin', '--------', 'game']:
         coin = info[0]
         logger.info("Adding "+coin+" to dpow")
         try:
@@ -73,8 +73,11 @@ for line in lines:
         })
 
 now_coins = list(dpow.keys())
+print(before_coins)
+print(now_coins)
 for coin in before_coins:
     if coin not in now_coins:
+        print("Removing "+coin+" from dpow")
         cursor.execute("DELETE FROM coins WHERE chain = '"+coin+"';")
         conn.commit()
 
