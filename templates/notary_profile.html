@@ -190,15 +190,17 @@
 										{% for notary, chain_vals in season_nn_chain_ntx_data.items %}
 											{% if notary == notary_name %}
 												{% for chain, vals in chain_vals.items %}
-												<tr>
-													<td data-data="chain">{{ chain }}</td>
-													<td data-data="count">{{ vals.num_nn_chain_ntx }}</td>
-													<td data-data="pct">{{ vals.participation_pct }}%</td>
-													<td data-data="block">{{ vals.last_ntx_block }}</td>
-													<td data-data="txid">{{ vals.last_ntx_txid }}</td>
-													<td data-data="time" data-order="{{ vals.last_ntx_block }}">{{ vals.time_since }}</td>
-													<td data-data="fund_ntx_ratio">TBA</td>
-												</tr>
+													{% if chain != "GAME" %}
+													<tr>
+														<td data-data="chain">{{ chain }}</td>
+														<td data-data="count">{{ vals.num_nn_chain_ntx }}</td>
+														<td data-data="pct">{{ vals.participation_pct }}%</td>
+														<td data-data="block">{{ vals.last_ntx_block }}</td>
+														<td data-data="txid">{{ vals.last_ntx_txid }}</td>
+														<td data-data="time" data-order="{{ vals.last_ntx_block }}">{{ vals.time_since }}</td>
+														<td data-data="fund_ntx_ratio">TBA</td>
+													</tr>
+													{% endif %}
 												{% endfor %}
 											{% endif %}
 										{% endfor %}
@@ -331,7 +333,7 @@
   
 	    $.ajax({ 
 	      method: "GET", 
-	      url: 'http://notary.earth:8762/api/graph_json/balances/?notary={{ notary_name }}', 
+	      url: 'http://{{ request.get_host }}/api/graph_json/balances/?notary={{ notary_name }}', 
 	      success: function(data) { 
 	      	//document.getElementById('graph_title').innerHTML = data.chartLabel;
 	        //drawLineGraph(data, 'myChartline'); 

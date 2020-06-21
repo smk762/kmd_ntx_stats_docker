@@ -151,6 +151,7 @@ def get_mainnet_chains(coins_data):
     for item in coins_data:
         if item['dpow']['server'].lower() == "dpow-mainnet":
             main_chains.append(item['chain'])
+    main_chains.sort()
     return main_chains
 
 def get_third_party_chains(coins_data):
@@ -158,6 +159,7 @@ def get_third_party_chains(coins_data):
     for item in coins_data:
         if item['dpow']['server'].lower() == "dpow-3p":
             third_chains.append(item['chain'])
+    third_chains.sort()
     return third_chains
 
 def get_server_chains(coins_data):
@@ -175,16 +177,6 @@ def get_ntx_score(btc_ntx, main_ntx, third_party_ntx):
         main_chains.remove('BTC')
     if 'KMD' in main_chains:
         main_chains.remove('KMD')
-    '''
-    print(len(third_party))
-    print(third_party)
-    print(len(main_chains))
-    print(main_chains)
-    '''
-    print('main_ntx')
-    print(main_ntx)
-    print('third_party_ntx')
-    print(third_party_ntx)
     return btc_ntx*0.0325 + main_ntx*0.8698/len(main_chains) + third_party_ntx*0.0977/len(third_party)
  
 def prepare_notary_balance_graph_data(chain_low_balance_notary_counts):

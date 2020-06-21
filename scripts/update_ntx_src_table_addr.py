@@ -115,20 +115,20 @@ def update_notarisations():
             block_time = row_data[2]
             txid = row_data[8]
             notaries = row_data[5]
-            season = row_data[10]
-            if not season:
+            ntx_season = row_data[10]
+            if not ntx_season:
                 if chain not in ['KMD', 'BTC']:
                     for season_num in seasons_info:
                         if block_time < seasons_info[season_num]['end_time'] and block_time >= seasons_info[season_num]['start_time']:
-                            season = season_num
+                            ntx_season = season_num
                 else:
                     for season_num in seasons_info:
                         if block_height < seasons_info[season_num]['end_block'] and block_height >= seasons_info[season_num]['start_block']:
-                            season = season_num
-            print(season+" | "+chain+" | "+str(block_height)+" | "+str(notaries)+" | ")            # update last ntx or last btc if newer than in tables.
+                            ntx_season = season_num
+            print(ntx_season+" | "+chain+" | "+str(block_height)+" | "+str(notaries)+" | ")            # update last ntx or last btc if newer than in tables.
             for notary in notaries:
                 last_ntx_row_data = (notary, chain, txid, block_height,
-                                     block_time, season)
+                                     block_time, ntx_season)
             
                 if notary in notary_last_ntx:
                     if chain not in notary_last_ntx[notary]:
@@ -139,7 +139,7 @@ def update_notarisations():
                     update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
                 if chain == 'KMD':
                     last_btc_ntx_row_data = (notary, txid, block_height,
-                                         block_time, season)
+                                         block_time, ntx_season)
 
                     if notary in notary_last_btc_ntx:
                         if block_height > notary_last_btc_ntx[notary]:

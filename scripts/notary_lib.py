@@ -634,18 +634,42 @@ def get_season_from_notaries(notaries):
 
 def get_season_from_addresses(notaries, address_list, chain):
     seasons = list(notary_addresses.keys())[::-1]
+    notary_seasons = []
+    last_season_num = None
     for season in seasons:
-        notary_seasons = []
+        season_num = season[0:8]
+        if last_season_num != season_num:
+            notary_seasons = []
+
         for notary in notaries:
             season_notaries = list(notary_addresses[season].keys())
             if notary in season_notaries:
                 if chain in notary_addresses[season][notary]:
-                    addr = notary_addresses[season][notary][chain]
+                    addr = notary_addresses[season][notary]["KMD"]
+                    #print(notary+": "+addr)
                     if addr in address_list:
-                        season_num = season[0:8]
                         notary_seasons.append(season_num)
         if len(notary_seasons) == 13:
-            return season_num
+            break
+        last_season_num = season_num
+    if chain == "GAME":
+        print("================================")
+        print(chain)
+        print(notaries)
+        print(address_list)
+        print(notary_seasons)
+        print(season)
+        print(season_num)
+        print("================================")
+    if len(notary_seasons) == 13 and len(set(notary_seasons)) == 1:
+        return notary_seasons[0]
+    else:
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print(chain)
+        print(notaries)
+        print(address_list)
+        print(notary_seasons)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     return None
 
 def get_ntx_data(txid):

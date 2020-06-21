@@ -186,10 +186,7 @@ def get_nn_ntx_summary(notary):
     ntx_season = notarised_count_season.objects \
                                     .filter(season=season, notary=notary) \
                                     .values()
-                                    
-    print(notary)
-    print(season)
-    print(ntx_season)
+
     if len(ntx_season) > 0:
         chains_ntx_season = ntx_season[0]['chain_ntx_counts']
         season_max_chain = max(chains_ntx_season, key=chains_ntx_season.get) 
