@@ -27,6 +27,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8762
     volumes:
       - .:/code
+      - /var/www/stats.kmd.io/html:/var/www/stats.kmd.io/html
     ports:
       - "8762:8762"
     depends_on:

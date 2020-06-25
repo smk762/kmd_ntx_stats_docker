@@ -345,7 +345,26 @@ def get_notarisation_scores(season, coin_notariser_ranks):
                 "rank": rank
             })
 
+
     return notarisation_scores
+
+def get_region_score_stats(notarisation_scores):
+    region_score_stats = {}
+    for region in notarisation_scores:
+        region_total = 0
+        notary_count = 0
+        for notary in notarisation_scores[region]:
+            notary_count += 1
+            region_total += notarisation_scores[region][notary]["score"]
+        region_average = region_total/notary_count
+        region_score_stats.update({
+            region:{
+                "notary_count": notary_count,
+                "total_score": region_total,
+                "average_score": region_average
+            }
+        })
+    return region_score_stats
 
 def get_top_region_notarisers(region_notary_ranks):
     top_region_notarisers = {

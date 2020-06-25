@@ -11,12 +11,12 @@ cursor = conn.cursor()
 #table = 'notarised_chain_season'
 #table = 'nn_social'
 #table = 'notarised_count_season'
-table = 'coins'
+#table = 'coins'
+table = 'notarised_btc'
 
-
-cursor.execute("SELECT chain FROM "+table+" WHERE dpow_active = 1;")
+cursor.execute("SELECT * FROM "+table+";")
 results = cursor.fetchall()
-print(results)
+#print(results)
 print(len(results))
 
 

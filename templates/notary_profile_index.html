@@ -7,7 +7,7 @@
 				<div class="row m-4">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#AR"><span class='badge kmd_ui_dark1_bg p-2'>Asia and Russia</span></a>
+							<a href="#AR"><span class='badge kmd_ui_dark1_bg p-2'>Asia & Russia</span></a>
 						</h4>
 						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
 							<a href="#EU"><span class='badge kmd_ui_dark1_bg p-2'>European Union</span></a>
@@ -39,7 +39,11 @@
 				            		<div class="p-2">
 									{% for nn, site_links in nn_social.items %}
 										{% if node == nn %}
+											{% if site_links.icon != '' %}
+												<img class="card-img-top m-auto auto-width" height='96px' src="{{ site_links.icon }}" alt="{{ node }} image" style="border-radius: 50%;">
+											{% else %}
 												<img class="card-img-top m-auto auto-width" height='96px' src="{% static 'img/notary/icon/' %}{{ node }}.png" alt="{{ node }} image" style="border-radius: 50%;">
+											{% endif %}
 										{% endif %}
 									{% endfor %}
 									</div>

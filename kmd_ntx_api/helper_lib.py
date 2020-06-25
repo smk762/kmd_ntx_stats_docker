@@ -72,6 +72,23 @@ def region_sort(notary_list):
                 new_list.append(notary)
     return new_list
 
+def get_region_rank(region_notarisation_scores, notary_score):
+    higher_ranked_notaries = []
+    for notary in region_notarisation_scores:
+        score = region_notarisation_scores[notary]['score']
+        if score > notary_score:
+            higher_ranked_notaries.append(notary)
+    rank = len(higher_ranked_notaries)+1
+    if rank == 1:
+        rank = str(rank)+"st"
+    elif rank == 2:
+        rank = str(rank)+"nd"
+    elif rank == 3:
+        rank = str(rank)+"rd"
+    else:
+        rank = str(rank)+"th"
+    return rank
+    
 # takes a row from queryset values, and returns a dict using a defined row value as top level key
 def items_row_to_dict(items_row, top_key):
     key_list = list(items_row.keys())
