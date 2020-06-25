@@ -36,10 +36,10 @@ class daily_chain_thread(threading.Thread):
 load_dotenv()
 
 # set this to False in .env when originally populating the table, or rescanning
-skip_past_seasons = os.getenv("skip_past_seasons")
+skip_past_seasons = (os.getenv("skip_past_seasons") == 'True')
 
 # set this to True in .env to quickly update tables with most recent data
-skip_until_yesterday = os.getenv("skip_until_yesterday")
+skip_until_yesterday = (os.getenv("skip_until_yesterday") == 'True')
 
 print(skip_past_seasons)
 print(skip_until_yesterday)
@@ -140,7 +140,7 @@ def validate_btc():
                 logger.info(resp)
                 logger.info("No more tx to scan!")
                 exit_loop = True
-        if exit_loop or page == 20:
+        if exit_loop or page > int(os.getenv("btc_validate_pages")):
             logger.info("exiting address txid loop!")
             break
 
