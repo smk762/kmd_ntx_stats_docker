@@ -586,22 +586,11 @@ def notary_profile_view(request, notary_name=None):
         notary_ntx_counts = coin_notariser_ranks[region][notary_name]
         season_nn_chain_ntx_data = get_season_nn_chain_ntx_data(season)
         notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
+        region_score_stats = get_region_score_stats(notarisation_scores)
         region_notarisation_scores = notarisation_scores[region]
         notary_score = notarisation_scores[region][notary_name]['score']
-        higher_ranked_notaries = []
-        for notary in region_notarisation_scores:
-            score = region_notarisation_scores[notary]['score']
-            if score > notary_score:
-                higher_ranked_notaries.append(notary)
-        rank = len(higher_ranked_notaries)+1
-        if rank == 1:
-            rank = str(rank)+"st"
-        elif rank == 2:
-            rank = str(rank)+"nd"
-        elif rank == 3:
-            rank = str(rank)+"rd"
-        else:
-            rank = str(rank)+"th"
+        rank = get_region_rank(region_notarisation_scores, notary_score)
+        notary_balances_graph_data = get_notary_balances_graph_data(notary_name)
 
         context.update({
             "explorers":get_dpow_explorers(),
@@ -610,6 +599,8 @@ def notary_profile_view(request, notary_name=None):
             "season_nn_chain_ntx_data":season_nn_chain_ntx_data,
             "rank":rank,
             "notary_name":notary_name,
+            "notary_balances_graph_data":notary_balances_graph_data,
+            "region_score_stats":region_score_stats,
             #"notary_ntx_counts":notary_ntx_counts,
             "mining_summary":get_nn_mining_summary(notary_name),
             "notary_addresses":notary_addresses
@@ -828,14 +819,29 @@ def ntx_scoreboard(request):
  
     coin_notariser_ranks = get_coin_notariser_ranks(season)
     notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
+    region_score_stats = get_region_score_stats(notarisation_scores)
+
     context = {
         "sidebar_links":get_sidebar_links(notary_list ,coins_data),
         "eco_data_link":get_eco_data_link(),
         "notarisation_scores":notarisation_scores,
+        "region_score_stats":region_score_stats,
         "nn_social":get_nn_social()
     }
     return render(request, 'ntx_scoreboard.html', context)
-    
+
+def ntx_tenure(request):
+    season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    tenure_data = notarised_tenure.objects.all().values()
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "tenure_data":tenure_data,
+        "eco_data_link":get_eco_data_link()
+    }
+    return render(request, 'ntx_tenure.html', context)
+        
 def chains_last_ntx(request):
     season = get_season(int(time.time()))
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
@@ -1000,11 +1006,13 @@ def dash_view(request, dash_name=None):
             mined_24hr = 0
         biggest_block = mined.objects.filter(season=season).order_by('-value').first()
         notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
+        region_score_stats = get_region_score_stats(notarisation_scores)
         context.update({
             "ntx_24hr":ntx_24hr,
             "mined_24hr":mined_24hr,
             "biggest_block":biggest_block,
             "notarisation_scores":notarisation_scores,
+            "region_score_stats":region_score_stats,
             "show_ticker":True
         })
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')

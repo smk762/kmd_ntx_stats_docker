@@ -28,6 +28,62 @@ def get_bot_balance_deltas():
     r = requests.get(url)
     return r.json()
 
+def get_notary_balances_graph_data(notary):
+    bg_color = []
+    border_color = []
+    chartdata = []
+    chartLabel = ""
+
+    season = get_season(int(time.time()))        
+    third_chains = []
+    main_chains = []
+    coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
+    balances_data = balances.objects.filter(
+                                        season=season, notary=notary
+                                    ).order_by(
+                                        '-season','notary', 'chain', 'balance'
+                                    ).values()
+
+    for item in coins_data:
+        if item['dpow']['server'] == "dpow-mainnet":
+            main_chains.append(item['chain'])
+        if item['dpow']['server'] == "dpow-3p":
+            third_chains.append(item['chain'])
+    third_chains.append("KMD_3P")
+    main_chains.sort()
+    third_chains.sort()
+    labels = list(main_chains+third_chains)
+
+    for label in labels:
+        if label in ['KMD', 'KMD_3P', 'BTC']:
+            bg_color.append('#f7931a')
+        elif label in third_chains:
+            bg_color.append('#b541ea')
+        elif label in main_chains:
+            bg_color.append('#2fea8b')            
+        border_color.append('#000')
+
+    chartdata = []
+    balances_dict = {}
+    for item in balances_data:
+        if item['node'] == 'third party' and item['chain'] == "KMD":
+            chain = "KMD_3P"
+        else: 
+            chain = item['chain']
+        balances_dict.update({chain:float(item['balance'])})
+
+    for label in labels:
+        chartdata.append(balances_dict[label])
+    
+    data = { 
+        "labels":labels, 
+        "chartLabel":chartLabel, 
+        "chartdata":chartdata, 
+        "bg_color":bg_color, 
+        "border_color":border_color, 
+    } 
+    return data
+
 def get_dpow_explorers():
     resp = {}
     coins_data = coins.objects.filter(dpow_active=1).values('chain','explorers')
