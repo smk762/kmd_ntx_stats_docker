@@ -59,6 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 ROOT_URLCONF = 'kmd_ntx_stats.urls'
 
 TEMPLATES = [
@@ -137,11 +138,13 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
-# See https://www.django-rest-framework.org/
 
+# See https://www.django-rest-framework.org/
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
+    'PAGE_SIZE': 100,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
@@ -153,10 +156,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         #'dynamic_rest.renderers.DynamicBrowsableAPIRenderer',
         'rest_framework_datatables.renderers.DatatablesRenderer',
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework_datatables.pagination.DatatablesPageNumberPagination',
-    #'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100,
+    ]
 }
 
 MESSAGE_TAGS = {
