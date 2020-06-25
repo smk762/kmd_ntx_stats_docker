@@ -225,7 +225,7 @@
 							</div>
 							<div class="card-body kmd_ui_dark1_bg">
 								<span id="graph_title"></span>
-							    <canvas id="myChartBar"></canvas> 
+							    <canvas id="balances_graph"></canvas> 
 							</div>	
 						</div>	
 					</div>	
@@ -326,29 +326,17 @@
 					document.getElementById("last_btc_ntx").innerHTML = rows[i][5].display; 
 				} 
 			}
-			console.log(rows[j][5])
+			console.log(rows[j][5]);
 			
+	        {% autoescape off %}
+		    drawBarGraph({{ notary_balances_graph_data }}, 'balances_graph');
+	        {% endautoescape %}
 			
 	    });
-  
-	    $.ajax({ 
-	      method: "GET", 
-	      url: 'http://{{ request.get_host }}/api/graph_json/balances/?notary={{ notary_name }}', 
-	      success: function(data) { 
-	      	//document.getElementById('graph_title').innerHTML = data.chartLabel;
-	        //drawLineGraph(data, 'myChartline'); 
-	        drawBarGraph(data, 'myChartBar'); 
-	        console.log("drawing"); 
-	      }, 
-	      error: function(error_data) { 
-	        console.log(error_data); 
-	      } 
-	    }) 
-	  
+
 		Chart.defaults.global.defaultFontColor = 'white';
 		Chart.defaults.global.defaultFontSize = 16;
 
-	  
 	    function drawBarGraph(data, id) { 
 			var labels = data.labels; 
 			var chartLabel = data.chartLabel; 

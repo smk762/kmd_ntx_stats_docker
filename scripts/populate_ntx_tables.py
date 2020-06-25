@@ -452,6 +452,46 @@ else:
             update_season_notarised_counts(season)
 
 
+chains = []
+cursor.execute("SELECT DISTINCT chain FROM notarised;")
+chain_results = cursor.fetchall()
+for result in chain_results:
+    chains.append(result[0])
+
+seasons = []
+cursor.execute("SELECT DISTINCT season FROM notarised;")
+season_results = cursor.fetchall()
+for result in season_results:
+    seasons.append(result[0])
+
+for chain in chains:
+    for season in seasons:
+        cursor.execute("SELECT MAX(block_height), MAX(block_time), \
+                        MIN(block_height), MIN(block_time), COUNT(*) \
+                        FROM notarised WHERE chain = '"+chain+"' \
+                        AND season = '"+season+"';")
+        ntx_results = cursor.fetchone()
+        print(chain+" "+season+": "+str(ntx_results))
+        max_blk = ntx_results[0]
+        max_blk_time = ntx_results[1]
+        min_blk = ntx_results[2]
+        min_blk_time = ntx_results[3]
+        ntx_count = ntx_results[4]
+        if max_blk is not None:
+            row_data = (chain, min_blk, max_blk, min_blk_time, max_blk_time, ntx_count, season)
+
+            sql = "INSERT INTO notarised_tenure (chain, first_ntx_block, \
+                last_ntx_block, first_ntx_block_time, last_ntx_block_time, ntx_count, season) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s) \
+                ON CONFLICT ON CONSTRAINT unique_chain_season_tenure DO UPDATE SET \
+                first_ntx_block='"+str(row_data[1])+"', last_ntx_block="+str(row_data[2])+", \
+                first_ntx_block_time="+str(row_data[3])+", last_ntx_block_time="+str(row_data[4])+", \
+                ntx_count="+str(row_data[5])+";"
+            cursor.execute(sql, row_data)
+            conn.commit()
+
+            logger.info(chain+" "+season+" notarised tenure updated!")
+
 
 
 
