@@ -632,7 +632,7 @@ def get_season_from_notaries(notaries):
             return season
     return None
 
-def get_season_from_addresses(notaries, address_list, chain):
+def get_season_from_addresses(notaries, address_list, chain, tx_chain="KMD"):
     seasons = list(notary_addresses.keys())[::-1]
     notary_seasons = []
     last_season_num = None
@@ -646,7 +646,7 @@ def get_season_from_addresses(notaries, address_list, chain):
         for notary in notaries:
             season_notaries = list(notary_addresses[season].keys())
             if notary in season_notaries:
-                addr = notary_addresses[season][notary]["KMD"]
+                addr = notary_addresses[season][notary][tx_chain]
                 if addr in address_list:
                     notary_seasons.append(season_num)
 

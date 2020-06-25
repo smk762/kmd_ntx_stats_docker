@@ -24,7 +24,6 @@ def connect_db():
 
 # TABLE UPDATES
 
-
 def update_addresses_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO addresses \

@@ -23,6 +23,25 @@ class notarised(models.Model):
                                  name='unique_txid')
         ]
 
+class notarised_btc(models.Model):
+    btc_txid = models.CharField(max_length=64)
+    btc_block_hash = models.CharField(max_length=64)
+    btc_block_ht = models.PositiveIntegerField()
+    addresses = ArrayField(models.CharField(max_length=34),size=13)
+    notaries = ArrayField(models.CharField(max_length=34),size=13)
+    kmd_txid = models.CharField(max_length=64)
+    kmd_block_hash = models.CharField(max_length=64)
+    kmd_block_ht = models.PositiveIntegerField()
+    opret = models.CharField(max_length=2048)
+    season = models.CharField(max_length=32)
+
+    class Meta:
+        db_table = 'notarised_btc'
+        constraints = [
+            models.UniqueConstraint(fields=['btc_txid'],
+                                 name='unique_btc_txid')
+        ]
+
 class last_notarised(models.Model):
     notary = models.CharField(max_length=64)
     chain = models.CharField(max_length=32)
@@ -40,6 +59,24 @@ class last_notarised(models.Model):
             models.UniqueConstraint(
                 fields=['notary','chain'],
                 name='unique_notary_chain'
+            )
+        ]
+
+class notarised_tenure(models.Model):
+    chain = models.CharField(max_length=64)
+    first_ntx_block = models.PositiveIntegerField()
+    last_ntx_block = models.PositiveIntegerField()
+    first_ntx_block_time = models.PositiveIntegerField()
+    last_ntx_block_time = models.PositiveIntegerField()
+    ntx_count = models.PositiveIntegerField()
+    season = models.CharField(max_length=32)
+
+    class Meta:
+        db_table = 'notarised_tenure'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['chain','season'],
+                name='unique_chain_season_tenure'
             )
         ]
 

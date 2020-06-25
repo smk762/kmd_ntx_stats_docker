@@ -14,6 +14,11 @@
 							<div class="card-header kmd_ui_dark1_bg">
 								<a id="{{region}}_table" class="section-anchor"></a>
 								<h3>{{ region }} Notarisation rankings</h3>
+								{% for reg, stats in region_score_stats.items %}
+									{% if reg == region %}
+										<h6>Average: {{ stats.average_score|floatformat:-2 }}</h6>
+									{% endif %}
+								{% endfor%}
 							</div>
 							<div class="card-body kmd_ui_dark1_bg">
 								<table id="{{ region }}_notarisations" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
@@ -62,7 +67,7 @@
   	<script>
 	    $(document).ready(function() {
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
-		        $('#AR_notarisations').DataTable({    
+		        AR_table = $('#AR_notarisations').DataTable({    
 		        	"paging": false,
 	        		order: [[ 0, 'asc' ]],
 		        	"columns": [
@@ -83,7 +88,22 @@
 				        }
 	        		]
 		        });
-		        $('#EU_notarisations').DataTable({
+		        var max_AR = AR_table.column(6).data()[0]
+				console.log(max_AR)
+			    AR_table.rows().every( function (index) {
+			    	var row = AR_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_AR/3)
+				    if (d.score < max_AR/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        EU_table = $('#EU_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
 		        	"columns": [
@@ -104,7 +124,22 @@
 				        }
 	        		]
 		        });
-		        $('#NA_notarisations').DataTable({
+		        var max_EU = EU_table.column(6).data()[0]
+				console.log(max_EU)
+			    EU_table.rows().every( function (index) {
+			    	var row = EU_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_EU/3)
+				    if (d.score < max_EU/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        NA_table = $('#NA_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
 		        	"columns": [
@@ -125,7 +160,22 @@
 				        }
 	        		]
 		        });
-		        $('#SH_notarisations').DataTable({
+		        var max_NA = NA_table.column(6).data()[0]
+				console.log(max_NA)
+			    NA_table.rows().every( function (index) {
+			    	var row = NA_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_NA/3)
+				    if (d.score < max_NA/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        SH_table = $('#SH_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
 		        	"columns": [
@@ -146,7 +196,22 @@
 				        }
 	        		]
 		        });
-		        $('#DEV_notarisations').DataTable({
+		        var max_SH = SH_table.column(6).data()[0]
+				console.log(max_SH)
+			    SH_table.rows().every( function (index) {
+			    	var row = SH_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_SH/3)
+				    if (d.score < max_SH/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        DEV_table = $('#DEV_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
 		        	"columns": [
@@ -167,6 +232,21 @@
 				        }
 	        		]
 		        });
+		        var max_DEV = DEV_table.column(6).data()[0]
+				console.log(max_DEV)
+			    DEV_table.rows().every( function (index) {
+			    	var row = DEV_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_DEV/3)
+				    if (d.score < max_DEV/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
 	    });
 	    /*
 	    $.ajax({ 
