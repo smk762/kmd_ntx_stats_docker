@@ -737,23 +737,23 @@ def get_ntx_data(txid):
                                         season = season_num
                         row_data = (chain, this_block_height, block_time, block_datetime,
                                     block_hash, notary_list, ac_ntx_blockhash, ac_ntx_height,
-                                    txid, opret, season)
+                                    txid, opret, season, "N/A")
                         return row_data
                 else:
                     # no opretrun in tx, and shouldnt polute the DB.
                     row_data = ("not_opret", this_block_height, block_time, block_datetime,
-                                block_hash, notary_list, "unknown", 0, txid, "unknown", "N/A")
+                                block_hash, notary_list, "unknown", 0, txid, "unknown", "N/A", "N/A")
                     return None
                 
             else:
                 # These are related to easy mining, and shouldnt polute the DB.
                 row_data = ("low_vin", this_block_height, block_time, block_datetime,
-                            block_hash, [], "unknown", 0, txid, "unknown", "N/A")
+                            block_hash, [], "unknown", 0, txid, "unknown", "N/A", "N/A")
                 return None
         else:
             # These are outgoing, and should not polute the DB.
             row_data = ("not_dest", this_block_height, block_time, block_datetime,
-                        block_hash, [], "unknown", 0, txid, "unknown", "N/A")
+                        block_hash, [], "unknown", 0, txid, "unknown", "N/A", "N/A" )
             return None
 
 

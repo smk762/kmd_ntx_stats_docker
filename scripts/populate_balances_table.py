@@ -91,26 +91,29 @@ def get_kmd_rewards():
             if utxo['height'] < oldest_utxo_block:
                 oldest_utxo_block = utxo['height']
             if utxo['height'] < KOMODO_ENDOFERA and utxo['satoshis'] >= MIN_SATOSHIS:
-                locktime = rpc.getrawtransaction(utxo["txid"], 1)['locktime']
-                coinage = math.floor((tiptime-locktime)/ONE_HOUR)
-                if coinage >= ONE_HOUR and locktime >= LOCKTIME_THRESHOLD:
-                    limit = ONE_YEAR
-                    if utxo['height'] >= ONE_MONTH_CAP_HARDFORK:
-                        limit = ONE_MONTH
-                    reward_period = min(coinage, limit) - 59
-                    rewards = math.floor(utxo['satoshis']/DEVISOR)*reward_period
-                    if rewards < 0:
-                        logger.info("Rewards should never be negative!")
-                    nn_utxos[addr]['eligible_utxos'].update({
-                        utxo['txid']:{
-                            "locktime":locktime,
-                            "sat_rewards":rewards,
-                            "kmd_rewards":rewards/100000000,
-                            "satoshis":utxo['satoshis'],
-                            "block_height":utxo['height']
-                        }
-                    })
-                    total_rewards += rewards/100000000
+                try:
+                    locktime = rpc.getrawtransaction(utxo["txid"], 1)['locktime']
+                    coinage = math.floor((tiptime-locktime)/ONE_HOUR)
+                    if coinage >= ONE_HOUR and locktime >= LOCKTIME_THRESHOLD:
+                        limit = ONE_YEAR
+                        if utxo['height'] >= ONE_MONTH_CAP_HARDFORK:
+                            limit = ONE_MONTH
+                        reward_period = min(coinage, limit) - 59
+                        rewards = math.floor(utxo['satoshis']/DEVISOR)*reward_period
+                        if rewards < 0:
+                            logger.info("Rewards should never be negative!")
+                        nn_utxos[addr]['eligible_utxos'].update({
+                            utxo['txid']:{
+                                "locktime":locktime,
+                                "sat_rewards":rewards,
+                                "kmd_rewards":rewards/100000000,
+                                "satoshis":utxo['satoshis'],
+                                "block_height":utxo['height']
+                            }
+                        })
+                        total_rewards += rewards/100000000
+                except:
+                    pass
         eligible_utxo_count = len(nn_utxos[addr]['eligible_utxos'])
         if oldest_utxo_block == 99999999999:
             oldest_utxo_block = 0
