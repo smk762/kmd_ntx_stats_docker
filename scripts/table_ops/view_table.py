@@ -12,11 +12,11 @@ cursor = conn.cursor()
 #table = 'nn_social'
 #table = 'notarised_count_season'
 #table = 'coins'
-table = 'notarised_btc'
+table = 'notarised'
 
-cursor.execute("SELECT * FROM "+table+";")
+cursor.execute("SELECT * FROM "+table+" WHERE btc_validated != '' AND  btc_validated != 'N/A';")
 results = cursor.fetchall()
-#print(results)
+print(results)
 print(len(results))
 
 
