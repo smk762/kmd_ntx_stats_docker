@@ -581,6 +581,13 @@ def notary_profile_view(request, notary_name=None):
     if notary_name:
         notary_addresses = addresses.objects.filter(notary=notary_name, season=season) \
                            .order_by('chain').values('chain','address')
+
+        coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
+        balances_data = balances.objects.filter(
+                                        season=season, notary=notary_name
+                                    ).order_by(
+                                        '-season','notary', 'chain', 'balance'
+                                    ).values()
         coin_notariser_ranks = get_coin_notariser_ranks(season)
         region = get_notary_region(notary_name)
         notary_ntx_counts = coin_notariser_ranks[region][notary_name]
@@ -590,7 +597,9 @@ def notary_profile_view(request, notary_name=None):
         region_notarisation_scores = notarisation_scores[region]
         notary_score = notarisation_scores[region][notary_name]['score']
         rank = get_region_rank(region_notarisation_scores, notary_score)
-        notary_balances_graph_data = get_notary_balances_graph_data(notary_name)
+        notary_balances_graph_data = get_notary_balances_graph_data(coins_data, balances_data)
+        notary_balances_table_data = get_notary_balances_table_data(coins_data, balances_data)
+        
 
         context.update({
             "explorers":get_dpow_explorers(),
@@ -600,6 +609,7 @@ def notary_profile_view(request, notary_name=None):
             "rank":rank,
             "notary_name":notary_name,
             "notary_balances_graph_data":notary_balances_graph_data,
+            "balances_data":balances_data,
             "region_score_stats":region_score_stats,
             #"notary_ntx_counts":notary_ntx_counts,
             "mining_summary":get_nn_mining_summary(notary_name),
@@ -863,27 +873,7 @@ def funds_sent(request):
     notaries_list = get_notary_list(season)
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
     funding_data = funding_transactions.objects.filter(season=season).values()
-
-    funding_totals = {"fees":{}}
-    now = int(time.time())
-    for item in funding_data:
-        tx_time = day_hr_min_sec(now - item['block_time'])
-        item.update({"time": tx_time})
-        if item["notary"] not in ["unknown", "funding bot"]:
-            if item["notary"] not in funding_totals:
-                funding_totals.update({item["notary"]:{}})
-
-            if item["chain"] not in funding_totals[item["notary"]]:
-                funding_totals[item["notary"]].update({item["chain"]:-item["amount"]})
-            else:
-                val = funding_totals[item["notary"]][item["chain"]]-item["amount"]
-                funding_totals[item["notary"]].update({item["chain"]:val})
-
-            if item["chain"] not in funding_totals["fees"]:
-                funding_totals["fees"].update({item["chain"]:-item["fee"]})
-            else:
-                val = funding_totals["fees"][item["chain"]]-item["fee"]
-                funding_totals["fees"].update({item["chain"]:val})
+    funding_totals = get_funding_totals(funding_data)
 
     context = {
         "sidebar_links":get_sidebar_links(notaries_list, coins_data),
