@@ -60,7 +60,7 @@ cursor = conn.cursor()
 
 #https://api.blockcypher.com/v1/btc/main/addrs/1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg?limit=2
 #https://api.blockcypher.com/v1/btc/main/txs/
-ntx_addr = '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg'
+btc_ntx_addr = '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg'
 def get_address_txids(address, before=None):
     try:
         url = 'https://api.blockcypher.com/v1/btc/main/addrs/'+address
@@ -105,7 +105,7 @@ def validate_btc():
     while has_more:
         page += 1
         logger.info("Page "+str(page))
-        resp = get_address_txids(ntx_addr, before_block)
+        resp = get_address_txids(btc_ntx_addr, before_block)
         if "error" in resp:
             page -= 1
             if resp['error'] == 'API calls limits have been reached. To extend your limits please upgrade your plan on BlockCypher accounts page.':
@@ -168,8 +168,8 @@ def validate_btc():
                 btc_block_ht = tx_info['block_height']
                 btc_block_hash = tx_info['block_hash']
                 addresses = tx_info['addresses']
-                if ntx_addr in addresses:
-                    addresses.remove(ntx_addr)
+                if btc_ntx_addr in addresses:
+                    addresses.remove(btc_ntx_addr)
                 for address in addresses:    
                     if address in known_addresses:
                         notary = known_addresses[address]
@@ -208,7 +208,7 @@ def validate_btc():
 
                             sql = "UPDATE notarised SET \
                                   btc_validated='true' \
-                                WHERE opret = '"+opret+"'' ;"
+                                WHERE opret = '"+opret+"' ;"
                             try:
                                 cursor.execute(sql, row_data)
                                 conn.commit()
