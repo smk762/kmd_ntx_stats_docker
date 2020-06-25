@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from notary_lib import *
 from rpclib import *
-from unittest import TestCase
+#from unittest import TestCase
 
 rpc = {}
 rpc["KMD"] = def_credentials("KMD")

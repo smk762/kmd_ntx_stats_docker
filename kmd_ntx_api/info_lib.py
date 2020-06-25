@@ -28,7 +28,33 @@ def get_bot_balance_deltas():
     r = requests.get(url)
     return r.json()
 
-def get_notary_balances_graph_data(notary):
+def get_notary_balances_table_data(coins_data, balances_data):
+ 
+    third_chains = []
+    main_chains = []
+
+    for item in coins_data:
+        if item['dpow']['server'] == "dpow-mainnet":
+            main_chains.append(item['chain'])
+        if item['dpow']['server'] == "dpow-3p":
+            third_chains.append(item['chain'])
+
+    third_chains.append("KMD_3P")
+
+    main_chains.sort()
+    third_chains.sort()
+
+    filtered_balances = []
+    for item in balances_data:
+        if item["chain"] in main_chains and item["node"] == 'main':
+            filtered_balances.append(item)
+        elif item["node"] == 'third_party':
+            if item["chain"] in third_chains or item['chain'] == "KMD":
+                filtered_balances.append(item)
+
+    return filtered_balances
+
+def get_notary_balances_graph_data(coins_data, balances_data):
     bg_color = []
     border_color = []
     chartdata = []
@@ -37,12 +63,6 @@ def get_notary_balances_graph_data(notary):
     season = get_season(int(time.time()))        
     third_chains = []
     main_chains = []
-    coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
-    balances_data = balances.objects.filter(
-                                        season=season, notary=notary
-                                    ).order_by(
-                                        '-season','notary', 'chain', 'balance'
-                                    ).values()
 
     for item in coins_data:
         if item['dpow']['server'] == "dpow-mainnet":
@@ -83,6 +103,32 @@ def get_notary_balances_graph_data(notary):
         "border_color":border_color, 
     } 
     return data
+
+def get_funding_totals(funding_data):
+    funding_totals = {"fees":{}}
+    now = int(time.time())
+
+    for item in funding_data:
+        tx_time = day_hr_min_sec(now - item['block_time'])
+        item.update({"time": tx_time})
+
+        if item["notary"] not in ["unknown", "funding bot"]:
+            if item["notary"] not in funding_totals:
+                funding_totals.update({item["notary"]:{}})
+
+            if item["chain"] not in funding_totals[item["notary"]]:
+                funding_totals[item["notary"]].update({item["chain"]:-item["amount"]})
+            else:
+                val = funding_totals[item["notary"]][item["chain"]]-item["amount"]
+                funding_totals[item["notary"]].update({item["chain"]:val})
+
+            if item["chain"] not in funding_totals["fees"]:
+                funding_totals["fees"].update({item["chain"]:-item["fee"]})
+            else:
+                val = funding_totals["fees"][item["chain"]]-item["fee"]
+                funding_totals["fees"].update({item["chain"]:val})
+
+    return funding_totals
 
 def get_dpow_explorers():
     resp = {}

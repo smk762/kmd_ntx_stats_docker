@@ -15,6 +15,7 @@ class notarised(models.Model):
     ac_ntx_height = models.PositiveIntegerField()
     opret = models.CharField(max_length=2048)
     season = models.CharField(max_length=32)
+    btc_validated = models.CharField(max_length=32, default='')
 
     class Meta:
         db_table = 'notarised'
