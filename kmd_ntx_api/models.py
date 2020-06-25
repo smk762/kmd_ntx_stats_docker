@@ -34,6 +34,7 @@ class notarised_btc(models.Model):
     kmd_block_ht = models.PositiveIntegerField()
     opret = models.CharField(max_length=2048)
     season = models.CharField(max_length=32)
+    test = models.CharField(max_length=32)
 
     class Meta:
         db_table = 'notarised_btc'
