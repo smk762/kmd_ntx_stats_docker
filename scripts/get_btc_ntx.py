@@ -104,7 +104,7 @@ while has_more:
             logger.info(resp)
             logger.info("No more tx to scan!")
             exit_loop = True
-    if exit_loop:
+    if exit_loop or page ==4:
         logger.info("exiting address txid loop!")
         break
 
