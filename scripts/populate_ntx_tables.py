@@ -35,12 +35,14 @@ class daily_chain_thread(threading.Thread):
 
 load_dotenv()
 
-# set this to false when originally populating the table, or rescanning
+# set this to False in .env when originally populating the table, or rescanning
 skip_past_seasons = os.getenv("skip_past_seasons")
 
-# set this to True to quickly update tables with most recent data
+# set this to True in .env to quickly update tables with most recent data
 skip_until_yesterday = os.getenv("skip_until_yesterday")
 
+print(skip_past_seasons)
+print(skip_until_yesterday)
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -138,7 +140,7 @@ def validate_btc():
                 logger.info(resp)
                 logger.info("No more tx to scan!")
                 exit_loop = True
-        if exit_loop or page ==4:
+        if exit_loop or page == 20:
             logger.info("exiting address txid loop!")
             break
 
