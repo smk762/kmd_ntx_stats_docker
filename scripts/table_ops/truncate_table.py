@@ -4,7 +4,7 @@ import table_lib
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-table = 'django_migrations'
+table = 'notarised_btc'
 
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
