@@ -56,14 +56,14 @@
 			            "data": 'btc_txid',
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='"+explorers['BTC']+'tx/'+oData.btc_txid+"'>"+oData.btc_txid.slice(0, 3)+"..."+oData.btc_txid.slice(-3)+"</a>");
+				            $(nTd).html("<a href='https://blockchair.com/bitcoin/block/"+oData.btc_txid+"'>"+oData.btc_txid.slice(0, 3)+"..."+oData.btc_txid.slice(-3)+"</a>");
 				        }
 			        },
         			{
 			            "data": 'kmd_block_ht',
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='"+explorers['KMD']+'block-index/'+oData.kmd_block_ht+"'>"+oData.kmd_block_ht+"</a>");
+				            $(nTd).html("<a href='https://blockchair.com/bitcoin/transaction/"+oData.kmd_block_ht+"'>"+oData.kmd_block_ht+"</a>");
 				        }
 			        },
         			{
