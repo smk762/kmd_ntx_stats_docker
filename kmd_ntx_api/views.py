@@ -822,6 +822,22 @@ def mining_overview(request):
     }
     return render(request, 'mining_overview.html', context)
 
+def btc_ntx(request):
+    season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    btc_ntx = notarised_btc.objects.filter(
+                            season=season).values()
+
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "explorers":get_dpow_explorers(),
+        "btc_ntx":btc_ntx,
+        "season":season.replace("_"," ")
+    }
+    return render(request, 'btc_ntx.html', context)
+
 def ntx_scoreboard(request):
     season = get_season(int(time.time()))
     notary_list = get_notary_list(season)
