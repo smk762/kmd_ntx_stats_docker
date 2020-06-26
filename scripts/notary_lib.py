@@ -56,6 +56,11 @@ seasons_info = {
 }
 
 
+rpc = {}
+rpc["KMD"] = def_credentials("KMD")
+ntx_addr = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
+noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
+
 if now > seasons_info['Season_3']['end_time']:
     pubkey_file = 's4_nn_pubkeys.json'
 else:
@@ -1447,7 +1452,3 @@ for season in notary_pubkeys:
         else:
             seasons_info[season]['notaries'].append(notary)
 
-rpc = {}
-rpc["KMD"] = def_credentials("KMD")
-ntx_addr = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
-noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']

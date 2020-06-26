@@ -181,45 +181,71 @@ def validate_btc():
                 if len(tx_info['outputs']) > 0:
                     if 'data_hex' in tx_info['outputs'][-1]:
                         opret = tx_info['outputs'][-1]['data_hex']
+
+                        sql = "SELECT txid, block_time, btc_validated FROM notarised \
+                              WHERE opret LIKE '%' || '"+opret[11:33]+"' || '%';"
+                        cursor.execute(sql)
+                        db_ntx_info = cursor.fetchone()
+                        print(db_ntx_info)
+                        if len(db_ntx_info) > 0:
+                            kmd_txid = db_ntx_info[0]
+                            kmd_block_time = db_ntx_info[1]
+                            if db_ntx_info[2] != 'true':
+                                sql = "UPDATE notarised SET \
+                                    btc_validated='true' \
+                                    WHERE opret LIKE '%' || '"+opret[11:33]+"' || '%';"
+                                try:
+                                    cursor.execute(sql)
+                                    conn.commit()
+                                    print("btc ntx validated in ntx table")
+                                except Exception as e:
+                                    if str(e).find('duplicate') == -1:
+                                        logger.debug(e)
+                                        logger.debug(row_data)
+                                    conn.rollback()
+                        else:
+                            kmd_txid = ''
+                            kmd_block_time = 0
+
                         r = requests.get('http://notary.earth:8762/api/tools/decode_opreturn/?OP_RETURN='+opret)
                         kmd_ntx_info = r.json()
-
+                        btc_block_time = 0
                         if kmd_ntx_info['chain'] == "KMD":
                             kmd_block_hash = kmd_ntx_info['notarised_blockhash']
                             kmd_block_ht = kmd_ntx_info['notarised_block']
+                            try:
+                                kmd_blockinfo = rpc["KMD"].getblock(str(kmd_block_ht), 2)
+                                kmd_block_time = kmd_blockinfo['time']
+                            except Exception as e:
+                                print(e)
+                                print(kmd_block_ht)
+                                kmd_block_time = 0
+                                pass
+
                             season = get_season_from_addresses(notaries, addresses, "BTC", "BTC")
                             row_data = (btc_txid, btc_block_hash, btc_block_ht,
-                                addresses, notaries,
-                                kmd_block_hash, kmd_block_ht,
+                                btc_block_time, addresses, notaries, kmd_txid,
+                                kmd_block_hash, kmd_block_ht, kmd_block_time,
                                 opret, season)
 
                             sql = "INSERT INTO notarised_btc (btc_txid, btc_block_hash, btc_block_ht, \
-                                                                addresses, notaries, \
-                                                                kmd_block_hash, kmd_block_ht, \
-                                                                opret, season) \
-                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+                                                              btc_block_time, \
+                                                              addresses, notaries, kmd_txid, \
+                                                              kmd_block_hash, kmd_block_ht, \
+                                                              kmd_block_time, \
+                                                              opret, season) \
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
                             try:
                                 cursor.execute(sql, row_data)
                                 conn.commit()
+                                logger.debug(row_data)
                             except Exception as e:
                                 if str(e).find('duplicate') == -1:
                                     logger.debug(e)
                                     logger.debug(row_data)
                                 conn.rollback()
 
-                            sql = "UPDATE notarised SET \
-                                  btc_validated='true' \
-                                  WHERE opret LIKE '%' || '"+opret[11:33]+"' || '%';"
-                            try:
-                                print(sql)
-                                cursor.execute(sql)
-                                conn.commit()
-                                print("input")
-                            except Exception as e:
-                                if str(e).find('duplicate') == -1:
-                                    logger.debug(e)
-                                    logger.debug(row_data)
-                                conn.rollback()
+
 
                             logger.info("Row inserted")
                             exit_loop = True

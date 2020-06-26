@@ -28,10 +28,13 @@ class notarised_btc(models.Model):
     btc_txid = models.CharField(max_length=64)
     btc_block_hash = models.CharField(max_length=64)
     btc_block_ht = models.PositiveIntegerField()
+    btc_block_time = models.PositiveIntegerField()
     addresses = ArrayField(models.CharField(max_length=34),size=13)
     notaries = ArrayField(models.CharField(max_length=34),size=13)
+    kmd_txid = models.CharField(max_length=64)
     kmd_block_hash = models.CharField(max_length=64)
     kmd_block_ht = models.PositiveIntegerField()
+    kmd_block_time = models.PositiveIntegerField()
     opret = models.CharField(max_length=2048)
     season = models.CharField(max_length=32)
 
