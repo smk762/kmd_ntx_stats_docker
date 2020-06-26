@@ -110,6 +110,7 @@ def validate_btc():
             page -= 1
             if resp['error'] == 'API calls limits have been reached. To extend your limits please upgrade your plan on BlockCypher accounts page.':
                 logger.info("API limit exceeded, sleeping for 10 min...")
+                exit_loop = True
                 time.sleep(600)
             else:
                 logger.info(resp['error'])
@@ -208,10 +209,12 @@ def validate_btc():
 
                             sql = "UPDATE notarised SET \
                                   btc_validated='true' \
-                                WHERE opret = '"+opret+"' ;"
+                                  WHERE opret LIKE '%' || '"+opret[11:33]+"' || '%';"
                             try:
-                                cursor.execute(sql, row_data)
+                                print(sql)
+                                cursor.execute(sql)
                                 conn.commit()
+                                print("input")
                             except Exception as e:
                                 if str(e).find('duplicate') == -1:
                                     logger.debug(e)
@@ -230,6 +233,7 @@ def validate_btc():
                 page -= 1
                 if tx_info['error'] == 'API calls limits have been reached. To extend your limits please upgrade your plan on BlockCypher accounts page.':
                     logger.info("API limit exceeded, sleeping for 10 min...")
+                    exit_loop = True
                     time.sleep(600)
                 else:
                     logger.info(tx_info['error'])
@@ -674,9 +678,27 @@ for chain in chains:
 
             logger.info(chain+" "+season+" notarised tenure updated!")
 
+''' This can update existing records for btc_validated if required
 
-
-
+oprets = []
+cursor.execute("SELECT DISTINCT opret FROM notarised_btc;")
+opret_results = cursor.fetchall()
+for result in opret_results:
+    opret = result[0]
+    sql = "UPDATE notarised SET \
+          btc_validated='true' \
+          WHERE opret LIKE '%' || '"+opret[11:33]+"' || '%';"
+    try:
+        print(sql)
+        cursor.execute(sql)
+        conn.commit()
+        print("input")
+    except Exception as e:
+        if str(e).find('duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
+'''
 
 cursor.close()
 

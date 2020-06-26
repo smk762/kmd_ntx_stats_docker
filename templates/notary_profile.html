@@ -14,13 +14,19 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Notarised Last 24hrs
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ ntx_summary.today.btc_ntx }}<br /> BTC
+										    	<a href="http://{{ request.get_host }}/ntx_24hrs">
+										    		{{ ntx_summary.today.btc_ntx }}<br /> BTC
+										    	</a>
 										    </span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ ntx_summary.today.main_ntx }}<br /> Main
+										    	<a href="http://{{ request.get_host }}/ntx_24hrs">
+										    		{{ ntx_summary.today.main_ntx }}<br /> Main
+										    	</a>
 										    </span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ ntx_summary.today.third_party_ntx }}<br /> 3rd Party
+										    	<a href="http://{{ request.get_host }}/ntx_24hrs">
+										    		{{ ntx_summary.today.third_party_ntx }}<br /> 3rd Party
+										    	</a>
 										    </span>
 										</div>
 									  </li>
@@ -28,30 +34,40 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 									    	Notarised Season
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ ntx_summary.season.btc_ntx }}<br /> BTC
+										    	<a href="http://{{ request.get_host }}/ntx_scoreboard">
+										    		{{ ntx_summary.season.btc_ntx }}<br /> BTC
+										    	</a>
 										    </span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ ntx_summary.season.main_ntx }}<br /> Main
+										    	<a href="http://{{ request.get_host }}/ntx_scoreboard">
+										    		{{ ntx_summary.season.main_ntx }}<br /> Main
+										    	</a>
 										    </span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ ntx_summary.season.third_party_ntx }}<br /> 3rd Party
+										    	<a href="http://{{ request.get_host }}/ntx_scoreboard">
+										    		{{ ntx_summary.season.third_party_ntx }}<br /> 3rd Party
+										    	</a>
 										    </span>
 										</div>									    
 									  </li>
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Last Notarisation
-										    <span id="last_ntx" class="badge kmd_ui_dark1_bg p-1">
-										    	{{ ntx_summary.time_since_last_ntx }}<br />{{ ntx_summary.last_ntx_chain }}
-										    </span>
+										    <a href="http://{{ request.get_host }}/chains_last_ntx">
+											    <span id="last_ntx" class="badge kmd_ui_dark1_bg p-1">
+											    		{{ ntx_summary.time_since_last_ntx }}<br />{{ ntx_summary.last_ntx_chain }}
+											    </span>
+										    </a>
 										</div>
 									  </li>
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 									    	Last BTC Notarisation
-										  	<span  id="last_btc_ntx" class="badge kmd_ui_dark1_bg p-1">
-										  		{{ ntx_summary.time_since_last_kmd_ntx }}
-										  	</span>
+										    <a href="http://{{ request.get_host }}/chains_last_ntx">
+											  	<span  id="last_btc_ntx" class="badge kmd_ui_dark1_bg p-1">
+											  			{{ ntx_summary.time_since_last_kmd_ntx }}
+											  	</span>
+										  	</a>
 										</div>
 									  </li>
 									</ul> 							
@@ -134,10 +150,14 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Mined
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ mining_summary.mined_last_24hrs|floatformat:-3 }} KMD<br />Last 24hrs
+										    	<a href="http://{{ request.get_host }}/mining_24hrs">
+										    		{{ mining_summary.mined_last_24hrs|floatformat:-3 }} KMD<br />Last 24hrs
+										    	</a>
 											</span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ mining_summary.season_value_mined|floatformat:-3 }} KMD<br />Season
+										    	<a href="http://{{ request.get_host }}/mining_overview">
+										    		{{ mining_summary.season_value_mined|floatformat:-3 }} KMD<br />Season
+										    	</a>
 											</span>
 										</div>
 									  </li>
@@ -145,7 +165,9 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Blocks Mined this Season
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ mining_summary.season_blocks_mined }}
+										    	<a href="http://{{ request.get_host }}/mining_overview">
+										    		{{ mining_summary.season_blocks_mined }}
+										    	</a>
 											</span>
 										</div>
 									  </li>
@@ -153,7 +175,9 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Largest Block Mined
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	{{ mining_summary.season_largest_block|floatformat:-3 }} KMD
+										    	<a href="http://{{ request.get_host }}/mining_overview">
+										    		{{ mining_summary.season_largest_block|floatformat:-3 }} KMD
+										    	</a>
 											</span>
 										</div>
 									  </li>
@@ -161,7 +185,9 @@
 									    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 											    Last Mined block
 											    <span class="badge kmd_ui_dark1_bg p-1">
-											    	{{ mining_summary.time_since_mined }}
+										    		<a href="http://{{ request.get_host }}/mining_24hrs">
+											    		{{ mining_summary.time_since_mined }}
+											    	</a>
 												</span>
 											</div>
 									  	</li>

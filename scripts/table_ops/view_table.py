@@ -14,14 +14,17 @@ cursor = conn.cursor()
 #table = 'coins'
 table = 'notarised'
 
-cursor.execute("SELECT * FROM "+table+" WHERE btc_validated != '' AND  btc_validated != 'N/A';")
+cursor.execute("SELECT * FROM "+table+" WHERE btc_validated='true';")
+
 results = cursor.fetchall()
 print(results)
 print(len(results))
 
+cursor.execute("SELECT * FROM notarised WHERE opret LIKE '%' || '06a75b02ee5825e84cf74' || '%';")
+results = cursor.fetchall()
+print(results)
 
-cursor.execute("SELECT COUNT(*) FROM "+table+";")
-print(cursor.fetchall())
+
 
 cursor.close()
 
