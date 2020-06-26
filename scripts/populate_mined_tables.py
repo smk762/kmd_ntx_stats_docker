@@ -24,10 +24,11 @@ Next, it retrieves info from the block chain for blocks not yet in the database 
 Lastly, it updates the mined_count_season and mined_count_daily tables with aggregated stats for each notar season.
 '''
 
-# set this to false when originally populating the table, or rescanning
-skip_past_seasons = True
-# set this to false when originally populating the daily tables table, or rescanning
-start_2days_ago = False
+# set this to False in .env when originally populating the table, or rescanning
+skip_past_seasons = os.getenv("skip_past_seasons")
+
+# set this to True in .env to quickly update tables with most recent data
+skip_until_yesterday = os.getenv("skip_until_yesterday")
 
 scan_depth = 100
 
@@ -74,7 +75,7 @@ def bulk_load_mined_clocks(conn, cursor, season):
     logger.info(season+" blocks not in database: "+str(len(unrecorded_blocks)))
     i = 1
     start_block = seasons_info[season]["start_block"]
-    if start_2days_ago:
+    if skip_until_yesterday:
         start_block = tip-2*24*60
     for block in unrecorded_blocks:
         if block >= start_block:
@@ -119,7 +120,7 @@ season_start_time = seasons_info[season]["start_time"]
 season_start_dt = dt.fromtimestamp(season_start_time)
 start = season_start_dt.date()
 end = datetime.date.today()
-if start_2days_ago:
+if skip_until_yesterday:
     start = end - datetime.timedelta(days=7)
 delta = datetime.timedelta(days=1)
 logger.info("Aggregating daily notary notarisations from "+str(start)+" to "+str(end))
