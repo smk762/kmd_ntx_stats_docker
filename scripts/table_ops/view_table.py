@@ -12,17 +12,14 @@ cursor = conn.cursor()
 #table = 'nn_social'
 #table = 'notarised_count_season'
 #table = 'coins'
-table = 'notarised'
+table = 'notarised_btc'
 
-cursor.execute("SELECT * FROM "+table+" WHERE btc_validated='true';")
+cursor.execute("SELECT * FROM "+table+";")
 
-results = cursor.fetchall()
+results = cursor.fetchone()
 print(results)
 print(len(results))
 
-cursor.execute("SELECT * FROM notarised WHERE opret LIKE '%' || '06a75b02ee5825e84cf74' || '%';")
-results = cursor.fetchall()
-print(results)
 
 
 
