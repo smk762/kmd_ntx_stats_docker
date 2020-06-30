@@ -3,6 +3,7 @@ import logging
 import datetime
 from datetime import datetime as dt
 from .models import *
+from .const_lib import *
 from .info_lib import *
 from .helper_lib import *
 from kmd_ntx_api.serializers import *
@@ -149,6 +150,231 @@ def get_balances_data(request):
         resp[season][notary][chain].update({address:balance})
 
     return wrap_api(resp)
+
+def get_daily_ntx_graph_data(request):
+    ntx_dict = {}
+    bg_color = []
+    border_color = []
+    third_chains = []
+    main_chains = []
+    notary_list = []                                                                         
+    chain_list = []
+
+    if 'notarised_date' in request.GET:
+        filter_kwargs.update({'notarised_date':request.GET['notarised_date']})
+    else:
+        today = datetime.date.today()
+        filter_kwargs.update({'notarised_date':today})
+    if 'notary' in request.GET:
+        filter_kwargs.update({'notary':request.GET['notary']})
+    elif 'chain' not in request.GET:
+        filter_kwargs.update({'notary':'alien_AR'})
+
+    data = notarised_count_daily.objects.filter(**filter_kwargs) \
+                .values('notary', 'notarised_date','chain_ntx_counts')
+
+    for item in data:
+        if item['notary'] not in notary_list:
+            notary_list.append(item['notary'])
+        chain_list += list(item['chain_ntx_counts'].keys())
+        ntx_dict.update({item['notary']:item['chain_ntx_counts']})
+
+    if 'chain' in request.GET:
+        chain_list = [request.GET['chain']]
+    else:
+        chain_list = list(set(chain_list))
+        chain_list.sort()
+
+    notary_list.sort()
+    notary_list = region_sort(notary_list)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
+    for item in coins_data:
+        if item['dpow']['server'] == "dPoW-mainnet":
+            main_chains.append(item['chain'])
+        if item['dpow']['server'] == "dPoW-3P":
+            third_chains.append(item['chain'])
+
+    if len(chain_list) == 1:
+        chain = chain_list[0]
+        labels = notary_list
+        chartLabel = chain+ " Notarisations"
+        for notary in notary_list:
+            if notary.endswith("_AR"):
+                bg_color.append('#DC0333')
+            elif notary.endswith("_EU"):
+                bg_color.append('#2FEA8B')
+            elif notary.endswith("_NA"):
+                bg_color.append('#B541EA')
+            elif notary.endswith("_SH"):
+                bg_color.append('#00E2FF')
+            else:
+                bg_color.append('#F7931A')
+            border_color.append('#000')
+    else:
+        notary = notary_list[0]
+        labels = chain_list
+        chartLabel = notary+ " Notarisations"
+        for chain in chain_list:
+            if chain in third_chains:
+                bg_color.append('#00E2FF')
+            elif chain in main_chains:
+                bg_color.append('#2FEA8B')
+            else:
+                bg_color.append('#B541EA')
+            border_color.append('#000')
+
+    chartdata = []
+    for notary in notary_list:
+        for chain in chain_list:
+            if chain in ntx_dict[notary]:
+                chartdata.append(ntx_dict[notary][chain])
+            else:
+                chartdata.append(0)
+    
+
+    data = { 
+        "labels":labels, 
+        "chartLabel":chartLabel, 
+        "chartdata":chartdata, 
+        "bg_color":bg_color, 
+        "border_color":border_color, 
+    }
+    return data
+
+def get_balances_graph_data(request):
+
+    if 'chain' in request.GET:
+        filter_kwargs.update({'chain':request.GET['chain']})
+    elif 'notary' in request.GET:
+        filter_kwargs.update({'notary':request.GET['notary']})
+    else:
+        filter_kwargs.update({'chain':'BTC'})
+
+    data = balances.objects.filter(**filter_kwargs).values('notary', 'chain', 'balance')
+    notary_list = []                                                                          
+    chain_list = []
+    balances_dict = {}
+    for item in data:
+        if item['notary'] not in notary_list:
+            notary_list.append(item['notary'])
+        if item['chain'] not in chain_list:
+            chain_list.append(item['chain'])
+        if item['notary'] not in balances_dict:
+            balances_dict.update({item['notary']:{}})
+        if item['chain'] not in balances_dict[item['notary']]:
+            balances_dict[item['notary']].update({item['chain']:item['balance']})
+        else:
+            bal = balances_dict[item['notary']][item['chain']] + item['balance']
+            balances_dict[item['notary']].update({item['chain']:bal})
+
+    chain_list.sort()
+    notary_list.sort()
+    notary_list = region_sort(notary_list)
+
+    bg_color = []
+    border_color = []
+
+    third_chains = []
+    main_chains = []
+    coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
+    for item in coins_data:
+        if item['dpow']['server'] == "dPoW-mainnet":
+            main_chains.append(item['chain'])
+        if item['dpow']['server'] == "dPoW-3P":
+            third_chains.append(item['chain'])
+
+    if len(chain_list) == 1:
+        chain = chain_list[0]
+        labels = notary_list
+        chartLabel = chain+ " Notary Balances"
+        for notary in notary_list:
+            if notary.endswith("_AR"):
+                bg_color.append('#DC0333')
+            elif notary.endswith("_EU"):
+                bg_color.append('#2FEA8B')
+            elif notary.endswith("_NA"):
+                bg_color.append('#B541EA')
+            elif notary.endswith("_SH"):
+                bg_color.append('#00E2FF')
+            else:
+                bg_color.append('#F7931A')
+            border_color.append('#000')
+    else:
+        notary = notary_list[0]
+        labels = chain_list
+        chartLabel = notary+ " Notary Balances"
+        for chain in chain_list:
+            if chain in third_chains:
+                bg_color.append('#b541ea')
+            elif chain in main_chains:
+                bg_color.append('#2fea8b')
+            else:
+                bg_color.append('#f7931a')
+            border_color.append('#000')
+
+    chartdata = []
+    for notary in notary_list:
+        for chain in chain_list:
+            chartdata.append(balances_dict[notary][chain])
+    
+    data = { 
+        "labels":labels, 
+        "chartLabel":chartLabel, 
+        "chartdata":chartdata, 
+        "bg_color":bg_color, 
+        "border_color":border_color, 
+    } 
+    return data
+
+
+def get_chain_sync_data(request):
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    context = {
+        "sidebar_links":get_sidebar_links(notaries_list, coins_data),
+        "explorers":get_dpow_explorers(),
+        "eco_data_link":get_eco_data_link(),
+    }
+    r = requests.get('http://138.201.207.24/show_sync_node_data')
+    try:
+        chain_sync_data = r.json()
+        sync_data_keys = list(chain_sync_data.keys())
+        chain_count = 0
+        sync_count = 0
+        for chain in sync_data_keys:
+            if chain == 'last_updated':
+                last_data_update = day_hr_min_sec(
+                    int(time.time()) - int(chain_sync_data['last_updated'])
+                )
+                chain_sync_data.update({
+                    "last_data_update": last_data_update
+                })
+            elif chain.find('last') == -1:
+                chain_count += 1
+                if "last_sync_blockhash" in chain_sync_data[chain]:
+                    if chain_sync_data[chain]["last_sync_blockhash"] == chain_sync_data[chain]["last_sync_dexhash"]:
+                        sync_count += 1
+                if 'last_sync_timestamp' in chain_sync_data[chain] :
+                    last_sync_update = day_hr_min_sec(
+                        int(time.time()) - int(chain_sync_data[chain]['last_sync_timestamp'])
+                    )
+                else:
+                    last_sync_update = "-"
+                chain_sync_data[chain].update({
+                    "last_sync_update": last_sync_update
+                })
+        sync_pct = round(sync_count/chain_count*100,3)
+        context.update({
+            "chain_sync_data":chain_sync_data,
+            "sync_count":sync_count,
+            "sync_pct":sync_pct,
+            "chain_count":chain_count
+        })
+    except Exception as e:
+        logger.info(e)
+        messages.error(request, 'Sync Node API not Responding!')
+    return context
 
 def get_mined_count_season_data(request):
     resp = {}

@@ -2,57 +2,13 @@
 import logging
 import binascii
 from .models import *
+from .const_lib import *
+
 logger = logging.getLogger("mylogger")
 
-noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
-
- # Need to confirm and fill this in correctly later...
-seasons_info = {
-    "Season_1": {
-            "start_block":1,
-            "end_block":1,
-            "start_time":1,
-            "end_time":1530921600,
-            "notaries":[]
-        },
-    "Season_2": {
-            "start_block":1,
-            "end_block":1,
-            "start_time":1530921600,
-            "end_time":1563148799,
-            "notaries":[]
-        },
-    "Season_3": {
-            "start_block":1444000,
-            "end_block":1921999,
-            "start_time":1563148800,
-            "end_time":1592146799,
-            "notaries":[]
-        },
-    "Season_4": {
-            "start_block":1922000,
-            "end_block":2444000,
-            "start_time":1592146800,
-            "end_time":1751328000,
-            "notaries":[]
-        }
-}
-
-def get_season(time_stamp):
-    for season in seasons_info:
-        if time_stamp >= seasons_info[season]['start_time'] and time_stamp <= seasons_info[season]['end_time']:
-            return season
-    return "season_undefined"
+def lil_endian(hex_str):
+    return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
     
-# convert timestamp to human time 
-intervals = (
-    ('wks', 604800),  # 60 * 60 * 24 * 7
-    ('days', 86400),    # 60 * 60 * 24
-    ('hrs', 3600),    # 60 * 60
-    ('mins', 60),
-    ('sec', 1),
-    )
-
 def day_hr_min_sec(seconds, granularity=2):
     result = []
     for name, count in intervals:
@@ -64,6 +20,12 @@ def day_hr_min_sec(seconds, granularity=2):
             result.append("{} {}".format(value, name))
     return ', '.join(result[:granularity])
 
+def get_season(time_stamp):
+    for season in seasons_info:
+        if time_stamp >= seasons_info[season]['start_time'] and time_stamp <= seasons_info[season]['end_time']:
+            return season
+    return "season_undefined"
+    
 def region_sort(notary_list):
     new_list = []
     for region in ['AR','EU','NA','SH','DEV']:
@@ -99,26 +61,6 @@ def items_row_to_dict(items_row, top_key):
             nested_json[items_row[top_key]].update({key:items_row[key]})
     return nested_json
 
-# convert timestamp to human time 
-intervals = (
-    ('wks', 604800),  # 60 * 60 * 24 * 7
-    ('days', 86400),    # 60 * 60 * 24
-    ('hrs', 3600),    # 60 * 60
-    ('mins', 60),
-    ('sec', 1),
-    )
-
-def day_hr_min_sec(seconds, granularity=2):
-    result = []
-    for name, count in intervals:
-        value = seconds // count
-        if value:
-            seconds -= value * count
-            if value == 1:
-                name = name.rstrip('s')
-            result.append("{} {}".format(value, name))
-    return ', '.join(result[:granularity])
-
 # OP_RETURN functions
 def get_ticker(scriptPubKeyBinary):
     chain = ''
@@ -136,9 +78,6 @@ def get_ticker(scriptPubKeyBinary):
         chain = "KMD"
     return chain
 
-
-def lil_endian(hex_str):
-    return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
 
 def decode_opret(scriptPubKey_asm):   
     ac_ntx_blockhash = lil_endian(scriptPubKey_asm[:64])

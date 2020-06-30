@@ -28,11 +28,13 @@ class notarised_btc(models.Model):
     btc_txid = models.CharField(max_length=64)
     btc_block_hash = models.CharField(max_length=64)
     btc_block_ht = models.PositiveIntegerField()
+    btc_block_time = models.PositiveIntegerField()
     addresses = ArrayField(models.CharField(max_length=34),size=13)
     notaries = ArrayField(models.CharField(max_length=34),size=13)
     kmd_txid = models.CharField(max_length=64)
     kmd_block_hash = models.CharField(max_length=64)
     kmd_block_ht = models.PositiveIntegerField()
+    kmd_block_time = models.PositiveIntegerField()
     opret = models.CharField(max_length=2048)
     season = models.CharField(max_length=32)
 
@@ -302,6 +304,28 @@ class addresses(models.Model):
             models.UniqueConstraint(
                 fields=['address', "season", "chain"],
                 name='unique_season_chain_address'
+            )
+        ]
+
+class btc_address_deltas(models.Model):
+    notary = models.CharField(max_length=34)
+    address = models.CharField(max_length=34)
+    category = models.CharField(max_length=34)
+    txid = models.CharField(max_length=128)
+    block_time = models.PositiveIntegerField()
+    total_in = models.IntegerField()
+    total_out = models.IntegerField()
+    fees = models.IntegerField()
+    vin_addr = JSONField()
+    vout_addr = JSONField()
+    season = models.CharField(max_length=34)
+
+    class Meta:
+        db_table = 'btc_address_deltas'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['notary', "txid"],
+                name='unique_notary_txid_deltas'
             )
         ]
 

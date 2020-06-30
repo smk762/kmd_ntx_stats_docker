@@ -4,13 +4,12 @@ import table_lib
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-table = 'notarised_btc'
-
+table = 'notarised'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
 
-cursor.execute("TRUNCATE "+table+";")
+cursor.execute("DELETE FROM "+table+" WHERE chain = 'KMD';")
 conn.commit()
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")

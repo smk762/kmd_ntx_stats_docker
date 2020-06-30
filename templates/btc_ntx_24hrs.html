@@ -54,18 +54,18 @@
 			            "data": 'chain',
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a></span>");
+			            	if (oData.chain == "KMD") {
+				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='http://{{ request.get_host }}/coin_profile/BTC'>BTC</a></span>");
+				            } else {
+				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a></span>");
+				            }
 				        }
 			        },
         			{
 			            "data": 'block_height',
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	if (oData.chain == "BTC") {
-				            	$(nTd).html("<a href='"+explorers['BTC']+'block-index/'+oData.block_height+"'>"+oData.block_height+"</a>");
-				            } else {
-				            	$(nTd).html("<a href='"+explorers['KMD']+'block-index/'+oData.block_height+"'>"+oData.block_height+"</a>");
-				        	}
+				            $(nTd).html("<a href='"+explorers['KMD']+'block-index/'+oData.block_height+"'>"+oData.block_height+"</a>");
 				        }
 			        },
         			{
@@ -86,12 +86,7 @@
 			            "data": 'opret',
 			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	if (oData.opret.split(" ").length > 1) {
-			            		op_return = oData.opret.split(" ")[1]
-			            	} else {
-			            		op_return = oData.opret
-			            	}
-
+			            	op_return = oData.opret.split(" ")[1]
 				            $(nTd).html("<a href='http://{{ request.get_host }}/api/tools/decode_opreturn/?OP_RETURN="+op_return+"'>"+op_return.slice(0, 3)+"..."+op_return.slice(-3)+"</a>");
 				        }
 			        },
