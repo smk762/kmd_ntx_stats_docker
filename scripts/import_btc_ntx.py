@@ -32,7 +32,7 @@ load_dotenv()
 def import_btc_ntx(existing_txids):
     r = requests.get("http://notary.earth:8762/api/source/notarised/?season=Season_4&chain=BTC")
     resp = r.json()
-    while resp["next"] != '':
+    while resp["next"] is not None:
 
         results = resp["results"]
         next_page = resp["next"]
@@ -44,6 +44,7 @@ def import_btc_ntx(existing_txids):
                             item["txid"], item["opret"], item["season"], "true")
 
                 update_ntx_row(conn, cursor, row_data)
+                time.sleep(0.1)
                 logger.info("Updated "+item['txid'])
             else:
                 logger.info("Skipping "+item['txid'])
@@ -60,6 +61,7 @@ def import_btc_ntx(existing_txids):
                         item["txid"], item["opret"], item["season"], "true")
 
             update_ntx_row(conn, cursor, row_data)
+            time.sleep(0.1)
             logger.info("Updated "+item['txid'])
         else:
             logger.info("Skipping "+item['txid'])
