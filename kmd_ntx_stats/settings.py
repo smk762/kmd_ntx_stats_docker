@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'rest_framework_datatables',
     'mathfilters',
+    'coverage',
     'kmd_ntx_api'
 ]
 

@@ -3,6 +3,7 @@ import logging
 import datetime
 from datetime import datetime as dt
 from .models import *
+from .const_lib import *
 from .info_lib import *
 from .helper_lib import *
 from kmd_ntx_api.serializers import *
@@ -371,7 +372,7 @@ def get_chain_sync_data(request):
             "chain_count":chain_count
         })
     except Exception as e:
-        print(e)
+        logger.info(e)
         messages.error(request, 'Sync Node API not Responding!')
     return context
 

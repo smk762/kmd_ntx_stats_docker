@@ -307,6 +307,28 @@ class addresses(models.Model):
             )
         ]
 
+class btc_address_deltas(models.Model):
+    notary = models.CharField(max_length=34)
+    address = models.CharField(max_length=34)
+    category = models.CharField(max_length=34)
+    txid = models.CharField(max_length=128)
+    block_time = models.PositiveIntegerField()
+    total_in = models.IntegerField()
+    total_out = models.IntegerField()
+    fees = models.IntegerField()
+    vin_addr = JSONField()
+    vout_addr = JSONField()
+    season = models.CharField(max_length=34)
+
+    class Meta:
+        db_table = 'btc_address_deltas'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['notary', "txid"],
+                name='unique_notary_txid_deltas'
+            )
+        ]
+
 # INFO
 
 class coins(models.Model):

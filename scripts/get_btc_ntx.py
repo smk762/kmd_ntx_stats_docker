@@ -150,7 +150,7 @@ for btc_txid in ntx_txids:
                     if kmd_ntx_info['chain'] == "KMD":
                         kmd_block_hash = kmd_ntx_info['notarised_blockhash']
                         kmd_block_ht = kmd_ntx_info['notarised_block']
-                        season = get_season_from_addresses(notaries, addresses, "BTC", "BTC")
+                        season = get_season_from_addresses(notaries, addresses, "BTC")
                         row_data = (btc_txid, btc_block_hash, btc_block_ht,
                             addresses, notaries,
                             kmd_block_hash, kmd_block_ht,

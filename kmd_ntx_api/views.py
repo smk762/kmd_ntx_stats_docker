@@ -66,7 +66,7 @@ class ntxFilter(FilterSet):
                   'max_ac_block', 'min_blocktime', 'max_blocktime', 
                   'txid', 'chain', 'block_height', 'block_time',
                   'block_datetime', 'block_hash', 'ac_ntx_blockhash',
-                  'ac_ntx_height', 'opret', 'season']
+                  'ac_ntx_height', 'opret', 'season', 'btc_validated']
 
 ## Source data endpoints
 
@@ -609,7 +609,7 @@ def notary_profile_view(request, notary_name=None):
             "rank":rank,
             "notary_name":notary_name,
             "notary_balances_graph_data":notary_balances_graph_data,
-            "balances_data":balances_data,
+            "notary_balances_table_data":notary_balances_table_data,
             "region_score_stats":region_score_stats,
             #"notary_ntx_counts":notary_ntx_counts,
             "mining_summary":get_nn_mining_summary(notary_name),
@@ -837,6 +837,22 @@ def btc_ntx(request):
         "season":season.replace("_"," ")
     }
     return render(request, 'btc_ntx.html', context)
+
+def btc_ntx_all(request):
+    season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    btc_ntx = notarised.objects.filter(
+                            season=season, chain='BTC').values()
+
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "explorers":get_dpow_explorers(),
+        "btc_ntx":btc_ntx,
+        "season":season.replace("_"," ")
+    }
+    return render(request, 'btc_ntx_all.html', context)
 
 def ntx_scoreboard(request):
     season = get_season(int(time.time()))
