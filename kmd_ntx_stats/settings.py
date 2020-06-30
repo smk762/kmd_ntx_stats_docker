@@ -45,8 +45,9 @@ INSTALLED_APPS = [
     'dynamic_rest',
     'crispy_forms',
     'rest_framework_datatables',
-    'kmd_ntx_api',
-    'mathfilters'
+    'mathfilters',
+    'coverage',
+    'kmd_ntx_api'
 ]
 
 MIDDLEWARE = [

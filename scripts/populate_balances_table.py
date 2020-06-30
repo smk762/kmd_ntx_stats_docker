@@ -68,9 +68,12 @@ ONE_YEAR = 365 * 24 * 60
 DEVISOR = 10512000
 
 tiptime = rpc.getinfo()['tiptime']
-def get_kmd_rewards():
+
+def get_kmd_rewards(season):
     nn_utxos = {}
-    for addr in known_addresses:
+    bitcoin.params = coin_params["KMD"]
+    for notary in notary_pubkeys[season]:
+        addr = str(P2PKHBitcoinAddress.from_pubkey(x(notary_pubkeys[season][notary])))
         utxos = rpc.getaddressutxos({"addresses": [addr]})
         notary = known_addresses[addr]
         utxo_count = len(utxos)
@@ -133,28 +136,39 @@ def get_kmd_rewards():
 
         update_rewards_tbl(conn, cursor, row_data)
 
-this_season = get_season(int(time.time()))
-thread_list = {}
-print(notary_addresses.keys())
-for season in notary_addresses:
-    if season.find(this_season) != -1:
-        for notary in notary_addresses[season]:
-            thread_list.update({notary:[]})
-            for chain in notary_addresses[season][notary]:
-                addr = notary_addresses[season][notary][chain]
-                pubkey = notary_pubkeys[season][notary]
-                if season.find("third_party") == -1:
-                    if chain not in third_party_coins:
+def get_balances(this_season):
+    thread_list = {}
+
+    for season in notary_addresses:
+
+        # update only current season
+        if season.find(this_season) != -1:
+
+            for notary in notary_addresses[season]:
+                thread_list.update({notary:[]})
+
+                for chain in notary_addresses[season][notary]:
+                    addr = notary_addresses[season][notary][chain]
+                    pubkey = notary_pubkeys[season][notary]
+
+                    # check only notarising addresses
+                    if season.find("third_party") == -1:
+                        if chain not in third_party_coins:
+                            check_bal = True
+                    elif chain in third_party_coins or chain == "KMD":
                         check_bal = True
-                elif chain in third_party_coins or chain == "KMD":
-                    check_bal = True
-                if check_bal:
-                    thread_list[notary].append(electrum_thread(conn, cursor, notary, chain, pubkey, addr, season))
-            for thread in thread_list[notary]:
-                thread.start()
-            time.sleep(4) # 4 sec sleep = 15 min runtime.
 
-get_kmd_rewards()
+                    if check_bal:
+                        thread_list[notary].append(electrum_thread(conn, cursor, notary, chain, pubkey, addr, season))
+
+                for thread in thread_list[notary]:
+                    thread.start()
+                time.sleep(4) # 4 sec sleep = 15 min runtime.
+
+season = get_season(int(time.time()))
+
+get_balances(season)
+get_kmd_rewards(season)
+
 cursor.close()
-
 conn.close()
