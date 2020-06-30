@@ -71,7 +71,7 @@ cursor = conn.cursor()
 
 existing_txids = get_existing_ntxids(cursor)
 
-import_btc_ntx(existing_txids)
+import_ntx(existing_txids)
 
 cursor.close()
 conn.close()
