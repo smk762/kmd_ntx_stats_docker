@@ -97,11 +97,32 @@ def update_notarised_btc_tbl(conn, cursor, row_data):
             logger.debug(row_data)
         conn.rollback()
 
-def update_ntx_records(conn, cursor, records):
-    execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, block_hash, \
-                            notaries, ac_ntx_blockhash, ac_ntx_height, txid, opret, season, btc_validated) VALUES %s", records)
+def update_ntx_row(conn, cursor, row_data):
+    sql = "INSERT INTO INSERT INTO notarised (chain, block_height, \
+                                block_time, block_datetime, block_hash, \
+                                notaries, ac_ntx_blockhash, ac_ntx_height, \
+                                txid, opret, season, btc_validated) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    try:
+        cursor.execute(sql, row_data)
+        conn.commit()
+        logger.debug(row_data)
+    except Exception as e:
+        if str(e).find('duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        conn.rollback()
 
-    conn.commit()
+def update_ntx_records(conn, cursor, records):
+    try:
+        execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, block_hash, \
+                                notaries, ac_ntx_blockhash, ac_ntx_height, txid, opret, season, btc_validated) VALUES %s", records)
+
+        conn.commit()
+    except Exception as e:
+        if str(e).find('duplicate') == -1:
+            logger.debug(e)
+        conn.rollback()
 
 def update_validation_notarised_tbl(conn, cursor, btc_txid, btc_block_hash, btc_block_ht, opret):
     sql = "UPDATE notarised SET \
