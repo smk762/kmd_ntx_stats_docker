@@ -98,7 +98,7 @@ def update_notarised_btc_tbl(conn, cursor, row_data):
         conn.rollback()
 
 def update_ntx_row(conn, cursor, row_data):
-    sql = "INSERT INTO INSERT INTO notarised (chain, block_height, \
+    sql = "INSERT INTO notarised (chain, block_height, \
                                 block_time, block_datetime, block_hash, \
                                 notaries, ac_ntx_blockhash, ac_ntx_height, \
                                 txid, opret, season, btc_validated) \
@@ -106,7 +106,6 @@ def update_ntx_row(conn, cursor, row_data):
     try:
         cursor.execute(sql, row_data)
         conn.commit()
-        logger.debug(row_data)
     except Exception as e:
         if str(e).find('duplicate') == -1:
             logger.debug(e)
