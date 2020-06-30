@@ -7,6 +7,7 @@ import psycopg2
 from decimal import *
 import logging
 import logging.handlers
+from .const_lib import *
 
 logger = logging.getLogger(__name__)
 

@@ -25,7 +25,7 @@ cursor = conn.cursor()
 # cursor.execute("DELETE FROM coins WHERE dpow_active = 1;")
 # conn.commit()
 
-dpow_coins = get_dpow_coins()
+dpow_coins = get_dpow_coins(conn, cursor)
 third_party_coins = []
 antara_coins = []
 other_coins = []

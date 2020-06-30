@@ -5,13 +5,10 @@ import logging
 import random
 import requests
 from .models import *
+from .const_lib import *
 from .query_lib import *
 from .helper_lib import *
 logger = logging.getLogger("mylogger")
-
-url = "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json"
-r = requests.get(url)
-eco_data = r.json()
 
 def get_low_nn_balances():
     url = "http://138.201.207.24/nn_balances_report"
@@ -34,9 +31,9 @@ def get_notary_balances_table_data(coins_data, balances_data):
     main_chains = []
 
     for item in coins_data:
-        if item['dpow']['server'] == "dpow-mainnet":
+        if item['dpow']['server'].lower() == "dpow-mainnet":
             main_chains.append(item['chain'])
-        if item['dpow']['server'] == "dpow-3p":
+        elif item['dpow']['server'].lower() == "dpow-3p":
             third_chains.append(item['chain'])
 
     third_chains.append("KMD_3P")
@@ -48,8 +45,7 @@ def get_notary_balances_table_data(coins_data, balances_data):
     for item in balances_data:
         if item["chain"] in main_chains and item["node"] == 'main':
             filtered_balances.append(item)
-        elif item["node"] == 'third_party':
-            if item["chain"] in third_chains or item['chain'] == "KMD":
+        elif item["node"] == 'third party' and item["chain"] in third_chains or item['chain'] == "KMD":
                 filtered_balances.append(item)
 
     return filtered_balances
@@ -65,9 +61,9 @@ def get_notary_balances_graph_data(coins_data, balances_data):
     main_chains = []
 
     for item in coins_data:
-        if item['dpow']['server'] == "dpow-mainnet":
+        if item['dpow']['server'].lower() == "dpow-mainnet":
             main_chains.append(item['chain'])
-        if item['dpow']['server'] == "dpow-3p":
+        if item['dpow']['server'].lower() == "dpow-3p":
             third_chains.append(item['chain'])
     third_chains.append("KMD_3P")
     main_chains.sort()
@@ -90,7 +86,10 @@ def get_notary_balances_graph_data(coins_data, balances_data):
             chain = "KMD_3P"
         else: 
             chain = item['chain']
-        balances_dict.update({chain:float(item['balance'])})
+        if chain in main_chains and item["node"] == 'main':
+            balances_dict.update({chain:float(item['balance'])})
+        elif item["node"] == 'third party' and chain in third_chains or chain == "KMD_3P":
+            balances_dict.update({chain:float(item['balance'])})
 
     for label in labels:
         chartdata.append(balances_dict[label])
