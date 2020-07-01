@@ -292,8 +292,6 @@ def get_nn_ntx_summary(notary):
         chains_ntx_season = ntx_season[0]['chain_ntx_counts']
         season_max_chain = max(chains_ntx_season, key=chains_ntx_season.get) 
         season_max_ntx = chains_ntx_season[season_max_chain]
-        if season_max_chain == 'KMD':
-            season_max_chain = 'BTC'
 
         ntx_summary['season'].update({
             "btc_ntx":ntx_season[0]['btc_count'],
@@ -315,7 +313,8 @@ def get_nn_ntx_summary(notary):
                              .values()
     last_chain_ntx_times = {}
     for item in ntx_last:
-        last_chain_ntx_times.update({item['chain']:item['block_time']})
+        if item['chain'] != "KMD":
+            last_chain_ntx_times.update({item['chain']:item['block_time']})
 
     if len(last_chain_ntx_times) > 0:
         max_last_ntx_chain = max(last_chain_ntx_times, key=last_chain_ntx_times.get) 
@@ -323,8 +322,6 @@ def get_nn_ntx_summary(notary):
         time_since_last_ntx = int(time.time()) - int(max_last_ntx_time)
         time_since_last_ntx = day_hr_min_sec(time_since_last_ntx)
         last_chain_ntx_times.update({item['chain']:item['block_time']})
-        if max_last_ntx_chain == 'KMD':
-            max_last_ntx_chain = 'BTC'
         ntx_summary.update({
             "time_since_last_ntx":time_since_last_ntx,
             "last_ntx_chain":max_last_ntx_chain,
@@ -360,16 +357,17 @@ def get_last_nn_chain_ntx(season):
         if notary not in last_nn_chain_ntx:
             last_nn_chain_ntx.update({notary:{}})
         chain = item['chain']
-        time_since = int(time.time()) - int(item['block_time'])
-        time_since = day_hr_min_sec(time_since)
-        last_nn_chain_ntx[notary].update({
-            chain:{
-                "txid": item['txid'],
-                "block_height": item['block_height'],
-                "block_time": item['block_time'],
-                "time_since": time_since
-            }
-        })
+        if chain != "KMD":
+            time_since = int(time.time()) - int(item['block_time'])
+            time_since = day_hr_min_sec(time_since)
+            last_nn_chain_ntx[notary].update({
+                chain:{
+                    "txid": item['txid'],
+                    "block_height": item['block_height'],
+                    "block_time": item['block_time'],
+                    "time_since": time_since
+                }
+            })
     return last_nn_chain_ntx
 
 # chain > data
@@ -384,19 +382,20 @@ def get_season_chain_ntx_data(season):
             time_since_last_ntx = int(time.time()) - int(item['kmd_ntx_blocktime'])
             time_since_last_ntx = day_hr_min_sec(time_since_last_ntx)
             if item['chain'] in dpow_coins_list:
-                season_chain_ntx_data.update({
-                    item['chain']: {
-                        'chain_ntx_season':item['ntx_count'],
-                        'last_ntx_time':item['kmd_ntx_blocktime'],
-                        'time_since_ntx':time_since_last_ntx,
-                        'last_ntx_block':item['block_height'],
-                        'last_ntx_hash':item['kmd_ntx_blocktime'],
-                        'last_ntx_ac_block':item['ac_ntx_height'],
-                        'ac_block_height':item['ac_block_height'],
-                        'ac_ntx_blockhash':item['ac_ntx_blockhash'],
-                        'ntx_lag':item['ntx_lag']
-                    }
-                })
+                if item['chain'] != 'KMD':
+                    season_chain_ntx_data.update({
+                        item['chain']: {
+                            'chain_ntx_season':item['ntx_count'],
+                            'last_ntx_time':item['kmd_ntx_blocktime'],
+                            'time_since_ntx':time_since_last_ntx,
+                            'last_ntx_block':item['block_height'],
+                            'last_ntx_hash':item['kmd_ntx_blocktime'],
+                            'last_ntx_ac_block':item['ac_ntx_height'],
+                            'ac_block_height':item['ac_block_height'],
+                            'ac_ntx_blockhash':item['ac_ntx_blockhash'],
+                            'ntx_lag':item['ntx_lag']
+                        }
+                    })
     return season_chain_ntx_data
 
 # notary > chain > count
@@ -420,64 +419,63 @@ def get_season_nn_chain_ntx_data(season):
     season_nn_chain_ntx_data = {}
     for notary in notary_list:
         for chain in coins_list:
-            if chain == "BTC":
-                chain = "KMD"
-            total_chain_ntx = 0
-            last_ntx_block = 0
-            num_nn_chain_ntx = 0
-            time_since = "N/A"
-            participation_pct = 0
-            if chain in season_chain_ntx_data:
-                total_chain_ntx = season_chain_ntx_data[chain]['chain_ntx_season']
-            else:
+            if chain != "KMD":
                 total_chain_ntx = 0
-
-            if notary in nn_season_ntx_counts:
-                num_nn_chain_ntx = nn_season_ntx_counts[notary]
-            else:
+                last_ntx_block = 0
                 num_nn_chain_ntx = 0
+                time_since = "N/A"
+                participation_pct = 0
+                if chain in season_chain_ntx_data:
+                    total_chain_ntx = season_chain_ntx_data[chain]['chain_ntx_season']
+                else:
+                    total_chain_ntx = 0
 
-            if notary in last_nn_chain_ntx:
-                if chain in last_nn_chain_ntx[notary]:
-                    time_since = last_nn_chain_ntx[notary][chain]["time_since"]
-                    last_ntx_block = last_nn_chain_ntx[notary][chain]['block_height']
-                    last_ntx_txid = last_nn_chain_ntx[notary][chain]['txid']
+                if notary in nn_season_ntx_counts:
+                    num_nn_chain_ntx = nn_season_ntx_counts[notary]
+                else:
+                    num_nn_chain_ntx = 0
+
+                if notary in last_nn_chain_ntx:
+                    if chain in last_nn_chain_ntx[notary]:
+                        time_since = last_nn_chain_ntx[notary][chain]["time_since"]
+                        last_ntx_block = last_nn_chain_ntx[notary][chain]['block_height']
+                        last_ntx_txid = last_nn_chain_ntx[notary][chain]['txid']
+                    else:
+                        time_since = ''
+                        last_ntx_block = ''
+                        last_ntx_txid = ''
                 else:
                     time_since = ''
                     last_ntx_block = ''
                     last_ntx_txid = ''
-            else:
-                time_since = ''
-                last_ntx_block = ''
-                last_ntx_txid = ''
 
-            if total_chain_ntx != 0 and not isinstance(num_nn_chain_ntx, int):
-                if chain in num_nn_chain_ntx:
-                    participation_pct = round(num_nn_chain_ntx[chain]/total_chain_ntx*100,2)
+                if total_chain_ntx != 0 and not isinstance(num_nn_chain_ntx, int):
+                    if chain in num_nn_chain_ntx:
+                        participation_pct = round(num_nn_chain_ntx[chain]/total_chain_ntx*100,2)
+                    else:
+                        participation_pct = 0
                 else:
                     participation_pct = 0
-            else:
-                participation_pct = 0
 
-            if notary not in season_nn_chain_ntx_data:
-                season_nn_chain_ntx_data.update({notary:{}})
-            if not isinstance(num_nn_chain_ntx, int):
-                if chain in num_nn_chain_ntx:
-                    num_ntx = num_nn_chain_ntx[chain]
+                if notary not in season_nn_chain_ntx_data:
+                    season_nn_chain_ntx_data.update({notary:{}})
+                if not isinstance(num_nn_chain_ntx, int):
+                    if chain in num_nn_chain_ntx:
+                        num_ntx = num_nn_chain_ntx[chain]
+                    else:
+                        num_ntx = 0
                 else:
                     num_ntx = 0
-            else:
-                num_ntx = 0
 
-            season_nn_chain_ntx_data[notary].update({
-                chain: {
-                    "num_nn_chain_ntx":num_ntx,
-                    "time_since":time_since,
-                    "last_ntx_block":last_ntx_block,
-                    "last_ntx_txid":last_ntx_txid,
-                    "participation_pct":participation_pct
-                }
-            })
+                season_nn_chain_ntx_data[notary].update({
+                    chain: {
+                        "num_nn_chain_ntx":num_ntx,
+                        "time_since":time_since,
+                        "last_ntx_block":last_ntx_block,
+                        "last_ntx_txid":last_ntx_txid,
+                        "participation_pct":participation_pct
+                    }
+                })
     return season_nn_chain_ntx_data
                      
 def get_nn_mining_summary(notary):

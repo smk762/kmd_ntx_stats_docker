@@ -241,7 +241,7 @@ def get_daily_ntx_graph_data(request):
     }
     return data
 
-def get_balances_graph_data(request):
+def get_balances_graph_data(request, filter_kwargs):
 
     if 'chain' in request.GET:
         filter_kwargs.update({'chain':request.GET['chain']})
@@ -331,11 +331,7 @@ def get_chain_sync_data(request):
     season = get_season(int(time.time()))
     notaries_list = get_notary_list(season)
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    context = {
-        "sidebar_links":get_sidebar_links(notaries_list, coins_data),
-        "explorers":get_dpow_explorers(),
-        "eco_data_link":get_eco_data_link(),
-    }
+    context = {}
     r = requests.get('http://138.201.207.24/show_sync_node_data')
     try:
         chain_sync_data = r.json()
@@ -443,7 +439,7 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary):
         if chain_ntx_count > max_ntx_count:
             max_chain = chain
             max_ntx_count = chain_ntx_count
-        if chain == "KMD":
+        if chain == "BTC":
             btc_ntx_count += chain_ntx_count
         elif chain in main_chains:
             main_ntx_count += chain_ntx_count
@@ -482,8 +478,6 @@ def get_coin_notariser_ranks(season):
         if notary in notary_list:
             for coin in item['chain_ntx_counts']:
                 if coin in dpow_coins:
-                    if coin == "BTC":
-                        coin = "KMD"
                     region = get_notary_region(notary)
                     if region in ["AR","EU","NA","SH", "DEV"]:
                         region_notary_ranks[region][notary].update({
@@ -529,7 +523,7 @@ def get_notarisation_scores(season, coin_notariser_ranks):
     for region in notarisation_scores:
         for notary in notarisation_scores[region]:
             for chain in coin_notariser_ranks[region][notary]:
-                if chain in ["KMD", "BTC"]:
+                if chain == "BTC":
                     val = notarisation_scores[region][notary]["btc"] \
                         +coin_notariser_ranks[region][notary][chain]
                     notarisation_scores[region][notary].update({
@@ -630,8 +624,6 @@ def get_top_region_notarisers(region_notary_ranks):
 
 def get_top_coin_notarisers(top_region_notarisers, chain):
     top_coin_notarisers = {}
-    if chain == "BTC":
-        chain = "KMD"
     for region in top_region_notarisers:
         if chain in top_region_notarisers[region]:
             top_coin_notarisers.update({

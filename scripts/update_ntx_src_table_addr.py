@@ -117,7 +117,7 @@ def update_notarisations():
             notaries = row_data[5]
             ntx_season = row_data[10]
             if not ntx_season:
-                if chain not in ['KMD', 'BTC']:
+                if chain != 'BTC':
                     for season_num in seasons_info:
                         if block_time < seasons_info[season_num]['end_time'] and block_time >= seasons_info[season_num]['start_time']:
                             ntx_season = season_num
@@ -137,7 +137,7 @@ def update_notarisations():
                         update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
                 else:
                     update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
-                if chain == 'KMD':
+                if chain == 'BTC':
                     last_btc_ntx_row_data = (notary, txid, block_height,
                                          block_time, ntx_season)
 

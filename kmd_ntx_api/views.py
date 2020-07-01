@@ -639,8 +639,9 @@ def coin_profile_view(request, chain=None):
     }
     if chain:
         balance_data = balances.objects.filter(chain=chain, season=season) \
-                                       .order_by('notary') \
-                                       .values('notary','address', 'balance')
+                                   .order_by('notary') \
+                                   .values('notary','address', 'balance')
+
         max_tick = 0
         for item in balance_data:
             if item['balance'] > max_tick:
@@ -651,7 +652,12 @@ def coin_profile_view(request, chain=None):
             max_tick = 10
         coin_notariser_ranks = get_coin_notariser_ranks(season)
         top_region_notarisers = get_top_region_notarisers(coin_notariser_ranks)
-        top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
+        if chain == "KMD":
+            top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, "BTC")
+            chain_ntx_summary = get_coin_ntx_summary("BTC")
+        else:
+            top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
+            chain_ntx_summary = get_coin_ntx_summary(chain)
         season_chain_ntx_data = get_season_chain_ntx_data(season)
 
         context.update({
@@ -659,21 +665,10 @@ def coin_profile_view(request, chain=None):
             "explorers":get_dpow_explorers(),
             "eco_data_link":get_eco_data_link(),
             "max_tick": max_tick,
-            "coin_social": get_coin_social(chain)
-        })
-        if chain == "BTC":
-            top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, "KMD")
-            context.update({
-                "chain_ntx_summary":get_coin_ntx_summary("KMD"),
-                "top_coin_notarisers":top_coin_notarisers
-            })
-        else:
-            top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
-            context.update({
-                "chain_ntx_summary":get_coin_ntx_summary(chain),
-                "top_coin_notarisers":top_coin_notarisers
-            })
-            
+            "coin_social": get_coin_social(chain),
+            "chain_ntx_summary": chain_ntx_summary,
+            "top_coin_notarisers":top_coin_notarisers
+        })            
 
         return render(request, 'coin_profile.html', context)
     else:
@@ -917,7 +912,16 @@ def funds_sent(request):
     return render(request, 'funding_sent.html', context)
 
 def chain_sync(request):
+    season = get_season(int(time.time()))
     context = get_chain_sync_data(request)
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+
+    context.update({
+        "sidebar_links":get_sidebar_links(notaries_list, coins_data),
+        "explorers":get_dpow_explorers(),
+        "eco_data_link":get_eco_data_link()
+        })
     return render(request, 'chain_sync.html', context)
 
 ## DASHBOARD        
@@ -1028,7 +1032,7 @@ class balances_graph(viewsets.ViewSet):
             if val is not None:
                 filter_kwargs.update({field:val}) 
 
-        data = get_balances_graph_data(request)
+        data = get_balances_graph_data(request, filter_kwargs)
 
         return Response(data) 
 
