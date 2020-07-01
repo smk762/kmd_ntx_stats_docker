@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="container text-center" width='90%'>
-		<div id="ui-view">
-			<div class="fade-in">
 				<div class="row my-3">
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0 mt-auto shadow-none">
@@ -65,7 +62,7 @@
 									    	Last BTC Notarisation
 										    <a href="http://{{ request.get_host }}/chains_last_ntx">
 											  	<span  id="last_btc_ntx" class="badge kmd_ui_dark1_bg p-1">
-											  			{{ ntx_summary.time_since_last_kmd_ntx }}
+											  			{{ ntx_summary.time_since_last_btc_ntx }}
 											  	</span>
 										  	</a>
 										</div>
@@ -293,9 +290,6 @@
 						</div>	
 					</div>
 				</div>
-			</div>	
-		</div>
-	</div>
     <!-- jquery -->
 
   	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
@@ -359,11 +353,11 @@
 		    var j = 0
 		    var max_blk = 0
 			for (var i = rows.length - 1; i >= 0; i--) {
-				if (rows[i].block > max_blk) {
+				if (rows[i].block > max_blk && rows[i].block > 1922000) {
 					max_blk = rows[i].block
 					document.getElementById("last_ntx").innerHTML = rows[i][5].display+"<br />"+rows[i].chain; 
 				} 
-				if (rows[i].chain == "KMD") {
+				if (rows[i].chain == "BTC") {
 					document.getElementById("last_btc_ntx").innerHTML = rows[i][5].display; 
 				} 
 			}
