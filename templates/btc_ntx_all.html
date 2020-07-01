@@ -56,11 +56,7 @@
 			            "data": 'chain',
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	if (oData.chain == "KMD") {
-				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='http://{{ request.get_host }}/coin_profile/BTC'>BTC</a></span>");
-				            } else {
 				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a></span>");
-				            }
 				        }
 			        },
         			{

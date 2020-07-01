@@ -43,9 +43,10 @@ It is intended to be run as a cronjob every 15-30 min
 Script runtime is around 5-10 mins, except for initial population which is up to 1 day per season
 '''
 
-def update_btc_notarisations():
+def update_btc_notarisations(conn, cursor):
     # Get existing data to avoid unneccesary updates 
     existing_txids = get_exisiting_btc_ntxids(cursor)
+    notary_last_ntx = get_notary_last_ntx(cursor)
 
     stop_block = 634000
     # Loop API queries to get BTC ntx
@@ -84,6 +85,22 @@ def update_btc_notarisations():
                     block_datetime = dt.utcfromtimestamp(int(block_time))
                     logger.info("Block datetime "+str(block_datetime))
 
+                    for notary in notaries:
+                        last_ntx_row_data = (notary, "BTC", btc_txid, block_height,
+                                             block_time, season)
+                        if notary in notary_last_ntx:
+                            if "BTC" not in notary_last_ntx[notary]:
+                                notary_last_ntx[notary].update({"BTC":0})
+
+                            if int(block_height) > int(notary_last_ntx[notary]["BTC"]):
+                                result = update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
+                        else:
+                            result = update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
+                        if result == 1:
+                            logger.info("last_ntx_tbl updated!")
+                        else:
+                            logger.warning("last_ntx_tbl not updated!")
+
                     if len(tx_info['outputs']) > 0:
                         if 'data_hex' in tx_info['outputs'][-1]:
                             opret = tx_info['outputs'][-1]['data_hex']
@@ -109,12 +126,11 @@ rpc = {}
 rpc["KMD"] = def_credentials("KMD")
 
 season = get_season(time.time())
-tip = int(rpc["KMD"].getblockcount())
 
 conn = connect_db()
 cursor = conn.cursor()
 
-update_btc_notarisations()
+update_btc_notarisations(conn, cursor)
 
 cursor.close()
 conn.close()

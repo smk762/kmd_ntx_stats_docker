@@ -251,7 +251,7 @@ def get_btc_ntxids(stop_block):
                 logger.info("No more tx to scan!")
                 exit_loop = True
                 
-        if exit_loop or page > int(os.getenv("btc_validate_pages")):
+        if exit_loop or page >= int(os.getenv("btc_validate_pages")):
             logger.info("exiting address txid loop!")
             break
     ntx_txids = list(set((ntx_txids)))

@@ -30,7 +30,7 @@ logger.setLevel(logging.INFO)
 load_dotenv()
 
 def import_ntx(existing_txids):
-    r = requests.get("http://notary.earth:8762/api/source/notarised/?season=Season_4")
+    r = requests.get("http://stats.kmd.io/api/source/notarised/?season=Season_4")
     resp = r.json()
     while resp["next"] is not None:
 
