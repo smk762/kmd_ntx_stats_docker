@@ -7,15 +7,16 @@ cursor = conn.cursor()
 #table = 'balances'
 #table = 'coin_social'
 #table = 'funding_transactions'
-#table = 'last_notarised'
+table = 'last_notarised'
 #table = 'notarised_chain_season'
 #table = 'nn_social'
 #table = 'notarised_count_season'
 #table = 'coins'
 #table = 'notarised_btc'
-table = 'btc_address_deltas'
+#table = 'btc_address_deltas'
 
-cursor.execute("SELECT * FROM "+table+";")
+#cursor.execute("SELECT * FROM "+table+";")
+cursor.execute("SELECT * FROM "+table+" WHERE chain = 'MCL';")
 
 results = cursor.fetchone()
 print(results)

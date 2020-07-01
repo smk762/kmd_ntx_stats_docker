@@ -32,6 +32,27 @@ seasons_info = {
         }
 }
 
+s4_numchains = {
+    "1921458": {
+        "phase":"S4 start",
+        "main": ['KMD', 'BTC', 'AXO', 'BET', 'BOTS', 'BTCH', 'CCL',
+                 'COQUICASH', 'CRYPTO', 'DEX', 'HODL', 'ILN', 'JUMBLR',
+                 'KOIN', 'MESH', 'MGW', 'MORTY', 'MSHARK', 'NINJA', 'OOT',
+                 'PANGEA', 'PGT', 'PIRATE', 'REVS', 'RFOX', 'RICK', 'STBL',
+                 'SUPERNET', 'THC', 'WLC21', 'ZILLA'],
+        "third party": ['AYA', 'CHIPS', 'EMC2', 'HUSH3', 'VRSC']
+    },
+    "1939795": {
+        "phase":"add MCL",
+        "main": ['KMD', 'BTC', 'AXO', 'BET', 'BOTS', 'BTCH', 'CCL',
+                 'COQUICASH', 'CRYPTO', 'DEX', 'HODL', 'ILN', 'JUMBLR',
+                 'KOIN', 'MESH', 'MGW', 'MORTY', 'MSHARK', 'NINJA', 'OOT',
+                 'PANGEA', 'PGT', 'PIRATE', 'REVS', 'RFOX', 'RICK', 'STBL',
+                 'SUPERNET', 'THC', 'WLC21', 'ZILLA'],
+        "third party": ['AYA', 'CHIPS', 'EMC2', 'HUSH3', 'MCL', 'VRSC']
+    },
+}
+
 # convert timestamp to human time 
 intervals = (
     ('wks', 604800),  # 60 * 60 * 24 * 7
