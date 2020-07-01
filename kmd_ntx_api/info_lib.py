@@ -4,11 +4,15 @@ from django.db.models import Count, Min, Max, Sum
 import logging
 import random
 import requests
+import os
+from dotenv import load_dotenv
 from .models import *
 from .const_lib import *
 from .query_lib import *
 from .helper_lib import *
 logger = logging.getLogger("mylogger")
+
+load_dotenv()
 
 def get_low_nn_balances():
     url = "http://138.201.207.24/nn_balances_report"
@@ -268,7 +272,7 @@ def get_nn_ntx_summary(notary):
             "third_party_ntx":0,
             "most_ntx":str(0)+" ("+str('-')+")"
         },
-        "time_since_last_kmd_ntx":-1,
+        "time_since_last_btc_ntx":-1,
         "time_since_last_ntx":-1,
         "last_ntx_chain":'-',
         "premining_ntx_score":0,
@@ -321,29 +325,20 @@ def get_nn_ntx_summary(notary):
         max_last_ntx_time = last_chain_ntx_times[max_last_ntx_chain]
         time_since_last_ntx = int(time.time()) - int(max_last_ntx_time)
         time_since_last_ntx = day_hr_min_sec(time_since_last_ntx)
-        last_chain_ntx_times.update({item['chain']:item['block_time']})
         ntx_summary.update({
             "time_since_last_ntx":time_since_last_ntx,
             "last_ntx_chain":max_last_ntx_chain,
         })
 
-    #last btc ntx data
-    btc_ntx_last = last_btc_notarised.objects \
-                             .filter(season=season, notary=notary) \
-                             .values()
-
-    max_kmd_ntx_time = 0
-    for item in btc_ntx_last:
-        max_kmd_ntx_time = item['block_time']
-
-    if max_kmd_ntx_time > 0:
-        time_since_last_kmd_ntx = int(time.time()) - int(max_kmd_ntx_time)
-        time_since_last_kmd_ntx = day_hr_min_sec(time_since_last_kmd_ntx)
+    if "BTC" in last_chain_ntx_times:
+        max_btc_ntx_time = last_chain_ntx_times["BTC"]
+        time_since_last_btc_ntx = int(time.time()) - int(max_btc_ntx_time)
+        time_since_last_btc_ntx = day_hr_min_sec(time_since_last_btc_ntx)
         ntx_summary.update({
-            "time_since_last_kmd_ntx":time_since_last_kmd_ntx,
+            "time_since_last_btc_ntx":time_since_last_btc_ntx,
         })
 
-    logger.info(ntx_summary)
+
     return ntx_summary
 
 # notary > chain > data
@@ -801,6 +796,7 @@ def get_sidebar_links(notary_list, coins_data):
     region_notaries = get_regions_info(notary_list)
     server_chains = get_server_chains(coins_data)
     sidebar_links = {
+        "server":os.getenv("SERVER"),
         "chains_menu":server_chains,
         "notaries_menu":region_notaries,
     }
