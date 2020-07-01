@@ -84,7 +84,11 @@
 								<ul class="list-group">
 								    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
-										    Last Notarisation Block (KMD)
+									    	{% if chain != 'KMD' %}
+										    	Last Notarisation Block (KMD)
+										    {% else %}
+										    	Last Notarisation Block (BTC)
+										    {% endif %}
 										    <span class="badge p-2 kmd_ui_dark4_bg">
 										    	{{ chain_ntx_summary.last_ntx_block }}
 										    </span>
@@ -342,7 +346,6 @@
 						        chartObj.ticks.push(10);
 						        chartObj.ticks.push(100);
 						        chartObj.ticks.push(1000);
-						        chartObj.ticks.push(10000);
 						        chartObj.ticks.push(10000);
 						    }
 						}],

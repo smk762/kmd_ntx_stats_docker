@@ -52,68 +52,6 @@ class daily_chain_thread(threading.Thread):
     def run(self):
         thread_chain_ntx_daily_aggregate(self.cursor, self.season, self.day)
 
-def update_btc_notarisations():
-    # Get existing data to avoid unneccesary updates 
-    existing_txids = get_exisiting_btc_ntxids(cursor)
-
-    stop_block = 632500
-    # Loop API queries to get BTC ntx
-    ntx_txids = get_btc_ntxids(stop_block)
-
-    with open("btc_ntx_txids.json", 'w+') as f:
-        f.write(json.dumps(ntx_txids))
-
-    i=0
-    for btc_txid in ntx_txids:
-        logger.info("TXID: "+btc_txid)
-        exit_loop = False
-
-        while True:
-            if exit_loop == True:
-                break
-            logger.info("Processing ntxid "+str(i)+"/"+str(len(ntx_txids)))
-            i += 1
-            tx_info = get_btc_tx_info(btc_txid)
-
-            if "error" in tx_info:
-                page -= 1
-                exit_loop = api_sleep_or_exit(resp)
-
-            elif 'block_height' in tx_info:
-                block_height = tx_info['block_height']
-                block_hash = tx_info['block_hash']
-                addresses = tx_info['addresses']
-                notaries = get_notaries_from_addresses(addresses)
-                season = get_season_from_addresses(notaries, addresses, "BTC")
-
-                btc_block_info = get_btc_block_info(block_height)
-                if 'time' in btc_block_info:
-                    block_time_iso8601 = btc_block_info['time']
-                    parsed_time = dp.parse(block_time_iso8601)
-                    block_time = parsed_time.strftime('%s')
-                    block_datetime = dt.utcfromtimestamp(int(block_time))
-
-                    if len(tx_info['outputs']) > 0:
-                        if 'data_hex' in tx_info['outputs'][-1]:
-                            opret = tx_info['outputs'][-1]['data_hex']
-                            r = requests.get('http://notary.earth:8762/api/tools/decode_opreturn/?OP_RETURN='+opret)
-                            kmd_ntx_info = r.json()
-                            ac_ntx_height = kmd_ntx_info['notarised_block']
-                            ac_ntx_blockhash = kmd_ntx_info['notarised_blockhash']
-
-                            row_data = ('BTC', block_height, block_time, block_datetime,
-                                        block_hash, notaries, ac_ntx_blockhash, ac_ntx_height,
-                                        btc_txid, opret, season, "true")
-
-                            update_ntx_records(conn, cursor, [row_data])
-                            logger.info("Row inserted")
-                            exit_loop = True
-                        else:
-                            logger.warning("No data hex: "+str(tx_info['outputs']))
-                            exit_loop = True
-                else:
-                    logger.info(btc_block_info)
-                    
 def update_notarisations(unrecorded_txids):
     i = 0
     records = []
@@ -128,34 +66,34 @@ def update_notarisations(unrecorded_txids):
             chain = row_data[0]
             if chain != 'KMD':
                 records.append(row_data)
-            if len(records) == 1:
-                runtime = int(time.time()-start)
-                pct = round(i/num_unrecorded_txids*100,3)
-                est_end = int(100/pct*runtime)
-                logger.info(str(pct)+"% :"+str(i)+"/"+str(num_unrecorded_txids)+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
-                logger.info("-----------------------------")
-                update_ntx_records(conn, cursor, records)
-                records = []
+                if len(records) == 1:
+                    runtime = int(time.time()-start)
+                    pct = round(i/num_unrecorded_txids*100,3)
+                    est_end = int(100/pct*runtime)
+                    logger.info(str(pct)+"% :"+str(i)+"/"+str(num_unrecorded_txids)+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
+                    logger.info("-----------------------------")
+                    update_ntx_records(conn, cursor, records)
+                    records = []
 
-            # update last ntx or last btc if newer than in tables.
-            block_height = row_data[1]
-            block_time = row_data[2]
-            txid = row_data[8]
-            notaries = row_data[5]
-            season = row_data[10]
+                # update last ntx or last btc if newer than in tables.
+                block_height = row_data[1]
+                block_time = row_data[2]
+                txid = row_data[8]
+                notaries = row_data[5]
+                season = row_data[10]
 
-            for notary in notaries:
-                last_ntx_row_data = (notary, chain, txid, block_height,
-                                     block_time, season)
-            
-                if notary in notary_last_ntx:
-                    if chain not in notary_last_ntx[notary]:
-                        notary_last_ntx[notary].update({chain:0})
+                for notary in notaries:
+                    last_ntx_row_data = (notary, chain, txid, block_height,
+                                         block_time, season)
+                
+                    if notary in notary_last_ntx:
+                        if chain not in notary_last_ntx[notary]:
+                            notary_last_ntx[notary].update({chain:0})
 
-                    if block_height > notary_last_ntx[notary][chain]:
+                        if block_height > notary_last_ntx[notary][chain]:
+                            update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
+                    else:
                         update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
-                else:
-                    update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
             
 
     logger.info("Notarised blocks updated!")
@@ -276,9 +214,7 @@ def update_daily_notarised_counts(season):
                     "total_ntx_count":0
                 }})
             for chain in notary_ntx_counts[notary]:
-                if chain == "KMD":
-                    pass
-                elif chain == "BTC":
+                if chain == "BTC":
                     count = node_counts[notary]["btc_count"]+notary_ntx_counts[notary][chain]
                     node_counts[notary].update({"btc_count":count})
                 elif chain in all_antara_coins:
@@ -358,9 +294,7 @@ def update_season_notarised_counts(season):
 
         notary_season_pct = {}
         for chain in chain_ntx_counts:
-            if chain == "KMD":
-                pass
-            elif chain == "BTC":
+            if chain == "BTC":
                 btc_count += chain_ntx_counts[chain]
                 total_ntx_count += chain_ntx_counts[chain]
             elif chain in third_party_coins:
@@ -421,7 +355,6 @@ if skip_past_seasons:
     logger.info("Processing notarisations for "+season)
     unrecorded_txids = get_unrecorded_txids(cursor, tip, season)
     update_notarisations(unrecorded_txids)
-    #update_btc_notarisations()
     update_daily_notarised_counts(season)
     update_daily_notarised_chains(season)
     update_season_notarised_counts(season)
@@ -432,7 +365,6 @@ else:
             logger.info("Processing notarisations for "+season)
             unrecorded_txids = get_unrecorded_txids(cursor, tip, season)
             update_notarisations(unrecorded_txids)
-            #update_btc_notarisations()
             update_daily_notarised_counts(season)
             update_daily_notarised_chains(season)
             update_season_notarised_counts(season)
