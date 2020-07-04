@@ -3,7 +3,7 @@
     <!-- Sidebar -->
     <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show kmd_ui_dark3_bg" id="sidebar" style="border-right: 1px solid #000 !important;    ">
       <div class="c-sidebar-brand d-md-down-none kmd_ui_dark1_bg">
-        <a href="http://{{ request.get_host }}">
+        <a href="//{{ request.get_host }}">
             <img class="c-sidebar-brand-full"height="46" alt="Komodo Logo" src="{% static 'img/brand/KMD_Horiz_Light.png' %}" />
             <img class="c-sidebar-brand-minimized" width="46" height="46" alt="Komodo Logo" src="{% static 'img/brand/KMD_Mark_Color.png' %}" />
         </a>
@@ -45,7 +45,7 @@
             <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ info.name }}</li>
                 {% for option in info.nodes %}
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/notary_profile/{{ option }}"> {{ option }}
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notary_profile/{{ option }}"> {{ option }}
                     </a>
                 </li>
                 {% endfor %}
@@ -62,7 +62,7 @@
             <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ section }}</li>
                 {% for option in info %}
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/coin_profile/{{ option }}"> {{ option }}
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/coin_profile/{{ option }}"> {{ option }}
                     </a>
                 </li>
                 {% endfor %}
@@ -76,11 +76,11 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/funding"> Funding Overview
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/funding"> Funding Overview
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/funds_sent"> Funds Sent
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/funds_sent"> Funds Sent
                     </a>
                 </li>
             </ul>
@@ -92,7 +92,7 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/chain_sync"> Block Hash Comparison
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/chain_sync"> Block Hash Comparison
                     </a>
                 </li>
             </ul>
@@ -104,13 +104,13 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/ntx_scoreboard"> Scoreboard
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard"> Scoreboard
                     </a>
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/chains_last_ntx"> Last Notarised
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/chains_last_ntx"> Last Notarised
                     </a>
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/ntx_24hrs"> Notarised last 24hrs
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_24hrs"> Notarised last 24hrs
                     </a>
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/ntx_tenure"> Tenure
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_tenure"> Tenure
                     </a>
                 </li>
             </ul>
@@ -122,11 +122,11 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/mining_overview"> Mining Overview
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/mining_overview"> Mining Overview
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="http://{{ request.get_host }}/mining_24hrs"> Mining last 24hrs
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/mining_24hrs"> Mining last 24hrs
                     </a>
                 </li>
             </ul>

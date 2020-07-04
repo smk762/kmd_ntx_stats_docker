@@ -35,7 +35,7 @@
 						</div>
 		            	<div class="card kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0 mt-auto shadow-none">
 		            		<div class="row d-flex justify-content-between align-items-center">
-		            			<a href="http://{{ request.get_host }}/coin_profile/{{ chain }}">
+		            			<a href="//{{ request.get_host }}/coin_profile/{{ chain }}">
 				            		<div class="p-1 col-4">
 										{% for coin, site_links in coin_social.items %}
 											{% if chain == coin and site_links.icon != '' %}
@@ -71,7 +71,7 @@
 								</a>									
 							</div>
 		            		<div class="row d-flex justify-content-between align-items-center m-auto">
-		            			<a href="http://{{ request.get_host }}/notary_profile/{{ chain }}" class="text-uppercase">
+		            			<a href="//{{ request.get_host }}/notary_profile/{{ chain }}" class="text-uppercase">
 		            				<h3 style="margin:0.75rem;" class="">{{ chain }}</h3>
 								</a>								
 							</div>
@@ -219,7 +219,7 @@
         			{
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='http://{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+				            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
 				        }
 			        },
 			        {
@@ -232,7 +232,7 @@
 	    });
 	    $.ajax({ 
 	      method: "GET", 
-	      url: 'http://{{ request.get_host }}/api/graph_json/balances/?chain={{ chain }}', 
+	      url: '//{{ request.get_host }}/api/graph_json/balances/?chain={{ chain }}', 
 	      success: function(data) { 
 	      	//document.getElementById('graph_title').innerHTML = data.chartLabel;
 	        //drawLineGraph(data, 'myChartline'); 

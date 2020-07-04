@@ -65,7 +65,7 @@
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	op_return = oData.opret
-				            $(nTd).html("<a href='http://{{ request.get_host }}/api/tools/decode_opreturn/?OP_RETURN="+op_return+"'>"+op_return.slice(0, 3)+"..."+op_return.slice(-3)+"</a>");
+				            $(nTd).html("<a href='//{{ request.get_host }}/api/tools/decode_opreturn/?OP_RETURN="+op_return+"'>"+op_return.slice(0, 3)+"..."+op_return.slice(-3)+"</a>");
 				        }
 			        }
 			    ]
