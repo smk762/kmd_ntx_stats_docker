@@ -9,7 +9,7 @@
 						<div class="card text-center" style="width: 18rem;">
 						  <div class="card-body kmd_ui_dark1_bg">
 						    <h1 class="card-title">{{ coins_list|length }}</h1>
-						    <a href="http://{{ request.get_host }}/coin_profile">
+						    <a href="//{{ request.get_host }}/coin_profile">
 						    	<p class="card-text">Coins secured by dPoW</p>
 							</a>
 							<!--<span style="font-style: italic; font-size: 0.8em">{{ server_chains.main|length }} * Antara, {{ server_chains.third_party|length }} * Third Party</span>-->
@@ -19,7 +19,7 @@
 						<div class="card text-center" style="width: 18rem;">
 						  <div class="card-body kmd_ui_dark1_bg">
 						    <h1 class="card-title">{{ ntx_24hr }}</h1>
-						    <a href="http://{{ request.get_host }}/chains_last_ntx">
+						    <a href="//{{ request.get_host }}/chains_last_ntx">
 						    	<p class="card-text">Notarised last 24hrs</p>
 							</a>
 						  </div>
@@ -29,7 +29,7 @@
 						<div class="card text-center" style="width: 18rem;">
 						  <div class="card-body kmd_ui_dark1_bg">
 						    <h1 class="card-title">{{ notaries_list|length }}</h1>
-						    <a href="http://{{ request.get_host }}/notary_profile">
+						    <a href="//{{ request.get_host }}/notary_profile">
 						    	<p class="card-text">Notary Nodes</p>
 							</a>
 						  </div>
@@ -44,7 +44,7 @@
 						<div class="card text-center" style="width: 18rem;">
 						  <div class="card-body kmd_ui_dark1_bg">
 						    <h1 class="card-title">{{ mined_24hr|floatformat:-2 }} KMD</h1>
-							<a href="http://{{ request.get_host }}/mining_24hrs">
+							<a href="//{{ request.get_host }}/mining_24hrs">
 						    	<p class="card-text">KMD Mined last 24hrs</p>
 						    </a>
 						  </div>
@@ -54,7 +54,7 @@
 						  <div class="card-body kmd_ui_dark1_bg">
 						    <h1 class="card-title">{{ biggest_block.value|floatformat:-2 }} KMD</h1>
 						    <p class="card-text">
-							    <a href="http://{{ request.get_host }}/mining_overview">
+							    <a href="//{{ request.get_host }}/mining_overview">
 							    	Season Largest KMD Block Mined
 								</a>
 						    </p>

@@ -11,17 +11,17 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Notarised Last 24hrs
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	<a href="http://{{ request.get_host }}/ntx_24hrs">
+										    	<a href="//{{ request.get_host }}/ntx_24hrs">
 										    		{{ ntx_summary.today.btc_ntx }}<br /> BTC
 										    	</a>
 										    </span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	<a href="http://{{ request.get_host }}/ntx_24hrs">
+										    	<a href="//{{ request.get_host }}/ntx_24hrs">
 										    		{{ ntx_summary.today.main_ntx }}<br /> Main
 										    	</a>
 										    </span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	<a href="http://{{ request.get_host }}/ntx_24hrs">
+										    	<a href="//{{ request.get_host }}/ntx_24hrs">
 										    		{{ ntx_summary.today.third_party_ntx }}<br /> 3rd Party
 										    	</a>
 										    </span>
@@ -31,17 +31,17 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 									    	Notarised Season
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	<a href="http://{{ request.get_host }}/ntx_scoreboard">
+										    	<a href="//{{ request.get_host }}/ntx_scoreboard">
 										    		{{ ntx_summary.season.btc_ntx }}<br /> BTC
 										    	</a>
 										    </span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	<a href="http://{{ request.get_host }}/ntx_scoreboard">
+										    	<a href="//{{ request.get_host }}/ntx_scoreboard">
 										    		{{ ntx_summary.season.main_ntx }}<br /> Main
 										    	</a>
 										    </span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	<a href="http://{{ request.get_host }}/ntx_scoreboard">
+										    	<a href="//{{ request.get_host }}/ntx_scoreboard">
 										    		{{ ntx_summary.season.third_party_ntx }}<br /> 3rd Party
 										    	</a>
 										    </span>
@@ -50,7 +50,7 @@
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Last Notarisation
-										    <a href="http://{{ request.get_host }}/chains_last_ntx">
+										    <a href="//{{ request.get_host }}/chains_last_ntx">
 											    <span id="last_ntx" class="badge kmd_ui_dark1_bg p-1">
 											    		{{ ntx_summary.time_since_last_ntx }}<br />{{ ntx_summary.last_ntx_chain }}
 											    </span>
@@ -60,7 +60,7 @@
 									  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 									    	Last BTC Notarisation
-										    <a href="http://{{ request.get_host }}/chains_last_ntx">
+										    <a href="//{{ request.get_host }}/chains_last_ntx">
 											  	<span  id="last_btc_ntx" class="badge kmd_ui_dark1_bg p-1">
 											  			{{ ntx_summary.time_since_last_btc_ntx }}
 											  	</span>
@@ -73,7 +73,7 @@
 						</div>
 		            	<div class="card kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0 mt-auto shadow-none">
 		            		<div class="row d-flex justify-content-between align-items-center">
-		            			<a href="http://{{ request.get_host }}/notary_profile/{{ notary_name }}">
+		            			<a href="//{{ request.get_host }}/notary_profile/{{ notary_name }}">
 				            		<div class="p-1 col-4">
 										{% for nn, site_links in nn_social.items %}
 											{% if notary_name == nn and site_links.icon != '' %}
@@ -121,7 +121,7 @@
 									    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    	Notarisation Score
 										    	<span class="badge kmd_ui_dark1_bg p-1">
-										    		<a href="http://{{ request.get_host }}/ntx_scoreboard">{{ ntx_summary.premining_ntx_score|floatformat:-3 }}</a>
+										    		<a href="//{{ request.get_host }}/ntx_scoreboard">{{ ntx_summary.premining_ntx_score|floatformat:-3 }}</a>
 										    	</span>
 											</div>
 										</li>
@@ -129,7 +129,7 @@
 									    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 											    Region Rank
 											    <span class="badge kmd_ui_dark1_bg p-1">
-											    	<a href="http://{{ request.get_host }}/ntx_scoreboard">
+											    	<a href="//{{ request.get_host }}/ntx_scoreboard">
 											    		{{ rank }}
 											    	</a>
 												</span>
@@ -147,12 +147,12 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Mined
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	<a href="http://{{ request.get_host }}/mining_24hrs">
+										    	<a href="//{{ request.get_host }}/mining_24hrs">
 										    		{{ mining_summary.mined_last_24hrs|floatformat:-3 }} KMD<br />Last 24hrs
 										    	</a>
 											</span>
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	<a href="http://{{ request.get_host }}/mining_overview">
+										    	<a href="//{{ request.get_host }}/mining_overview">
 										    		{{ mining_summary.season_value_mined|floatformat:-3 }} KMD<br />Season
 										    	</a>
 											</span>
@@ -162,7 +162,7 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Blocks Mined this Season
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	<a href="http://{{ request.get_host }}/mining_overview">
+										    	<a href="//{{ request.get_host }}/mining_overview">
 										    		{{ mining_summary.season_blocks_mined }}
 										    	</a>
 											</span>
@@ -172,7 +172,7 @@
 									    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    Largest Block Mined
 										    <span class="badge kmd_ui_dark1_bg p-1">
-										    	<a href="http://{{ request.get_host }}/mining_overview">
+										    	<a href="//{{ request.get_host }}/mining_overview">
 										    		{{ mining_summary.season_largest_block|floatformat:-3 }} KMD
 										    	</a>
 											</span>
@@ -182,7 +182,7 @@
 									    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 											    Last Mined block
 											    <span class="badge kmd_ui_dark1_bg p-1">
-										    		<a href="http://{{ request.get_host }}/mining_24hrs">
+										    		<a href="//{{ request.get_host }}/mining_24hrs">
 											    		{{ mining_summary.time_since_mined }}
 											    	</a>
 												</span>
@@ -311,7 +311,7 @@
         			{
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");
+				            $(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");
 				        }
         			}
         		]
@@ -325,9 +325,9 @@
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.chain == "KMD") {
-			            		$(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/BTC'>BTC</a>");
+			            		$(nTd).html("<a href='//{{ request.get_host }}/coin_profile/BTC'>BTC</a>");
 			            	} else {
-			            		$(nTd).html("<a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");	
+			            		$(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");	
 			            	}
 				            
 				        }
