@@ -365,8 +365,6 @@ class mined_count_season_filter(viewsets.ViewSet):
 class mined_count_date_filter(viewsets.ViewSet):
     """
     API endpoint showing mined blocks by notary/address (minimum 10 blocks mined) \n
-    Use a filter such as below - \n
-    http://notary.earth:8762/daily/mined_count/?mined_date=2020-05-11&notary=node-9_EU \n
     Defaults to todays date.
     """
     serializer_class = MinedCountDailySerializer
@@ -417,8 +415,6 @@ class notarised_count_season_filter(viewsets.ViewSet):
 class notarised_chain_date_filter(viewsets.ViewSet):
     """
     API endpoint showing notary node mined blocks. \n
-    Use a filter such as below \n
-    http://notary.earth:8762/daily/notarised_chain/?notarised_date=2019-07-27 \n
     Defaults to filtering by todays date \n
     """
     serializer_class = NotarisedChainDailySerializer

@@ -75,27 +75,6 @@ def update_notarisations(unrecorded_txids):
                     update_ntx_records(conn, cursor, records)
                     records = []
 
-                # update last ntx or last btc if newer than in tables.
-                block_height = row_data[1]
-                block_time = row_data[2]
-                txid = row_data[8]
-                notaries = row_data[5]
-                season = row_data[10]
-
-                for notary in notaries:
-                    last_ntx_row_data = (notary, chain, txid, block_height,
-                                         block_time, season)
-                
-                    if notary in notary_last_ntx:
-                        if chain not in notary_last_ntx[notary]:
-                            notary_last_ntx[notary].update({chain:0})
-
-                        if block_height > notary_last_ntx[notary][chain]:
-                            update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
-                    else:
-                        update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
-            
-
     logger.info("Notarised blocks updated!")
     logger.info("NTX Address transactions processed: "+str(len(unrecorded_txids)))
     logger.info(str(len(unrecorded_txids))+" notarised TXIDs added to table")
@@ -341,6 +320,34 @@ def update_season_notarised_counts(season):
 
         update_season_notarised_chain_tbl(conn, cursor, row_data)
 
+def update_latest_ntx(cursor):
+    season = get_season(time.time())
+    # agg = get_chain_ntx_season_aggregates(cursor, season)
+
+    sql = "SELECT chain, MAX(block_time) \
+           FROM notarised WHERE \
+           season = '"+str(season)+"' \
+           GROUP BY chain;"
+    cursor.execute(sql)
+    resp = cursor.fetchall()
+    for item in resp:
+        chain = item[0]
+        block_time = item[1]
+        sql = "SELECT block_height, txid, notaries \
+               FROM notarised WHERE season='"+season+"' AND \
+               chain='"+str(chain)+"' AND block_time="+str(block_time)+";"
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+
+        for x in rows:
+            print(item)
+            block_height = x[0]
+            txid = x[1]
+            notaries = x[2]
+            for notary in notaries:
+                last_ntx_row_data = (notary, chain, txid, block_height,
+                                     block_time, season)
+                update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
 
 rpc = {}
 rpc["KMD"] = def_credentials("KMD")
@@ -350,7 +357,7 @@ tip = int(rpc["KMD"].getblockcount())
 
 conn = connect_db()
 cursor = conn.cursor()
-
+update_latest_ntx(cursor)
 if skip_past_seasons:
     logger.info("Processing notarisations for "+season)
     unrecorded_txids = get_unrecorded_txids(cursor, tip, season)
