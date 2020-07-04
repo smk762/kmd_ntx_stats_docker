@@ -218,8 +218,8 @@ def get_coin_social(coin=None):
             if item in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'explorer', 'website']:
                 if coin_social_info[coin][item].endswith('/'):
                     coin_social_info[coin][item] = coin_social_info[coin][item][:-1]
-                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://", "")
                 coin_social_info[coin][item] = coin_social_info[coin][item].replace("http://", "")
+                coin_social_info[coin][item] = coin_social_info[coin][item].replace("https://", "")
                 coin_social_info[coin][item] = coin_social_info[coin][item].replace("t.me/", "")
                 coin_social_info[coin][item] = coin_social_info[coin][item].replace("twitter.com/", "")
                 coin_social_info[coin][item] = coin_social_info[coin][item].replace("github.com/", "")
@@ -241,7 +241,7 @@ def get_nn_social(notary_name=None):
                 if nn_social_info[notary][item].endswith('/'):
                    nn_social_info[notary][item] = nn_social_info[notary][item][:-1]
                 nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://", "")
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("http://", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://", "")
                 nn_social_info[notary][item] = nn_social_info[notary][item].replace("t.me/", "")
                 nn_social_info[notary][item] = nn_social_info[notary][item].replace("twitter.com/", "")
                 nn_social_info[notary][item] = nn_social_info[notary][item].replace("github.com/", "")

@@ -48,7 +48,7 @@
 			            "data": 'chain',
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='http://{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a></span>");
+				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a></span>");
 				        }
 			        },
         			{
@@ -77,7 +77,7 @@
 			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	op_return = oData.opret.split(" ")[1]
-				            $(nTd).html("<a href='http://{{ request.get_host }}/api/tools/decode_opreturn/?OP_RETURN="+op_return+"'>"+op_return.slice(0, 3)+"..."+op_return.slice(-3)+"</a>");
+				            $(nTd).html("<a href='//{{ request.get_host }}/api/tools/decode_opreturn/?OP_RETURN="+op_return+"'>"+op_return.slice(0, 3)+"..."+op_return.slice(-3)+"</a>");
 				        }
 			        },
         			{

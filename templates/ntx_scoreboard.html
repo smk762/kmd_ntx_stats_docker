@@ -77,7 +77,7 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<a href='http://{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
 					        }
 				        }
 	        		]
@@ -113,7 +113,7 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<a href='http://{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
 					        }
 				        }
 	        		]
@@ -149,7 +149,7 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<a href='http://{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
 					        }
 				        }
 	        		]
@@ -185,7 +185,7 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<a href='http://{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
 					        }
 				        }
 	        		]
@@ -221,7 +221,7 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<a href='http://{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
 					        }
 				        }
 	        		]
@@ -245,7 +245,7 @@
 	    /*
 	    $.ajax({ 
 	      method: "GET", 
-	      url: 'http://{{ request.get_host }}/api/graph_json/balances/?chain={{ chain }}', 
+	      url: '//{{ request.get_host }}/api/graph_json/balances/?chain={{ chain }}', 
 	      success: function(data) { 
 	      	//document.getElementById('graph_title').innerHTML = data.chartLabel;
 	        //drawLineGraph(data, 'myChartline'); 
