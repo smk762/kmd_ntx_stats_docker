@@ -246,6 +246,7 @@ def get_nn_social(notary_name=None):
                 nn_social_info[notary][item] = nn_social_info[notary][item].replace("twitter.com/", "")
                 nn_social_info[notary][item] = nn_social_info[notary][item].replace("github.com/", "")
                 nn_social_info[notary][item] = nn_social_info[notary][item].replace("www.youtube.com/", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("keybase.io/", "")
 
     return nn_social_info
 

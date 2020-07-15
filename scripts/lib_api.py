@@ -15,8 +15,10 @@ logger.setLevel(logging.INFO)
 def get_btc_address_txids(address, before=None):
     exit_loop = False
     resp = {}
+    i = 0
     while True:
-        if exit_loop == True:
+        i += 1
+        if exit_loop == True or i == 10:
             return resp
         logger.info("getting BTC TXIDs for "+str(address))
         try:
@@ -33,8 +35,10 @@ def get_btc_address_txids(address, before=None):
 def get_btc_tx_info(tx_hash):
     exit_loop = False
     resp = {}
+    i = 0
     while True:
-        if exit_loop == True:
+        i += 1
+        if exit_loop == True or i == 10:
             return resp
         logger.info("getting info for BTC TX "+str(tx_hash))
         try:
@@ -49,8 +53,10 @@ def get_btc_tx_info(tx_hash):
 def get_btc_block_info(block):
     exit_loop = False
     resp = {}
+    i = 0
     while True:
-        if exit_loop == True:
+        i += 1
+        if exit_loop == True or i == 10:
             return resp
         logger.info("getting info for BTC block "+str(block))
         try:
@@ -61,6 +67,7 @@ def get_btc_block_info(block):
         except Exception as e:
             logger.warning(e)
         exit_loop = api_sleep_or_exit(resp)
+
 
 def api_sleep_or_exit(resp):
     if 'error' in resp:
