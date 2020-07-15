@@ -373,10 +373,11 @@ def update_last_ntx_tbl(conn, cursor, row_data):
             season='"+str(row_data[5])+"';"
         cursor.execute(sql, row_data)
         conn.commit()
+        logger.info("Added "+str(row_data))
         return 1
     except Exception as e:
+        logger.debug(e)
         if str(e).find('Duplicate') == -1:
-            logger.debug(e)
             logger.debug(row_data)
         conn.rollback()
         return 0
