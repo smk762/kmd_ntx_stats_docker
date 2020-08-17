@@ -920,6 +920,37 @@ def chain_sync(request):
         })
     return render(request, 'chain_sync.html', context)
 
+def faucet(request):
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    context = {
+        "sidebar_links":get_sidebar_links(notaries_list, coins_data),
+        "explorers":get_dpow_explorers(),
+        "eco_data_link":get_eco_data_link()
+        }
+    if request.method == 'POST':
+        if 'coin' in request.POST:
+            coin = request.POST['coin']
+        if 'address' in request.POST:
+            address = request.POST['address']
+        r = requests.get('http://stats.kmd.io:8080/faucet/'+coin+'/'+address)
+        try:
+            resp = r.json()
+            messages.success(request, resp["Response"]["Message"])
+            if resp['Result'] == "Success":
+                context.update({"result":coin+"_success"})
+            elif resp['Result'] == "Error":
+                context.update({"result":"disqualified"})
+            else:
+                context.update({"result":"fail"})
+        except:
+            messages.success(request, "Something went wrong... ")
+            context.update({"result":"fail"})
+
+    return render(request, 'faucet.html', context)
+
+
 ## DASHBOARD        
 def dash_view(request, dash_name=None):
     # Table Views
