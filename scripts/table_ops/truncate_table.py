@@ -4,8 +4,8 @@ import table_lib
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-table = 'notarised_btc'
-
+#table = 'notarised_btc'
+table = 'nn_btc_tx'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())

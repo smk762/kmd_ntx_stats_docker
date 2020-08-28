@@ -980,3 +980,32 @@ def get_rewards_data(request):
 
 
     return wrap_api(resp)
+
+def get_btc_txid_data(request, category=None):
+    resp = {}
+    filter_kwargs = {}
+    data = nn_btc_tx.objects.all()
+    print(category)
+    if not category:
+        resp = []
+        for item in data:
+            resp.append(item)
+    else:
+        if category == "NTX":
+            nn_btc_tx.objects.filter(category="NTX")
+        elif category == "splits":
+            nn_btc_tx.objects.filter(category="Split or Consolidate")
+
+        if category == "other":
+            data = nn_btc_tx.objects.exclude(category="Split or Consolidate").exclude(category="NTX")
+
+        data = data.order_by('-block_height','address').values()
+
+        for item in data:        
+            address = item['address']
+
+            if address not in resp:
+                resp.update({address:[]})
+            resp[address].append(item)
+
+    return wrap_api(resp)

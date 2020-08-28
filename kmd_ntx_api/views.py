@@ -471,6 +471,23 @@ def chain_sync_api(request):
     except:
         return JsonResponse({})
 
+def nn_btc_txid_splits(request):
+    resp = get_btc_txid_data(request, "splits")
+    return JsonResponse(resp)
+
+def nn_btc_txid_other(request):
+    resp = get_btc_txid_data(request, "other")
+    return JsonResponse(resp)
+
+def nn_btc_txid_ntx(request):
+    resp = get_btc_txid_data(request, "NTX")
+    return JsonResponse(resp)
+
+def nn_btc_txid_raw(request):
+    resp = get_btc_txid_data(request, "splits")
+    return JsonResponse(resp)
+
+
 # Tool views
 class decode_op_return(viewsets.ViewSet):
     """
@@ -552,6 +569,7 @@ class notarised_filter(viewsets.ViewSet):
     def get(self, request, format=None):
         api_resp = get_notarised_data(request)
         return Response(api_resp)
+
 
 # PROFILES
 def notary_profile_view(request, notary_name=None):
@@ -845,6 +863,71 @@ def btc_ntx_all(request):
     }
     return render(request, 'btc_ntx_all.html', context)
 
+def ntx_scoreboard_24hrs(request):
+    season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+
+    now = int(time.time())
+    day_ago = now - 24*60*60
+    mined_last_24hrs = mined.objects.filter(block_time__gte=str(day_ago), block_time__lte=str(now)) \
+                      .values('name').annotate(mined_24hrs=Sum('value'), blocks_24hrs=Count('value'))
+
+    nn_mined_last_24hrs = {}
+    for item in mined_last_24hrs:
+        nn_mined_last_24hrs.update({item['name']:item['blocks_24hrs']})
+
+    ntx_24hr = notarised.objects.filter(
+        block_time__gt=str(int(time.time()-24*60*60))
+        ).values()
+
+    daily_stats = {}
+    for notary_name in notary_list:
+        region = get_notary_region(notary_name)
+        notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary_name)
+        score = get_ntx_score(
+            notary_ntx_24hr_summary["btc_ntx"],
+            notary_ntx_24hr_summary["main_ntx"],
+            notary_ntx_24hr_summary["third_party_ntx"]
+        )
+
+        if region not in daily_stats:
+            daily_stats.update({region:[]})
+
+        daily_stats[region].append({
+            "notary":notary_name,
+            "btc":notary_ntx_24hr_summary["btc_ntx"],
+            "main":notary_ntx_24hr_summary["main_ntx"],
+            "third_party":notary_ntx_24hr_summary["third_party_ntx"],
+            "mining":nn_mined_last_24hrs[notary_name],
+            "score":score,
+        })
+
+    daily_stats_sorted = {}
+    for region in daily_stats:
+        daily_stats_sorted.update({region:[]})
+        scores_dict = {}
+        for item in daily_stats[region]:
+            scores_dict.update({item['notary']:item['score']})
+        sorted_scores = {k: v for k, v in sorted(scores_dict.items(), key=lambda x: x[1])}
+        dec_sorted_scores = dict(reversed(list(sorted_scores.items()))) 
+        i = 1
+        for notary in dec_sorted_scores:
+            for item in daily_stats[region]:
+                if notary == item['notary']:
+                    new_item = item.copy()
+                    new_item.update({"rank":i})
+                    daily_stats_sorted[region].append(new_item)
+            i += 1
+
+    context = {
+        "daily_stats_sorted":daily_stats_sorted,
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "nn_social":get_nn_social()
+    }
+    return render(request, 'ntx_scoreboard_24hrs.html', context)
+
 def ntx_scoreboard(request):
     season = get_season(int(time.time()))
     notary_list = get_notary_list(season)
@@ -862,6 +945,7 @@ def ntx_scoreboard(request):
         "nn_social":get_nn_social()
     }
     return render(request, 'ntx_scoreboard.html', context)
+
 
 def ntx_tenure(request):
     season = get_season(int(time.time()))

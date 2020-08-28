@@ -215,7 +215,20 @@ def get_existing_ntxids(cursor):
         recorded_txids.append(txid[0])
     return recorded_txids
 
-def get_exisiting_btc_ntxids(cursor):
+def get_existing_nn_btc_txids(cursor, address=None):
+    recorded_txids = []
+    logger.info("Getting existing TXIDs from database...")
+    if address:
+        cursor.execute("SELECT DISTINCT txid from nn_btc_tx where address = '"+address+"';")
+    else:
+        cursor.execute("SELECT DISTINCT txid from nn_btc_tx;")
+    existing_txids = cursor.fetchall()
+
+    for txid in existing_txids:
+        recorded_txids.append(txid[0])
+    return recorded_txids
+
+def get_existing_btc_ntxids(cursor):
     existing_txids = []
     cursor.execute("SELECT DISTINCT txid FROM notarised WHERE chain = 'BTC';")
     txids_results = cursor.fetchall()
