@@ -865,64 +865,12 @@ def btc_ntx_all(request):
 
 def ntx_scoreboard_24hrs(request):
     season = get_season(int(time.time()))
-    notary_list = get_notary_list(season)
+    notaries_list = get_notary_list(season)
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
 
-    now = int(time.time())
-    day_ago = now - 24*60*60
-    mined_last_24hrs = mined.objects.filter(block_time__gte=str(day_ago), block_time__lte=str(now)) \
-                      .values('name').annotate(mined_24hrs=Sum('value'), blocks_24hrs=Count('value'))
-
-    nn_mined_last_24hrs = {}
-    for item in mined_last_24hrs:
-        nn_mined_last_24hrs.update({item['name']:item['blocks_24hrs']})
-
-    ntx_24hr = notarised.objects.filter(
-        block_time__gt=str(int(time.time()-24*60*60))
-        ).values()
-
-    daily_stats = {}
-    for notary_name in notary_list:
-        region = get_notary_region(notary_name)
-        notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary_name)
-        score = get_ntx_score(
-            notary_ntx_24hr_summary["btc_ntx"],
-            notary_ntx_24hr_summary["main_ntx"],
-            notary_ntx_24hr_summary["third_party_ntx"]
-        )
-
-        if region not in daily_stats:
-            daily_stats.update({region:[]})
-
-        daily_stats[region].append({
-            "notary":notary_name,
-            "btc":notary_ntx_24hr_summary["btc_ntx"],
-            "main":notary_ntx_24hr_summary["main_ntx"],
-            "third_party":notary_ntx_24hr_summary["third_party_ntx"],
-            "mining":nn_mined_last_24hrs[notary_name],
-            "score":score,
-        })
-
-    daily_stats_sorted = {}
-    for region in daily_stats:
-        daily_stats_sorted.update({region:[]})
-        scores_dict = {}
-        for item in daily_stats[region]:
-            scores_dict.update({item['notary']:item['score']})
-        sorted_scores = {k: v for k, v in sorted(scores_dict.items(), key=lambda x: x[1])}
-        dec_sorted_scores = dict(reversed(list(sorted_scores.items()))) 
-        i = 1
-        for notary in dec_sorted_scores:
-            for item in daily_stats[region]:
-                if notary == item['notary']:
-                    new_item = item.copy()
-                    new_item.update({"rank":i})
-                    daily_stats_sorted[region].append(new_item)
-            i += 1
-
     context = {
-        "daily_stats_sorted":daily_stats_sorted,
-        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "daily_stats_sorted":get_daily_stats_sorted(notaries_list),
+        "sidebar_links":get_sidebar_links(notaries_list ,coins_data),
         "eco_data_link":get_eco_data_link(),
         "nn_social":get_nn_social()
     }
@@ -1043,7 +991,7 @@ def dash_view(request, dash_name=None):
     html = 'dash_index.html'
     season = get_season(int(time.time()))
     notaries_list = get_notary_list(season)
-    coins_list = get_dpow_coins_list() 
+    coins_list = get_dpow_coins_list()
     if dash_name:
         if dash_name.find('table') != -1:
             if dash_name == 'balances_table':
@@ -1117,7 +1065,9 @@ def dash_view(request, dash_name=None):
         "server_chains":server_chains,
         "coins_list":coins_list,
         "notaries_list":notaries_list,
-        "nn_social":get_nn_social()
+        "daily_stats_sorted":get_daily_stats_sorted(notaries_list),
+        "nn_social":get_nn_social(),
+
     })
     return render(request, html, context)
 

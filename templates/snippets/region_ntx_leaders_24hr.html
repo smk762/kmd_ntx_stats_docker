@@ -4,45 +4,45 @@
 					<div class="card-deck d-flex justify-content-between col-12 m-auto">
 						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mb-0">
 							<div class="card-body kmd_ui_dark1_bg">
-						    	<h3>Top Region Notarisation Scores Last 24hrs</h3>
+						    	<h3>Top Region Notarisation Scores (Last 24hrs)</h3>
 							    <div class="col-12 d-flex justify-content-between align-items-center">
-				{% for region, region_data in daily_stats_sorted.items %}
-										{% for item in region_data.items %}
+									{% for region, region_data in daily_stats_sorted.items %}
+										{% for item in region_data %}
 											{% if item.rank == 1 %}
-										    <div class="badge kmd_ui_dark4_bg m-2" style="width:16%; background-color: #26456B !important;">
+										    <div class="		badge kmd_ui_dark4_bg m-2" style="width:16%; background-color: #26456B !important;">
 										    	<div class="col-12">
 													{% for nn, site_links in nn_social.items %}
-														{% if notary == nn %}
+														{% if item.notary == nn %}
 															{% if site_links.icon != '' %}
-																<img class="card-img-top m-auto auto-width p-2" height='96px' src="{{ site_links.icon }}" alt="{{ notary }} image here" style="border-radius: 50%;">
+																<img class="card-img-top m-auto auto-width p-2" height='96px' src="{{ site_links.icon }}" alt="{{ item.notary }} image here" style="border-radius: 50%;">
 															{% else %}
-																<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/notary/icon/' %}{{ notary }}.png" alt="{{ notary }} image here" style="border-radius: 50%;">
+																<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/notary/icon/' %}{{ item.notary }}.png" alt="{{ item.notary }} image here" style="border-radius: 50%;">
 															{% endif %}
 														{% endif %}
 													{% endfor %}
 										    	</div>
 										    	<div class="col-12">
-										    		<a class="badge kmd_ui_dark1_bg" style="font-size: 1.3em" href="http://{{ request.get_host }}/notary_profile/{{ notary }}"> {{ notary }} <br /><span style="font-size: 1.2em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
+										    		<a class="badge kmd_ui_dark1_bg" style="font-size: 1.3em" href="http://{{ request.get_host }}/notary_profile/{{ item.notary }}"> {{ item.notary }} <br /><span style="font-size: 1.2em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
 										    	</div>
 										    	{% if region == 'AR' %}
 												<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2 mt-0">
-													<a href="#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Asia and Russia</span></a>
+													<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Asia and Russia</span></a>
 												</h5>
 												{% elif region == 'EU' %}
 												<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
-													<a href="#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>European Union</span></a>
+													<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>European Union</span></a>
 												</h5>
 												{% elif region == 'NA' %}
 												<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
-													<a href="#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>North America</span></a>
+													<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>North America</span></a>
 												</h5>
 												{% elif region == 'SH' %}
 												<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
-													<a href="#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Southern Hemisphere</span></a>
+													<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Southern Hemisphere</span></a>
 												</h5>
 												{% elif region == 'DEV' %}
 												<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
-													<a href="#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Development</span></a>
+													<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Development</span></a>
 												</h5>
 												{% endif %}
 										    </div>
