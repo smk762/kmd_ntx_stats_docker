@@ -14,10 +14,13 @@ cursor = conn.cursor()
 #table = 'coins'
 #table = 'notarised_btc'
 #table = 'btc_address_deltas'
-table = 'notarised'
+#table = 'notarised'
+table = 'nn_btc_tx'
 
 #cursor.execute("SELECT * FROM "+table+";")
-cursor.execute("SELECT * FROM "+table+" WHERE chain = 'BTC' AND btc_validated = 'false';")
+cursor.execute("SELECT * FROM "+table+" WHERE category != 'NTX';")
+
+#cursor.execute("SELECT * FROM "+table+" WHERE chain = 'BTC' AND btc_validated = 'false';")
 
 results = cursor.fetchone()
 print(results)

@@ -802,3 +802,19 @@ def get_sidebar_links(notary_list, coins_data):
         "notaries_menu":region_notaries,
     }
     return sidebar_links
+
+def get_btc_split_stats(address):
+    resp = {}
+    filter_kwargs = {}
+    data = nn_btc_tx.objects.filter(category="Split or Consolidate").filter(address=address)
+    sum_fees = data.annotate(Sum("fees"))
+    num_splits = data.exclude().distinct("txid")
+    avg_split_size = 0
+    for item in data:        
+        address = item['address']
+
+        if address not in resp:
+            resp.update({address:[]})
+        resp[address].append(item)
+
+    return wrap_api(resp)

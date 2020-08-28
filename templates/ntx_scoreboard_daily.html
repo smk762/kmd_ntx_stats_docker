@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+        		{% include "snippets/region_ntx_leaders_2.html" %}
+
+				{% for region, region_data in notarisation_scores.items %}
+				<div class="row my-3">
+					<div class="card-deck d-flex justify-content-between col-12 m-auto">
+						<div class="card kmd_ui_light4">
+							<div class="card-header kmd_ui_dark1_bg">
+								<a id="{{region}}_table" class="section-anchor"></a>
+								<h3>{{ region }} Notarisation rankings</h3>
+								{% for reg, stats in region_score_stats.items %}
+									{% if reg == region %}
+										<h6>Average: {{ stats.average_score|floatformat:-2 }}</h6>
+									{% endif %}
+								{% endfor%}
+							</div>
+							<div class="card-body kmd_ui_dark1_bg">
+								<table id="{{ region }}_notarisations" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+									<thead>
+										<tr>
+											<th>Rank</th>
+											<th>Notary</th>
+											<th>BTC</th>
+											<th>Main</th>
+											<th>3rd Party</th>
+											<th>Mining</th>
+											<th>Scoring</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for notary, notary_data in region_data.items %}
+										<tr>
+											<td data-data="rank">
+										  		<span class="badge kmd_ui_dark1_bg p-2">
+										  			{{ notary_data.rank }}
+										  		</span>
+										  	</td>
+											<td data-data="chain">{{ notary }}</th>
+											<td data-data="btc">{{ notary_data.btc }}</th>
+											<td data-data="main">{{ notary_data.main }}</th>
+											<td data-data="third_party">{{ notary_data.third_party }}</th>
+											<td data-data="mining">{{ notary_data.mining }}</th>
+											<td data-data="score">{{ notary_data.score|floatformat:-3 }}</th>
+										</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>	
+					</div>
+				</div>
+				{% endfor %}
+    <!-- jquery -->
+  
+  	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    {{ explorers|json_script:"explorers-data" }}
+  	<script>
+	    $(document).ready(function() {
+	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
+		        AR_table = $('#AR_notarisations').DataTable({    
+		        	"paging": false,
+	        		order: [[ 0, 'asc' ]],
+		        	"columns": [
+				        { "data": "rank" },
+				        { "data": "notary" },
+				        { "data": "btc" },
+				        { "data": "main" },
+				        { "data": "third_party" },	
+				        { "data": "mining" },
+				        { "data": "score" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					        }
+				        }
+	        		]
+		        });
+		        var max_AR = AR_table.column(6).data()[0]
+				console.log(max_AR)
+			    AR_table.rows().every( function (index) {
+			    	var row = AR_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_AR/3)
+				    if (d.score < max_AR/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        EU_table = $('#EU_notarisations').DataTable({
+	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
+		        	"columns": [
+				        { "data": "rank" },
+				        { "data": "notary" },
+				        { "data": "btc" },
+				        { "data": "main" },
+				        { "data": "third_party" },	
+				        { "data": "mining" },
+				        { "data": "score" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					        }
+				        }
+	        		]
+		        });
+		        var max_EU = EU_table.column(6).data()[0]
+				console.log(max_EU)
+			    EU_table.rows().every( function (index) {
+			    	var row = EU_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_EU/3)
+				    if (d.score < max_EU/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        NA_table = $('#NA_notarisations').DataTable({
+	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
+		        	"columns": [
+				        { "data": "rank" },
+				        { "data": "notary" },
+				        { "data": "btc" },
+				        { "data": "main" },
+				        { "data": "third_party" },	
+				        { "data": "mining" },
+				        { "data": "score" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					        }
+				        }
+	        		]
+		        });
+		        var max_NA = NA_table.column(6).data()[0]
+				console.log(max_NA)
+			    NA_table.rows().every( function (index) {
+			    	var row = NA_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_NA/3)
+				    if (d.score < max_NA/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        SH_table = $('#SH_notarisations').DataTable({
+	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
+		        	"columns": [
+				        { "data": "rank" },
+				        { "data": "notary" },
+				        { "data": "btc" },
+				        { "data": "main" },
+				        { "data": "third_party" },	
+				        { "data": "mining" },
+				        { "data": "score" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					        }
+				        }
+	        		]
+		        });
+		        var max_SH = SH_table.column(6).data()[0]
+				console.log(max_SH)
+			    SH_table.rows().every( function (index) {
+			    	var row = SH_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_SH/3)
+				    if (d.score < max_SH/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        DEV_table = $('#DEV_notarisations').DataTable({
+	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
+		        	"columns": [
+				        { "data": "rank" },
+				        { "data": "notary" },
+				        { "data": "btc" },
+				        { "data": "main" },
+				        { "data": "third_party" },	
+				        { "data": "mining" },
+				        { "data": "score" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					        }
+				        }
+	        		]
+		        });
+		        var max_DEV = DEV_table.column(6).data()[0]
+				console.log(max_DEV)
+			    DEV_table.rows().every( function (index) {
+			    	var row = DEV_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_DEV/3)
+				    if (d.score < max_DEV/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+	    });
+	    /*
+	    $.ajax({ 
+	      method: "GET", 
+	      url: '//{{ request.get_host }}/api/graph_json/balances/?chain={{ chain }}', 
+	      success: function(data) { 
+	      	//document.getElementById('graph_title').innerHTML = data.chartLabel;
+	        //drawLineGraph(data, 'myChartline'); 
+	        drawBarGraph(data, 'myChartBar'); 
+	        console.log("drawing"); 
+	      }, 
+	      error: function(error_data) { 
+	        console.log(error_data); 
+	      } 
+	    }) 
+	   */
+		Chart.defaults.global.defaultFontColor = 'white';
+		Chart.defaults.global.defaultFontSize = 14;
+
+	    /*
+	    function drawLineGraph(data, id) { 
+			var labels = data.labels; 
+			var chartLabel = data.chartLabel; 
+			var chartdata = data.chartdata; 
+			var ctx = document.getElementById(id).getContext('2d'); 
+			var chart = new Chart(ctx, { 
+		        // The type of chart we want to create 
+		        type: 'line', 
+		  
+		        // The data for our dataset 
+		        data: { 
+		          labels: labels, 
+		          datasets: [{ 
+		            label: chartLabel, 
+		            backgroundColor: 'rgb(255, 100, 200)', 
+		            borderColor: 'rgb(55, 99, 132)', 
+		            data: chartdata, 
+		          }] 
+		        }, 
+		  
+		        // Configuration options go here 
+		        options: { 
+			        scales: { 
+			            xAxes: [{ 
+			                display: true 
+			            }], 
+			            yAxes: [{ 
+			                ticks: { 
+			                	beginAtZero: true 
+			                } 
+			            }] 
+		            } 
+		        } 
+	     	}); 
+	    } 
+	  
+	    function drawBarGraph(data, id) { 
+			var labels = data.labels; 
+			var chartLabel = data.chartLabel; 
+			var chartdata = data.chartdata; 
+			var bg_color = data.bg_color; 
+			var border_color = data.border_color; 
+			var ctx = document.getElementById(id).getContext('2d'); 
+			var myChart = new Chart(ctx, { 
+				type: 'bar', 
+				data: { 
+				  labels: labels, 
+				  datasets: [{ 
+				    label: chartLabel, 
+				    data: chartdata, 
+				    backgroundColor: bg_color,
+				    borderColor: border_color, 
+				    borderWidth: 1 
+				  }] 
+				}, 
+				options: { 
+	    			responsive: true,
+					tooltips: {
+						position: 'nearest',
+						mode: 'index',
+						intersect: true,
+					},
+				    legend: {
+				    	display: false,
+				        labels: {
+				            fontColor: '#B7BBBF'
+				        }
+				    },
+					scales: { 
+						yAxes: [{
+						    scaleLabel: {
+						        display: true,
+						        labelString: 'Balance in Notary Wallets',
+				            	fontColor: '#B7BBBF'
+						    },
+						    type: 'logarithmic',
+						    position: 'left',
+						    ticks: {
+							    fontColor: '#41EAD4',
+								min: 0, //minimum tick
+								max: {{ max_tick }}, //maximum tick
+								callback: function (value, index, values) {
+									return Number(value.toString());//pass tick values as a string into Number function
+								}
+						    },
+						    afterBuildTicks: function (chartObj) { //Build ticks labelling as per your need
+						        chartObj.ticks = [];
+						        chartObj.ticks.push(0.1);
+						        chartObj.ticks.push(1);
+						        chartObj.ticks.push(10);
+						        chartObj.ticks.push(100);
+						        chartObj.ticks.push(1000);
+						        chartObj.ticks.push(10000);
+						        chartObj.ticks.push(10000);
+						    }
+						}],
+						xAxes: [{
+							position: 'nearest',
+							padding: 0,
+							ticks: {
+							    fontColor: '#41EAD4'
+							}
+						}]
+				  	} 
+				} 
+			}); 
+	    } */
+  </script> 
+
+{% endblock %}

@@ -29,8 +29,9 @@ logger.setLevel(logging.INFO)
 
 load_dotenv()
 
-def import_btc_ntx(existing_txids):
-    r = requests.get("http://notary.earth:8762/api/source/notarised/?season=Season_4&chain=BTC")
+def import_nn_btc_txids(existing_txids):
+    r = requests.get("http://notary.earth:8762/api/source/nn_btc_txids/?season=Season_4")
+    # r = requests.get("http://stats.kmd.io/api/source/nn_btc_txids/?season=Season_4")
     resp = r.json()
     while resp["next"] is not None:
 
@@ -38,12 +39,9 @@ def import_btc_ntx(existing_txids):
         next_page = resp["next"]
         for item in results:
             if item["txid"] not in existing_txids:
-                row_data = (item["chain"], item["block_height"], item["block_time"],
-                            item["block_datetime"], item["block_hash"],
-                            item["notaries"], item["ac_ntx_blockhash"], item["ac_ntx_height"],
-                            item["txid"], item["opret"], item["season"], "true")
+                row_data = ()
 
-                update_ntx_row(conn, cursor, row_data)
+                update_nn_btc_tx_row(conn, cursor, row_data)
                 time.sleep(0.1)
                 logger.info("Updated "+item['txid'])
             else:
@@ -55,12 +53,9 @@ def import_btc_ntx(existing_txids):
     results = resp["results"]
     for item in results:
         if item["txid"] not in existing_txids:
-            row_data = (item["chain"], item["block_height"], item["block_time"],
-                        item["block_datetime"], item["block_hash"],
-                        item["notaries"], item["ac_ntx_blockhash"], item["ac_ntx_height"],
-                        item["txid"], item["opret"], item["season"], "true")
+            row_data = ()
 
-            update_ntx_row(conn, cursor, row_data)
+            update_nn_btc_tx_row(conn, cursor, row_data)
             time.sleep(0.1)
             logger.info("Updated "+item['txid'])
         else:
@@ -69,9 +64,9 @@ def import_btc_ntx(existing_txids):
 conn = connect_db()
 cursor = conn.cursor()
 
-existing_txids = get_existing_btc_ntxids(cursor)
+existing_txids = get_existing_nn_btc_txids(cursor)
 
-import_btc_ntx(existing_txids)
+import_nn_btc_txids(existing_txids)
 
 cursor.close()
 conn.close()

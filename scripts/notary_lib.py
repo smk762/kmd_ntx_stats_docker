@@ -257,6 +257,55 @@ def get_btc_ntxids(stop_block):
     ntx_txids = list(set((ntx_txids)))
     return ntx_txids
 
+def get_nn_btc_txids(notary_address):
+    has_more=True
+    before_block=None
+    txids = []
+    page = 0
+    exit_loop = False
+    existing_txids = get_existing_nn_btc_txids(cursor, notary_address)
+    while True:
+        page += 1
+        logger.info("Page "+str(page))
+        resp = get_btc_address_txids(notary_address, before_block)
+        if "error" in resp:
+            page -= 1
+            exit_loop = api_sleep_or_exit(resp)
+        else:
+            if 'txrefs' in resp:
+                tx_list = resp['txrefs']
+                if before_block == tx_list[-1]['block_height']:
+                    logger.info("No more for txids in previous blocks!")
+                    exit_loop = True                    
+                else:
+                    before_block = tx_list[-1]['block_height']
+                num_txids = len(txids)
+                for tx in tx_list:
+                    if tx['tx_hash'] not in txids and tx['tx_hash'] not in existing_txids:
+                        txids.append(tx['tx_hash'])
+                if before_block < 634774:
+                    logger.info("No more for s4!")
+                    exit_loop = True
+                elif len(txids) == 0:
+                    logger.info("No new txids... exiting loop.")
+                    exit_loop = True
+                elif len(txids) == num_txids:
+                    logger.info("No new txids on page "+str(page)+"... exiting loop.")
+                    # exit_loop = True
+                else:
+                    logger.info(str(len(txids))+" txids scanned...")
+                logger.info("scannning back from block "+str(before_block))
+            else:
+                logger.info("No more!")
+                exit_loop = True
+                
+        if exit_loop:
+            logger.info("exiting address txid loop!")
+            break
+    txids = list(set((txids)))
+    return txids
+
+
 def get_notaries_from_addresses(addresses):
     notaries = []
     if btc_ntx_addr in addresses:
