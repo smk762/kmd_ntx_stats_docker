@@ -18,16 +18,18 @@ cursor = conn.cursor()
 table = 'nn_btc_tx'
 
 #cursor.execute("SELECT * FROM "+table+";")
-cursor.execute("SELECT * FROM "+table+" WHERE category != 'NTX';")
+cursor.execute("SELECT DISTINCT txid FROM "+table+" WHERE address = '1Lets1xxxx1use1xxxxxxxxxxxy2EaMkJ';")
 
 #cursor.execute("SELECT * FROM "+table+" WHERE chain = 'BTC' AND btc_validated = 'false';")
 
-results = cursor.fetchone()
-print(results)
 results = cursor.fetchall()
+#print(results)
 print(len(results))
 
-
+list = []
+for item in results:
+    list.append(item[0])
+print(list)
 cursor.close()
 
 conn.close()

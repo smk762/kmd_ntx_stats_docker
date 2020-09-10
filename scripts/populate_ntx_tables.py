@@ -43,78 +43,21 @@ It is intended to be run as a cronjob every 15-30 min
 Script runtime is around 5-10 mins, except for initial population which is up to 1 day per season
 '''
 
+# Threading function to get daily aggregates
 class daily_chain_thread(threading.Thread):
+
     def __init__(self, cursor, season, day):
         threading.Thread.__init__(self)
         self.season = season
         self.cursor = cursor
         self.day = day
+
     def run(self):
         thread_chain_ntx_daily_aggregate(self.cursor, self.season, self.day)
 
-def update_notarisations(unrecorded_txids):
-    i = 0
-    records = []
-    start = time.time()
-    notary_last_ntx = get_notary_last_ntx(cursor)
-    num_unrecorded_txids = len(unrecorded_txids)
-    
-    for txid in unrecorded_txids:
-        row_data = get_ntx_data(txid)
-        i += 1
-        if row_data is not None:
-            chain = row_data[0]
-            if chain != 'KMD':
-                records.append(row_data)
-                if len(records) == 1:
-                    runtime = int(time.time()-start)
-                    pct = round(i/num_unrecorded_txids*100,3)
-                    est_end = int(100/pct*runtime)
-                    logger.info(str(pct)+"% :"+str(i)+"/"+str(num_unrecorded_txids)+" records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
-                    logger.info("-----------------------------")
-                    update_ntx_records(conn, cursor, records)
-                    records = []
-
-    logger.info("Notarised blocks updated!")
-    logger.info("NTX Address transactions processed: "+str(len(unrecorded_txids)))
-    logger.info(str(len(unrecorded_txids))+" notarised TXIDs added to table")
-
-def update_daily_notarised_chains(season):
-    logger.info("Aggregating Notarised blocks for chains...")
-
-    season_start_time = seasons_info[season]["start_time"]
-    season_start_dt = dt.fromtimestamp(season_start_time)
-
-    season_end_time = seasons_info[season]["end_time"]
-    season_end_dt = dt.fromtimestamp(season_end_time)
-
-    logger.info(season + " start: " + str(season_start_dt))
-    logger.info(season + " end: " + str(season_end_dt))
-
-    day = season_start_dt.date()
-    end = datetime.date.today()
-    delta = datetime.timedelta(days=1)
-    if skip_until_yesterday:
-        logger.info("Starting "+season+" scan from 24hrs ago...")
-        day = end - delta
-    else:
-        logger.info("Starting "+season+" scan from start of "+season)
-        day = season_start_dt.date()
-
-    while day <= end:
-        thread_list = []
-        while day <= end:
-            logger.info("Aggregating chain notarisations for "+str(day))
-            thread_list.append(daily_chain_thread(cursor, season, day))
-            day += delta
-        for thread in thread_list:
-            time.sleep(5)
-            thread.start()
-        logger.info("Notarised blocks for daily chains aggregation complete!")
-        day += delta
-    logger.info("Notarised daily aggregation for "+season+" chains finished...")
-
+# Threaded update of daily aggregates for KMD notarisations for each chain
 def thread_chain_ntx_daily_aggregate(cursor, season, day):
+
     chains_aggr_resp = get_chain_ntx_date_aggregates(cursor, day)
     for item in chains_aggr_resp:
         try:
@@ -132,13 +75,74 @@ def thread_chain_ntx_daily_aggregate(cursor, season, day):
             logger.warning("Error in thread_chain_ntx_daily_aggregate: "+str(item))
             logger.warning("Error in thread_chain_ntx_daily_aggregate: "+str(day))
 
-def update_daily_notarised_counts(season):
-    # start on date of most recent season
-    season_start_time = seasons_info[season]["start_time"]
-    season_start_dt = dt.fromtimestamp(season_start_time)
+# Process KMD notarisation transactions from KMD OpReturns
+def update_KMD_notarisations(unrecorded_KMD_txids):
+    logger.info("Updating KMD notarisations...")
 
-    season_end_time = seasons_info[season]["end_time"]
-    season_end_dt = dt.fromtimestamp(season_end_time)
+    i = 0
+    records = []
+    start = time.time()
+    notary_last_ntx = get_notary_last_ntx(cursor)
+    num_unrecorded_KMD_txids = len(unrecorded_KMD_txids)
+    
+    for txid in unrecorded_KMD_txids:
+        row_data = get_ntx_data(txid)
+        i += 1
+
+        if row_data is not None: # ignore TXIDs that are not notarisations
+            chain = row_data[0]
+
+            if chain != 'KMD': # KMD -> BTC notarisations are requested via BTC blockchain APIs
+                records.append(row_data)
+                runtime = int(time.time()-start)
+                pct = round(i/num_unrecorded_KMD_txids*100,3)
+                est_end = int(100/pct*runtime)
+                logger.info(str(pct)+"% :"+str(i)+"/"+str(num_unrecorded_KMD_txids)+
+                         " records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
+                update_ntx_records(conn, cursor, records)
+                records = []
+
+    logger.info("Notarised blocks updated!")
+
+def update_daily_notarised_chains(season):
+
+    season_start_dt = dt.fromtimestamp(SEASONS_INFO[season]["start_time"])
+    season_end_dt = dt.fromtimestamp(SEASONS_INFO[season]["end_time"])
+
+    logger.info("Aggregating Notarised blocks for chains...")
+    logger.info(season + " start: " + str(season_start_dt))
+    logger.info(season + " end: " + str(season_end_dt))
+
+    # Define timespan
+    day = season_start_dt.date()
+    end = datetime.date.today()
+    delta = datetime.timedelta(days=1)
+    if skip_until_yesterday:
+        logger.info("Starting "+season+" scan from 24hrs ago...")
+        day = end - delta
+    else:
+        logger.info("Starting "+season+" scan from start of "+season)
+        day = season_start_dt.date()
+
+    # calc daily aggregates for timespan
+    while day <= end:
+        thread_list = []
+        while day <= end:
+            logger.info("Aggregating chain notarisations for "+str(day))
+            thread_list.append(daily_chain_thread(cursor, season, day))
+            day += delta
+        for thread in thread_list:
+            time.sleep(5)
+            thread.start()
+        day += delta
+    logger.info("Notarised daily aggregation for "+season+" chains finished...")
+
+
+def update_daily_notarised_counts(season):
+
+    # start on date of most recent season
+    season_start_dt = dt.fromtimestamp(SEASONS_INFO[season]["start_time"])
+    season_end_dt = dt.fromtimestamp(SEASONS_INFO[season]["end_time"])
 
     logger.info(season + " start: " + str(season_start_dt))
     logger.info(season + " end: " + str(season_end_dt))
@@ -146,6 +150,7 @@ def update_daily_notarised_counts(season):
     day = season_start_dt.date()
     end = datetime.date.today()
     delta = datetime.timedelta(days=1)
+
     if skip_until_yesterday:
         logger.warning("Starting "+season+" scan from 24hrs ago...")
         day = end - delta
@@ -156,20 +161,23 @@ def update_daily_notarised_counts(season):
     while day <= end:
         logger.info("Getting daily "+season+" notary notarisations via get_ntx_for_day for "+str(day))
         results = get_ntx_for_day(cursor, day)
-        # Get list of chain/notary list dicts :p
         results_list = []
         time_stamp = int(time.time())
+
         for item in results:
             results_list.append({
                     "chain":item[0],
                     "notaries":item[1]
                 })
+
         # iterate over notaries list for each record and add to count for chain foreach notary
         notary_ntx_counts = {}
         logger.info("Aggregating "+str(len(results_list))+" rows from notarised table for "+str(day))
+
         for item in results_list:
             notaries = item['notaries']
             chain = item['chain']
+
             for notary in notaries:
                 if notary not in notary_ntx_counts:
                     notary_ntx_counts.update({notary:{}})
@@ -183,6 +191,7 @@ def update_daily_notarised_counts(season):
         node_counts = {}
         other_coins = []
         notary_ntx_pct = {}
+
         for notary in notary_ntx_counts:
             notary_ntx_pct.update({notary:{}})
             node_counts.update({notary:{
@@ -192,6 +201,7 @@ def update_daily_notarised_counts(season):
                     "other_count":0,
                     "total_ntx_count":0
                 }})
+
             for chain in notary_ntx_counts[notary]:
                 if chain == "BTC":
                     count = node_counts[notary]["btc_count"]+notary_ntx_counts[notary][chain]
@@ -213,49 +223,58 @@ def update_daily_notarised_counts(season):
         # get daily ntx total for each chain
         chain_totals = {}
         chains_aggr_resp = get_chain_ntx_date_aggregates(cursor, day)
+
         for item in chains_aggr_resp:
             chain = item[0]
             max_block = item[1]
             max_blocktime = item[2]
             ntx_count = item[3]
             chain_totals.update({chain:ntx_count})
+
         logger.info("chain_totals: "+str(chain_totals))
+
         # calculate notary ntx percentage for chains and add row to db table.
         for notary in node_counts:
             for chain in notary_ntx_counts[notary]:
-                #logger.info(notary+" count for "+chain+": "+str(notary_ntx_counts[notary][chain]))
-                #logger.info("Total count for "+chain+": "+str(chain_totals[chain]))
                 pct = round(notary_ntx_counts[notary][chain]/chain_totals[chain]*100,2)
-                #logger.info("Pct: "+str(pct))
                 notary_ntx_pct[notary].update({chain:pct})
+
             row_data = (notary, node_counts[notary]['btc_count'], node_counts[notary]['antara_count'], 
                         node_counts[notary]['third_party_count'], node_counts[notary]['other_count'], 
                         node_counts[notary]['total_ntx_count'], json.dumps(notary_ntx_counts[notary]),
                         json.dumps(notary_ntx_pct[notary]), time_stamp, season, day)
+
             logger.info("Adding counts for "+season+" "+notary+" for "+str(day)+" to notarised_count_daily table")
             update_daily_notarised_count_tbl(conn, cursor, row_data)
+
         day += delta
     logger.info("Notarised blocks daily aggregation for "+season+" notaries finished...")
 
 def update_season_notarised_counts(season):
+
     ac_block_heights = get_ac_block_info()
     chain_season_ntx_result = get_chain_ntx_season_aggregates(cursor, season)
     total_chain_season_ntx = {}
+
     for item in chain_season_ntx_result:
         chain = item[0]
         count = item[3]
         total_chain_season_ntx.update({
             chain:count
         })
+
     notary_season_counts = {}
     logger.info("Getting "+season+" notary notarisations")
     results = get_ntx_for_season(cursor, season)
+
     for item in results:
         chain = item[0]
         notaries = item[1]
+
         for notary in notaries:
             if notary not in notary_season_counts:
                 notary_season_counts.update({notary:{}})
+
             if chain not in notary_season_counts[notary]:
                 notary_season_counts[notary].update({chain:1})
             else:
@@ -283,17 +302,21 @@ def update_season_notarised_counts(season):
                 antara_count += chain_ntx_counts[chain]
                 total_ntx_count += chain_ntx_counts[chain]
             else:
-                other_count += chain_ntx_counts[chain]                
+                other_count += chain_ntx_counts[chain]
+
             pct = round(chain_ntx_counts[chain]/total_chain_season_ntx[chain]*100,3)
             notary_season_pct.update({chain:pct})
+
         time_stamp = time.time()
         row_data = (notary, btc_count, antara_count, \
                     third_party_count, other_count, \
                     total_ntx_count, json.dumps(chain_ntx_counts), \
                     json.dumps(notary_season_pct), time_stamp, season)
+
         update_season_notarised_count_tbl(conn, cursor, row_data)
 
     results = get_chain_ntx_season_aggregates(cursor, season)
+
     for item in results:
         chain = item[0]
         block_height = item[1]
@@ -308,12 +331,14 @@ def update_season_notarised_counts(season):
         opret = last_ntx_result[3]
         ac_ntx_blockhash = last_ntx_result[4]
         ac_ntx_height = last_ntx_result[5]
+
         if chain in ac_block_heights:
             ac_block_height = ac_block_heights[chain]['height']
             ntx_lag = ac_block_height - ac_ntx_height
         else:
             ac_block_height = 0
             ntx_lag = "-"
+
         row_data = (chain, ntx_count, block_height, kmd_ntx_blockhash,\
                     kmd_ntx_txid, kmd_ntx_blocktime, opret, ac_ntx_blockhash, \
                     ac_ntx_height, ac_block_height, ntx_lag, season)
@@ -330,6 +355,7 @@ def update_latest_ntx(cursor):
            GROUP BY chain;"
     cursor.execute(sql)
     resp = cursor.fetchall()
+
     for item in resp:
         chain = item[0]
         block_time = item[1]
@@ -357,27 +383,40 @@ tip = int(rpc["KMD"].getblockcount())
 
 conn = connect_db()
 cursor = conn.cursor()
-update_latest_ntx(cursor)
+
+
 if skip_past_seasons:
     logger.info("Processing notarisations for "+season)
-    unrecorded_txids = get_unrecorded_txids(cursor, tip, season)
-    update_notarisations(unrecorded_txids)
+    update_BTC_notarisations(conn, cursor, 634000)
+    unrecorded_KMD_txids = get_unrecorded_KMD_txids(cursor, tip, season)
+    update_KMD_notarisations(unrecorded_KMD_txids)
+
     update_daily_notarised_counts(season)
     update_daily_notarised_chains(season)
+
     update_season_notarised_counts(season)
+
 else:
-    for season in seasons_info:
+    for season in SEASONS_INFO:
         # Some S1 OP_RETURNS are decoding incorrectly, so skip.
         if season != "Season_1":
             logger.info("Processing notarisations for "+season)
-            unrecorded_txids = get_unrecorded_txids(cursor, tip, season)
-            update_notarisations(unrecorded_txids)
+
+            # TODO: Need to define season BTC start/end blocks!
+            update_BTC_notarisations(conn, cursor, 634000) 
+
+            unrecorded_KMD_txids = get_unrecorded_KMD_txids(cursor, tip, season)
+            update_KMD_notarisations(unrecorded_KMD_txids)
+
             update_daily_notarised_counts(season)
             update_daily_notarised_chains(season)
+
             update_season_notarised_counts(season)
 
 notarised_chains = get_notarised_chains(cursor)
 notarised_seasons = get_notarised_seasons(cursor)
+
+update_latest_ntx(cursor)
 update_ntx_tenure(notarised_chains, notarised_seasons)
 
 cursor.close()

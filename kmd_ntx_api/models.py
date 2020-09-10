@@ -427,6 +427,7 @@ class nn_btc_tx(models.Model):
     block_datetime = models.DateTimeField()
 
     address = models.CharField(max_length=42)
+    notary = models.CharField(max_length=42, default="non-NN")
     season = models.CharField(max_length=32)
     category = models.CharField(max_length=32)
 

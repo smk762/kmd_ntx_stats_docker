@@ -162,8 +162,8 @@ def get_dpow_coins(conn, cursor):
 
 def get_season_mined_counts(cursor, season, season_notaries):
     sql = "SELECT name, COUNT(*), SUM(value), MAX(value), max(block_time), \
-           max(block_height) FROM mined WHERE block_time >= "+str(seasons_info[season]['start_time'])+" \
-           AND block_time <= "+str(seasons_info[season]['end_time'])+" GROUP BY name;"
+           max(block_height) FROM mined WHERE block_time >= "+str(SEASONS_INFO[season]['start_time'])+" \
+           AND block_time <= "+str(SEASONS_INFO[season]['end_time'])+" GROUP BY name;"
     cursor.execute(sql)
     return cursor.fetchall()
 
@@ -231,6 +231,14 @@ def get_existing_nn_btc_txids(cursor, address=None):
 def get_existing_btc_ntxids(cursor):
     existing_txids = []
     cursor.execute("SELECT DISTINCT txid FROM notarised WHERE chain = 'BTC';")
+    txids_results = cursor.fetchall()
+    for result in txids_results:
+        existing_txids.append(result[0])    
+    return existing_txids
+
+def get_existing_notarised_btc(cursor):
+    existing_txids = []
+    cursor.execute("SELECT DISTINCT btc_txid FROM notarised_btc;")
     txids_results = cursor.fetchall()
     for result in txids_results:
         existing_txids.append(result[0])

@@ -471,10 +471,10 @@ def update_notarised_tenure(conn, cursor, row_data):
 def update_nn_btc_tx_row(conn, cursor, row_data):
     sql = "INSERT INTO nn_btc_tx (txid, block_hash, block_height, \
                                 block_time, block_datetime, \
-                                address, season, category, \
+                                address, notary, season, category, \
                                 input_index, input_sats, \
                                 output_index, output_sats, fees, num_inputs, num_outputs) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     try:
         cursor.execute(sql, row_data)
         conn.commit()

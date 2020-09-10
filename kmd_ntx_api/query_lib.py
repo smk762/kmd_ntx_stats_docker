@@ -984,7 +984,7 @@ def get_rewards_data(request):
 def get_btc_txid_data(request, category=None):
     resp = {}
     filter_kwargs = {}
-    data = nn_btc_tx.objects.all()
+    data = nn_btc_tx.objects.exclude(category="SPAM")
     print(category)
     if not category:
         resp = []
@@ -992,9 +992,9 @@ def get_btc_txid_data(request, category=None):
             resp.append(item)
     else:
         if category == "NTX":
-            nn_btc_tx.objects.filter(category="NTX")
+            data = nn_btc_tx.objects.filter(category="NTX")
         elif category == "splits":
-            nn_btc_tx.objects.filter(category="Split or Consolidate")
+            data = nn_btc_tx.objects.filter(category="Split or Consolidate")
 
         if category == "other":
             data = nn_btc_tx.objects.exclude(category="Split or Consolidate").exclude(category="NTX")
