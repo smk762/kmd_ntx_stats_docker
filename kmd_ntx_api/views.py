@@ -484,7 +484,7 @@ def nn_btc_txid_ntx(request):
     return JsonResponse(resp)
 
 def nn_btc_txid_raw(request):
-    resp = get_btc_txid_data(request, "splits")
+    resp = get_btc_txid_data(request)
     return JsonResponse(resp)
 
 

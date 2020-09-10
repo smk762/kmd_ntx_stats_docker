@@ -1,9 +1,9 @@
 
 
-ntx_addr = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
-btc_ntx_addr = '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg'
+NTX_ADDR = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
+BTC_NTX_ADDR = '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg'
 # Update this each season change
-notary_pubkeys = {
+NOTARY_PUBKEYS = {
     "Season_1": {
         "0_jl777_testA":"03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828",
         "0_jl777_testB":"02ebfc784a4ba768aad88d44d1045d240d47b26e248cafaf1c5169a42d7a61d344",
@@ -468,7 +468,7 @@ notary_pubkeys = {
         }
 }
 
-seasons_info = {
+SEASONS_INFO = {
     "Season_1": {
             "start_block":1,
             "end_block":813999,
