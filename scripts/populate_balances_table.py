@@ -7,6 +7,7 @@ import logging.handlers
 from notary_lib import *
 from rpclib import def_credentials
 import threading
+from lib_const import *
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -72,8 +73,8 @@ tiptime = rpc.getinfo()['tiptime']
 def get_kmd_rewards(season):
     nn_utxos = {}
     bitcoin.params = coin_params["KMD"]
-    for notary in notary_pubkeys[season]:
-        addr = str(P2PKHBitcoinAddress.from_pubkey(x(notary_pubkeys[season][notary])))
+    for notary in NOTARY_PUBKEYS[season]:
+        addr = str(P2PKHBitcoinAddress.from_pubkey(x(NOTARY_PUBKEYS[season][notary])))
         utxos = rpc.getaddressutxos({"addresses": [addr]})
         notary = known_addresses[addr]
         utxo_count = len(utxos)
@@ -149,7 +150,7 @@ def get_balances(this_season):
 
                 for chain in notary_addresses[season][notary]:
                     addr = notary_addresses[season][notary][chain]
-                    pubkey = notary_pubkeys[season][notary]
+                    pubkey = NOTARY_PUBKEYS[season][notary]
 
                     # check only notarising addresses
                     if season.find("third_party") == -1:
