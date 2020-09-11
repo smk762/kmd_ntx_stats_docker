@@ -4,6 +4,7 @@ import requests
 import logging
 import logging.handlers
 import notary_lib
+import lib_const
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -19,7 +20,7 @@ conn = notary_lib.connect_db()
 cursor = conn.cursor()
 
 season = "Season_4"
-for notary in notary_lib.notary_pubkeys['Season_4']:
+for notary in lib_const.NOTARY_PUBKEYS['Season_4']:
     notary_name = notary.split("_")[0]
     for region in nn_social[notary_name]['regions']:
         row_list = [notary_name+"_"+region]
