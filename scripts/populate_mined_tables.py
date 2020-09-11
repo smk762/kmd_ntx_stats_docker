@@ -12,7 +12,7 @@ from notary_lib import *
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+Formatterr = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
@@ -62,7 +62,7 @@ def bulk_load_mined_blocks(conn, cursor, season):
     start = time.time()
     existing_blocks = select_from_table(cursor, 'mined', 'block_height')
     tip = int(rpc["KMD"].getblockcount())
-    all_blocks = [*range(seasons_info[season]["start_block"],tip,1)]
+    all_blocks = [*range(SEASONS_INFO[season]["start_block"],tip,1)]
     recorded_blocks = []
 
     for block in existing_blocks:
@@ -73,7 +73,7 @@ def bulk_load_mined_blocks(conn, cursor, season):
     logger.info(season+" blocks in chain: "+str(len(all_blocks)))
     logger.info(season+" blocks not in database: "+str(len(unrecorded_blocks)))
     i = 1
-    start_block = seasons_info[season]["start_block"]
+    start_block = SEASONS_INFO[season]["start_block"]
 
     if skip_until_yesterday:
         start_block = tip-2*24*60
@@ -118,7 +118,7 @@ if skip_past_seasons:
         result = update_season_mined_count_tbl(conn, cursor, row_data)
 else:
     # updating season mined count aggregate table
-    for season in seasons_info:
+    for season in SEASONS_INFO:
         bulk_load_mined_blocks(conn, cursor, season)
 
         season_notaries = get_season_notaries(season)
@@ -135,7 +135,7 @@ else:
 # updating daily mined count aggregate table
 
 # start on date of most recent season
-season_start_time = seasons_info[season]["start_time"]
+season_start_time = SEASONS_INFO[season]["start_time"]
 season_start_dt = dt.fromtimestamp(season_start_time)
 start = season_start_dt.date()
 end = datetime.date.today()

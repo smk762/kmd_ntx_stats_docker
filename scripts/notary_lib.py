@@ -483,6 +483,7 @@ def get_miner(block):
                 return row_data
 
 def get_daily_mined_counts(conn, cursor, day):
+    result = 0
     results = get_mined_date_aggregates(cursor, day)
     time_stamp = int(time.time())
     for item in results:
