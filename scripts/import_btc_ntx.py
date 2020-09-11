@@ -69,7 +69,7 @@ def import_btc_ntx(existing_txids):
 conn = connect_db()
 cursor = conn.cursor()
 
-existing_txids = get_exisiting_btc_ntxids(cursor)
+existing_txids = get_existing_btc_ntxids(cursor)
 
 import_btc_ntx(existing_txids)
 

@@ -802,3 +802,77 @@ def get_sidebar_links(notary_list, coins_data):
         "notaries_menu":region_notaries,
     }
     return sidebar_links
+
+def get_btc_split_stats(address):
+    resp = {}
+    filter_kwargs = {}
+    data = nn_btc_tx.objects.filter(category="Split or Consolidate").filter(address=address)
+    sum_fees = data.annotate(Sum("fees"))
+    num_splits = data.exclude().distinct("txid")
+    avg_split_size = 0
+    for item in data:        
+        address = item['address']
+
+        if address not in resp:
+            resp.update({address:[]})
+        resp[address].append(item)
+
+    return wrap_api(resp)
+
+def get_daily_stats_sorted(notary_list):
+
+    now = int(time.time())
+    day_ago = now - 24*60*60
+    mined_last_24hrs = mined.objects.filter(block_time__gte=str(day_ago), block_time__lte=str(now)) \
+                      .values('name').annotate(mined_24hrs=Sum('value'), blocks_24hrs=Count('value'))
+
+    nn_mined_last_24hrs = {}
+    for item in mined_last_24hrs:
+        nn_mined_last_24hrs.update({item['name']:item['blocks_24hrs']})
+
+    ntx_24hr = notarised.objects.filter(
+        block_time__gt=str(int(time.time()-24*60*60))
+        ).values()
+
+    daily_stats = {}
+    for notary_name in notary_list:
+        region = get_notary_region(notary_name)
+        notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary_name)
+        score = get_ntx_score(
+            notary_ntx_24hr_summary["btc_ntx"],
+            notary_ntx_24hr_summary["main_ntx"],
+            notary_ntx_24hr_summary["third_party_ntx"]
+        )
+
+        if region not in daily_stats:
+            daily_stats.update({region:[]})
+
+        if notary_name not in nn_mined_last_24hrs:
+            nn_mined_last_24hrs.update({notary_name:0})
+
+        daily_stats[region].append({
+            "notary":notary_name,
+            "btc":notary_ntx_24hr_summary["btc_ntx"],
+            "main":notary_ntx_24hr_summary["main_ntx"],
+            "third_party":notary_ntx_24hr_summary["third_party_ntx"],
+            "mining":nn_mined_last_24hrs[notary_name],
+            "score":score,
+        })
+
+    daily_stats_sorted = {}
+    for region in daily_stats:
+        daily_stats_sorted.update({region:[]})
+        scores_dict = {}
+        for item in daily_stats[region]:
+            scores_dict.update({item['notary']:item['score']})
+        sorted_scores = {k: v for k, v in sorted(scores_dict.items(), key=lambda x: x[1])}
+        dec_sorted_scores = dict(reversed(list(sorted_scores.items()))) 
+        i = 1
+        for notary in dec_sorted_scores:
+            for item in daily_stats[region]:
+                if notary == item['notary']:
+                    new_item = item.copy()
+                    new_item.update({"rank":i})
+                    daily_stats_sorted[region].append(new_item)
+            i += 1
+    return daily_stats_sorted

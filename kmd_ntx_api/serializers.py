@@ -122,6 +122,11 @@ class ElectrumsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         fields = ['chain', 'explorer']
 
+class BtcTxidSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = nn_btc_tx
+        fields = ['txid', 'address', 'block_height', 'block_time', 'category', 'fees']
+
 class decodeOpRetSerializer(serializers.Serializer):
     OP_RETURN = serializers.CharField(
         max_length=1000,

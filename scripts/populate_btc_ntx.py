@@ -45,7 +45,7 @@ Script runtime is around 5-10 mins, except for initial population which is up to
 
 def update_btc_notarisations(conn, cursor):
     # Get existing data to avoid unneccesary updates 
-    existing_txids = get_exisiting_btc_ntxids(cursor)
+    existing_txids = get_existing_btc_ntxids(cursor)
     notary_last_ntx = get_notary_last_ntx(cursor)
 
     stop_block = 634000
@@ -86,6 +86,7 @@ def update_btc_notarisations(conn, cursor):
                     logger.info("Block datetime "+str(block_datetime))
 
                     for notary in notaries:
+                        result = 0
                         last_ntx_row_data = (notary, "BTC", btc_txid, block_height,
                                              block_time, season)
                         if notary in notary_last_ntx:

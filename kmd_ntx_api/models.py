@@ -416,5 +416,35 @@ class funding_transactions(models.Model):
                 name='unique_category_vout_txid_funding'
             )
         ]
+
+
+
+class nn_btc_tx(models.Model):
+    txid = models.CharField(max_length=64)
+    block_hash = models.CharField(max_length=64)
+    block_height = models.PositiveIntegerField()
+    block_time = models.PositiveIntegerField()
+    block_datetime = models.DateTimeField()
+
+    address = models.CharField(max_length=42)
+    notary = models.CharField(max_length=42, default="non-NN")
+    season = models.CharField(max_length=32)
+    category = models.CharField(max_length=32)
+
+    input_index = models.PositiveIntegerField(blank=True, null=True)
+    input_sats = models.PositiveIntegerField(blank=True, null=True)
+    output_index = models.PositiveIntegerField(blank=True, null=True)
+    output_sats = models.PositiveIntegerField(blank=True, null=True)
+    num_inputs = models.PositiveIntegerField(blank=True, null=True)
+    num_outputs = models.PositiveIntegerField(blank=True, null=True)
+    fees = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = 'nn_btc_tx'
+        constraints = [
+            models.UniqueConstraint(fields=['txid', 'input_index', 'output_index'],
+                                 name='unique_btc_nn_txid')
+        ]
+
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"

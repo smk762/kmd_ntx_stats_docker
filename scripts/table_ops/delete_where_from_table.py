@@ -5,14 +5,21 @@ conn = table_lib.connect_db()
 cursor = conn.cursor()
 
 #table = 'balances'
-table = 'notarised'
+#table = 'notarised'
 #table = 'mined'
 #table = 'mined_count_season'
+table = 'nn_btc_tx'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
 
-cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_4';")
+cursor.execute("DELETE FROM "+table+" WHERE category = 'Sent';")
+conn.commit()
+
+cursor.execute("SELECT COUNT(*) FROM "+table+";")
+print(cursor.fetchall())
+
+cursor.execute("DELETE FROM "+table+" WHERE category = 'Received';")
 conn.commit()
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")

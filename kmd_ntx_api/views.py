@@ -471,6 +471,23 @@ def chain_sync_api(request):
     except:
         return JsonResponse({})
 
+def nn_btc_txid_splits(request):
+    resp = get_btc_txid_data(request, "splits")
+    return JsonResponse(resp)
+
+def nn_btc_txid_other(request):
+    resp = get_btc_txid_data(request, "other")
+    return JsonResponse(resp)
+
+def nn_btc_txid_ntx(request):
+    resp = get_btc_txid_data(request, "NTX")
+    return JsonResponse(resp)
+
+def nn_btc_txid_raw(request):
+    resp = get_btc_txid_data(request)
+    return JsonResponse(resp)
+
+
 # Tool views
 class decode_op_return(viewsets.ViewSet):
     """
@@ -552,6 +569,7 @@ class notarised_filter(viewsets.ViewSet):
     def get(self, request, format=None):
         api_resp = get_notarised_data(request)
         return Response(api_resp)
+
 
 # PROFILES
 def notary_profile_view(request, notary_name=None):
@@ -845,6 +863,19 @@ def btc_ntx_all(request):
     }
     return render(request, 'btc_ntx_all.html', context)
 
+def ntx_scoreboard_24hrs(request):
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+
+    context = {
+        "daily_stats_sorted":get_daily_stats_sorted(notaries_list),
+        "sidebar_links":get_sidebar_links(notaries_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "nn_social":get_nn_social()
+    }
+    return render(request, 'ntx_scoreboard_24hrs.html', context)
+
 def ntx_scoreboard(request):
     season = get_season(int(time.time()))
     notary_list = get_notary_list(season)
@@ -862,6 +893,7 @@ def ntx_scoreboard(request):
         "nn_social":get_nn_social()
     }
     return render(request, 'ntx_scoreboard.html', context)
+
 
 def ntx_tenure(request):
     season = get_season(int(time.time()))
@@ -920,6 +952,37 @@ def chain_sync(request):
         })
     return render(request, 'chain_sync.html', context)
 
+def faucet(request):
+    season = get_season(int(time.time()))
+    notaries_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    context = {
+        "sidebar_links":get_sidebar_links(notaries_list, coins_data),
+        "explorers":get_dpow_explorers(),
+        "eco_data_link":get_eco_data_link()
+        }
+    if request.method == 'POST':
+        if 'coin' in request.POST:
+            coin = request.POST['coin']
+        if 'address' in request.POST:
+            address = request.POST['address']
+        r = requests.get('http://stats.kmd.io:8080/faucet/'+coin+'/'+address)
+        try:
+            resp = r.json()
+            messages.success(request, resp["Response"]["Message"])
+            if resp['Result'] == "Success":
+                context.update({"result":coin+"_success"})
+            elif resp['Result'] == "Error":
+                context.update({"result":"disqualified"})
+            else:
+                context.update({"result":"fail"})
+        except:
+            messages.success(request, "Something went wrong... ")
+            context.update({"result":"fail"})
+
+    return render(request, 'faucet.html', context)
+
+
 ## DASHBOARD        
 def dash_view(request, dash_name=None):
     # Table Views
@@ -928,7 +991,7 @@ def dash_view(request, dash_name=None):
     html = 'dash_index.html'
     season = get_season(int(time.time()))
     notaries_list = get_notary_list(season)
-    coins_list = get_dpow_coins_list() 
+    coins_list = get_dpow_coins_list()
     if dash_name:
         if dash_name.find('table') != -1:
             if dash_name == 'balances_table':
@@ -1002,7 +1065,9 @@ def dash_view(request, dash_name=None):
         "server_chains":server_chains,
         "coins_list":coins_list,
         "notaries_list":notaries_list,
-        "nn_social":get_nn_social()
+        "daily_stats_sorted":get_daily_stats_sorted(notaries_list),
+        "nn_social":get_nn_social(),
+
     })
     return render(request, html, context)
 
