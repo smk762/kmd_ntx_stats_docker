@@ -45,7 +45,7 @@ before_coins = antara_coins + third_party_coins + other_coins + ['BTC', 'KMD']
 dpow = {}
 dpow_main = []
 dpow_3p = []
-r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/master/README.md")
+r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/README.md")
 dpow_readme = r.text
 lines = dpow_readme.splitlines()
 for line in lines:
@@ -111,6 +111,7 @@ other_launch = {
     "GAME":"~/GameCredits/src/gamecreditsd",
     "EMC2":"~/einsteinium/src/einsteiniumd",
     "VRSC":"~/VerusCoin/src/verusd",   
+    "GLEEC":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",   
 }
 other_conf = {
     "BTC":"~/.bitcoin/bitcoin.conf",
@@ -121,6 +122,7 @@ other_conf = {
     "GAME":"~/.gamecredits/gamecredits.conf",
     "EMC2":"~/.einsteinium/einsteinium.conf",
     "VRSC":"~/.komodo/VRSC/VRSC.conf",   
+    "GLEEC":"~/.gleecbtc/gleecbtc.conf",   
 }
 other_cli = {
     "BTC":"~/bitcoin/src/bitcoin-cli",
@@ -131,6 +133,7 @@ other_cli = {
     "GAME":"~/GameCredits/src/gamecredits-cli",
     "EMC2":"~/einsteinium/src/einsteinium-cli",
     "VRSC":"~/VerusCoin/src/verus",   
+    "GLEEC":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
 }
 
 for chain in other_launch:
@@ -147,7 +150,7 @@ r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/
 coins_repo = r.json()
 
 # Some coins are named differently between dpow and coins repo...
-translate_coins = { 'COQUI':'COQUICASH','HUSH':'HUSH3','OURC':'OUR','WLC':'WLC21' }
+translate_coins = { 'COQUI':'COQUICASH','HUSH':'HUSH3','OURC':'OUR','WLC':'WLC21','GLEEC':'GleecBTC' }
 
 coins_info = {}
 for item in coins_repo:
@@ -163,7 +166,7 @@ for item in coins_repo:
     logger.info("Getting info for ["+coin+"]")
 
     try:
-        if coin in ['COQUICASH', 'HUSH3', 'WLC21', 'OUR']:
+        if coin in ['COQUICASH', 'HUSH3', 'WLC21', 'OUR', 'GleecBTC']:
             r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+item['coin'])
         else:
             r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+coin)
