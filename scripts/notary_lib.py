@@ -517,7 +517,7 @@ now = int(time.time())
 rpc = {}
 rpc["KMD"] = def_credentials("KMD")
 NTX_ADDR = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
-noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA']
+noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA', 'GLEEC']
 
 if now > SEASONS_INFO['Season_3']['end_time']:
     pubkey_file = 's4_nn_pubkeys.json'

@@ -41,7 +41,14 @@ class GIN_CoinParams(CoreMainParams):
     BASE58_PREFIXES = {'PUBKEY_ADDR': 38,
                        'SCRIPT_ADDR': 10,
                        'SECRET_KEY': 198}
-                       
+
+class GLEEC_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 35,
+                       'SCRIPT_ADDR': 38,
+                       'SECRET_KEY': 65}
+
 coin_params = {
     "KMD": KMD_CoinParams,
     "MCL": KMD_CoinParams,
@@ -53,4 +60,5 @@ coin_params = {
     "EMC2": EMC2_CoinParams,
     "GAME": GAME_CoinParams,
     "GIN": GIN_CoinParams,
+    "GleecBTC": GLEEC_CoinParams
 }
