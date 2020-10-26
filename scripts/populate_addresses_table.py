@@ -26,7 +26,7 @@ for season in notary_addresses:
         node = 'main'
 
     for notary in notary_addresses[season]:
-        pubkey = notary_pubkeys[season][notary]
+        pubkey = NOTARY_PUBKEYS[season][notary]
 
         for chain in notary_addresses[season][notary]:
             is_main_server = (node == 'main' and chain in antara_coins or chain == 'BTC')
@@ -42,7 +42,8 @@ for season in notary_addresses:
                     result = "[FAILED]"
                 else:
                     result = "[SUCCESS]"
-                print(" | "+result+" | "+pubkey+" | "+address+" | "+season+" | "+node+" | "+notary+" | "+chain+" | ")
+                if chain == 'GleecBTC':
+                    print(" | "+result+" | "+pubkey+" | "+address+" | "+season+" | "+node+" | "+notary+" | "+chain+" | ")
 
 cursor.close()
 
