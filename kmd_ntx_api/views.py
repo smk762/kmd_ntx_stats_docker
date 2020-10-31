@@ -966,7 +966,7 @@ def faucet(request):
             coin = request.POST['coin']
         if 'address' in request.POST:
             address = request.POST['address']
-        r = requests.get('http://stats.kmd.io:8080/faucet/'+coin+'/'+address)
+        r = requests.get('http://faucet.komodo.live/faucet/'+coin+'/'+address)
         try:
             resp = r.json()
             messages.success(request, resp["Response"]["Message"])
