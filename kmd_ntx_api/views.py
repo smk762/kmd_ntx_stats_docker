@@ -966,7 +966,9 @@ def faucet(request):
             coin = request.POST['coin']
         if 'address' in request.POST:
             address = request.POST['address']
-        r = requests.get('http://faucet.komodo.live/faucet/'+coin+'/'+address)
+        url = f'https://faucet.komodo.live/faucet/{coin}/{address}'
+        print(url)
+        r = requests.get(url)
         try:
             resp = r.json()
             messages.success(request, resp["Response"]["Message"])
@@ -976,8 +978,8 @@ def faucet(request):
                 context.update({"result":"disqualified"})
             else:
                 context.update({"result":"fail"})
-        except:
-            messages.success(request, "Something went wrong... ")
+        except Exception as e:
+            messages.success(request, f"Something went wrong... {e}")
             context.update({"result":"fail"})
 
     return render(request, 'faucet.html', context)
