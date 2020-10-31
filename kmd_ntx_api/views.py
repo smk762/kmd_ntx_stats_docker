@@ -971,10 +971,10 @@ def faucet(request):
         r = requests.get(url)
         try:
             resp = r.json()
-            messages.success(request, resp["Response"]["Message"])
-            if resp['Result'] == "Success":
+            messages.success(request, resp["Result"]["Message"])
+            if resp['Status'] == "Success":
                 context.update({"result":coin+"_success"})
-            elif resp['Result'] == "Error":
+            elif resp['Status'] == "Error":
                 context.update({"result":"disqualified"})
             else:
                 context.update({"result":"fail"})
