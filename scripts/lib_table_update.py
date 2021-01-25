@@ -474,7 +474,9 @@ def update_nn_btc_tx_row(conn, cursor, row_data):
                                 address, notary, season, category, \
                                 input_index, input_sats, \
                                 output_index, output_sats, fees, num_inputs, num_outputs) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+        ON CONFLICT ON CONSTRAINT unique_btc_nn_txid DO UPDATE SET \
+        notary='"+str(row_data[6])+"';"
     try:
         cursor.execute(sql, row_data)
         conn.commit()
@@ -482,4 +484,13 @@ def update_nn_btc_tx_row(conn, cursor, row_data):
         logger.debug(e)
         if str(e).find('duplicate') == -1:
             logger.debug(row_data)
+        conn.rollback()
+
+def delete_nn_btc_tx_row(conn, cursor, txid, notary):
+    sql = "DELETE FROM nn_btc_tx WHERE txid='"+str(txid)+"' and notary='"+str(notary)+"';"
+    try:
+        cursor.execute(sql)
+        conn.commit()
+    except Exception as e:
+        logger.debug(e)
         conn.rollback()

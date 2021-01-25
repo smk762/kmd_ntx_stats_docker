@@ -981,7 +981,7 @@ def get_rewards_data(request):
 
     return wrap_api(resp)
 
-def get_btc_txid_data(request, category=None):
+def get_btc_txid_data(category=None):
     resp = {}
     filter_kwargs = {}
     data = nn_btc_tx.objects.exclude(category="SPAM")
@@ -995,9 +995,10 @@ def get_btc_txid_data(request, category=None):
             data = nn_btc_tx.objects.filter(category="NTX")
         elif category == "splits":
             data = nn_btc_tx.objects.filter(category="Split or Consolidate")
-
+        elif category == "SPAM":
+            data = nn_btc_tx.objects.filter(category="SPAM")
         if category == "other":
-            data = nn_btc_tx.objects.exclude(category="Split or Consolidate").exclude(category="NTX")
+            data = nn_btc_tx.objects.exclude(category="Split or Consolidate").exclude(category="NTX").exclude(category="SPAM")
 
         data = data.order_by('-block_height','address').values()
 
