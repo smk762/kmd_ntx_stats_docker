@@ -427,3 +427,14 @@ def ts_col_to_season_col(conn, cursor, ts_col, season_col, table):
                AND "+ts_col+" < "+str(seasons_info[season]['end_time'])+";"
         cursor.execute(sql)
         conn.commit()
+
+def get_constraints_from_table(cursor, table):
+    sql = "SELECT con.* \
+       FROM pg_catalog.pg_constraint con \
+            INNER JOIN pg_catalog.pg_class rel \
+                       ON rel.oid = con.conrelid \
+            INNER JOIN pg_catalog.pg_namespace nsp \
+                       ON nsp.oid = connamespace ;"
+    cursor.execute(sql)
+    data = cursor.fetchall()
+    return data

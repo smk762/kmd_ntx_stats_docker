@@ -876,3 +876,64 @@ def get_daily_stats_sorted(notary_list):
                     daily_stats_sorted[region].append(new_item)
             i += 1
     return daily_stats_sorted
+
+def get_split_stats():
+    resp = get_btc_txid_data("splits")
+    split_summary = {}
+    for address in resp["results"][0]:
+        for tx in resp["results"][0][address]:
+
+            nn_name = tx["notary"]
+            if nn_name not in split_summary:
+                split_summary.update({
+                    nn_name:{}
+                })
+
+            season = tx["season"]
+            if season not in split_summary[nn_name]:
+                split_summary[nn_name].update({
+                    season: {
+                        "split_count":0,
+                        "last_split_block":0,
+                        "last_split_time":0,
+                        "sum_split_utxos":0,
+                        "average_split_utxos":0,
+                        "sum_fees":0,
+                        "txids":[]
+                    }
+                })
+
+            fees = int(tx["fees"])/100000000
+            num_outputs = int(tx["num_outputs"])
+            split_summary[nn_name][season].update({
+                "split_count":split_summary[nn_name][season]["split_count"]+1,
+                "sum_split_utxos":split_summary[nn_name][season]["sum_split_utxos"]+num_outputs,
+                "sum_fees":split_summary[nn_name][season]["sum_fees"]+fees
+            })
+
+            split_summary[nn_name][season].update({
+                "average_split_utxos":split_summary[nn_name][season]["sum_split_utxos"]/split_summary[nn_name][season]["split_count"],
+            })
+
+            txid = tx["txid"]
+            if txid not in split_summary[nn_name][season]["txids"]:
+                split_summary[nn_name][season]["txids"].append(txid)
+
+            block_height = int(tx["block_height"])
+            block_time = int(tx["block_time"])
+            if block_time > split_summary[nn_name][season]["last_split_time"]:
+                split_summary[nn_name][season].update({
+                    "last_split_block":block_time,
+                    "last_split_time":block_height
+                })
+    return split_summary
+
+def get_split_stats_table():
+    split_summary = get_split_stats()
+    split_rows = []
+    for nn in split_summary:
+        if nn != 'non-NN':
+            row = split_summary[nn]['Season_4']
+            row.append(nn)
+            split_rows.append(row)
+    return split_rows

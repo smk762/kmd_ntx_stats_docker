@@ -21,12 +21,15 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.views import APIView
+from django.core.serializers import json
 
 from kmd_ntx_api.serializers import *
 from kmd_ntx_api.models import *
 from kmd_ntx_api.helper_lib import *
 from kmd_ntx_api.info_lib import *
 from kmd_ntx_api.query_lib import *
+
+json_serializer = json.Serializer()
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
@@ -192,9 +195,9 @@ class lastNtxViewSet(viewsets.ModelViewSet):
     serializer_class = LastNotarisedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['notary', 'chain']
-    ordering_fields = ['notary', 'chain']
-    ordering = ['notary', 'chain']
+    filterset_fields = ['notary', 'chain', 'season']
+    ordering_fields = ['season', 'notary', 'chain']
+    ordering = ['season', 'notary', 'chain']
 
 class lastBtcNtxViewSet(viewsets.ModelViewSet):
     """
@@ -472,19 +475,31 @@ def chain_sync_api(request):
         return JsonResponse({})
 
 def nn_btc_txid_splits(request):
-    resp = get_btc_txid_data(request, "splits")
+    resp = get_btc_txid_data("splits")
+    return JsonResponse(resp)
+
+def split_summary_api(request):
+    resp = get_split_stats()
+    return JsonResponse(resp)
+
+def split_summary_table(request):
+    resp = get_split_stats_table()
     return JsonResponse(resp)
 
 def nn_btc_txid_other(request):
-    resp = get_btc_txid_data(request, "other")
+    resp = get_btc_txid_data("other")
     return JsonResponse(resp)
 
 def nn_btc_txid_ntx(request):
-    resp = get_btc_txid_data(request, "NTX")
+    resp = get_btc_txid_data("NTX")
+    return JsonResponse(resp)
+
+def nn_btc_txid_spam(request):
+    resp = get_btc_txid_data("SPAM")
     return JsonResponse(resp)
 
 def nn_btc_txid_raw(request):
-    resp = get_btc_txid_data(request)
+    resp = get_btc_txid_data()
     return JsonResponse(resp)
 
 
@@ -801,6 +816,48 @@ def mining_24hrs(request):
     }
     return render(request, 'mining_24hrs.html', context)
 
+def mining_24hrs_api(request):
+    mined_24hrs = mined.objects.filter(
+        block_time__gt=str(int(time.time()-24*60*60))
+        ).values()
+    serializer = MinedSerializer(mined_24hrs, many=True)
+    return JsonResponse({'data': serializer.data})
+
+def nn_mined_4hrs_api(request):
+    mined_4hrs = mined.objects.filter(
+        block_time__gt=str(int(time.time()-4*60*60))
+        ).values()
+    serializer = MinedSerializer(mined_4hrs, many=True)
+    season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
+    mined_counts_4hr = {}
+    for nn in notary_list:
+        mined_counts_4hr.update({nn:0})
+    for item in serializer.data:
+        nn = item['name']
+        if nn in mined_counts_4hr:
+            count = mined_counts_4hr[nn] + 1
+            mined_counts_4hr.update({nn:count})
+        else:
+            mined_counts_4hr.update({nn:1})
+    return JsonResponse(mined_counts_4hr)
+
+def nn_mined_last_api(request):
+    season = get_season(int(time.time()))
+    mined_last = mined.objects.filter(season=season).values("name").annotate(Max("block_time"),Max("block_height"))
+    notary_list = get_notary_list(season)
+    mined_last_dict = {}
+    for item in mined_last:
+        if item["name"] in notary_list:
+            mined_last_dict.update({
+                item["name"]:{
+                    "blocktime":item["block_time__max"],
+                    "blockheight":item["block_height__max"],
+                }
+            })
+
+    return JsonResponse(mined_last_dict)
+
 def ntx_24hrs(request):
     season = get_season(int(time.time()))
     notary_list = get_notary_list(season)
@@ -817,6 +874,13 @@ def ntx_24hrs(request):
         "season":season.replace("_"," ")
     }
     return render(request, 'ntx_24hrs.html', context)
+
+def ntx_24hrs_api(request):
+    ntx_24hrs = notarised.objects.filter(
+        block_time__gt=str(int(time.time()-24*60*60))
+        ).values()
+    serializer = NotarisedSerializer(ntx_24hrs, many=True)
+    return JsonResponse({'data': serializer.data})
 
 def mining_overview(request):
     season = get_season(int(time.time()))
@@ -963,9 +1027,9 @@ def faucet(request):
         }
     if request.method == 'POST':
         if 'coin' in request.POST:
-            coin = request.POST['coin']
+            coin = request.POST['coin'].strip()
         if 'address' in request.POST:
-            address = request.POST['address']
+            address = request.POST['address'].strip()
         url = f'https://faucet.komodo.live/faucet/{coin}/{address}'
         print(url)
         r = requests.get(url)

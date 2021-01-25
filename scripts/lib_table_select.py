@@ -228,6 +228,16 @@ def get_existing_nn_btc_txids(cursor, address=None):
         recorded_txids.append(txid[0])
     return recorded_txids
 
+def get_non_notary_btc_txids(cursor):
+    non_notary_txids = []
+    logger.info("Getting non-notary TXIDs from database...")
+    cursor.execute("SELECT DISTINCT txid from nn_btc_tx where category = 'Split or Consolidate' and notary = 'non-NN';")
+    txids = cursor.fetchall()
+
+    for txid in txids:
+        non_notary_txids.append(txid[0])
+    return non_notary_txids
+
 def get_existing_btc_ntxids(cursor):
     existing_txids = []
     cursor.execute("SELECT DISTINCT txid FROM notarised WHERE chain = 'BTC';")
