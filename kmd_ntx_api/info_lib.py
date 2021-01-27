@@ -916,15 +916,15 @@ def get_split_stats():
             })
 
             txid = tx["txid"]
-            if txid not in split_summary[nn_name][season]["txids"]:
-                split_summary[nn_name][season]["txids"].append(txid)
+            
+            split_summary[nn_name][season]["txids"].append(txid)
 
             block_height = int(tx["block_height"])
             block_time = int(tx["block_time"])
             if block_time > split_summary[nn_name][season]["last_split_time"]:
                 split_summary[nn_name][season].update({
-                    "last_split_block":block_time,
-                    "last_split_time":block_height
+                    "last_split_block":block_height,
+                    "last_split_time":block_time
                 })
     return split_summary
 

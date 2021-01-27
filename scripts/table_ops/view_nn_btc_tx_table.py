@@ -19,8 +19,8 @@ table = 'nn_btc_tx'
 
     
 
-#cursor.execute("SELECT * FROM "+table+";")
-cursor.execute("SELECT txid, block_hash, block_height, block_time, block_datetime, address, notary, season, category, input_index, input_sats, output_index, output_sats, num_inputs, num_outputs, fees FROM "+table+";")
+cursor.execute("SELECT txid, block_hash, block_height, block_time, block_datetime, address, notary, season, category, input_index, input_sats, output_index, output_sats, num_inputs, num_outputs, fees FROM "+table+" WHERE notary = 'dudezmobi_AR' AND season = 'Season_4' AND category = 'Split or Consolidate' AND txid = 'fd74efad61642b58c9bb5eb2f72515e12e93eff73cbbc1c0f01f2022739cf642';")
+#cursor.execute("SELECT txid, block_hash, block_height, block_time, block_datetime, address, notary, season, category, input_index, input_sats, output_index, output_sats, num_inputs, num_outputs, fees FROM "+table+";")
 
 #cursor.execute("SELECT * FROM "+table+" WHERE chain = 'BTC' AND btc_validated = 'false';")
 
@@ -29,6 +29,7 @@ results = cursor.fetchall()
 print(len(results))
 
 output = []
+txids = []
 for item in results:
 	row = {
 		"txid":item[0],
@@ -48,11 +49,15 @@ for item in results:
 		"num_outputs":item[14],
 		"fees":item[15]
 	}
-	print(row)
+	#print(row)
 	output.append(row)
-	
+	txids.append(item[0])
+
 
 print(output)
+print(len(txids))
+print(len(set(txids)))
+
 cursor.close()
 
 conn.close()
