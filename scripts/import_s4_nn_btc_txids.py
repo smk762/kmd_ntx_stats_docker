@@ -39,9 +39,12 @@ skip_until_yesterday = (os.getenv("skip_until_yesterday") == 'True')
 conn = connect_db()
 cursor = conn.cursor()
 
+#other_server = "http://116.203.120.91:8762"
+other_server = "http://stats.kmd.io"
+
 addresses_dict = {}
 try:
-    addresses = requests.get("http://notary.earth:8762/api/source/addresses/?chain=BTC&season=Season_4").json()
+    addresses = requests.get(f"{other_server}/api/source/addresses/?chain=BTC&season=Season_4").json()
     for item in addresses['results']:
         print(item)
         addresses_dict.update({item["address"]:item["notary"]})
@@ -55,10 +58,11 @@ i = 1
 num_addr = len(notary_btc_addresses)
 print(num_addr)
 
+
 try:
     existing_txids = get_existing_nn_btc_txids(cursor)
     logger.info("Getting txids stored n other server")
-    r = requests.get("http://116.203.120.91:8762/api/info/nn_btc_txid_list")
+    r = requests.get(f"{other_server}/api/info/nn_btc_txid_list")
     resp = r.json()
     txids = resp['results'][0]
     new_txids = []
@@ -74,10 +78,19 @@ logger.info(str(len(new_txids))+" to process")
 j = 1
 for txid in new_txids:
     # Get data from other server
-    r = requests.get("http://stats.kmd.io/api/info/nn_btc_txid?txid={txid}")
+
+    r = requests.get(f"{other_server}/api/info/nn_btc_txid?txid={txid}")
     resp = r.json()
     if resp['count'] > 0:
         for item in resp['results'][0]:
+            if item["output_index"] is None:
+                output_index = 1000
+            else:
+                output_index = item["output_index"]
+            if item["input_index"] is None:
+                input_index = 1000
+            else:
+                input_index = item["input_index"]
             row_data = (
                 item["txid"],
                 item["block_hash"],
@@ -88,9 +101,9 @@ for txid in new_txids:
                 item["notary"],
                 item["season"],
                 item["category"],
-                item["input_index"],
+                input_index,
                 item["input_sats"],
-                item["output_index"],
+                output_index,
                 item["output_sats"],
                 item["fees"],
                 item["num_inputs"],

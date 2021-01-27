@@ -50,10 +50,12 @@ except Exception as e:
     logger.error(e)
     logger.info("Addresses API might be down!")
 
-notary_btc_addresses = addresses_dict.keys()
+notary_btc_addresses = list(addresses_dict.keys())
 i = 1
 num_addr = len(notary_btc_addresses)
 print(num_addr)
+
+notary_btc_addresses.reverse()
 
 for notary_address in notary_btc_addresses:
     print(notary_address)
@@ -135,9 +137,9 @@ for notary_address in notary_btc_addresses:
                             notary_name = "non-NN"
                         input_sats = 0
                         output_sats = 0
-                        output_index = None
+                        output_index = 1000
                         output_sats = None
-                        input_index = None
+                        input_index = 1000
                         input_sats = None
                         row_data = (txid, block_hash, block_height, block_time,
                                     block_datetime, address, notary_name, season, category,
@@ -158,7 +160,7 @@ for notary_address in notary_btc_addresses:
                             else:
                                 notary_name = "non-NN"
                             input_sats = vin['output_value']
-                            output_index = None
+                            output_index = 1000
                             output_sats = None
                             row_data = (txid, block_hash, block_height, block_time,
                                         block_datetime, address, notary_name, season, category,
@@ -180,7 +182,7 @@ for notary_address in notary_btc_addresses:
                                     notary_name = addresses_dict[address]
                                 else:
                                     notary_name = "non-NN"
-                                input_index = None
+                                input_index = 1000
                                 input_sats = None
                                 output_sats = vout['value']
                                 row_data = (txid, block_hash, block_height, block_time,
