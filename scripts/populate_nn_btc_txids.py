@@ -76,7 +76,7 @@ for notary_address in notary_btc_addresses:
             notary_name = "non-NN"
         logger.info("Processing "+str(j)+"/"+str(len(txids))+" for "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
         # Check if available on other server
-        r = requests.get("http://116.203.120.91:8762/api/info/nn_btc_txid?txid={txid}")
+        r = requests.get("http://stats.kmd.io/api/info/nn_btc_txid?txid={txid}")
         resp = r.json()
         if resp['count'] > 0:
             for item in resp['results'][0]:

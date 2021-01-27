@@ -170,6 +170,9 @@ urlpatterns = [
     path('api/info/nn_btc_txid',
           views.nn_btc_txid,
           name='nn_btc_txid'),
+    path('api/info/nn_btc_txid_list',
+          views.nn_btc_txid_list,
+          name='nn_btc_txid_list'),
 
     path('chain_sync/',
           views.chain_sync,
