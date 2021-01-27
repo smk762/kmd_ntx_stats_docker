@@ -392,6 +392,8 @@ def update_BTC_notarisations(conn, cursor, stop_block=634000):
 
 
 def get_new_nn_btc_txids(existing_txids, notary_address):
+    num_existing = len(existing_txids)
+    print(f"{num_existing} txids in DB")
     has_more=True
     before_block=None
     txids = []
@@ -404,6 +406,8 @@ def get_new_nn_btc_txids(existing_txids, notary_address):
         if "error" in resp:
             page -= 1
             exit_loop = True
+            logger.info(f"Error in resp: {resp}")
+            api_sleep_or_exit(resp, exit=None)
         else:
             if 'txrefs' in resp:
                 tx_list = resp['txrefs']
@@ -413,15 +417,18 @@ def get_new_nn_btc_txids(existing_txids, notary_address):
                 else:
                     before_block = tx_list[-1]['block_height']
                 num_txids = len(txids)
+                print(f"TXID count = {num_txids}")
                 for tx in tx_list:
                     if tx['tx_hash'] not in txids and tx['tx_hash'] not in existing_txids:
                         txids.append(tx['tx_hash'])
+                        print(f"appended tx {tx}")
+
                 if before_block < 634774:
                     logger.info("No more for s4!")
                     exit_loop = True
                 elif len(txids) == 0:
                     logger.info("No new txids... exiting loop.")
-                    exit_loop = True
+                    # exit_loop = True
                 elif len(txids) == num_txids:
                     logger.info("No new txids on page "+str(page)+"... exiting loop.")
                     # exit_loop = True
