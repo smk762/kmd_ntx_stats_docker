@@ -18,7 +18,7 @@ cursor = conn.cursor()
 table = 'nn_btc_tx'
 
 #cursor.execute("SELECT * FROM "+table+";")
-cursor.execute("SELECT DISTINCT txid FROM "+table+" WHERE address = '1Lets1xxxx1use1xxxxxxxxxxxy2EaMkJ';")
+cursor.execute("SELECT * FROM "+table+";")
 
 #cursor.execute("SELECT * FROM "+table+" WHERE chain = 'BTC' AND btc_validated = 'false';")
 
