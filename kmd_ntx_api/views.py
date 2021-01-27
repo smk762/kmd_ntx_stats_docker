@@ -481,6 +481,10 @@ def nn_btc_txid(request):
         resp = {"error":"You need to specify a TXID like '/nn_btc_txid?txid=86e23d8415737f1f6a723d1996f3e373e77d7e16a7ae8548b4928eb019237321'"}
     return JsonResponse(resp)
 
+def nn_btc_txid_list(request):
+    resp = get_btc_txid_list()
+    return JsonResponse(resp)
+
 def nn_btc_txid_splits(request):
     resp = get_btc_txid_data("splits")
     return JsonResponse(resp)

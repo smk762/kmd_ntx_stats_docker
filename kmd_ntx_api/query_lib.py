@@ -1036,3 +1036,10 @@ def get_btc_txid_single(txid=None):
         }
         resp.append(row)
     return wrap_api(resp)
+
+def get_btc_txid_list():
+    resp = []
+    data = nn_btc_tx.objects.all()
+    for item in data:
+        resp.append(item.txid)
+    return wrap_api(resp)
