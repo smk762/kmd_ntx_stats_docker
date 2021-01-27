@@ -1010,3 +1010,29 @@ def get_btc_txid_data(category=None):
             resp[address].append(item)
 
     return wrap_api(resp)
+
+def get_btc_txid_single(txid=None):
+    resp = []
+    filter_kwargs = {}
+    data = nn_btc_tx.objects.filter(txid=txid)
+    for item in data:
+        row = {
+            "txid":item.txid,
+            "block_hash":item.block_hash,
+            "block_height":item.block_height,
+            "block_time":item.block_time,
+            "block_datetime":item.block_datetime,
+            "address":item.address,
+            "notary":item.notary,
+            "season":item.season,
+            "category":item.category,
+            "input_index":item.input_index,
+            "input_sats":item.input_sats,
+            "output_index":item.output_index,
+            "output_sats":item.output_sats,
+            "num_inputs":item.num_inputs,
+            "num_outputs":item.num_outputs,
+            "fees":item.fees
+        }
+        resp.append(row)
+    return wrap_api(resp)
