@@ -13,11 +13,11 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 def get_btc_address_txids(address, before=None):
-    logger.info("getting BTC TXIDs for "+str(address))
+    logger.info(f"getting BTC TXIDs for {address} before block {before}")
     try:
         url = 'https://api.blockcypher.com/v1/btc/main/addrs/'+address+'?limit=2000'
         if before:
-            url = url+'?before='+str(before)
+            url = url+'&before='+str(before)
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
         r = requests.get(url, headers=headers)
         return r.json()
@@ -73,8 +73,13 @@ def api_sleep_or_exit(resp, exit=None):
             logger.warning("API limit exceeded, sleeping for 10 min...")
             time.sleep(600)
             return False
+        elif resp['error'] == 'Limits reached.':
+            logger.warning("API limit exceeded, sleeping for 10 min...")
+            time.sleep(600)
+            return False            
         else:
             logger.warning(resp['error'])
             return True
     else:
+        #print(resp)
         return True
