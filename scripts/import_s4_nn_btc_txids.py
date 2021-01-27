@@ -7,6 +7,7 @@ import logging
 import logging.handlers
 import psycopg2
 import requests
+import threading
 from decimal import *
 from datetime import datetime as dt
 import datetime
@@ -29,44 +30,81 @@ logger.setLevel(logging.INFO)
 
 load_dotenv()
 
-def import_nn_btc_txids(existing_txids):
-    r = requests.get("http://notary.earth:8762/api/source/nn_btc_txids/?season=Season_4")
-    # r = requests.get("http://stats.kmd.io/api/source/nn_btc_txids/?season=Season_4")
-    resp = r.json()
-    while resp["next"] is not None:
+# set this to False in .env when originally populating the table, or rescanning
+skip_past_seasons = (os.getenv("skip_past_seasons") == 'True')
 
-        results = resp["results"]
-        next_page = resp["next"]
-        for item in results:
-            if item["txid"] not in existing_txids:
-                row_data = ()
-
-                update_nn_btc_tx_row(conn, cursor, row_data)
-                time.sleep(0.1)
-                logger.info("Updated "+item['txid'])
-            else:
-                logger.info("Skipping "+item['txid'])
-
-        r = requests.get(resp["next"])
-        resp = r.json()
-
-    results = resp["results"]
-    for item in results:
-        if item["txid"] not in existing_txids:
-            row_data = ()
-
-            update_nn_btc_tx_row(conn, cursor, row_data)
-            time.sleep(0.1)
-            logger.info("Updated "+item['txid'])
-        else:
-            logger.info("Skipping "+item['txid'])
+# set this to True in .env to quickly update tables with most recent data
+skip_until_yesterday = (os.getenv("skip_until_yesterday") == 'True')
 
 conn = connect_db()
 cursor = conn.cursor()
 
-existing_txids = get_existing_nn_btc_txids(cursor)
+addresses_dict = {}
+try:
+    addresses = requests.get("http://notary.earth:8762/api/source/addresses/?chain=BTC&season=Season_4").json()
+    for item in addresses['results']:
+        print(item)
+        addresses_dict.update({item["address"]:item["notary"]})
+    addresses_dict.update({BTC_NTX_ADDR:"BTC_NTX_ADDR"})
+except Exception as e:
+    logger.error(e)
+    logger.info("Addresses API might be down!")
 
-import_nn_btc_txids(existing_txids)
+notary_btc_addresses = addresses_dict.keys()
+i = 1
+num_addr = len(notary_btc_addresses)
+print(num_addr)
+
+for notary_address in notary_btc_addresses:
+    print(notary_address)
+    if notary_address in addresses_dict:
+        notary_name = addresses_dict[notary_address]
+    else:
+        notary_name = "non-NN"
+    try:
+        existing_txids = get_existing_nn_btc_txids(cursor)
+        r = requests.get("http://116.203.120.91:8762/api/info/nn_btc_txid_list")
+        resp = r.json()
+        txids = resp['results'][0]
+    except Exception as e:
+        print(e)
+        txids = []
+    logger.info(str(len(txids))+" to process for "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
+    j = 1
+    for txid in txids:
+        if notary_address in addresses_dict:
+            notary_name = addresses_dict[notary_address]
+        else:
+            notary_name = "non-NN"
+        logger.info("Processing "+str(j)+"/"+str(len(txids))+" for "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
+        # Check if available on other server
+        r = requests.get("http://stats.kmd.io/api/info/nn_btc_txid?txid={txid}")
+        resp = r.json()
+        if resp['count'] > 0:
+            for item in resp['results'][0]:
+                row_data = (
+                    item["txid"],
+                    item["block_hash"],
+                    item["block_height"],
+                    item["block_time"],
+                    item["block_datetime"],
+                    item["address"],
+                    item["notary"],
+                    item["season"],
+                    item["category"],
+                    item["input_index"],
+                    item["input_sats"],
+                    item["output_index"],
+                    item["output_sats"],
+                    item["fees"],
+                    item["num_inputs"],
+                    item["num_outputs"]
+                )
+                logger.info(f"Adding {item['txid']} from other server")
+                update_nn_btc_tx_row(conn, cursor, row_data)
+        j += 1
+    i += 1
 
 cursor.close()
 conn.close()
+
