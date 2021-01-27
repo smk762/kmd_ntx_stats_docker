@@ -75,98 +75,124 @@ for notary_address in notary_btc_addresses:
         else:
             notary_name = "non-NN"
         logger.info("Processing "+str(j)+"/"+str(len(txids))+" for "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
-        tx_info = get_btc_tx_info(txid)
-        if 'fees' in tx_info:
-            fees = tx_info['fees']
-            num_outputs = tx_info['vout_sz']
-            num_inputs = tx_info['vin_sz']
-            block_hash = tx_info['block_hash']
-            block_height = tx_info['block_height']
-            block_time_iso8601 = tx_info['confirmed']
-            parsed_time = dp.parse(block_time_iso8601)
-            block_time = parsed_time.strftime('%s')
-            season = get_season(int(block_time))
-            block_datetime = dt.utcfromtimestamp(int(block_time))
-
-            # single row for memo.sv spam
-            if '1See1xxxx1memo1xxxxxxxxxxxxxBuhPF' in tx_info['addresses']:
-                row_data = (txid, block_hash, block_height, block_time,
-                            block_datetime, 'SPAM', 'non-NN', season, 'SPAM',
-                            0, 0, 0, 0, fees, num_inputs, num_outputs)
-                logger.info("Adding "+txid+" SPAM")
+        # Check if available on other server
+        r = requests.get("http://116.203.120.91:8762/api/info/nn_btc_txid?txid={txid}")
+        resp = r.json()
+        if resp['count'] > 0:
+            for item in resp['results'][0]:
+                row_data = (
+                    item["txid"],
+                    item["block_hash"],
+                    item["block_height"],
+                    item["block_time"],
+                    item["block_datetime"],
+                    item["address"],
+                    item["notary"],
+                    item["season"],
+                    item["category"],
+                    item["input_index"],
+                    item["input_sats"],
+                    item["output_index"],
+                    item["output_sats"],
+                    item["fees"],
+                    item["num_inputs"],
+                    item["num_outputs"]
+                )
+                logger.info(f"Adding {item['txid']} from other server")
                 update_nn_btc_tx_row(conn, cursor, row_data)
-            else:
-                vouts = tx_info["outputs"]
-                vins = tx_info["inputs"]
+        else:
+            tx_info = get_btc_tx_info(txid)
+            if 'fees' in tx_info:
+                fees = tx_info['fees']
+                num_outputs = tx_info['vout_sz']
+                num_inputs = tx_info['vin_sz']
+                block_hash = tx_info['block_hash']
+                block_height = tx_info['block_height']
+                block_time_iso8601 = tx_info['confirmed']
+                parsed_time = dp.parse(block_time_iso8601)
+                block_time = parsed_time.strftime('%s')
+                season = get_season(int(block_time))
+                block_datetime = dt.utcfromtimestamp(int(block_time))
 
-                # single row for splits
-                if len(tx_info['addresses']) == 1:
-                    category = "Split or Consolidate"
-                    address = tx_info['addresses'][0]
-                    if address in addresses_dict:
-                        notary_name = addresses_dict[address]
-                    else:
-                        notary_name = "non-NN"
-                    input_sats = 0
-                    output_sats = 0
-                    output_index = None
-                    output_sats = None
-                    input_index = None
-                    input_sats = None
+                # single row for memo.sv spam
+                if '1See1xxxx1memo1xxxxxxxxxxxxxBuhPF' in tx_info['addresses']:
                     row_data = (txid, block_hash, block_height, block_time,
-                                block_datetime, address, notary_name, season, category,
-                                input_index, input_sats, output_index,
-                                output_sats, fees, num_inputs, num_outputs)
-                    logger.info("Adding "+txid+" "+str(notary_name)+" "+str(address)+" "+str(len(vouts)-1)+" vouts"+" ("+category.upper()+")")
+                                block_datetime, 'SPAM', 'non-NN', season, 'SPAM',
+                                0, 0, 0, 0, fees, num_inputs, num_outputs)
+                    logger.info("Adding "+txid+" SPAM")
                     update_nn_btc_tx_row(conn, cursor, row_data)
                 else:
-                    input_index = 0
-                    for vin in vins:
-                        if BTC_NTX_ADDR in tx_info['addresses']:
-                            category = "NTX"
-                        else:
-                            category = "Sent"
-                        address = vin["addresses"][0]
+                    vouts = tx_info["outputs"]
+                    vins = tx_info["inputs"]
+
+                    # single row for splits
+                    if len(tx_info['addresses']) == 1:
+                        category = "Split or Consolidate"
+                        address = tx_info['addresses'][0]
                         if address in addresses_dict:
                             notary_name = addresses_dict[address]
                         else:
                             notary_name = "non-NN"
-                        input_sats = vin['output_value']
+                        input_sats = 0
+                        output_sats = 0
                         output_index = None
                         output_sats = None
+                        input_index = None
+                        input_sats = None
                         row_data = (txid, block_hash, block_height, block_time,
                                     block_datetime, address, notary_name, season, category,
                                     input_index, input_sats, output_index,
                                     output_sats, fees, num_inputs, num_outputs)
-                        logger.info("Adding "+txid+" vin "+str(input_index)+" "+str(notary_name)+" "+str(address)+" ("+category.upper()+")")
+                        logger.info("Adding "+txid+" "+str(notary_name)+" "+str(address)+" "+str(len(vouts)-1)+" vouts"+" ("+category.upper()+")")
                         update_nn_btc_tx_row(conn, cursor, row_data)
-                        input_index += 1
-
-                    output_index = 0
-                    for vout in vouts:
-                        if BTC_NTX_ADDR in tx_info['addresses']:
-                            category = "NTX"
-                        else:
-                            category = "Received"
-                        if vout["addresses"] is not None:
-                            address = vout["addresses"][0]
+                    else:
+                        input_index = 0
+                        for vin in vins:
+                            if BTC_NTX_ADDR in tx_info['addresses']:
+                                category = "NTX"
+                            else:
+                                category = "Sent"
+                            address = vin["addresses"][0]
                             if address in addresses_dict:
                                 notary_name = addresses_dict[address]
                             else:
                                 notary_name = "non-NN"
-                            input_index = None
-                            input_sats = None
-                            output_sats = vout['value']
+                            input_sats = vin['output_value']
+                            output_index = None
+                            output_sats = None
                             row_data = (txid, block_hash, block_height, block_time,
                                         block_datetime, address, notary_name, season, category,
                                         input_index, input_sats, output_index,
                                         output_sats, fees, num_inputs, num_outputs)
-                            logger.info("Adding "+txid+" vout "+str(output_index)+" "+str(notary_name)+" "+str(address)+" ("+category.upper()+")")
+                            logger.info("Adding "+txid+" vin "+str(input_index)+" "+str(notary_name)+" "+str(address)+" ("+category.upper()+")")
                             update_nn_btc_tx_row(conn, cursor, row_data)
-                            output_index += 1
-        else:
-            print("Fees not in txinfo!")
-            #print(tx_info)
+                            input_index += 1
+
+                        output_index = 0
+                        for vout in vouts:
+                            if BTC_NTX_ADDR in tx_info['addresses']:
+                                category = "NTX"
+                            else:
+                                category = "Received"
+                            if vout["addresses"] is not None:
+                                address = vout["addresses"][0]
+                                if address in addresses_dict:
+                                    notary_name = addresses_dict[address]
+                                else:
+                                    notary_name = "non-NN"
+                                input_index = None
+                                input_sats = None
+                                output_sats = vout['value']
+                                row_data = (txid, block_hash, block_height, block_time,
+                                            block_datetime, address, notary_name, season, category,
+                                            input_index, input_sats, output_index,
+                                            output_sats, fees, num_inputs, num_outputs)
+                                logger.info("Adding "+txid+" vout "+str(output_index)+" "+str(notary_name)+" "+str(address)+" ("+category.upper()+")")
+                                update_nn_btc_tx_row(conn, cursor, row_data)
+                                output_index += 1
+            else:
+                print("Fees not in txinfo!")
+                #print(tx_info)
         j += 1
     i += 1
 

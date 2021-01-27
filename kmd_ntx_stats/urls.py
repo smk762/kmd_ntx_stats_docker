@@ -167,6 +167,10 @@ urlpatterns = [
     path('api/info/nn_btc_txid_spam',
           views.nn_btc_txid_spam,
           name='nn_btc_txid_spam'),
+    path('api/info/nn_btc_txid',
+          views.nn_btc_txid,
+          name='nn_btc_txid'),
+
     path('chain_sync/',
           views.chain_sync,
           name='chain_sync'),
