@@ -1042,4 +1042,5 @@ def get_btc_txid_list():
     data = nn_btc_tx.objects.all()
     for item in data:
         resp.append(item.txid)
+    resp = list(set(resp))
     return wrap_api(resp)

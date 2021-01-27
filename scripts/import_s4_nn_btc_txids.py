@@ -55,55 +55,51 @@ i = 1
 num_addr = len(notary_btc_addresses)
 print(num_addr)
 
-for notary_address in notary_btc_addresses:
-    print(notary_address)
-    if notary_address in addresses_dict:
-        notary_name = addresses_dict[notary_address]
-    else:
-        notary_name = "non-NN"
-    try:
-        existing_txids = get_existing_nn_btc_txids(cursor)
-        r = requests.get("http://116.203.120.91:8762/api/info/nn_btc_txid_list")
-        resp = r.json()
-        txids = resp['results'][0]
-    except Exception as e:
-        print(e)
-        txids = []
-    logger.info(str(len(txids))+" to process for "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
-    j = 1
+try:
+    existing_txids = get_existing_nn_btc_txids(cursor)
+    logger.info("Getting txids stored n other server")
+    r = requests.get("http://116.203.120.91:8762/api/info/nn_btc_txid_list")
+    resp = r.json()
+    txids = resp['results'][0]
+    new_txids = []
     for txid in txids:
-        if notary_address in addresses_dict:
-            notary_name = addresses_dict[notary_address]
-        else:
-            notary_name = "non-NN"
-        logger.info("Processing "+str(j)+"/"+str(len(txids))+" for "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
-        # Check if available on other server
-        r = requests.get("http://stats.kmd.io/api/info/nn_btc_txid?txid={txid}")
-        resp = r.json()
-        if resp['count'] > 0:
-            for item in resp['results'][0]:
-                row_data = (
-                    item["txid"],
-                    item["block_hash"],
-                    item["block_height"],
-                    item["block_time"],
-                    item["block_datetime"],
-                    item["address"],
-                    item["notary"],
-                    item["season"],
-                    item["category"],
-                    item["input_index"],
-                    item["input_sats"],
-                    item["output_index"],
-                    item["output_sats"],
-                    item["fees"],
-                    item["num_inputs"],
-                    item["num_outputs"]
-                )
-                logger.info(f"Adding {item['txid']} from other server")
-                update_nn_btc_tx_row(conn, cursor, row_data)
-        j += 1
-    i += 1
+        if txid not in existing_txids:
+            new_txids.append(txid)
+    logger.info(str(len(new_txids))+" extra txids detected")
+except Exception as e:
+    print(e)
+    new_txids = []
+logger.info(str(len(new_txids))+" to process")
+
+j = 1
+for txid in new_txids:
+    # Get data from other server
+    r = requests.get("http://stats.kmd.io/api/info/nn_btc_txid?txid={txid}")
+    resp = r.json()
+    if resp['count'] > 0:
+        for item in resp['results'][0]:
+            row_data = (
+                item["txid"],
+                item["block_hash"],
+                item["block_height"],
+                item["block_time"],
+                item["block_datetime"],
+                item["address"],
+                item["notary"],
+                item["season"],
+                item["category"],
+                item["input_index"],
+                item["input_sats"],
+                item["output_index"],
+                item["output_sats"],
+                item["fees"],
+                item["num_inputs"],
+                item["num_outputs"]
+            )
+            logger.info(f"Adding {item['txid']} from other server")
+            update_nn_btc_tx_row(conn, cursor, row_data)
+    j += 1
+i += 1
 
 cursor.close()
 conn.close()
