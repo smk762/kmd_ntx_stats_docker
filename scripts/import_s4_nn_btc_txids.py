@@ -56,9 +56,10 @@ notary_btc_addresses = list(addresses_dict.keys())
 i = 1
 num_addr = len(notary_btc_addresses)
 print(num_addr)
-notary_btc_addresses.append("non-NN")
+
 for notary_address in notary_btc_addresses:
     try:
+
         existing_txids = get_existing_nn_btc_txids(cursor, notary_address)
         logger.info(f"{len(existing_txids)} existing txids in local DB detected for {notary_address}")
         logger.info(f"Getting txids stored on other server for {addresses_dict[notary_address]}")
