@@ -46,9 +46,10 @@ addresses_dict = {}
 try:
     addresses = requests.get(f"{other_server}/api/source/addresses/?chain=BTC&season=Season_4").json()
     for item in addresses['results']:
-        print(item)
-        addresses_dict.update({item["address"]:item["notary"]})
-    addresses_dict.update({BTC_NTX_ADDR:"BTC_NTX_ADDR"})
+        if item["notary"] == 'dragonhound_NA':
+            print(item)
+            addresses_dict.update({item["address"]:item["notary"]})
+    #addresses_dict.update({BTC_NTX_ADDR:"BTC_NTX_ADDR"})
 except Exception as e:
     logger.error(e)
     logger.info("Addresses API might be down!")
@@ -58,62 +59,97 @@ i = 1
 num_addr = len(notary_btc_addresses)
 print(num_addr)
 
+for notary_address in notary_btc_addresses:
+    try:
+        existing_txids = get_existing_nn_btc_txids(cursor, notary_address)
+        logger.info(f"{len(existing_txids)} existing txids in local DB detected for {notary_address}")
+        logger.info(f"Getting txids stored on other server for {addresses_dict[notary_address]}")
+        url = f"{other_server}/api/info/nn_btc_txid_list?notary={addresses_dict[notary_address]}"
+        logger.info(url)
+        r = requests.get(url)
+        resp = r.json()
+        txids = resp['results'][0]
+        new_txids = []
+        for txid in txids:
+            if txid not in existing_txids:
+                new_txids.append(txid)
+        new_txids = list(set(new_txids))
+        logger.info(f"{len(new_txids)} extra txids detected for {addresses_dict[notary_address]} on other server")
+    except Exception as e:
+        print(e)
+        new_txids = []
+    logger.info(str(len(new_txids))+" to process")
 
-try:
-    existing_txids = get_existing_nn_btc_txids(cursor)
-    logger.info("Getting txids stored n other server")
-    r = requests.get(f"{other_server}/api/info/nn_btc_txid_list")
-    resp = r.json()
-    txids = resp['results'][0]
-    new_txids = []
-    for txid in txids:
-        if txid not in existing_txids:
-            new_txids.append(txid)
-    logger.info(str(len(new_txids))+" extra txids detected")
-except Exception as e:
-    print(e)
-    new_txids = []
-logger.info(str(len(new_txids))+" to process")
+    j = 1
+    for txid in new_txids:
+        # Get data from other server
 
-j = 1
-for txid in new_txids:
-    # Get data from other server
+        print(f"{other_server}/api/info/nn_btc_txid?txid={txid}")
+        r = requests.get(f"{other_server}/api/info/nn_btc_txid?txid={txid}")
+        try:
+            resp = r.json()
+            if resp['count'] > 0:
+                for item in resp['results'][0]:
+                    if item["output_index"] is None:
+                        output_index = -1
+                    else:
+                        output_index = item["output_index"]
 
-    r = requests.get(f"{other_server}/api/info/nn_btc_txid?txid={txid}")
-    resp = r.json()
-    if resp['count'] > 0:
-        for item in resp['results'][0]:
-            if item["output_index"] is None:
-                output_index = 1000
-            else:
-                output_index = item["output_index"]
-            if item["input_index"] is None:
-                input_index = 1000
-            else:
-                input_index = item["input_index"]
-            row_data = (
-                item["txid"],
-                item["block_hash"],
-                item["block_height"],
-                item["block_time"],
-                item["block_datetime"],
-                item["address"],
-                item["notary"],
-                item["season"],
-                item["category"],
-                input_index,
-                item["input_sats"],
-                output_index,
-                item["output_sats"],
-                item["fees"],
-                item["num_inputs"],
-                item["num_outputs"]
-            )
-            logger.info(f"Adding {item['txid']} from other server")
-            update_nn_btc_tx_row(conn, cursor, row_data)
-    j += 1
-i += 1
+                    if item["input_index"] is None or item["input_index"] == 1000:
+                        input_index = -1
+                    else:
+                        input_index = item["input_index"]
+
+                    if item["input_sats"] is None:
+                        input_sats = -1
+                    else:
+                        input_sats = item["input_sats"]
+
+                    if item["output_sats"] is None or item["output_index"] == 1000:
+                        output_sats = -1
+                    else:
+                        output_sats = item["output_sats"]
+
+                    if item["num_inputs"] is None:
+                        num_inputs = 0
+                    else:
+                        num_inputs = item["num_inputs"]
+
+                    if item["num_outputs"] is None:
+                        num_outputs = 0
+                    else:
+                        num_outputs = item["num_outputs"]
+
+                    if item["address"] in addresses_dict:
+                        notary = addresses_dict[item["address"]]
+                    else:
+                        notary = item["notary"]
+
+                    row_data = (
+                        item["txid"],
+                        item["block_hash"],
+                        item["block_height"],
+                        item["block_time"],
+                        item["block_datetime"],
+                        item["address"],
+                        notary,
+                        item["season"],
+                        item["category"],
+                        input_index,
+                        input_sats,
+                        output_index,
+                        output_sats,
+                        item["fees"],
+                        num_inputs,
+                        num_outputs
+                    )
+                    logger.info(f"Adding {item['txid']} from other server for {notary}")
+                    update_nn_btc_tx_row(conn, cursor, row_data)
+        except Exception as e:
+            print(e)
+            print(r.text)
+        j += 1
+    i += 1
 
 cursor.close()
 conn.close()
-

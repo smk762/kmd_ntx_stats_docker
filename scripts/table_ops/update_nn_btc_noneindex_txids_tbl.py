@@ -33,8 +33,7 @@ sql = "DELETE FROM nn_btc_tx a \
         FROM nn_btc_tx \
         GROUP BY txid HAVING COUNT(*) > 1 \
       ) b \
-      WHERE a.txid = b.txid \
-      AND a.category = 'Split or Consolidate';"
+      WHERE a.txid = b.txid;"
 
 
 #sql = "UPDATE nn_btc_tx SET \

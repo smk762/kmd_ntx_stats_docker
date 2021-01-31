@@ -431,18 +431,18 @@ class nn_btc_tx(models.Model):
     season = models.CharField(max_length=32)
     category = models.CharField(max_length=32)
 
-    input_index = models.PositiveIntegerField(blank=True, null=True)
-    input_sats = models.PositiveIntegerField(blank=True, null=True)
-    output_index = models.PositiveIntegerField(blank=True, null=True)
-    output_sats = models.PositiveIntegerField(blank=True, null=True)
-    num_inputs = models.PositiveIntegerField(blank=True, null=True)
-    num_outputs = models.PositiveIntegerField(blank=True, null=True)
-    fees = models.PositiveIntegerField()
+    input_index = models.IntegerField(default=-1)
+    input_sats = models.IntegerField(default=-1)
+    output_index = models.IntegerField(default=-1)
+    output_sats = models.IntegerField(default=-1)
+    num_inputs = models.PositiveIntegerField(default=0)
+    num_outputs = models.PositiveIntegerField(default=0)
+    fees = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = 'nn_btc_tx'
         constraints = [
-            models.UniqueConstraint(fields=['txid', 'input_index', 'output_index'],
+            models.UniqueConstraint(fields=['txid', 'address', 'input_index', 'output_index'],
                                  name='unique_btc_nn_txid')
         ]
 
