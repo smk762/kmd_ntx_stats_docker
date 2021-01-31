@@ -359,8 +359,8 @@ def update_BTC_notarisations(conn, cursor, stop_block=634000):
                                 notary_name = "non-NN"
 
                             input_sats = vin['output_value']
-                            output_index = None
-                            output_sats = None
+                            output_index = -1
+                            output_sats = -1
 
                             row_data = (btc_txid, block_hash, block_height, block_time,
                                         block_datetime, address, notary_name, season, category,
@@ -381,8 +381,8 @@ def update_BTC_notarisations(conn, cursor, stop_block=634000):
                                 else:
                                     notary_name = "non-NN"
 
-                                input_index = None
-                                input_sats = None
+                                input_index = -1
+                                input_sats = -1
                                 output_sats = vout['value']
                                 row_data = (btc_txid, block_hash, block_height, block_time,
                                             block_datetime, address, notary_name, season, category,

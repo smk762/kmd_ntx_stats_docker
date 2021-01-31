@@ -109,10 +109,10 @@ for notary_address in notary_btc_addresses:
                         notary_name = "non-NN"
                     input_sats = 0
                     output_sats = 0
-                    output_index = None
-                    output_sats = None
-                    input_index = None
-                    input_sats = None
+                    output_index = -1
+                    output_sats = -1
+                    input_index = -1
+                    input_sats = -1
                     row_data = (txid, block_hash, block_height, block_time,
                                 block_datetime, address, notary_name, season, category,
                                 input_index, input_sats, output_index,
@@ -132,8 +132,8 @@ for notary_address in notary_btc_addresses:
                         else:
                             notary_name = "non-NN"
                         input_sats = vin['output_value']
-                        output_index = None
-                        output_sats = None
+                        output_index = -1
+                        output_sats = -1
                         row_data = (txid, block_hash, block_height, block_time,
                                     block_datetime, address, notary_name, season, category,
                                     input_index, input_sats, output_index,
@@ -154,8 +154,8 @@ for notary_address in notary_btc_addresses:
                                 notary_name = addresses_dict[address]
                             else:
                                 notary_name = "non-NN"
-                            input_index = None
-                            input_sats = None
+                            input_index = -1
+                            input_sats = -1
                             output_sats = vout['value']
                             row_data = (txid, block_hash, block_height, block_time,
                                         block_datetime, address, notary_name, season, category,
