@@ -47,7 +47,7 @@ try:
     for item in addresses['results']:
         print(item)
         addresses_dict.update({item["address"]:item["notary"]})
-    #addresses_dict.update({BTC_NTX_ADDR:"BTC_NTX_ADDR"})
+    addresses_dict.update({BTC_NTX_ADDR:"BTC_NTX_ADDR"})
 except Exception as e:
     logger.error(e)
     logger.info("Addresses API might be down!")
@@ -87,6 +87,14 @@ for notary_address in notary_btc_addresses:
         try:
             resp = r.json()
             if resp['count'] > 0:
+                tx_addresses = []
+                season = None
+                for item in resp['results'][0]:
+                    if item["address"] != '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg':
+                        tx_addresses.append(item["address"])
+                tx_addresses = list(set(tx_addresses))
+                season = get_season_from_addresses(tx_addresses, resp['results'][0][0]["block_time"], "BTC")
+                logger.info(f"Detected {season} from addresses")
                 for item in resp['results'][0]:
                     if item["output_index"] is None:
                         output_index = -1
@@ -131,7 +139,7 @@ for notary_address in notary_btc_addresses:
                         item["block_datetime"],
                         item["address"],
                         notary,
-                        item["season"],
+                        season,
                         item["category"],
                         input_index,
                         input_sats,
@@ -141,7 +149,7 @@ for notary_address in notary_btc_addresses:
                         num_inputs,
                         num_outputs
                     )
-                    logger.info(f"Adding {item['txid']} from other server for {notary}")
+                    logger.info(f"Adding {item['txid']} {item['category']} from other server for {notary}")
                     update_nn_btc_tx_row(conn, cursor, row_data)
         except Exception as e:
             print(e)
