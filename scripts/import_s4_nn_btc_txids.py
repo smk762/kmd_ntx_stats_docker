@@ -56,7 +56,7 @@ notary_btc_addresses = addresses_dict.keys()
 i = 1
 num_addr = len(notary_btc_addresses)
 print(num_addr)
-
+notary_btc_addresses.append("non-NN")
 for notary_address in notary_btc_addresses:
     try:
         existing_txids = get_existing_nn_btc_txids(cursor, notary_address)
