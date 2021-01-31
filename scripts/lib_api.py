@@ -33,7 +33,7 @@ def get_btc_tx_info(tx_hash, wait=True):
         i += 1
         if exit_loop == True or i == 6:
             return resp
-        logger.info("getting info for BTC TX "+str(tx_hash))
+        logger.info("getting BLOCKCYPHER API info for BTC TX "+str(tx_hash))
         try:
             url = 'https://api.blockcypher.com/v1/btc/main/txs/'+tx_hash+'?limit=800'
             headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
@@ -41,6 +41,7 @@ def get_btc_tx_info(tx_hash, wait=True):
             resp = r.json()
         except Exception as e:
             logger.warning(e)
+            print("err in get_btc_tx_info")
         if wait:
             exit_loop = api_sleep_or_exit(resp)
         else:

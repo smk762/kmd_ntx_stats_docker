@@ -474,44 +474,6 @@ def chain_sync_api(request):
     except:
         return JsonResponse({})
 
-def nn_btc_txid(request):
-    if 'txid' in request.GET:
-        resp = get_btc_txid_single(request.GET['txid'])
-    else:
-        resp = {"error":"You need to specify a TXID like '/nn_btc_txid?txid=86e23d8415737f1f6a723d1996f3e373e77d7e16a7ae8548b4928eb019237321'"}
-    return JsonResponse(resp)
-
-def nn_btc_txid_list(request):
-    resp = get_btc_txid_list()
-    return JsonResponse(resp)
-
-def nn_btc_txid_splits(request):
-    resp = get_btc_txid_data("splits")
-    return JsonResponse(resp)
-
-def split_summary_api(request):
-    resp = get_split_stats()
-    return JsonResponse(resp)
-
-def split_summary_table(request):
-    resp = get_split_stats_table()
-    return JsonResponse(resp)
-
-def nn_btc_txid_other(request):
-    resp = get_btc_txid_data("other")
-    return JsonResponse(resp)
-
-def nn_btc_txid_ntx(request):
-    resp = get_btc_txid_data("NTX")
-    return JsonResponse(resp)
-
-def nn_btc_txid_spam(request):
-    resp = get_btc_txid_data("SPAM")
-    return JsonResponse(resp)
-
-def nn_btc_txid_raw(request):
-    resp = get_btc_txid_data()
-    return JsonResponse(resp)
 
 
 # Tool views
@@ -1198,6 +1160,61 @@ class daily_ntx_graph(viewsets.ViewSet):
 
         return Response(data) 
 
+
+# Notary BTC TXID API Endpoints
+
+def nn_btc_txid(request):
+    if 'txid' in request.GET:
+        resp = get_btc_txid_single(request.GET['txid'])
+    else:
+        resp = {"error":"You need to specify a TXID like '/nn_btc_txid?txid=86e23d8415737f1f6a723d1996f3e373e77d7e16a7ae8548b4928eb019237321'"}
+    return JsonResponse(resp)
+
+def notary_btc_txids(request):
+    if 'notary' in request.GET and 'category' in request.GET:
+        resp = get_btc_txid_notary(request.GET['notary'], request.GET['category'])
+    elif 'notary' in request.GET:
+        resp = get_btc_txid_notary(request.GET['notary'])
+    else:
+        resp = {"error":"You need to specify a NOTARY like '/nn_btc_txid?notary=dragonhound_NA'. Category param is optional, e.g. '/nn_btc_txid?notary=dragonhound_NA&category=NTX'"}
+    return JsonResponse(resp)
+
+def nn_btc_txid_list(request):
+    if 'notary' in request.GET:
+        resp = get_btc_txid_list(request.GET['notary'])
+    else:
+        resp = get_btc_txid_list()
+    distinct = len(list(set(resp['results'][0])))
+    resp.update({"distinct":distinct})
+    return JsonResponse(resp)
+
+def nn_btc_txid_other(request):
+    resp = get_btc_txid_data("other")
+    return JsonResponse(resp)
+
+def nn_btc_txid_ntx(request):
+    resp = get_btc_txid_data("NTX")
+    return JsonResponse(resp)
+
+def nn_btc_txid_spam(request):
+    resp = get_btc_txid_data("SPAM")
+    return JsonResponse(resp)
+
+def nn_btc_txid_raw(request):
+    resp = get_btc_txid_data()
+    return JsonResponse(resp)
+
+def nn_btc_txid_splits(request):
+    resp = get_btc_txid_data("splits")
+    return JsonResponse(resp)
+
+def split_summary_api(request):
+    resp = get_split_stats()
+    return JsonResponse(resp)
+
+def split_summary_table(request):
+    resp = get_split_stats_table()
+    return JsonResponse(resp)
 
 # sync lag graph
 # daily ntx category stack graph
