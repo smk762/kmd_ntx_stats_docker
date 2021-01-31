@@ -52,7 +52,7 @@ except Exception as e:
     logger.error(e)
     logger.info("Addresses API might be down!")
 
-notary_btc_addresses = addresses_dict.keys()
+notary_btc_addresses = list(addresses_dict.keys())
 i = 1
 num_addr = len(notary_btc_addresses)
 print(num_addr)
