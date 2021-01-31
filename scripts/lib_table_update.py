@@ -480,6 +480,11 @@ def update_nn_btc_tx_row(conn, cursor, row_data):
     try:
         cursor.execute(sql, row_data)
         conn.commit()
+        txid = row_data[0]
+        notary = row_data[6]
+        season = row_data[7]
+        category = row_data[8]
+        logger.info(f"{txid} {notary} {season} {category} added to DB")
     except Exception as e:
         logger.debug(e)
         if str(e).find('duplicate') == -1:

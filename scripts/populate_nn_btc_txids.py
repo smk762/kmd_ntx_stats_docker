@@ -36,6 +36,8 @@ skip_past_seasons = (os.getenv("skip_past_seasons") == 'True')
 # set this to True in .env to quickly update tables with most recent data
 skip_until_yesterday = (os.getenv("skip_until_yesterday") == 'True')
 
+other_server = os.getenv("other_server")
+
 conn = connect_db()
 cursor = conn.cursor()
 
@@ -73,18 +75,55 @@ for notary_address in notary_btc_addresses:
         txids = []
     j = 1
     for txid in txids:
-        logger.info("Processing "+str(j)+"/"+str(len(txids))+" for "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
-        # Check if available on other server
-        url = f"http://stats.kmd.io/api/info/nn_btc_txid?txid={txid}"
-        r = requests.get(url)
+        # Try to get data from other server
+        print(f"{other_server}/api/info/nn_btc_txid?txid={txid}")
+        r = requests.get(f"{other_server}/api/info/nn_btc_txid?txid={txid}")
         resp = r.json()
         if resp['count'] > 0:
+            tx_addresses = []
+            season = None
             for item in resp['results'][0]:
-                logger.info(f"Adding {item['txid']} from other server")
+                if item["address"] != '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg':
+                    tx_addresses.append(item["address"])
+            tx_addresses = list(set(tx_addresses))
+            season = get_season_from_addresses(tx_addresses, resp['results'][0][0]["block_time"], "BTC")
+            logger.info(f"Detected {season} from addresses")
+            for item in resp['results'][0]:
+                if item["output_index"] is None:
+                    output_index = -1
+                else:
+                    output_index = item["output_index"]
+
+                if item["input_index"] is None or item["input_index"] == 1000:
+                    input_index = -1
+                else:
+                    input_index = item["input_index"]
+
+                if item["input_sats"] is None:
+                    input_sats = -1
+                else:
+                    input_sats = item["input_sats"]
+
+                if item["output_sats"] is None or item["output_index"] == 1000:
+                    output_sats = -1
+                else:
+                    output_sats = item["output_sats"]
+
+                if item["num_inputs"] is None:
+                    num_inputs = 0
+                else:
+                    num_inputs = item["num_inputs"]
+
+                if item["num_outputs"] is None:
+                    num_outputs = 0
+                else:
+                    num_outputs = item["num_outputs"]
+
                 if item["address"] in addresses_dict:
                     notary = addresses_dict[item["address"]]
                 else:
                     notary = item["notary"]
+
                 row_data = (
                     item["txid"],
                     item["block_hash"],
@@ -93,21 +132,18 @@ for notary_address in notary_btc_addresses:
                     item["block_datetime"],
                     item["address"],
                     notary,
-                    item["season"],
+                    season,
                     item["category"],
-                    item["input_index"],
-                    item["input_sats"],
-                    item["output_index"],
-                    item["output_sats"],
+                    input_index,
+                    input_sats,
+                    output_index,
+                    output_sats,
                     item["fees"],
-                    item["num_inputs"],
-                    item["num_outputs"]
+                    num_inputs,
+                    num_outputs
                 )
+                logger.info(f"Adding {item['txid']} {item['category']} from other server for {notary}")
                 update_nn_btc_tx_row(conn, cursor, row_data)
-        else:
-            print(url)
-            print(resp)
-        '''
         else:
             tx_info = get_btc_tx_info(txid)
             if 'fees' in tx_info:
@@ -119,11 +155,13 @@ for notary_address in notary_btc_addresses:
                 block_time_iso8601 = tx_info['confirmed']
                 parsed_time = dp.parse(block_time_iso8601)
                 block_time = parsed_time.strftime('%s')
-                season = get_season(int(block_time))
                 block_datetime = dt.utcfromtimestamp(int(block_time))
 
+                addresses = tx_info['addresses']
+                season = get_season_from_addresses(addresses, block_time, "BTC")
+
                 # single row for memo.sv spam
-                if '1See1xxxx1memo1xxxxxxxxxxxxxBuhPF' in tx_info['addresses']:
+                if '1See1xxxx1memo1xxxxxxxxxxxxxBuhPF' in addresses:
                     row_data = (txid, block_hash, block_height, block_time,
                                 block_datetime, 'SPAM', 'non-NN', season, 'SPAM',
                                 0, 0, 0, 0, fees, num_inputs, num_outputs)
@@ -134,9 +172,9 @@ for notary_address in notary_btc_addresses:
                     vins = tx_info["inputs"]
 
                     # single row for splits
-                    if len(tx_info['addresses']) == 1:
+                    if len(addresses) == 1:
                         category = "Split or Consolidate"
-                        address = tx_info['addresses'][0]
+                        address = addresses[0]
                         if address in addresses_dict:
                             notary_name = addresses_dict[address]
                         else:
@@ -156,7 +194,7 @@ for notary_address in notary_btc_addresses:
                     else:
                         input_index = 0
                         for vin in vins:
-                            if BTC_NTX_ADDR in tx_info['addresses']:
+                            if BTC_NTX_ADDR in addresses:
                                 category = "NTX"
                             else:
                                 category = "Sent"
@@ -178,7 +216,7 @@ for notary_address in notary_btc_addresses:
 
                         output_index = 0
                         for vout in vouts:
-                            if BTC_NTX_ADDR in tx_info['addresses']:
+                            if BTC_NTX_ADDR in addresses:
                                 category = "NTX"
                             else:
                                 category = "Received"
@@ -201,7 +239,6 @@ for notary_address in notary_btc_addresses:
             else:
                 print("Fees not in txinfo!")
                 #print(tx_info)
-            '''
         j += 1
     i += 1
 

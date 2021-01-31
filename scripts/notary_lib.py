@@ -55,12 +55,13 @@ def get_season_notaries(season):
 
 def get_season(time_stamp):
     # detect & convert js timestamps
+    time_stamp = int(time_stamp)
     if round((time_stamp/1000)/time.time()) == 1:
         time_stamp = time_stamp/1000
     for season in SEASONS_INFO:
         if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= SEASONS_INFO[season]['end_time']:
             return season
-    return "season_undefined"
+    return None
 
 def get_season_from_block(block):
     if not isinstance(block, int):
@@ -68,7 +69,7 @@ def get_season_from_block(block):
     for season in SEASONS_INFO:
         if block >= SEASONS_INFO[season]['start_block'] and block <= SEASONS_INFO[season]['end_block']:
             return season
-    return "season_undefined"
+    return None
 
 def get_seasons_from_address(addr, chain="KMD"):
     addr_seasons = []
@@ -79,7 +80,7 @@ def get_seasons_from_address(addr, chain="KMD"):
                 addr_seasons.append(season)
     return addr_seasons
 
-def get_season_from_addresses(notaries, address_list, tx_chain="KMD"):
+def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD"):
     seasons = list(notary_addresses.keys())[::-1]
     notary_seasons = []
     last_season_num = None
@@ -104,7 +105,7 @@ def get_season_from_addresses(notaries, address_list, tx_chain="KMD"):
     if len(notary_seasons) == 13 and len(set(notary_seasons)) == 1:
         return notary_seasons[0]
     else:
-        return "season_undefined"
+        return get_season(time_stamp)
 
 def get_known_addr(coin, season):
     # k:v dict for matching address to owner
@@ -195,7 +196,7 @@ def get_ntx_data(txid):
                         chain = chain.replace('\x00','')
                     # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
                     if chain.upper() == chain:
-                        season = get_season_from_addresses(notary_list, address_list, "KMD")
+                        season = get_season_from_addresses(address_list, block_time, "KMD")
                         row_data = (chain, this_block_height, block_time, block_datetime,
                                     block_hash, notary_list, ac_ntx_blockhash, ac_ntx_height,
                                     txid, opret, season, "N/A")
@@ -307,7 +308,7 @@ def update_BTC_notarisations(conn, cursor, stop_block=634000):
             if '1See1xxxx1memo1xxxxxxxxxxxxxBuhPF' not in addresses:
                 notaries = get_notaries_from_addresses(addresses)
                 print(notaries)
-                season = get_season_from_addresses(notaries, addresses, "BTC")
+                season = get_season_from_addresses(addresses, block_time, "BTC")
                 for notary in notaries:
                     result = 0
                     last_ntx_row_data = (notary, "BTC", btc_txid, block_height,
