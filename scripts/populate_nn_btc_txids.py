@@ -55,7 +55,7 @@ i = 1
 num_addr = len(notary_btc_addresses)
 print(num_addr)
 
-notary_btc_addresses.reverse()
+#notary_btc_addresses.reverse()
 
 for notary_address in notary_btc_addresses:
     print(notary_address)
@@ -64,24 +64,27 @@ for notary_address in notary_btc_addresses:
     else:
         notary_name = "non-NN"
     try:
-        existing_txids = get_existing_nn_btc_txids(cursor)
+        existing_txids = get_existing_nn_btc_txids(cursor, notary_address)
+        logger.info(str(len(existing_txids))+" EXIST IN DB FOR "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
         txids = get_new_nn_btc_txids(existing_txids, notary_address)
+        logger.info(str(len(txids))+" new TXIDs to process for "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
     except Exception as e:
         print(e)
         txids = []
-    logger.info(str(len(txids))+" to process for "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
     j = 1
     for txid in txids:
-        if notary_address in addresses_dict:
-            notary_name = addresses_dict[notary_address]
-        else:
-            notary_name = "non-NN"
         logger.info("Processing "+str(j)+"/"+str(len(txids))+" for "+notary_address+" | "+notary_name+" ("+str(i)+"/"+str(num_addr)+")")
         # Check if available on other server
-        r = requests.get("http://stats.kmd.io/api/info/nn_btc_txid?txid={txid}")
+        url = f"http://stats.kmd.io/api/info/nn_btc_txid?txid={txid}"
+        r = requests.get(url)
         resp = r.json()
         if resp['count'] > 0:
             for item in resp['results'][0]:
+                logger.info(f"Adding {item['txid']} from other server")
+                if item["address"] in addresses_dict:
+                    notary = addresses_dict[item["address"]]
+                else:
+                    notary = item["notary"]
                 row_data = (
                     item["txid"],
                     item["block_hash"],
@@ -89,7 +92,7 @@ for notary_address in notary_btc_addresses:
                     item["block_time"],
                     item["block_datetime"],
                     item["address"],
-                    item["notary"],
+                    notary,
                     item["season"],
                     item["category"],
                     item["input_index"],
@@ -100,8 +103,11 @@ for notary_address in notary_btc_addresses:
                     item["num_inputs"],
                     item["num_outputs"]
                 )
-                logger.info(f"Adding {item['txid']} from other server")
                 update_nn_btc_tx_row(conn, cursor, row_data)
+        else:
+            print(url)
+            print(resp)
+        '''
         else:
             tx_info = get_btc_tx_info(txid)
             if 'fees' in tx_info:
@@ -137,10 +143,10 @@ for notary_address in notary_btc_addresses:
                             notary_name = "non-NN"
                         input_sats = 0
                         output_sats = 0
-                        output_index = 1000
-                        output_sats = None
-                        input_index = 1000
-                        input_sats = None
+                        output_index = -1
+                        output_sats = -1
+                        input_index = -1
+                        input_sats = -1
                         row_data = (txid, block_hash, block_height, block_time,
                                     block_datetime, address, notary_name, season, category,
                                     input_index, input_sats, output_index,
@@ -160,8 +166,8 @@ for notary_address in notary_btc_addresses:
                             else:
                                 notary_name = "non-NN"
                             input_sats = vin['output_value']
-                            output_index = 1000
-                            output_sats = None
+                            output_index = -1
+                            output_sats = -1
                             row_data = (txid, block_hash, block_height, block_time,
                                         block_datetime, address, notary_name, season, category,
                                         input_index, input_sats, output_index,
@@ -182,8 +188,8 @@ for notary_address in notary_btc_addresses:
                                     notary_name = addresses_dict[address]
                                 else:
                                     notary_name = "non-NN"
-                                input_index = 1000
-                                input_sats = None
+                                input_index = -1
+                                input_sats = -1
                                 output_sats = vout['value']
                                 row_data = (txid, block_hash, block_height, block_time,
                                             block_datetime, address, notary_name, season, category,
@@ -195,6 +201,7 @@ for notary_address in notary_btc_addresses:
             else:
                 print("Fees not in txinfo!")
                 #print(tx_info)
+            '''
         j += 1
     i += 1
 

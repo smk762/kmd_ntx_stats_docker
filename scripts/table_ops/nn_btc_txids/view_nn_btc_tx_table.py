@@ -17,7 +17,7 @@ cursor = conn.cursor()
 #table = 'notarised'
 table = 'nn_btc_tx'
 
-    
+
 
 cursor.execute("SELECT txid, block_hash, block_height, block_time, block_datetime, address, notary, season, category, input_index, input_sats, output_index, output_sats, num_inputs, num_outputs, fees FROM "+table+" WHERE notary = 'dudezmobi_AR' AND season = 'Season_4' AND category = 'Split or Consolidate' AND txid = 'fd74efad61642b58c9bb5eb2f72515e12e93eff73cbbc1c0f01f2022739cf642';")
 #cursor.execute("SELECT txid, block_hash, block_height, block_time, block_datetime, address, notary, season, category, input_index, input_sats, output_index, output_sats, num_inputs, num_outputs, fees FROM "+table+";")

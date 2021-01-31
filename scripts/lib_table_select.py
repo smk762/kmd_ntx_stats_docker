@@ -205,10 +205,13 @@ def get_notary_last_ntx(cursor):
     return notary_last_ntx
 
 
-def get_existing_ntxids(cursor):
+def get_existing_ntxids(cursor, address=None):
     recorded_txids = []
     logger.info("Getting existing TXIDs from database...")
-    cursor.execute("SELECT txid from notarised;")
+    if address:
+        cursor.execute(f"SELECT txid from notarised WHERE address='{address}';")    
+    else:
+        cursor.execute("SELECT txid from notarised;")
     existing_txids = cursor.fetchall()
 
     for txid in existing_txids:
@@ -217,10 +220,11 @@ def get_existing_ntxids(cursor):
 
 def get_existing_nn_btc_txids(cursor, address=None):
     recorded_txids = []
-    logger.info("Getting existing TXIDs from database...")
     if address:
+        logger.info(f"Getting existing TXIDs from database for {address}...")
         cursor.execute("SELECT DISTINCT txid from nn_btc_tx where address = '"+address+"';")
     else:
+        logger.info("Getting existing TXIDs from database...")
         cursor.execute("SELECT DISTINCT txid from nn_btc_tx;")
     existing_txids = cursor.fetchall()
 

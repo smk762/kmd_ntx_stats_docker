@@ -392,13 +392,11 @@ def update_BTC_notarisations(conn, cursor, stop_block=634000):
 
 
 def get_new_nn_btc_txids(existing_txids, notary_address):
-    num_existing = len(existing_txids)
-    print(f"{num_existing} txids in DB")
-    has_more=True
     before_block=None
-    txids = []
     page = 0
     exit_loop = False
+    api_txids = []
+    new_txids = []
     while True:
         page += 1
         logger.info("Page "+str(page))
@@ -411,39 +409,37 @@ def get_new_nn_btc_txids(existing_txids, notary_address):
         else:
             if 'txrefs' in resp:
                 tx_list = resp['txrefs']
-                if before_block == tx_list[-1]['block_height']:
-                    logger.info("No more for txids in previous blocks!")
-                    exit_loop = True                    
-                else:
-                    before_block = tx_list[-1]['block_height']
-                num_txids = len(txids)
-                print(f"TXID count = {num_txids}")
+                before_block = tx_list[-1]['block_height']
+
                 for tx in tx_list:
-                    if tx['tx_hash'] not in txids and tx['tx_hash'] not in existing_txids:
-                        txids.append(tx['tx_hash'])
+                    api_txids.append(tx['tx_hash'])
+                    if tx['tx_hash'] not in new_txids and tx['tx_hash'] not in existing_txids:
+                        new_txids.append(tx['tx_hash'])
                         print(f"appended tx {tx}")
 
+                # exit loop if earlier than s4
                 if before_block < 634774:
                     logger.info("No more for s4!")
                     exit_loop = True
-                elif len(txids) == 0:
-                    logger.info("No new txids... exiting loop.")
-                    # exit_loop = True
-                elif len(txids) == num_txids:
-                    logger.info("No new txids on page "+str(page)+"... exiting loop.")
-                    # exit_loop = True
-                else:
-                    logger.info(str(len(txids))+" txids scanned...")
+
                 logger.info("scannning back from block "+str(before_block))
             else:
-                logger.info("No more!")
+                # exit loop if no more tx for address at api
+                logger.info("No more for address!")
                 exit_loop = True
-                
+
         if exit_loop:
             logger.info("exiting address txid loop!")
             break
-    txids = list(set((txids)))
-    return txids
+
+    logger.info(f"{len(api_txids)} TXIDs counted from API")
+    num_api_txids = list(set((api_txids)))
+    logger.info(f"{len(num_api_txids)} DISTINCT TXIDs counted from API")
+
+    logger.info(f"{len(new_txids)} NEW TXIDs counted from API")
+    new_txids = list(set((new_txids)))
+    logger.info(f"{len(new_txids)} DISTINCT NEW TXIDs counted from API")
+    return new_txids
 
 
 def get_notaries_from_addresses(addresses):
