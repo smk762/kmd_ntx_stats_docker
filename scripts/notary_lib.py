@@ -33,6 +33,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+API_PAGE_BREAK = os.getenv("API_PAGE_BREAK")
 
 def connect_db():
     conn = psycopg2.connect(
@@ -220,6 +221,9 @@ def get_btc_ntxids(cursor, stop_block, exit=None):
     exit_loop = False
     existing_txids = get_existing_btc_ntxids(cursor)
     while has_more:
+        # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
+        if page >= API_PAGE_BREAK:
+            break
         page += 1
         logger.info("Page "+str(page))
         resp = get_btc_address_txids(BTC_NTX_ADDR, before_block)
@@ -399,6 +403,9 @@ def get_new_nn_btc_txids(existing_txids, notary_address):
     api_txids = []
     new_txids = []
     while True:
+        # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
+        if page >= API_PAGE_BREAK:
+            break
         page += 1
         logger.info("Page "+str(page))
         resp = get_btc_address_txids(notary_address, before_block)
