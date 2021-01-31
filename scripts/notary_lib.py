@@ -33,7 +33,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-API_PAGE_BREAK = os.getenv("API_PAGE_BREAK")
+API_PAGE_BREAK = int(os.getenv("API_PAGE_BREAK"))
 
 def connect_db():
     conn = psycopg2.connect(
