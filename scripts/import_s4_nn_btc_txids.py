@@ -39,16 +39,14 @@ skip_until_yesterday = (os.getenv("skip_until_yesterday") == 'True')
 conn = connect_db()
 cursor = conn.cursor()
 
-#other_server = "http://116.203.120.91:8762"
-other_server = "http://stats.kmd.io"
+other_server = os.getenv("other_server")
 
 addresses_dict = {}
 try:
     addresses = requests.get(f"{other_server}/api/source/addresses/?chain=BTC&season=Season_4").json()
     for item in addresses['results']:
-        if item["notary"] == 'dragonhound_NA':
-            print(item)
-            addresses_dict.update({item["address"]:item["notary"]})
+        print(item)
+        addresses_dict.update({item["address"]:item["notary"]})
     #addresses_dict.update({BTC_NTX_ADDR:"BTC_NTX_ADDR"})
 except Exception as e:
     logger.error(e)
