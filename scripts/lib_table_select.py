@@ -204,11 +204,14 @@ def get_notary_last_ntx(cursor):
         notary_last_ntx[notary].update({chain:block_height})
     return notary_last_ntx
 
-
-def get_existing_ntxids(cursor, address=None):
+def get_existing_ntxids(cursor, address=None, category=None):
     recorded_txids = []
     logger.info("Getting existing TXIDs from database...")
-    if address:
+    if address and category:
+        cursor.execute(f"SELECT txid from notarised WHERE address='{address}' AND category='{category}';")    
+    elif category:
+        cursor.execute(f"SELECT txid from notarised WHERE category='{category}';")    
+    elif address:
         cursor.execute(f"SELECT txid from notarised WHERE address='{address}';")    
     else:
         cursor.execute("SELECT txid from notarised;")
@@ -218,9 +221,15 @@ def get_existing_ntxids(cursor, address=None):
         recorded_txids.append(txid[0])
     return recorded_txids
 
-def get_existing_nn_btc_txids(cursor, address=None):
+def get_existing_nn_btc_txids(cursor, address=None, category=None):
     recorded_txids = []
-    if address:
+    if address and category:
+        logger.info(f"Getting existing TXIDs from database for {address} {category}...")
+        cursor.execute("SELECT DISTINCT txid from nn_btc_tx where address = '"+address+"' and category = '"+category+"';")
+    elif category:
+        logger.info(f"Getting existing TXIDs from database for {category}...")
+        cursor.execute("SELECT DISTINCT txid from nn_btc_tx where category = '"+category+"';")
+    elif address:
         logger.info(f"Getting existing TXIDs from database for {address}...")
         cursor.execute("SELECT DISTINCT txid from nn_btc_tx where address = '"+address+"';")
     else:
