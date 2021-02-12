@@ -1037,10 +1037,14 @@ def get_btc_txid_single(txid=None):
         resp.append(row)
     return wrap_api(resp)
 
-def get_btc_txid_list(notary=None):
+def get_btc_txid_list(notary=None, season=None):
     resp = []
-    if notary:
+    if notary and season:
+        data = nn_btc_tx.objects.filter(notary=notary, season=season)
+    elif notary:
         data = nn_btc_tx.objects.filter(notary=notary)
+    elif season:
+        data = nn_btc_tx.objects.filter(notary=season)
     else:
         data = nn_btc_tx.objects.all()
     for item in data:
@@ -1056,6 +1060,43 @@ def get_btc_txid_notary(notary, category=None):
         data = nn_btc_tx.objects.filter(notary=notary, category=category).values()
     else:
         data = nn_btc_tx.objects.filter(notary=notary).values()
+    for item in data:
+        if item['season'] not in resp:
+            resp.update({item['season']:{}})
+            txid_season_list.update({item['season']:[]})
+        if item['category'] not in resp[item['season']]:
+            resp[item['season']].update({item['category']:{}})
+        if item['txid'] not in resp[item['season']][item['category']]:
+            resp[item['season']][item['category']].update({item['txid']:[item]})
+        else:
+            resp[item['season']][item['category']][item['txid']].append(item)
+        txid_list.append(item['txid'])
+        txid_season_list[item['season']].append(item['txid'])
+
+    api_resp = {
+        "count":len(list(set(txid_list))),
+        "results":{}
+    }
+    for season in resp:
+        if season not in api_resp["results"]:
+            api_resp["results"].update({season:{"count":len(list(set(txid_season_list[season])))}})
+        for category in resp[season]:
+            api_resp["results"][season].update({
+                category:{
+                    "count":len(resp[season][category]),
+                    "txids":resp[season][category]
+                }
+            })
+    return api_resp
+
+def get_btc_txid_address(address, category=None):
+    resp = {}
+    txid_list = []
+    txid_season_list = {}
+    if category:
+        data = nn_btc_tx.objects.filter(address=address, category=category).values()
+    else:
+        data = nn_btc_tx.objects.filter(address=address).values()
     for item in data:
         if item['season'] not in resp:
             resp.update({item['season']:{}})
