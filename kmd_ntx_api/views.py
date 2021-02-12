@@ -1170,6 +1170,15 @@ def nn_btc_txid(request):
         resp = {"error":"You need to specify a TXID like '/nn_btc_txid?txid=86e23d8415737f1f6a723d1996f3e373e77d7e16a7ae8548b4928eb019237321'"}
     return JsonResponse(resp)
 
+def address_btc_txids(request):
+    if 'address' in request.GET and 'category' in request.GET:
+        resp = get_btc_txid_address(request.GET['address'], request.GET['category'])
+    elif 'address' in request.GET:
+        resp = get_btc_txid_address(request.GET['address'])
+    else:
+        resp = {"error":"You need to specify an ADDRESS like '/address_btc_txids?address=1LtvR7B1zmvqKUeJkuaWYzSK2on8dS4u1h'. Category param is optional, e.g. '/address_btc_txids?address=1LtvR7B1zmvqKUeJkuaWYzSK2on8dS4u1h&category=NTX'"}
+    return JsonResponse(resp)
+
 def notary_btc_txids(request):
     if 'notary' in request.GET and 'category' in request.GET:
         resp = get_btc_txid_notary(request.GET['notary'], request.GET['category'])
@@ -1180,8 +1189,12 @@ def notary_btc_txids(request):
     return JsonResponse(resp)
 
 def nn_btc_txid_list(request):
-    if 'notary' in request.GET:
+    if 'season' in request.GET and 'notary' in request.GET:
+        resp = get_btc_txid_list(request.GET['notary'], request.GET['season'])
+    elif 'notary' in request.GET:
         resp = get_btc_txid_list(request.GET['notary'])
+    elif 'season' in request.GET:
+        resp = get_btc_txid_list(None, request.GET['season'])
     else:
         resp = get_btc_txid_list()
     distinct = len(list(set(resp['results'][0])))

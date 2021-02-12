@@ -476,7 +476,7 @@ def update_nn_btc_tx_row(conn, cursor, row_data):
                                 output_index, output_sats, fees, num_inputs, num_outputs) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_btc_nn_txid DO UPDATE SET \
-        notary='"+str(row_data[6])+"';"
+        notary='"+str(row_data[6])+"', category='"+str(row_data[8])+"';"
     try:
         cursor.execute(sql, row_data)
         conn.commit()

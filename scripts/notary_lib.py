@@ -25,6 +25,8 @@ from lib_table_update import *
 from lib_table_select import *
 
 load_dotenv()
+other_server = os.getenv("other_server")
+this_server = os.getenv("this_server")
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -670,3 +672,28 @@ def get_unrecorded_KMD_txids(cursor, tip, season):
     recorded_txids = get_existing_ntxids(cursor)
     unrecorded_txids = set(all_txids) - set(recorded_txids)
     return unrecorded_txids
+
+def get_addresses_dict():
+    addresses_dict = {}
+    try:
+        addresses = requests.get(f"{other_server}/api/source/addresses/?chain=BTC&season=Season_4").json()
+        for item in addresses['results']:
+            print(item)
+            addresses_dict.update({item["address"]:item["notary"]})
+    except Exception as e:
+        logger.error(e)
+        logger.info("Addresses API might be down!")
+    return addresses_dict
+
+def get_nn_btc_tx_parts(txid):
+    r = requests.get(f"{this_server}/api/info/nn_btc_txid?txid={txid}")
+    tx_parts_list = r.json()["results"][0]
+    
+    tx_vins = []
+    tx_vouts = []
+    for part in tx_parts_list:
+        if part["input_index"] != -1:
+            tx_vins.append(part)
+        if part["output_index"] != -1:
+            tx_vouts.append(part)
+    return tx_vins, tx_vouts
