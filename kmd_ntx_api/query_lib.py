@@ -994,11 +994,11 @@ def get_btc_txid_data(category=None):
         if category == "NTX":
             data = nn_btc_tx.objects.filter(category="NTX")
         elif category == "splits":
-            data = nn_btc_tx.objects.filter(category="Split or Consolidate")
+            data = nn_btc_tx.objects.filter(category="Split")
         elif category == "SPAM":
             data = nn_btc_tx.objects.filter(category="SPAM")
         if category == "other":
-            data = nn_btc_tx.objects.exclude(category="Split or Consolidate").exclude(category="NTX").exclude(category="SPAM")
+            data = nn_btc_tx.objects.exclude(category="Split").exclude(category="NTX").exclude(category="SPAM")
 
         data = data.order_by('-block_height','address').values()
 
