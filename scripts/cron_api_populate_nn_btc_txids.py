@@ -88,7 +88,6 @@ def is_notary_address(addr):
         return True
     return False
 
-
 def detect_replenish(vins, vouts):
 
     vin_notaries = []
