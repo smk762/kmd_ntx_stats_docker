@@ -469,7 +469,7 @@ def update_notarised_tenure(conn, cursor, row_data):
         return 0
 
 def delete_nn_btc_tx_transaction(conn, cursor, txid):
-    cursor.execute(f"DELETE FROM nn_btc_tx WHERE txid={txid};")
+    cursor.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
     conn.commit()
 
 def update_nn_btc_tx_row(conn, cursor, row_data):
