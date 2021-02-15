@@ -27,6 +27,7 @@ cursor = conn.cursor()
 
 for notary in NOTARIES["Season_4"]:
     url = f"{other_server}/api/info/nn_btc_txid_list?notary={notary}"
+    time.sleep(0.02)
     r = requests.get(url)
     try:
         resp = r.json()
@@ -37,6 +38,7 @@ for notary in NOTARIES["Season_4"]:
             txid_del.delete()
 
             txid_url = f"{other_server}/api/info/nn_btc_txid?txid={txid}"
+            time.sleep(0.02)
             r = requests.get(txid_url)
             try:
                 resp = r.json()
