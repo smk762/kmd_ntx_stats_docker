@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
 import logging.handlers
-from notary_lib import *
+from lib_notary import *
 
 ''' You should only need to run this once per season, unless notary pubkeys change. 
 Dont forget to update the pubkeys in py

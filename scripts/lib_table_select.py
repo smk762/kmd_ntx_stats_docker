@@ -221,20 +221,25 @@ def get_existing_ntxids(cursor, address=None, category=None):
         recorded_txids.append(txid[0])
     return recorded_txids
 
-def get_existing_nn_btc_txids(cursor, address=None, category=None):
+def get_existing_nn_btc_txids(cursor, address=None, category=None, season=None, notary=None):
     recorded_txids = []
-    if address and category:
-        logger.info(f"Getting existing TXIDs from database for {address} {category}...")
-        cursor.execute("SELECT DISTINCT txid from nn_btc_tx where address = '"+address+"' and category = '"+category+"';")
-    elif category:
-        logger.info(f"Getting existing TXIDs from database for {category}...")
-        cursor.execute("SELECT DISTINCT txid from nn_btc_tx where category = '"+category+"';")
-    elif address:
-        logger.info(f"Getting existing TXIDs from database for {address}...")
-        cursor.execute("SELECT DISTINCT txid from nn_btc_tx where address = '"+address+"';")
-    else:
-        logger.info("Getting existing TXIDs from database...")
-        cursor.execute("SELECT DISTINCT txid from nn_btc_tx;")
+    sql = f"SELECT DISTINCT txid from nn_btc_tx"
+    conditions = []
+    if category:
+        conditions.append(f"category = '{category}'")
+    if season:
+        conditions.append(f"season = '{season}'")
+    if address:
+        conditions.append(f"address = '{address}'")
+    if notary:
+        conditions.append(f"notary = '{notary}'")
+
+    if len(conditions) > 0:
+        sql += " where "
+        sql += " and ".join(conditions)    
+    sql += ";"
+
+    cursor.execute(sql)
     existing_txids = cursor.fetchall()
 
     for txid in existing_txids:
@@ -244,12 +249,22 @@ def get_existing_nn_btc_txids(cursor, address=None, category=None):
 def get_non_notary_btc_txids(cursor):
     non_notary_txids = []
     logger.info("Getting non-notary TXIDs from database...")
-    cursor.execute("SELECT DISTINCT txid from nn_btc_tx where category = 'Split or Consolidate' and notary = 'non-NN';")
+    cursor.execute("SELECT DISTINCT txid from nn_btc_tx where notary = 'non-NN';")
     txids = cursor.fetchall()
 
     for txid in txids:
         non_notary_txids.append(txid[0])
     return non_notary_txids
+
+def get_replenish_addresses(cursor):
+    replenish_addr = []
+    logger.info("Getting Replenish Addresses from database...")
+    cursor.execute("SELECT DISTINCT address from nn_btc_tx WHERE notary = 'Replenish_Address';")
+    addresses = cursor.fetchall()
+
+    for addr in addresses:
+        replenish_addr.append(addr[0])
+    return replenish_addr
 
 def get_existing_btc_ntxids(cursor):
     existing_txids = []

@@ -8,9 +8,8 @@ import requests
 import psycopg2
 from decimal import *
 from psycopg2.extras import execute_values
-from notary_lib import *
-from rpclib import def_credentials
-import table_lib
+from lib_notary import *
+from lib_rpc import def_credentials
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()

@@ -468,6 +468,10 @@ def update_notarised_tenure(conn, cursor, row_data):
         conn.rollback()
         return 0
 
+def delete_nn_btc_tx_transaction(conn, cursor, txid):
+    cursor.execute(f"DELETE FROM nn_btc_tx WHERE txid={txid};")
+    conn.commit()
+
 def update_nn_btc_tx_row(conn, cursor, row_data):
     sql = "INSERT INTO nn_btc_tx (txid, block_hash, block_height, \
                                 block_time, block_datetime, \
@@ -480,16 +484,70 @@ def update_nn_btc_tx_row(conn, cursor, row_data):
     try:
         cursor.execute(sql, row_data)
         conn.commit()
-        txid = row_data[0]
-        notary = row_data[6]
-        season = row_data[7]
-        category = row_data[8]
-        logger.info(f"{txid} {notary} {season} {category} added to DB")
     except Exception as e:
         logger.debug(e)
         if str(e).find('duplicate') == -1:
             logger.debug(row_data)
         conn.rollback()
+
+def insert_nn_btc_tx_row(conn, cursor, row_data):
+    sql = "INSERT INTO nn_btc_tx (txid, block_hash, block_height, \
+                                block_time, block_datetime, \
+                                address, notary, season, category, \
+                                input_index, input_sats, \
+                                output_index, output_sats, fees, num_inputs, num_outputs) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    try:
+        cursor.execute(sql, row_data)
+        conn.commit()
+    except Exception as e:
+        logger.debug(e)
+        if str(e).find('duplicate') == -1:
+            logger.debug(row_data)
+        conn.rollback()
+
+def update_nn_btc_tx_notary_from_addr(conn, cursor, notary, addr):
+    sql = f"UPDATE nn_btc_tx SET notary='{notary}' WHERE address='{addr}';"
+    try:
+        cursor.execute(sql)
+        conn.commit()
+        logger.info(f"{addr} tagged as {notary} in DB")
+    except Exception as e:
+        logger.debug(e)
+        conn.rollback()
+
+def update_nn_btc_tx_notary_category_from_addr(conn, cursor, notary, category, addr):
+    sql = f"UPDATE nn_btc_tx SET notary='{notary}', category='{category}' WHERE address='{addr}';"
+    try:
+        cursor.execute(sql)
+        conn.commit()
+        logger.info(f"{addr} tagged as {notary} in DB")
+    except Exception as e:
+        logger.debug(e)
+        conn.rollback()
+
+def update_nn_btc_tx_category_from_txid(conn, cursor, category, txid):
+    sql = f"UPDATE nn_btc_tx SET category='{category}' WHERE txid='{txid}';"
+    try:
+        cursor.execute(sql)
+        conn.commit()
+        logger.info(f"{txid} tagged as {category} in DB")
+    except Exception as e:
+        logger.debug(e)
+        conn.rollback()
+
+def update_nn_btc_tx_outindex_from_txid(conn, cursor, outindex, txid):
+    sql = f"UPDATE nn_btc_tx SET output_index='{outindex}' WHERE txid='{txid}';"
+    try:
+        cursor.execute(sql)
+        conn.commit()
+        logger.info(f"{txid} tagged as {outindex} in DB")
+    except Exception as e:
+        logger.debug(e)
+        conn.rollback()
+
+
+
 
 def delete_nn_btc_tx_row(conn, cursor, txid, notary):
     sql = "DELETE FROM nn_btc_tx WHERE txid='"+str(txid)+"' and notary='"+str(notary)+"';"
