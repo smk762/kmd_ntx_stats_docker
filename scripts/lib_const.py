@@ -1,4 +1,19 @@
+import os
+import requests
+import logging
+import logging.handlers
+from dotenv import load_dotenv
 
+logger = logging.getLogger(__name__)
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
+load_dotenv()
+
+other_server = os.getenv("other_server")
 
 NTX_ADDR = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 BTC_NTX_ADDR = '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg'
@@ -498,3 +513,31 @@ SEASONS_INFO = {
             "notaries":[]
         }
 }
+
+
+NN_BTC_ADDRESSES_DICT = {}
+NOTARY_BTC_ADDRESSES = {}
+NOTARIES = {}
+ALL_SEASON_NN_BTC_ADDRESSES_DICT = {}
+ALL_SEASON_NOTARY_BTC_ADDRESSES = []
+ALL_SEASON_NOTARIES = []
+
+for season in SEASONS_INFO:
+    NN_BTC_ADDRESSES_DICT.update({season:{}})
+    try:
+        addresses = requests.get(f"{other_server}/api/source/addresses/?chain=BTC&season={season}").json()
+        for item in addresses['results']:
+            ALL_SEASON_NOTARIES.append(item["notary"])
+            ALL_SEASON_NOTARY_BTC_ADDRESSES.append(item["address"])
+            ALL_SEASON_NN_BTC_ADDRESSES_DICT.update({item["address"]:item["notary"]})
+            NN_BTC_ADDRESSES_DICT[season].update({item["address"]:item["notary"]})
+    except Exception as e:
+        logger.error(e)
+        logger.info("Addresses API might be down!")
+
+    NOTARY_BTC_ADDRESSES.update({season:list(NN_BTC_ADDRESSES_DICT[season].keys())})
+    NOTARIES.update({season:list(NN_BTC_ADDRESSES_DICT[season].values())})
+
+ALL_SEASON_NOTARIES = list(set(ALL_SEASON_NOTARIES))
+ALL_SEASON_NOTARY_BTC_ADDRESSES = list(set(ALL_SEASON_NOTARY_BTC_ADDRESSES))
+S4_INIT_BTC_FUNDING_TX = "13fee57ec60ef4ca42dbed5eb77d576bf7545e7042b334b27afdc33051635611"

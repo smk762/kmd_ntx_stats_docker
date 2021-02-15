@@ -5,10 +5,10 @@ import logging.handlers
 from datetime import datetime as dt
 import datetime
 import psycopg2
-from rpclib import def_credentials
+from lib_rpc import def_credentials
 from decimal import *
 from psycopg2.extras import execute_values
-from notary_lib import *
+from lib_notary import *
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()

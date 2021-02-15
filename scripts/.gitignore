@@ -1,3 +1,3 @@
 *.log
 .env
-btc_ntx_txids.json
+*.json

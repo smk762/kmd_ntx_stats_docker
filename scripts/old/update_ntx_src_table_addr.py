@@ -12,10 +12,10 @@ from decimal import *
 from datetime import datetime as dt
 import datetime
 from dotenv import load_dotenv
-from rpclib import def_credentials
+from lib_rpc import def_credentials
 from psycopg2.extras import execute_values
-from electrum_lib import get_ac_block_info
-from notary_lib import *
+from lib_electrum import get_ac_block_info
+from lib_notary import *
 
 '''
 This script scans the blockchain for notarisation txids that are not already recorded in the database.

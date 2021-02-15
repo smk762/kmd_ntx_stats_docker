@@ -12,10 +12,10 @@ from datetime import datetime as dt
 import datetime
 import dateutil.parser as dp
 from dotenv import load_dotenv
-from rpclib import def_credentials
-from electrum_lib import get_ac_block_info
+from lib_rpc import def_credentials
+from lib_electrum import get_ac_block_info
 from lib_const import *
-from notary_lib import *
+from lib_notary import *
 from lib_table_update import *
 from lib_table_select import *
 from lib_api import *

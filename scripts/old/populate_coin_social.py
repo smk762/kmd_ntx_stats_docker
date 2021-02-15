@@ -5,7 +5,7 @@ import time
 import requests
 import logging
 import logging.handlers
-import notary_lib
+import lib_notary
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -21,7 +21,7 @@ with open(os.path.dirname(os.path.abspath(__file__))+'/coins_social.json', 'r') 
     coin_social = json.load(j)
 
 
-conn = notary_lib.connect_db()
+conn = lib_notary.connect_db()
 cursor = conn.cursor()
 
 season = "Season_4"
@@ -35,7 +35,7 @@ for chain in coin_social:
     row_list.append(season)
     row_data = tuple(row_list)
 
-    notary_lib.update_coin_social_tbl(conn, cursor, row_data)
+    lib_notary.update_coin_social_tbl(conn, cursor, row_data)
    
 
 cursor.close()
