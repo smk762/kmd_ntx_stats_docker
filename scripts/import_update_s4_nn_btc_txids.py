@@ -62,11 +62,10 @@ for notary in NOTARIES["Season_4"]:
                     txid_data.num_inputs = row["num_inputs"]
                     txid_data.num_outputs = row["num_outputs"]
                     txid_data.update()
-            except:
+            except Exception as e:
                 logger.error(f"Something wrong with API? {txid_url}")
-    except:
+                logger.error(f"{e}")
+
+    except Exception as e:
         logger.error(f"Something wrong with API? {url}")
-
-
-cursor.close()
-conn.close()
+        logger.error(f"{e}")
