@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import time
 import math
-import electrum_lib
+import lib_electrum
 import logging
 import logging.handlers
-from notary_lib import *
-from rpclib import def_credentials
+from lib_notary import *
+from lib_rpc import def_credentials
 import threading
 from lib_const import *
 
@@ -48,7 +48,7 @@ def thread_electrum(conn, cursor, notary, chain, pubkey, addr, season):
         season = "Season_3"
     if season.find("Season_4") != -1:
         season = "Season_4"
-    balance = electrum_lib.get_balance(chain, pubkey, addr, notary, node)
+    balance = lib_electrum.get_balance(chain, pubkey, addr, notary, node)
     if balance != -1:
         row_data = (notary, chain, balance, addr,
                     season, node, int(time.time()))

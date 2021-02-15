@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from notary_lib import *
-from rpclib import *
+from lib_notary import *
+from lib_rpc import *
 import unittest
 
 '''

@@ -3,7 +3,7 @@ import json
 import requests
 import logging
 import logging.handlers
-from notary_lib import *
+from lib_notary import *
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()

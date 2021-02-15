@@ -3,7 +3,7 @@ import time
 import requests
 import logging
 import logging.handlers
-import notary_lib
+import lib_notary
 import lib_const
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ logger.setLevel(logging.INFO)
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/season4/elected_nn_social.json")
 nn_social = r.json()
 
-conn = notary_lib.connect_db()
+conn = lib_notary.connect_db()
 cursor = conn.cursor()
 
 season = "Season_4"
@@ -35,7 +35,7 @@ for notary in lib_const.NOTARY_PUBKEYS['Season_4']:
         row_list.append(season)
         row_data = tuple(row_list)
 
-        notary_lib.update_nn_social_tbl(conn, cursor, row_data)
+        lib_notary.update_nn_social_tbl(conn, cursor, row_data)
     
 
 cursor.close()

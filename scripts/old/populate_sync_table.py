@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import requests
-from notary_lib import *
+from lib_notary import *
 import socket
 import json
 import time
