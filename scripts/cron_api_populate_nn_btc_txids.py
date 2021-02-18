@@ -88,6 +88,24 @@ def is_notary_address(addr):
         return True
     return False
 
+def detect_ntx(vins, vouts):
+    if BTC_NTX_ADDR in addresses and len(vins) == 13 and len(vouts) == 2:
+        for vin in vins:
+            if vin["output_value"] != 10000:
+                return False
+
+        for vout in vouts:
+            if vout["addresses"] is not None:
+                if vout["addresses"] != BTC_NTX_ADDR:
+                    return False
+                if vout["value"] != 98800:
+                    return False
+
+        return True
+    else:
+        return False
+
+
 def detect_replenish(vins, vouts):
 
     vin_notaries = []
@@ -187,10 +205,12 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
 
     num_txids = len(txids)
 
+    j = 0
     for txid in txids:
+        j += 1
         # Get tx data from Blockcypher API
+        logger.info(f">>> Processing txid {j}/{num_txids}")
         tx_info = get_btc_tx_info(txid)
-
         if 'fees' in tx_info:
             txid_data = tx_row()
             txid_data.txid = txid
@@ -214,7 +234,6 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
             vouts = tx_info["outputs"]
             vins = tx_info["inputs"]
 
-
             ## CATEGORIES ##
             # SPAM index/outputs = 0
             # NTX
@@ -236,9 +255,38 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
                 txid_data.category = "SPAM"
                 txid_data.update()
 
-            # Detect NTX
-            elif BTC_NTX_ADDR in addresses and len(vins) == 13 and len(vouts) == 2:
-                txid_data.category = "NTX"
+            # Detect Split (single row only)
+            elif len(addresses) == 1:
+                txid_data.category = "Split"
+                txid_data.input_sats = -99
+                txid_data.output_sats = -99
+                txid_data.input_index = -99
+                txid_data.output_index = -99
+                txid_data.address = addresses[0]
+                txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
+                txid_data.update()
+
+            else:
+                # Detect NTX
+                if txid in ["9d29730c09f7d1983a413a14bb0b8ffcf0cb652472a428e97c250da03ae47082", "9bc103a16c477d55ba42e4fc97a6256e04813e9b947c895c6cd0e2f028bdfa67"] :
+                    txid_data.category = "MadMax personal top up"
+                elif txid in [
+                    "e4b2e4afa20b7cf39e96422bb72a522e0cb9fc49dbd4cfa5386b3733833365aa",
+                    "5d93f75414d6c581e8589339fe1915437a01b0e8ee4149a5fea508a080b1815e",
+                    "535bac3813dd0e36db503dbeef916f8e1198386a5909b1b7142a5984e91309c5",
+                    "f18186cd8a05f2a5148694ccbf95c4230b4b63183d835c9d88fed15b16c1db7d",
+                    "8737a7bb20e9f33e2c46a1c5d93b11d2c64f04e1cab4655eeb314e8e93f84ec6"
+                    ]:
+                    txid_data.category = "previous season funds transfer"
+                elif detect_ntx(vins, vouts):
+                    txid_data.category = "NTX"
+                elif detect_replenish(vins, vouts):
+                    txid_data.category = "Replenish"
+                elif detect_consolidate(vins, vouts):
+                    txid_data.category = "Consolidate"
+                else:
+                    txid_data.category = "Other"
+
                 input_index = 0
                 for vin in vins:
                     txid_data.output_sats = -1
@@ -255,114 +303,14 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
                     if vout["addresses"] is not None:
                         txid_data.input_index = -1
                         txid_data.input_sats = -1
+                        txid_data.address = vout["addresses"][0]
+                        txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
                         txid_data.output_sats = vout['value']
                         txid_data.output_index = output_index
-                        txid_data.address = vout["addresses"][0]
-                        txid_data.notary = "BTC_NTX_ADDR"
                         txid_data.update()
                         output_index += 1
-
-            # Detect Split (single row only)
-            elif len(addresses) == 1:
-                txid_data.category = "Split"
-                txid_data.input_sats = -99
-                txid_data.output_sats = -99
-                txid_data.input_index = -99
-                txid_data.output_index = -99
-                txid_data.address = addresses[0]
-                txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
-                txid_data.update()
-
-            else:
-                if txid in ["9d29730c09f7d1983a413a14bb0b8ffcf0cb652472a428e97c250da03ae47082", "9bc103a16c477d55ba42e4fc97a6256e04813e9b947c895c6cd0e2f028bdfa67"] :
-                    txid_data.category = "MadMax personal top up"
-                elif txid == "248ef589d50047a43d987f6af05ab8568f5a2070e25c3e1d3b063884948634ee":
-                    txid_data.category = "MadMax personal top up repaid"
-                elif txid in [
-                    "e4b2e4afa20b7cf39e96422bb72a522e0cb9fc49dbd4cfa5386b3733833365aa",
-                    "5d93f75414d6c581e8589339fe1915437a01b0e8ee4149a5fea508a080b1815e",
-                    "535bac3813dd0e36db503dbeef916f8e1198386a5909b1b7142a5984e91309c5",
-                    "f18186cd8a05f2a5148694ccbf95c4230b4b63183d835c9d88fed15b16c1db7d",
-                    "8737a7bb20e9f33e2c46a1c5d93b11d2c64f04e1cab4655eeb314e8e93f84ec6"
-                    ]:
-                    txid_data.category = "previous season funds transfer"
-                elif detect_replenish(vins, vouts):
-                    txid_data.category = "Replenish"
-                    input_index = 0
-                    for vin in vins:
-                        txid_data.output_sats = -1
-                        txid_data.output_index = -1
-                        txid_data.input_sats = vin['output_value']
-                        txid_data.input_index = input_index
-                        txid_data.address = vin["addresses"][0]
-                        txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
-                        txid_data.update()
-                        input_index += 1
-
-                    output_index = 0
-                    for vout in vouts:
-                        if vout["addresses"] is not None:
-                            txid_data.input_index = -1
-                            txid_data.input_sats = -1
-                            txid_data.address = vout["addresses"][0]
-                            txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
-                            txid_data.output_sats = vout['value']
-                            txid_data.output_index = output_index
-                            txid_data.update()
-                            output_index += 1
-
-                elif detect_consolidate(vins, vouts):
-                    txid_data.category = "Consolidate"
-                    input_index = 0
-                    for vin in vins:
-                        txid_data.output_sats = -1
-                        txid_data.output_index = -1
-                        txid_data.input_sats = vin['output_value']
-                        txid_data.input_index = input_index
-                        txid_data.address = vin["addresses"][0]
-                        txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
-                        txid_data.update()
-                        input_index += 1
-
-                    output_index = 0
-                    for vout in vouts:
-                        if vout["addresses"] is not None:
-                            txid_data.input_index = -1
-                            txid_data.input_sats = -1
-                            txid_data.address = vout["addresses"][0]
-                            txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
-                            txid_data.output_sats = vout['value']
-                            txid_data.output_index = output_index
-                            txid_data.update()
-                            output_index += 1
-
-                else:
-                    txid_data.category = "Other"
-
-                    input_index = 0
-                    for vin in vins:
-                        txid_data.output_sats = -1
-                        txid_data.output_index = -1
-                        txid_data.input_sats = vin['output_value']
-                        txid_data.input_index = input_index
-                        txid_data.address = vin["addresses"][0]
-                        txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
-                        txid_data.update()
-                        input_index += 1
-
-                    output_index = 0
-                    for vout in vouts:
-                        if vout["addresses"] is not None:
-                            txid_data.input_index = -1
-                            txid_data.input_sats = -1
-                            txid_data.address = vout["addresses"][0]
-                            txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
-                            txid_data.output_sats = vout['value']
-                            txid_data.output_index = output_index
-                            txid_data.update()
-                            output_index += 1
         else:
-            print("Fees not in txinfo! Likely unconfirmed...")
+            logger.warning(f"Fees not in txinfo for {txdi}! Likely unconfirmed...")
 
 cursor.close()
 conn.close()
