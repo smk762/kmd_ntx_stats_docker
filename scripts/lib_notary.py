@@ -332,20 +332,19 @@ def get_btc_ntxids(cursor, stop_block, exit=None):
     has_more=True
     before_block=None
     ntx_txids = []
-    page = 0
+    page = 1
     exit_loop = False
     existing_txids = get_existing_btc_ntxids(cursor)
     while has_more:
-        # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
-        if page >= API_PAGE_BREAK:
-            break
-        page += 1
-        logger.info("Page "+str(page))
+        logger.info(f"Getting TXIDs from API Page {page}...")
         resp = get_btc_address_txids(BTC_NTX_ADDR, before_block)
+        # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
+        if page > API_PAGE_BREAK:
+            break
         if "error" in resp:
-            page -= 1
             exit_loop = api_sleep_or_exit(resp, exit)
         else:
+            page += 1
             if 'txrefs' in resp:
                 tx_list = resp['txrefs']
                 for tx in tx_list:
@@ -357,7 +356,6 @@ def get_btc_ntxids(cursor, stop_block, exit=None):
                 has_more = resp['hasMore']
                 if has_more:
                     before_block = tx_list[-1]['block_height']
-                    logger.info("scannning back from block "+str(before_block))
                     if before_block < stop_block:
                         logger.info("Scanned to start of s4")
                         exit_loop = True
@@ -497,23 +495,21 @@ def update_BTC_notarisations(conn, cursor, stop_block=634000):
 
 def get_new_nn_btc_txids(existing_txids, notary_address):
     before_block=None
-    page = 0
+    page = 1
     exit_loop = False
     api_txids = []
     new_txids = []
     while True:
         # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
-        if page >= API_PAGE_BREAK:
+        if page > API_PAGE_BREAK:
             break
-        page += 1
-        logger.info("Page "+str(page))
+        logger.info(f"Getting TXIDs from API Page {page}...")
         resp = get_btc_address_txids(notary_address, before_block)
         if "error" in resp:
-            page -= 1
-            exit_loop = True
             logger.info(f"Error in resp: {resp}")
-            api_sleep_or_exit(resp, exit=None)
+            exit_loop = api_sleep_or_exit(resp, exit=None)
         else:
+            page += 1
             if 'txrefs' in resp:
                 tx_list = resp['txrefs']
                 before_block = tx_list[-1]['block_height']
@@ -528,8 +524,6 @@ def get_new_nn_btc_txids(existing_txids, notary_address):
                 if before_block < 634774:
                     logger.info("No more for s4!")
                     exit_loop = True
-
-                logger.info("scannning back from block "+str(before_block))
             else:
                 # exit loop if no more tx for address at api
                 logger.info("No more for address!")
@@ -539,13 +533,9 @@ def get_new_nn_btc_txids(existing_txids, notary_address):
             logger.info("exiting address txid loop!")
             break
 
-    logger.info(f"{len(api_txids)} TXIDs counted from API")
     num_api_txids = list(set((api_txids)))
     logger.info(f"{len(num_api_txids)} DISTINCT TXIDs counted from API")
 
-    logger.info(f"{len(new_txids)} NEW TXIDs counted from API")
-    new_txids = list(set((new_txids)))
-    logger.info(f"{len(new_txids)} DISTINCT NEW TXIDs counted from API")
     return new_txids
 
 

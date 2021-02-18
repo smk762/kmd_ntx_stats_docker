@@ -30,7 +30,11 @@ r = requests.get(url)
 try:
     resp = r.json()
     txid_list = resp["results"][0]
+
+    j = 0
+    num_txid = len(txid_list)
     for txid in txid_list:
+        logger.info(f">>> Importing {txid} for {j}/{num_txid}")
         txid_del = tx_row()
         txid_del.txid = txid
         txid_del.delete()
