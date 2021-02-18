@@ -26,13 +26,19 @@ this_server = os.getenv("this_server")
 conn = connect_db()
 cursor = conn.cursor()
 
+i = 0
+num_addr = len(NOTARY_BTC_ADDRESSES["Season_4"])
 for notary_address in NOTARY_BTC_ADDRESSES["Season_4"]:
-    logger.info(f">>> Categorising {notary_address} for {season}")
+    i += 1
+    logger.info(f">>> Categorising {notary_address} for {season} {i}/{num_addr}")
     txid_list = get_new_notary_txids(notary_address)
     logger.info(f"Processing ETA: {0.02*len(txid_list)} sec")
-    i = 1
-    j = 1
+
+    j = 0
+    num_txid = len(txid_list)
     for txid in txid_list:
+        j += 1
+        logger.info(f">>> Categorising {txid} for {j}/{num_txid}")
         txid_url = f"{other_server}/api/info/nn_btc_txid?txid={txid}"
         time.sleep(0.02)
         r = requests.get(txid_url)
