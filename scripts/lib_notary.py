@@ -186,22 +186,22 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD"):
 
     seasons = list(SEASONS_INFO.keys())[::-1]
     notary_seasons = []
-    last_season_num = None
+    last_season = None
 
     for season in seasons:
 
-        if last_season_num != season_num:
+        if last_season != season:
             notary_seasons = []
 
         season_notaries = list(notary_addresses[season].keys())
         for notary in season_notaries:
             addr = notary_addresses[season][notary][tx_chain]
             if addr in address_list:
-                notary_seasons.append(season_num)
+                notary_seasons.append(season)
 
         if len(notary_seasons) == 13:
             break
-        last_season_num = season_num
+        last_season_num = season
 
     if len(notary_seasons) == 13 and len(set(notary_seasons)) == 1:
         return notary_seasons[0]
@@ -919,7 +919,7 @@ def validate_ntx_vouts(vouts):
     return False
 
 def get_category_from_vins_vouts(tx_vins, tx_vouts, season):
-
+    # TODO: Align this with api populate script
     notary_vins = []
     notary_vouts = []
     non_notary_vins = []
