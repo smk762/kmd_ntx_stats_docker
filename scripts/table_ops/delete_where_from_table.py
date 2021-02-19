@@ -19,8 +19,8 @@ print(cursor.fetchall())
 #    cursor.execute(f"DELETE FROM {table} WHERE category='{i}';")
 #    conn.commit()
 
-#cursor.execute("DELETE FROM "+table+" WHERE category='Other' or category='Replenished' or address='SPAM';")
 cursor.execute("DELETE FROM "+table+" WHERE category='Other';")
+#cursor.execute("DELETE FROM "+table+" WHERE category='No Vout NTX' or category='Low Vin NTX' or category='Incoming Replenish';")
 
 #cursor.execute("DELETE FROM "+table+" WHERE txid='b05e743a6ad8e419aef37d2c4a0f3882e4737115fe26812c7289df3372a4167f';")
 conn.commit()
