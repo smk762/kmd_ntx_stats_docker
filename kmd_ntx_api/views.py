@@ -1184,8 +1184,10 @@ def notary_btc_txids(request):
         resp = get_btc_txid_notary(request.GET['notary'], request.GET['category'])
     elif 'notary' in request.GET:
         resp = get_btc_txid_notary(request.GET['notary'])
+    elif 'category' in request.GET:
+        resp = get_btc_txid_notary(None, request.GET['category'])
     else:
-        resp = {"error":"You need to specify a NOTARY like '/nn_btc_txid?notary=dragonhound_NA'. Category param is optional, e.g. '/nn_btc_txid?notary=dragonhound_NA&category=NTX'"}
+        resp = {"error":"You need to specify a NOTARY or CATEGORY like '/nn_btc_txid?notary=dragonhound_NA' or '/nn_btc_txid?notary=dragonhound_NA&category=NTX'"}
     return JsonResponse(resp)
 
 def nn_btc_txid_list(request):

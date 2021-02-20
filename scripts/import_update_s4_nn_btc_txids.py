@@ -34,6 +34,7 @@ try:
     j = 0
     num_txid = len(txid_list)
     for txid in txid_list:
+        j += 1
         logger.info(f">>> Importing {txid} for {j}/{num_txid}")
         txid_del = tx_row()
         txid_del.txid = txid
