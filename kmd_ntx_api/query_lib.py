@@ -1052,14 +1052,18 @@ def get_btc_txid_list(notary=None, season=None):
     resp = list(set(resp))
     return wrap_api(resp)
 
-def get_btc_txid_notary(notary, category=None):
+def get_btc_txid_notary(notary= None, category=None):
     resp = {}
     txid_list = []
     txid_season_list = {}
-    if category:
+    if category and notary:
         data = nn_btc_tx.objects.filter(notary=notary, category=category).values()
-    else:
+    elif category:
+        data = nn_btc_tx.objects.filter(category=category).values()
+    elif notary:
         data = nn_btc_tx.objects.filter(notary=notary).values()
+    else:
+        data = []
     for item in data:
         if item['season'] not in resp:
             resp.update({item['season']:{}})
