@@ -119,27 +119,7 @@
         "website": "",
         "youtube": ""
     },
-    "ETOMIC": {
-        "discord": "",
-        "explorer": "",
-        "github": "",
-        "icon": "",
-        "telegram": "",
-        "twitter": "",
-        "website": "",
-        "youtube": ""
-    },
-    "GAME": {
-        "discord": "",
-        "explorer": "",
-        "github": "",
-        "icon": "",
-        "telegram": "",
-        "twitter": "",
-        "website": "",
-        "youtube": ""
-    },
-    "GIN": {
+    "GleecBTC": {
         "discord": "",
         "explorer": "",
         "github": "",
@@ -150,16 +130,6 @@
         "youtube": ""
     },
     "HODL": {
-        "discord": "",
-        "explorer": "",
-        "github": "",
-        "icon": "",
-        "telegram": "",
-        "twitter": "",
-        "website": "",
-        "youtube": ""
-    },
-    "HUSH3": {
         "discord": "",
         "explorer": "",
         "github": "",
@@ -189,7 +159,7 @@
         "website": "",
         "youtube": ""
     },
-    "K64": {
+    "KMD": {
         "discord": "",
         "explorer": "",
         "github": "",
@@ -198,16 +168,6 @@
         "twitter": "",
         "website": "",
         "youtube": ""
-    },
-    "KMD": {
-        "discord": "412898016371015680",
-        "explorer": "https://komodod.com/",
-        "github": "https://github.com/komodoplatform",
-        "icon": "",
-        "telegram": "https://t.me/atomicDEX",
-        "twitter": "https://twitter.com/KomodoPlatform/",
-        "website": "https://komodoplatform.com/",
-        "youtube": "https://www.youtube.com/channel/UCtp7YrrEnZbW97sgPldyvKg"
     },
     "KOIN": {
         "discord": "",
@@ -219,17 +179,7 @@
         "website": "",
         "youtube": ""
     },
-    "KSB": {
-        "discord": "",
-        "explorer": "",
-        "github": "",
-        "icon": "",
-        "telegram": "",
-        "twitter": "",
-        "website": "",
-        "youtube": ""
-    },
-    "KV": {
+    "MCL": {
         "discord": "",
         "explorer": "",
         "github": "",
@@ -299,7 +249,7 @@
         "website": "",
         "youtube": ""
     },
-    "OUR": {
+    "PANGEA": {
         "discord": "",
         "explorer": "",
         "github": "",
@@ -309,7 +259,7 @@
         "website": "",
         "youtube": ""
     },
-    "PANGEA": {
+    "PBC": {
         "discord": "",
         "explorer": "",
         "github": "",
@@ -349,27 +299,7 @@
         "website": "",
         "youtube": ""
     },
-    "RFOX": {
-        "discord": "",
-        "explorer": "",
-        "github": "",
-        "icon": "",
-        "telegram": "",
-        "twitter": "",
-        "website": "",
-        "youtube": ""
-    },
     "RICK": {
-        "discord": "",
-        "explorer": "",
-        "github": "",
-        "icon": "",
-        "telegram": "",
-        "twitter": "",
-        "website": "",
-        "youtube": ""
-    },
-    "SEC": {
         "discord": "",
         "explorer": "",
         "github": "",
@@ -409,16 +339,6 @@
         "website": "",
         "youtube": ""
     },
-    "VOTE2020": {
-        "discord": "",
-        "explorer": "",
-        "github": "",
-        "icon": "",
-        "telegram": "",
-        "twitter": "",
-        "website": "",
-        "youtube": ""
-    },
     "VRSC": {
         "discord": "",
         "explorer": "",
@@ -430,16 +350,6 @@
         "youtube": ""
     },
     "WLC21": {
-        "discord": "",
-        "explorer": "",
-        "github": "",
-        "icon": "",
-        "telegram": "",
-        "twitter": "",
-        "website": "",
-        "youtube": ""
-    },
-    "ZEXO": {
         "discord": "",
         "explorer": "",
         "github": "",

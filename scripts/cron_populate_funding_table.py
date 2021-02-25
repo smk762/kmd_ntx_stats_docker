@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
-import time
 import logging
 import logging.handlers
-from datetime import datetime as dt
-import datetime
 import requests
-import psycopg2
-from decimal import *
-from psycopg2.extras import execute_values
-from lib_notary import *
-from lib_rpc import def_credentials
+from lib_notary import get_notary_from_address, get_season
+from models import funding_row
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -24,29 +18,18 @@ try:
 except:
     funding_tx = []
 
-conn = connect_db()
-cursor = conn.cursor()
-
 for item in funding_tx:
-    row_list = []
-    row_list.append(item["chain"])
-    row_list.append(item["txid"])
-    row_list.append(item["vout"])
-    row_list.append(item["amount"])
-    row_list.append(item["block_hash"])
-    row_list.append(item["block_height"])
-    row_list.append(item["block_time"])
-    row_list.append(item["category"])
-    row_list.append(item["fee"])
-    row_list.append(item["address"])
-    notary = get_notary_from_address(item["address"])
-    row_list.append(notary)
-    row_list.append(get_season(int(item["block_time"])))
-    row_data = tuple(row_list)
-
-    update_funding_tbl(conn, cursor, row_data)
-
-
-cursor.close()
-
-conn.close()
+    row = funding_row()
+    row.chain = item["chain"]
+    row.txid = item["txid"]
+    row.vout = item["vout"]
+    row.amount = item["amount"]
+    row.block_hash = item["block_hash"]
+    row.block_height = item["block_height"]
+    row.block_time = item["block_time"]
+    row.category = item["category"]
+    row.fee = item["fee"]
+    row.address = item["address"]
+    row.notary = get_notary_from_address(item["address"])
+    row.season = get_season(int(item["block_time"]))
+    row.update()

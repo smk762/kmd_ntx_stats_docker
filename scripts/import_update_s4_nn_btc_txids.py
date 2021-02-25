@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-import os
-import sys
 import json
 import time
 import logging
 import logging.handlers
-import psycopg2
 import requests
-from dotenv import load_dotenv
-from lib_notary import *
+from lib_const import OTHER_SERVER
+from models import tx_row
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -17,14 +14,8 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-load_dotenv()
-other_server = os.getenv("other_server")
-this_server = os.getenv("this_server")
 
-conn = connect_db()
-cursor = conn.cursor()
-
-url = f"{other_server}/api/info/nn_btc_txid_list"
+url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list"
 time.sleep(0.02)
 r = requests.get(url)
 try:
@@ -40,7 +31,7 @@ try:
         txid_del.txid = txid
         txid_del.delete()
 
-        txid_url = f"{other_server}/api/info/nn_btc_txid?txid={txid}"
+        txid_url = f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={txid}"
         time.sleep(0.02)
         r = requests.get(txid_url)
         try:

@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
-import os
-import sys
 import json
 import time
 import logging
 import logging.handlers
-import psycopg2
 import requests
-from dotenv import load_dotenv
-from lib_const import *
-from lib_notary import *
+from lib_const import NOTARY_BTC_ADDRESSES, OTHER_SERVER
+from lib_notary import get_new_notary_txids
+from models import tx_row
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -18,17 +15,11 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-load_dotenv()
-
-other_server = os.getenv("other_server")
-this_server = os.getenv("this_server")
-
-conn = connect_db()
-cursor = conn.cursor()
+season = "Season_4"
 
 i = 0
-num_addr = len(NOTARY_BTC_ADDRESSES["Season_4"])
-for notary_address in NOTARY_BTC_ADDRESSES["Season_4"]:
+num_addr = len(NOTARY_BTC_ADDRESSES[season])
+for notary_address in NOTARY_BTC_ADDRESSES[season]:
     i += 1
     logger.info(f">>> Categorising {notary_address} for {season} {i}/{num_addr}")
     txid_list = get_new_notary_txids(notary_address)
@@ -39,7 +30,7 @@ for notary_address in NOTARY_BTC_ADDRESSES["Season_4"]:
     for txid in txid_list:
         j += 1
         logger.info(f">>> Categorising {txid} for {j}/{num_txid}")
-        txid_url = f"{other_server}/api/info/nn_btc_txid?txid={txid}"
+        txid_url = f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={txid}"
         time.sleep(0.02)
         r = requests.get(txid_url)
         try:
@@ -67,5 +58,5 @@ for notary_address in NOTARY_BTC_ADDRESSES["Season_4"]:
         except:
             logger.error(f"Something wrong with API? {txid_url}")
 
-cursor.close()
-conn.close()
+CURSOR.close()
+CONN.close()

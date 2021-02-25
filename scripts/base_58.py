@@ -1,4 +1,7 @@
+import bitcoin
+from bitcoin.core import x
 from bitcoin.core import CoreMainParams
+from bitcoin.wallet import P2PKHBitcoinAddress
 
 class KMD_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
@@ -35,13 +38,6 @@ class GAME_CoinParams(CoreMainParams):
                        'SCRIPT_ADDR': 5,
                        'SECRET_KEY': 166}
 
-class GIN_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 38,
-                       'SCRIPT_ADDR': 10,
-                       'SECRET_KEY': 198}
-
 class GLEEC_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
     DEFAULT_PORT = 7770
@@ -49,17 +45,19 @@ class GLEEC_CoinParams(CoreMainParams):
                        'SCRIPT_ADDR': 38,
                        'SECRET_KEY': 65}
 
-coin_params = {
+COIN_PARAMS = {
     "KMD": KMD_CoinParams,
     "MCL": KMD_CoinParams,
     "PBC": KMD_CoinParams,
     "CHIPS": KMD_CoinParams,
     "VRSC": KMD_CoinParams,
-    "HUSH3": KMD_CoinParams,
     "BTC": BTC_CoinParams,
     "AYA": AYA_CoinParams,
     "EMC2": EMC2_CoinParams,
     "GAME": GAME_CoinParams,
-    "GIN": GIN_CoinParams,
     "GleecBTC": GLEEC_CoinParams
 }
+
+def get_addr_from_pubkey(coin, pubkey):
+    bitcoin.params = COIN_PARAMS[coin]
+    return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
