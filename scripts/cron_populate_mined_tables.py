@@ -4,133 +4,101 @@ import logging
 import logging.handlers
 from datetime import datetime as dt
 import datetime
-import psycopg2
-from lib_rpc import def_credentials
-from decimal import *
-from psycopg2.extras import execute_values
-from lib_notary import *
+
+from lib_const import SEASONS_INFO, SKIP_PAST_SEASONS, SKIP_UNTIL_YESTERDAY, RPC
+from lib_table_select import select_from_table, get_season_mined_counts
+from lib_notary import get_season, update_miner, get_season_notaries, get_daily_mined_counts
+from models import season_mined_count_row
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
-Formatterr = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s',
+                              datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 ''' 
 This script is intended to run as a cronjob every 5-15 minutes.
-It rescans the last 100 blocks in the database (configurable with "scan_depth" variable) to realign potential orphaned blocks in the database
-Next, it retrieves info from the block chain for blocks not yet in the database and updates the mined table.
-Lastly, it updates the mined_count_season and mined_count_daily tables with aggregated stats for each notar season.
+It rescans the last 100 blocks in the database
+(configurable with "scan_depth" variable) to realign potential
+orphaned blocks in the database.
+Next, it retrieves info from the block chain for blocks not yet
+in the database and updates the mined table.
+Lastly, it updates the mined_count_season and mined_count_daily
+tables with aggregated stats for each notary season.
 '''
-
-# set this to False in .env when originally populating the table, or rescanning
-skip_past_seasons = os.getenv("skip_past_seasons")
-
-# set this to True in .env to quickly update tables with most recent data
-skip_until_yesterday = os.getenv("skip_until_yesterday")
 
 scan_depth = 100
 
-conn = connect_db()
-cursor = conn.cursor()
-
 season = get_season(int(time.time()))
 
-rpc = {}
-rpc["KMD"] = def_credentials("KMD")
 
-def bulk_load_mined_blocks(conn, cursor, season):
-    # Scanning recently added blocks to recify orphans
-    recorded_txids = []
-    db_txids =  select_from_table(cursor, 'mined', 'txid')
-    for txid in db_txids:
-        recorded_txids.append(txid[0])
+def update_mined_blocks(season):
 
     # re-check last ten recorded blocks in case of orphans
-    tip = int(rpc["KMD"].getblockcount())
-    scan_blocks = [*range(tip-10,tip,1)]
-    
-    for block in scan_blocks:
-        logger.info("scanning block "+str(block)+"...")
-        row_data = get_miner(block)
-        logger.info("UPDATING BLOCK: "+str(block))
-        update_mined_tbl(conn, cursor, row_data)
+    tip = int(RPC["KMD"].getblockcount())
+    start_block = SEASONS_INFO[season]["start_block"]
+    scan_blocks = [*range(tip-100,tip,1)]
+    all_blocks = [*range(start_block,tip,1)]
 
     # adding new blocks...
-    records = []
     start = time.time()
-    existing_blocks = select_from_table(cursor, 'mined', 'block_height')
-    tip = int(rpc["KMD"].getblockcount())
-    all_blocks = [*range(SEASONS_INFO[season]["start_block"],tip,1)]
-    recorded_blocks = []
+    existing_blocks = select_from_table('mined', 'block_height')
 
+    recorded_blocks = []
     for block in existing_blocks:
         recorded_blocks.append(block[0])
 
+    logger.info(f"{len(existing_blocks)} in mined table in db")
+    
     unrecorded_blocks = set(all_blocks) - set(recorded_blocks)
-    logger.info("Blocks in database: "+str(len(recorded_blocks)))
-    logger.info(season+" blocks in chain: "+str(len(all_blocks)))
-    logger.info(season+" blocks not in database: "+str(len(unrecorded_blocks)))
-    i = 1
-    start_block = SEASONS_INFO[season]["start_block"]
+    logger.info(f"{len(unrecorded_blocks)} not in mined table in db")
 
-    if skip_until_yesterday:
-        start_block = tip-2*24*60
+    scan_blocks = list(set(list(unrecorded_blocks) + scan_blocks))
+    logger.info(f"{len(scan_blocks)} blocks to scan")
 
-    for block in unrecorded_blocks:
-
+    time.sleep(4)
+    for block in scan_blocks:
         if block >= start_block:
-            row_data = get_miner(block)
-            records.append(row_data)
+            update_miner(block)
 
-            if len(records) == 1000:
-                now = time.time()
-                pct = round(len(records)*i/len(unrecorded_blocks)*100,3)
-                runtime = int(now-start)
-                est_end = int(100/pct*runtime)
-                logger.info(str(pct)+"% :"+str(len(records)*i)+"/"+str(len(unrecorded_blocks))+" records added to db \
-                         ["+str(runtime)+"/"+str(est_end)+" sec]")
-                execute_values(cursor, "INSERT INTO mined (block_height, block_time, block_datetime, value, address, name, txid, season) VALUES %s", records)
-                conn.commit()
-                records = []
-                logger.info(str(len(records))+" Blocks added to db")
-                i += 1
 
-    execute_values(cursor, "INSERT INTO mined (block_height, block_time, block_datetime, value, address, name, txid, season) VALUES %s", records)
-    conn.commit()
-    logger.info("Finished!")
-    logger.info(str(len(unrecorded_blocks))+" mined blocks added to table")
-
-if skip_past_seasons:
-    bulk_load_mined_blocks(conn, cursor, season)
+if SKIP_PAST_SEASONS:
+    update_mined_blocks(season)
 
     season_notaries = get_season_notaries(season)
-    results = get_season_mined_counts(cursor, season, season_notaries)
-    time_stamp = int(time.time())
+    results = get_season_mined_counts(season, season_notaries)
 
     for item in results:
-        row_data = (item[0], season, int(item[1]), float(item[2]), float(item[3]),
-                    int(item[4]), int(item[5]), int(time_stamp))
+        row = season_mined_count_row()
+        row.notary = item[0]
+        row.season = season
+        row.blocks_mined = int(item[1])
+        row.sum_value_mined = float(item[2])
+        row.max_value_mined = float(item[3])
+        row.last_mined_blocktime = int(item[4])
+        row.last_mined_block = int(item[5])
+        row.update()
 
-        if item[0] in season_notaries:
-            logger.info("Adding "+str(row_data)+" to season_mined_counts table")
-        result = update_season_mined_count_tbl(conn, cursor, row_data)
 else:
     # updating season mined count aggregate table
     for season in SEASONS_INFO:
-        bulk_load_mined_blocks(conn, cursor, season)
+        update_mined_blocks(season)
 
         season_notaries = get_season_notaries(season)
-        results = get_season_mined_counts(cursor, season, season_notaries)
-        time_stamp = int(time.time())
+        results = get_season_mined_counts(season, season_notaries)
 
         for item in results:
-            row_data = (item[0], season, int(item[1]), float(item[2]), float(item[3]),
-                        int(item[4]), int(item[5]), int(time_stamp))
-            if item[0] in season_notaries:
-                logger.info("Adding "+str(row_data)+" to season_mined_counts table")
-            result = update_season_mined_count_tbl(conn, cursor, row_data)
+            row = season_mined_count_row()
+            row.notary = item[0]
+            row.season = season
+            row.blocks_mined = int(item[1])
+            row.sum_value_mined = float(item[2])
+            row.max_value_mined = float(item[3])
+            row.last_mined_blocktime = int(item[4])
+            row.last_mined_block = int(item[5])
+            row.update()
 
 # updating daily mined count aggregate table
 
@@ -140,17 +108,14 @@ season_start_dt = dt.fromtimestamp(season_start_time)
 start = season_start_dt.date()
 end = datetime.date.today()
 
-if skip_until_yesterday:
+if SKIP_UNTIL_YESTERDAY:
     start = end - datetime.timedelta(days=7)
 
 delta = datetime.timedelta(days=1)
-logger.info("Aggregating daily notary notarisations from "+str(start)+" to "+str(end))
+logger.info("Aggregating daily mined counts from "+str(start)+" to "+str(end))
 day = start
 
 while day <= end:
-    get_daily_mined_counts(conn, cursor, day)
+    get_daily_mined_counts(day)
     day += delta
 logger.info("Finished!")
-
-cursor.close()
-conn.close()

@@ -14,8 +14,6 @@ from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
 from datetime import datetime as dt
 import dateutil.parser as dp
-from dotenv import load_dotenv
-from lib_rpc import def_credentials
 import logging
 import logging.handlers
 from base_58 import *
@@ -23,126 +21,9 @@ from lib_const import *
 from lib_api import *
 from lib_table_update import *
 from lib_table_select import *
-
-load_dotenv()
-other_server = os.getenv("other_server")
-this_server = os.getenv("this_server")
+from models import *
 
 logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
-
-API_PAGE_BREAK = int(os.getenv("API_PAGE_BREAK"))
-
-class tx_row():
-    def __init__(self, txid='', block_hash='', block_height='',
-                 block_time='', block_datetime='', address='',
-                 notary='non-NN', season='', category='Other',
-                 input_index=-1, input_sats=-1, output_index=-1,
-                 output_sats=-1, fees=-1, num_inputs=0,
-                 num_outputs=0):
-        self.txid = txid
-        self.block_hash = block_hash
-        self.block_height = block_height
-        self.block_time = block_time
-        self.block_datetime = block_datetime
-        self.address = address
-        self.notary = notary
-        self.season = season
-        self.category = category
-        self.input_index = input_index
-        self.input_sats = input_sats
-        self.output_index = output_index
-        self.output_sats = output_sats
-        self.fees = fees
-        self.num_inputs = num_inputs
-        self.num_outputs = num_outputs
-
-        if self.category == "SPAM":
-            self.input_index = 0
-            self.input_sats = 0
-            self.output_index = 0
-            self.output_sats = 0
-
-        if self.category == "Split":
-            self.input_index = -99
-            self.input_sats = -99
-            self.output_index = -99
-            self.output_sats = -99
-
-        if self.address == BTC_NTX_ADDR:
-            self.notary = "BTC_NTX_ADDR"
-
-    def validated(self):
-
-        for i in [
-            self.txid, self.block_hash, self.block_height,
-            self.block_time, self.block_datetime, self.address,
-            self.season, self.block_hash, self.txid, self.block_hash
-            ]:
-
-            if i == '':
-                return False
-
-        return True
-
-    def update(self):
-        row_data = (
-            self.txid, self.block_hash, self.block_height,
-            self.block_time, self.block_datetime, self.address,
-            self.notary, self.season, self.category, self.input_index,
-            self.input_sats, self.output_index, self.output_sats,
-            self.fees, self.num_inputs, self.num_outputs
-        )
-        if self.validated():
-            if self.input_index != -1:
-                logger.info(f"Adding {self.season} {self.txid} {self.category} for {self.notary} VIN {self.input_index}")
-            elif self.output_index != -1:
-                logger.info(f"Adding {self.season} {self.txid} {self.category} for {self.notary} VOUT {self.output_index}")
-            else:
-                logger.info(f"Adding {self.season} {self.txid} {self.category} for {self.notary}")
-            update_nn_btc_tx_row(conn, cursor, row_data)
-        else:
-            logger.warning(f"Row data invalid!")
-            logger.warning(f"{other_server}/api/info/nn_btc_txid?txid={self.txid}")
-            logger.warning(f"{row_data}")
-
-    def insert(self):
-        row_data = (
-            self.txid, self.block_hash, self.block_height,
-            self.block_time, self.block_datetime, self.address,
-            self.notary, self.season, self.category, self.input_index,
-            self.input_sats, self.output_index, self.output_sats,
-            self.fees, self.num_inputs, self.num_outputs
-        )
-        if self.validated():
-            if self.input_index != -1:
-                logger.info(f"Inserting {self.season} {self.txid} {self.category} for {self.notary} VIN {self.input_index}")
-            elif self.output_index != -1:
-                logger.info(f"Inserting {self.season} {self.txid} {self.category} for {self.notary} VOUT {self.output_index}")
-            else:
-                logger.info(f"Inserting {self.season} {self.txid} {self.category} for {self.notary}")
-            insert_nn_btc_tx_row(conn, cursor, row_data)
-        else:
-            logger.warning(f"Row data invalid!")
-            logger.warning(f"{other_server}/api/info/nn_btc_txid?txid={self.txid}")
-            logger.warning(f"{row_data}")
-
-    def delete(self):
-        delete_nn_btc_tx_transaction(conn, cursor, self.txid)
-            
-def connect_db():
-    conn = psycopg2.connect(
-        host='localhost',
-        user=os.getenv("DB_USER"),
-        password=os.getenv("PASSWORD"),
-        port = "7654",
-        database='postgres'
-    )
-    return conn
 
 def get_season_notaries(season):
     notaries = []
@@ -173,9 +54,9 @@ def get_season_from_block(block):
 
 def get_seasons_from_address(addr, chain="KMD"):
     addr_seasons = []
-    for season in notary_addresses:
-        for notary in notary_addresses[season]:
-            season_addr = notary_addresses[season][notary][chain]
+    for season in NOTARY_ADDRESSES_DICT:
+        for notary in NOTARY_ADDRESSES_DICT[season]:
+            season_addr = NOTARY_ADDRESSES_DICT[season][notary][chain]
             if addr == season_addr:
                 addr_seasons.append(season)
     return addr_seasons
@@ -193,9 +74,9 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD"):
         if last_season != season:
             notary_seasons = []
 
-        season_notaries = list(notary_addresses[season].keys())
+        season_notaries = list(NOTARY_ADDRESSES_DICT[season].keys())
         for notary in season_notaries:
-            addr = notary_addresses[season][notary][tx_chain]
+            addr = NOTARY_ADDRESSES_DICT[season][notary][tx_chain]
             if addr in address_list:
                 notary_seasons.append(season)
 
@@ -223,27 +104,17 @@ def get_season_from_btc_addresses(address_list, time_stamp):
 
     return get_season(time_stamp)
 
-def get_known_addr(coin, season):
-    # k:v dict for matching address to owner
-    # TODO: add pool addresses
-    addresses = {}
-    bitcoin.params = coin_params[coin]
-    for notary in NOTARY_PUBKEYS[season]:
-        addr = str(P2PKHBitcoinAddress.from_pubkey(x(NOTARY_PUBKEYS[season][notary])))
-        addresses.update({addr:notary})
-
-    return addresses
 
 def get_notary_from_address(address):
-    if address in known_addresses:
-        return known_addresses[address]
+    if address in KNOWN_ADDRESSES:
+        return KNOWN_ADDRESSES[address]
     return "unknown"
 
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
 
 def get_ntx_txids(NTX_ADDR, start, end):
-    return rpc["KMD"].getaddresstxids({"addresses": [NTX_ADDR], "start":start, "end":end})
+    return RPC["KMD"].getaddresstxids({"addresses": [NTX_ADDR], "start":start, "end":end})
   
 def get_ticker(scriptPubKeyBinary):
     chain = ''
@@ -262,7 +133,7 @@ def get_ticker(scriptPubKeyBinary):
     return str(chain)
 
 def get_ntx_data(txid):
-    raw_tx = rpc["KMD"].getrawtransaction(txid,1)
+    raw_tx = RPC["KMD"].getrawtransaction(txid,1)
     block_hash = raw_tx['blockhash']
     dest_addrs = raw_tx["vout"][0]['scriptPubKey']['addresses']
     block_time = raw_tx['blocktime']
@@ -276,8 +147,8 @@ def get_ntx_data(txid):
                 for item in raw_tx['vin']:
                     if "address" in item:
                         address_list.append(item['address'])
-                        if item['address'] in known_addresses:
-                            notary = known_addresses[item['address']]
+                        if item['address'] in KNOWN_ADDRESSES:
+                            notary = KNOWN_ADDRESSES[item['address']]
                             notary_list.append(notary)
                         else:
                             notary_list.append(item['address'])
@@ -328,13 +199,13 @@ def get_ntx_data(txid):
             # These are outgoing, and should not polute the DB.
             return None
 
-def get_btc_ntxids(cursor, stop_block, exit=None):
+def get_btc_ntxids(stop_block, exit=None):
     has_more=True
     before_block=None
     ntx_txids = []
     page = 1
     exit_loop = False
-    existing_txids = get_existing_btc_ntxids(cursor)
+    existing_txids = get_existing_btc_ntxids()
     while has_more:
         logger.info(f"Getting TXIDs from API Page {page}...")
         resp = get_btc_address_txids(BTC_NTX_ADDR, before_block)
@@ -368,129 +239,12 @@ def get_btc_ntxids(cursor, stop_block, exit=None):
                 logger.info("No more tx to scan!")
                 exit_loop = True
                 
-        if exit_loop or page >= int(os.getenv("btc_validate_pages")):
+        if exit_loop or page >= API_PAGE_BREAK:
             logger.info("exiting address txid loop!")
             break
     ntx_txids = list(set((ntx_txids)))
     return ntx_txids
 
-def update_BTC_notarisations(conn, cursor, stop_block=634000):
-    # Get existing data to avoid unneccesary updates 
-    existing_txids = get_existing_btc_ntxids(cursor)
-    notary_last_ntx = get_notary_last_ntx(cursor)
-
-    # Loop API queries to get BTC ntx
-    ntx_txids = get_btc_ntxids(cursor, stop_block, False)
-
-    with open("btc_ntx_txids.json", 'w+') as f:
-        f.write(json.dumps(ntx_txids))
-
-    i=0
-    for btc_txid in ntx_txids:
-        logger.info("TXID: "+btc_txid)
-
-        logger.info("Processing ntxid "+str(i)+"/"+str(len(ntx_txids)))
-        i += 1
-        tx_info = get_btc_tx_info(btc_txid, False)
-
-        if "error" in tx_info:
-            exit_loop = True
-
-        elif 'block_height' in tx_info:
-
-            block_height = tx_info['block_height']
-            block_hash = tx_info['block_hash']
-            block_time_iso8601 = tx_info['confirmed']
-            parsed_time = dp.parse(block_time_iso8601)
-            block_time = parsed_time.strftime('%s')
-            block_datetime = dt.utcfromtimestamp(int(block_time))
-            logger.info("Block datetime "+str(block_datetime))
-
-            addresses = tx_info['addresses'][:]
-            fees = tx_info['fees']
-            num_outputs = tx_info['vout_sz']
-            num_inputs = tx_info['vin_sz']
-            vouts = tx_info["outputs"]
-            vins = tx_info["inputs"]
-            if '1See1xxxx1memo1xxxxxxxxxxxxxBuhPF' not in addresses:
-                notaries = get_notaries_from_addresses(addresses)
-                print(notaries)
-                season = get_season_from_btc_addresses(addresses, block_time)
-                for notary in notaries:
-                    result = 0
-                    last_ntx_row_data = (notary, "BTC", btc_txid, block_height,
-                                         block_time, season)
-                    if notary in notary_last_ntx:
-                        if "BTC" not in notary_last_ntx[notary]:
-                            notary_last_ntx[notary].update({"BTC":0})
-
-                        if int(block_height) > int(notary_last_ntx[notary]["BTC"]):
-                            result = update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
-                    else:
-                        result = update_last_ntx_tbl(conn, cursor, last_ntx_row_data)
-                    if result == 1:
-                        logger.info("last_ntx_tbl updated!")
-                    else:
-                        logger.warning("last_ntx_tbl not updated!")
-
-                if len(tx_info['outputs']) > 0:
-                    if 'data_hex' in tx_info['outputs'][-1]:
-                        opret = tx_info['outputs'][-1]['data_hex']
-
-                        r = requests.get('http://notary.earth:8762/api/tools/decode_opreturn/?OP_RETURN='+opret)
-                        kmd_ntx_info = r.json()
-
-                        ac_ntx_height = kmd_ntx_info['notarised_block']
-                        ac_ntx_blockhash = kmd_ntx_info['notarised_blockhash']
-
-                        # Update "notarised" table
-                        row_data = ('BTC', block_height, block_time, block_datetime,
-                                    block_hash, notaries, ac_ntx_blockhash, ac_ntx_height,
-                                    btc_txid, opret, season, "true")
-                        update_ntx_records(conn, cursor, [row_data])
-                        logger.info("Row inserted")
-
-                        input_index = 0
-
-                        category = "NTX"
-                        for vin in vins:
-                            address = vin["addresses"][0]
-
-                            notary_name = get_notary_from_btc_address(address)
-
-                            input_sats = vin['output_value']
-                            output_index = -1
-                            output_sats = -1
-
-                            row_data = (btc_txid, block_hash, block_height, block_time,
-                                        block_datetime, address, notary_name, season, category,
-                                        input_index, input_sats, output_index,
-                                        output_sats, fees, num_inputs, num_outputs)
-                            logger.info("Adding "+btc_txid+" vin "+str(input_index)+" "+str(notary_name)+" "+str(address)+" ("+category.upper()+")")
-                            update_nn_btc_tx_row(conn, cursor, row_data)
-
-                            input_index += 1
-
-                        output_index = 0
-                        for vout in vouts:
-                            if vout["addresses"] is not None:
-                                address = vout["addresses"][0]
-
-                                notary_name = get_notary_from_btc_address(address)
-
-                                input_index = -1
-                                input_sats = -1
-                                output_sats = vout['value']
-                                row_data = (btc_txid, block_hash, block_height, block_time,
-                                            block_datetime, address, notary_name, season, category,
-                                            input_index, input_sats, output_index,
-                                            output_sats, fees, num_inputs, num_outputs)
-
-                                logger.info("Adding "+btc_txid+" vout "+str(output_index)+" "+str(notary_name)+" "+str(address)+" ("+category.upper()+")")
-                                update_nn_btc_tx_row(conn, cursor, row_data)
-                                output_index += 1
-            else:
-                print("SPAM")
 
 
 def get_new_nn_btc_txids(existing_txids, notary_address):
@@ -544,8 +298,8 @@ def get_notaries_from_addresses(addresses):
     if BTC_NTX_ADDR in addresses:
         addresses.remove(BTC_NTX_ADDR)
     for address in addresses:
-        if address in known_addresses:
-            notary = known_addresses[address]
+        if address in KNOWN_ADDRESSES:
+            notary = KNOWN_ADDRESSES[address]
             notaries.append(notary)
         else:
             notaries.append(address)
@@ -554,177 +308,73 @@ def get_notaries_from_addresses(addresses):
 
 # MINED OPS
 
-def get_miner(block):
+def update_miner(block):
     logger.info("Getting mining data for block "+str(block))
-    rpc = {}
-    rpc["KMD"] = def_credentials("KMD")
-    blockinfo = rpc["KMD"].getblock(str(block), 2)
-    blocktime = blockinfo['time']
-    block_datetime = dt.utcfromtimestamp(blockinfo['time'])
+    blockinfo = RPC["KMD"].getblock(str(block), 2)
     for tx in blockinfo['tx']:
         if len(tx['vin']) > 0:
             if 'coinbase' in tx['vin'][0]:
                 if 'addresses' in tx['vout'][0]['scriptPubKey']:
                     address = tx['vout'][0]['scriptPubKey']['addresses'][0]
-                    if address in known_addresses:
-                        name = known_addresses[address]
+                    if address in KNOWN_ADDRESSES:
+                        name = KNOWN_ADDRESSES[address]
                     else:
                         name = address
                 else:
                     address = "N/A"
                     name = "non-standard"
-                for season_num in SEASONS_INFO:
-                    if blocktime < SEASONS_INFO[season_num]['end_time']:
-                        season = season_num
-                        break
 
-                value = tx['vout'][0]['value']
-                row_data = (block, blocktime, block_datetime, Decimal(value), address, name, tx['txid'], season)
-                return row_data
+                row = mined_row()
+                row.block_height = block
+                row.block_time = blockinfo['time']
+                row.block_datetime = dt.utcfromtimestamp(blockinfo['time'])
+                row.address = address
+                row.name = name
+                row.txid = tx['txid']
+                row.season = get_season_from_block(block)
+                row.value = Decimal(tx['vout'][0]['value'])
+                row.update()
 
-def get_daily_mined_counts(conn, cursor, day):
+def get_daily_mined_counts(day):
     result = 0
-    results = get_mined_date_aggregates(cursor, day)
+    results = get_mined_date_aggregates(day)
     time_stamp = int(time.time())
     for item in results:
-        row_data = (item[0], int(item[1]), float(item[2]), str(day), int(time_stamp))
-        if item[0] in notary_info:
-            logger.info("Adding "+str(row_data)+" to daily_mined_counts table")
-        result = update_daily_mined_count_tbl(conn, cursor, row_data)
+        row = daily_mined_count_row()
+        row.notary = item[0]
+        if row.notary in ALL_SEASON_NOTARIES:
+            row.blocks_mined = int(item[1])
+            row.sum_value_mined = float(item[2])
+            row.mined_date = str(day)
+            row.update()
     return result
 
 # MISC TABLE OPS
 
-def delete_from_table(conn, cursor, table, condition=None):
+def delete_from_table(table, condition=None):
     sql = "DELETE FROM "+table
     if condition:
         sql = sql+" WHERE "+condition
     sql = sql+";"
-    cursor.execute()
-    conn.commit()
+    CURSOR.execute()
+    CONN.commit()
 
-def ts_col_to_season_col(conn, cursor, ts_col, season_col, table):
+def ts_col_to_season_col(ts_col, season_col, table):
     for season in SEASONS_INFO:
         sql = "UPDATE "+table+" \
                SET "+season_col+"='"+season+"' \
                WHERE "+ts_col+" > "+str(SEASONS_INFO[season]['start_time'])+" \
                AND "+ts_col+" < "+str(SEASONS_INFO[season]['end_time'])+";"
-        cursor.execute(sql)
-        conn.commit()
+        CURSOR.execute(sql)
+        CONN.commit()
 
 now = int(time.time())
 
-rpc = {}
-rpc["KMD"] = def_credentials("KMD")
-NTX_ADDR = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
-noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA', 'GLEEC']
-
-if now > SEASONS_INFO['Season_3']['end_time']:
-    pubkey_file = 's4_nn_pubkeys.json'
-else:
-    pubkey_file = 's3_nn_pubkeys.json'
-
-pubkey_file = os.path.join(os.path.dirname(__file__), pubkey_file)
-
-with open(pubkey_file) as f:
-    season_pubkeys = json.load(f)
-
-conn = connect_db()
-cursor = conn.cursor()
-dpow_coins = get_dpow_coins(conn, cursor)
-
-third_party_coins = []
-antara_coins = []
-
-for item in dpow_coins:
-    if item[6]['server'] == 'dpow-mainnet':
-        if item[1] not in ['KMD', 'BTC']:
-            antara_coins.append(item[1])
-    elif item[6]['server'] == 'dpow-3p':
-        third_party_coins.append(item[1])
-                   
-all_coins = antara_coins + third_party_coins + ['BTC', 'KMD']
-all_antara_coins = antara_coins +[] # add retired smartchains here
-
-for coin in antara_coins:
-    coin_params.update({coin:KMD_CoinParams})
-
-for coin in third_party_coins:
-    coin_params.update({coin:coin_params[coin]})
-
-known_addresses = {}
-for coin in all_coins:
-    for season in NOTARY_PUBKEYS:
-        known_addresses.update(get_known_addr(coin, season))
-
-known_addresses.update({"RKrMB4guHxm52Tx9LG8kK3T5UhhjVuRand":"funding bot"})
-
-# lists all season, name, address and id info for each notary
-notary_info = {}
-
-# detailed address info categories by season. showing notary name, id and pubkey
-address_info = {}
-
-# shows addresses for all coins for each notary node, by season.
-notary_addresses = {}
-
-for season in NOTARY_PUBKEYS:
-    notary_addresses.update({season:{}})
-    notary_id = 0
-    notaries = list(NOTARY_PUBKEYS[season].keys())
-    notaries.sort()
-    for notary in notaries:
-        if notary not in notary_addresses:
-            notary_addresses[season].update({notary:{}})
-        for coin in coin_params:
-            bitcoin.params = coin_params[coin]
-            pubkey = NOTARY_PUBKEYS[season][notary]
-            address = str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
-            notary_addresses[season][notary].update({coin:address})
-
-bitcoin.params = coin_params["KMD"]
-for season in NOTARY_PUBKEYS:
-    notary_id = 0    
-    address_info.update({season:{}})
-    notaries = list(NOTARY_PUBKEYS[season].keys())
-    notaries.sort()
-    for notary in notaries:
-        if notary not in notary_info:
-            notary_info.update({
-                notary:{
-                    "Notary_ids":[],
-                    "Seasons":[],
-                    "Addresses":[],
-                    "Pubkeys":[]
-                }})
-        addr = str(P2PKHBitcoinAddress.from_pubkey(x(NOTARY_PUBKEYS[season][notary])))
-        address_info[season].update({
-            addr:{
-                "Notary":notary,
-                "Notary_id":notary_id,
-                "Pubkey":NOTARY_PUBKEYS[season][notary]
-            }})
-        notary_info[notary]['Notary_ids'].append(notary_id)
-        notary_info[notary]['Seasons'].append(season)
-        notary_info[notary]['Addresses'].append(addr)
-        notary_info[notary]['Pubkeys'].append(NOTARY_PUBKEYS[season][notary])
-        notary_id += 1
-
-for season in NOTARY_PUBKEYS:
-    notaries = list(NOTARY_PUBKEYS[season].keys())
-    notaries.sort()
-    for notary in notaries:
-        if season.find("Season_3") != -1:
-            SEASONS_INFO["Season_3"]['notaries'].append(notary)
-        elif season.find("Season_4") != -1:
-            SEASONS_INFO["Season_4"]['notaries'].append(notary)
-        else:
-            SEASONS_INFO[season]['notaries'].append(notary)
 
 def update_ntx_tenure(chains, seasons):
     for chain in chains:
-        for season in seasons:
-            ntx_results = get_ntx_min_max(cursor, season, chain)
+        for season in seasons:            
+            ntx_results = get_ntx_min_max(season, chain)
             logger.info(chain+" "+season+": "+str(ntx_results))
             max_blk = ntx_results[0]
             max_blk_time = ntx_results[1]
@@ -732,11 +382,18 @@ def update_ntx_tenure(chains, seasons):
             min_blk_time = ntx_results[3]
             ntx_count = ntx_results[4]
             if max_blk is not None:
-                row_data = (chain, min_blk, max_blk, min_blk_time, max_blk_time, ntx_count, season)
-                update_notarised_tenure(conn, cursor, row_data)
-                logger.info(chain+" "+season+" notarised tenure updated!")
+                row = ntx_tenure_row()
+                row.chain = chain
+                row.first_ntx_block = min_blk
+                row.last_ntx_block = max_blk
+                row.first_ntx_block_time = min_blk_time
+                row.last_ntx_block_time = max_blk_time
+                row.ntx_count = ntx_count
+                row.season = season
+                row.update()
 
-def get_unrecorded_KMD_txids(cursor, tip, season):
+
+def get_unrecorded_KMD_txids(tip, season):
     recorded_txids = []
     start_block = SEASONS_INFO[season]["start_block"]
     end_block = SEASONS_INFO[season]["end_block"]
@@ -744,7 +401,7 @@ def get_unrecorded_KMD_txids(cursor, tip, season):
     if end_block <= tip:
         tip = end_block
 
-    if skip_until_yesterday:
+    if SKIP_UNTIL_YESTERDAY:
         start_block = tip - 24*60*2
 
     all_txids = []
@@ -756,13 +413,13 @@ def get_unrecorded_KMD_txids(cursor, tip, season):
         all_txids += get_ntx_txids(NTX_ADDR, start_block+1, start_block+chunk_size)
         start_block += chunk_size
     all_txids += get_ntx_txids(NTX_ADDR, start_block+1, tip)
-    recorded_txids = get_existing_ntxids(cursor)
+    recorded_txids = get_existing_ntxids()
     unrecorded_txids = set(all_txids) - set(recorded_txids)
     return unrecorded_txids
 
 
 def get_nn_btc_tx_parts(txid):
-    r = requests.get(f"{other_server}/api/info/nn_btc_txid?txid={txid}")
+    r = requests.get(f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={txid}")
     tx_parts_list = r.json()["results"][0]
     
     tx_vins = []
@@ -775,7 +432,7 @@ def get_nn_btc_tx_parts(txid):
     return tx_vins, tx_vouts
 
 def get_nn_btc_tx_parts_local(txid):
-    r = requests.get(f"{this_server}/api/info/nn_btc_txid?txid={txid}")
+    r = requests.get(f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}")
     tx_parts_list = r.json()["results"][0]
     
     tx_vins = []
@@ -789,12 +446,12 @@ def get_nn_btc_tx_parts_local(txid):
 
 def get_new_notary_txids(notary_address, season=None): 
     if season:
-        existing_txids = get_existing_nn_btc_txids(cursor, None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
-        url = f"{other_server}/api/info/nn_btc_txid_list?notary={NN_BTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
+        existing_txids = get_existing_nn_btc_txids(None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
+        url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={NN_BTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
         logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
     else:
-        existing_txids = get_existing_nn_btc_txids(cursor, None, None, None, ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address])
-        url = f"{other_server}/api/info/nn_btc_txid_list?notary={ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]}"
+        existing_txids = get_existing_nn_btc_txids(None, None, None, ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address])
+        url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]}"
         logger.info(f"{len(existing_txids)} existing txids in local DB detected for {ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]} {notary_address}")
     
     logger.info(url)
@@ -827,7 +484,7 @@ def categorize_import_transactions(notary_address, season):
         txid_data.txid = txid
 
         # import NTX if existing on other server
-        url = f"{other_server}/api/info/nn_btc_txid?txid={txid}"
+        url = f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={txid}"
         r = requests.get(url)
         time.sleep(0.02)
         try:
@@ -1029,3 +686,4 @@ def get_category_from_vins_vouts(tx_vins, tx_vouts, season):
         return "Incoming Replenish"
 
     return "Other"
+

@@ -5,41 +5,14 @@ import json
 import time
 import hashlib
 import codecs
-import base58
 import logging
-import bitcoin
-from bitcoin.core import x
-from bitcoin.core import CoreMainParams
-from bitcoin.wallet import P2PKHBitcoinAddress
-from lib_notary import *
+from base_58 import *
+from lib_const import *
 
 logger = logging.getLogger()
 
-class BTC_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 0,
-                       'SCRIPT_ADDR': 5,
-                       'SECRET_KEY': 128}
-
-def get_from_electrum(url, port, method, params=[]):
-    try:
-        params = [params] if type(params) is not list else params
-        socket.setdefaulttimeout(5)
-        s = socket.create_connection((url, port))
-        s.send(json.dumps({"id": 0, "method": method, "params": params}).encode() + b'\n')
-        return json.loads(s.recv(99999)[:-1].decode())
-    except Exception as e:
-        print("==============================")
-        print(str(url)+""+str(port)+" failed!")
-        print(e)
-        print("==============================")
-
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
-
-def get_addr_from_pubkey(pubkey):
-    return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
 
 def get_p2pk_scripthash_from_pubkey(pubkey):
     scriptpubkey = '21' +pubkey+ 'ac'
@@ -73,23 +46,11 @@ def get_full_electrum_balance(pubkey, url, port):
     total_unconfirmed = p2pk_unconfirmed_balance + p2pkh_unconfirmed_balance
     total = total_confirmed + total_unconfirmed
     return total/100000000
-
-electrums = {}
-r = requests.get('http://notary.earth:8762/api/info/coins/?dpow_active=1')
-coins_info = r.json()
-for coin in coins_info['results'][0]:
-    if len(coins_info['results'][0][coin]['electrums']) > 0:
-        electrum = coins_info['results'][0][coin]['electrums'][0].split(":") 
-        electrums.update({
-            coin:{
-                "url":electrum[0],
-                "port":electrum[1]
-                }
-            })
+    # NINJA returns "1", TODO: check electrum version etc.
 
 def get_ac_block_info():
     ac_block_info = {}
-    for chain in antara_coins:
+    for chain in ANTARA_COINS:
       try:
         url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/sync'
         r = requests.get(url)
@@ -101,7 +62,6 @@ def get_ac_block_info():
         logger.warning(chain+" failed in ac_block_info")
         logger.warning(e)
     return ac_block_info
-
 
 # http://kmd.explorer.dexstats.info/insight-api-komodo/block-index/8888
 # http://explorer.chips.cash/api/getblockcount
@@ -127,12 +87,10 @@ def get_balance(chain, pubkey, addr, notary, node):
     balance = -1
     check_bal = False
     try:
-        if chain == "GIN":
-            logger.warning("Getting "+chain+" {"+node+"}"+" {"+notary+"}")
-        if chain in electrums:
+        if chain in ELECTRUMS:
             try:
-                url = electrums[chain]["url"]
-                port = electrums[chain]["port"]
+                url = ELECTRUMS[chain]["url"]
+                port = ELECTRUMS[chain]["port"]
                 balance = get_full_electrum_balance(pubkey, url, port)
             except Exception as e:
                 logger.warning(">>>>> "+chain+" via ["+url+":"+str(port)+"] FAILED | addr: "+addr+" | "+str(e))
@@ -142,18 +100,12 @@ def get_balance(chain, pubkey, addr, notary, node):
                 except Exception as e:
                     logger.warning(">>>>> "+chain+" via [DEXSTATS] FAILED | addr: "+addr+" | "+str(e))
 
-        elif chain in antara_coins or chain in ["HUSH3"]:
+        elif chain in ANTARA_COINS:
             try:
                 balance = get_dexstats_balance(chain, addr)
             except Exception as e:
                 logger.warning(">>>>> "+chain+" via [DEXSTATS] FAILED | addr: "+addr+" | "+str(e))
 
-        elif chain == "GIN":
-            # Gin is dead.
-            # addr = addr_to_scripthash_256(addr)
-            # resp = get_from_electrum('electrum2.gincoin.io', 6001, 'blockchain.scripthash.get_balance', addr)
-            # balance = resp['result']['confirmed']
-            pass
         elif chain == "AYA":
             url = 'https://explorer.aryacoin.io/ext/getaddress/'+addr
             r = requests.get(url)
@@ -163,5 +115,5 @@ def get_balance(chain, pubkey, addr, notary, node):
                 logger.warning(">>>>> "+chain+" via explorer.aryacoin.io FAILED | addr: "+addr+" | "+str(r.text))
 
     except Exception as e:
-        logger.warning(">>>>> "+chain+" FAILED | addr: "+addr+" | "+str(e))
+        logger.warning(">>>>> "+chain+" FAILED ALL METHODS | addr: "+addr+" | "+str(e))
     return balance
