@@ -4,6 +4,10 @@ import logging
 import logging.handlers
 from dotenv import load_dotenv
 
+from lib_db import CONN, CURSOR
+from base_58 import COIN_PARAMS, get_addr_from_pubkey
+from lib_rpc import def_credentials
+
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
@@ -11,12 +15,70 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+# ENV VARS
 load_dotenv()
 
-other_server = os.getenv("other_server")
+SKIP_PAST_SEASONS = (os.getenv("SKIP_PAST_SEASONS") == 'True') # set this to False in .env when originally populating the table, or rescanning
+SKIP_UNTIL_YESTERDAY = (os.getenv("SKIP_UNTIL_YESTERDAY") == 'True') # set this to True in .env to quickly update tables with most recent data
+OTHER_SERVER = os.getenv("OTHER_SERVER") # set to IP or domain to allow for external imports of data to avoid API limits
+THIS_SERVER = os.getenv("THIS_SERVER") # IP / domain of the local server
+API_PAGE_BREAK = int(os.getenv("API_PAGE_BREAK")) # How many pages back to go with verbose API responses
 
+# Notarisation Addresses
 NTX_ADDR = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 BTC_NTX_ADDR = '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg'
+
+RPC = {}
+RPC["KMD"] = def_credentials("KMD")
+noMoM = ['CHIPS', 'GAME', 'EMC2', 'AYA', 'GLEEC']
+
+# KMD REWARDS CONSTANTS
+KOMODO_ENDOFERA = 7777777
+LOCKTIME_THRESHOLD = 500000000
+MIN_SATOSHIS = 1000000000
+ONE_MONTH_CAP_HARDFORK = 1000000
+ONE_HOUR = 60
+ONE_MONTH = 31 * 24 * 60
+ONE_YEAR = 365 * 24 * 60
+DEVISOR = 10512000
+
+# Coins categorised
+OTHER_COINS = []
+ANTARA_COINS = []
+THIRD_PARTY_COINS = []
+
+# Electrum server:port for all dpow coins
+ELECTRUMS = {}
+r = requests.get(f'{THIS_SERVER}/api/info/coins/?dpow_active=1')
+DPOW_COINS = r.json()['results'][0]
+for coin in DPOW_COINS:
+    if len(DPOW_COINS[coin]['electrums']) > 0:
+        electrum = DPOW_COINS[coin]['electrums'][0].split(":") 
+        ELECTRUMS.update({
+            coin:{
+                "url":electrum[0],
+                "port":electrum[1]
+                }
+            })
+    nn_server = DPOW_COINS[coin]['dpow']['server']
+    if nn_server == 'dpow-mainnet':
+        if coin not in ['KMD', 'BTC']:
+            ANTARA_COINS.append(coin)
+    elif nn_server == 'dpow-3p':
+        THIRD_PARTY_COINS.append(coin)
+    else:
+        OTHER_COINS.append(coin)
+                   
+ALL_COINS = ANTARA_COINS + THIRD_PARTY_COINS + ['BTC', 'KMD']
+ALL_ANTARA_COINS = ANTARA_COINS +[] # add retired smartchains here
+
+# DEFINE BASE_58 COIN PARAMS
+for coin in ANTARA_COINS:
+    COIN_PARAMS.update({coin:COIN_PARAMS["KMD"]})
+
+for coin in THIRD_PARTY_COINS:
+    COIN_PARAMS.update({coin:COIN_PARAMS[coin]})
+
 # Update this each season change
 NOTARY_PUBKEYS = {
     "Season_1": {
@@ -483,6 +545,7 @@ NOTARY_PUBKEYS = {
         }
 }
 
+# TODO: see if this is better derived from the NTX Tenure table
 SEASONS_INFO = {
     "Season_1": {
             "start_block":1,
@@ -515,6 +578,7 @@ SEASONS_INFO = {
 }
 
 
+# BTC specific addresses. TODO: This could be reduced / merged.
 NN_BTC_ADDRESSES_DICT = {}
 NOTARY_BTC_ADDRESSES = {}
 NOTARIES = {}
@@ -525,7 +589,7 @@ ALL_SEASON_NOTARIES = []
 for season in SEASONS_INFO:
     NN_BTC_ADDRESSES_DICT.update({season:{}})
     try:
-        addresses = requests.get(f"{other_server}/api/source/addresses/?chain=BTC&season={season}").json()
+        addresses = requests.get(f"{THIS_SERVER}/api/source/addresses/?chain=BTC&season={season}").json()
         for item in addresses['results']:
             ALL_SEASON_NOTARIES.append(item["notary"])
             ALL_SEASON_NOTARY_BTC_ADDRESSES.append(item["address"])
@@ -540,4 +604,106 @@ for season in SEASONS_INFO:
 
 ALL_SEASON_NOTARIES = list(set(ALL_SEASON_NOTARIES))
 ALL_SEASON_NOTARY_BTC_ADDRESSES = list(set(ALL_SEASON_NOTARY_BTC_ADDRESSES))
+
+
+# shows addresses for all coins for each notary node, by season.
+NOTARY_ADDRESSES_DICT = {}
+
+for season in NOTARY_PUBKEYS:
+    NOTARY_ADDRESSES_DICT.update({season:{}})
+    notaries = list(NOTARY_PUBKEYS[season].keys())
+    notaries.sort()
+    for notary in notaries:
+        if notary not in NOTARY_ADDRESSES_DICT:
+            NOTARY_ADDRESSES_DICT[season].update({notary:{}})
+        for coin in COIN_PARAMS:
+            NOTARY_ADDRESSES_DICT[season][notary].update({
+                coin:get_addr_from_pubkey(coin, NOTARY_PUBKEYS[season][notary])
+            })
+
+
+# lists all season, name, address and id info for each notary
+NOTARY_INFO = {}
+
+# detailed address info categories by season. showing notary name, id and pubkey
+ADDRESS_INFO = {}
+
+for season in NOTARY_PUBKEYS:
+    notary_id = 0    
+    ADDRESS_INFO.update({season:{}})
+    notaries = list(NOTARY_PUBKEYS[season].keys())
+    notaries.sort()
+    for notary in notaries:
+        if notary not in NOTARY_INFO:
+            NOTARY_INFO.update({
+                notary:{
+                    "Notary_ids":[],
+                    "Seasons":[],
+                    "Addresses":[],
+                    "Pubkeys":[]
+                }})
+        addr = get_addr_from_pubkey("KMD", NOTARY_PUBKEYS[season][notary])
+        ADDRESS_INFO[season].update({
+            addr:{
+                "Notary":notary,
+                "Notary_id":notary_id,
+                "Pubkey":NOTARY_PUBKEYS[season][notary]
+            }})
+        NOTARY_INFO[notary]['Notary_ids'].append(notary_id)
+        NOTARY_INFO[notary]['Seasons'].append(season)
+        NOTARY_INFO[notary]['Addresses'].append(addr)
+        NOTARY_INFO[notary]['Pubkeys'].append(NOTARY_PUBKEYS[season][notary])
+        notary_id += 1
+
+for season in NOTARY_PUBKEYS:
+    notaries = list(NOTARY_PUBKEYS[season].keys())
+    notaries.sort()
+    for notary in notaries:
+        if season.find("Season_3") != -1:
+            SEASONS_INFO["Season_3"]['notaries'].append(notary)
+        elif season.find("Season_4") != -1:
+            SEASONS_INFO["Season_4"]['notaries'].append(notary)
+        else:
+            SEASONS_INFO[season]['notaries'].append(notary)
+
+
+# SPECIAL CASE BTC TXIDS
 S4_INIT_BTC_FUNDING_TX = "13fee57ec60ef4ca42dbed5eb77d576bf7545e7042b334b27afdc33051635611"
+
+KNOWN_ADDRESSES = {}
+for season in NOTARY_ADDRESSES_DICT:
+    for notary in NOTARY_ADDRESSES_DICT[season]:
+        for coin in NOTARY_ADDRESSES_DICT[season][notary]:
+            address = NOTARY_ADDRESSES_DICT[season][notary][coin]
+            KNOWN_ADDRESSES.update({address:notary})
+
+OTHER_LAUNCH_PARAMS = {
+    "BTC":"~/bitcoin/src/bitcoind",
+    "KMD":"~/komodo/src/komodod", 
+    "AYA":"~/AYAv2/src/aryacoind",
+    "CHIPS":"~/chips3/src/chipsd",
+    "EMC2":"~/einsteinium/src/einsteiniumd",
+    "VRSC":"~/VerusCoin/src/verusd",   
+    "GLEEC":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",   
+}
+OTHER_CONF_FILE = {
+    "BTC":"~/.bitcoin/bitcoin.conf",
+    "KMD":"~/.komodo/komodo.conf",   
+    "AYA":"~/.aryacoin/aryacoin.conf",
+    "CHIPS":"~/.chips/chips.conf",
+    "EMC2":"~/.einsteinium/einsteinium.conf",
+    "VRSC":"~/.komodo/VRSC/VRSC.conf",   
+    "GLEEC":"~/.gleecbtc/gleecbtc.conf",   
+}
+OTHER_CLI = {
+    "BTC":"~/bitcoin/src/bitcoin-cli",
+    "KMD":"~/komodo/src/komodo-cli",  
+    "AYA":"~/AYAv2/src/aryacoin-cli",
+    "CHIPS":"~/chips3/src/chips-cli",
+    "EMC2":"~/einsteinium/src/einsteinium-cli",
+    "VRSC":"~/VerusCoin/src/verus",   
+    "GLEEC":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
+}
+
+# Some coins are named differently between dpow and coins repo...
+TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GLEEC':'GleecBTC' }

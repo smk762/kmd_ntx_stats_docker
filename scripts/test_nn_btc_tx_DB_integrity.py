@@ -4,10 +4,7 @@ from lib_table_update import *
 from lib_table_select import *
 from lib_api import *
 
-conn = connect_db()
-cursor = conn.cursor()
-
-def get_existing_nn_btc_txids(cursor, address=None, category=None, season=None):
+def get_existing_nn_btc_txids(address=None, category=None, season=None):
     recorded_txids = []
     sql = f"SELECT DISTINCT txid from nn_btc_tx"
     conditions = []
@@ -23,8 +20,8 @@ def get_existing_nn_btc_txids(cursor, address=None, category=None, season=None):
         sql += " and ".join(conditions)    
     sql += ";"
 
-    cursor.execute(sql)
-    existing_txids = cursor.fetchall()
+    CURSOR.execute(sql)
+    existing_txids = CURSOR.fetchall()
 
     for txid in existing_txids:
         recorded_txids.append(txid[0])
@@ -32,8 +29,8 @@ def get_existing_nn_btc_txids(cursor, address=None, category=None, season=None):
 
 def validate_ntx_addr():
     print(f"Validating NTX Address...")
-    cursor.execute(f"SELECT category, notary, txid FROM nn_btc_tx WHERE address='{BTC_NTX_ADDR}';")
-    ntx_addr_txids = cursor.fetchall()
+    CURSOR.execute(f"SELECT category, notary, txid FROM nn_btc_tx WHERE address='{BTC_NTX_ADDR}';")
+    ntx_addr_txids = CURSOR.fetchall()
     for row in ntx_addr_txids:
         category = row[0]
         notary = row[1]
@@ -43,53 +40,53 @@ def validate_ntx_addr():
             print(f"BTC_NTX_ADDR {txid} IMPROPER NOTARY {notary}")
             delete = input("Delete? (y/n)")
             if delete in ["Y", "y"]:
-                cursor.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
-                conn.commit()
+                CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
+                CONN.commit()
                 print(f"deleted {txid}")
 
         if category != "NTX":
             print(f"BTC_NTX_ADDR {txid} IMPROPER CATEGORY {category}")
             delete = input("Delete? (y/n)")
             if delete in ["Y", "y"]:
-                cursor.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
-                conn.commit()
+                CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
+                CONN.commit()
                 print(f"deleted {txid}")
 
 
 def validate_ntx_row_counts():
     print(f"Validating NTX Rows...")
-    ntx_txids = get_existing_nn_btc_txids(cursor, None, "NTX")
+    ntx_txids = get_existing_nn_btc_txids(None, "NTX")
     for txid in ntx_txids:
-        cursor.execute(f"SELECT COUNT(*) FROM nn_btc_tx WHERE txid='{txid}';")
-        txid_row_count = cursor.fetchall()[0][0]
+        CURSOR.execute(f"SELECT COUNT(*) FROM nn_btc_tx WHERE txid='{txid}';")
+        txid_row_count = CURSOR.fetchall()[0][0]
 
         if txid_row_count != 14:
             print(f"ntx {txid} row count {txid_row_count}")
             delete = input("Delete? (y/n)")
 
             if delete in ["Y", "y"]:
-                cursor.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
-                conn.commit()
+                CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
+                CONN.commit()
                 print(f"deleted {txid}")
 
 def validate_split_rows():
     print(f"Validating Split Rows...")
-    ntx_txids = get_existing_nn_btc_txids(cursor, None, "Split")
+    ntx_txids = get_existing_nn_btc_txids(None, "Split")
     for txid in ntx_txids:
-        cursor.execute(f"SELECT COUNT(*) FROM nn_btc_tx WHERE txid='{txid}';")
-        txid_row_count = cursor.fetchall()[0][0]
+        CURSOR.execute(f"SELECT COUNT(*) FROM nn_btc_tx WHERE txid='{txid}';")
+        txid_row_count = CURSOR.fetchall()[0][0]
 
         if txid_row_count != 1:
             print(f"split {txid} row count {txid_row_count}")
             delete = input("Delete? (y/n)")
 
             if delete in ["Y", "y"]:
-                cursor.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
-                conn.commit()
+                CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
+                CONN.commit()
                 print(f"deleted {txid}")
         else:
-            cursor.execute(f"SELECT input_index, input_sats, output_index, output_sats, txid FROM nn_btc_tx WHERE txid='{txid}';")
-            split_row = cursor.fetchall()[0]
+            CURSOR.execute(f"SELECT input_index, input_sats, output_index, output_sats, txid FROM nn_btc_tx WHERE txid='{txid}';")
+            split_row = CURSOR.fetchall()[0]
             input_index = split_row[0]
             input_sats = split_row[1]
             output_index = split_row[2]
@@ -102,14 +99,14 @@ def validate_split_rows():
                     delete = input("Delete? (y/n)")
 
                     if delete in ["Y", "y"]:
-                        cursor.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
-                        conn.commit()
+                        CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
+                        CONN.commit()
                         print(f"deleted {txid}")
 
 def validate_notaries_by_address(address, season):
     print(f"Validating Notary Address Rows for {address} {season} {NN_BTC_ADDRESSES_DICT[season][address]}...")
-    cursor.execute(f"SELECT notary, txid FROM nn_btc_tx WHERE address='{address}';")
-    addr_rows = cursor.fetchall()
+    CURSOR.execute(f"SELECT notary, txid FROM nn_btc_tx WHERE address='{address}';")
+    addr_rows = CURSOR.fetchall()
     for row in addr_rows:
         notary = row[0]
         txid = row[1]
@@ -120,8 +117,8 @@ def validate_notaries_by_address(address, season):
 
             if update_it in ["Y", "y"]:
                 sql = f"UPDATE nn_btc_tx SET notary = '{NN_BTC_ADDRESSES_DICT[season][address]}' WHERE address = '{address}' and txid = '{txid}';"
-                cursor.execute(sql)
-                conn.commit()
+                CURSOR.execute(sql)
+                CONN.commit()
                 print(f"Updated {txid} {notary} {address} {season}")
 
 
@@ -134,6 +131,6 @@ for season in NN_BTC_ADDRESSES_DICT:
             validate_notaries_by_address(address, season)
 
 print(f"Categories in DB:")
-cursor.execute(f"SELECT DISTINCT category FROM nn_btc_tx;")
-cat_rows = cursor.fetchall()
+CURSOR.execute(f"SELECT DISTINCT category FROM nn_btc_tx;")
+cat_rows = CURSOR.fetchall()
 print(cat_rows)

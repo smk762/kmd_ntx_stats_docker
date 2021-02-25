@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
+from lib_const import *
 from lib_notary import *
-from lib_rpc import *
 import unittest
 
 '''
-rpc = {}
-rpc["KMD"] = def_credentials("KMD")
-
-conn = connect_db()
-cursor = conn.cursor()
 
 season = get_season(int(time.time()))
 assert season == "Season_4"
@@ -19,8 +14,8 @@ test_data = {}
 for tbl in block_range_tables:
 #collect test data: 500 blocks (1929000 - 1929099)
     sql = "SELECT * FROM "+tbl+" WHERE block_height >= 1929000 AND block_height < 1929100;"
-    cursor.execute(sql)
-    test_data.update({tbl: cursor.fetchall()})
+    CURSOR.execute(sql)
+    test_data.update({tbl: CURSOR.fetchall()})
 
 try:
     assert len(test_data['mined']) == 100
@@ -166,11 +161,11 @@ class Test_opret_decode(unittest.TestCase):
         expected = result
         self.assertEqual(actual, expected)
 
-class Test_get_miner(unittest.TestCase):
+class Test_update_miner(unittest.TestCase):
 
-    def test_get_miner(self):
+    def test_update_miner(self):
         block = 1939602
-        actual = get_miner(block)
+        actual = update_miner(block)
         expected = (1939602, 1593247810, datetime.datetime(2020, 6, 27, 8, 50, 10),
                     Decimal('3.001609999999999889297441768576391041278839111328125'),
                     'RS4S9b9aG1yfeXFoBj2NcPoBE21XKfJDgc', 'decker_EU',

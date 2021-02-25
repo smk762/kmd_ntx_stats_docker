@@ -2,8 +2,9 @@
 import os
 import json
 import requests
+from lib_const import *
 
-r = requests.get("http://notary.earth:8762/api/info/coins/?dpow_active=1")
+r = requests.get(f"{THIS_SERVER}/api/info/coins/?dpow_active=1")
 coins_data = r.json()
 
 coins_list = list(coins_data['results'][0].keys())

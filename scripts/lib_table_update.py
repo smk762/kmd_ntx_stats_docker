@@ -1,26 +1,13 @@
 #!/usr/bin/env python3
 import logging
 import logging.handlers
-from dotenv import load_dotenv
 import os
 from psycopg2.extras import execute_values
 from lib_const import *
 
 logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
-load_dotenv()
-# set this to False in .env when originally populating the table, or rescanning
-skip_past_seasons = (os.getenv("skip_past_seasons") == 'True')
-
-# set this to True in .env to quickly update tables with most recent data
-skip_until_yesterday = (os.getenv("skip_until_yesterday") == 'True')
-
-def update_addresses_tbl(conn, cursor, row_data):
+def update_addresses_tbl(row_data):
     try:
         sql = "INSERT INTO addresses \
               (season, node, notary, notary_id, chain, pubkey, address) \
@@ -28,37 +15,19 @@ def update_addresses_tbl(conn, cursor, row_data):
                ON CONFLICT ON CONSTRAINT unique_season_chain_address DO UPDATE SET \
                node='"+str(row_data[1])+"', notary='"+str(row_data[2])+"', \
                pubkey='"+str(row_data[5])+"', address='"+str(row_data[6])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         logger.debug(e)
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_balances_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO balances \
-            (notary, chain, balance, address, season, node, update_time) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_address_season_balance DO UPDATE SET \
-            balance="+str(row_data[2])+", \
-            node='"+str(row_data[5])+"', \
-            update_time="+str(row_data[6])+";"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
 
-def update_rewards_tbl(conn, cursor, row_data):
+def update_rewards_row(row_data):
     try:
         sql = "INSERT INTO rewards \
             (address, notary, utxo_count, eligible_utxo_count, \
@@ -69,17 +38,17 @@ def update_rewards_tbl(conn, cursor, row_data):
             eligible_utxo_count="+str(row_data[3])+", oldest_utxo_block="+str(row_data[4])+", \
             balance="+str(row_data[5])+", rewards="+str(row_data[6])+", \
             update_time="+str(row_data[7])+";"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_notarised_btc_tbl(conn, cursor, row_data):
+def update_notarised_btc_tbl(row_data):
     sql = "INSERT INTO notarised_btc (btc_txid, btc_block_hash, btc_block_ht, \
                                       btc_block_time, \
                                       addresses, notaries, kmd_txid, \
@@ -88,42 +57,45 @@ def update_notarised_btc_tbl(conn, cursor, row_data):
                                       opret, season) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     try:
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         logger.debug(row_data)
     except Exception as e:
         if str(e).find('duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
 
-def update_ntx_row(conn, cursor, row_data):
+def update_ntx_row(row_data):
     sql = "INSERT INTO notarised (chain, block_height, \
                                 block_time, block_datetime, block_hash, \
                                 notaries, ac_ntx_blockhash, ac_ntx_height, \
                                 txid, opret, season, btc_validated) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     try:
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
     except Exception as e:
         if str(e).find('duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
 
-def update_ntx_records(conn, cursor, records):
+def update_ntx_records(records):
     try:
-        execute_values(cursor, "INSERT INTO notarised (chain, block_height, block_time, block_datetime, block_hash, \
-                                notaries, ac_ntx_blockhash, ac_ntx_height, txid, opret, season, btc_validated) VALUES %s", records)
+        execute_values(CURSOR, "INSERT INTO notarised (chain, block_height, \
+                                block_time, block_datetime, block_hash, \
+                                notaries, ac_ntx_blockhash, ac_ntx_height, \
+                                txid, opret, season, btc_validated) \
+                                VALUES %s", records)
 
-        conn.commit()
+        CONN.commit()
     except Exception as e:
         if str(e).find('duplicate') == -1:
             logger.debug(e)
-        conn.rollback()
+        CONN.rollback()
 
-def update_validation_notarised_tbl(conn, cursor, btc_txid, btc_block_hash, btc_block_ht, opret):
+def update_validation_notarised_tbl(btc_txid, btc_block_hash, btc_block_ht, opret):
     sql = "UPDATE notarised SET \
           chain='BTC', btc_validated='true', \
           txid='"+btc_txid+"', \
@@ -132,16 +104,16 @@ def update_validation_notarised_tbl(conn, cursor, btc_txid, btc_block_hash, btc_
           opret='"+opret+"' \
           WHERE opret LIKE '%' || '"+opret[11:33]+"' || '%';"
     try:
-        cursor.execute(sql)
-        conn.commit()
+        CURSOR.execute(sql)
+        CONN.commit()
         logger.info("btc ntx validated in ntx table")
     except Exception as e:
         if str(e).find('duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
 
-def update_coins_tbl(conn, cursor, row_data):
+def update_coins_row(row_data):
     try:
         sql = "INSERT INTO coins \
             (chain, coins_info, electrums, electrums_ssl, explorers, dpow, dpow_active, mm2_compatible) \
@@ -154,17 +126,17 @@ def update_coins_tbl(conn, cursor, row_data):
             dpow='"+str(row_data[5])+"', \
             dpow_active='"+str(row_data[6])+"', \
             mm2_compatible='"+str(row_data[7])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
         
-def update_mined_tbl(conn, cursor, row_data):
+def update_mined_row(row_data):
     try:
         sql = "INSERT INTO mined \
             (block_height, block_time, block_datetime, \
@@ -173,23 +145,20 @@ def update_mined_tbl(conn, cursor, row_data):
             ON CONFLICT ON CONSTRAINT unique_block DO UPDATE SET \
             block_time='"+str(row_data[1])+"', \
             block_datetime='"+str(row_data[2])+"', \
-            value='"+str(row_data[3])+"', \
+            value="+str(row_data[3])+", \
             address='"+str(row_data[4])+"', \
             name='"+str(row_data[5])+"', \
             txid='"+str(row_data[6])+"', \
             season='"+str(row_data[7])+"';"
-        cursor.execute(sql, row_data)
-        logger.info((row_data)+" added to db")
-        conn.commit()
-        return 1
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
     except Exception as e:
         logger.debug(e)
         if str(e).find('Duplicate') == -1:
             logger.debug(row_data)
-        conn.rollback()
-        return 0
+        CONN.rollback()
 
-def update_season_mined_count_tbl(conn, cursor, row_data):
+def update_season_mined_count_row(row_data):
     try:
         sql = "INSERT INTO  mined_count_season \
             (notary, season, blocks_mined, sum_value_mined, \
@@ -199,17 +168,17 @@ def update_season_mined_count_tbl(conn, cursor, row_data):
             blocks_mined="+str(row_data[2])+", sum_value_mined="+str(row_data[3])+", \
             max_value_mined="+str(row_data[4])+", last_mined_blocktime="+str(row_data[5])+", \
             last_mined_block="+str(row_data[6])+", time_stamp='"+str(row_data[7])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_season_notarised_chain_tbl(conn, cursor, row_data):
+def update_season_notarised_chain_row(row_data):
     sql = "INSERT INTO notarised_chain_season \
          (chain, ntx_count, block_height, kmd_ntx_blockhash,\
           kmd_ntx_txid, kmd_ntx_blocktime, opret, ac_ntx_blockhash, \
@@ -222,10 +191,10 @@ def update_season_notarised_chain_tbl(conn, cursor, row_data):
           ac_ntx_blockhash='"+str(row_data[7])+"', ac_ntx_height="+str(row_data[8])+", \
           ac_block_height='"+str(row_data[9])+"', ntx_lag='"+str(row_data[10])+"';"
          
-    cursor.execute(sql, row_data)
-    conn.commit()
+    CURSOR.execute(sql, row_data)
+    CONN.commit()
 
-def update_season_notarised_count_tbl(conn, cursor, row_data): 
+def update_season_notarised_count_row(row_data): 
     sql = "INSERT INTO notarised_count_season \
         (notary, btc_count, antara_count, \
         third_party_count, other_count, \
@@ -237,10 +206,10 @@ def update_season_notarised_count_tbl(conn, cursor, row_data):
         third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
         total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
         chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
-    cursor.execute(sql, row_data)
-    conn.commit()
+    CURSOR.execute(sql, row_data)
+    CONN.commit()
 
-def update_daily_mined_count_tbl(conn, cursor, row_data):
+def update_daily_mined_count_row(row_data):
     try:
         sql = "INSERT INTO mined_count_daily \
             (notary, blocks_mined, sum_value_mined, \
@@ -249,26 +218,26 @@ def update_daily_mined_count_tbl(conn, cursor, row_data):
             DO UPDATE SET \
             blocks_mined="+str(row_data[1])+", \
             sum_value_mined='"+str(row_data[2])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_daily_notarised_chain_tbl(conn, cursor, row_data):
+def update_daily_notarised_chain_row(row_data):
     sql = "INSERT INTO notarised_chain_daily \
          (chain, ntx_count, notarised_date) \
           VALUES (%s, %s, %s) \
           ON CONFLICT ON CONSTRAINT unique_notarised_chain_date DO UPDATE \
           SET ntx_count="+str(row_data[1])+";"
-    cursor.execute(sql, row_data)
-    conn.commit()
+    CURSOR.execute(sql, row_data)
+    CONN.commit()
 
-def update_daily_notarised_count_tbl(conn, cursor, row_data): 
+def update_daily_notarised_count_row(row_data): 
     sql = "INSERT INTO notarised_count_daily \
         (notary, btc_count, antara_count, \
         third_party_count, other_count, \
@@ -281,24 +250,24 @@ def update_daily_notarised_count_tbl(conn, cursor, row_data):
         total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
         chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+",  \
         season='"+str(row_data[9])+"', notarised_date='"+str(row_data[10])+"';"
-    cursor.execute(sql, row_data)
-    conn.commit()
+    CURSOR.execute(sql, row_data)
+    CONN.commit()
 
-def update_table(conn, cursor, table, update_str, condition):
+def update_table(table, update_str, condition):
     try:
         sql = "UPDATE "+table+" \
                SET "+update_str+" WHERE "+condition+";"
         logger.info(sql)
-        cursor.execute(sql)
-        conn.commit()
+        CURSOR.execute(sql)
+        CONN.commit()
         return 1
     except Exception as e:
         logger.debug(e)
         logger.debug(sql)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_sync_tbl(conn, cursor, row_data):
+def update_sync_tbl(row_data):
     try:
         sql = "INSERT INTO chain_sync \
             (chain, block_height, sync_hash, explorer_hash) \
@@ -307,39 +276,39 @@ def update_sync_tbl(conn, cursor, row_data):
             block_height='"+str(row_data[1])+"', \
             sync_hash='"+str(row_data[2])+"', \
             explorer_hash='"+str(row_data[3])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_nn_social_tbl(conn, cursor, row_data):
+def update_nn_social_row(row_data):
     try:
         sql = "INSERT INTO  nn_social \
             (notary, twitter, youtube, discord, \
             telegram, github, keybase, \
-            website, icon,season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            website, icon, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_notary_season_social DO UPDATE SET \
             twitter='"+str(row_data[1])+"', \
             youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
             telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
             keybase='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
             icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_coin_social_tbl(conn, cursor, row_data):
+def update_coin_social_row(row_data):
     try:
         sql = "INSERT INTO  coin_social \
             (chain, twitter, youtube, discord, \
@@ -351,17 +320,17 @@ def update_coin_social_tbl(conn, cursor, row_data):
             telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
             explorer='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
             icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_last_ntx_tbl(conn, cursor, row_data):
+def update_last_ntx_row(row_data):
     try:
         sql = "INSERT INTO  last_notarised \
             (notary, chain, txid, block_height, \
@@ -371,18 +340,18 @@ def update_last_ntx_tbl(conn, cursor, row_data):
             block_height='"+str(row_data[3])+"', \
             block_time='"+str(row_data[4])+"', \
             season='"+str(row_data[5])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         logger.info("Added "+str(row_data))
         return 1
     except Exception as e:
         logger.debug(e)
         if str(e).find('Duplicate') == -1:
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_last_btc_ntx_tbl(conn, cursor, row_data):
+def update_last_btc_ntx_tbl(row_data):
     try:
         sql = "INSERT INTO  last_btc_notarised \
             (notary, txid, block_height, \
@@ -392,33 +361,33 @@ def update_last_btc_ntx_tbl(conn, cursor, row_data):
             block_height='"+str(row_data[2])+"', \
             block_time='"+str(row_data[3])+"', \
             season='"+str(row_data[4])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_btc_address_deltas_tbl(conn, cursor, row_data):
+def update_btc_address_deltas_tbl(row_data):
     try:
         sql = "INSERT INTO  btc_address_deltas \
             (notary, address, category, txid, block_time, \
              total_in, total_out, fees, vin_addr, vout_addr, season) \
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def update_funding_tbl(conn, cursor, row_data):
+def update_funding_row(row_data):
     try:
         sql = "INSERT INTO  funding_transactions \
             (chain, txid, vout, amount, \
@@ -434,22 +403,22 @@ def update_funding_tbl(conn, cursor, row_data):
             address='"+str(row_data[9])+"', \
             notary='"+str(row_data[10])+"', \
             season='"+str(row_data[11])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def ts_col_to_dt_col(conn, cursor, ts_col, dt_col, table):
+def ts_col_to_dt_col(ts_col, dt_col, table):
     sql = "UPDATE "+table+" SET "+dt_col+"=to_timestamp("+ts_col+");"
-    cursor.execute(sql)
-    conn.commit()
+    CURSOR.execute(sql)
+    CONN.commit()
 
-def update_notarised_tenure(conn, cursor, row_data):
+def update_notarised_tenure_row(row_data):
     try:
         sql = "INSERT INTO notarised_tenure (chain, first_ntx_block, \
             last_ntx_block, first_ntx_block_time, last_ntx_block_time, ntx_count, season) \
@@ -458,21 +427,21 @@ def update_notarised_tenure(conn, cursor, row_data):
             first_ntx_block='"+str(row_data[1])+"', last_ntx_block="+str(row_data[2])+", \
             first_ntx_block_time="+str(row_data[3])+", last_ntx_block_time="+str(row_data[4])+", \
             ntx_count="+str(row_data[5])+";"
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
         return 0
 
-def delete_nn_btc_tx_transaction(conn, cursor, txid):
-    cursor.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
-    conn.commit()
+def delete_nn_btc_tx_transaction(txid):
+    CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
+    CONN.commit()
 
-def update_nn_btc_tx_row(conn, cursor, row_data):
+def update_nn_btc_tx_row(row_data):
     sql = "INSERT INTO nn_btc_tx (txid, block_hash, block_height, \
                                 block_time, block_datetime, \
                                 address, notary, season, category, \
@@ -482,15 +451,15 @@ def update_nn_btc_tx_row(conn, cursor, row_data):
         ON CONFLICT ON CONSTRAINT unique_btc_nn_txid DO UPDATE SET \
         notary='"+str(row_data[6])+"', category='"+str(row_data[8])+"';"
     try:
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
     except Exception as e:
         logger.debug(e)
         if str(e).find('duplicate') == -1:
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
 
-def insert_nn_btc_tx_row(conn, cursor, row_data):
+def insert_nn_btc_tx_row(row_data):
     sql = "INSERT INTO nn_btc_tx (txid, block_hash, block_height, \
                                 block_time, block_datetime, \
                                 address, notary, season, category, \
@@ -498,62 +467,87 @@ def insert_nn_btc_tx_row(conn, cursor, row_data):
                                 output_index, output_sats, fees, num_inputs, num_outputs) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     try:
-        cursor.execute(sql, row_data)
-        conn.commit()
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
     except Exception as e:
         logger.debug(e)
         if str(e).find('duplicate') == -1:
             logger.debug(row_data)
-        conn.rollback()
+        CONN.rollback()
 
-def update_nn_btc_tx_notary_from_addr(conn, cursor, notary, addr):
+def update_nn_btc_tx_notary_from_addr(notary, addr):
     sql = f"UPDATE nn_btc_tx SET notary='{notary}' WHERE address='{addr}';"
     try:
-        cursor.execute(sql)
-        conn.commit()
+        CURSOR.execute(sql)
+        CONN.commit()
         logger.info(f"{addr} tagged as {notary} in DB")
     except Exception as e:
         logger.debug(e)
-        conn.rollback()
+        CONN.rollback()
 
-def update_nn_btc_tx_notary_category_from_addr(conn, cursor, notary, category, addr):
+def update_nn_btc_tx_notary_category_from_addr(notary, category, addr):
     sql = f"UPDATE nn_btc_tx SET notary='{notary}', category='{category}' WHERE address='{addr}';"
     try:
-        cursor.execute(sql)
-        conn.commit()
+        CURSOR.execute(sql)
+        CONN.commit()
         logger.info(f"{addr} tagged as {notary} in DB")
     except Exception as e:
         logger.debug(e)
-        conn.rollback()
+        CONN.rollback()
 
-def update_nn_btc_tx_category_from_txid(conn, cursor, category, txid):
+def update_nn_btc_tx_category_from_txid(category, txid):
     sql = f"UPDATE nn_btc_tx SET category='{category}' WHERE txid='{txid}';"
     try:
-        cursor.execute(sql)
-        conn.commit()
+        CURSOR.execute(sql)
+        CONN.commit()
         logger.info(f"{txid} tagged as {category} in DB")
     except Exception as e:
         logger.debug(e)
-        conn.rollback()
+        CONN.rollback()
 
-def update_nn_btc_tx_outindex_from_txid(conn, cursor, outindex, txid):
+def update_nn_btc_tx_outindex_from_txid(outindex, txid):
     sql = f"UPDATE nn_btc_tx SET output_index='{outindex}' WHERE txid='{txid}';"
     try:
-        cursor.execute(sql)
-        conn.commit()
+        CURSOR.execute(sql)
+        CONN.commit()
         logger.info(f"{txid} tagged as {outindex} in DB")
     except Exception as e:
         logger.debug(e)
-        conn.rollback()
+        CONN.rollback()
 
-
-
-
-def delete_nn_btc_tx_row(conn, cursor, txid, notary):
+def delete_nn_btc_tx_row(txid, notary):
     sql = "DELETE FROM nn_btc_tx WHERE txid='"+str(txid)+"' and notary='"+str(notary)+"';"
     try:
-        cursor.execute(sql)
-        conn.commit()
+        CURSOR.execute(sql)
+        CONN.commit()
     except Exception as e:
         logger.debug(e)
-        conn.rollback()
+        CONN.rollback()
+
+#### BALANCES TABLE
+
+def update_balances_row(row_data):
+    try:
+        sql = "INSERT INTO balances \
+            (notary, chain, balance, address, season, node, update_time) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_address_season_balance DO UPDATE SET \
+            balance="+str(row_data[2])+", \
+            node='"+str(row_data[5])+"', \
+            update_time="+str(row_data[6])+";"
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
+    except Exception as e:
+        if str(e).find('Duplicate') == -1:
+            logger.debug(e)
+            logger.debug(row_data)
+        CONN.rollback()
+
+def delete_balances_row(chain, address, season):
+    try:
+        sql = f"DELETE FROM balances WHERE chain='{chain}' and address='{address}' and season={season};"
+        CURSOR.execute(sql)
+        CONN.commit()
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()
