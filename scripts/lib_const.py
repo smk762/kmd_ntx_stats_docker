@@ -706,4 +706,4 @@ OTHER_CLI = {
 }
 
 # Some coins are named differently between dpow and coins repo...
-TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GLEEC':'GleecBTC' }
+TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GleecBTC':'GLEEC', "PBC":"SFUSD" }

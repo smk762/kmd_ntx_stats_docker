@@ -48,14 +48,14 @@ class GLEEC_CoinParams(CoreMainParams):
 COIN_PARAMS = {
     "KMD": KMD_CoinParams,
     "MCL": KMD_CoinParams,
-    "PBC": KMD_CoinParams,
+    "SFUSD": KMD_CoinParams,
     "CHIPS": KMD_CoinParams,
     "VRSC": KMD_CoinParams,
     "BTC": BTC_CoinParams,
     "AYA": AYA_CoinParams,
     "EMC2": EMC2_CoinParams,
     "GAME": GAME_CoinParams,
-    "GleecBTC": GLEEC_CoinParams
+    "GLEEC": GLEEC_CoinParams
 }
 
 def get_addr_from_pubkey(coin, pubkey):
