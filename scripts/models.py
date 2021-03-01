@@ -319,99 +319,6 @@ class funding_row():
         CONN.commit()
         
 
-
-class mined_row():
-    def __init__(self, block_height='', block_time='', block_datetime='', 
-             value='', address='', name='', txid='', season=''):
-        self.block_height = block_height
-        self.block_time = block_time
-        self.block_datetime = block_datetime
-        self.value = value
-        self.address = address
-        self.name = name
-        self.txid = txid
-        self.season = season
-
-    def validated(self):
-        return True
-
-    def update(self):
-        row_data = (
-            self.block_height, self.block_time, self.block_datetime, 
-            self.value, self.address, self.name, self.txid, self.season
-        )
-        if self.validated():
-            update_mined_row(row_data)
-            logger.info(f"Updated mined TABLE {self.block_height} | {self.name} | {self.value} ")
-        else:
-            logger.warning(f"Row data invalid!")
-            logger.warning(f"{row_data}")
-
-    def delete(self):
-        CURSOR.execute(f"DELETE FROM mined WHERE name = '{self.name}';")
-        CONN.commit()
-
-class season_mined_count_row():
-    def __init__(self, notary='', season='', blocks_mined='', sum_value_mined='', 
-            max_value_mined='', last_mined_blocktime='', last_mined_block='', 
-            time_stamp=int(time.time())):
-        self.notary = notary
-        self.season = season
-        self.blocks_mined = blocks_mined
-        self.sum_value_mined = sum_value_mined
-        self.max_value_mined = max_value_mined
-        self.last_mined_blocktime = last_mined_blocktime
-        self.last_mined_block = last_mined_block
-        self.time_stamp = time_stamp
-
-    def validated(self):
-        return True
-
-    def update(self):
-        row_data = (
-            self.notary, self.season, self.blocks_mined, 
-            self.sum_value_mined, self.max_value_mined,
-            self.last_mined_blocktime, self.last_mined_block, self.time_stamp
-        )
-        if self.validated():
-            logger.info(f"Updating season_mined_count TABLE {self.notary} ")
-            update_season_mined_count_row(row_data)
-        else:
-            logger.warning(f"Row data invalid!")
-            logger.warning(f"{row_data}")
-
-    def delete(self):
-        CURSOR.execute(f"DELETE FROM season_mined_count WHERE notary = '{self.notary}';")
-        CONN.commit()
-
-class daily_mined_count_row():
-    def __init__(self, notary='', blocks_mined='', sum_value_mined='', \
-            mined_date='', time_stamp=int(time.time())):
-        self.notary = notary
-        self.blocks_mined = blocks_mined
-        self.sum_value_mined = sum_value_mined
-        self.mined_date = mined_date
-        self.time_stamp = time_stamp
-
-    def validated(self):
-        return True
-
-    def update(self):
-        row_data = (
-            self.notary, self.blocks_mined, self.sum_value_mined, \
-            self.mined_date, self.time_stamp
-        )
-        if self.validated():
-            logger.info(f"Updating mined_count_daily TABLE {self.notary} ")
-            update_season_mined_count_row(row_data)
-        else:
-            logger.warning(f"Row data invalid!")
-            logger.warning(f"{row_data}")
-
-    def delete(self):
-        CURSOR.execute(f"DELETE FROM mined_count_daily WHERE notary = '{self.notary}';")
-        CONN.commit()
-
 class notarised_chain_daily_row():
     def __init__(self, chain='', ntx_count='', notarised_date=''):
         self.chain = chain
@@ -655,4 +562,97 @@ class ntx_tenure_row():
         
 
 
+## KMD MINING CLASSES ###
+
+class mined_row():
+    def __init__(self, block_height='', block_time='', block_datetime='', 
+             value='', address='', name='', txid='', season=''):
+        self.block_height = block_height
+        self.block_time = block_time
+        self.block_datetime = block_datetime
+        self.value = value
+        self.address = address
+        self.name = name
+        self.txid = txid
+        self.season = season
+
+    def validated(self):
+        return True
+
+    def update(self):
+        row_data = (
+            self.block_height, self.block_time, self.block_datetime, 
+            self.value, self.address, self.name, self.txid, self.season
+        )
+        if self.validated():
+            update_mined_row(row_data)
+            logger.info(f"Updated mined TABLE {self.block_height} | {self.name} | {self.value} ")
+        else:
+            logger.warning(f"Row data invalid!")
+            logger.warning(f"{row_data}")
+
+    def delete(self):
+        CURSOR.execute(f"DELETE FROM mined WHERE name = '{self.name}';")
+        CONN.commit()
+
+class season_mined_count_row():
+    def __init__(self, notary='', season='', blocks_mined='', sum_value_mined='', 
+            max_value_mined='', last_mined_blocktime='', last_mined_block='', 
+            time_stamp=int(time.time())):
+        self.notary = notary
+        self.season = season
+        self.blocks_mined = blocks_mined
+        self.sum_value_mined = sum_value_mined
+        self.max_value_mined = max_value_mined
+        self.last_mined_blocktime = last_mined_blocktime
+        self.last_mined_block = last_mined_block
+        self.time_stamp = time_stamp
+
+    def validated(self):
+        return True
+
+    def update(self):
+        row_data = (
+            self.notary, self.season, self.blocks_mined, 
+            self.sum_value_mined, self.max_value_mined,
+            self.last_mined_blocktime, self.last_mined_block, self.time_stamp
+        )
+        if self.validated():
+            logger.info(f"Updating season_mined_count TABLE {self.notary} ")
+            update_season_mined_count_row(row_data)
+        else:
+            logger.warning(f"Row data invalid!")
+            logger.warning(f"{row_data}")
+
+    def delete(self):
+        CURSOR.execute(f"DELETE FROM season_mined_count WHERE notary = '{self.notary}';")
+        CONN.commit()
+
+class daily_mined_count_row():
+    def __init__(self, notary='', blocks_mined='', sum_value_mined='', \
+            mined_date='', time_stamp=int(time.time())):
+        self.notary = notary
+        self.blocks_mined = blocks_mined
+        self.sum_value_mined = sum_value_mined
+        self.mined_date = mined_date
+        self.time_stamp = time_stamp
+
+    def validated(self):
+        return True
+
+    def update(self):
+        row_data = (
+            self.notary, self.blocks_mined, self.sum_value_mined, \
+            self.mined_date, self.time_stamp
+        )
+        if self.validated():
+            logger.info(f"Updating mined_count_daily TABLE {self.notary} ")
+            update_season_mined_count_row(row_data)
+        else:
+            logger.warning(f"Row data invalid!")
+            logger.warning(f"{row_data}")
+
+    def delete(self):
+        CURSOR.execute(f"DELETE FROM mined_count_daily WHERE notary = '{self.notary}';")
+        CONN.commit()
 
