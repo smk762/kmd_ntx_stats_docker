@@ -542,6 +542,21 @@ NOTARY_PUBKEYS = {
         "artemii235_DEV": "037a20916d2e9ea575300ac9d729507c23a606b9a200c8e913d7c9832f912a1fa7",
         "tonyl_DEV": "0258b77d7dcfc6c2628b0b6b438951a6e74201fb2cd180a795e4c37fcf8e78a678",
         "decker_DEV": "02fca8ee50e49f480de275745618db7b0b3680b0bdcce7dcae7d2e0fd5c3345744"
+        },
+    "Season_5_Testnet": {
+            "Alright0": "02480688f3bd5d455481c63607d5ab2ddbe3f9ba407b7dd91b68f7e983e8b8c2e4",
+            "Alright1": "026943ec773d7a273d56d50546583ded7bc3521a731cc9d4dba273e67c721d2832",
+            "daemonfox": "0314e6cf7d6f8e4e54c63ab179c77d64f36e17f7032e614ed5a38e4f9001c47217",
+            "jorian": "038dd5025c22e22640f940083b76f3a728979a91513e5baa59e9be888153d34875",
+            "gcharang": "0249e51068be9031d20cb2ad4fa214706af32f12b5d254ab01e457f1a60a367878",
+            "dudezmobi": "02ff5f6b33ddb72b79da6e2396751fa9b8ad6a58bb86dcf0c49f2b3bf891b92c74",
+            "CHMEX": "02551b3ff2e666cc6ca82356a818821e28bde8c47ac5adcd9fffe772bf71fe8d2e",
+            "crisf": "02f8a9bd7a5f2a3878182e566093f08aebe258908ca481bf1638451a1ebd5aed94",
+            "smk": "03e81e1333f9f91a8d2afcfe3fcffaba8ba543d5552e4cbe3faf7cf64d2887d4f5",
+            "Paro": "02cceec27084c0d1795caccf98fd1abd531b809cec6f04da51735af4a3f17b19f1",
+            "madmax": "03b9b4d0b661444d204010b995d23b092719ea9e3c284c63cb80b0fe85b9a03871",
+            "phm87": "0361fd943ad190ee6a0ca982497e2475dc968787934f16f3f556b0c915034971e1",
+            "tonyL": "031dc30665bf0cdec6330aad72639717e153324f715592b94c3f5310998356267f"
         }
 }
 
@@ -572,6 +587,13 @@ SEASONS_INFO = {
             "start_block":1922000,
             "end_block":2444000,
             "start_time":1592146800,
+            "end_time":1751328000,
+            "notaries":[]
+        },
+    "Season_5_Testnet": {
+            "start_block":2299140,
+            "end_block":2444000,
+            "start_time":1615367302,
             "end_time":1751328000,
             "notaries":[]
         }

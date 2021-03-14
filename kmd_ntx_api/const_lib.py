@@ -67,3 +67,5 @@ noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA', 'MCL', 'VRSC']
 url = "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json"
 r = requests.get(url)
 eco_data = r.json()
+
+TESTNET_CHAINS = ["RICK", "MORTY"]

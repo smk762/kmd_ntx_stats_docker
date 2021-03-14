@@ -33,5 +33,16 @@ for notary in NOTARY_PUBKEYS['Season_4']:
         nn_social.icon = elected_nn_social[notary_name]["icon"]
         nn_social.update()
     
+
+r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/season4/elected_nn_social.json")
+elected_nn_social = r.json()
+
+season = "Season_5_Testnet"
+for notary in NOTARY_PUBKEYS['Season_5_Testnet']:
+    nn_social = nn_social_row()
+    nn_social.notary = f"{notary}"
+    nn_social.season = season
+    nn_social.update()
+    
 CURSOR.close()
 CONN.close()

@@ -10,6 +10,7 @@ from .models import *
 from .const_lib import *
 from .query_lib import *
 from .helper_lib import *
+from .base_58 import *
 logger = logging.getLogger("mylogger")
 
 load_dotenv()
@@ -937,3 +938,178 @@ def get_split_stats_table():
             row.append(nn)
             split_rows.append(row)
     return split_rows
+
+def get_address_from_pubkey(request):
+    coin = "KMD"
+
+    if "coin" in request.GET:
+        if request.GET["coin"] in COIN_PARAMS:
+            coin = request.GET["coin"]
+
+    if "pubkey" in request.GET:
+        pubkey = request.GET["pubkey"]
+        return {
+            "coin": coin,
+            "pubkey": pubkey,
+            "address": get_addr_from_pubkey(coin, pubkey)
+        }
+
+    else:
+        return {
+            "Error": "You need to specify a pubkey and coin like '?coin=KMD&pubkey=<YOUR_PUBKEY>'\nIf coin not specified or unknown, will revert to KMD"
+        }
+
+
+def get_testnet_addresses(season):
+    addresses_dict = {}
+    addresses_data = addresses.objects.filter(season=season, chain="KMD")
+    addresses_data = addresses_data.order_by('notary').values()
+
+    for item in addresses_data:
+        if item["notary"] not in addresses_dict: 
+            addresses_dict.update({item["notary"]:item['address']})
+
+    return addresses_dict
+
+def prepare_testnet_stats_dict(season, testnet_chains):
+    notaries = get_notary_list(season)
+    testnet_stats_dict = create_dict(notaries)
+
+    addresses_dict = get_testnet_addresses(season)
+
+    testnet_stats_dict = add_numeric_dict_nest(testnet_stats_dict, "Total")
+    testnet_stats_dict = add_numeric_dict_nest(testnet_stats_dict, "Rank")
+    testnet_stats_dict = add_numeric_dict_nest(testnet_stats_dict, "24hr_Total")
+    testnet_stats_dict = add_numeric_dict_nest(testnet_stats_dict, "24hr_Rank")
+    testnet_stats_dict = add_string_dict_nest(testnet_stats_dict, "Address")
+
+    for chain in testnet_chains:
+        testnet_stats_dict = add_numeric_dict_nest(testnet_stats_dict, chain)
+        testnet_stats_dict = add_numeric_dict_nest(testnet_stats_dict, f"24hr_{chain}")
+        testnet_stats_dict = add_numeric_dict_nest(testnet_stats_dict, f"Last_{chain}")
+
+    for notary in testnet_stats_dict:
+        if notary in addresses_dict:
+            address = addresses_dict[notary]
+            testnet_stats_dict[notary].update({"Address":address})
+    return testnet_stats_dict
+
+def get_api_testnet(request, stat):
+    season = "Season_5_Testnet"
+
+    # Prepare ntx data
+    ntx_data = notarised.objects.filter(season=season) \
+            .order_by('chain', '-block_height') \
+            .values()
+
+    ntx_dict = {}
+    for item in ntx_data:
+        chain = item['chain']
+        if chain not in ntx_dict:
+            ntx_dict.update({chain:[]})
+        ntx_dict[chain].append(item)
+
+    # Prepare 24hr ntx data
+    ntx_data_24hr = notarised.objects.filter(season=season, 
+        block_time__gt=str(int(time.time()-24*60*60))) \
+        .order_by('chain', '-block_height') \
+        .values()
+
+    ntx_dict_24hr = {}
+    for item in ntx_data_24hr:
+        chain = item['chain']
+        if chain not in ntx_dict_24hr:
+            ntx_dict_24hr.update({chain:[]})
+        ntx_dict_24hr[chain].append(item)
+
+    testnet_chains = list(ntx_dict.keys())
+
+    if stat == "raw":
+        return wrap_api(ntx_dict)
+
+    if stat == "raw_24hrs":
+        return wrap_api(ntx_dict_24hr)
+
+    elif stat == "totals":
+        testnet_stats_dict = prepare_testnet_stats_dict(season, testnet_chains)
+
+        last_notarisations = get_last_nn_chain_ntx(season)
+
+        for chain in testnet_chains:
+
+            # Get last notarised times
+            for notary in testnet_stats_dict:
+                try:
+                    last_chain_ntx = last_notarisations[notary][chain]["time_since"]
+                    testnet_stats_dict[notary].update({f"Last_{chain}":last_chain_ntx})
+                except Exception as e:
+                    print(e)
+                    testnet_stats_dict[notary].update({f"Last_{chain}":"> 24hrs"})
+
+            # Get notarisation counts
+            for item in ntx_dict[chain]:
+                ntx_notaries = item["notaries"]
+
+                for notary in ntx_notaries:
+
+                    if testnet_stats_dict[notary]["Total"] == 0:
+                        testnet_stats_dict[notary].update({"Total":1})
+
+                    else:
+                        count = testnet_stats_dict[notary]["Total"]+1
+                        testnet_stats_dict[notary].update({"Total":count})
+
+                    if testnet_stats_dict[notary][chain] == 0:
+                        testnet_stats_dict[notary].update({chain:1})
+                        testnet_stats_dict[notary].update({chain:1})
+                        
+                    else:
+                        count = testnet_stats_dict[notary][chain]+1
+                        testnet_stats_dict[notary].update({chain:count})
+
+            # Get notarisation counts 24hr
+            for item in ntx_dict_24hr[chain]:
+                ntx_notaries = item["notaries"]
+
+                for notary in ntx_notaries:
+
+                    if testnet_stats_dict[notary]["24hr_Total"] == 0:
+                        testnet_stats_dict[notary].update({"24hr_Total":1})
+
+                    else:
+                        count = testnet_stats_dict[notary]["24hr_Total"]+1
+                        testnet_stats_dict[notary].update({"24hr_Total":count})
+
+                    if testnet_stats_dict[notary][chain] == 0:
+                        testnet_stats_dict[notary].update({f"24hr_{chain}":1})
+                        testnet_stats_dict[notary].update({f"24hr_{chain}":1})
+                        
+                    else:
+                        count = testnet_stats_dict[notary][f"24hr_{chain}"]+1
+                        testnet_stats_dict[notary].update({f"24hr_{chain}":count})
+
+        # Get notarisation rank
+        notary_totals = {}
+        for notary in testnet_stats_dict:
+            notary_totals.update({notary:testnet_stats_dict[notary]["Total"]})
+        ranked_totals = {k: v for k, v in sorted(notary_totals.items(), key=lambda x: x[1])}
+        ranked_totals = dict(reversed(list(ranked_totals.items()))) 
+
+        i = 0
+        for notary in ranked_totals:
+            i += 1
+            testnet_stats_dict[notary].update({"Rank":i})
+
+        # Get 24hr notarisation rank
+        notary_totals_24hr = {}
+        for notary in testnet_stats_dict:
+            notary_totals_24hr.update({notary:testnet_stats_dict[notary]["24hr_Total"]})
+        ranked_totals_24hr = {k: v for k, v in sorted(notary_totals_24hr.items(), key=lambda x: x[1])}
+        ranked_totals_24hr = dict(reversed(list(ranked_totals_24hr.items()))) 
+
+        i = 0
+        for notary in ranked_totals_24hr:
+            i += 1
+            testnet_stats_dict[notary].update({"24hr_Rank":i})
+
+        return wrap_api(testnet_stats_dict)

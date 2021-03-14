@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 from lib_notary import *
+from lib_const import *
 from lib_table_update import *
 from lib_table_select import *
 from lib_api import *
 
+deleted = []
 def get_existing_nn_btc_txids(address=None, category=None, season=None):
     recorded_txids = []
     sql = f"SELECT DISTINCT txid from nn_btc_tx"
@@ -77,10 +79,11 @@ def validate_split_rows():
         txid_row_count = CURSOR.fetchall()[0][0]
 
         if txid_row_count != 1:
-            print(f"split {txid} row count {txid_row_count}")
+            print(f"split {THIS_SERVER}/api/info/nn_btc_txid?txid={txid} row count > 1 {txid_row_count}")
             delete = input("Delete? (y/n)")
 
             if delete in ["Y", "y"]:
+                deleted.append(txid)
                 CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
                 CONN.commit()
                 print(f"deleted {txid}")
@@ -113,7 +116,8 @@ def validate_notaries_by_address(address, season):
 
         if NN_BTC_ADDRESSES_DICT[season][address] != notary:
             print(f"{address} is {NN_BTC_ADDRESSES_DICT[season][address]}, not {notary}")
-            update_it = input("Update? (y/n)")
+            #update_it = input("Update? (y/n)")
+            update_it = "Y"
 
             if update_it in ["Y", "y"]:
                 sql = f"UPDATE nn_btc_tx SET notary = '{NN_BTC_ADDRESSES_DICT[season][address]}' WHERE address = '{address}' and txid = '{txid}';"
@@ -134,3 +138,4 @@ print(f"Categories in DB:")
 CURSOR.execute(f"SELECT DISTINCT category FROM nn_btc_tx;")
 cat_rows = CURSOR.fetchall()
 print(cat_rows)
+print(f"Deleted txids = {deleted}")

@@ -7,6 +7,7 @@ import requests
 from lib_const import NOTARY_BTC_ADDRESSES, OTHER_SERVER
 from lib_notary import get_new_notary_txids
 from models import tx_row
+from lib_const import *
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()

@@ -5,10 +5,10 @@ conn = table_lib.connect_db()
 cursor = conn.cursor()
 
 #table = 'balances'
-#table = 'notarised'
+table = 'nn_social'
 #table = 'mined'
 #table = 'mined_count_season'
-table = 'nn_btc_tx'
+#table = 'nn_btc_tx'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
@@ -19,17 +19,16 @@ print(cursor.fetchall())
 #    cursor.execute(f"DELETE FROM {table} WHERE category='{i}';")
 #    conn.commit()
 
-cursor.execute("DELETE FROM coins WHERE chain = 'PBC';")
-#cursor.execute("DELETE FROM "+table+" WHERE category='No Vout NTX' or category='Low Vin NTX' or category='Incoming Replenish';")
+#cursor.execute("DELETE FROM "+table+" WHERE category='Other';")
 
-#cursor.execute("DELETE FROM "+table+" WHERE txid='b05e743a6ad8e419aef37d2c4a0f3882e4737115fe26812c7289df3372a4167f';")
+cursor.execute("DELETE FROM "+table+" WHERE season='Season_5_Testnet';")
 conn.commit()
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
 
-cursor.execute("SELECT DISTINCT category FROM "+table+";")
-print(cursor.fetchall())
+#cursor.execute("SELECT DISTINCT category FROM "+table+";")
+#print(cursor.fetchall())
 
 cursor.close()
 

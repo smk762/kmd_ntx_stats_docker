@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import logging
+import json
 import logging.handlers
 import os
 from psycopg2.extras import execute_values
@@ -71,7 +72,9 @@ def update_ntx_row(row_data):
                                 block_time, block_datetime, block_hash, \
                                 notaries, ac_ntx_blockhash, ac_ntx_height, \
                                 txid, opret, season, btc_validated) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_txid DO UPDATE SET \
+            season='"+str(row_data[10])+"';"
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()
