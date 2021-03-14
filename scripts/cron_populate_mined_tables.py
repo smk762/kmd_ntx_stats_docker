@@ -6,9 +6,10 @@ from datetime import datetime as dt
 import datetime
 
 from lib_const import SEASONS_INFO, SKIP_PAST_SEASONS, SKIP_UNTIL_YESTERDAY, RPC
-from lib_table_select import select_from_table, get_season_mined_counts
+from lib_table_select import select_from_table, get_season_mined_counts, get_mined_date_aggregates
 from lib_notary import get_season, update_miner, get_season_notaries, get_daily_mined_counts
-from models import season_mined_count_row
+from models import season_mined_count_row, daily_mined_count_row
+
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -109,14 +110,24 @@ start = season_start_dt.date()
 end = datetime.date.today()
 
 if SKIP_UNTIL_YESTERDAY:
-    start = end - datetime.timedelta(days=7)
+    start = end - datetime.timedelta(days=31)
 
 delta = datetime.timedelta(days=1)
 logger.info("Aggregating daily mined counts from "+str(start)+" to "+str(end))
 day = start
 
+time_stamp = int(time.time())
 while day <= end:
+    logger.info(f"Aggregating daily mined counts for {day}")
+    results = get_mined_date_aggregates(day)
     
-    get_daily_mined_counts(day)
+    for item in results:
+        row = daily_mined_count_row()
+        row.notary = item[0]
+        row.blocks_mined = int(item[1])
+        row.sum_value_mined = float(item[2])
+        row.mined_date = day
+        row.time_stamp = time_stamp
+        row.update()
     day += delta
 logger.info("Finished!")

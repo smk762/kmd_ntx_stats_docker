@@ -646,8 +646,8 @@ class daily_mined_count_row():
             self.mined_date, self.time_stamp
         )
         if self.validated():
-            logger.info(f"Updating mined_count_daily TABLE {self.notary} ")
-            update_season_mined_count_row(row_data)
+            logger.info(f"Updating mined_count_daily TABLE {self.notary} {self.mined_date} ")
+            update_daily_mined_count_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
             logger.warning(f"{row_data}")
