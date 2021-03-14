@@ -116,6 +116,7 @@ logger.info("Aggregating daily mined counts from "+str(start)+" to "+str(end))
 day = start
 
 while day <= end:
+    
     get_daily_mined_counts(day)
     day += delta
 logger.info("Finished!")

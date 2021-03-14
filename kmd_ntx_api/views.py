@@ -1231,6 +1231,52 @@ def split_summary_table(request):
     resp = get_split_stats_table()
     return JsonResponse(resp)
 
+# TESTNET
+
+def api_testnet_raw(request):
+    resp = get_api_testnet(request, "raw")
+    return JsonResponse(resp)
+
+def api_testnet_raw_24hr(request):
+    resp = get_api_testnet(request, "raw_24hr")
+    return JsonResponse(resp)
+
+def api_testnet_totals(request):
+    resp = get_api_testnet(request, "totals")
+    return JsonResponse(resp)
+
+
+def testnet_ntx_scoreboard(request):
+    season = get_season(int(time.time()))
+    notary_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+ 
+    testnet_ntx_counts = get_api_testnet(request, "totals")["results"][0]
+    num_notaries = len(testnet_ntx_counts)
+
+    combined_total = 0
+    combined_total_24hr = 0
+    for notary in testnet_ntx_counts:
+        combined_total += testnet_ntx_counts[notary]["Total"]
+        combined_total_24hr += testnet_ntx_counts[notary]["24hr_Total"]
+    average_score = combined_total/num_notaries
+    average_score_24hr = combined_total_24hr/num_notaries
+
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "eco_data_link":get_eco_data_link(),
+        "average_score":average_score,
+        "average_score_24hr":average_score_24hr,
+        "testnet_ntx_counts":testnet_ntx_counts
+    }
+    return render(request, 'testnet_scoreboard.html', context)
+
+# TOOLS
+
+def api_address_from_pubkey(request):
+    resp = get_address_from_pubkey(request)
+    return JsonResponse(resp)
+
 # sync lag graph
 # daily ntx category stack graph
 # monitor and detect suspicious NN fund exits. To other NN addr is ok, ntx is ok.

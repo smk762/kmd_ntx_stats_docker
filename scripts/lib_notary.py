@@ -40,7 +40,10 @@ def get_season(time_stamp):
     if round((time_stamp/1000)/time.time()) == 1:
         time_stamp = time_stamp/1000
     for season in SEASONS_INFO:
-        if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= SEASONS_INFO[season]['end_time']:
+        if season.find("Testnet") == -1:
+            if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= SEASONS_INFO[season]['end_time']:
+                return season
+        else:
             return season
     return None
 
@@ -48,8 +51,9 @@ def get_season_from_block(block):
     if not isinstance(block, int):
         block = int(block)
     for season in SEASONS_INFO:
-        if block >= SEASONS_INFO[season]['start_block'] and block <= SEASONS_INFO[season]['end_block']:
-            return season
+        if season.find("Testnet") == -1:
+            if block >= SEASONS_INFO[season]['start_block'] and block <= SEASONS_INFO[season]['end_block']:
+                return season
     return None
 
 def get_seasons_from_address(addr, chain="KMD"):
@@ -65,6 +69,8 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD"):
     if BTC_NTX_ADDR in address_list:
         address_list.remove(BTC_NTX_ADDR)
 
+    print(address_list)
+
     seasons = list(SEASONS_INFO.keys())[::-1]
     notary_seasons = []
     last_season = None
@@ -75,17 +81,23 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD"):
             notary_seasons = []
 
         season_notaries = list(NOTARY_ADDRESSES_DICT[season].keys())
+
         for notary in season_notaries:
             addr = NOTARY_ADDRESSES_DICT[season][notary][tx_chain]
+
             if addr in address_list:
                 notary_seasons.append(season)
 
-        if len(notary_seasons) == 13:
+        if len(notary_seasons) == 13 or "Season_5_Testnet" in notary_seasons and len(set(notary_seasons)) == 1:
             break
         last_season_num = season
 
-    if len(notary_seasons) == 13 and len(set(notary_seasons)) == 1:
+    if "Season_5_Testnet" in notary_seasons and len(set(notary_seasons)) == 1:
+        return "Season_5_Testnet"
+
+    elif len(notary_seasons) == 13 and len(set(notary_seasons)) == 1:
         return notary_seasons[0]
+
     else:
         return get_season(time_stamp)
 
@@ -141,7 +153,7 @@ def get_ntx_data(txid):
     this_block_height = raw_tx['height']
     if len(dest_addrs) > 0:
         if NTX_ADDR in dest_addrs:
-            if len(raw_tx['vin']) == 13:
+            if len(raw_tx['vin']) > 1:
                 notary_list = []
                 address_list = []
                 for item in raw_tx['vin']:
@@ -373,7 +385,8 @@ now = int(time.time())
 
 def update_ntx_tenure(chains, seasons):
     for chain in chains:
-        for season in seasons:            
+        for season in seasons:
+            logger.info(f"Getting tenure for {season} {chain}")      
             ntx_results = get_ntx_min_max(season, chain)
             logger.info(chain+" "+season+": "+str(ntx_results))
             max_blk = ntx_results[0]

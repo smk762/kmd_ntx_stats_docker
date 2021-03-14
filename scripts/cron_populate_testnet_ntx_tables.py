@@ -96,8 +96,6 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
                 runtime = int(time.time()-start)
                 pct = round(i/num_unrecorded_KMD_txids*100,3)
                 est_end = int(100/pct*runtime)
-                if row.season == "Season_5_Testnet":
-                    logger.info(f"{row.season} NTX {row.notaries}")
                 logger.info(str(pct)+"% :"+str(i)+"/"+str(num_unrecorded_KMD_txids)+
                          " records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
 
@@ -398,39 +396,17 @@ def update_latest_ntx(season):
 
 tip = int(RPC["KMD"].getblockcount())
 
-if SKIP_PAST_SEASONS:
-    for season in SEASONS_INFO:
-        if season == get_season(time.time()) or season.find("Testnet") != -1:
-            logger.info(f"Processing notarisations for {season} only")
-            unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season)
-            update_KMD_notarisations(unrecorded_KMD_txids)
+season = "Season_5_Testnet"
+logger.info(f"Processing notarisations for {season} only")
+unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season)
+update_KMD_notarisations(unrecorded_KMD_txids)
 
-            update_daily_notarised_counts(season)
-            update_daily_notarised_chains(season)
+update_daily_notarised_counts(season)
+update_daily_notarised_chains(season)
 
-            update_season_notarised_counts(season)
-            update_latest_ntx(season)
+update_season_notarised_counts(season)
+update_latest_ntx(season)
 
-else:
-    for season in SEASONS_INFO:
-        # Some S1 OP_RETURNS are decoding incorrectly, so skip.
-        if season != "Season_1":
-            logger.info("Processing notarisations for "+season)
-
-
-            unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season)
-            update_KMD_notarisations(unrecorded_KMD_txids)
-
-            update_daily_notarised_counts(season)
-            update_daily_notarised_chains(season)
-
-            update_season_notarised_counts(season)
-            update_latest_ntx(season)
-
-notarised_chains = get_notarised_chains()
-notarised_seasons = get_notarised_seasons()
-
-update_ntx_tenure(notarised_chains, notarised_seasons)
 
 CURSOR.close()
 CONN.close()

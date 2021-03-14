@@ -14,6 +14,7 @@ from lib_table_select import get_existing_nn_btc_txids
 from lib_api import get_btc_tx_info
 from models import tx_row, last_notarised_row, ntx_records_row
 from lib_const import *
+from known_txids import *
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -174,14 +175,76 @@ def detect_consolidate(vins, vouts):
 
     return False
 
+def update_notary_linked_vins(vins):
+    vin_notaries = []
+    vin_non_notary_addresses = []
+    for vin in vins:
+        address = vin["addresses"][0]
+        if is_notary_address(address):
+            notary = ALL_SEASON_NN_BTC_ADDRESSES_DICT[address]
+            vin_notaries.append(notary)
+        else:
+            vin_non_notary_addresses.append(address)
+
+    if len(list(set(vin_notaries))) == 1 and len(vin_non_notary_addresses) > 0:
+        for addr in vin_non_notary_addresses:
+            update_nn_btc_tx_notary_from_addr(f"{notary} (linked)", address)
+
+
+def detect_intra_notary(vins, vouts):
+    for vin in vins:
+        address = vin["addresses"][0]
+        if is_notary_address(address):
+            notary = ALL_SEASON_NN_BTC_ADDRESSES_DICT[address]
+        else:
+            return False
+
+    for vout in vouts:
+        address = vout["addresses"][0]
+        if is_notary_address(address):
+            notary = ALL_SEASON_NN_BTC_ADDRESSES_DICT[address]
+        else:
+            return False
+
+    return True
+
+def detect_spam(txid_data, addresses):
+    if '1See1xxxx1memo1xxxxxxxxxxxxxBuhPF' in addresses:        
+        txid_data.input_sats = 0
+        txid_data.output_sats = 0
+        txid_data.input_index = 0
+        txid_data.output_index = 0
+        txid_data.category = "SPAM"
+        for vout in vouts:
+            txid_data.address = addresses[0]
+            txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
+            if txid_data.notary != "non-NN":
+                txid_data.update()
+        return True
+    return False
+
+
+def detect_split(txid_data, addresses):
+    if len(addresses) == 1:
+        txid_data.category = "Split"
+        txid_data.input_sats = -99
+        txid_data.output_sats = -99
+        txid_data.input_index = -99
+        txid_data.output_index = -99
+        txid_data.address = addresses[0]
+        txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
+        txid_data.update()
+        return True
+    return False
+
 season = "Season_4"
 i = 0
 num_addr = len(NOTARY_BTC_ADDRESSES[season])
 
 
 notary_last_ntx = get_notary_last_ntx("BTC")
-print(notary_last_ntx)
 
+NOTARY_BTC_ADDRESSES[season].reverse()
 for notary_address in NOTARY_BTC_ADDRESSES[season]:
     i += 1
 
@@ -192,6 +255,7 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
 
     existing_txids = get_existing_nn_btc_txids(notary_address)
     txids = get_new_nn_btc_txids(existing_txids, notary_address)
+    # txids = ["a91ee826138ac209e1c03ea599d86918ece7bed436b14dbeb231e98a82d16317"]
 
     logger.info(f"{len(existing_txids)} EXIST IN DB FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
     logger.info(f"{len(txids)} NEW TXIDs TO PROCESS FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
@@ -226,6 +290,7 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
 
             vouts = tx_info["outputs"]
             vins = tx_info["inputs"]
+            update_notary_linked_vins(vins)
 
             ## CATEGORIES ##
             # SPAM index/outputs = 0
@@ -240,48 +305,37 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
             # OTHER (FALL BACK)
 
             # single row for memo.sv spam
-            if '1See1xxxx1memo1xxxxxxxxxxxxxBuhPF' in addresses:
-                txid_data.input_sats = 0
-                txid_data.output_sats = 0
-                txid_data.input_index = 0
-                txid_data.output_index = 0
-                txid_data.category = "SPAM"
-                for vout in vouts:
-                    txid_data.address = addresses[0]
-                    txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
-                    if txid_data.notary != "non-NN":
-                        txid_data.update()
+            if detect_spam(txid_data, addresses):
+                logger.info("SPAM detected")
 
             # Detect Split (single row only)
-            elif len(addresses) == 1:
-                txid_data.category = "Split"
-                txid_data.input_sats = -99
-                txid_data.output_sats = -99
-                txid_data.input_index = -99
-                txid_data.output_index = -99
-                txid_data.address = addresses[0]
-                txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
-                txid_data.update()
+            elif detect_split(txid_data, addresses):
+                logger.info("SPLIT detected")
 
             else:
-                if txid in ["9d29730c09f7d1983a413a14bb0b8ffcf0cb652472a428e97c250da03ae47082", "9bc103a16c477d55ba42e4fc97a6256e04813e9b947c895c6cd0e2f028bdfa67"] :
+                if txid in MadMax_personal_top_up:
                     txid_data.category = "MadMax personal top up"
-                if txid in ["6f19dcb633bd4d2423f31e3b393c6b69dfceec3fa9f787340a3a3ef8f694a8f3", "a11f4aeaabf73c8bd26dcb64676d2c2521af4733f073b1a5bdeabefc80e2adb2"]:
+                elif txid in BTC_NTX_ADDR_consolidate:
                     txid_data.category = "BTC_NTX_ADDR consolidate"
-                elif txid in [
-                    "e4b2e4afa20b7cf39e96422bb72a522e0cb9fc49dbd4cfa5386b3733833365aa",
-                    "5d93f75414d6c581e8589339fe1915437a01b0e8ee4149a5fea508a080b1815e",
-                    "535bac3813dd0e36db503dbeef916f8e1198386a5909b1b7142a5984e91309c5",
-                    "f18186cd8a05f2a5148694ccbf95c4230b4b63183d835c9d88fed15b16c1db7d",
-                    "8737a7bb20e9f33e2c46a1c5d93b11d2c64f04e1cab4655eeb314e8e93f84ec6"
-                    ]:
+                elif txid in previous_season_funds_transfer:
                     txid_data.category = "previous season funds transfer"
+                elif txid in webworker_2step_consolidate:
+                    txid_data.category = "webworker_2step_consolidate"
+                elif txid in team_incoming:
+                    txid_data.category = "team_incoming"
+                elif txid in dragonhound_witness:
+                    txid_data.category = "dragonhound_witness"
+                elif txid in cipi_faucet:
+                    txid_data.category = "cipi_faucet"
+                    
                 elif detect_ntx(vins, vouts):
                     txid_data.category = "NTX"
                 elif detect_replenish(vins, vouts):
                     txid_data.category = "Replenish"
-                elif detect_consolidate(vins, vouts):
+                elif detect_consolidate(vins, vouts) or txid in dragonhound_consolidate:
                     txid_data.category = "Consolidate"
+                elif detect_intra_notary(vins, vouts):
+                    txid_data.category = "Intra-Notary"
                 else:
                     txid_data.category = "Other"
 
@@ -352,6 +406,7 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
                             row.btc_validated =  "true"
                             row.update()     
 
+            logger.info(f"TXID: {txid} ({txid_data.category})")
         else:
             logger.warning(f"Fees not in txinfo for {txid}! Likely unconfirmed...")
 

@@ -460,29 +460,49 @@ def get_coin_notariser_ranks(season):
     ntx_season = notarised_count_season.objects \
                                     .filter(season=season) \
                                     .values()
-    region_notary_ranks = {
-        "AR":{},
-        "EU":{},
-        "NA":{},
-        "SH":{},
-        "DEV":{}
-    }
-    notary_list = get_notary_list(season)
-    dpow_coins = get_dpow_coins_list()
-    for notary in notary_list:
-        region = get_notary_region(notary)
-        if region in ["AR","EU","NA","SH", "DEV"]:
-            region_notary_ranks[region].update({notary:{}})
-    for item in ntx_season:
-        notary = item['notary']
-        if notary in notary_list:
-            for coin in item['chain_ntx_counts']:
-                if coin in dpow_coins:
-                    region = get_notary_region(notary)
-                    if region in ["AR","EU","NA","SH", "DEV"]:
+    if season == "Season_5_Testnet":
+        region_notary_ranks = {
+            "TESTNET":{}
+        }
+        notary_list = get_notary_list(season)
+        dpow_coins = ["RICK", "MORTY"]
+
+        for notary in notary_list:
+            region_notary_ranks["TESTNET"].update({notary:{}})
+
+        for item in ntx_season:
+            notary = item['notary']
+
+            if notary in notary_list:
+                for coin in item['chain_ntx_counts']:
+                    if coin in dpow_coins:
                         region_notary_ranks[region][notary].update({
                             coin:item['chain_ntx_counts'][coin]
                         })
+    else:
+        region_notary_ranks = {
+            "AR":{},
+            "EU":{},
+            "NA":{},
+            "SH":{},
+            "DEV":{}
+        }
+        notary_list = get_notary_list(season)
+        dpow_coins = get_dpow_coins_list()
+        for notary in notary_list:
+            region = get_notary_region(notary)
+            if region in ["AR","EU","NA","SH", "DEV"]:
+                region_notary_ranks[region].update({notary:{}})
+        for item in ntx_season:
+            notary = item['notary']
+            if notary in notary_list:
+                for coin in item['chain_ntx_counts']:
+                    if coin in dpow_coins:
+                        region = get_notary_region(notary)
+                        if region in ["AR","EU","NA","SH", "DEV"]:
+                            region_notary_ranks[region][notary].update({
+                                coin:item['chain_ntx_counts'][coin]
+                            })
     return region_notary_ranks
 
 
@@ -665,7 +685,7 @@ def get_mined_count_daily_data(request):
     delta = datetime.timedelta(days=1)
     yesterday = item['mined_date']-delta
     tomorrow = item['mined_date']+delta
-    url = request.build_absolute_uri('/mined_stats/daily/')
+    url = request.build_absolute_uri('/api/mined_stats/daily/')
     return paginate_wrap(resp, url, "mined_date",
                          str(yesterday), str(tomorrow))
 
@@ -793,7 +813,7 @@ def get_notarised_chain_daily_data(request):
         delta = datetime.timedelta(days=1)
         yesterday = today-delta
         tomorrow = today+delta
-    url = request.build_absolute_uri('/chain_stats/daily/')
+    url = request.build_absolute_uri('/api/chain_stats/daily/')
     return paginate_wrap(resp, url, "notarised_date",
                          str(yesterday), str(tomorrow))
 
@@ -850,7 +870,7 @@ def get_notarised_count_date_data(request):
         yesterday = today-delta
         tomorrow = today+delta
 
-    url = request.build_absolute_uri('/notary_stats/daily/')
+    url = request.build_absolute_uri('/api/notary_stats/daily/')
     return paginate_wrap(resp, url, "notarised_date",
                          str(yesterday), str(tomorrow))
 

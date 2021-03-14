@@ -33,9 +33,9 @@ def get_chain_ntx_season_aggregates(season):
     CURSOR.execute(sql)
     return CURSOR.fetchall()
 
-def get_chain_ntx_date_aggregates(day):
+def get_chain_ntx_date_aggregates(day, season):
     sql = "SELECT chain, COALESCE(MAX(block_height), 0), COALESCE(MAX(block_time), 0), COALESCE(COUNT(*), 0) \
-           FROM notarised WHERE \
+           FROM notarised WHERE season='"+season+"' AND \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY chain;"
     CURSOR.execute(sql)
@@ -55,9 +55,9 @@ def get_ntx_for_season(season):
     CURSOR.execute(sql)
     return CURSOR.fetchall()
 
-def get_ntx_for_day(day):
+def get_ntx_for_day(day, season):
     sql = "SELECT chain, notaries \
-           FROM notarised WHERE \
+           FROM notarised WHERE season='"+season+"' AND \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
     CURSOR.execute(sql)
     resp = CURSOR.fetchall() 
@@ -192,6 +192,7 @@ def get_notary_last_ntx(chain=None):
             notary_last_ntx.update({notary:{}})
         notary_last_ntx[notary].update({chain:block_height})
     return notary_last_ntx
+
 
 def get_existing_ntxids(address=None, category=None):
     recorded_txids = []
