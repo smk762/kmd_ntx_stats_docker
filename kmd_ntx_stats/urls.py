@@ -218,9 +218,25 @@ urlpatterns = [
     path('api/info/address_btc_txids',
           views.address_btc_txids,
           name='address_btc_txids'),
-    path('api/info/nn_btc_txid_list',
-          views.nn_btc_txid_list,
-          name='nn_btc_txid_list'),
+
+    path('api/testnet/totals',
+          views.api_testnet_totals,
+          name='api_testnet_totals'),
+
+    path('api/testnet/raw',
+          views.api_testnet_raw,
+          name='api_testnet_raw'),
+
+    path('api/testnet/raw_24hr',
+          views.api_testnet_raw_24hr,
+          name='api_testnet_raw_24hr'),
+
+    path('testnet_ntx_scoreboard',
+          views.testnet_ntx_scoreboard,
+          name='testnet_ntx_scoreboard'),
+    path('api/info/address_from_pubkey',
+          views.api_address_from_pubkey,
+          name='api_address_from_pubkey'),
 
     path('api-auth/',
          include('rest_framework.urls',
