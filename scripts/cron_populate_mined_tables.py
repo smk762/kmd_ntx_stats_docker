@@ -110,7 +110,7 @@ start = season_start_dt.date()
 end = datetime.date.today()
 
 if SKIP_UNTIL_YESTERDAY:
-    start = end - datetime.timedelta(days=31)
+    start = end - datetime.timedelta(days=7)
 
 delta = datetime.timedelta(days=1)
 logger.info("Aggregating daily mined counts from "+str(start)+" to "+str(end))
