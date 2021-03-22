@@ -165,7 +165,7 @@ def detect_consolidate(vins, vouts):
             else:
                 vout_non_notary_addresses.append(address)
 
-        if len(list(set(vout_notaries))) == 1:
+        if len(list(set(vout_notaries))) == 1 and is_notary_address(vouts[0]["addresses"][0]):
             if notary == vout_notaries[0]:
                 for addr in vin_non_notary_addresses:
                     update_nn_btc_tx_notary_from_addr(f"{notary} (linked)", addr)
@@ -223,6 +223,19 @@ def detect_spam(txid_data, addresses):
         return True
     return False
 
+def detect_cipi_faucet(txid_data, addresses, vins):
+    if vins[0]["addresses"][0] == CIPI_FAUCET_ADDR and len(addresses) == 2:
+        addresses.remove(CIPI_FAUCET_ADDR)
+        txid_data.category = "cipi_faucet"
+        txid_data.input_sats = -99
+        txid_data.output_sats = -99
+        txid_data.input_index = -99
+        txid_data.output_index = -99
+        txid_data.address = addresses[0]
+        txid_data.notary = get_notary_from_btc_address(txid_data.address, txid_data.season)
+        txid_data.update()
+        return True
+    return False
 
 def detect_split(txid_data, addresses):
     if len(addresses) == 1:
@@ -308,6 +321,9 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
             if detect_spam(txid_data, addresses):
                 logger.info("SPAM detected")
 
+            elif detect_cipi_faucet(txid_data, addresses, vins):
+                logger.info("CIPI_FAUCET detected")
+
             # Detect Split (single row only)
             elif detect_split(txid_data, addresses):
                 logger.info("SPLIT detected")
@@ -319,20 +335,18 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
                     txid_data.category = "BTC_NTX_ADDR consolidate"
                 elif txid in previous_season_funds_transfer:
                     txid_data.category = "previous season funds transfer"
-                elif txid in webworker_2step_consolidate:
-                    txid_data.category = "webworker_2step_consolidate"
                 elif txid in team_incoming:
                     txid_data.category = "team_incoming"
-                elif txid in dragonhound_witness:
-                    txid_data.category = "dragonhound_witness"
-                elif txid in cipi_faucet:
-                    txid_data.category = "cipi_faucet"
+                elif txid in REPORTED:
+                    txid_data.category = "REPORTED"
+                #elif txid in pungo_other:
+                #    txid_data.category = "Other"
                     
                 elif detect_ntx(vins, vouts):
                     txid_data.category = "NTX"
                 elif detect_replenish(vins, vouts):
                     txid_data.category = "Replenish"
-                elif detect_consolidate(vins, vouts) or txid in dragonhound_consolidate:
+                elif detect_consolidate(vins, vouts) or txid in dragonhound_consolidate or txid in strob_consolidate or txid in webworker_2step_consolidate:
                     txid_data.category = "Consolidate"
                 elif detect_intra_notary(vins, vouts):
                     txid_data.category = "Intra-Notary"

@@ -1,7 +1,53 @@
 #!/usr/bin/env python3
-from lib_const import *
-import requests
+import os
 import json
+import time
+import logging
+import telebot
+import datetime
+import threading
+import concurrent.futures
+from telebot import util
+from telegram import ParseMode
+import requests
+from datetime import datetime as dt
+
+from lib_const import *
+from dotenv import load_dotenv
+from logging import Handler, Formatter
+
+load_dotenv()
+
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+
+class RequestsHandler(Handler):
+    def emit(self, record):
+        log_entry = self.format(record)
+        payload = {
+            'chat_id': TELEGRAM_CHAT_ID,
+            'text': log_entry,
+            'parse_mode': 'HTML'
+        }
+        return requests.post("https://api.telegram.org/bot{token}/sendMessage".format(token=TELEGRAM_TOKEN),
+                             data=payload).content
+
+class LogstashFormatter(Formatter):
+    def __init__(self):
+        super(LogstashFormatter, self).__init__()
+
+    def format(self, record):
+        t = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+
+        return "<i>{datetime}</i><pre>\n{message}</pre>".format(message=record.msg, datetime=t)
+
+logger = logging.getLogger()
+logger.setLevel(logging.WARNING)
+
+handler = RequestsHandler()
+formatter = LogstashFormatter()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 r = requests.get(f"{THIS_SERVER}/api/info/notary_nodes/")
 notaries = r.json()["results"][0]
@@ -23,26 +69,23 @@ for notary in notaries:
         for txid in txids:
             notaries_with_others[notary]['txids'].append(f"https://www.blockchain.com/btc/tx/{txid}")
 
-print("\n Uncategorised Transactions")
+msg = f"### Uncategorised Transactions ###\n"
 for notary in notaries_with_others:
     print(f"{notary}")
+    msg += f"### {notary} ###\n"
+
     for txid in notaries_with_others[notary]['txids']:
         print(txid)
+        msg += f"{txid}\n"
 
-'''
-for txid in [
-    "37a3dea365c395ce77d196221d1fe6e02e909ae9fe2e93e2550bb221ebb5972f",
-    "7eb2125b338b7d5a548253eedfccf4a665dd78e63490b78b7db3ec90288bc069",
-    "2fd3e99bd7b19c1fbbcc5cc15f703c2c729ae2dd8bc924e3fec81e452f810e15",
-    "3ef3e2e0e82f5a710538d32ce081fdd140a0679bcc36a32add49f65dee0430b2",
-    "6f80a01c348b19255e5a1f2403aca5034d167d7daba7563fc30b7941465d3ea9",
-    "37a3dea365c395ce77d196221d1fe6e02e909ae9fe2e93e2550bb221ebb5972f",
-    "37a3dea365c395ce77d196221d1fe6e02e909ae9fe2e93e2550bb221ebb5972f",
-    "37a3dea365c395ce77d196221d1fe6e02e909ae9fe2e93e2550bb221ebb5972f",
-    "37a3dea365c395ce77d196221d1fe6e02e909ae9fe2e93e2550bb221ebb5972f",
-    "37a3dea365c395ce77d196221d1fe6e02e909ae9fe2e93e2550bb221ebb5972f",
-    "37a3dea365c395ce77d196221d1fe6e02e909ae9fe2e93e2550bb221ebb5972f",
-    "37a3dea365c395ce77d196221d1fe6e02e909ae9fe2e93e2550bb221ebb5972f",
-    "37a3dea365c395ce77d196221d1fe6e02e909ae9fe2e93e2550bb221ebb5972f",
+        if len(msg) > 3200:
+            print(msg)
+            logger.warning(msg)
+            msg = ''
 
-]'''
+if msg == f"### Uncategorised Transactions ###\n":
+    pass
+elif msg != '':
+    print(msg)
+    logger.warning(msg)
+

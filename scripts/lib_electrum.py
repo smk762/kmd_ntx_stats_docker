@@ -9,7 +9,12 @@ import logging
 from base_58 import *
 from lib_const import *
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
 
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
@@ -117,3 +122,24 @@ def get_balance(chain, pubkey, addr, notary, node):
     except Exception as e:
         logger.warning(">>>>> "+chain+" FAILED ALL METHODS | addr: "+addr+" | "+str(e))
     return balance
+
+def get_listunspent(chain, pubkey):
+    try:
+        if chain in ELECTRUMS:
+            url = ELECTRUMS[chain]["url"]
+            port = ELECTRUMS[chain]["port"]
+            logger.info(f"{chain} {url}:{port}")
+            p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
+            p2pk_resp = get_from_electrum(url, port, 'blockchain.scripthash.listunspent', p2pk_scripthash)
+            p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
+            p2pkh_resp = get_from_electrum(url, port, 'blockchain.scripthash.listunspent', p2pkh_scripthash)
+            num_unspent = 0
+            for item in p2pk_resp['result']:
+                if item['value'] == 10000:
+                    num_unspent +=1
+            return num_unspent
+            #unspent = get_full_electrum_balance(pubkey, url, port)
+        else:
+            logger.info(f"{chain} not in electrums")
+    except Exception as e:
+        logger.error(e)
