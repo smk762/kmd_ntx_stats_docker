@@ -11,5 +11,14 @@ from base_58 import *
 from lib_const import *
 from lib_electrum import *
 
-pubkey = "026943ec773d7a273d56d50546583ded7bc3521a731cc9d4dba273e67c721d2832"
-print(get_p2pkh_scripthash_from_pubkey(pubkey))
+
+logger = logging.getLogger(__name__)
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
+pubkey = "0227e5cad3731e381df157de189527aac8eb50d82a13ce2bd81153984ebc749515"
+for chain in ANTARA_COINS:
+	logger.info(f"num {chain} utxos: {get_listunspent(chain, pubkey)}")

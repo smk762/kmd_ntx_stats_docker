@@ -400,7 +400,7 @@ tip = int(RPC["KMD"].getblockcount())
 
 if SKIP_PAST_SEASONS:
     for season in SEASONS_INFO:
-        if season == get_season(time.time()) or season.find("Testnet") != -1:
+        if season == get_season(time.time()) and season.find("Testnet") == -1:
             logger.info(f"Processing notarisations for {season} only")
             unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season)
             update_KMD_notarisations(unrecorded_KMD_txids)
@@ -427,10 +427,6 @@ else:
             update_season_notarised_counts(season)
             update_latest_ntx(season)
 
-notarised_chains = get_notarised_chains()
-notarised_seasons = get_notarised_seasons()
-
-update_ntx_tenure(notarised_chains, notarised_seasons)
 
 CURSOR.close()
 CONN.close()
