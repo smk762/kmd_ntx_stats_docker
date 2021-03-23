@@ -45,6 +45,7 @@ class GLEEC_CoinParams(CoreMainParams):
                        'SCRIPT_ADDR': 38,
                        'SECRET_KEY': 65}
 
+
 COIN_PARAMS = {
     "KMD": KMD_CoinParams,
     "MCL": KMD_CoinParams,
@@ -64,3 +65,25 @@ def get_addr_from_pubkey(coin, pubkey):
       return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
     except Exception as e:
       return str(e)
+
+def get_addr_tool(pubkey, pub_addr, script_addr, secret_key):
+    class CoinParams(CoreMainParams):
+        MESSAGE_START = b'\x24\xe9\x27\x64'
+        DEFAULT_PORT = 7770
+        BASE58_PREFIXES = {'PUBKEY_ADDR': int(pub_addr),
+                           'SCRIPT_ADDR': int(script_addr),
+                           'SECRET_KEY': int(secret_key)}
+    bitcoin.params = CoinParams
+
+    try:
+        address = str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
+        return {
+            "pubkey":pubkey,
+            "pub_addr_param":pub_addr,
+            "script_addr_param":script_addr,
+            "secret_key_param":secret_key,
+            "address":address
+        }
+
+    except Exception as e:
+        return {"error":str(e)}
