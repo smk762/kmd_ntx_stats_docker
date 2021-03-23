@@ -2,12 +2,12 @@ from django.test import TestCase
 
 # Create your tests here.
 
-from helper_lib import *
-from table_lib import *
-from query_lib import *
-from info_lib import *
+from lib_helper import *
+from lib_table import *
+from lib_query import *
+from lib_info import *
 
-class Test_helper_lib(TestCase):
+class Test_lib_helper(TestCase):
 
     def test_lil_endian(self):
         hex_str = "efbeadde"

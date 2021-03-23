@@ -7,7 +7,7 @@ import psycopg2
 from decimal import *
 import logging
 import logging.handlers
-from .const_lib import *
+from .lib_const import *
 
 logger = logging.getLogger(__name__)
 
@@ -253,16 +253,6 @@ def get_season_mined_counts(conn, cursor, season):
         result = update_season_mined_count_tbl(conn, cursor, row_data)
     return result
 
-def get_daily_mined_counts(conn, cursor, day):
-    results = get_mined_date_aggregates(cursor, day)
-    time_stamp = int(time.time())
-    for item in results:
-        row_data = (item[0], int(item[1]), float(item[2]), float(item[3]),
-                    int(item[4]), int(item[5]), str(day), int(time_stamp))
-        if item[0] in notary_info:
-            logger.info("Adding "+str(row_data)+" to daily_mined_counts table")
-        result = update_daily_mined_count_tbl(conn, cursor, row_data)
-    return result
 
 # AGGREGATES
 
