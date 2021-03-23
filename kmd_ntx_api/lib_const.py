@@ -1,6 +1,15 @@
 
 import requests
- # Need to confirm and fill this in correctly later...
+from django.contrib import messages
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
+
 seasons_info = {
     "Season_1": {
             "start_block":1,

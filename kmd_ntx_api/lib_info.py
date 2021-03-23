@@ -7,9 +7,9 @@ import requests
 import os
 from dotenv import load_dotenv
 from .models import *
-from .const_lib import *
-from .query_lib import *
-from .helper_lib import *
+from .lib_const import *
+from .lib_query import *
+from .lib_helper import *
 from .base_58 import *
 logger = logging.getLogger("mylogger")
 
@@ -941,7 +941,6 @@ def get_split_stats_table():
 
 def get_address_from_pubkey(request):
     coin = "KMD"
-
     if "coin" in request.GET:
         if request.GET["coin"] in COIN_PARAMS:
             coin = request.GET["coin"]
@@ -1048,24 +1047,27 @@ def get_api_testnet(request, stat):
 
             # Get notarisation counts
             for item in ntx_dict[chain]:
-                ntx_notaries = item["notaries"]
+                # RICK/MORTY heights from gcharang
+                # https://discord.com/channels/412898016371015680/455755767132454913/823823358768185344
+                if item["block_height"] >= 2316959:
+                    ntx_notaries = item["notaries"]
 
-                for notary in ntx_notaries:
+                    for notary in ntx_notaries:
 
-                    if testnet_stats_dict[notary]["Total"] == 0:
-                        testnet_stats_dict[notary].update({"Total":1})
+                        if testnet_stats_dict[notary]["Total"] == 0:
+                            testnet_stats_dict[notary].update({"Total":1})
 
-                    else:
-                        count = testnet_stats_dict[notary]["Total"]+1
-                        testnet_stats_dict[notary].update({"Total":count})
+                        else:
+                            count = testnet_stats_dict[notary]["Total"]+1
+                            testnet_stats_dict[notary].update({"Total":count})
 
-                    if testnet_stats_dict[notary][chain] == 0:
-                        testnet_stats_dict[notary].update({chain:1})
-                        testnet_stats_dict[notary].update({chain:1})
-                        
-                    else:
-                        count = testnet_stats_dict[notary][chain]+1
-                        testnet_stats_dict[notary].update({chain:count})
+                        if testnet_stats_dict[notary][chain] == 0:
+                            testnet_stats_dict[notary].update({chain:1})
+                            testnet_stats_dict[notary].update({chain:1})
+                            
+                        else:
+                            count = testnet_stats_dict[notary][chain]+1
+                            testnet_stats_dict[notary].update({chain:count})
 
             # Get notarisation counts 24hr
             for item in ntx_dict_24hr[chain]:

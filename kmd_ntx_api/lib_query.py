@@ -3,9 +3,9 @@ import logging
 import datetime
 from datetime import datetime as dt
 from .models import *
-from .const_lib import *
-from .info_lib import *
-from .helper_lib import *
+from .lib_const import *
+from .lib_info import *
+from .lib_helper import *
 from kmd_ntx_api.serializers import *
 logger = logging.getLogger("mylogger")
 
@@ -47,11 +47,13 @@ def paginate_wrap(resp, url, field, prev_value, next_value):
     }
     return api_resp
 
-def wrap_api(resp):
+def wrap_api(resp, filters=None):
     api_resp = {
         "count":len(resp),
         "results":[resp]
     }
+    if filters:
+        api_resp.update({"filters":filters})
     return api_resp
 
 def get_notary_list(season):
@@ -97,6 +99,7 @@ def get_coins_data(request):
     return wrap_api(resp)
 
 def get_addresses_data(request):
+    filters = AddressesSerializer.Meta.fields
     resp = {}
     data = addresses.objects.all()
     full_count = data.count()
@@ -121,7 +124,7 @@ def get_addresses_data(request):
             resp[item["notary"]][item["season"]]["addresses"].update({
                 item["chain"]: item['address']
             })
-    return wrap_api(resp)
+    return wrap_api(resp, filters)
 
 def get_balances_data(request):
     resp = {}
@@ -159,6 +162,7 @@ def get_daily_ntx_graph_data(request):
     main_chains = []
     notary_list = []                                                                         
     chain_list = []
+    filter_kwargs = {}
 
     if 'notarised_date' in request.GET:
         filter_kwargs.update({'notarised_date':request.GET['notarised_date']})
@@ -658,11 +662,16 @@ def get_top_coin_notarisers(top_region_notarisers, chain):
 def get_mined_count_daily_data(request):
     resp = {}
     data = mined_count_daily.objects.all()
+    print(data)
+    print(len(data))
+
     data = apply_filters(request, MinedCountDailySerializer, data, 'daily_mined_count')
+    print(len(data))
     # default filter if none set.
     if len(data) == len(mined_count_daily.objects.all()) or len(data) == 0:
         today = datetime.date.today()
         data = mined_count_daily.objects.filter(mined_date=str(today))
+        mined_date = today
     data = data.order_by('mined_date', 'notary').values()
 
     for item in data:
@@ -670,12 +679,12 @@ def get_mined_count_daily_data(request):
         notary = item['notary']
         sum_value_mined = item['sum_value_mined']
         time_stamp = item['time_stamp']
-        mined_date = str(item['mined_date'])
+        mined_date = item['mined_date']
 
-        if mined_date not in resp:
-            resp.update({mined_date:{}})
+        if str(mined_date) not in resp:
+            resp.update({str(mined_date):{}})
 
-        resp[mined_date].update({
+        resp[str(mined_date)].update({
             notary:{
                 "blocks_mined":blocks_mined,
                 "sum_value_mined":sum_value_mined,
@@ -683,8 +692,8 @@ def get_mined_count_daily_data(request):
             }
         })
     delta = datetime.timedelta(days=1)
-    yesterday = item['mined_date']-delta
-    tomorrow = item['mined_date']+delta
+    yesterday = mined_date-delta
+    tomorrow = mined_date+delta
     url = request.build_absolute_uri('/api/mined_stats/daily/')
     return paginate_wrap(resp, url, "mined_date",
                          str(yesterday), str(tomorrow))
@@ -1064,7 +1073,7 @@ def get_btc_txid_list(notary=None, season=None):
     elif notary:
         data = nn_btc_tx.objects.filter(notary=notary)
     elif season:
-        data = nn_btc_tx.objects.filter(notary=season)
+        data = nn_btc_tx.objects.filter(season=season)
     else:
         data = nn_btc_tx.objects.all()
     for item in data:
@@ -1149,3 +1158,90 @@ def get_btc_txid_address(address, category=None):
                 }
             })
     return api_resp
+
+def get_btc_ntx_lag(request):
+    data = notarised.objects.filter(chain="BTC").values()
+    block_time_list = []
+    for item in data:
+        block_time_list.append(item["block_time"])
+    block_time_list = list(set(block_time_list))
+    block_time_list.sort()
+
+    max_lags = []
+    max_lag_vals = []
+    while len(max_lags) < 25:
+        max_blocktime_lag = 0
+        for block_time in block_time_list:
+            try:
+                blocktime_lag = block_time - last_blocktime
+
+                if blocktime_lag > max_blocktime_lag and blocktime_lag not in max_lag_vals:
+                    max_blocktime_lag = blocktime_lag
+                    max_lag_blocktime = block_time
+            except:
+                pass
+            last_blocktime = block_time
+
+        lagged_blocks = []
+        for item in data:
+            if item["block_time"] == max_lag_blocktime:
+                lagged_blocks.append(item)
+
+        max_lags.append({
+            "max_blocktime_lag_sec":max_blocktime_lag,
+            "max_blocktime_lag":day_hr_min_sec(max_blocktime_lag),
+            "max_lag_blocktime":max_lag_blocktime,
+            "max_lag_block_datetime":dt.fromtimestamp(max_lag_blocktime),
+            "num_lagged_blocks":len(lagged_blocks),
+            "lagged_blocks":lagged_blocks
+        })
+        max_lag_vals.append(max_blocktime_lag)
+    return {"max_lags":max_lags}
+
+def get_ntx_tenure_data(request, output="json"):
+    filters = ntxTenureSerializer.Meta.fields
+    resp = {}
+    data = notarised_tenure.objects.all()
+    full_count = data.count()
+    data = apply_filters(request, ntxTenureSerializer, data)
+    season = get_season(int(time.time()))
+    if data.count() == full_count:
+        data = notarised_tenure.objects.filter(season=season)
+    data = data.order_by('season', 'chain').values()
+
+
+    if output == "csv":
+        msg = ""
+        for item in data:
+            row = []
+            row.append(item["chain"])
+            row.append(str(item["first_ntx_block"]))
+            row.append(str(item["last_ntx_block"]))
+            row.append(str(item["first_ntx_block_time"]))
+            row.append(str(item["last_ntx_block_time"]))
+            row.append(str(item["ntx_count"]))
+            row.append(item["season"])
+            msg += ", ".join(row)+"\n"
+        return msg
+
+    else:
+
+        for item in data:
+
+            if item["season"] not in resp: 
+                resp.update({item["season"]:{}})
+
+            if item["chain"] not in resp[item["season"]]:
+                resp[item["season"]].update({
+                    item["chain"]: {
+                        "first_ntx_block":item["first_ntx_block"],
+                        "last_ntx_block":item["last_ntx_block"], 
+                        "first_ntx_block_time":item["first_ntx_block_time"],
+                        "last_ntx_block_time":item["last_ntx_block_time"],
+                        "ntx_count":item["ntx_count"]
+                    }
+                })
+
+
+
+        return wrap_api(resp, filters)

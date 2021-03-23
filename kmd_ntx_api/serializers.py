@@ -109,6 +109,13 @@ class NNSocialSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['notary', 'twitter', 'youtube', 'discord', 'telegram',
                   'github', 'keybase', 'website', 'icon', 'season']
 
+class ntxTenureSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = notarised_tenure
+        fields = ['chain', 'first_ntx_block', 'last_ntx_block', 
+                  'first_ntx_block_time', 'last_ntx_block_time',
+                  'ntx_count', 'season']
+
 class ExplorersSerializer(serializers.HyperlinkedModelSerializer):
     chain = serializers.CharField()
     explorer = serializers.CharField()
@@ -144,5 +151,13 @@ class decodeOpRetSerializer(serializers.Serializer):
         fields = ['OP_RETURN', 'chain',
                   'notarised_block',
                   'notarised_blockhash']
+
+class addrFromPubkeySerializer(serializers.Serializer):
+    class Meta:
+        fields = ['pubkey', 'chain']
+
+class addrFromBase58Serializer(serializers.Serializer):
+    class Meta:
+        fields = ["pubkey", "pub_addr", "script_addr", "secret_key"]
 
         

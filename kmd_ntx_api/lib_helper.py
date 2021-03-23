@@ -2,7 +2,7 @@
 import logging
 import binascii
 from .models import *
-from .const_lib import *
+from .lib_const import *
 
 logger = logging.getLogger("mylogger")
 
