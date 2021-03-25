@@ -32,7 +32,7 @@ for season in NOTARY_ADDRESSES_DICT:
             is_main_server = (node == 'main' and chain in ANTARA_COINS or chain == 'BTC')
             is_3p_server = (node == 'third party' and chain in THIRD_PARTY_COINS)
             # ignore non notarising addresses
-            if chain in ['KMD'] or is_main_server or is_3p_server:
+            if chain in ['KMD', 'LTC', 'BTC'] or is_main_server or is_3p_server:
                 address = NOTARY_ADDRESSES_DICT[season][notary][chain]
                 kmd_addr = NOTARY_ADDRESSES_DICT[season][notary]["KMD"]
                 notary_id = ADDRESS_INFO[season][kmd_addr]['Notary_id']

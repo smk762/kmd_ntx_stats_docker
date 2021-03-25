@@ -27,6 +27,7 @@ API_PAGE_BREAK = int(os.getenv("API_PAGE_BREAK")) # How many pages back to go wi
 # Notarisation Addresses
 NTX_ADDR = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 BTC_NTX_ADDR = '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg'
+LTC_NTX_ADDR = 'LhGojDga6V1fGzQfNGcYFAfKnDvsWeuAsP'
 
 RPC = {}
 RPC["KMD"] = def_credentials("KMD")
@@ -563,7 +564,11 @@ NOTARY_PUBKEYS = {
             "mcrypt": "022cee72fe1972d806993de8f73269625b38a23aa1d24f9d1912d450fa027bf967",
             "crackers": "028ec691456204718b3ad07eff57399378f009a828a9581307d364e08dd5baee16",
             "metaphilibert": "0271298c7b958721bada560ae41b8ab62be8737c9c2cbc70bb1981f680a76956dc",
-            "arnomad": "03069e5271e0abd0d7b8daf66c017d0ab5edf7ca3f4286b3be6d3342378d05e865"
+            "arnomad": "03069e5271e0abd0d7b8daf66c017d0ab5edf7ca3f4286b3be6d3342378d05e865",
+            "greer": "03c820cd01d0b8b9b4d58c53c31116fb8292a02705ee5564c17c0f88404c5407da",
+            "dav": "02924b7c33db64fe3a14007f2d3cf212c08e5f5def2b7a3f93c1a676bc197ab812",
+            "decker": "02a50b6acc2d022ecd4807443bf3c981dc0d4f201efa65caac226d88fc793f0959",
+            "rustytwilight": "03491764a17598e32f994fc53ccc515947edd2280a5db669a28a8876ea1a8ced20"
         }
 }
 
@@ -608,32 +613,61 @@ SEASONS_INFO = {
 
 
 # BTC specific addresses. TODO: This could be reduced / merged.
+NOTARIES = {}
+ALL_SEASON_NOTARIES = []
+
+
+for season in SEASONS_INFO:
+    NOTARIES.update({season:[]})
+    try:
+        addresses = requests.get(f"{THIS_SERVER}/api/source/addresses/?chain=KMD&season={season}").json()
+        for item in addresses['results']:
+            NOTARIES[season].append(item["notary"])
+            ALL_SEASON_NOTARIES.append(item["notary"])
+    except Exception as e:
+        logger.info(f"Addresses API might be down! {e}")
+ALL_SEASON_NOTARIES = list(set(ALL_SEASON_NOTARIES))
+
 NN_BTC_ADDRESSES_DICT = {}
 NOTARY_BTC_ADDRESSES = {}
-NOTARIES = {}
 ALL_SEASON_NN_BTC_ADDRESSES_DICT = {}
 ALL_SEASON_NOTARY_BTC_ADDRESSES = []
-ALL_SEASON_NOTARIES = []
 
 for season in SEASONS_INFO:
     NN_BTC_ADDRESSES_DICT.update({season:{}})
     try:
         addresses = requests.get(f"{THIS_SERVER}/api/source/addresses/?chain=BTC&season={season}").json()
         for item in addresses['results']:
-            ALL_SEASON_NOTARIES.append(item["notary"])
             ALL_SEASON_NOTARY_BTC_ADDRESSES.append(item["address"])
             ALL_SEASON_NN_BTC_ADDRESSES_DICT.update({item["address"]:item["notary"]})
             NN_BTC_ADDRESSES_DICT[season].update({item["address"]:item["notary"]})
     except Exception as e:
         logger.error(e)
         logger.info("Addresses API might be down!")
-
     NOTARY_BTC_ADDRESSES.update({season:list(NN_BTC_ADDRESSES_DICT[season].keys())})
-    NOTARIES.update({season:list(NN_BTC_ADDRESSES_DICT[season].values())})
 
-ALL_SEASON_NOTARIES = list(set(ALL_SEASON_NOTARIES))
 ALL_SEASON_NOTARY_BTC_ADDRESSES = list(set(ALL_SEASON_NOTARY_BTC_ADDRESSES))
 
+
+NN_LTC_ADDRESSES_DICT = {}
+NOTARY_LTC_ADDRESSES = {}
+ALL_SEASON_NN_LTC_ADDRESSES_DICT = {}
+ALL_SEASON_NOTARY_LTC_ADDRESSES = []
+
+for season in SEASONS_INFO:
+    NN_LTC_ADDRESSES_DICT.update({season:{}})
+    try:
+        addresses = requests.get(f"{THIS_SERVER}/api/source/addresses/?chain=LTC&season={season}").json()
+        for item in addresses['results']:
+            ALL_SEASON_NOTARY_LTC_ADDRESSES.append(item["address"])
+            ALL_SEASON_NN_LTC_ADDRESSES_DICT.update({item["address"]:item["notary"]})
+            NN_LTC_ADDRESSES_DICT[season].update({item["address"]:item["notary"]})
+    except Exception as e:
+        logger.error(e)
+        logger.info("Addresses API might be down!")
+    NOTARY_LTC_ADDRESSES.update({season:list(NN_LTC_ADDRESSES_DICT[season].keys())})
+
+ALL_SEASON_NOTARY_LTC_ADDRESSES = list(set(ALL_SEASON_NOTARY_LTC_ADDRESSES))
 
 # shows addresses for all coins for each notary node, by season.
 NOTARY_ADDRESSES_DICT = {}

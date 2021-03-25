@@ -10,7 +10,8 @@ from kmd_ntx_api.filters import *
 from kmd_ntx_api.serializers import *
 from kmd_ntx_api.models import *
 from kmd_ntx_api.lib_query import * 
-from kmd_ntx_api.base_58 import get_addr_from_pubkey
+from kmd_ntx_api.base_58 import get_addr_from_pubkey, get_addr_tool, COIN_PARAMS
+
 
 # Tool views
 class api_decode_op_return_tool(viewsets.ViewSet):
@@ -33,7 +34,7 @@ class api_decode_op_return_tool(viewsets.ViewSet):
 
             decoded = decode_opret(request.GET['OP_RETURN'])
         else:
-            decoded = {}
+            decoded = {"error":"needs parm like ?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400"}
         return Response(decoded)
 
 class api_address_from_pubkey_tool(viewsets.ViewSet):

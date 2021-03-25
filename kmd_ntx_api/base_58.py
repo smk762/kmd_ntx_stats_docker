@@ -17,6 +17,13 @@ class BTC_CoinParams(CoreMainParams):
                        'SCRIPT_ADDR': 5,
                        'SECRET_KEY': 128}
 
+class LTC_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 48,
+                       'SCRIPT_ADDR': 5,
+                       'SECRET_KEY': 176}
+
 class AYA_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
     DEFAULT_PORT = 7770
@@ -53,6 +60,7 @@ COIN_PARAMS = {
     "CHIPS": KMD_CoinParams,
     "VRSC": KMD_CoinParams,
     "BTC": BTC_CoinParams,
+    "LTC": LTC_CoinParams,
     "AYA": AYA_CoinParams,
     "EMC2": EMC2_CoinParams,
     "GAME": GAME_CoinParams,
