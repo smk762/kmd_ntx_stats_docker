@@ -8,8 +8,8 @@ cursor = conn.cursor()
 #table = 'nn_social'
 #table = 'mined'
 #table = 'mined_count_season'
-#table = 'nn_ltc_tx'
-table = 'notarised'
+table = 'nn_ltc_tx'
+#table = 'notarised'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
@@ -20,7 +20,8 @@ print(cursor.fetchall())
 #    cursor.execute(f"DELETE FROM {table} WHERE category='{i}';")
 #    conn.commit()
 
-cursor.execute("DELETE FROM "+table+" WHERE txid='89df083dd753fab9acb4984fe81212e609e3bb30fac1212255e54b07c11626be';")
+#cursor.execute("DELETE FROM "+table+" WHERE chain = 'LTC';")
+cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_4';")
 #cursor.execute("DELETE FROM "+table+";")
 conn.commit()
 

@@ -1017,8 +1017,11 @@ def get_api_testnet(request, stat):
             ntx_dict_24hr.update({chain:[]})
         # RICK/MORTY heights from gcharang
         # https://discord.com/channels/412898016371015680/455755767132454913/823823358768185344
-        if item["block_height"] >= 2316959:
+        if chain in ["RICK", "MORTY"] and item["block_height"] >= 2316959:
             ntx_dict[chain].append(item)
+        elif chain in ["LTC"] and item["block_height"] >= 2022000:
+            ntx_dict[chain].append(item)
+            print(item)
 
 
     for item in ntx_data_24hr:
@@ -1056,6 +1059,7 @@ def get_api_testnet(request, stat):
 
                 for notary in ntx_notaries:
                     if notary in testnet_stats_dict:
+
                         if testnet_stats_dict[notary]["Total"] == 0:
                             testnet_stats_dict[notary].update({"Total":1})
 

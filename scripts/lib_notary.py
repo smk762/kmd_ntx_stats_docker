@@ -283,15 +283,17 @@ def get_btc_ntxids(stop_block, exit=None):
 
 
 
-def get_new_nn_btc_txids(existing_txids, notary_address):
+def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None):
     before_block=None
     page = 1
     exit_loop = False
     api_txids = []
     new_txids = []
+    if not page_break:
+        page_break = API_PAGE_BREAK
     while True:
         # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
-        if page > API_PAGE_BREAK:
+        if page > page_break:
             break
         logger.info(f"Getting TXIDs from API Page {page}...")
         resp = get_btc_address_txids(notary_address, before_block)
@@ -804,6 +806,8 @@ def get_season_from_ltc_addresses(address_list, time_stamp):
                 notaries_in_season.append(NN_LTC_ADDRESSES_DICT[season][address])
                 if len(notaries_in_season) == 13:
                     return season
+        if len(set(notaries_in_season)) > 1 and season.lower().find("testnet") != -1:
+            return season
 
     return get_season(time_stamp)
 
