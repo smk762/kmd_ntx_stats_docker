@@ -164,8 +164,22 @@ def api_testnet_totals(request):
     resp = get_api_testnet(request, "totals")
     return JsonResponse(resp)
 
-def api_btc_ntx_lag(request):
-    resp = get_btc_ntx_lag(request)
+def nn_ltc_txid(request):
+    if 'txid' in request.GET:
+        resp = get_ltc_txid_single(request.GET['txid'])
+    else:
+        resp = {"error":"You need to specify a TXID like '/nn_ltc_txid?txid=86e23d8415737f1f6a723d1996f3e373e77d7e16a7ae8548b4928eb019237321'"}
+    return JsonResponse(resp)
+
+def notary_ltc_txids(request):
+    if 'notary' in request.GET and 'category' in request.GET:
+        resp = get_ltc_txid_notary(request.GET['notary'], request.GET['category'])
+    elif 'notary' in request.GET:
+        resp = get_ltc_txid_notary(request.GET['notary'])
+    elif 'category' in request.GET:
+        resp = get_ltc_txid_notary(None, request.GET['category'])
+    else:
+        resp = {"error":"You need to specify a NOTARY or CATEGORY like '/nn_ltc_txid?notary=dragonhound_NA' or '/nn_btc_txid?notary=dragonhound_NA&category=NTX'"}
     return JsonResponse(resp)
 
 # sync lag graph
@@ -181,3 +195,7 @@ def api_btc_ntx_lag(request):
 # -
 # graphs: daily/season chain ntx, notary chain balances
 # tables: daily/season chain ntx, notary chain balances
+
+def api_btc_ntx_lag(request):
+    resp = get_btc_ntx_lag(request)
+    return JsonResponse(resp)

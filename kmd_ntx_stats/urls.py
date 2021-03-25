@@ -280,6 +280,14 @@ urlpatterns = [
           views.split_summary_api,
           name='split_summary_api'),
 
+    # LTC
+    path('api/info/nn_ltc_txid',
+          views.nn_ltc_txid,
+          name='nn_ltc_txid'),
+
+    path('api/info/notary_ltc_txids',
+          views.notary_ltc_txids,
+          name='notary_ltc_txids'),
 
     # TESTNET API
     path('api/testnet/totals',
