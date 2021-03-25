@@ -17,8 +17,8 @@ cursor = conn.cursor()
 #table = 'notarised'
 table = 'nn_btc_tx'
 
-cursor.execute("SELECT * FROM "+table+";")
-#cursor.execute("SELECT * FROM "+table+" WHERE txid = '2cc68de3c286726fa5df46623266b8a7cc6c7b8d099621e2398956835da187c9';")
+#cursor.execute("SELECT * FROM "+table+";")
+cursor.execute("SELECT * FROM "+table+" WHERE txid = 'a5340c46819522cff18a1f372f4e0f4eed2091648063a669958f5fcc52557e5a';")
 
 #cursor.execute("SELECT * FROM "+table+" WHERE chain = 'BTC' AND btc_validated = 'false';")
 

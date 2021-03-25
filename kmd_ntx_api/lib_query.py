@@ -1040,6 +1040,37 @@ def get_btc_txid_data(category=None):
 
     return wrap_api(resp)
 
+def get_notarisation_txid_single(txid=None):
+    resp = []
+    filter_kwargs = {}
+    data = notarised.objects.filter(txid=txid)
+    print(data)
+    for item in data:
+        row = {
+            "chain":item.chain,
+            "txid":item.txid,
+            "block_hash":item.block_hash,
+            "block_height":item.block_height,
+            "block_time":item.block_time,
+            "block_datetime":item.block_datetime,
+            "notaries":item.notaries,
+            "notary_addresses":item.notary_addresses,
+            "ac_ntx_blockhash":item.ac_ntx_blockhash,
+            "ac_ntx_height":item.ac_ntx_height,
+            "opret":item.opret,
+            "season":item.season,
+            "server":item.server,
+            "scored":item.scored,
+            "btc_validated":item.btc_validated
+        }
+        resp.append(row)
+    print(resp)
+    if len(resp) > 0:
+        return wrap_api(resp)
+    else:
+        return wrap_api("TXID not found!")
+
+
 def get_btc_txid_single(txid=None):
     resp = []
     filter_kwargs = {}
@@ -1081,7 +1112,7 @@ def get_btc_txid_list(notary=None, season=None):
     resp = list(set(resp))
     return wrap_api(resp)
 
-def get_btc_txid_notary(notary= None, category=None):
+def get_btc_txid_notary(notary=None, category=None):
     resp = {}
     txid_list = []
     txid_season_list = {}
@@ -1094,15 +1125,20 @@ def get_btc_txid_notary(notary= None, category=None):
     else:
         data = []
     for item in data:
+
         if item['season'] not in resp:
             resp.update({item['season']:{}})
             txid_season_list.update({item['season']:[]})
+
         if item['category'] not in resp[item['season']]:
             resp[item['season']].update({item['category']:{}})
+
         if item['txid'] not in resp[item['season']][item['category']]:
             resp[item['season']][item['category']].update({item['txid']:[item]})
+            
         else:
             resp[item['season']][item['category']][item['txid']].append(item)
+
         txid_list.append(item['txid'])
         txid_season_list[item['season']].append(item['txid'])
 

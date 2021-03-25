@@ -11,10 +11,13 @@ class notarised(models.Model):
     block_datetime = models.DateTimeField()
     block_height = models.PositiveIntegerField()
     notaries = ArrayField(models.CharField(max_length=34),size=13)
+    notary_addresses = ArrayField(models.CharField(max_length=34),size=13, default=list)
     ac_ntx_blockhash = models.CharField(max_length=64)
     ac_ntx_height = models.PositiveIntegerField()
     opret = models.CharField(max_length=2048)
     season = models.CharField(max_length=32)
+    server = models.CharField(max_length=32, default='')
+    scored = models.BooleanField(default=True)
     btc_validated = models.CharField(max_length=32, default='')
 
     class Meta:
@@ -446,5 +449,32 @@ class nn_btc_tx(models.Model):
                                  name='unique_btc_nn_txid')
         ]
 
+
+class nn_ltc_tx(models.Model):
+    txid = models.CharField(max_length=64)
+    block_hash = models.CharField(max_length=64)
+    block_height = models.PositiveIntegerField()
+    block_time = models.PositiveIntegerField()
+    block_datetime = models.DateTimeField()
+
+    address = models.CharField(max_length=42)
+    notary = models.CharField(max_length=42, default="non-NN")
+    season = models.CharField(max_length=32)
+    category = models.CharField(max_length=32)
+
+    input_index = models.IntegerField(default=-1)
+    input_sats = models.IntegerField(default=-1)
+    output_index = models.IntegerField(default=-1)
+    output_sats = models.IntegerField(default=-1)
+    num_inputs = models.PositiveIntegerField(default=0)
+    num_outputs = models.PositiveIntegerField(default=0)
+    fees = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = 'nn_ltc_tx'
+        constraints = [
+            models.UniqueConstraint(fields=['txid', 'address', 'input_index', 'output_index'],
+                                 name='unique_ltc_nn_txid')
+        ]
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"

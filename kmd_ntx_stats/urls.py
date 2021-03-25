@@ -142,7 +142,7 @@ router.register(r'source/notarised_chain_date',
 router.register(r'source/notarised_count_date',
                 views.ntxCountDateViewSet,
                 basename='ntxCountDateViewSet')
-router.register(r'source/ntx_tenure',
+router.register(r'source/notarised_tenure',
                 views.ntxTenureViewSet,
                 basename='ntxTenureViewSet')
 router.register(r'source/notary_rewards',
@@ -248,6 +248,10 @@ urlpatterns = [
     path('api/nn_mined_last_api/',
           views.nn_mined_last_api,
           name='nn_mined_last_api'),
+    
+    path('api/info/notarisation_txid',
+          views.notarisation_txid,
+          name='notarisation_txid'),
     
     # Notary BTC txids
     path('api/info/address_btc_txids',

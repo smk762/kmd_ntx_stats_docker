@@ -31,7 +31,11 @@ def get_chain_ntx_season_aggregates(season):
            season = '"+str(season)+"' \
            GROUP BY chain;"
     CURSOR.execute(sql)
-    return CURSOR.fetchall()
+    results = CURSOR.fetchall()
+    if len(results) > 0:
+        return results
+    else:
+        return ()
 
 def get_chain_ntx_date_aggregates(day, season):
     sql = "SELECT chain, COALESCE(MAX(block_height), 0), COALESCE(MAX(block_time), 0), COALESCE(COUNT(*), 0) \
@@ -39,29 +43,44 @@ def get_chain_ntx_date_aggregates(day, season):
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY chain;"
     CURSOR.execute(sql)
-    return CURSOR.fetchall()
+    results = CURSOR.fetchall()
+    if len(results) > 0:
+        return results
+    else:
+        return ()
 
 def get_mined_date_aggregates(day):
     sql = "SELECT name, COALESCE(COUNT(*),0), SUM(value) FROM mined WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY name;"
     CURSOR.execute(sql)
-    return CURSOR.fetchall()
+    results = CURSOR.fetchall()
+    if len(results) > 0:
+        return results
+    else:
+        return ()
 
 def get_ntx_for_season(season):
     sql = "SELECT chain, notaries \
            FROM notarised WHERE \
            season = '"+str(season)+"';"
     CURSOR.execute(sql)
-    return CURSOR.fetchall()
+    results = CURSOR.fetchall()
+    if len(results) > 0:
+        return results
+    else:
+        return ()
 
 def get_ntx_for_day(day, season):
     sql = "SELECT chain, notaries \
            FROM notarised WHERE season='"+season+"' AND \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
     CURSOR.execute(sql)
-    resp = CURSOR.fetchall() 
-    return resp
+    results = CURSOR.fetchall()
+    if len(results) > 0:
+        return results
+    else:
+        return ()
 
 def get_mined_for_season(season):
     sql = "SELECT * \
@@ -75,7 +94,11 @@ def get_mined_for_day(day):
            FROM mined WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
     CURSOR.execute(sql)
-    return CURSOR.fetchall()
+    results = CURSOR.fetchall()
+    if len(results) > 0:
+        return results
+    else:
+        return ()
 
 
 def get_dates_list(table, date_col):
@@ -112,7 +135,11 @@ def select_from_table(table, cols, conditions=None):
         sql = sql+" WHERE "+conditions
     sql = sql+";"
     CURSOR.execute(sql)
-    return CURSOR.fetchall()
+    results = CURSOR.fetchall()
+    if len(results) > 0:
+        return results
+    else:
+        return ()
 
 def get_min_from_table(table, col):
     sql = "SELECT MIN("+col+") FROM "+table
@@ -150,7 +177,11 @@ def get_season_mined_counts(season, season_notaries):
            max(block_height) FROM mined WHERE block_time >= "+str(SEASONS_INFO[season]['start_time'])+" \
            AND block_time <= "+str(SEASONS_INFO[season]['end_time'])+" GROUP BY name;"
     CURSOR.execute(sql)
-    return CURSOR.fetchall()
+    results = CURSOR.fetchall()
+    if len(results) > 0:
+        return results
+    else:
+        return ()
 
 def get_ntx_min_max(season, chain):
     CURSOR.execute("SELECT MAX(block_height), MAX(block_time), \
@@ -271,3 +302,30 @@ def get_existing_notarised_btc():
     for result in txids_results:
         existing_txids.append(result[0])
     return existing_txids
+
+#### LTC
+
+def get_existing_nn_ltc_txids(address=None, category=None, season=None, notary=None):
+    recorded_txids = []
+    sql = f"SELECT DISTINCT txid from nn_ltc_tx"
+    conditions = []
+    if category:
+        conditions.append(f"category = '{category}'")
+    if season:
+        conditions.append(f"season = '{season}'")
+    if address:
+        conditions.append(f"address = '{address}'")
+    if notary:
+        conditions.append(f"notary = '{notary}'")
+
+    if len(conditions) > 0:
+        sql += " where "
+        sql += " and ".join(conditions)    
+    sql += ";"
+
+    CURSOR.execute(sql)
+    existing_txids = CURSOR.fetchall()
+
+    for txid in existing_txids:
+        recorded_txids.append(txid[0])
+    return recorded_txids

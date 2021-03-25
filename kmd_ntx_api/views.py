@@ -71,7 +71,14 @@ def ntx_24hrs_api(request):
     return JsonResponse({'data': serializer.data})
 
 
-
+# Notarisation TXID API Endpoints
+# TODO - add search and display frontend
+def notarisation_txid(request):
+    if 'txid' in request.GET:
+        resp = get_notarisation_txid_single(request.GET['txid'])
+    else:
+        resp = {"error":"You need to specify a TXID like '/notarisation_txid?txid=86e23d8415737f1f6a723d1996f3e373e77d7e16a7ae8548b4928eb019237321'"}
+    return JsonResponse(resp)
 
 # Notary BTC TXID API Endpoints
 
