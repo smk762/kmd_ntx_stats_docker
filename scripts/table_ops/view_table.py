@@ -14,11 +14,11 @@ cursor = conn.cursor()
 #table = 'coins'
 #table = 'notarised_btc'
 #table = 'btc_address_deltas'
-#table = 'notarised'
-table = 'nn_btc_tx'
+table = 'notarised'
+#table = 'nn_ltc_tx'
 
 #cursor.execute("SELECT * FROM "+table+";")
-cursor.execute("SELECT * FROM "+table+" WHERE txid = 'a5340c46819522cff18a1f372f4e0f4eed2091648063a669958f5fcc52557e5a';")
+cursor.execute("SELECT * FROM "+table+" WHERE chain = 'LTC';")
 
 #cursor.execute("SELECT * FROM "+table+" WHERE chain = 'BTC' AND btc_validated = 'false';")
 

@@ -1281,3 +1281,76 @@ def get_ntx_tenure_data(request, output="json"):
 
 
         return wrap_api(resp, filters)
+
+
+def get_ltc_txid_single(txid=None):
+    resp = []
+    filter_kwargs = {}
+    data = nn_ltc_tx.objects.filter(txid=txid)
+    for item in data:
+        row = {
+            "txid":item.txid,
+            "block_hash":item.block_hash,
+            "block_height":item.block_height,
+            "block_time":item.block_time,
+            "block_datetime":item.block_datetime,
+            "address":item.address,
+            "notary":item.notary,
+            "season":item.season,
+            "category":item.category,
+            "input_index":item.input_index,
+            "input_sats":item.input_sats,
+            "output_index":item.output_index,
+            "output_sats":item.output_sats,
+            "num_inputs":item.num_inputs,
+            "num_outputs":item.num_outputs,
+            "fees":item.fees
+        }
+        resp.append(row)
+    return wrap_api(resp)
+
+def get_ltc_txid_notary(notary=None, category=None):
+    resp = {}
+    txid_list = []
+    txid_season_list = {}
+    if category and notary:
+        data = nn_ltc_tx.objects.filter(notary=notary, category=category).values()
+    elif category:
+        data = nn_ltc_tx.objects.filter(category=category).values()
+    elif notary:
+        data = nn_ltc_tx.objects.filter(notary=notary).values()
+    else:
+        data = []
+    for item in data:
+
+        if item['season'] not in resp:
+            resp.update({item['season']:{}})
+            txid_season_list.update({item['season']:[]})
+
+        if item['category'] not in resp[item['season']]:
+            resp[item['season']].update({item['category']:{}})
+
+        if item['txid'] not in resp[item['season']][item['category']]:
+            resp[item['season']][item['category']].update({item['txid']:[item]})
+            
+        else:
+            resp[item['season']][item['category']][item['txid']].append(item)
+
+        txid_list.append(item['txid'])
+        txid_season_list[item['season']].append(item['txid'])
+
+    api_resp = {
+        "count":len(list(set(txid_list))),
+        "results":{}
+    }
+    for season in resp:
+        if season not in api_resp["results"]:
+            api_resp["results"].update({season:{"count":len(list(set(txid_season_list[season])))}})
+        for category in resp[season]:
+            api_resp["results"][season].update({
+                category:{
+                    "count":len(resp[season][category]),
+                    "txids":resp[season][category]
+                }
+            })
+    return api_resp
