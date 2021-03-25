@@ -6,7 +6,12 @@ import os
 from psycopg2.extras import execute_values
 from lib_const import *
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
 
 def update_addresses_tbl(row_data):
     try:
@@ -68,16 +73,21 @@ def update_notarised_btc_tbl(row_data):
         CONN.rollback()
 
 def update_ntx_row(row_data):
+    logger.info("update_ntx_row executed")
     sql = "INSERT INTO notarised (chain, block_height, \
                                 block_time, block_datetime, block_hash, \
-                                notaries, ac_ntx_blockhash, ac_ntx_height, \
-                                txid, opret, season, btc_validated) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                                notaries, notary_addresses, ac_ntx_blockhash, ac_ntx_height, \
+                                txid, opret, season, server, scored, btc_validated) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_txid DO UPDATE SET \
-            season='"+str(row_data[10])+"';"
+            season='"+str(row_data[11])+"', server='"+str(row_data[12])+"', scored='"+str(row_data[13])+"', \
+            notary_addresses=ARRAY"+str(row_data[6])+";"
+    logger.info(sql)
     try:
         CURSOR.execute(sql, row_data)
+        logger.info("update_ntx_row executed")
         CONN.commit()
+        logger.info("update_ntx_row commited")
     except Exception as e:
         if str(e).find('duplicate') == -1:
             logger.debug(e)
@@ -88,8 +98,8 @@ def update_ntx_records(records):
     try:
         execute_values(CURSOR, "INSERT INTO notarised (chain, block_height, \
                                 block_time, block_datetime, block_hash, \
-                                notaries, ac_ntx_blockhash, ac_ntx_height, \
-                                txid, opret, season, btc_validated) \
+                                notaries, notary_addresses, ac_ntx_blockhash, ac_ntx_height, \
+                                txid, opret, season, server, scored, btc_validated) \
                                 VALUES %s", records)
 
         CONN.commit()
@@ -553,4 +563,34 @@ def delete_balances_row(chain, address, season):
         CONN.commit()
     except Exception as e:
         logger.debug(e)
+        CONN.rollback()
+
+#### LTC
+
+def update_nn_ltc_tx_notary_from_addr(notary, addr):
+    sql = f"UPDATE nn_ltc_tx SET notary='{notary}' WHERE address='{addr}';"
+    try:
+        CURSOR.execute(sql)
+        CONN.commit()
+        logger.info(f"{addr} tagged as {notary} in DB")
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()
+
+def update_nn_ltc_tx_row(row_data):
+    sql = "INSERT INTO nn_ltc_tx (txid, block_hash, block_height, \
+                                block_time, block_datetime, \
+                                address, notary, season, category, \
+                                input_index, input_sats, \
+                                output_index, output_sats, fees, num_inputs, num_outputs) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+        ON CONFLICT ON CONSTRAINT unique_ltc_nn_txid DO UPDATE SET \
+        notary='"+str(row_data[6])+"', category='"+str(row_data[8])+"';"
+    try:
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
+    except Exception as e:
+        logger.debug(e)
+        if str(e).find('duplicate') == -1:
+            logger.debug(row_data)
         CONN.rollback()

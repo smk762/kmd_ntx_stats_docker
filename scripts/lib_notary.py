@@ -74,7 +74,7 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD"):
     if BTC_NTX_ADDR in address_list:
         address_list.remove(BTC_NTX_ADDR)
 
-    print(address_list)
+    #print(address_list)
 
     seasons = list(SEASONS_INFO.keys())[::-1]
     notary_seasons = []
@@ -150,71 +150,90 @@ def get_ticker(scriptPubKeyBinary):
     return str(chain)
 
 def get_ntx_data(txid):
-    raw_tx = RPC["KMD"].getrawtransaction(txid,1)
-    block_hash = raw_tx['blockhash']
-    dest_addrs = raw_tx["vout"][0]['scriptPubKey']['addresses']
-    block_time = raw_tx['blocktime']
-    block_datetime = dt.utcfromtimestamp(raw_tx['blocktime'])
-    this_block_height = raw_tx['height']
-    if len(dest_addrs) > 0:
-        if NTX_ADDR in dest_addrs:
-            if len(raw_tx['vin']) > 1:
-                notary_list = []
-                address_list = []
-                for item in raw_tx['vin']:
-                    if "address" in item:
-                        address_list.append(item['address'])
-                        if item['address'] in KNOWN_ADDRESSES:
-                            notary = KNOWN_ADDRESSES[item['address']]
-                            notary_list.append(notary)
-                        else:
-                            notary_list.append(item['address'])
-                notary_list.sort()
-                opret = raw_tx['vout'][1]['scriptPubKey']['asm']
-                logger.info(opret)
-                if opret.find("OP_RETURN") != -1:
-                    scriptPubKey_asm = opret.replace("OP_RETURN ","")
-                    ac_ntx_blockhash = lil_endian(scriptPubKey_asm[:64])
-                    try:
-                        ac_ntx_height = int(lil_endian(scriptPubKey_asm[64:72]),16) 
-                    except:
-                        logger.info(scriptPubKey_asm)
-                        sys.exit()
-                    scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
-                    chain = get_ticker(scriptPubKeyBinary)
-                    if chain.endswith("KMD"):
-                        chain = "KMD"
-                    if chain == "KMD":
-                        btc_txid = lil_endian(scriptPubKey_asm[72:136])
-                    elif chain not in noMoM:
-                        # not sure about this bit, need another source to validate the data
+    try:
+        raw_tx = RPC["KMD"].getrawtransaction(txid,1)
+        block_hash = raw_tx['blockhash']
+        dest_addrs = raw_tx["vout"][0]['scriptPubKey']['addresses']
+        block_time = raw_tx['blocktime']
+        block_datetime = dt.utcfromtimestamp(raw_tx['blocktime'])
+        this_block_height = raw_tx['height']
+        if len(dest_addrs) > 0:
+            if NTX_ADDR in dest_addrs:
+                if len(raw_tx['vin']) > 1:
+                    notary_list = []
+                    address_list = []
+                    for item in raw_tx['vin']:
+                        if "address" in item:
+                            address_list.append(item['address'])
+                            if item['address'] in KNOWN_ADDRESSES:
+                                notary = KNOWN_ADDRESSES[item['address']]
+                                notary_list.append(notary)
+                            else:
+                                notary_list.append(item['address'])
+                    notary_list.sort()
+                    opret = raw_tx['vout'][1]['scriptPubKey']['asm']
+                    logger.info(opret)
+                    if opret.find("OP_RETURN") != -1:
+                        scriptPubKey_asm = opret.replace("OP_RETURN ","")
+                        ac_ntx_blockhash = lil_endian(scriptPubKey_asm[:64])
                         try:
-                            start = 72+len(chain)*2+4
-                            end = 72+len(chain)*2+4+64
-                            MoM_hash = lil_endian(scriptPubKey_asm[start:end])
-                            MoM_depth = int(lil_endian(scriptPubKey_asm[end:]),16)
-                        except Exception as e:
-                            logger.debug(e)
-                    # some decodes have a null char error, this gets rid of that so populate script doesnt error out 
-                    if chain.find('\x00') != -1:
-                        chain = chain.replace('\x00','')
-                    # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
-                    if chain.upper() == chain:
-                        season = get_season_from_addresses(address_list, block_time, "KMD")
-                        row_data = (chain, this_block_height, block_time, block_datetime,
-                                    block_hash, notary_list, ac_ntx_blockhash, ac_ntx_height,
-                                    txid, opret, season, "N/A")
-                        return row_data
+                            ac_ntx_height = int(lil_endian(scriptPubKey_asm[64:72]),16) 
+                        except:
+                            logger.info(scriptPubKey_asm)
+                            sys.exit()
+                        scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
+                        chain = get_ticker(scriptPubKeyBinary)
+                        if chain.endswith("KMD"):
+                            chain = "KMD"
+                        if chain == "KMD":
+                            btc_txid = lil_endian(scriptPubKey_asm[72:136])
+                        elif chain not in noMoM:
+                            # not sure about this bit, need another source to validate the data
+                            try:
+                                start = 72+len(chain)*2+4
+                                end = 72+len(chain)*2+4+64
+                                MoM_hash = lil_endian(scriptPubKey_asm[start:end])
+                                MoM_depth = int(lil_endian(scriptPubKey_asm[end:]),16)
+                            except Exception as e:
+                                logger.debug(e)
+                        # some decodes have a null char error, this gets rid of that so populate script doesnt error out 
+                        if chain.find('\x00') != -1:
+                            chain = chain.replace('\x00','')
+                        # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
+                        if chain.upper() == chain:
+                            season = get_season_from_addresses(address_list, block_time, "KMD")
+                            server = get_server(coin)
+                            scored = get_scored(coin, block_time)
+                            row_data = (chain, this_block_height, block_time, block_datetime,
+                                        block_hash, notary_list, address_list, ac_ntx_blockhash, ac_ntx_height,
+                                        txid, opret, season, server, scored, "N/A")
+                            return row_data
+                    else:
+                        # no opretrun in tx, and shouldnt polute the DB.
+                        return None
+                    
                 else:
-                    # no opretrun in tx, and shouldnt polute the DB.
+                    # These are related to easy mining, and shouldnt polute the DB.
                     return None
-                
             else:
-                # These are related to easy mining, and shouldnt polute the DB.
+                # These are outgoing, and should not polute the DB.
                 return None
-        else:
-            # These are outgoing, and should not polute the DB.
-            return None
+    except Exception as e:
+        logger.warning(e)
+        logger.warning(txid)
+
+
+def get_server(coin):
+    # TODO: use tenure json to define this better
+    if coin in THIRD_PARTY_COINS:
+        return "Third Party"
+    elif coin in ANTARA_COINS or coin in ["KMD", "BTC"]:
+        return "Main"
+    return "Unknown"
+
+def get_scored(coin, block_time):
+    # TODO: use tenure json to define this better
+    return True
 
 def get_btc_ntxids(stop_block, exit=None):
     has_more=True
@@ -705,3 +724,217 @@ def get_category_from_vins_vouts(tx_vins, tx_vouts, season):
 
     return "Other"
 
+
+
+### LTC
+### TODO: standardise this for all chains.
+
+def get_new_nn_ltc_txids(existing_txids, notary_address):
+    before_block=None
+    page = 1
+    exit_loop = False
+    api_txids = []
+    new_txids = []
+    while True:
+        # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
+        if page > API_PAGE_BREAK:
+            break
+        logger.info(f"Getting TXIDs from API Page {page}...")
+        resp = get_ltc_address_txids(notary_address, before_block)
+        if "error" in resp:
+            logger.info(f"Error in resp: {resp}")
+            exit_loop = api_sleep_or_exit(resp, exit=None)
+        else:
+            page += 1
+            if 'txrefs' in resp:
+                tx_list = resp['txrefs']
+                before_block = tx_list[-1]['block_height']
+
+                for tx in tx_list:
+                    api_txids.append(tx['tx_hash'])
+                    if tx['tx_hash'] not in new_txids and tx['tx_hash'] not in existing_txids:
+                        new_txids.append(tx['tx_hash'])
+                        logger.info(f"appended tx {tx}")
+
+                # exit loop if earlier than s4
+                if before_block < 634774:
+                    logger.info("No more for s4!")
+                    exit_loop = True
+            else:
+                # exit loop if no more tx for address at api
+                logger.info("No more for address!")
+                exit_loop = True
+
+        if exit_loop:
+            logger.info("exiting address txid loop!")
+            break
+
+    num_api_txids = list(set((api_txids)))
+    logger.info(f"{len(num_api_txids)} DISTINCT TXIDs counted from API")
+
+    return new_txids
+
+
+def get_notary_from_ltc_address(address, season=None, notary=None):
+    if address == LTC_NTX_ADDR:
+        return "LTC_NTX_ADDR"
+
+    if address in NN_LTC_ADDRESSES_DICT[season]:
+        return NN_LTC_ADDRESSES_DICT[season][address]
+
+    seasons = list(SEASONS_INFO.keys())[::-1]
+
+    for s in seasons:
+        if address in NN_LTC_ADDRESSES_DICT[s]:
+            return NN_LTC_ADDRESSES_DICT[s][address]
+    if notary:
+        return notary
+    else:
+        return "non-NN"
+
+def get_season_from_ltc_addresses(address_list, time_stamp):
+    if LTC_NTX_ADDR in address_list:
+        address_list.remove(LTC_NTX_ADDR)
+
+    seasons = list(SEASONS_INFO.keys())[::-1]
+    for season in seasons:
+        notaries_in_season = []
+        for address in address_list:
+            if address in NN_LTC_ADDRESSES_DICT[season]:
+                notaries_in_season.append(NN_LTC_ADDRESSES_DICT[season][address])
+                if len(notaries_in_season) == 13:
+                    return season
+
+    return get_season(time_stamp)
+
+
+def validate_ltc_ntx_vins(vins):
+    for vin in vins:
+        notary = get_notary_from_ltc_address(vin["addresses"][0])
+
+        if notary == "non-NN" or vin["output_value"] != 10000:
+            return False
+
+    return True
+
+def validate_ltc_ntx_vouts(vouts):
+    for vout in vouts:
+
+        if vout["addresses"] is not None:
+
+            if vout["addresses"][0] == LTC_NTX_ADDR and vout["value"] == 98800:
+                return True
+
+    return False
+
+def get_category_from_ltc_vins_vouts(tx_vins, tx_vouts, season):
+    # TODO: Align this with api populate script
+    notary_vins = []
+    notary_vouts = []
+    non_notary_vins = []
+    non_notary_vouts = []
+    replenish_vins = False
+    replenish_vouts = False
+    to_dragonhound = False
+    ntx_vin = True
+    ntx_vout = False
+
+    for vin in tx_vins:
+        txid = vin["txid"]
+        import_category = vin["category"]
+        notary = get_notary_from_ltc_address(vin["address"], season, vin["notary"])
+        if notary in ALL_SEASON_NOTARIES:
+            notary_vins.append(notary)
+        else:
+            non_notary_vins.append(notary)
+
+        if notary in ["dragonhound_NA", "Replenish_Address"]:
+            replenish_vins = True
+
+        if vin["input_sats"] != 10000:
+            ntx_vin = False
+
+    for vout in tx_vouts:
+        txid = vout["txid"]
+        import_category = vout["category"]
+        notary = get_notary_from_ltc_address(vout["address"], season, vout["notary"])
+        if notary in ALL_SEASON_NOTARIES:
+            notary_vouts.append(notary)
+        else:
+            non_notary_vouts.append(notary)
+
+        if vout["address"] == "SPAM":
+            # TODO: SPAM sometimes being mis-tagged as Replenish
+            return "SPAM"
+
+        elif vout['address'] == LTC_NTX_ADDR:
+            ntx_vout = True
+
+        elif notary == "dragonhound_NA":
+            sats = vout["output_sats"]
+            to_dragonhound = True
+
+        elif notary in ALL_SEASON_NOTARIES:
+            replenish_vouts = True
+
+    notary_vins = list(set(notary_vins))
+    notary_vouts = list(set(notary_vouts))
+    non_notary_vins = list(set(non_notary_vins))
+    non_notary_vouts = list(set(non_notary_vouts))
+    
+    '''
+    if txid == "0b415ea1ec9852393903370fb4c3bf38b437a024f681f8b734de29579a06cf2f":
+        print(f"ntx_vout {ntx_vout}")
+        print(f"ntx_vin {ntx_vin}")
+        print(f"len(notary_vins) {len(notary_vins)}")
+        print(f"import_category {import_category}")
+        input("continue?")
+    '''
+
+    # overrides (skip if -1 vin/vout)
+    try:
+        if txid == ["9d29730c09f7d1983a413a14bb0b8ffcf0cb652472a428e97c250da03ae47082", "9bc103a16c477d55ba42e4fc97a6256e04813e9b947c895c6cd0e2f028bdfa67"] :
+            return "MadMax personal top up"
+        elif txid == "248ef589d50047a43d987f6af05ab8568f5a2070e25c3e1d3b063884948634ee":
+            return "MadMax personal top up repaid"
+        elif txid in [
+            "e4b2e4afa20b7cf39e96422bb72a522e0cb9fc49dbd4cfa5386b3733833365aa",
+            "5d93f75414d6c581e8589339fe1915437a01b0e8ee4149a5fea508a080b1815e",
+            "535bac3813dd0e36db503dbeef916f8e1198386a5909b1b7142a5984e91309c5",
+            "f18186cd8a05f2a5148694ccbf95c4230b4b63183d835c9d88fed15b16c1db7d"
+            ]:
+            return "previous season funds transfer"
+    except:
+        pass
+
+    if ntx_vout and ntx_vin:
+        if len(notary_vins) == 13:
+            return "NTX"
+        elif import_category == "NTX":
+            return "Low Vin NTX"
+        else:
+            return "Damaged NTX"
+
+    if ntx_vin and import_category == "NTX":
+        if len(notary_vins) == 13:
+            return "No Vout NTX"
+        else:
+            return "Low Vin, No Vout NTX"
+
+
+    if len(notary_vins) == len(notary_vouts) and len(notary_vins) == 1 and notary_vins[0] == notary_vouts[0]:
+        # 76aeb20c7af38141720ef672cbb295015e24ca129b62ac02830c35b357d02238 not a split!
+        if len(non_notary_vins) == 0 and len(non_notary_vouts) == 0:
+            return "Split"
+        else:
+            # TODO: add NN-related addresses
+            return "Consolidate"
+        
+
+    if replenish_vins and replenish_vouts:
+        return "Top Up"
+
+    if to_dragonhound and sats >= 10000000:
+        return "Incoming Replenish"
+
+    return "Other"

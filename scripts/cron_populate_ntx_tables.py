@@ -85,11 +85,14 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
                 row.block_datetime = row_data[3]
                 row.block_hash = row_data[4]
                 row.notaries = row_data[5]
-                row.ac_ntx_blockhash = row_data[6]
-                row.ac_ntx_height = row_data[7]
-                row.txid = row_data[8]
-                row.opret = row_data[9]
-                row.season = row_data[10]
+                row.notary_addresses = row_data[6]
+                row.ac_ntx_blockhash = row_data[7]
+                row.ac_ntx_height = row_data[8]
+                row.txid = row_data[9]
+                row.opret = row_data[10]
+                row.season = row_data[11]
+                row.server = row_data[12]
+                row.scored = row_data[13]
                 row.btc_validated =  "N/A"
                 row.update()
 

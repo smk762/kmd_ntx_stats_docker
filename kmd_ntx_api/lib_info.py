@@ -1001,27 +1001,28 @@ def get_api_testnet(request, stat):
             .order_by('chain', '-block_height') \
             .values()
 
-    ntx_dict = {}
-    for item in ntx_data:
-        chain = item['chain']
-        if chain not in ntx_dict:
-            ntx_dict.update({chain:[]})
-        # RICK/MORTY heights from gcharang
-        # https://discord.com/channels/412898016371015680/455755767132454913/823823358768185344
-        if item["block_height"] >= 2316959:
-            ntx_dict[chain].append(item)
-
     # Prepare 24hr ntx data
     ntx_data_24hr = notarised.objects.filter(season=season, 
         block_time__gt=str(int(time.time()-24*60*60))) \
         .order_by('chain', '-block_height') \
         .values()
 
+    ntx_dict = {}
     ntx_dict_24hr = {}
+
+    for item in ntx_data:
+        chain = item['chain']
+        if chain not in ntx_dict:
+            ntx_dict.update({chain:[]})
+            ntx_dict_24hr.update({chain:[]})
+        # RICK/MORTY heights from gcharang
+        # https://discord.com/channels/412898016371015680/455755767132454913/823823358768185344
+        if item["block_height"] >= 2316959:
+            ntx_dict[chain].append(item)
+
+
     for item in ntx_data_24hr:
         chain = item['chain']
-        if chain not in ntx_dict_24hr:
-            ntx_dict_24hr.update({chain:[]})
         if item["block_height"] >= 2316959:
             ntx_dict_24hr[chain].append(item)
 
@@ -1054,42 +1055,48 @@ def get_api_testnet(request, stat):
                 ntx_notaries = item["notaries"]
 
                 for notary in ntx_notaries:
+                    if notary in testnet_stats_dict:
+                        if testnet_stats_dict[notary]["Total"] == 0:
+                            testnet_stats_dict[notary].update({"Total":1})
 
-                    if testnet_stats_dict[notary]["Total"] == 0:
-                        testnet_stats_dict[notary].update({"Total":1})
+                        else:
+                            count = testnet_stats_dict[notary]["Total"]+1
+                            testnet_stats_dict[notary].update({"Total":count})
 
+                        if testnet_stats_dict[notary][chain] == 0:
+                            testnet_stats_dict[notary].update({chain:1})
+                            testnet_stats_dict[notary].update({chain:1})
+                            
+                        else:
+                            count = testnet_stats_dict[notary][chain]+1
+                            testnet_stats_dict[notary].update({chain:count})
                     else:
-                        count = testnet_stats_dict[notary]["Total"]+1
-                        testnet_stats_dict[notary].update({"Total":count})
-
-                    if testnet_stats_dict[notary][chain] == 0:
-                        testnet_stats_dict[notary].update({chain:1})
-                        testnet_stats_dict[notary].update({chain:1})
-                        
-                    else:
-                        count = testnet_stats_dict[notary][chain]+1
-                        testnet_stats_dict[notary].update({chain:count})
+                        print(item)
 
             # Get notarisation counts 24hr
             for item in ntx_dict_24hr[chain]:
                 ntx_notaries = item["notaries"]
 
                 for notary in ntx_notaries:
+                    if notary in testnet_stats_dict:
 
-                    if testnet_stats_dict[notary]["24hr_Total"] == 0:
-                        testnet_stats_dict[notary].update({"24hr_Total":1})
+                        if testnet_stats_dict[notary]["24hr_Total"] == 0:
+                            testnet_stats_dict[notary].update({"24hr_Total":1})
 
+                        else:
+                            count = testnet_stats_dict[notary]["24hr_Total"]+1
+                            testnet_stats_dict[notary].update({"24hr_Total":count})
+
+                        if testnet_stats_dict[notary][chain] == 0:
+                            testnet_stats_dict[notary].update({f"24hr_{chain}":1})
+                            testnet_stats_dict[notary].update({f"24hr_{chain}":1})
+                            
+                        else:
+                            count = testnet_stats_dict[notary][f"24hr_{chain}"]+1
+                            testnet_stats_dict[notary].update({f"24hr_{chain}":count})
                     else:
-                        count = testnet_stats_dict[notary]["24hr_Total"]+1
-                        testnet_stats_dict[notary].update({"24hr_Total":count})
+                        print(item)
 
-                    if testnet_stats_dict[notary][chain] == 0:
-                        testnet_stats_dict[notary].update({f"24hr_{chain}":1})
-                        testnet_stats_dict[notary].update({f"24hr_{chain}":1})
-                        
-                    else:
-                        count = testnet_stats_dict[notary][f"24hr_{chain}"]+1
-                        testnet_stats_dict[notary].update({f"24hr_{chain}":count})
 
         # Get notarisation rank
         notary_totals = {}
