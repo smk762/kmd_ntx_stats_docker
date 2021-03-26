@@ -1014,7 +1014,6 @@ def get_api_testnet(request, stat):
         chain = item['chain']
         if chain not in ntx_dict:
             ntx_dict.update({chain:[]})
-            ntx_dict_24hr.update({chain:[]})
         # RICK/MORTY heights from gcharang
         # https://discord.com/channels/412898016371015680/455755767132454913/823823358768185344
         if chain in ["RICK", "MORTY"] and item["block_height"] >= 2316959:
@@ -1026,8 +1025,13 @@ def get_api_testnet(request, stat):
 
     for item in ntx_data_24hr:
         chain = item['chain']
-        if item["block_height"] >= 2316959:
+        if chain not in ntx_dict_24hr:
+            ntx_dict_24hr.update({chain:[]})
+        if chain in ["RICK", "MORTY"] and item["block_height"] >= 2316959:
             ntx_dict_24hr[chain].append(item)
+        elif chain in ["LTC"] and item["block_height"] >= 2022000:
+            ntx_dict_24hr[chain].append(item)
+            print(item)
 
     testnet_chains = list(ntx_dict.keys())
 
