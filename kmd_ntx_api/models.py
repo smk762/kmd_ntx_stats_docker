@@ -457,7 +457,7 @@ class nn_ltc_tx(models.Model):
     block_time = models.PositiveIntegerField()
     block_datetime = models.DateTimeField()
 
-    address = models.CharField(max_length=42)
+    address = models.CharField(max_length=64)
     notary = models.CharField(max_length=42, default="non-NN")
     season = models.CharField(max_length=32)
     category = models.CharField(max_length=32)
@@ -478,3 +478,4 @@ class nn_ltc_tx(models.Model):
         ]
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"
+
