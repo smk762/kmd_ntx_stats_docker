@@ -569,7 +569,8 @@ NOTARY_PUBKEYS = {
             "dav": "02924b7c33db64fe3a14007f2d3cf212c08e5f5def2b7a3f93c1a676bc197ab812",
             "decker": "02a50b6acc2d022ecd4807443bf3c981dc0d4f201efa65caac226d88fc793f0959",
             "rustytwilight": "03491764a17598e32f994fc53ccc515947edd2280a5db669a28a8876ea1a8ced20"
-        }
+        },
+    "Season_5": {}
 }
 
 # TODO: see if this is better derived from the NTX Tenure table
@@ -597,16 +598,23 @@ SEASONS_INFO = {
         },
     "Season_4": {
             "start_block":1922000,
-            "end_block":2444000,
+            "end_block":2436999,
             "start_time":1592146800,
-            "end_time":1751328000,
+            "end_time":1623682799,
+            "notaries":[]
+        },
+    "Season_5": {
+            "start_block":2437000,
+            "end_block":3437000,
+            "start_time":1623682800,
+            "end_time":1773682800,
             "notaries":[]
         },
     "Season_5_Testnet": {
             "start_block":2299140,
             "end_block":2444000,
             "start_time":1615367302,
-            "end_time":1751328000,
+            "end_time":1623682800,
             "notaries":[]
         }
 }
@@ -770,3 +778,42 @@ OTHER_CLI = {
 
 # Some coins are named differently between dpow and coins repo...
 TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GleecBTC':'GLEEC', "PBC":"SFUSD" }
+BACK_TRANSLATE_COINS = { 'COQUICASH':'COQUI','OUR':'OURC','WLC21':'WLC','GLEEC':'GleecBTC', "SFUSD":"PBC" }
+
+PARTIAL_SEASON_DPOW_CHAINS = {
+    "Season_4": {
+        "HUSH3": {
+            "end_time":1603661223
+        },
+        "GLEEC": {
+            "start_time":1603562256
+        },
+        "MCL": {
+            "start_time":1593244139
+        },
+        "PBC": {
+            "start_time":1606302315
+        },
+        "RFOX": {
+            "end_time":1613856136
+        },
+        "PGT": {
+            "end_time":1616280243
+        },
+        "STBL": {
+            "end_time":1616280243
+        }
+    }
+}
+
+S4_DPOW_EXCLUDED_CHAINS = [
+    "BLUR",
+    "ETOMIC",
+    "KSB",
+    "KV",
+    "OUR",
+    "SEC",
+    "ZEXO",
+    "GAME",
+    "TXSCLI"
+]

@@ -329,3 +329,31 @@ def get_existing_nn_ltc_txids(address=None, category=None, season=None, notary=N
     for txid in existing_txids:
         recorded_txids.append(txid[0])
     return recorded_txids
+
+
+def get_notarisations(season=None, chain=None, scored=None):
+    txids = []
+    logger.info("Getting existing NTXIDs from database...")
+    sql = f"SELECT txid, block_time, chain, season, scored from notarised"
+    filters = []
+    if season:
+        filters.append(f"season='{season}'")
+    if chain:
+        filters.append(f"chain='{chain}'")
+    if scored:
+        filters.append(f"scored='{scored}'")
+    if len(filters) > 0:
+        sql += " WHERE "+" AND ".join(filters)
+    sql += ";"
+    CURSOR.execute(sql)
+    resp = CURSOR.fetchall()
+
+    for item in resp:
+        txids.append({
+            "txid":item[0],
+            "block_time":item[1],
+            "chain":item[2],
+            "season":item[3],
+            "scored":item[4]
+        })
+    return txids

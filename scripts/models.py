@@ -254,13 +254,14 @@ class rewards_row():
 class coins_row():
     def __init__(self, chain='', coins_info='',
      electrums='', electrums_ssl='', explorers='',
-     dpow='', dpow_active='', mm2_compatible=''):
+     dpow='', dpow_tenure=dict, dpow_active='', mm2_compatible=''):
         self.chain = chain
         self.coins_info = coins_info
         self.electrums = electrums
         self.electrums_ssl = electrums_ssl
         self.explorers = explorers
         self.dpow = dpow
+        self.dpow_tenure = dpow_tenure
         self.dpow_active = dpow_active
         self.mm2_compatible = mm2_compatible
 
@@ -271,8 +272,10 @@ class coins_row():
         row_data = (
             self.chain, self.coins_info, self.electrums,
             self.electrums_ssl, self.explorers, self.dpow,
+            self.dpow_tenure,
             self.dpow_active, self.mm2_compatible
         )
+        print(row_data)
         if self.validated():
             logger.info(f"Updating COIN TABLE {self.chain} ")
             update_coins_row(row_data)

@@ -231,3 +231,9 @@ def add_string_dict_nest(old_dict, new_key):
     for key in old_dict:
         old_dict[key].update({new_key:""})
     return old_dict
+
+def get_server_chains_at_time(season, server, timestamp):
+    # Query notarised_tenure 
+    # Return list of chains actively dpow'd at timestamp
+    
+    pass

@@ -16,6 +16,7 @@ def get_btc_address_txids(address, before=None):
     logger.info(f"getting BTC TXIDs for {address} before block {before}")
     try:
         url = 'https://api.blockcypher.com/v1/btc/main/addrs/'+address+'?limit=2000'
+        print(url)
         if before:
             url = url+'&before='+str(before)
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}

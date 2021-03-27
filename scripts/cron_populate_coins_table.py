@@ -129,6 +129,10 @@ def parse_coins_repo(dpow):
         if coin not in coins_info:
             coins_info.update({coin:{"coins_info":{}}})
 
+    for coin in PARTIAL_SEASON_DPOW_CHAINS["Season_4"]:
+        if coin not in coins_info:
+            coins_info.update({coin:{"coins_info":{}}})
+
     for coin in coins_info:
         logger.info(f"Getting info for {coin} from coins repo")
         coins_info[coin].update({
@@ -222,12 +226,70 @@ def parse_electrum_explorer(dpow, coins_info):
     logger.warning("no_explorers: "+str(no_explorers))
     return coins_info
 
+def get_dpow_tenure():
+    tenure = requests.get(f'{THIS_SERVER}/api/info/notarised_tenure/').json()["results"][0]
 
+    tenured_coins = list(tenure.keys()) + list(PARTIAL_SEASON_DPOW_CHAINS["Season_4"].keys())
+
+    for chain in tenured_coins:
+        for season in tenure[chain]:
+            if season == "Season_4" and chain in S4_DPOW_EXCLUDED_CHAINS or season == "season_undefined":
+                pass
+            else:
+                season_start_block = SEASONS_INFO[season]["start_block"]
+                season_start_time = SEASONS_INFO[season]["start_time"]
+                season_end_block = SEASONS_INFO[season]["end_block"]
+                season_end_time = SEASONS_INFO[season]["end_time"]
+
+                tenure[chain][season].update({"first_ntx_block":season_start_block})
+                tenure[chain][season].update({"last_ntx_block":season_end_block})
+                tenure[chain][season].update({"first_ntx_block_time":season_start_time})
+                tenure[chain][season].update({"last_ntx_block_time":season_end_time})
+
+                if season in PARTIAL_SEASON_DPOW_CHAINS:
+
+                    if chain in PARTIAL_SEASON_DPOW_CHAINS[season]:
+                        # TODO: Calc first / last block based on timestamp
+                        if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][chain]:
+                            season_start_time = PARTIAL_SEASON_DPOW_CHAINS[season][chain]["start_time"]
+                            tenure[chain][season].update({"first_ntx_block_time":season_start_time})
+                            tenure[chain][season].update({"first_ntx_block":0})
+
+                        if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][chain]:
+                            season_end_time = PARTIAL_SEASON_DPOW_CHAINS[season][chain]["end_time"]
+                            tenure[chain][season].update({"last_ntx_block_time":season_end_time})
+                            tenure[chain][season].update({"last_ntx_block":0})
+
+    for chain in TRANSLATE_COINS:
+        try:
+            if TRANSLATE_COINS[chain] not in tenure:
+                tenure.update({TRANSLATE_COINS[chain]:tenure[chain]})
+
+            for season in tenure[chain]:
+                tenure[TRANSLATE_COINS[chain]].update({season:tenure[chain][season]})
+        except:
+            pass
+
+    for chain in BACK_TRANSLATE_COINS:
+        try:
+            if BACK_TRANSLATE_COINS[chain] not in tenure:
+                tenure.update({BACK_TRANSLATE_COINS[chain]:tenure[chain]})
+
+            for season in tenure[chain]:
+                tenure[BACK_TRANSLATE_COINS[chain]].update({season:tenure[chain][season]})
+        except:
+            pass
+    return tenure
+
+dpow_tenure = get_dpow_tenure()
+
+ 
 dpow, dpow_main, dpow_3p = parse_dpow_coins()
 remove_from_dpow(dpow)
 dpow = parse_assetchains(dpow)
 coins_info = parse_coins_repo(dpow)
 coins_info = parse_electrum_explorer(dpow, coins_info)
+
 
 for coin in coins_info:
 
@@ -238,6 +300,11 @@ for coin in coins_info:
     coin_data.electrums_ssl = json.dumps(coins_info[coin]['electrums_ssl'])
     coin_data.explorers = json.dumps(coins_info[coin]['explorers'])
     coin_data.dpow = json.dumps(coins_info[coin]['dpow'])
+    if coin in dpow_tenure:
+        print(dpow_tenure[coin])
+        coin_data.dpow_tenure = json.dumps(dpow_tenure[coin])
+    else:
+        coin_data.dpow_tenure = json.dumps({})
     coin_data.dpow_active = coins_info[coin]['dpow_active']
     coin_data.mm2_compatible = coins_info[coin]['mm2_compatible']
     coin_data.update()
@@ -249,3 +316,11 @@ logger.info("dpow_main: "+str(dpow_main))
 logger.info("dpow_3p count: "+str(len(dpow_3p)))
 logger.info("dpow_3p: "+str(dpow_3p))
 logging.info("Finished!")
+
+for season in SEASONS_INFO:
+    try:
+        coin_data = coins_row()
+        coin_data.coin = season
+        coin_data.delete()
+    except:
+        pass

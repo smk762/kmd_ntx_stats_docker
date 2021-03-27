@@ -31,3 +31,14 @@ class ntxFilter(FilterSet):
                   'txid', 'chain', 'block_height', 'block_time',
                   'block_datetime', 'block_hash', 'ac_ntx_blockhash',
                   'ac_ntx_height', 'opret', 'season', 'btc_validated']
+
+class ntxTenureFilter(FilterSet):
+    gte_official_start = NumberFilter(field_name="official_start_block_time", lookup_expr='gte')
+    lte_official_start = NumberFilter(field_name="official_start_block_time", lookup_expr='lte')
+    gte_official_end = NumberFilter(field_name="official_end_block_time", lookup_expr='gte')
+    lte_official_end = NumberFilter(field_name="official_end_block_time", lookup_expr='lte')
+
+    class Meta:
+        model = notarised
+        fields = ['gte_official_start', 'lte_official_start',
+                  'gte_official_end', 'lte_official_end', 'season', 'chain']

@@ -3,6 +3,7 @@ from django.urls import include, path
 from rest_framework import routers
 from kmd_ntx_api import views
 from kmd_ntx_api import api_viewsets
+from kmd_ntx_api import api_filtered_viewsets
 from kmd_ntx_api import api_tools
 from kmd_ntx_api import api_graph
 from kmd_ntx_api import page_views
@@ -15,75 +16,70 @@ router.register(r'groups', api_viewsets.GroupViewSet)
 
 # info
 router.register(r'info/addresses',
-                api_viewsets.addresses_filter,
+                api_filtered_viewsets.addresses_filter,
                 basename='addresses_filter') # 
 router.register(r'info/balances',
-                api_viewsets.balances_filter,
+                api_filtered_viewsets.balances_filter,
                 basename='balances_filter')
 router.register(r'info/coins',
-                api_viewsets.coins_filter,
+                api_filtered_viewsets.coins_filter,
                 basename='coins_filter')
 router.register(r'info/explorers',
-                api_viewsets.explorers_filter,
+                api_filtered_viewsets.explorers_filter,
                 basename='explorers_filter')
 router.register(r'info/mined_count_season',
-                api_viewsets.mined_count_season_filter,
+                api_filtered_viewsets.mined_count_season_filter,
                 basename='mined_count_season_filter')
 router.register(r'info/mined_count_date',
-                api_viewsets.mined_count_date_filter,
+                api_filtered_viewsets.mined_count_date_filter,
                 basename='mined_count_date_filter')
 router.register(r'info/mined',
-                api_viewsets.mined_filter,
+                api_filtered_viewsets.mined_filter,
                 basename='mined_filter')
 router.register(r'info/notarised',
-                api_viewsets.notarised_filter,
+                api_filtered_viewsets.notarised_filter,
                 basename='notarised_filter')
 
 router.register(r'info/notarised_chain_season',
-                api_viewsets.notarised_chain_season_filter,
+                api_filtered_viewsets.notarised_chain_season_filter,
                 basename='notarised_chain_season_filter')
 router.register(r'info/notarised_count_season',
-                api_viewsets.notarised_count_season_filter,
+                api_filtered_viewsets.notarised_count_season_filter,
                 basename='notarised_count_season_filter')
 router.register(r'info/notarised_chain_date',
-                api_viewsets.notarised_chain_date_filter,
+                api_filtered_viewsets.notarised_chain_date_filter,
                 basename='notarised_chain_date_filter')
 router.register(r'info/notarised_count_date',
-                api_viewsets.notarised_count_date_filter,
+                api_filtered_viewsets.notarised_count_date_filter,
                 basename='notarised_count_date_filter')
 router.register(r'info/notarised_tenure',
-                api_viewsets.notarised_tenure_filter,
+                api_filtered_viewsets.notarised_tenure_filter,
                 basename='notarised_tenure_filter')
 router.register(r'info/notary_nodes',
-                api_viewsets.notary_nodes_filter,
+                api_filtered_viewsets.notary_nodes_filter,
                 basename='notary_nodes_filter')
 router.register(r'info/notary_rewards',
-                api_viewsets.notary_rewards_filter,
+                api_filtered_viewsets.notary_rewards_filter,
                 basename='notary_rewards_filter')
 
 
 router.register(r'info/nn_social',
-                api_viewsets.notary_social_filter,
+                api_filtered_viewsets.notary_social_filter,
                 basename='notary_social_filter')
 
 router.register(r'source/last_notarised',
                 api_viewsets.lastNtxViewSet,
                 basename='lastNtxViewSet')
 router.register(r'info/last_notarised',
-                api_viewsets.last_ntx_filter,
+                api_filtered_viewsets.last_ntx_filter,
                 basename='last_ntx_filter')
 
 router.register(r'source/last_btc_notarised',
                 api_viewsets.lastBtcNtxViewSet,
                 basename='lastBtcNtxViewSet')
 router.register(r'info/last_btc_notarised',
-                api_viewsets.last_btc_ntx_filter,
+                api_filtered_viewsets.last_btc_ntx_filter,
                 basename='last_btc_ntx_filter')
-
-# CSV output
-router.register(r'csv/notarised_tenure',
-                api_viewsets.notarised_tenure_csv,
-                basename='notarised_tenure_csv')
 
 # Tools 
 router.register(r'tools/decode_opreturn',
