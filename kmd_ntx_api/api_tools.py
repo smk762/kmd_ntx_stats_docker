@@ -1,25 +1,15 @@
 #!/usr/bin/env python3
-from kmd_ntx_api.serializers import *
-from django.contrib.auth.models import User, Group
-from django_filters.rest_framework import DjangoFilterBackend, FilterSet, \
-                                          NumberFilter
 from rest_framework.response import Response
-from rest_framework.filters import OrderingFilter
 from rest_framework import permissions, viewsets, authentication
-from kmd_ntx_api.filters import *
-from kmd_ntx_api.serializers import *
-from kmd_ntx_api.models import *
-from kmd_ntx_api.lib_query import * 
+from kmd_ntx_api.serializers import addrFromBase58Serializer, addrFromPubkeySerializer, decodeOpRetSerializer
+from kmd_ntx_api.lib_helper import decode_opret
 from kmd_ntx_api.base_58 import get_addr_from_pubkey, get_addr_tool, COIN_PARAMS
 
 
 # Tool views
-class api_decode_op_return_tool(viewsets.ViewSet):
-    """
-    Decodes notarization OP_RETURN strings.
-    USAGE: decode_opret/?OP_RETURN=<OP_RETURN>
-    """    
-    serializer_class = decodeOpRetSerializer
+
+class api_addr_from_base58_tool(viewsets.ViewSet):
+    serializer_class = addrFromBase58Serializer
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -28,14 +18,21 @@ class api_decode_op_return_tool(viewsets.ViewSet):
 
     def get(self, request, format=None):
         """
-        Returns decoded notarisation information from OP_RETURN strings
+        Returns address from pubkey using INPUT base 58 params
         """
-        if 'OP_RETURN' in request.GET:
+        missing_params = []
+        for x in addrFromBase58Serializer.Meta.fields:
+            if x not in request.GET:
+                missing_params.append(f"{x}=<{x}>")
 
-            decoded = decode_opret(request.GET['OP_RETURN'])
-        else:
-            decoded = {"error":"needs parm like ?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400"}
-        return Response(decoded)
+        if len(missing_params) > 0:
+            params = '&'.join(missing_params)
+            error = f"You need to specify params like '?{params}'"
+            return Response({"error":f"Missing params: {error}"})
+
+        resp = get_addr_tool(request.GET["pubkey"], request.GET["pub_addr"],
+                             request.GET["script_addr"], request.GET["secret_key"])
+        return Response(resp)
 
 class api_address_from_pubkey_tool(viewsets.ViewSet):
     serializer_class = addrFromPubkeySerializer
@@ -68,8 +65,12 @@ class api_address_from_pubkey_tool(viewsets.ViewSet):
             }
         return Response(resp)
 
-class api_addr_from_base58_tool(viewsets.ViewSet):
-    serializer_class = addrFromPubkeySerializer
+class api_decode_op_return_tool(viewsets.ViewSet):
+    """
+    Decodes notarization OP_RETURN strings.
+    USAGE: decode_opret/?OP_RETURN=<OP_RETURN>
+    """    
+    serializer_class = decodeOpRetSerializer
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
@@ -78,18 +79,11 @@ class api_addr_from_base58_tool(viewsets.ViewSet):
 
     def get(self, request, format=None):
         """
-        Returns address from pubkey using INPUT base 58 params
+        Returns decoded notarisation information from OP_RETURN strings
         """
-        missing_params = []
-        for x in addrFromBase58Serializer.Meta.fields:
-            if x not in request.GET:
-                missing_params.append(f"{x}=<{x}>")
+        if 'OP_RETURN' in request.GET:
 
-        if len(missing_params) > 0:
-            params = '&'.join(missing_params)
-            error = f"You need to specify params like '?{params}'"
-            return Response({"error":f"Missing params: {error}"})
-
-        resp = get_addr_tool(request.GET["pubkey"], request.GET["pub_addr"],
-                             request.GET["script_addr"], request.GET["secret_key"])
-        return Response(resp)
+            decoded = decode_opret(request.GET['OP_RETURN'])
+        else:
+            decoded = {"error":"needs parm like ?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400"}
+        return Response(decoded)

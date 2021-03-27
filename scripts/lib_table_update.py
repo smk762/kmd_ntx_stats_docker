@@ -126,25 +126,39 @@ def update_validation_notarised_tbl(btc_txid, btc_block_hash, btc_block_ht, opre
             logger.debug(row_data)
         CONN.rollback()
 
+
+def update_score_notarised_tbl(txid, scored):
+    sql = f"UPDATE notarised SET \
+          scored={scored} \
+          WHERE txid='{txid}';"
+    try:
+        CURSOR.execute(sql)
+        CONN.commit()
+        print(f"{txid} tagged as {scored}")
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()
+
 def update_coins_row(row_data):
     try:
         sql = "INSERT INTO coins \
-            (chain, coins_info, electrums, electrums_ssl, explorers, dpow, dpow_active, mm2_compatible) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
+            (chain, coins_info, electrums, electrums_ssl, explorers, dpow, dpow_tenure, dpow_active, mm2_compatible) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_chain_coin DO UPDATE SET \
             coins_info='"+str(row_data[1])+"', \
             electrums='"+str(row_data[2])+"', \
             electrums_ssl='"+str(row_data[3])+"', \
             explorers='"+str(row_data[4])+"', \
             dpow='"+str(row_data[5])+"', \
-            dpow_active='"+str(row_data[6])+"', \
-            mm2_compatible='"+str(row_data[7])+"';"
+            dpow_tenure='"+str(row_data[6])+"', \
+            dpow_active='"+str(row_data[7])+"', \
+            mm2_compatible='"+str(row_data[8])+"';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
         return 1
     except Exception as e:
+        logger.debug(e)
         if str(e).find('Duplicate') == -1:
-            logger.debug(e)
             logger.debug(row_data)
         CONN.rollback()
         return 0

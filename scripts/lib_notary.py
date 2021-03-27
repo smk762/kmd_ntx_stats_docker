@@ -283,14 +283,20 @@ def get_btc_ntxids(stop_block, exit=None):
 
 
 
-def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None):
+def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None, stop_block=None):
     before_block=None
+    stop_block = 634774
     page = 1
     exit_loop = False
     api_txids = []
     new_txids = []
+    
     if not page_break:
         page_break = API_PAGE_BREAK
+    
+    if not stop_block:
+        stop_block = 634774
+
     while True:
         # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
         if page > page_break:
@@ -313,7 +319,7 @@ def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None):
                         logger.info(f"appended tx {tx}")
 
                 # exit loop if earlier than s4
-                if before_block < 634774:
+                if before_block < stop_block:
                     logger.info("No more for s4!")
                     exit_loop = True
             else:
@@ -408,6 +414,29 @@ def ts_col_to_season_col(ts_col, season_col, table):
 
 now = int(time.time())
 
+def get_dpow_scoring_window(season, chain):
+
+    official_start = None
+    official_end = None
+
+    if season in SEASONS_INFO:
+
+        official_start = SEASONS_INFO[season]["start_time"]
+        official_end = SEASONS_INFO[season]["end_time"]
+
+    if season in PARTIAL_SEASON_DPOW_CHAINS:
+
+        if chain in PARTIAL_SEASON_DPOW_CHAINS[season]:
+
+            if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][chain]:
+                official_end = PARTIAL_SEASON_DPOW_CHAINS[season][chain]["end_time"]
+
+            if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][chain]:
+                official_start = PARTIAL_SEASON_DPOW_CHAINS[season][chain]["start_time"]
+
+    return official_start, official_end
+
+
 
 def update_ntx_tenure(chains, seasons):
     for chain in chains:
@@ -420,6 +449,7 @@ def update_ntx_tenure(chains, seasons):
             min_blk = ntx_results[2]
             min_blk_time = ntx_results[3]
             ntx_count = ntx_results[4]
+            official_start, official_end = get_dpow_scoring_window(season, chain)
             if max_blk is not None:
                 row = ntx_tenure_row()
                 row.chain = chain
@@ -427,6 +457,8 @@ def update_ntx_tenure(chains, seasons):
                 row.last_ntx_block = max_blk
                 row.first_ntx_block_time = min_blk_time
                 row.last_ntx_block_time = max_blk_time
+                row.official_start_block_time = official_start
+                row.official_end_block_time = official_end
                 row.ntx_count = ntx_count
                 row.season = season
                 row.update()
