@@ -89,6 +89,7 @@ def get_coins_data(request):
             item["chain"]:{
                 "coins_info":item["coins_info"],
                 "dpow":item["dpow"],
+                "dpow_tenure":item["dpow_tenure"],
                 "explorers":item["explorers"],
                 "electrums":item["electrums"],
                 "electrums_ssl":item["electrums_ssl"],
@@ -1234,53 +1235,29 @@ def get_btc_ntx_lag(request):
         max_lag_vals.append(max_blocktime_lag)
     return {"max_lags":max_lags}
 
-def get_ntx_tenure_data(request, output="json"):
+def get_ntx_tenure_data(request):
     filters = ntxTenureSerializer.Meta.fields
     resp = {}
     data = notarised_tenure.objects.all()
-    full_count = data.count()
     data = apply_filters(request, ntxTenureSerializer, data)
-    season = get_season(int(time.time()))
-    if data.count() == full_count:
-        data = notarised_tenure.objects.filter(season=season)
-    data = data.order_by('season', 'chain').values()
+    data = data.order_by('chain', 'season').values()
+    for item in data:
 
+        if item["chain"] not in resp: 
+            resp.update({item["chain"]:{}})
 
-    if output == "csv":
-        msg = ""
-        for item in data:
-            row = []
-            row.append(item["chain"])
-            row.append(str(item["first_ntx_block"]))
-            row.append(str(item["last_ntx_block"]))
-            row.append(str(item["first_ntx_block_time"]))
-            row.append(str(item["last_ntx_block_time"]))
-            row.append(str(item["ntx_count"]))
-            row.append(item["season"])
-            msg += ", ".join(row)+"\n"
-        return msg
+        if item["season"] not in resp[item["chain"]]:
+            resp[item["chain"]].update({
+                item["season"]: {
+                    "first_ntx_block":item["first_ntx_block"],
+                    "last_ntx_block":item["last_ntx_block"], 
+                    "first_ntx_block_time":item["first_ntx_block_time"],
+                    "last_ntx_block_time":item["last_ntx_block_time"],
+                    "ntx_count":item["ntx_count"]
+                }
+            })
 
-    else:
-
-        for item in data:
-
-            if item["season"] not in resp: 
-                resp.update({item["season"]:{}})
-
-            if item["chain"] not in resp[item["season"]]:
-                resp[item["season"]].update({
-                    item["chain"]: {
-                        "first_ntx_block":item["first_ntx_block"],
-                        "last_ntx_block":item["last_ntx_block"], 
-                        "first_ntx_block_time":item["first_ntx_block_time"],
-                        "last_ntx_block_time":item["last_ntx_block_time"],
-                        "ntx_count":item["ntx_count"]
-                    }
-                })
-
-
-
-        return wrap_api(resp, filters)
+    return wrap_api(resp, filters)
 
 
 def get_ltc_txid_single(txid=None):
