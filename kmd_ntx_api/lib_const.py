@@ -10,7 +10,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
-seasons_info = {
+SEASONS_INFO = {
     "Season_1": {
             "start_block":1,
             "end_block":813999,

@@ -461,19 +461,17 @@ def get_nn_mining_summary(notary):
         "last_mined_datetime": -1,
         "time_since_mined": -1,
     }
-    notary_mined = mined.objects.filter(season=season, name=notary)
+    # notary_season_mined = get_notary_season_mined(season, notary)
 
-    mined_last_24hrs = notary_mined.filter(block_time__gte=str(day_ago), block_time__lte=str(now)) \
-                      .values('name').annotate(mined_24hrs=Sum('value'))
+    mined_this_season = get_notary_season_aggr(season, notary)
+    mined_last_24hrs = get_notary_mined_last_24hrs(notary)
 
     if len(mined_last_24hrs) > 0:
         mining_summary.update({
             "mined_last_24hrs": float(mined_last_24hrs[0]['mined_24hrs'])
         })
 
-
-
-    mined_this_season = get_mined_this_season()
+    
     if len(mined_last_24hrs) > 0:
         time_since_mined = int(time.time()) - int(mined_this_season[0]['last_mined_time'])
         time_since_mined = day_hr_min_sec(time_since_mined)

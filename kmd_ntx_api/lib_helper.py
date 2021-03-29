@@ -21,8 +21,8 @@ def day_hr_min_sec(seconds, granularity=2):
 def get_season(time_stamp=None):
     if not time_stamp:
         time_stamp = int(time.time())
-    for season in seasons_info:
-        if time_stamp >= seasons_info[season]['start_time'] and time_stamp <= seasons_info[season]['end_time']:
+    for season in SEASONS_INFO:
+        if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= SEASONS_INFO[season]['end_time']:
             return season
     return "season_undefined"
 
