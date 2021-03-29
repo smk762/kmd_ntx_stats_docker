@@ -233,35 +233,36 @@ def get_dpow_tenure():
     tenured_coins = list(tenure.keys()) + list(PARTIAL_SEASON_DPOW_CHAINS["Season_4"].keys())
 
     for chain in tenured_coins:
-        for season in tenure[chain]:
-            if season == "Season_4" and chain in DPOW_EXCLUDED_CHAINS["Season_4"] \
-            or season == "season_undefined":
-                pass
-            else:
-                season_start_block = SEASONS_INFO[season]["start_block"]
-                season_start_time = SEASONS_INFO[season]["start_time"]
-                season_end_block = SEASONS_INFO[season]["end_block"]
-                season_end_time = SEASONS_INFO[season]["end_time"]
+        if chain in tenure:
+            for season in tenure[chain]:
+                if season == "Season_4" and chain in DPOW_EXCLUDED_CHAINS["Season_4"] \
+                or season == "season_undefined":
+                    pass
+                elif season in  SEASONS_INFO:
+                    season_start_block = SEASONS_INFO[season]["start_block"]
+                    season_start_time = SEASONS_INFO[season]["start_time"]
+                    season_end_block = SEASONS_INFO[season]["end_block"]
+                    season_end_time = SEASONS_INFO[season]["end_time"]
 
-                tenure[chain][season].update({"first_ntx_block":season_start_block})
-                tenure[chain][season].update({"last_ntx_block":season_end_block})
-                tenure[chain][season].update({"first_ntx_block_time":season_start_time})
-                tenure[chain][season].update({"last_ntx_block_time":season_end_time})
+                    tenure[chain][season].update({"first_ntx_block":season_start_block})
+                    tenure[chain][season].update({"last_ntx_block":season_end_block})
+                    tenure[chain][season].update({"first_ntx_block_time":season_start_time})
+                    tenure[chain][season].update({"last_ntx_block_time":season_end_time})
 
-                if season in PARTIAL_SEASON_DPOW_CHAINS:
-                    if server in PARTIAL_SEASON_DPOW_CHAINS:
+                    if season in PARTIAL_SEASON_DPOW_CHAINS:
+                        if server in PARTIAL_SEASON_DPOW_CHAINS:
 
-                        if chain in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
-                            # TODO: Calc first / last block based on timestamp
-                            if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
-                                season_start_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"]
-                                tenure[chain][season].update({"first_ntx_block_time":season_start_time})
-                                tenure[chain][season].update({"first_ntx_block":0})
+                            if chain in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
+                                # TODO: Calc first / last block based on timestamp
+                                if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+                                    season_start_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"]
+                                    tenure[chain][season].update({"first_ntx_block_time":season_start_time})
+                                    tenure[chain][season].update({"first_ntx_block":0})
 
-                            if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
-                                season_end_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]
-                                tenure[chain][season].update({"last_ntx_block_time":season_end_time})
-                                tenure[chain][season].update({"last_ntx_block":0})
+                                if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+                                    season_end_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]
+                                    tenure[chain][season].update({"last_ntx_block_time":season_end_time})
+                                    tenure[chain][season].update({"last_ntx_block":0})
 
     for chain in TRANSLATE_COINS:
         try:
