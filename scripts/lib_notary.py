@@ -253,8 +253,8 @@ def is_coin_is_dpow_active(season, server, coin, timestamp):
     if season in tenure:
         if server in tenure[season]:
             if coin in tenure[season][server]:
-                if timestamp >= tenure[season][server][coin]["official_start_block_time"]:
-                    if timestamp <= tenure[season][server][coin]["official_end_block_time"]:
+                if int(timestamp) >= int(tenure[season][server][coin]["official_start_block_time"]):
+                    if int(timestamp) <= int(tenure[season][server][coin]["official_end_block_time"]):
                         return server, True
 
     return "Unofficial", False
