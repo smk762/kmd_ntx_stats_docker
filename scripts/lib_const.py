@@ -67,7 +67,7 @@ for coin in DPOW_COINS:
             })
     nn_server = DPOW_COINS[coin]['dpow']['server']
     if coin == "SFUSD":
-        coin = PBC
+        coin = "PBC"
     if nn_server == 'dpow-mainnet':
         if coin not in ['KMD', 'BTC']:
             ANTARA_COINS.append(coin)
