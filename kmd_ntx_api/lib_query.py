@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import time
 import logging
 import datetime
 from datetime import datetime as dt
@@ -69,8 +70,12 @@ def get_nn_social_data(request):
                            .order_by('-season','notary', 'chain', 'balance') \
                            .values()
 
-def get_mined_this_season():
-    return notary_mined.filter(block_time__gte=seasons_info[season]['start_time'],
+def get_notary_season_mined(season, notary):
+    return mined.objects.filter(season=season, name=notary)
+
+def get_notary_season_aggr(season, notary):
+    now = int(time.time())
+    return mined.objects.filter(name=notary, block_time__gte=SEASONS_INFO[season]['start_time'],
                           block_time__lte=str(now)) \
                          .values('name').annotate(season_value_mined=Sum('value'),\
                                             season_blocks_mined=Count('value'),
@@ -78,6 +83,12 @@ def get_mined_this_season():
                                             last_mined_datetime=Max('block_datetime'),
                                             last_mined_block=Max('block_height'),
                                             last_mined_time=Max('block_time'))
+
+def get_notary_mined_last_24hrs(notary):
+    now = int(time.time())
+    day_ago = now - 24*60*60
+    return mined.objects.filter(name=notary, block_time__gte=str(day_ago), block_time__lte=str(now)) \
+                      .values('name').annotate(mined_24hrs=Sum('value'))
 
 def get_btc_txid_data(category=None):
     resp = {}
@@ -450,7 +461,7 @@ def get_notarisation_scores(season, coin_notariser_ranks):
                 }
             })
     # populate mining data
-    mined_season = mined.objects.filter(block_time__gte=seasons_info[season]['start_time'],
+    mined_season = mined.objects.filter(block_time__gte=SEASONS_INFO[season]['start_time'],
                                             block_time__lte=str(int(time.time()))).values('name') \
                                            .annotate(season_blocks_mined=Count('value'))
     for item in mined_season:
