@@ -134,7 +134,6 @@ for item in notarised_rows:
 
 
     logger.info(f"Processing {i}/{num_rows} | {chain} | {season} | {server} | {score_value} | {scored}")
-    logger.info(f"addresses {address_list}")
     if chain not in ["KMD", "BTC"]:
         ntx_chain = "KMD"
     else:
@@ -148,13 +147,16 @@ for item in notarised_rows:
             tx_info = get_btc_tx_info(txid)
             address_list = tx_info['addresses']
             address_season, address_server = get_season_from_addresses(address_list, block_time, ntx_chain, chain, txid, notaries)
+            print(f">>> Updating Addresses... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
+            update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
         else:
             row_data = get_notarised_data(txid)
-            address_list = row_data[6]
-            address_season = row_data[11]
-            address_server = row_data[12]
-        print(f">>> Updating Addresses... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
-        update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
+            if row_data is not None:
+                address_list = row_data[6]
+                address_season = row_data[11]
+                address_server = row_data[12]
+                print(f">>> Updating Addresses... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
+                update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
 
 
     elif season != address_season:
