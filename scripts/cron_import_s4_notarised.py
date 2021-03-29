@@ -5,9 +5,11 @@ import logging
 import logging.handlers
 import requests
 from lib_const import NOTARY_BTC_ADDRESSES, OTHER_SERVER
-from lib_notary import get_new_notary_txids
-from models import tx_row
+from lib_notary import get_new_notary_txids, get_season_from_addresses, get_notarised_data
+from models import notarised_row
 from lib_const import *
+from lib_api import get_btc_tx_info
+from lib_table_select import get_existing_notarised_txids, get_notarised_chains
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -20,53 +22,71 @@ logger.setLevel(logging.INFO)
 
 season = "Season_4"
 chains = get_notarised_chains(season)
-existing_notarised_txids = get_existing_notarised_txids()
 
 i = 0
 for chain in chains:
 
     i += 1
-    logger.info(f">>> Categorising {chain} for {season} {i}/{len(chains)}")
+    logger.info(f">>> Importing {chain} for {season} {i}/{len(chains)}")
 
     existing_notarised_txids = get_existing_notarised_txids(chain, season)
+    logger.info(f"existing_notarised_txids: {len(existing_notarised_txids)}")
 
-    txid_list_url = f"{OTHER_SERVER}/api/info/chain_notarisation_txid_list?chain={chain}&season={season}"
-    txid_list = requests.get(txid_list_url).json()["notarisation_txid_list"]
+    import_txids_url = f"{OTHER_SERVER}/api/info/chain_notarisation_txid_list?chain={chain}&season={season}"
+    import_txids = requests.get(import_txids_url).json()["notarisation_txid_list"]
+    logger.info(f"import_txids: {len(import_txids)}")
 
-    logger.info(f"Processing ETA: {0.03*len(txid_list)} sec")
+    logger.info(f"Processing ETA: {0.03*len(import_txids)} sec")
     time.sleep(0.02)
-
-    new_txids = list(set(existing_notarised_txids)-set(txid_list))
+    
+    new_txids = list(set(import_txids)-set(existing_notarised_txids))
+    logger.info(f"new_txids: {len(new_txids)}")
 
     j = 0
     for txid in new_txids:
         j += 1
-        logger.info(f">>> Importing {txid} {j}/{len(num_txid)}")
+        logger.info(f">>> Importing {txid} {j}/{len(new_txids)}")
         txid_url = f"{OTHER_SERVER}/api/info/notarisation_txid?txid={txid}"
         time.sleep(0.02)
         r = requests.get(txid_url)
         try:
             txid_info = r.json()
-            tx_resp = resp["results"][0]
-                row = notarised_row()
-                row.chain = txid_info["chain"]
-                row.block_height = txid_info["block_height"]
-                row.block_time = txid_info["block_time"]
-                row.block_datetime = txid_info["block_datetime"]
-                row.block_hash = txid_info["block_hash"]
-                row.notaries = txid_info["notaries"]
+            row = notarised_row()
+            row.chain = txid_info["chain"]
+            row.block_height = txid_info["block_height"]
+            row.block_time = txid_info["block_time"]
+            row.block_datetime = txid_info["block_datetime"]
+            row.block_hash = txid_info["block_hash"]
+            row.notaries = txid_info["notaries"]
+            if len(txid_info["notary_addresses"]) == 0:
+                if row.chain == "BTC":
+                    tx_info = get_btc_tx_info(txid)
+                    row.notary_addresses = tx_info['addresses']
+                    row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time, "BTC", "BTC", txid, row.notaries)
+                elif row.chain == "LTC":
+                    tx_info = get_ltc_tx_info(txid)
+                    row.notary_addresses = tx_info['addresses']
+                    row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time, "LTC", "LTC", txid, row.notaries)
+                else:
+                    row_data = get_notarised_data(txid)
+                    row.notary_addresses = row_data[6]
+                    row.season = row_data[11]
+                    row.server = row_data[12]                
+            else:
                 row.notary_addresses = txid_info["notary_addresses"]
-                row.ac_ntx_blockhash = txid_info["ac_ntx_blockhash"]
-                row.ac_ntx_height = txid_info["ac_ntx_height"]
-                row.txid = txid_info["txid"]
-                row.opret = txid_info["opret"]
                 row.season = txid_info["season"]
                 row.server = txid_info["server"]
-                row.score_value = txid_info["score_value"]
-                row.scored = txid_info["scored"]
-                row.btc_validated = txid_info["btc_validated"]
-                row.update()
-        except:
+
+            row.ac_ntx_blockhash = txid_info["ac_ntx_blockhash"]
+            row.ac_ntx_height = txid_info["ac_ntx_height"]
+            row.txid = txid_info["txid"]
+            row.opret = txid_info["opret"]
+            row.score_value = txid_info["score_value"]
+            row.scored = txid_info["scored"]
+            row.btc_validated = txid_info["btc_validated"]
+            row.update()
+        except Exception as e:
+            logger.error(e)
             logger.error(f"Something wrong with API? {txid_url}")
 
 CURSOR.close()

@@ -41,7 +41,9 @@ strob_consolidate = [
 		"c558c131cb7a5efce8f28def3c4777520109dd8785c4a61dc68af9a5be8d7f0e",
 ]
 
-
+pgt_return = [
+	"2f2785e3128ad4d777c67fb54918725223002aa36522d8c221ec5c4268063084"
+]
 
 CIPI_FAUCET_ADDR = "1JsAjr6d21j9T8EMsYnQ6GXf1mM523JAv1"
 '''

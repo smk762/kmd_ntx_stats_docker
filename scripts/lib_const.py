@@ -43,6 +43,10 @@ ONE_MONTH = 31 * 24 * 60
 ONE_YEAR = 365 * 24 * 60
 DEVISOR = 10512000
 
+# Some coins are named differently between dpow and coins repo...
+TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GleecBTC':'GLEEC', "SFUSD":"PBC"  }
+BACK_TRANSLATE_COINS = { 'COQUICASH':'COQUI','OUR':'OURC','WLC21':'WLC','GLEEC':'GleecBTC', "PBC":"SFUSD"}
+
 # Coins categorised
 OTHER_COINS = []
 ANTARA_COINS = []
@@ -62,6 +66,8 @@ for coin in DPOW_COINS:
                 }
             })
     nn_server = DPOW_COINS[coin]['dpow']['server']
+    if coin == "SFUSD":
+        coin = PBC
     if nn_server == 'dpow-mainnet':
         if coin not in ['KMD', 'BTC']:
             ANTARA_COINS.append(coin)
@@ -854,9 +860,6 @@ OTHER_CLI = {
     "GLEEC":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
 }
 
-# Some coins are named differently between dpow and coins repo...
-TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GleecBTC':'GLEEC', "SFUSD":"PBC"  }
-BACK_TRANSLATE_COINS = { 'COQUICASH':'COQUI','OUR':'OURC','WLC21':'WLC','GLEEC':'GleecBTC', "PBC":"SFUSD"}
 
 PARTIAL_SEASON_DPOW_CHAINS = {
     "Season_4": {
