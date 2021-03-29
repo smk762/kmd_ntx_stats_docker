@@ -920,7 +920,8 @@ def get_notary_balances_data(coins_data, balances_data):
 
     chartdata = []
     for label in labels:
-        chartdata.append(balances_graph_dict[label])
+        if label in balances_graph_dict:
+            chartdata.append(balances_graph_dict[label])
 
     notary_balances_graph = { 
         "labels":labels, 

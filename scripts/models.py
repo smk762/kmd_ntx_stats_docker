@@ -141,7 +141,7 @@ class tx_row():
                 logger.info(f"Inserting {self.season} {self.txid} {self.category} for {self.notary} VOUT {self.output_index}")
             else:
                 logger.info(f"Inserting {self.season} {self.txid} {self.category} for {self.notary}")
-            insert_nn_btc_tx_row(row_data)
+            update_nn_btc_tx_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
             logger.warning(f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={self.txid}")
