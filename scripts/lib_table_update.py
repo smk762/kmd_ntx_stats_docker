@@ -163,10 +163,12 @@ def update_txid_score_notarised_tbl(txid, scored, score_value):
         logger.debug(e)
         CONN.rollback()
 
-def update_season_notarised_tbl(txid, season, server):
+def update_season_server_addresses_notarised_tbl(txid, season, server, addresses):
     sql = f"UPDATE notarised SET \
+          notary_addresses=ARRAY{addresses},  \
           season='{season}', server='{server}' \
           WHERE txid='{txid}';"
+    print(sql)
     try:
         CURSOR.execute(sql)
         CONN.commit()

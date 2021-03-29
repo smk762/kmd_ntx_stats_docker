@@ -123,7 +123,6 @@ def get_btc_txid_data(category=None):
 def get_notarisation_txid_single(txid=None):
 
     data = notarised.objects.filter(txid=txid)
-    print(data)
 
     for item in data:
 
@@ -155,7 +154,6 @@ def get_chain_notarisation_txid_list(chain, season=None):
     else:
         data = notarised.objects.filter(chain=chain)
     for item in data:
-        print(item.txid)
         resp.append(item.txid)
 
     return resp
