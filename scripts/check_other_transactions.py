@@ -41,7 +41,7 @@ class LogstashFormatter(Formatter):
 
         return "<i>{datetime}</i><pre>\n{message}</pre>".format(message=record.msg, datetime=t)
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
 handler = RequestsHandler()

@@ -70,13 +70,17 @@ def get_seasons_from_address(addr, chain="KMD"):
                 addr_seasons.append(season)
     return addr_seasons
 
-def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD"):
+def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD", chain=None, txid=None, notaries=None):
     if BTC_NTX_ADDR in address_list:
         address_list.remove(BTC_NTX_ADDR)
 
+    if chain == "BTC":
+        tx_chain = "BTC"
+    elif chain == "LTC":
+        tx_chain = "LTC"
     #print(address_list)
 
-    seasons = list(SEASONS_INFO.keys())[::-1]
+    seasons = list(NOTARY_ADDRESSES_DICT.keys())[::-1]
     notary_seasons = []
     last_season = None
 
@@ -98,29 +102,22 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD"):
         last_season_num = season
 
     if "Season_5_Testnet" in notary_seasons and len(set(notary_seasons)) == 1:
-        return "Season_5_Testnet"
+        return "Season_5_Testnet", "testnet"
 
     elif len(notary_seasons) == 13 and len(set(notary_seasons)) == 1:
-        return notary_seasons[0]
+        if notary_seasons[0].find("_Third_Party") > -1:
+            server = "Third_Party"
+        else:
+            server = "Main"
+        ntx_season = notary_seasons[0].replace("_Third_Party", "").replace(".5", "")
+        return ntx_season, server
 
     else:
-        return get_season(time_stamp)
-
-def get_season_from_btc_addresses(address_list, time_stamp):
-    if BTC_NTX_ADDR in address_list:
-        address_list.remove(BTC_NTX_ADDR)
-
-    seasons = list(SEASONS_INFO.keys())[::-1]
-    for season in seasons:
-        notaries_in_season = []
-        for address in address_list:
-            if address in NN_BTC_ADDRESSES_DICT[season]:
-                notaries_in_season.append(NN_BTC_ADDRESSES_DICT[season][address])
-                if len(notaries_in_season) == 13:
-                    return season
-
-    return get_season(time_stamp)
-
+        season = get_season(time_stamp)
+        if chain and txid and notaries:
+            if chain not in DPOW_EXCLUDED_CHAINS[season]:
+                print(f"\nSetting_season_via_timestamp {season} {chain} {txid} {notaries}")
+        return season, "Unofficial"
 
 def get_notary_from_address(address):
     if address in KNOWN_ADDRESSES:
@@ -172,7 +169,7 @@ def get_ntx_data(txid):
                                 notary_list.append(item['address'])
                     notary_list.sort()
                     opret = raw_tx['vout'][1]['scriptPubKey']['asm']
-                    logger.info(opret)
+
                     if opret.find("OP_RETURN") != -1:
                         scriptPubKey_asm = opret.replace("OP_RETURN ","")
                         ac_ntx_blockhash = lil_endian(scriptPubKey_asm[:64])
@@ -201,12 +198,10 @@ def get_ntx_data(txid):
                             chain = chain.replace('\x00','')
                         # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
                         if chain.upper() == chain:
-                            season = get_season_from_addresses(address_list, block_time, "KMD")
-                            server = get_server(coin)
-                            scored = get_scored(coin, block_time)
+                            season, server = get_season_from_addresses(address_list, block_time, "KMD")
                             row_data = (chain, this_block_height, block_time, block_datetime,
                                         block_hash, notary_list, address_list, ac_ntx_blockhash, ac_ntx_height,
-                                        txid, opret, season, server, scored, "N/A")
+                                        txid, opret, season, server, "N/A")
                             return row_data
                     else:
                         # no opretrun in tx, and shouldnt polute the DB.
@@ -222,18 +217,62 @@ def get_ntx_data(txid):
         logger.warning(e)
         logger.warning(txid)
 
+def get_dpow_score_value(season, server, coin, timestamp):
 
-def get_server(coin):
-    # TODO: use tenure json to define this better
-    if coin in THIRD_PARTY_COINS:
-        return "Third Party"
-    elif coin in ANTARA_COINS or coin in ["KMD", "BTC"]:
-        return "Main"
-    return "Unknown"
+    score  = 0
 
-def get_scored(coin, block_time):
-    # TODO: use tenure json to define this better
-    return True
+    active = is_coin_is_dpow_active(season, server, coin, timestamp)
+
+    if active:
+
+        if coin == "BTC":
+            score = 0.0325
+            num_coins = 1
+
+        else:
+            num_coins = get_num_server_active_dpow_at_time(season, server, timestamp)
+
+            if num_coins > 0:
+
+                if server == "Main":
+                    score = 0.8698/num_coins
+
+                if server == "Third_Party":
+                    score = 0.977/num_coins
+
+        print(f"{coin} {server} {num_coins} {score}\n")
+
+    return score
+
+
+def is_coin_is_dpow_active(season, server, coin, timestamp):
+
+    r = requests.get(f"{THIS_SERVER}/api/info/notarised_tenure/?chain={coin}")
+    tenure = r.json()["results"][0]
+
+    if season in tenure:
+        if server in tenure[season]:
+            if coin in tenure[season][server]:
+                if timestamp >= tenure[season][server][coin]["official_start_block_time"]:
+                    if timestamp <= tenure[season][server][coin]["official_end_block_time"]:
+                        return server, True
+
+    return "Unofficial", False
+
+def get_num_server_active_dpow_at_time(season, server, timestamp):
+
+    r = requests.get(f"{THIS_SERVER}/api/info/notarised_tenure/?server={server}")
+    tenure = r.json()["results"][0]
+
+    count = 0
+    if season in tenure:
+        if server in tenure[season]:
+            for coin in tenure[season][server]:
+                if timestamp >= tenure[season][server][coin]["official_start_block_time"]:
+                    if timestamp <= tenure[season][server][coin]["official_end_block_time"]:
+                        count += 1
+
+    return count
 
 def get_btc_ntxids(stop_block, exit=None):
     has_more=True
@@ -280,8 +319,6 @@ def get_btc_ntxids(stop_block, exit=None):
             break
     ntx_txids = list(set((ntx_txids)))
     return ntx_txids
-
-
 
 def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None, stop_block=None):
     before_block=None
@@ -335,7 +372,6 @@ def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None, stop_b
     logger.info(f"{len(num_api_txids)} DISTINCT TXIDs counted from API")
 
     return new_txids
-
 
 def get_notaries_from_addresses(addresses):
     notaries = []
@@ -412,9 +448,7 @@ def ts_col_to_season_col(ts_col, season_col, table):
         CURSOR.execute(sql)
         CONN.commit()
 
-now = int(time.time())
-
-def get_dpow_scoring_window(season, chain):
+def get_dpow_scoring_window(season, chain, server):
 
     official_start = None
     official_end = None
@@ -425,44 +459,59 @@ def get_dpow_scoring_window(season, chain):
         official_end = SEASONS_INFO[season]["end_time"]
 
     if season in PARTIAL_SEASON_DPOW_CHAINS:
+        for server in PARTIAL_SEASON_DPOW_CHAINS[season]:
 
-        if chain in PARTIAL_SEASON_DPOW_CHAINS[season]:
+            if chain in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
 
-            if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][chain]:
-                official_end = PARTIAL_SEASON_DPOW_CHAINS[season][chain]["end_time"]
+                if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+                    official_start = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"]
 
-            if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][chain]:
-                official_start = PARTIAL_SEASON_DPOW_CHAINS[season][chain]["start_time"]
+                if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+                    official_end = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]
 
-    return official_start, official_end
+    scored_list, unscored_list = get_ntx_scored(season, chain, official_start, official_end, server)
+    return official_start, official_end, scored_list, unscored_list
 
-
-
-def update_ntx_tenure(chains, seasons):
+def update_ntx_tenure(chains, season, server):
     for chain in chains:
-        for season in seasons:
-            logger.info(f"Getting tenure for {season} {chain}")      
-            ntx_results = get_ntx_min_max(season, chain)
-            logger.info(chain+" "+season+": "+str(ntx_results))
-            max_blk = ntx_results[0]
-            max_blk_time = ntx_results[1]
-            min_blk = ntx_results[2]
-            min_blk_time = ntx_results[3]
-            ntx_count = ntx_results[4]
-            official_start, official_end = get_dpow_scoring_window(season, chain)
-            if max_blk is not None:
-                row = ntx_tenure_row()
-                row.chain = chain
-                row.first_ntx_block = min_blk
-                row.last_ntx_block = max_blk
-                row.first_ntx_block_time = min_blk_time
-                row.last_ntx_block_time = max_blk_time
-                row.official_start_block_time = official_start
-                row.official_end_block_time = official_end
-                row.ntx_count = ntx_count
-                row.season = season
-                row.update()
+        logger.info(f"Getting tenure for {season} {server} {chain}")  
+        ntx_results = get_ntx_min_max(season, chain, server)
+        max_blk = ntx_results[0]
+        max_blk_time = ntx_results[1]
+        min_blk = ntx_results[2]
+        min_blk_time = ntx_results[3]
+        total_ntx_count = ntx_results[4]
 
+        if max_blk is not None:
+            scoring_window = get_dpow_scoring_window(season, chain, server)
+            official_start = scoring_window[0]
+            official_end = scoring_window[1]
+
+            if season in DPOW_EXCLUDED_CHAINS:
+                if chain in DPOW_EXCLUDED_CHAINS[season]:
+                    scored_ntx_count = 0
+                    unscored_ntx_count = len(scoring_window[2])+len(scoring_window[3])
+                else:
+                    scored_ntx_count = len(scoring_window[2])
+                    unscored_ntx_count = len(scoring_window[3])
+            else:
+                scored_ntx_count = len(scoring_window[2])
+                unscored_ntx_count = len(scoring_window[3])
+
+
+            row = ntx_tenure_row()
+            row.chain = chain
+            row.first_ntx_block = min_blk
+            row.last_ntx_block = max_blk
+            row.first_ntx_block_time = min_blk_time
+            row.last_ntx_block_time = max_blk_time
+            row.official_start_block_time = official_start
+            row.official_end_block_time = official_end
+            row.scored_ntx_count = scored_ntx_count
+            row.unscored_ntx_count = unscored_ntx_count
+            row.season = season
+            row.server = server
+            row.update()
 
 def get_unrecorded_KMD_txids(tip, season):
     recorded_txids = []
@@ -487,7 +536,6 @@ def get_unrecorded_KMD_txids(tip, season):
     recorded_txids = get_existing_ntxids()
     unrecorded_txids = set(all_txids) - set(recorded_txids)
     return unrecorded_txids
-
 
 def get_nn_btc_tx_parts(txid):
     r = requests.get(f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={txid}")
@@ -541,7 +589,6 @@ def get_new_notary_txids(notary_address, season=None):
     else:
         logger.info(f"{len(new_txids)} extra txids detected for {ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]} {notary_address}")
     return new_txids
-
 
 def categorize_import_transactions(notary_address, season):
 
@@ -758,8 +805,6 @@ def get_category_from_vins_vouts(tx_vins, tx_vouts, season):
 
     return "Other"
 
-
-
 ### LTC
 ### TODO: standardise this for all chains.
 
@@ -809,60 +854,25 @@ def get_new_nn_ltc_txids(existing_txids, notary_address):
     return new_txids
 
 
-def get_notary_from_ltc_address(address, season=None, notary=None):
-    if address == LTC_NTX_ADDR:
-        return "LTC_NTX_ADDR"
+# DEPRECATED
+'''
 
-    if address in NN_LTC_ADDRESSES_DICT[season]:
-        return NN_LTC_ADDRESSES_DICT[season][address]
-
-    seasons = list(SEASONS_INFO.keys())[::-1]
-
-    for s in seasons:
-        if address in NN_LTC_ADDRESSES_DICT[s]:
-            return NN_LTC_ADDRESSES_DICT[s][address]
-    if notary:
-        return notary
-    else:
-        return "non-NN"
-
-def get_season_from_ltc_addresses(address_list, time_stamp):
-    if LTC_NTX_ADDR in address_list:
-        address_list.remove(LTC_NTX_ADDR)
+def get_season_from_btc_addresses(address_list, time_stamp):
+    if BTC_NTX_ADDR in address_list:
+        address_list.remove(BTC_NTX_ADDR)
 
     seasons = list(SEASONS_INFO.keys())[::-1]
     for season in seasons:
         notaries_in_season = []
         for address in address_list:
-            if address in NN_LTC_ADDRESSES_DICT[season]:
-                notaries_in_season.append(NN_LTC_ADDRESSES_DICT[season][address])
+            if address in NN_BTC_ADDRESSES_DICT[season]:
+                notaries_in_season.append(NN_BTC_ADDRESSES_DICT[season][address])
                 if len(notaries_in_season) == 13:
                     return season
-        if len(set(notaries_in_season)) > 1 and season.lower().find("testnet") != -1:
-            return season
 
     return get_season(time_stamp)
 
-
-def validate_ltc_ntx_vins(vins):
-    for vin in vins:
-        notary = get_notary_from_ltc_address(vin["addresses"][0])
-
-        if notary == "non-NN" or vin["output_value"] != 10000:
-            return False
-
-    return True
-
-def validate_ltc_ntx_vouts(vouts):
-    for vout in vouts:
-
-        if vout["addresses"] is not None:
-
-            if vout["addresses"][0] == LTC_NTX_ADDR and vout["value"] == 98800:
-                return True
-
-    return False
-
+'''
 def get_category_from_ltc_vins_vouts(tx_vins, tx_vouts, season):
     # TODO: Align this with api populate script
     notary_vins = []
@@ -974,3 +984,55 @@ def get_category_from_ltc_vins_vouts(tx_vins, tx_vouts, season):
         return "Incoming Replenish"
 
     return "Other"
+
+def get_notary_from_ltc_address(address, season=None, notary=None):
+    if address == LTC_NTX_ADDR:
+        return "LTC_NTX_ADDR"
+
+    if address in NN_LTC_ADDRESSES_DICT[season]:
+        return NN_LTC_ADDRESSES_DICT[season][address]
+
+    seasons = list(SEASONS_INFO.keys())[::-1]
+
+    for s in seasons:
+        if address in NN_LTC_ADDRESSES_DICT[s]:
+            return NN_LTC_ADDRESSES_DICT[s][address]
+    if notary:
+        return notary
+    else:
+        return "non-NN"
+
+def validate_ltc_ntx_vins(vins):
+    for vin in vins:
+        notary = get_notary_from_ltc_address(vin["addresses"][0])
+
+        if notary == "non-NN" or vin["output_value"] != 10000:
+            return False
+
+    return True
+
+def validate_ltc_ntx_vouts(vouts):
+    for vout in vouts:
+
+        if vout["addresses"] is not None:
+
+            if vout["addresses"][0] == LTC_NTX_ADDR and vout["value"] == 98800:
+                return True
+
+    return False
+def get_season_from_ltc_addresses(address_list, time_stamp):
+    if LTC_NTX_ADDR in address_list:
+        address_list.remove(LTC_NTX_ADDR)
+
+    seasons = list(SEASONS_INFO.keys())[::-1]
+    for season in seasons:
+        notaries_in_season = []
+        for address in address_list:
+            if address in NN_LTC_ADDRESSES_DICT[season]:
+                notaries_in_season.append(NN_LTC_ADDRESSES_DICT[season][address])
+                if len(notaries_in_season) == 13:
+                    return season
+        if len(set(notaries_in_season)) > 1 and season.lower().find("testnet") != -1:
+            return season
+
+    return get_season(time_stamp)

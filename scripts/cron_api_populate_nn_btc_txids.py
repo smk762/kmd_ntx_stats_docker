@@ -8,9 +8,9 @@ from decimal import *
 from datetime import datetime as dt
 import datetime
 import dateutil.parser as dp
-from lib_notary import get_new_nn_btc_txids, get_notary_from_btc_address, get_notary_last_ntx, get_season_from_btc_addresses
+from lib_notary import get_new_nn_btc_txids, get_notary_from_btc_address, get_notary_last_ntx, get_season_from_addresses, get_dpow_score_value
 from lib_table_update import update_nn_btc_tx_notary_from_addr
-from lib_table_select import get_existing_nn_btc_txids
+from lib_table_select import get_existing_nn_btc_txids, get_existing_notarised_btc_txids
 from lib_api import get_btc_tx_info
 from models import tx_row, last_notarised_row, ntx_records_row
 from lib_const import *
@@ -274,7 +274,9 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
     else:
         notary_name = "non-NN"
 
-    existing_txids = get_existing_nn_btc_txids(notary_address)
+    existing_nn_btc_txids = get_existing_nn_btc_txids(notary_address)
+    existing_notarised_txids = get_existing_notarised_btc_txids()
+    existing_txids = list(set(existing_nn_btc_txids)&set(existing_notarised_txids))
     txids = get_new_nn_btc_txids(existing_txids, notary_address)
     # txids = ["a91ee826138ac209e1c03ea599d86918ece7bed436b14dbeb231e98a82d16317"]
 
@@ -307,7 +309,7 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
             txid_data.block_datetime = dt.utcfromtimestamp(int(txid_data.block_time))
 
             addresses = tx_info['addresses']
-            txid_data.season = get_season_from_btc_addresses(addresses[:], txid_data.block_time)
+            txid_data.season, txid_data.server = get_season_from_addresses(addresses[:], txid_data.block_time, "BTC")
 
             vouts = tx_info["outputs"]
             vins = tx_info["inputs"]
@@ -418,7 +420,7 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
                             row = ntx_records_row()
                             row.chain = 'BTC'
                             row.block_height = txid_data.block_height
-                            row.block_time = txid_data.block_time
+                            row.block_time = int(txid_data.block_time)
                             row.block_datetime = txid_data.block_datetime
                             row.block_hash = txid_data.block_hash
                             row.notaries = notary_list
@@ -428,8 +430,15 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
                             row.txid = txid_data.txid
                             row.opret = opret
                             row.season = txid_data.season
-                            row.server = "main"
-                            row.scored = True
+                            row.server = txid_data.server
+                            row.score_value = get_dpow_score_value(row.season, row.server, row.chain, row.block_time)
+                            if row.score_value > 0:
+                                row.scored = True
+                            else:
+                                row.scored = False
+                            
+                            row.btc_validated =  "N/A"
+                            row.update()
                             row.btc_validated =  "true"
                             row.update()     
 

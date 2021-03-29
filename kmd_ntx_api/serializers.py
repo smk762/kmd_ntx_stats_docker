@@ -117,7 +117,8 @@ class NotarisedSerializer(serializers.HyperlinkedModelSerializer):
         model = notarised
         fields = ['txid', 'chain', 'block_height', 'block_time',
                   'block_datetime', 'block_hash', 'ac_ntx_blockhash',
-                  'ac_ntx_height', 'opret', 'notaries', 'season', 'btc_validated']
+                  'ac_ntx_height', 'opret', 'notaries', 'notary_addresses',
+                  'season', 'server', 'scored', 'score_value', 'btc_validated']
 
 class NotarisedChainDailySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -153,7 +154,7 @@ class ntxTenureSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['chain', 'first_ntx_block', 'last_ntx_block', 
                   'first_ntx_block_time', 'last_ntx_block_time',
                   'official_start_block_time', 'official_end_block_time',
-                  'ntx_count', 'season']
+                  'scored_ntx_count', 'unscored_ntx_count', 'season', 'server']
 
 class RewardsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

@@ -10,6 +10,7 @@ from .models import *
 from .lib_const import *
 from .lib_query import *
 from .lib_helper import *
+from .lib_api import *
 from .base_58 import *
 logger = logging.getLogger("mylogger")
 
@@ -30,83 +31,6 @@ def get_bot_balance_deltas():
     r = requests.get(url)
     return r.json()
 
-def get_notary_balances_table_data(coins_data, balances_data):
- 
-    third_chains = []
-    main_chains = []
-
-    for item in coins_data:
-        if item['dpow']['server'].lower() == "dpow-mainnet":
-            main_chains.append(item['chain'])
-        elif item['dpow']['server'].lower() == "dpow-3p":
-            third_chains.append(item['chain'])
-
-    third_chains.append("KMD_3P")
-
-    main_chains.sort()
-    third_chains.sort()
-
-    filtered_balances = []
-    for item in balances_data:
-        if item["chain"] in main_chains and item["node"] == 'main':
-            filtered_balances.append(item)
-        elif item["node"] == 'third party' and item["chain"] in third_chains or item['chain'] == "KMD":
-                filtered_balances.append(item)
-
-    return filtered_balances
-
-def get_notary_balances_graph_data(coins_data, balances_data):
-    bg_color = []
-    border_color = []
-    chartdata = []
-    chartLabel = ""
-
-    season = get_season(int(time.time()))        
-    third_chains = []
-    main_chains = []
-
-    for item in coins_data:
-        if item['dpow']['server'].lower() == "dpow-mainnet":
-            main_chains.append(item['chain'])
-        if item['dpow']['server'].lower() == "dpow-3p":
-            third_chains.append(item['chain'])
-    third_chains.append("KMD_3P")
-    main_chains.sort()
-    third_chains.sort()
-    labels = list(main_chains+third_chains)
-
-    for label in labels:
-        if label in ['KMD', 'KMD_3P', 'BTC']:
-            bg_color.append('#f7931a')
-        elif label in third_chains:
-            bg_color.append('#b541ea')
-        elif label in main_chains:
-            bg_color.append('#2fea8b')            
-        border_color.append('#000')
-
-    chartdata = []
-    balances_dict = {}
-    for item in balances_data:
-        if item['node'] == 'third party' and item['chain'] == "KMD":
-            chain = "KMD_3P"
-        else: 
-            chain = item['chain']
-        if chain in main_chains and item["node"] == 'main':
-            balances_dict.update({chain:float(item['balance'])})
-        elif item["node"] == 'third party' and chain in third_chains or chain == "KMD_3P":
-            balances_dict.update({chain:float(item['balance'])})
-
-    for label in labels:
-        chartdata.append(balances_dict[label])
-    
-    data = { 
-        "labels":labels, 
-        "chartLabel":chartLabel, 
-        "chartdata":chartdata, 
-        "bg_color":bg_color, 
-        "border_color":border_color, 
-    } 
-    return data
 
 def get_funding_totals(funding_data):
     funding_totals = {"fees":{}}
@@ -206,7 +130,7 @@ def get_eco_data_link():
     return link
 
 def get_coin_social(coin=None):
-    season = get_season(int(time.time()))
+    season = get_season()
     coin_social_info = {}
     if coin:
         coin_social_data = coin_social.objects.filter(season=season, chain=coin).values()
@@ -228,7 +152,7 @@ def get_coin_social(coin=None):
     return coin_social_info
 
 def get_nn_social(notary_name=None):
-    season = get_season(int(time.time()))
+    season = get_season()
     nn_social_info = {}
     if notary_name:
         nn_social_data = nn_social.objects.filter(season=season, notary=notary_name).values()
@@ -252,7 +176,7 @@ def get_nn_social(notary_name=None):
     return nn_social_info
 
 def get_nn_ntx_summary(notary):
-    season = get_season(int(time.time()))
+    season = get_season()
     now = int(time.time())
     day_ago = now - 24*60*60
     week_ago = now - 24*60*60*7
@@ -476,7 +400,7 @@ def get_season_nn_chain_ntx_data(season):
     return season_nn_chain_ntx_data
                      
 def get_nn_mining_summary(notary):
-    season = get_season(int(time.time()))
+    season = get_season()
     now = int(time.time())
     day_ago = now - 24*60*60
     week_ago = now - 24*60*60*7
@@ -524,143 +448,10 @@ def get_nn_mining_summary(notary):
     logger.info(mining_summary)
     return mining_summary
 
-def get_nn_health():
-    # widget using this has been deprecated, but leaving code here for reference
-    # to use in potential replacement functions.
-    if 1 == 0:
-        coins_data = coins.objects.filter(dpow_active=1).values('chain')
-        chains_list = []
-        for item in coins_data:
-            # ignore BTC, OP RETURN lists ntx to BTC as "KMD"
-            if item['chain'] not in chains_list and item['chain'] != 'BTC':
-                chains_list.append(item['chain'])
-
-        sync_matches = []
-        sync_mismatches = []
-        sync_no_exp = []
-        sync_no_sync = []
-        sync = chain_sync.objects.all().values()
-        for item in sync:
-            if item['sync_hash'] == item['explorer_hash']:
-                sync_matches.append(item['chain'])
-            else:
-                if item['explorer_hash'] != 'no exp data' and item['sync_hash'] != 'no sync data':
-                    sync_mismatches.append(item['chain'])
-                if item['sync_hash'] == 'no sync data':
-                    sync_no_sync.append(item['chain'])
-                if item['explorer_hash'] == 'no exp data':
-                    sync_no_exp.append(item['chain'])    
-        sync_count = len(sync_matches)
-        no_sync_count = len(sync_mismatches)
-        sync_pct = round(sync_count/(len(sync))*100,2)
-
-        sync_tooltip = "<h4 class='kmd_teal'>"+str(sync_count)+"/"+str(len(sync))+" ("+str(sync_pct)+"%) recent sync hashes matching</h4>\n"
-        if len(sync_mismatches) > 0:
-            sync_tooltip += "<h5 class='kmd_secondary_red'>"+str(sync_mismatches)+" have mismatched hashes </h5>\n"
-        if len(sync_no_sync) > 0:
-            sync_tooltip += "<h5 class='kmd_secondary_red'>"+str(sync_no_sync)+" are not syncing </h5>\n"
-        if len(sync_no_exp) > 0:
-            sync_tooltip += "<h5 class='kmd_secondary_red'>"+str(sync_no_exp)+" have no explorer </h5>\n"
-
-        season = get_season(int(time.time()))
-        notary_list = get_notary_list(season)
-
-        timenow = int(time.time())
-        day_ago = timenow-60*60*24
-
-        filter_kwargs = {
-            'block_time__gte':day_ago,
-            'block_time__lte':timenow
-        }
-
-        ntx_data = notarised.objects.filter(**filter_kwargs)
-        ntx_chain_24hr = ntx_data.values('chain') \
-                         .annotate(max_ntx_time=Max('block_time'))
-
-        ntx_chains = []
-        for item in ntx_chain_24hr:
-            ntx_chains.append(item['chain'])
-        ntx_chains = list(set(ntx_chains))
-
-        ntx_node_24hr = ntx_data.values('notaries')
-        ntx_nodes = []
-        for item in ntx_node_24hr:
-            ntx_nodes += item['notaries']
-        ntx_nodes = list(set(ntx_nodes))
-
-        mining_data = mined.objects.filter(**filter_kwargs) \
-                     .values('name') \
-                     .annotate(num_mined=Count('name'))
-        mining_nodes = []
-        for item in mining_data:
-            if item['name'] in notary_list:
-                mining_nodes.append(item['name'])
-
-        season = get_season(int(time.time()))
-        filter_kwargs = {'season':season}
-        balances_dict = get_balances_dict(filter_kwargs) 
-
-        # some chains do not have a working electrum, so balances ignored
-        ignore_chains = ['K64', 'PGT', 'GIN']
-        low_balances = get_low_balances(notary_list, balances_dict, ignore_chains)
-        low_balances_dict = low_balances[0]
-        low_balance_count = low_balances[1]
-        sufficient_balance_count = low_balances[2]
-        low_balances_tooltip = get_low_balance_tooltip(low_balances, ignore_chains)
-        low_balances_pct = round(sufficient_balance_count/(low_balance_count+sufficient_balance_count)*100,2)
-
-        non_mining_nodes = list(set(notary_list)- set(mining_nodes))
-        non_ntx_nodes = list(set(notary_list).symmetric_difference(set(ntx_nodes)))
-        non_ntx_chains = list(set(chains_list).symmetric_difference(set(ntx_chains)))
-        mining_nodes_pct = round(len(mining_nodes)/len(notary_list)*100,2)
-        ntx_nodes_pct = round(len(ntx_nodes)/len(notary_list)*100,2)
-        ntx_chains_pct = round(len(ntx_chains)/len(chains_list)*100,2)
-
-
-        mining_tooltip = "<h4 class='kmd_teal'>"+str(len(mining_nodes))+"/"+str(len(non_mining_nodes)+len(mining_nodes))+" ("+str(mining_nodes_pct)+"%) mined 1+ block in last 24hrs</h4>\n"
-        mining_tooltip += "<h5 class='kmd_secondary_red'>"+str(non_mining_nodes)+" are not mining! </h5>\n"
-
-        ntx_nodes_tooltip = "<h4 class='kmd_teal'>"+str(len(ntx_nodes))+"/"+str(len(non_ntx_nodes)+len(ntx_nodes))+" ("+str(ntx_nodes_pct)+"%) notarised 1+ times in last 24hrs</h4>\n"
-        ntx_nodes_tooltip += "<h5 class='kmd_secondary_red'>"+str(non_ntx_nodes)+" are not notarising! </h5>\n"
-
-        ntx_chains_tooltip = "<h4 class='kmd_teal'>"+str(len(ntx_chains))+"/"+str(len(non_ntx_chains)+len(ntx_chains))+" ("+str(ntx_chains_pct)+"%) notarised 1+ times in last 24hrs</h4>\n"
-        ntx_chains_tooltip += "<h5 class='kmd_secondary_red'>"+str(non_ntx_chains)+" are not notarising! </h5>\n"
-
-        regions_info = get_regions_info(notary_list)
-        sync_no_exp = []
-        sync_no_sync = []
-        nn_health = {
-            "sync_pct":sync_pct,
-            "regions_info":regions_info,
-            "sync_tooltip":sync_tooltip,
-            "low_balances_dict":low_balances_dict,
-            "low_balances_tooltip":low_balances_tooltip,
-            "low_balance_count":low_balance_count,
-            "sufficient_balance_count":sufficient_balance_count,
-            "balance_pct":low_balances_pct,
-            "non_mining_nodes":non_mining_nodes,
-            "mining_nodes":mining_nodes,
-            "mining_tooltip":mining_tooltip,
-            "non_mining_nodes":non_mining_nodes,
-            "mining_nodes_pct":mining_nodes_pct,
-            "ntx_nodes":ntx_nodes,
-            "non_ntx_nodes":non_ntx_nodes,
-            "ntx_nodes_pct":ntx_nodes_pct,
-            "ntx_chains_tooltip":ntx_chains_tooltip,
-            "chains_list":chains_list,
-            "ntx_chains":ntx_chains,
-            "non_ntx_chains":non_ntx_chains,
-            "ntx_chains_pct":ntx_chains_pct,
-            "ntx_nodes_tooltip":ntx_nodes_tooltip
-        }
-        return nn_health
-    else:
-        return {}
-
 def get_nn_info():
     # widget using this has been deprecated, but leaving code here for reference
     # to use in potential replacement functions.
-    season = get_season(int(time.time()))
+    season = get_season()
     notary_list = get_notary_list(season)
     regions_info = get_regions_info(notary_list)
     nn_info = {
@@ -671,7 +462,7 @@ def get_nn_info():
 def get_coin_info():
     # widget using this has been deprecated, but leaving code here for reference
     # to use in potential replacement functions.
-    season = get_season(int(time.time()))
+    season = get_season()
     coins_list = get_dpow_coins_list()
     server_info = get_server_info(coins_list)
     coins_info = {
@@ -792,7 +583,6 @@ def get_low_balance_tooltip(low_balances, ignore_chains):
     # close container
     low_balances_tooltip += "</div>"
     return low_balances_tooltip
-
 
 def get_sidebar_links(notary_list, coins_data):
     region_notaries = get_regions_info(notary_list)
@@ -958,7 +748,6 @@ def get_address_from_pubkey(request):
             "Error": "You need to specify a pubkey and coin like '?coin=KMD&pubkey=<YOUR_PUBKEY>'\nIf coin not specified or unknown, will revert to KMD"
         }
 
-
 def get_testnet_addresses(season):
     addresses_dict = {}
     addresses_data = addresses.objects.filter(season=season, chain="KMD")
@@ -993,7 +782,7 @@ def prepare_testnet_stats_dict(season, testnet_chains):
             testnet_stats_dict[notary].update({"Address":address})
     return testnet_stats_dict
 
-def get_api_testnet(request, stat):
+def get_api_testnet(request):
     season = "Season_5_Testnet"
 
     # Prepare ntx data
@@ -1034,99 +823,93 @@ def get_api_testnet(request, stat):
 
     testnet_chains = list(ntx_dict.keys())
 
-    if stat == "raw":
-        return wrap_api(ntx_dict)
+    testnet_stats_dict = prepare_testnet_stats_dict(season, testnet_chains)
 
-    if stat == "raw_24hrs":
-        return wrap_api(ntx_dict_24hr)
+    last_notarisations = get_last_nn_chain_ntx(season)
 
-    elif stat == "totals":
-        testnet_stats_dict = prepare_testnet_stats_dict(season, testnet_chains)
+    for chain in testnet_chains:
 
-        last_notarisations = get_last_nn_chain_ntx(season)
-
-        for chain in testnet_chains:
-
-            # Get last notarised times
-            for notary in testnet_stats_dict:
-                try:
-                    last_chain_ntx = last_notarisations[notary][chain]["time_since"]
-                    testnet_stats_dict[notary].update({f"Last_{chain}":last_chain_ntx})
-                except Exception as e:
-                    print(e)
-                    testnet_stats_dict[notary].update({f"Last_{chain}":"> 24hrs"})
-
-            # Get notarisation counts
-            for item in ntx_dict[chain]:
-                ntx_notaries = item["notaries"]
-
-                for notary in ntx_notaries:
-                    if notary in testnet_stats_dict:
-
-                        if testnet_stats_dict[notary]["Total"] == 0:
-                            testnet_stats_dict[notary].update({"Total":1})
-
-                        else:
-                            count = testnet_stats_dict[notary]["Total"]+1
-                            testnet_stats_dict[notary].update({"Total":count})
-
-                        if testnet_stats_dict[notary][chain] == 0:
-                            testnet_stats_dict[notary].update({chain:1})
-                            testnet_stats_dict[notary].update({chain:1})
-                            
-                        else:
-                            count = testnet_stats_dict[notary][chain]+1
-                            testnet_stats_dict[notary].update({chain:count})
-                    else:
-                        print(item)
-
-            # Get notarisation counts 24hr
-            for item in ntx_dict_24hr[chain]:
-                ntx_notaries = item["notaries"]
-
-                for notary in ntx_notaries:
-                    if notary in testnet_stats_dict:
-
-                        if testnet_stats_dict[notary]["24hr_Total"] == 0:
-                            testnet_stats_dict[notary].update({"24hr_Total":1})
-
-                        else:
-                            count = testnet_stats_dict[notary]["24hr_Total"]+1
-                            testnet_stats_dict[notary].update({"24hr_Total":count})
-
-                        if testnet_stats_dict[notary][chain] == 0:
-                            testnet_stats_dict[notary].update({f"24hr_{chain}":1})
-                            testnet_stats_dict[notary].update({f"24hr_{chain}":1})
-                            
-                        else:
-                            count = testnet_stats_dict[notary][f"24hr_{chain}"]+1
-                            testnet_stats_dict[notary].update({f"24hr_{chain}":count})
-                    else:
-                        print(item)
-
-
-        # Get notarisation rank
-        notary_totals = {}
+        # Get last notarised times
         for notary in testnet_stats_dict:
-            notary_totals.update({notary:testnet_stats_dict[notary]["Total"]})
-        ranked_totals = {k: v for k, v in sorted(notary_totals.items(), key=lambda x: x[1])}
-        ranked_totals = dict(reversed(list(ranked_totals.items()))) 
+            try:
+                last_chain_ntx = last_notarisations[notary][chain]["time_since"]
+                testnet_stats_dict[notary].update({f"Last_{chain}":last_chain_ntx})
+            except Exception as e:
+                print(e)
+                testnet_stats_dict[notary].update({f"Last_{chain}":"> 24hrs"})
 
-        i = 0
-        for notary in ranked_totals:
-            i += 1
-            testnet_stats_dict[notary].update({"Rank":i})
+        # Get notarisation counts
+        for item in ntx_dict[chain]:
+            ntx_notaries = item["notaries"]
 
-        # Get 24hr notarisation rank
-        notary_totals_24hr = {}
-        for notary in testnet_stats_dict:
-            notary_totals_24hr.update({notary:testnet_stats_dict[notary]["24hr_Total"]})
-        ranked_totals_24hr = {k: v for k, v in sorted(notary_totals_24hr.items(), key=lambda x: x[1])}
-        ranked_totals_24hr = dict(reversed(list(ranked_totals_24hr.items()))) 
+            for notary in ntx_notaries:
+                if notary in testnet_stats_dict:
 
-        i = 0
-        for notary in ranked_totals_24hr:
-            i += 1
-            testnet_stats_dict[notary].update({"24hr_Rank":i})
+                    if testnet_stats_dict[notary]["Total"] == 0:
+                        testnet_stats_dict[notary].update({"Total":1})
 
-        return wrap_api(testnet_stats_dict)
+                    else:
+                        count = testnet_stats_dict[notary]["Total"]+1
+                        testnet_stats_dict[notary].update({"Total":count})
+
+                    if testnet_stats_dict[notary][chain] == 0:
+                        testnet_stats_dict[notary].update({chain:1})
+                        testnet_stats_dict[notary].update({chain:1})
+                        
+                    else:
+                        count = testnet_stats_dict[notary][chain]+1
+                        testnet_stats_dict[notary].update({chain:count})
+                else:
+                    print(item)
+
+        # Get notarisation counts 24hr
+        for item in ntx_dict_24hr[chain]:
+            ntx_notaries = item["notaries"]
+
+            for notary in ntx_notaries:
+                if notary in testnet_stats_dict:
+
+                    if testnet_stats_dict[notary]["24hr_Total"] == 0:
+                        testnet_stats_dict[notary].update({"24hr_Total":1})
+
+                    else:
+                        count = testnet_stats_dict[notary]["24hr_Total"]+1
+                        testnet_stats_dict[notary].update({"24hr_Total":count})
+
+                    if testnet_stats_dict[notary][chain] == 0:
+                        testnet_stats_dict[notary].update({f"24hr_{chain}":1})
+                        testnet_stats_dict[notary].update({f"24hr_{chain}":1})
+                        
+                    else:
+                        count = testnet_stats_dict[notary][f"24hr_{chain}"]+1
+                        testnet_stats_dict[notary].update({f"24hr_{chain}":count})
+                else:
+                    print(item)
+
+
+    # Get notarisation rank
+    notary_totals = {}
+    for notary in testnet_stats_dict:
+        notary_totals.update({notary:testnet_stats_dict[notary]["Total"]})
+    ranked_totals = {k: v for k, v in sorted(notary_totals.items(), key=lambda x: x[1])}
+    ranked_totals = dict(reversed(list(ranked_totals.items()))) 
+
+    i = 0
+    for notary in ranked_totals:
+        i += 1
+        testnet_stats_dict[notary].update({"Rank":i})
+
+    # Get 24hr notarisation rank
+    notary_totals_24hr = {}
+    for notary in testnet_stats_dict:
+        notary_totals_24hr.update({notary:testnet_stats_dict[notary]["24hr_Total"]})
+    ranked_totals_24hr = {k: v for k, v in sorted(notary_totals_24hr.items(), key=lambda x: x[1])}
+    ranked_totals_24hr = dict(reversed(list(ranked_totals_24hr.items()))) 
+
+    i = 0
+    for notary in ranked_totals_24hr:
+        i += 1
+        testnet_stats_dict[notary].update({"24hr_Rank":i})
+
+    return wrap_api(testnet_stats_dict)
+
