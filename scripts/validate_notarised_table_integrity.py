@@ -17,7 +17,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-# recorded_txids = get_existing_ntxids()
+# recorded_txids = get_existing_notarised_txids()
 deleted = {}
 '''
 for item in ["chain", "season", "server", "scored", "btc_validated"]:

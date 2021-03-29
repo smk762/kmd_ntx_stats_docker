@@ -492,7 +492,7 @@ class last_notarised_row():
         CURSOR.execute(f"DELETE FROM last_notarised WHERE notary = '{self.notary}' and chain = '{self.chain}';")
         CONN.commit()
 
-class ntx_records_row():
+class notarised_row():
     def __init__(self, chain='', block_height='', 
                 block_time='', block_datetime='', block_hash='', 
                 notaries=list, notary_addresses=list, ac_ntx_blockhash='', ac_ntx_height='', 

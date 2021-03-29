@@ -31,10 +31,13 @@ def get_chain_ntx_season_aggregates(season):
            season = '"+str(season)+"' \
            GROUP BY chain;"
     CURSOR.execute(sql)
-    results = CURSOR.fetchall()
-    if len(results) > 0:
-        return results
-    else:
+    try:
+        results = CURSOR.fetchall()
+        if len(results) > 0:
+            return results
+        else:
+            return ()
+    except:
         return ()
 
 def get_chain_ntx_date_aggregates(day, season):
@@ -211,7 +214,7 @@ def get_ntx_scored(season, chain, lowest_block_time, highest_block_time, server)
                     AND block_time >= {lowest_block_time} \
                     AND block_time <= {highest_block_time} \
                     ;"
-    print(sql)
+                    
     CURSOR.execute(sql)
     scored_resp = CURSOR.fetchall()
 
@@ -222,7 +225,7 @@ def get_ntx_scored(season, chain, lowest_block_time, highest_block_time, server)
                     AND (block_time < {lowest_block_time} \
                     OR block_time > {highest_block_time}) \
                     ;"
-    #print(sql)
+
     CURSOR.execute(sql)
     unscored_resp = CURSOR.fetchall()
 
@@ -294,19 +297,25 @@ def get_notary_last_ntx(chain=None):
     return notary_last_ntx
 
 
-def get_existing_ntxids(address=None, category=None):
-    recorded_txids = []
-    logger.info("Getting existing TXIDs from database...")
-    if address and category:
-        CURSOR.execute(f"SELECT txid from notarised WHERE address='{address}' AND category='{category}';")    
-    elif category:
-        CURSOR.execute(f"SELECT txid from notarised WHERE category='{category}';")    
-    elif address:
-        CURSOR.execute(f"SELECT txid from notarised WHERE address='{address}';")    
-    else:
-        CURSOR.execute("SELECT txid from notarised;")
+def get_existing_notarised_txids(chain=None, season=None):
+
+    logger.info("Getting existing TXIDs from [notarised]...")
+    sql = f"SELECT DISTINCT txid from notarised"
+
+    conditions = []
+    if chain:
+        conditions.append(f"chain = '{chain}'")
+    if season:
+        conditions.append(f"season = '{season}'")
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+
+    CURSOR.execute(sql)
     existing_txids = CURSOR.fetchall()
 
+    recorded_txids = []
     for txid in existing_txids:
         recorded_txids.append(txid[0])
     return recorded_txids

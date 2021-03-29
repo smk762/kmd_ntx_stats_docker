@@ -282,6 +282,10 @@ urlpatterns = [
           api_views.notarisation_txid,
           name='notarisation_txid'),
 
+    path('api/info/chain_notarisation_txid_list',
+          api_views.chain_notarisation_txid_list,
+          name='chain_notarisation_txid_list'),
+
     path('api/info/notary_btc_txids',
           api_views.notary_btc_txids,
           name='notary_btc_txids'),

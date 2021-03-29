@@ -69,10 +69,8 @@ if SKIP_PAST_SEASONS:
     update_mined_blocks(season)
 
     season_notaries = get_season_notaries(season)
-    input(season_notaries)
 
     results = get_season_mined_counts(season, season_notaries)
-    input(results)
     for item in results:
         row = season_mined_count_row()
         row.notary = item[0]

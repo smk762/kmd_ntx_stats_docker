@@ -64,6 +64,8 @@ def validate_ntx_row_counts():
 
         if txid_row_count != 14:
             print(f"ntx {txid} row count {txid_row_count}")
+            print(f"https://www.blockchain.com/btc/tx/{txid}")
+            print(f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}")
             delete = input("Delete? (y/n)")
 
             if delete in ["Y", "y"]:
@@ -79,7 +81,9 @@ def validate_split_rows():
         txid_row_count = CURSOR.fetchall()[0][0]
 
         if txid_row_count != 1:
-            print(f"split {THIS_SERVER}/api/info/nn_btc_txid?txid={txid} row count > 1 {txid_row_count}")
+            print(f"https://www.blockchain.com/btc/tx/{txid}")
+            print(f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}")
+            print(f"split row count > 1 {txid_row_count}")
             delete = input("Delete? (y/n)")
 
             if delete in ["Y", "y"]:
@@ -98,6 +102,8 @@ def validate_split_rows():
 
             for i in [input_index, input_sats, output_index, output_sats]:
                 if i != -99:
+                    print(f"https://www.blockchain.com/btc/tx/{txid}")
+                    print(f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}")
                     print(f"Non -99 value for input/output index/sats in txid {txid}")
                     delete = input("Delete? (y/n)")
 
