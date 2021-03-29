@@ -222,7 +222,7 @@ class notary_nodes_filter(viewsets.ViewSet):
         """
         """
         season = get_season()
-        if "season" not in request.GET:
+        if "season" in request.GET:
             season = request.GET["season"]
         notaries_list = get_notary_list(season)
         api_resp = wrap_api(notaries_list)

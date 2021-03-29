@@ -907,3 +907,66 @@ def get_notary_balances_data(coins_data, balances_data):
     } 
 
     return notary_balances_list, notary_balances_graph
+
+
+def get_epoch_scoring_table(request):
+    resp = []
+    data = scoring_epochs.objects.all()
+
+    if "season" in request.GET:
+        season=request.GET["season"]
+
+    elif len(data) == len(scoring_epochs.objects.all()):
+        season = get_season()
+        
+    data = scoring_epochs.objects.filter(season=season).order_by('season', 'server').values()
+    for item in data:
+
+        resp.append({
+                "season":item['season'],
+                "server":item['server'],
+                "epoch":item['epoch'],
+                "epoch_start":item['epoch_start'],
+                "epoch_end":item['epoch_end'],
+                "start_event":item['start_event'],
+                "end_event":item['end_event'],
+                "epoch_chains":item['epoch_chains'],
+                "score_per_ntx":item['score_per_ntx']
+        })
+    return resp
+
+
+def get_mined_count_season_table(request):
+    resp = []
+    data = mined_count_season.objects.all()
+
+    if "season" in request.GET:
+        season=request.GET["season"]
+
+    elif len(data) == len(mined_count_season.objects.all()):
+        season = get_season()
+        
+    data = mined_count_season.objects.filter(season=season).order_by('season', 'notary').values()
+
+    # name num sum max last
+    for item in data:
+        blocks_mined = item['blocks_mined']
+        if blocks_mined > 10:
+            notary = item['notary']
+            sum_value_mined = item['sum_value_mined']
+            max_value_mined = item['max_value_mined']
+            last_mined_block = item['last_mined_block']
+            last_mined_blocktime = item['last_mined_blocktime']
+            time_stamp = item['time_stamp']
+            season = item['season']
+
+            resp.append({
+                    "notary":notary,
+                    "blocks_mined":blocks_mined,
+                    "sum_value_mined":sum_value_mined,
+                    "max_value_mined":max_value_mined,
+                    "last_mined_block":last_mined_block,
+                    "last_mined_blocktime":last_mined_blocktime
+            })
+
+    return resp

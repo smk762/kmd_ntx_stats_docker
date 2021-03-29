@@ -221,16 +221,16 @@ def get_dpow_score_value(season, server, coin, timestamp):
 
     score  = 0
 
-    active = is_coin_is_dpow_active(season, server, coin, timestamp)
+    active_chains, num_coins = get_server_active_dpow_chains_at_time(season, server, timestamp)
 
-    if active:
+    if coin in active_chains:
 
         if coin == "BTC":
             score = 0.0325
             num_coins = 1
 
         else:
-            num_coins = get_num_server_active_dpow_at_time(season, server, timestamp)
+            
 
             if num_coins > 0:
 
@@ -240,9 +240,8 @@ def get_dpow_score_value(season, server, coin, timestamp):
                 if server == "Third_Party":
                     score = 0.977/num_coins
 
-        print(f"{coin} {server} {num_coins} {score}\n")
 
-    return score
+    return round(score, 8)
 
 
 def is_coin_is_dpow_active(season, server, coin, timestamp):
@@ -259,20 +258,23 @@ def is_coin_is_dpow_active(season, server, coin, timestamp):
 
     return "Unofficial", False
 
-def get_num_server_active_dpow_at_time(season, server, timestamp):
+def get_server_active_dpow_chains_at_time(season, server, timestamp):
 
     r = requests.get(f"{THIS_SERVER}/api/info/notarised_tenure/?server={server}")
     tenure = r.json()["results"][0]
-
+    chains = []
     count = 0
     if season in tenure:
         if server in tenure[season]:
             for coin in tenure[season][server]:
                 if timestamp >= tenure[season][server][coin]["official_start_block_time"]:
                     if timestamp <= tenure[season][server][coin]["official_end_block_time"]:
-                        count += 1
+                        if coin != "BTC":
+                            chains.append(coin)
+                        
 
-    return count
+    return chains, len(list(set(chains)))
+
 
 def get_btc_ntxids(stop_block, exit=None):
     has_more=True

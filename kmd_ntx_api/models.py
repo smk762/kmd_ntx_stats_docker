@@ -473,6 +473,26 @@ class nn_social(models.Model):
             )
         ]
 
+class scoring_epochs(models.Model):
+    season = models.CharField(max_length=128)
+    server = models.CharField(max_length=128)
+    epoch = models.CharField(max_length=128)
+    epoch_start = models.PositiveIntegerField(default=0)
+    epoch_end = models.PositiveIntegerField(default=0)
+    start_event = models.CharField(max_length=128)
+    end_event = models.CharField(max_length=128)
+    epoch_chains = ArrayField(models.CharField(max_length=34), default=list)
+    score_per_ntx = models.DecimalField(max_digits=18, decimal_places=8)
+
+    class Meta:
+        db_table = 'scoring_epochs'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['season', 'server', 'epoch'],
+                name='unique_scoring_epoch'
+            )
+        ]
+
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"
 
