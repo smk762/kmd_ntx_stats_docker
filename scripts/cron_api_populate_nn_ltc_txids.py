@@ -22,7 +22,7 @@ from lib_const import LTC_NTX_ADDR, NOTARY_LTC_ADDRESSES, NN_LTC_ADDRESSES_DICT,
 from lib_db import CONN, CURSOR
 from known_txids import *
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)
@@ -311,7 +311,8 @@ for notary_address in NOTARY_LTC_ADDRESSES[season]:
             txid_data.block_datetime = dt.utcfromtimestamp(int(txid_data.block_time))
 
             addresses = tx_info['addresses']
-            txid_data.season = get_season_from_ltc_addresses(addresses[:], txid_data.block_time)
+            txid_data.season, txid_data.server = get_season_from_addresses(addresses[:], txid_data.block_time, "BTC")
+
 
             vouts = tx_info["outputs"]
             vins = tx_info["inputs"]
@@ -412,7 +413,7 @@ for notary_address in NOTARY_LTC_ADDRESSES[season]:
                             row.txid = txid_data.txid
                             row.opret = opret
                             row.season = txid_data.season
-                            row.server = "testnet"
+                            row.server = txid_data.server
                             row.scored = True
                             row.btc_validated = "N/A"
                             row.update()

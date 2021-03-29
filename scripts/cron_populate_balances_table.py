@@ -11,7 +11,7 @@ from models import balance_row, rewards_row
 from lib_electrum import get_balance
 from base_58 import get_addr_from_pubkey
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s',
                                datefmt='%d-%b-%y %H:%M:%S')

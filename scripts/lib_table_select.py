@@ -183,28 +183,93 @@ def get_season_mined_counts(season, season_notaries):
     else:
         return ()
 
-def get_ntx_min_max(season, chain):
+def season_server_chain_has_ntx(season, chain, server):
+    CURSOR.execute("SELECT COUNT(txid) \
+                    FROM notarised WHERE chain = '"+chain+"' \
+                    AND season = '"+season+"' \
+                    AND server = '"+server+"';")
+    if CURSOR.fetchone() == 0:
+        return False
+    return True
+
+def get_ntx_min_max(season, chain, server):
     CURSOR.execute("SELECT MAX(block_height), MAX(block_time), \
                     MIN(block_height), MIN(block_time), COUNT(*) \
                     FROM notarised WHERE chain = '"+chain+"' \
-                    AND season = '"+season+"';")
+                    AND season = '"+season+"' \
+                    AND server = '"+server+"';")
     return CURSOR.fetchone()
 
-def get_notarised_chains():
+def get_ntx_scored(season, chain, lowest_block_time, highest_block_time, server):
+    scored_list = []
+    unscored_list = []
+
+    sql = f"SELECT DISTINCT txid \
+                    FROM notarised WHERE chain = '{chain}' \
+                    AND season = '{season}' \
+                    AND server = '{server}' \
+                    AND block_time >= {lowest_block_time} \
+                    AND block_time <= {highest_block_time} \
+                    ;"
+    #print(sql)
+    CURSOR.execute(sql)
+    scored_resp = CURSOR.fetchall()
+
+    sql = f"SELECT DISTINCT txid \
+                    FROM notarised WHERE chain = '{chain}' \
+                    AND season = '{season}' \
+                    AND server = '{server}' \
+                    AND (block_time < {lowest_block_time} \
+                    OR block_time > {highest_block_time}) \
+                    ;"
+    #print(sql)
+    CURSOR.execute(sql)
+    unscored_resp = CURSOR.fetchall()
+
+    for item in scored_resp:
+        scored_list.append(scored_resp[0])
+
+    for item in unscored_resp:
+        unscored_list.append(unscored_resp[0])
+
+    return scored_list, unscored_list
+
+def get_notarised_chains(season=None):
     chains = []
-    CURSOR.execute("SELECT DISTINCT chain FROM notarised;")
+    if season:
+        CURSOR.execute(f"SELECT DISTINCT chain FROM notarised WHERE season='{season}';")
+    else:
+        CURSOR.execute("SELECT DISTINCT chain FROM notarised;")
     chain_results = CURSOR.fetchall()
     for result in chain_results:
         chains.append(result[0])
+    chains.sort()
     return chains
 
-def get_notarised_seasons():
+def get_notarised_seasons(chain=None):
     seasons = []
-    CURSOR.execute("SELECT DISTINCT season FROM notarised;")
+    if chain:
+        CURSOR.execute(f"SELECT DISTINCT season FROM notarised WHERE chain='{chain}';")
+    else:
+        CURSOR.execute("SELECT DISTINCT season FROM notarised;")
     season_results = CURSOR.fetchall()
     for result in season_results:
         seasons.append(result[0])
+    seasons.sort()
+    seasons.reverse()
     return seasons
+
+def get_notarised_servers(season):
+    servers = []
+    if season:
+        CURSOR.execute(f"SELECT DISTINCT server FROM notarised WHERE season='{season}';")
+    else:
+        CURSOR.execute("SELECT DISTINCT season FROM notarised;")
+    servers_results = CURSOR.fetchall()
+    for result in servers_results:
+        servers.append(result[0])
+    servers.sort()
+    return servers
 
 def get_notary_last_ntx(chain=None):
     # Get chain and time of last ntx
@@ -259,6 +324,17 @@ def get_existing_nn_btc_txids(address=None, category=None, season=None, notary=N
         sql += " where "
         sql += " and ".join(conditions)    
     sql += ";"
+
+    CURSOR.execute(sql)
+    existing_txids = CURSOR.fetchall()
+
+    for txid in existing_txids:
+        recorded_txids.append(txid[0])
+    return recorded_txids
+
+def get_existing_notarised_btc_txids():
+    recorded_txids = []
+    sql = f"SELECT DISTINCT txid from notarised where chain='BTC';"
 
     CURSOR.execute(sql)
     existing_txids = CURSOR.fetchall()

@@ -28,7 +28,7 @@ class balances_graph(viewsets.ViewSet):
         return Task(id=None, **validated_data)
    
     def get(self, request, format = None): 
-        season = get_season(int(time.time()))
+        season = get_season()
         filter_kwargs = {'season':season}
 
         for field in BalancesSerializer.Meta.fields:
@@ -56,7 +56,7 @@ class daily_ntx_graph(viewsets.ViewSet):
         return Task(id=None, **validated_data)
    
     def get(self, request, format = None): 
-        season = get_season(int(time.time()))
+        season = get_season()
         filter_kwargs = {'season':season}
 
         for field in NotarisedCountDailySerializer.Meta.fields:

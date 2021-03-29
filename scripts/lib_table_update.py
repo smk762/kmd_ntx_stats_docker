@@ -6,7 +6,7 @@ import os
 from psycopg2.extras import execute_values
 from lib_const import *
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)
@@ -73,16 +73,14 @@ def update_notarised_btc_tbl(row_data):
         CONN.rollback()
 
 def update_ntx_row(row_data):
-    logger.info("update_ntx_row executed")
-    sql = "INSERT INTO notarised (chain, block_height, \
+    sql = f"INSERT INTO notarised (chain, block_height, \
                                 block_time, block_datetime, block_hash, \
                                 notaries, notary_addresses, ac_ntx_blockhash, ac_ntx_height, \
-                                txid, opret, season, server, scored, btc_validated) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_txid DO UPDATE SET \
-            season='"+str(row_data[11])+"', server='"+str(row_data[12])+"', scored='"+str(row_data[13])+"', \
-            notary_addresses=ARRAY"+str(row_data[6])+";"
-    logger.info(sql)
+                                txid, opret, season, server, scored, score_value, btc_validated) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                ON CONFLICT ON CONSTRAINT unique_txid DO UPDATE SET \
+                season='{row_data[11]}', server='{row_data[12]}', scored='{row_data[13]}', \
+                notaries=ARRAY{row_data[5]}, notary_addresses=ARRAY{row_data[6]}, score_value={row_data[14]};"
     try:
         CURSOR.execute(sql, row_data)
         logger.info("update_ntx_row executed")
@@ -127,17 +125,33 @@ def update_validation_notarised_tbl(btc_txid, btc_block_hash, btc_block_ht, opre
         CONN.rollback()
 
 
-def update_score_notarised_tbl(txid, scored):
+def update_score_notarised_tbl(txid, scored, score_value):
     sql = f"UPDATE notarised SET \
-          scored={scored} \
+          scored={scored}, score_value={score_value} \
           WHERE txid='{txid}';"
     try:
         CURSOR.execute(sql)
         CONN.commit()
-        print(f"{txid} tagged as {scored}")
+        print(f"{txid} tagged as {scored} ({score_value})")
     except Exception as e:
         logger.debug(e)
         CONN.rollback()
+
+def update_season_notarised_tbl(txid, season, server):
+    sql = f"UPDATE notarised SET \
+          season='{season}', server='{server}' \
+          WHERE txid='{txid}';"
+    try:
+        CURSOR.execute(sql)
+        CONN.commit()
+        print(f"{txid} tagged as {season}")
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()
+
+def delete_txid_from_notarised_tbl(txid):
+    CURSOR.execute(f"DELETE FROM notarised WHERE txid = '{txid}';")
+    CONN.commit()
 
 def update_coins_row(row_data):
     try:
@@ -448,12 +462,16 @@ def ts_col_to_dt_col(ts_col, dt_col, table):
 def update_notarised_tenure_row(row_data):
     try:
         sql = "INSERT INTO notarised_tenure (chain, first_ntx_block, \
-            last_ntx_block, first_ntx_block_time, last_ntx_block_time, ntx_count, season) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_season_tenure DO UPDATE SET \
+            last_ntx_block, first_ntx_block_time, last_ntx_block_time, \
+            official_start_block_time, official_end_block_time, \
+            unscored_ntx_count, scored_ntx_count, season, server) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_season_server_tenure DO UPDATE SET \
             first_ntx_block='"+str(row_data[1])+"', last_ntx_block="+str(row_data[2])+", \
             first_ntx_block_time="+str(row_data[3])+", last_ntx_block_time="+str(row_data[4])+", \
-            ntx_count="+str(row_data[5])+";"
+            official_start_block_time="+str(row_data[5])+", official_end_block_time="+str(row_data[6])+", \
+            unscored_ntx_count="+str(row_data[7])+", scored_ntx_count="+str(row_data[8])+", \
+            server='"+str(row_data[10])+"';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
         return 1

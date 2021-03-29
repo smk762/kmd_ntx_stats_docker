@@ -9,7 +9,7 @@ from models import coins_row
 from lib_table_select import get_existing_ntxids, get_notarisations
 from lib_table_update import update_score_notarised_tbl
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)
@@ -21,7 +21,7 @@ txids = get_notarisations("Season_4")
 
 for txid in txids:
 	coin = txid["chain"]
-	if coin in S4_DPOW_EXCLUDED_CHAINS:
+	if coin in DPOW_EXCLUDED_CHAINS["Season_4"]:
 		print("not Scored, excluded")
 	else:
 		try:
@@ -36,7 +36,7 @@ for txid in txids:
 				update_score_notarised_tbl(txid["txid"], True)
 			else:
 				update_score_notarised_tbl(txid["txid"], False)
-				input()
+
 		except Exception as e:
 			print(e)
 			input()

@@ -90,9 +90,15 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
                 row.ac_ntx_height = row_data[8]
                 row.txid = row_data[9]
                 row.opret = row_data[10]
+                logger.info(f"{row.chain} {row.opret}")
                 row.season = row_data[11]
                 row.server = row_data[12]
-                row.scored = row_data[13]
+                row.score_value = get_dpow_score_value(row.season, row.server, row.chain, row.block_time)
+                if row.score_value > 0:
+                    row.scored = True
+                else:
+                    row.scored = False
+                
                 row.btc_validated =  "N/A"
                 row.update()
 

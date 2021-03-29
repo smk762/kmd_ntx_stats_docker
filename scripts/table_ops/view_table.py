@@ -18,11 +18,10 @@ table = 'notarised'
 #table = 'nn_ltc_tx'
 #table = 'notarised_tenure'
 
-#cursor.execute("SELECT * FROM "+table+";")
+cursor.execute("SELECT DISTINCT server FROM "+table+";")
 #cursor.execute("SELECT * FROM "+table+" WHERE txid = 'fe9492e6cab89023bdc4e28aee742515e8e8a75ba321617e9715818a4888bb1e';")
 
-cursor.execute("SELECT * FROM "+table+" WHERE chain = 'PBC';")
-
+#cursor.execute(sql)
 #cursor.execute("SELECT * FROM "+table+" WHERE chain = 'BTC' AND btc_validated = 'false';")
 
 results = cursor.fetchall()

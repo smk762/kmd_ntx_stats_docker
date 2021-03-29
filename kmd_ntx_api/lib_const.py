@@ -77,4 +77,13 @@ url = "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.jso
 r = requests.get(url)
 eco_data = r.json()
 
-TESTNET_CHAINS = ["RICK", "MORTY"]
+#TESTNET_CHAINS = ["RICK", "MORTY", "LTC"]
+
+# COLORS
+
+BLACK = "#000"
+RED = "#DC0333"
+LT_GREEN = "#2FEA8B"
+LT_PURPLE = "#B541EA"
+LT_BLUE = "#00E2FF"
+LT_ORANGE = "#F7931A"
