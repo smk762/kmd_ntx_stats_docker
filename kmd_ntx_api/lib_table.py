@@ -240,8 +240,8 @@ def get_latest_chain_ntx_info(cursor, chain, height):
 
 def get_season_mined_counts(conn, cursor, season):
     sql = "SELECT name, COUNT(*), SUM(value), MAX(value), max(block_time), \
-           max(block_height) FROM mined WHERE block_time >= "+str(seasons_info[season]['start_time'])+" \
-           AND block_time <= "+str(seasons_info[season]['end_time'])+" GROUP BY name;"
+           max(block_height) FROM mined WHERE block_time >= "+str(SEASONS_INFO[season]['start_time'])+" \
+           AND block_time <= "+str(SEASONS_INFO[season]['end_time'])+" GROUP BY name;"
     cursor.execute(sql)
     results = cursor.fetchall()
     time_stamp = int(time.time())
@@ -397,10 +397,10 @@ def ts_col_to_dt_col(conn, cursor, ts_col, dt_col, table):
     conn.commit()
 
 def ts_col_to_season_col(conn, cursor, ts_col, season_col, table):
-    for season in seasons_info:
+    for season in SEASONS_INFO:
         sql = "UPDATE "+table+" \
                SET "+season_col+"='"+season+"' \
-               WHERE "+ts_col+" > "+str(seasons_info[season]['start_time'])+" \
-               AND "+ts_col+" < "+str(seasons_info[season]['end_time'])+";"
+               WHERE "+ts_col+" > "+str(SEASONS_INFO[season]['start_time'])+" \
+               AND "+ts_col+" < "+str(SEASONS_INFO[season]['end_time'])+";"
         cursor.execute(sql)
         conn.commit()
