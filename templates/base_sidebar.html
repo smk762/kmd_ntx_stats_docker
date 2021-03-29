@@ -33,6 +33,7 @@
             <li class="c-sidebar-nav-title">Info</li>
             <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'coins_filter-list' %}"> Coins</a></li>
             <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notary_nodes_filter-list' %}"> Notaries</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'epoch_scoring_table' %}"> Scoring Epochs</a></li>
 
             <li class="c-sidebar-nav-title">Testnet</li>
             <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'api_testnet_totals' %}"> Stats</a></li>
@@ -117,6 +118,8 @@
                     <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_24hrs"> Notarised last 24hrs
                     </a>
                     <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_tenure"> Tenure
+                    </a>
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/scoring_epochs"> Scoring Epochs
                     </a>
                 </li>
             </ul>

@@ -776,3 +776,37 @@ class ltc_tx_row():
 
     def delete(self):
         delete_nn_ltc_tx_transaction(self.txid)
+
+
+class scoring_epoch_row():
+    def __init__(self, season='', server='', epoch='',epoch_start=0, epoch_end=0, \
+                    start_event='', end_event='', epoch_chains=list, score_per_ntx=0):
+        self.season = season
+        self.server = server
+        self.epoch = epoch
+        self.epoch_start = epoch_start
+        self.epoch_end = epoch_end
+        self.start_event = start_event
+        self.end_event = end_event
+        self.epoch_chains = epoch_chains
+        self.score_per_ntx = score_per_ntx
+
+    def validated(self):
+        return True
+
+    def update(self):
+        row_data = (self.season, self.server, self.epoch, self.epoch_start, self.epoch_end, \
+                    self.start_event, self.end_event, self.epoch_chains, self.score_per_ntx)
+        if self.validated():
+            update_scoring_epoch_row(row_data)
+            logger.info(f"Updated scoring_epoch TABLE {self.season} | {self.server} | {self.epoch} ")
+        else:
+            logger.warning(f"Row data invalid!")
+            logger.warning(f"{row_data}")
+
+    def delete(self):
+        CURSOR.execute(f"DELETE FROM scoring_epoch WHERE season = '{self.season}' \
+                         AND server = '{self.server}' \
+                         AND epoch = '{self.epoch}' \
+                         ;")
+        CONN.commit()

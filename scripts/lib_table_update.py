@@ -138,12 +138,12 @@ def update_server_notarised_tbl(old_server, server):
         CONN.rollback()
 
 def update_chain_score_notarised_tbl(chain, score_value, min_time, max_time):
-    sql = f"UPDATE notarised SET \
-          scored=TRUE, score_value={score_value} \
-          WHERE chain='{chain} \
-          AND min_time >= {min_time}\
-          AND max_time >= {max_time}';"
+    sql = f"UPDATE notarised SET scored={True}, score_value={score_value} \
+          WHERE chain='{chain}' \
+          AND block_time >= {min_time}\
+          AND block_time <= {max_time};"
     try:
+        #print(sql)
         CURSOR.execute(sql)
         CONN.commit()
         print(f"{txid} tagged as {scored} ({score_value})")
@@ -644,6 +644,28 @@ def update_nn_ltc_tx_row(row_data):
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_ltc_nn_txid DO UPDATE SET \
         notary='"+str(row_data[6])+"', category='"+str(row_data[8])+"';"
+    try:
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
+    except Exception as e:
+        logger.debug(e)
+        if str(e).find('duplicate') == -1:
+            logger.debug(row_data)
+        CONN.rollback()
+
+
+def update_scoring_epoch_row(row_data):
+    sql = f"INSERT INTO scoring_epochs \
+                (season, server, epoch, epoch_start, epoch_end, \
+                start_event, end_event, epoch_chains, score_per_ntx) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) \
+        ON CONFLICT ON CONSTRAINT unique_scoring_epoch DO UPDATE SET \
+            epoch_start={row_data[3]}, \
+            epoch_end={row_data[4]}, \
+            start_event='{row_data[5]}', \
+            end_event='{row_data[6]}', \
+            epoch_chains=ARRAY{row_data[7]}, \
+            score_per_ntx={row_data[8]};"
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()

@@ -436,6 +436,17 @@ def notarised_tenure_view(request):
         "eco_data_link":get_eco_data_link()
     }
     return render(request, 'notarised_tenure.html', context)
+
+def scoring_epochs_view(request):
+    season = get_season()
+    notary_list = get_notary_list(season)
+    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "epochs":get_epoch_scoring_table(request),
+        "eco_data_link":get_eco_data_link()
+    }
+    return render(request, 'scoring_epochs.html', context)
         
 def testnet_ntx_scoreboard(request):
     season = get_season()
