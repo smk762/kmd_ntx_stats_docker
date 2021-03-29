@@ -125,7 +125,33 @@ def update_validation_notarised_tbl(btc_txid, btc_block_hash, btc_block_ht, opre
         CONN.rollback()
 
 
-def update_score_notarised_tbl(txid, scored, score_value):
+def update_server_notarised_tbl(old_server, server):
+    sql = f"UPDATE notarised SET \
+          server='{server}' \
+          WHERE server='{old_server}';"
+    try:
+        CURSOR.execute(sql)
+        CONN.commit()
+        print(f"{old_server} reclassed as {server}")
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()
+
+def update_chain_score_notarised_tbl(chain, score_value, min_time, max_time):
+    sql = f"UPDATE notarised SET \
+          scored=TRUE, score_value={score_value} \
+          WHERE chain='{chain} \
+          AND min_time >= {min_time}\
+          AND max_time >= {max_time}';"
+    try:
+        CURSOR.execute(sql)
+        CONN.commit()
+        print(f"{txid} tagged as {scored} ({score_value})")
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()
+
+def update_txid_score_notarised_tbl(txid, scored, score_value):
     sql = f"UPDATE notarised SET \
           scored={scored}, score_value={score_value} \
           WHERE txid='{txid}';"

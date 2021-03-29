@@ -559,6 +559,10 @@ class ntx_tenure_row():
         self.season = season
 
     def validated(self):
+        if self.server not in ["Main", "Third_Party", "Testnet", "Unofficial"]:
+            return False
+        if self.season not in ['Season_5', 'Season_5_Testnet', 'Season_4', 'Season_3', 'Season_2', 'Season_1']:
+            return False
         return True
 
     def update(self):
