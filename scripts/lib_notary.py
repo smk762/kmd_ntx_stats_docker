@@ -102,7 +102,7 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD", chain=No
         last_season_num = season
 
     if "Season_5_Testnet" in notary_seasons and len(set(notary_seasons)) == 1:
-        return "Season_5_Testnet", "testnet"
+        return "Season_5_Testnet", "Testnet"
 
     elif len(notary_seasons) == 13 and len(set(notary_seasons)) == 1:
         if notary_seasons[0].find("_Third_Party") > -1:
@@ -470,6 +470,9 @@ def get_dpow_scoring_window(season, chain, server):
                     official_end = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]
 
     scored_list, unscored_list = get_ntx_scored(season, chain, official_start, official_end, server)
+    logger.info(f"scored_list: {scored_list}")
+    logger.info(f"unscored_list: {unscored_list}")
+
     return official_start, official_end, scored_list, unscored_list
 
 def update_ntx_tenure(chains, season, server):
@@ -481,11 +484,20 @@ def update_ntx_tenure(chains, season, server):
         min_blk = ntx_results[2]
         min_blk_time = ntx_results[3]
         total_ntx_count = ntx_results[4]
+        logger.info(f"{chain} {season} {server}")
+        logger.info(f"max_blk: {max_blk}")
+        logger.info(f"max_blk_time: {max_blk_time}")
+        logger.info(f"max_blk: {min_blk}")
+        logger.info(f"max_blk_time: {min_blk_time}")
+        logger.info(f"total_ntx_count: {total_ntx_count}")
+        logger.info(f"max_blk_time: {max_blk_time}")
 
         if max_blk is not None:
             scoring_window = get_dpow_scoring_window(season, chain, server)
             official_start = scoring_window[0]
             official_end = scoring_window[1]
+            logger.info(f"official_start: {official_start}")
+            logger.info(f"official_end: {official_end}")
 
             if season in DPOW_EXCLUDED_CHAINS:
                 if chain in DPOW_EXCLUDED_CHAINS[season]:
@@ -497,6 +509,8 @@ def update_ntx_tenure(chains, season, server):
             else:
                 scored_ntx_count = len(scoring_window[2])
                 unscored_ntx_count = len(scoring_window[3])
+            logger.info(f"scored_ntx_count: {scored_ntx_count}")
+            logger.info(f"unscored_ntx_count: {unscored_ntx_count}")
 
 
             row = ntx_tenure_row()
