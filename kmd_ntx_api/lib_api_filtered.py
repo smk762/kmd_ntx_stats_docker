@@ -6,6 +6,7 @@ from .models import *
 from .serializers import *
 from .lib_helper import get_season, paginate_wrap, wrap_api
 
+
 def apply_filters(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
         filter_kwargs = {}
@@ -161,6 +162,7 @@ def get_mined_count_season_data(request):
             })
 
     return resp
+
 
 def get_mined_count_daily_data(request):
     resp = {}

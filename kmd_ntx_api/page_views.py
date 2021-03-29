@@ -7,6 +7,7 @@ from django.shortcuts import render
 from kmd_ntx_api.lib_helper import *
 from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_query import *
+from kmd_ntx_api.api_tables import *
 
 ## DASHBOARD        
 
@@ -370,6 +371,7 @@ def mining_overview(request):
         "sidebar_links":get_sidebar_links(notary_list ,coins_data),
         "eco_data_link":get_eco_data_link(),
         "explorers":get_dpow_explorers(),
+        "mined_season":get_mined_count_season_table(request),
         "season":season.replace("_"," ")
     }
     return render(request, 'mining_overview.html', context)

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
+from kmd_ntx_api import api_tables
 from kmd_ntx_api import api_views
 from kmd_ntx_api import api_viewsets
 from kmd_ntx_api import api_filtered_viewsets
@@ -28,9 +29,11 @@ router.register(r'info/coins',
 router.register(r'info/explorers',
                 api_filtered_viewsets.explorers_filter,
                 basename='explorers_filter')
+
 router.register(r'info/mined_count_season',
                 api_filtered_viewsets.mined_count_season_filter,
                 basename='mined_count_season_filter')
+
 router.register(r'info/mined_count_date',
                 api_filtered_viewsets.mined_count_date_filter,
                 basename='mined_count_date_filter')
@@ -126,6 +129,7 @@ router.register(r'source/mined_count_date',
 router.register(r'source/mined_count_season',
                 api_viewsets.MinedCountSeasonViewSet,
                 basename='MinedCountSeasonViewSet')
+
 
 router.register(r'source/nn_social',
                 api_viewsets.nn_socialViewSet,
@@ -325,6 +329,10 @@ urlpatterns = [
           api_views.split_summary_table,
           name='split_summary_table'),
     
+
+    path('api/table/mined_count_season',
+          api_tables.mined_count_season_table,
+          name='mined_count_season_table'),
 
     # REVIEW? DEPRECATED?
     path('review/funding/',
