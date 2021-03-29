@@ -41,6 +41,7 @@ seasons_info = {
         }
 }
 
+'''
 s4_numchains = {
     "1921458": {
         "phase":"S4 start",
@@ -61,6 +62,7 @@ s4_numchains = {
         "third party": ['AYA', 'CHIPS', 'EMC2', 'HUSH3', 'MCL', 'VRSC']
     },
 }
+'''
 
 # convert timestamp to human time 
 intervals = (
