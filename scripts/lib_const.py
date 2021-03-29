@@ -350,6 +350,74 @@ NOTARY_PUBKEYS = {
         "madmax_NA":"02ef81a360411adf71184ff04d0c5793fc41fd1d7155a28dd909f21f35f4883ac1",
         "alright_AR":"036a6bca1c2a8166f79fa8a979662892742346cc972b432f8e61950a358d705517",
         "strob_NA":"02049202f3872877e81035549f6f3a0f868d0ad1c9b0e0d2b48b1f30324255d26d",
+        "dwy_SH": "02c593f32643f1d9af5c03eddf3e67d085b9173d9bc746443afe0abff9e5dd72f4",
+        "phm87_SH":"03889a10f9df2caef57220628515693cf25316fe1b0693b0241419e75d0d0e66ed",
+        "chainmakers_NA":"030e4822bddba10eb50d52d7da13106486651e4436962078ee8d681bc13f4993e9",
+        "indenodes_EU":"03a416533cace0814455a1bb1cd7861ce825a543c6f6284a432c4c8d8875b7ace9",
+        "blackjok3r_SH":"03d23bb5aad3c20414078472220cc5c26bc5aeb41e43d72c99158d450f714d743a",
+        "chainmakers_EU":"034f8c0a504856fb3d80a94c3aa78828c1152daf8ccc45a17c450f32a1e242bb0c",
+        "titomane_AR":"0358cd6d7460654a0ddd5125dd6fa0402d0719999444c6cc3888689a0b4446136a",
+        "fullmoon_SH":"0275031fa79846c5d667b1f7c4219c487d439cd367dd294f73b5ecd55b4e673254",
+        "indenodes_NA":"02b3908eda4078f0e9b6704451cdc24d418e899c0f515fab338d7494da6f0a647b",
+        "chmex_EU":"03e5b7ab96b7271ecd585d6f22807fa87da374210a843ec3a90134cbf4a62c3db1",
+        "metaphilibert_SH":"03b21ff042bf1730b28bde43f44c064578b41996117ac7634b567c3773089e3be3",
+        "ca333_DEV":"029c0342ce2a4f9146c7d1ee012b26f5c2df78b507fb4461bf48df71b4e3031b56",
+        "cipi_NA":"034406ac4cf94e84561c5d3f25384dd59145e92fefc5972a037dc6a44bfa286688",
+        "pungocloud_SH":"0203064e291045187927cc35ed350e046bba604e324bb0e3b214ea83c74c4713b1",
+        "voskcoin_EU":"037bfd946f1dd3736ddd2cb1a0731f8b83de51be5d1be417496fbc419e203bc1fe",
+        "decker_DEV":"02fca8ee50e49f480de275745618db7b0b3680b0bdcce7dcae7d2e0fd5c3345744",
+        "cryptoeconomy_EU":"037d04b7d16de61a44a3fc766bea4b7791023a36675d6cee862fe53defd04dd8f2",
+        "etszombi_EU":"02f65da26061d1b9f1756a274918a37e83086dbfe9a43d2f0b35b9d2f593b31907",
+        "karasugoi_NA":"024ba10f7f5325fd6ec6cab50c5242d142d00fab3537c0002097c0e98f72014177",
+        "pirate_AR":"0353e2747f89968741c24f254caec24f9f49a894a0039ee9ba09234fcbad75c77d",
+        "metaphilibert_AR":"0239e34ad22957bbf4c8df824401f237b2afe8d40f7a645ecd43e8f27dde1ab0da",
+        "zatjum_SH":"03643c3b0a07a34f6ae7b048832e0216b935408dfc48b0c7d3d4faceb38841f3f3",
+        "madmax_AR":"038735b4f6881925e5a9b14275af80fa2b712c8bd57eef26b97e5b153218890e38",
+        "lukechilds_NA":"024607d85ea648511fa50b13f29d16beb2c3a248c586b449707d7be50a6060cf50",
+        "cipi_AR":"025b7655826f5fd3a807cbb4918ef9f02fe64661153ca170db981e9b0861f8c5ad",
+        "tonyl_AR":"03a8db38075c80348889871b4318b0a79a1fd7e9e21daefb4ca6e4f05e5963569c",
+        "infotech_DEV":"0399ff59b0244103486a94acf1e4a928235cb002b20e26a6f3163b4a0d5e62db91",
+        "fullmoon_NA":"02adf6e3cb8a3c94d769102aec9faf2cb073b7f2979ce64efb1161a596a8d16312",
+        "etszombi_AR":"03c786702b81e0122157739c8e2377cf945998d36c0d187ec5c5ff95855848dfdd",
+        "node-9_EU":"024f2402daddee0c8169ccd643e5536c2cf95b9690391c370a65c9dd0169fc3dc6",
+        "phba2061_EU":"02dc98f064e3bf26a251a269893b280323c83f1a4d4e6ccd5e84986cc3244cb7c9",
+        "indenodes_AR":"0242778789986d614f75bcf629081651b851a12ab1cc10c73995b27b90febb75a2",
+        "and1-89_EU":"029f5a4c6046de880cc95eb448d20c80918339daff7d71b73dd3921895559d7ca3",
+        "komodopioneers_SH":"02ae196a1e93444b9fcac2b0ccee428a4d9232a00b3a508484b5bccaedc9bac55e",
+        "komodopioneers_EU":"03c7fef345ca6b5326de9d5a38498638801eee81bfea4ca8ffc3dacac43c27b14d",
+        "d0ct0r_NA":"0235b211469d7c1881d30ab647e0d6ddb4daf9466f60e85e6a33a92e39dedde3a7",
+        "kolo_DEV":"03dc7c71a5ef7104f81e62928446c4216d6e9f68d944c893a21d7a0eba74b1cb7c",
+        "peer2cloud_AR":"0351c784d966dbb79e1bab4fad7c096c1637c98304854dcdb7d5b5aeceb94919b4",
+        "webworker01_SH":"0221365d89a6f6373b15daa4a50d56d34ad1b4b8a48a7fd090163b6b5a5ecd7a0a",
+        "webworker01_NA":"03bfc36a60194b495c075b89995f307bec68c1bcbe381b6b29db47af23494430f9",
+        "pbca26_NA":"038319dcf74916486dbd506ac866d184c17c3202105df68c8335a1a1079ef0dfcc",
+        "indenodes_SH":"031d1584cf0eb4a2d314465e49e2677226b1615c3718013b8d6b4854c15676a58c",
+        "pirate_NA":"034899e6e884b3cb1f491d296673ab22a6590d9f62020bea83d721f5c68b9d7aa7",
+        "lukechilds_AR":"031ee242e67a8166e489c0c4ed1e5f7fa32dff19b4c1749de35f8da18befa20811",
+        "dragonhound_NA":"022405dbc2ea320131e9f0c4115442c797bf0f2677860d46679ac4522300ce8c0a",
+        "fullmoon_AR":"03cd152ae20adcc389e77acad25953fc2371961631b35dc92cf5c96c7729c2e8d9",
+        "chainzilla_SH":"03fe36ff13cb224217898682ce8b87ba6e3cdd4a98941bb7060c04508b57a6b014",
+        "titomane_EU":"03d691cd0914a711f651082e2b7b27bee778c1309a38840e40a6cf650682d17bb5",
+        "jeezy_EU":"022bca828b572cb2b3daff713ed2eb0bbc7378df20f799191eebecf3ef319509cd",
+        "titomane_SH":"038c2a64f7647633c0e74eec93f9a668d4bf80214a43ed7cd08e4e30d3f2f7acfb",
+        "alien_AR":"024f20c096b085308e21893383f44b4faf1cdedea9ad53cc7d7e7fbfa0c30c1e71",
+        "pirate_EU":"0371f348b4ac848cdfb732758f59b9fdd64285e7adf769198771e8e203638db7e6",
+        "thegaltmines_NA":"03e1d4cec2be4c11e368ff0c11e80cd1b09da8026db971b643daee100056b110fa",
+        "computergenie_NA":"02f945d87b7cd6e9f2173a110399d36b369edb1f10bdf5a4ba6fd4923e2986e137",
+        "nutellalicka_SH":"035ec5b9e88734e5bd0f3bd6533e52f917d51a0e31f83b2297aabb75f9798d01ef",
+        "chainstrike_SH":"0221f9dee04b7da1f3833c6ea7f7325652c951b1c239052b0dadb57209084ca6a8",
+        "dwy_EU": "037b29e58166f7a2122a9ebfff273b40805b6d710adc032f1f8cf077bdbe7c0d5c",
+        "alien_EU":"022b85908191788f409506ebcf96a892f3274f352864c3ed566c5a16de63953236",
+        "gt_AR":"0307c1cf89bd8ed4db1b09a0a98cf5f746fc77df3803ecc8611cf9455ec0ce6960",
+        "patchkez_SH":"03d7c187689bf829ca076a30bbf36d2e67bb74e16a3290d8a55df21d6cb15c80c1",
+        "decker_AR":"02a85540db8d41c7e60bf0d33d1364b4151cad883dd032878ea4c037f67b769635"
+    },
+
+
+    "Season_3.5_Third_Party":{
+        "madmax_NA":"02ef81a360411adf71184ff04d0c5793fc41fd1d7155a28dd909f21f35f4883ac1",
+        "alright_AR":"036a6bca1c2a8166f79fa8a979662892742346cc972b432f8e61950a358d705517",
+        "strob_NA":"02049202f3872877e81035549f6f3a0f868d0ad1c9b0e0d2b48b1f30324255d26d",
         "hunter_EU":"0378224b4e9d8a0083ce36f2963ec0a4e231ec06b0c780de108e37f41181a89f6a",
         "phm87_SH":"03889a10f9df2caef57220628515693cf25316fe1b0693b0241419e75d0d0e66ed",
         "chainmakers_NA":"030e4822bddba10eb50d52d7da13106486651e4436962078ee8d681bc13f4993e9",
@@ -412,6 +480,9 @@ NOTARY_PUBKEYS = {
         "patchkez_SH":"03d7c187689bf829ca076a30bbf36d2e67bb74e16a3290d8a55df21d6cb15c80c1",
         "decker_AR":"02a85540db8d41c7e60bf0d33d1364b4151cad883dd032878ea4c037f67b769635"
     },
+
+
+
     "Season_4": {
         "alien_AR": "03911a60395801082194b6834244fa78a3c30ff3e888667498e157b4aa80b0a65f",
         "alien_EU": "03bb749e337b9074465fa28e757b5aa92cb1f0fea1a39589bca91a602834d443cd",
@@ -545,30 +616,30 @@ NOTARY_PUBKEYS = {
         "decker_DEV": "02fca8ee50e49f480de275745618db7b0b3680b0bdcce7dcae7d2e0fd5c3345744"
         },
     "Season_5_Testnet": {
-            "Alright0": "02480688f3bd5d455481c63607d5ab2ddbe3f9ba407b7dd91b68f7e983e8b8c2e4",
-            "Alright1": "026943ec773d7a273d56d50546583ded7bc3521a731cc9d4dba273e67c721d2832",
-            "daemonfox": "0314e6cf7d6f8e4e54c63ab179c77d64f36e17f7032e614ed5a38e4f9001c47217",
-            "jorian": "038dd5025c22e22640f940083b76f3a728979a91513e5baa59e9be888153d34875",
-            "gcharang": "0249e51068be9031d20cb2ad4fa214706af32f12b5d254ab01e457f1a60a367878",
-            "dudezmobi": "02ff5f6b33ddb72b79da6e2396751fa9b8ad6a58bb86dcf0c49f2b3bf891b92c74",
-            "CHMEX": "02551b3ff2e666cc6ca82356a818821e28bde8c47ac5adcd9fffe772bf71fe8d2e",
-            "crisf": "02f8a9bd7a5f2a3878182e566093f08aebe258908ca481bf1638451a1ebd5aed94",
-            "smk": "03e81e1333f9f91a8d2afcfe3fcffaba8ba543d5552e4cbe3faf7cf64d2887d4f5",
-            "Paro": "02cceec27084c0d1795caccf98fd1abd531b809cec6f04da51735af4a3f17b19f1",
-            "madmax": "03b9b4d0b661444d204010b995d23b092719ea9e3c284c63cb80b0fe85b9a03871",
-            "phm87": "0361fd943ad190ee6a0ca982497e2475dc968787934f16f3f556b0c915034971e1",
-            "tonyL": "031dc30665bf0cdec6330aad72639717e153324f715592b94c3f5310998356267f",
-            "Strob": "03cd7d3f5d7bd1c2bde405aa2916c91c3320c854b1b558d5e43aeed1a7a526ec83",
-            "pbca26": "03831c34de63595f449461171835b4543bb8a382fd996e5ec80f47e4b9fcb514bf",
-            "biz": "02a9a46aaa33936e3fd4507f24f997ccb053e6d86289abd781ec9ca2677b2bbdaa",
-            "mcrypt": "022cee72fe1972d806993de8f73269625b38a23aa1d24f9d1912d450fa027bf967",
-            "crackers": "028ec691456204718b3ad07eff57399378f009a828a9581307d364e08dd5baee16",
-            "metaphilibert": "0271298c7b958721bada560ae41b8ab62be8737c9c2cbc70bb1981f680a76956dc",
-            "arnomad": "03069e5271e0abd0d7b8daf66c017d0ab5edf7ca3f4286b3be6d3342378d05e865",
-            "greer": "03c820cd01d0b8b9b4d58c53c31116fb8292a02705ee5564c17c0f88404c5407da",
-            "dav": "02924b7c33db64fe3a14007f2d3cf212c08e5f5def2b7a3f93c1a676bc197ab812",
-            "decker": "02a50b6acc2d022ecd4807443bf3c981dc0d4f201efa65caac226d88fc793f0959",
-            "rustytwilight": "03491764a17598e32f994fc53ccc515947edd2280a5db669a28a8876ea1a8ced20"
+        "Alright0": "02480688f3bd5d455481c63607d5ab2ddbe3f9ba407b7dd91b68f7e983e8b8c2e4",
+        "Alright1": "026943ec773d7a273d56d50546583ded7bc3521a731cc9d4dba273e67c721d2832",
+        "daemonfox": "0314e6cf7d6f8e4e54c63ab179c77d64f36e17f7032e614ed5a38e4f9001c47217",
+        "jorian": "038dd5025c22e22640f940083b76f3a728979a91513e5baa59e9be888153d34875",
+        "gcharang": "0249e51068be9031d20cb2ad4fa214706af32f12b5d254ab01e457f1a60a367878",
+        "dudezmobi": "02ff5f6b33ddb72b79da6e2396751fa9b8ad6a58bb86dcf0c49f2b3bf891b92c74",
+        "CHMEX": "02551b3ff2e666cc6ca82356a818821e28bde8c47ac5adcd9fffe772bf71fe8d2e",
+        "crisf": "02f8a9bd7a5f2a3878182e566093f08aebe258908ca481bf1638451a1ebd5aed94",
+        "smk": "03e81e1333f9f91a8d2afcfe3fcffaba8ba543d5552e4cbe3faf7cf64d2887d4f5",
+        "Paro": "02cceec27084c0d1795caccf98fd1abd531b809cec6f04da51735af4a3f17b19f1",
+        "madmax": "03b9b4d0b661444d204010b995d23b092719ea9e3c284c63cb80b0fe85b9a03871",
+        "phm87": "0361fd943ad190ee6a0ca982497e2475dc968787934f16f3f556b0c915034971e1",
+        "tonyL": "031dc30665bf0cdec6330aad72639717e153324f715592b94c3f5310998356267f",
+        "Strob": "03cd7d3f5d7bd1c2bde405aa2916c91c3320c854b1b558d5e43aeed1a7a526ec83",
+        "pbca26": "03831c34de63595f449461171835b4543bb8a382fd996e5ec80f47e4b9fcb514bf",
+        "biz": "02a9a46aaa33936e3fd4507f24f997ccb053e6d86289abd781ec9ca2677b2bbdaa",
+        "mcrypt": "022cee72fe1972d806993de8f73269625b38a23aa1d24f9d1912d450fa027bf967",
+        "crackers": "028ec691456204718b3ad07eff57399378f009a828a9581307d364e08dd5baee16",
+        "metaphilibert": "0271298c7b958721bada560ae41b8ab62be8737c9c2cbc70bb1981f680a76956dc",
+        "arnomad": "03069e5271e0abd0d7b8daf66c017d0ab5edf7ca3f4286b3be6d3342378d05e865",
+        "greer": "03c820cd01d0b8b9b4d58c53c31116fb8292a02705ee5564c17c0f88404c5407da",
+        "dav": "02924b7c33db64fe3a14007f2d3cf212c08e5f5def2b7a3f93c1a676bc197ab812",
+        "decker": "02a50b6acc2d022ecd4807443bf3c981dc0d4f201efa65caac226d88fc793f0959",
+        "rustytwilight": "03491764a17598e32f994fc53ccc515947edd2280a5db669a28a8876ea1a8ced20"
         },
     "Season_5": {}
 }
@@ -600,7 +671,7 @@ SEASONS_INFO = {
             "start_block":1922000,
             "end_block":2436999,
             "start_time":1592146800,
-            "end_time":1623682799,
+            "end_time":1617364800, # April 2nd 2021 12pm
             "notaries":[]
         },
     "Season_5": {
@@ -612,9 +683,9 @@ SEASONS_INFO = {
         },
     "Season_5_Testnet": {
             "start_block":2299140,
-            "end_block":2444000,
+            "end_block":2436999,
             "start_time":1615367302,
-            "end_time":1623682800,
+            "end_time":1617364800, # April 2nd 2021 12pm,
             "notaries":[]
         }
 }
@@ -755,11 +826,13 @@ OTHER_LAUNCH_PARAMS = {
     "CHIPS":"~/chips3/src/chipsd",
     "EMC2":"~/einsteinium/src/einsteiniumd",
     "VRSC":"~/VerusCoin/src/verusd",   
-    "GLEEC":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",   
+    "GLEEC":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",
+    "MCL":"~/komodo/src/komodod -ac_name=MCL -ac_supply=2000000 -ac_cc=2 -addnode=37.148.210.158 -addnode=37.148.212.36 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000"
 }
 OTHER_CONF_FILE = {
     "BTC":"~/.bitcoin/bitcoin.conf",
     "KMD":"~/.komodo/komodo.conf",   
+    "MCL":"~/.komodo/MCL/MCL.conf",
     "AYA":"~/.aryacoin/aryacoin.conf",
     "CHIPS":"~/.chips/chips.conf",
     "EMC2":"~/.einsteinium/einsteinium.conf",
@@ -768,7 +841,8 @@ OTHER_CONF_FILE = {
 }
 OTHER_CLI = {
     "BTC":"~/bitcoin/src/bitcoin-cli",
-    "KMD":"~/komodo/src/komodo-cli",  
+    "KMD":"~/komodo/src/komodo-cli",
+    "MCL":"~/komodo/src/komodo-cli -ac_name=MCL",
     "AYA":"~/AYAv2/src/aryacoin-cli",
     "CHIPS":"~/chips3/src/chips-cli",
     "EMC2":"~/einsteinium/src/einsteinium-cli",
@@ -782,38 +856,86 @@ BACK_TRANSLATE_COINS = { 'COQUICASH':'COQUI','OUR':'OURC','WLC21':'WLC','GLEEC':
 
 PARTIAL_SEASON_DPOW_CHAINS = {
     "Season_4": {
-        "HUSH3": {
-            "end_time":1603661223
+        "Main": {
+            "RFOX": {
+                "end_time":1613856136
+            },
+            "PGT": {
+                "end_time":1616280243
+            },
+            "STBL": {
+                "end_time":1616280243
+            }
+
         },
-        "GLEEC": {
-            "start_time":1603562256
-        },
-        "MCL": {
-            "start_time":1593244139
-        },
-        "PBC": {
-            "start_time":1606302315
-        },
-        "RFOX": {
-            "end_time":1613856136
-        },
-        "PGT": {
-            "end_time":1616280243
-        },
-        "STBL": {
-            "end_time":1616280243
+        "Third_Party": {
+            "PBC": {
+                "start_time":1606302315 # TODO not recognised?
+            },
+            "HUSH3": {
+                "end_time":1603661223
+            },
+            "GLEEC": {
+                "start_time":1603562256
+            },
+            "MCL": {
+                "start_time":1593244139
+            }, 
         }
+    },
+    "Season_5_Testnet": {
+        "Main": {
+            "LTC": {
+                "start_time":1616508400 # LTC Block 2022000
+            }
+
+        },
+        "Third_Party": {
+            "RICK": {
+                "end_time":1616442129 # KMD Block 2316959
+            },
+            "MORTY": {
+                "start_time":1616442129 # KMD Block 2316959
+            },
+        },
     }
 }
 
-S4_DPOW_EXCLUDED_CHAINS = [
-    "BLUR",
-    "ETOMIC",
-    "KSB",
-    "KV",
-    "OUR",
-    "SEC",
-    "ZEXO",
-    "GAME",
-    "TXSCLI"
-]
+DPOW_EXCLUDED_CHAINS = {
+    "Season_1": [],
+    "Season_2": [
+        "TXSCLCC",
+        "BEER",
+        "PIZZA"
+    ],
+    "Season_3": [
+        "TEST1",
+        "TEST2",
+        "TEST3",
+        "TEST4",
+        "TEST2FAST",
+        "TEST2FAST1",
+        "TEST2FAST2",
+        "TEST2FAST3",
+        "TEST2FAST4",
+        "TEST2FAST5",
+        "TEST2FAST6",
+    ],
+    "Season_4": [
+        "BLUR",
+        "ETOMIC",
+        "KSB",
+        "KV",
+        "OUR",
+        "LABS",
+        "SEC",
+        "ZEXO",
+        "GAME",
+        "TXSCLI",
+        "HUF",
+        "K64", 
+        "LTC"
+    ],
+    "Season_5": [],
+    "Season_5_Testnet": []
+}

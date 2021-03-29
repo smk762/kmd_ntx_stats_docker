@@ -495,8 +495,8 @@ class last_notarised_row():
 class ntx_records_row():
     def __init__(self, chain='', block_height='', 
                 block_time='', block_datetime='', block_hash='', 
-                notaries='', notary_addresses=list, ac_ntx_blockhash='', ac_ntx_height='', 
-                txid='', opret='', season='', server='', scored=True , btc_validated=''):
+                notaries=list, notary_addresses=list, ac_ntx_blockhash='', ac_ntx_height='', 
+                txid='', opret='', season='', server='', scored=True, score_value=0, btc_validated=''):
         self.chain = chain
         self.block_height = block_height
         self.block_time = block_time
@@ -510,7 +510,12 @@ class ntx_records_row():
         self.opret = opret
         self.season = season
         self.server = server
-        self.scored = scored
+        
+        self.score_value = score_value
+        if self.score_value > 0:
+            self.scored = True
+        else:
+            self.scored = False
         self.btc_validated = btc_validated
 
     def validated(self):
@@ -522,29 +527,35 @@ class ntx_records_row():
             self.block_time, self.block_datetime, self.block_hash, 
             self.notaries, self.notary_addresses, self.ac_ntx_blockhash,
             self.ac_ntx_height, self.txid, self.opret, self.season,
-            self.server, self.scored, self.btc_validated
+            self.server, self.scored, self.score_value, self.btc_validated
         )
         if self.validated():
-            logger.info(f"Updating notarised TABLE {self.chain} {self.season} {self.server}")
+            logger.info(f"Updating [notarised] {self.chain} {self.season} {self.server}  {self.scored} {self.score_value}")
             update_ntx_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
-        CURSOR.execute(f"DELETE FROM notarised WHERE chain = '{self.chain}'and season='{self.season}';")
+        CURSOR.execute(f"DELETE FROM notarised WHERE txid = '{self.txid}';")
         CONN.commit()
 
 class ntx_tenure_row():
     def __init__(self, chain='', first_ntx_block='', 
             last_ntx_block='', first_ntx_block_time='',
-            last_ntx_block_time='', ntx_count='', season=''):
+            last_ntx_block_time='',official_start_block_time='',
+            official_end_block_time='', unscored_ntx_count='',
+            scored_ntx_count='', season='', server=''):
         self.chain = chain
         self.first_ntx_block = first_ntx_block
         self.last_ntx_block = last_ntx_block
         self.first_ntx_block_time = first_ntx_block_time
         self.last_ntx_block_time = last_ntx_block_time
-        self.ntx_count = ntx_count
+        self.official_start_block_time = official_start_block_time
+        self.official_end_block_time = official_end_block_time
+        self.unscored_ntx_count = unscored_ntx_count
+        self.scored_ntx_count = scored_ntx_count
+        self.server = server
         self.season = season
 
     def validated(self):
@@ -554,10 +565,12 @@ class ntx_tenure_row():
         row_data = (
             self.chain, self.first_ntx_block, 
             self.last_ntx_block, self.first_ntx_block_time,
-            self.last_ntx_block_time, self.ntx_count, self.season
+            self.last_ntx_block_time, self.official_start_block_time, 
+            self.official_end_block_time, self.unscored_ntx_count, 
+            self.scored_ntx_count, self.season, self.server
         )
         if self.validated():
-            logger.info(f"Updating notarised_tenure TABLE {self.chain} {self.season}")
+            logger.info(f"{self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
             update_notarised_tenure_row(row_data)
         else:
             logger.warning(f"Row data invalid!")

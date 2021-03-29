@@ -27,7 +27,7 @@ class balances(models.Model):
     address = models.CharField(max_length=34)
     season = models.CharField(max_length=34)
     node = models.CharField(max_length=34)
-    update_time = models.PositiveIntegerField()
+    update_time = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = 'balances'
@@ -43,10 +43,10 @@ class btc_address_deltas(models.Model):
     address = models.CharField(max_length=34)
     category = models.CharField(max_length=34)
     txid = models.CharField(max_length=128)
-    block_time = models.PositiveIntegerField()
-    total_in = models.IntegerField()
-    total_out = models.IntegerField()
-    fees = models.IntegerField()
+    block_time = models.PositiveIntegerField(default=0)
+    total_in = models.IntegerField(default=0)
+    total_out = models.IntegerField(default=0)
+    fees = models.IntegerField(default=0)
     vin_addr = JSONField(default=dict)
     vout_addr = JSONField(default=dict)
     season = models.CharField(max_length=34)
@@ -62,7 +62,7 @@ class btc_address_deltas(models.Model):
 
 class chain_sync(models.Model):
     chain = models.CharField(max_length=64)
-    block_height = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField(default=0)
     sync_hash = models.CharField(max_length=64)
     explorer_hash = models.CharField(max_length=64)
 
@@ -83,8 +83,8 @@ class coins(models.Model):
     explorers = JSONField(default=dict)
     dpow = JSONField(default=dict)
     dpow_tenure = JSONField(default=dict)
-    dpow_active = models.PositiveIntegerField()
-    mm2_compatible = models.PositiveIntegerField()
+    dpow_active = models.PositiveIntegerField(default=0)
+    mm2_compatible = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = 'coins'
@@ -119,14 +119,14 @@ class coin_social(models.Model):
 class funding_transactions(models.Model):
     chain = models.CharField(max_length=128)
     txid = models.CharField(max_length=128)
-    vout = models.PositiveIntegerField()
+    vout = models.PositiveIntegerField(default=0)
     amount = models.DecimalField(max_digits=18, decimal_places=8)
 
     address = models.CharField(max_length=128)
     notary = models.CharField(max_length=128)
     block_hash = models.CharField(max_length=128)
-    block_height = models.PositiveIntegerField()
-    block_time = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField(default=0)
+    block_time = models.PositiveIntegerField(default=0)
 
     category = models.CharField(max_length=128)
     fee = models.DecimalField(max_digits=18, decimal_places=8)
@@ -144,8 +144,8 @@ class funding_transactions(models.Model):
 class last_btc_notarised(models.Model):
     notary = models.CharField(max_length=64)
     txid = models.CharField(max_length=64)
-    block_height = models.PositiveIntegerField()
-    block_time = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField(default=0)
+    block_time = models.PositiveIntegerField(default=0)
     season = models.CharField(max_length=32)
 
     class Meta:
@@ -161,8 +161,8 @@ class last_notarised(models.Model):
     notary = models.CharField(max_length=64)
     chain = models.CharField(max_length=32)
     txid = models.CharField(max_length=64)
-    block_height = models.PositiveIntegerField()
-    block_time = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField(default=0)
+    block_time = models.PositiveIntegerField(default=0)
     season = models.CharField(max_length=32)
 
     class Meta:
@@ -178,8 +178,8 @@ class last_notarised(models.Model):
         ]
 
 class mined(models.Model):
-    block_height = models.PositiveIntegerField()
-    block_time = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField(default=0)
+    block_time = models.PositiveIntegerField(default=0)
     block_datetime = models.DateTimeField()
     value = models.DecimalField(max_digits=18, decimal_places=8)
     address = models.CharField(max_length=34)
@@ -199,9 +199,9 @@ class mined(models.Model):
 class mined_count_daily(models.Model):
     mined_date = models.DateField()
     notary = models.CharField(max_length=64)
-    blocks_mined = models.PositiveIntegerField()
+    blocks_mined = models.PositiveIntegerField(default=0)
     sum_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
-    time_stamp = models.PositiveIntegerField()
+    time_stamp = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = 'mined_count_daily'
@@ -214,12 +214,12 @@ class mined_count_daily(models.Model):
 
 class mined_count_season(models.Model):
     notary = models.CharField(max_length=64)
-    blocks_mined = models.PositiveIntegerField()
+    blocks_mined = models.PositiveIntegerField(default=0)
     sum_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
     max_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
-    last_mined_block = models.PositiveIntegerField()
-    last_mined_blocktime = models.PositiveIntegerField()
-    time_stamp = models.PositiveIntegerField()
+    last_mined_block = models.PositiveIntegerField(default=0)
+    last_mined_blocktime = models.PositiveIntegerField(default=0)
+    time_stamp = models.PositiveIntegerField(default=0)
     season = models.CharField(max_length=34)
 
     class Meta:
@@ -235,17 +235,18 @@ class notarised(models.Model):
     txid = models.CharField(max_length=64)
     chain = models.CharField(max_length=32)
     block_hash = models.CharField(max_length=64)
-    block_time = models.PositiveIntegerField()
+    block_time = models.PositiveIntegerField(default=0)
     block_datetime = models.DateTimeField()
-    block_height = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField(default=0)
     notaries = ArrayField(models.CharField(max_length=34),size=13)
     notary_addresses = ArrayField(models.CharField(max_length=34),size=13, default=list)
     ac_ntx_blockhash = models.CharField(max_length=64)
-    ac_ntx_height = models.PositiveIntegerField()
+    ac_ntx_height = models.PositiveIntegerField(default=0)
     opret = models.CharField(max_length=2048)
     season = models.CharField(max_length=32)
     server = models.CharField(max_length=32, default='')
     scored = models.BooleanField(default=True)
+    score_value = models.DecimalField(max_digits=18, decimal_places=8, default=0)
     btc_validated = models.CharField(max_length=32, default='')
 
     class Meta:
@@ -258,14 +259,14 @@ class notarised(models.Model):
 class notarised_btc(models.Model):
     btc_txid = models.CharField(max_length=64)
     btc_block_hash = models.CharField(max_length=64)
-    btc_block_ht = models.PositiveIntegerField()
-    btc_block_time = models.PositiveIntegerField()
+    btc_block_ht = models.PositiveIntegerField(default=0)
+    btc_block_time = models.PositiveIntegerField(default=0)
     addresses = ArrayField(models.CharField(max_length=34),size=13)
     notaries = ArrayField(models.CharField(max_length=34),size=13)
     kmd_txid = models.CharField(max_length=64)
     kmd_block_hash = models.CharField(max_length=64)
-    kmd_block_ht = models.PositiveIntegerField()
-    kmd_block_time = models.PositiveIntegerField()
+    kmd_block_ht = models.PositiveIntegerField(default=0)
+    kmd_block_time = models.PositiveIntegerField(default=0)
     opret = models.CharField(max_length=2048)
     season = models.CharField(max_length=32)
 
@@ -279,7 +280,7 @@ class notarised_btc(models.Model):
 class notarised_chain_daily(models.Model):
     notarised_date = models.DateField()
     chain = models.CharField(max_length=64)
-    ntx_count = models.PositiveIntegerField()
+    ntx_count = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = 'notarised_chain_daily'
@@ -292,14 +293,14 @@ class notarised_chain_daily(models.Model):
 
 class notarised_chain_season(models.Model):
     chain = models.CharField(max_length=64)
-    ntx_count = models.PositiveIntegerField()
-    block_height = models.PositiveIntegerField()
+    ntx_count = models.PositiveIntegerField(default=0)
+    block_height = models.PositiveIntegerField(default=0)
     kmd_ntx_blockhash = models.CharField(max_length=64)
     kmd_ntx_txid = models.CharField(max_length=64)
-    kmd_ntx_blocktime = models.PositiveIntegerField()
+    kmd_ntx_blocktime = models.PositiveIntegerField(default=0)
     opret = models.CharField(max_length=2048)
     ac_ntx_blockhash = models.CharField(max_length=64)
-    ac_ntx_height = models.PositiveIntegerField()
+    ac_ntx_height = models.PositiveIntegerField(default=0)
     ac_block_height = models.CharField(max_length=34)
     ntx_lag = models.CharField(max_length=34)
     season = models.CharField(max_length=34)
@@ -316,14 +317,14 @@ class notarised_chain_season(models.Model):
 class notarised_count_daily(models.Model):
     notarised_date = models.DateField()
     notary = models.CharField(max_length=64)
-    btc_count = models.PositiveIntegerField()
-    antara_count = models.PositiveIntegerField()
-    third_party_count = models.PositiveIntegerField()
-    other_count = models.PositiveIntegerField()
-    total_ntx_count = models.PositiveIntegerField()
+    btc_count = models.PositiveIntegerField(default=0)
+    antara_count = models.PositiveIntegerField(default=0)
+    third_party_count = models.PositiveIntegerField(default=0)
+    other_count = models.PositiveIntegerField(default=0)
+    total_ntx_count = models.PositiveIntegerField(default=0)
     chain_ntx_counts = JSONField(default=dict)
     chain_ntx_pct = JSONField(default=dict)
-    time_stamp = models.PositiveIntegerField()
+    time_stamp = models.PositiveIntegerField(default=0)
     season = models.CharField(max_length=34)
 
     class Meta:
@@ -337,14 +338,14 @@ class notarised_count_daily(models.Model):
 
 class notarised_count_season(models.Model):
     notary = models.CharField(max_length=64)
-    btc_count = models.PositiveIntegerField()
-    antara_count = models.PositiveIntegerField()
-    third_party_count = models.PositiveIntegerField()
-    other_count = models.PositiveIntegerField()
-    total_ntx_count = models.PositiveIntegerField()
+    btc_count = models.PositiveIntegerField(default=0)
+    antara_count = models.PositiveIntegerField(default=0)
+    third_party_count = models.PositiveIntegerField(default=0)
+    other_count = models.PositiveIntegerField(default=0)
+    total_ntx_count = models.PositiveIntegerField(default=0)
     chain_ntx_counts = JSONField(default=dict)
     chain_ntx_pct = JSONField(default=dict)
-    time_stamp = models.PositiveIntegerField()
+    time_stamp = models.PositiveIntegerField(default=0)
     season = models.CharField(max_length=34)
 
     class Meta:
@@ -358,33 +359,35 @@ class notarised_count_season(models.Model):
 
 class notarised_tenure(models.Model):
     chain = models.CharField(max_length=64)
-    first_ntx_block = models.PositiveIntegerField()
-    last_ntx_block = models.PositiveIntegerField()
-    first_ntx_block_time = models.PositiveIntegerField()
-    last_ntx_block_time = models.PositiveIntegerField()
-    official_start_block_time = models.PositiveIntegerField()
-    official_end_block_time = models.PositiveIntegerField()
-    ntx_count = models.PositiveIntegerField()
-    season = models.CharField(max_length=32)
+    first_ntx_block = models.PositiveIntegerField(default=0)
+    last_ntx_block = models.PositiveIntegerField(default=0)
+    first_ntx_block_time = models.PositiveIntegerField(default=0)
+    last_ntx_block_time = models.PositiveIntegerField(default=0)
+    official_start_block_time = models.PositiveIntegerField(default=0)
+    official_end_block_time = models.PositiveIntegerField(default=0)
+    unscored_ntx_count = models.PositiveIntegerField(default=0)
+    scored_ntx_count = models.PositiveIntegerField(default=0)
+    server = models.CharField(max_length=32, default="Unofficial")
+    season = models.CharField(max_length=32, default="Unofficial")
 
     class Meta:
         db_table = 'notarised_tenure'
         constraints = [
             models.UniqueConstraint(
-                fields=['chain','season'],
-                name='unique_chain_season_tenure'
+                fields=['chain','season', 'server'],
+                name='unique_chain_season_server_tenure'
             )
         ]
 
 class rewards(models.Model):
     address = models.CharField(max_length=34)
     notary = models.CharField(max_length=34)
-    utxo_count = models.PositiveIntegerField()
-    eligible_utxo_count = models.PositiveIntegerField()
-    oldest_utxo_block = models.PositiveIntegerField()
+    utxo_count = models.PositiveIntegerField(default=0)
+    eligible_utxo_count = models.PositiveIntegerField(default=0)
+    oldest_utxo_block = models.PositiveIntegerField(default=0)
     balance = models.DecimalField(max_digits=18, decimal_places=8)
     rewards = models.DecimalField(max_digits=18, decimal_places=8)
-    update_time = models.PositiveIntegerField()
+    update_time = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = 'rewards'
@@ -398,8 +401,8 @@ class rewards(models.Model):
 class nn_btc_tx(models.Model):
     txid = models.CharField(max_length=64)
     block_hash = models.CharField(max_length=64)
-    block_height = models.PositiveIntegerField()
-    block_time = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField(default=0)
+    block_time = models.PositiveIntegerField(default=0)
     block_datetime = models.DateTimeField()
 
     address = models.CharField(max_length=42)
@@ -425,8 +428,8 @@ class nn_btc_tx(models.Model):
 class nn_ltc_tx(models.Model):
     txid = models.CharField(max_length=64)
     block_hash = models.CharField(max_length=64)
-    block_height = models.PositiveIntegerField()
-    block_time = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField(default=0)
+    block_time = models.PositiveIntegerField(default=0)
     block_datetime = models.DateTimeField()
 
     address = models.CharField(max_length=64)

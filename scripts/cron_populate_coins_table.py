@@ -6,7 +6,7 @@ import logging.handlers
 from lib_const import *
 from models import coins_row
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)
@@ -129,9 +129,10 @@ def parse_coins_repo(dpow):
         if coin not in coins_info:
             coins_info.update({coin:{"coins_info":{}}})
 
-    for coin in PARTIAL_SEASON_DPOW_CHAINS["Season_4"]:
-        if coin not in coins_info:
-            coins_info.update({coin:{"coins_info":{}}})
+    for server in PARTIAL_SEASON_DPOW_CHAINS["Season_4"]:
+        for coin in PARTIAL_SEASON_DPOW_CHAINS["Season_4"][server]:
+            if coin not in coins_info:
+                coins_info.update({coin:{"coins_info":{}}})
 
     for coin in coins_info:
         logger.info(f"Getting info for {coin} from coins repo")
@@ -233,7 +234,8 @@ def get_dpow_tenure():
 
     for chain in tenured_coins:
         for season in tenure[chain]:
-            if season == "Season_4" and chain in S4_DPOW_EXCLUDED_CHAINS or season == "season_undefined":
+            if season == "Season_4" and chain in DPOW_EXCLUDED_CHAINS["Season_4"] \
+            or season == "season_undefined":
                 pass
             else:
                 season_start_block = SEASONS_INFO[season]["start_block"]
@@ -247,18 +249,19 @@ def get_dpow_tenure():
                 tenure[chain][season].update({"last_ntx_block_time":season_end_time})
 
                 if season in PARTIAL_SEASON_DPOW_CHAINS:
+                    if server in PARTIAL_SEASON_DPOW_CHAINS:
 
-                    if chain in PARTIAL_SEASON_DPOW_CHAINS[season]:
-                        # TODO: Calc first / last block based on timestamp
-                        if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][chain]:
-                            season_start_time = PARTIAL_SEASON_DPOW_CHAINS[season][chain]["start_time"]
-                            tenure[chain][season].update({"first_ntx_block_time":season_start_time})
-                            tenure[chain][season].update({"first_ntx_block":0})
+                        if chain in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
+                            # TODO: Calc first / last block based on timestamp
+                            if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+                                season_start_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"]
+                                tenure[chain][season].update({"first_ntx_block_time":season_start_time})
+                                tenure[chain][season].update({"first_ntx_block":0})
 
-                        if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][chain]:
-                            season_end_time = PARTIAL_SEASON_DPOW_CHAINS[season][chain]["end_time"]
-                            tenure[chain][season].update({"last_ntx_block_time":season_end_time})
-                            tenure[chain][season].update({"last_ntx_block":0})
+                            if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+                                season_end_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]
+                                tenure[chain][season].update({"last_ntx_block_time":season_end_time})
+                                tenure[chain][season].update({"last_ntx_block":0})
 
     for chain in TRANSLATE_COINS:
         try:

@@ -8,7 +8,7 @@ cursor = conn.cursor()
 #table = 'nn_social'
 #table = 'mined'
 #table = 'mined_count_season'
-table = 'nn_ltc_tx'
+table = 'notarised_tenure'
 #table = 'notarised'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
@@ -21,8 +21,8 @@ print(cursor.fetchall())
 #    conn.commit()
 
 #cursor.execute("DELETE FROM "+table+" WHERE chain = 'LTC';")
-cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_4';")
-#cursor.execute("DELETE FROM "+table+";")
+#cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_4';")
+cursor.execute("DELETE FROM "+table+";")
 conn.commit()
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")

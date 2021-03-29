@@ -11,7 +11,7 @@ from lib_notary import get_season, update_miner, get_season_notaries, get_daily_
 from models import season_mined_count_row, daily_mined_count_row
 
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s',
                               datefmt='%d-%b-%y %H:%M:%S')
