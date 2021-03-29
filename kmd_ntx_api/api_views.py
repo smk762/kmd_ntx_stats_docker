@@ -97,6 +97,26 @@ def nn_btc_txid_list(request):
     resp.update({"distinct":distinct})
     return JsonResponse(resp)
 
+
+def chain_notarisation_txid_list(request):
+
+    if 'season' in request.GET and 'chain' in request.GET:
+        txid_list = get_chain_notarisation_txid_list(request.GET['chain'], request.GET['season'])
+
+    elif 'chain' in request.GET:
+        txid_list = get_chain_notarisation_txid_list(request.GET['chain'])
+
+    else:
+        return JsonResponse({"error":"You need to add a chain param like ?chain=PIRATE (season param is optional"})
+
+    distinct = len(list(set(txid_list)))
+    
+    return JsonResponse({
+        "count":distinct,
+        "notarisation_txid_list":txid_list
+        })
+
+
 def nn_btc_txid_ntx(request):
     resp = get_btc_txid_data("NTX")
     return JsonResponse(resp)

@@ -146,7 +146,7 @@ class Test_opret_decode(unittest.TestCase):
         expected = "HODL"
         self.assertEqual(actual, expected)
 
-    def test_get_ntx_data(self):
+    def test_get_notarised_data(self):
         result = ('HODL', 1939649, 1593250479, datetime.datetime(2020, 6, 27, 9, 34, 39),
                     '0ddce76cc7c3d63254e81f1f1d76912734537ea0cfe71a125e1766ba73075cfb',
                     ['chmex_AR', 'decker_AR', 'decker_EU', 'etszombi_AR', 'fullmoon_NA', 'madmax_NA',
@@ -157,7 +157,7 @@ class Test_opret_decode(unittest.TestCase):
                     'OP_RETURN ab7a0202322a2124c0ceadf15ba2a2a6b1f2838587319ac92cfa3111617b0e029e9d0e00484f444c00e1956043b84a6fe3c8db130ab43d75d26d84b1e681de90e4f3a2b57676cf1b510c000000',
                     'Season_4', 'N/A')
 
-        actual = get_ntx_data("2e8732b608a37b47307a67abce11922db968435552f2ea6ad0b5b4fda82123d5")
+        actual = get_notarised_data("2e8732b608a37b47307a67abce11922db968435552f2ea6ad0b5b4fda82123d5")
         expected = result
         self.assertEqual(actual, expected)
 

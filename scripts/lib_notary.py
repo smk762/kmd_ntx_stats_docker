@@ -146,7 +146,7 @@ def get_ticker(scriptPubKeyBinary):
         chain = "KMD"
     return str(chain)
 
-def get_ntx_data(txid):
+def get_notarised_data(txid):
     try:
         raw_tx = RPC["KMD"].getrawtransaction(txid,1)
         block_hash = raw_tx['blockhash']
@@ -461,19 +461,17 @@ def get_dpow_scoring_window(season, chain, server):
         official_end = SEASONS_INFO[season]["end_time"]
 
     if season in PARTIAL_SEASON_DPOW_CHAINS:
-        for server in PARTIAL_SEASON_DPOW_CHAINS[season]:
+        for _server in PARTIAL_SEASON_DPOW_CHAINS[season]:
 
-            if chain in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
+            if chain in PARTIAL_SEASON_DPOW_CHAINS[season][_server]:
 
-                if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
-                    official_start = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"]
+                if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]:
+                    official_start = PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]["start_time"]
 
-                if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
-                    official_end = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]
+                if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]:
+                    official_end = PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]["end_time"]
 
     scored_list, unscored_list = get_ntx_scored(season, chain, official_start, official_end, server)
-    logger.info(f"scored_list: {scored_list}")
-    logger.info(f"unscored_list: {unscored_list}")
 
     return official_start, official_end, scored_list, unscored_list
 
@@ -486,20 +484,11 @@ def update_ntx_tenure(chains, season, server):
         min_blk = ntx_results[2]
         min_blk_time = ntx_results[3]
         total_ntx_count = ntx_results[4]
-        logger.info(f"{chain} {season} {server}")
-        logger.info(f"max_blk: {max_blk}")
-        logger.info(f"max_blk_time: {max_blk_time}")
-        logger.info(f"max_blk: {min_blk}")
-        logger.info(f"max_blk_time: {min_blk_time}")
-        logger.info(f"total_ntx_count: {total_ntx_count}")
-        logger.info(f"max_blk_time: {max_blk_time}")
 
         if max_blk is not None:
             scoring_window = get_dpow_scoring_window(season, chain, server)
             official_start = scoring_window[0]
             official_end = scoring_window[1]
-            logger.info(f"official_start: {official_start}")
-            logger.info(f"official_end: {official_end}")
 
             if season in DPOW_EXCLUDED_CHAINS:
                 if chain in DPOW_EXCLUDED_CHAINS[season]:
@@ -525,9 +514,11 @@ def update_ntx_tenure(chains, season, server):
             row.official_end_block_time = official_end
             row.scored_ntx_count = scored_ntx_count
             row.unscored_ntx_count = unscored_ntx_count
+            # TODO: Add epoch scoring? Add epoch field to notarised table?
             row.season = season
             row.server = server
             row.update()
+    print("\n")
 
 def get_unrecorded_KMD_txids(tip, season):
     recorded_txids = []
@@ -549,7 +540,7 @@ def get_unrecorded_KMD_txids(tip, season):
         all_txids += get_ntx_txids(NTX_ADDR, start_block+1, start_block+chunk_size)
         start_block += chunk_size
     all_txids += get_ntx_txids(NTX_ADDR, start_block+1, tip)
-    recorded_txids = get_existing_ntxids()
+    recorded_txids = get_existing_notarised_txids()
     unrecorded_txids = set(all_txids) - set(recorded_txids)
     return unrecorded_txids
 
@@ -764,14 +755,6 @@ def get_category_from_vins_vouts(tx_vins, tx_vouts, season):
     non_notary_vins = list(set(non_notary_vins))
     non_notary_vouts = list(set(non_notary_vouts))
     
-    '''
-    if txid == "0b415ea1ec9852393903370fb4c3bf38b437a024f681f8b734de29579a06cf2f":
-        print(f"ntx_vout {ntx_vout}")
-        print(f"ntx_vin {ntx_vin}")
-        print(f"len(notary_vins) {len(notary_vins)}")
-        print(f"import_category {import_category}")
-        input("continue?")
-    '''
 
     # overrides (skip if -1 vin/vout)
     try:
@@ -944,14 +927,6 @@ def get_category_from_ltc_vins_vouts(tx_vins, tx_vouts, season):
     non_notary_vins = list(set(non_notary_vins))
     non_notary_vouts = list(set(non_notary_vouts))
     
-    '''
-    if txid == "0b415ea1ec9852393903370fb4c3bf38b437a024f681f8b734de29579a06cf2f":
-        print(f"ntx_vout {ntx_vout}")
-        print(f"ntx_vin {ntx_vin}")
-        print(f"len(notary_vins) {len(notary_vins)}")
-        print(f"import_category {import_category}")
-        input("continue?")
-    '''
 
     # overrides (skip if -1 vin/vout)
     try:

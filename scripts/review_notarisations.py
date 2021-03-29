@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 
-from models import ntx_records_row
-from lib_notary import get_ntx_data
-from lib_table_select import get_existing_ntxids
+from models import notarised_row
+from lib_notary import get_notarised_data
+from lib_table_select import get_existing_notarised_txids
 
-txids = get_existing_ntxids()
+txids = get_existing_notarised_txids()
 
 for txid in txids:
-	row_data = get_ntx_data(txid)
+	row_data = get_notarised_data(txid)
 
 	if row_data is not None: # ignore TXIDs that are not notarisations
 	    chain = row_data[0]
 
 	    if chain not in ['KMD', 'BTC']: # KMD -> BTC notarisations are requested via BTC blockchain APIs
-	        row = ntx_records_row()
+	        row = notarised_row()
 	        row.chain = chain
 	        row.block_height = row_data[1]
 	        row.block_time = row_data[2]

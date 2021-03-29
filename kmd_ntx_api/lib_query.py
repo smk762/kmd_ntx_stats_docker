@@ -121,12 +121,13 @@ def get_btc_txid_data(category=None):
     return wrap_api(resp)
 
 def get_notarisation_txid_single(txid=None):
-    resp = []
-    filter_kwargs = {}
+
     data = notarised.objects.filter(txid=txid)
     print(data)
+
     for item in data:
-        row = {
+
+        return {
             "chain":item.chain,
             "txid":item.txid,
             "block_hash":item.block_hash,
@@ -141,14 +142,23 @@ def get_notarisation_txid_single(txid=None):
             "season":item.season,
             "server":item.server,
             "scored":item.scored,
+            "score_value":item.score_value,
             "btc_validated":item.btc_validated
         }
-        resp.append(row)
-    print(resp)
-    if len(resp) > 0:
-        return wrap_api(resp)
+
+    return {"error":"TXID not found!"}
+
+def get_chain_notarisation_txid_list(chain, season=None):
+    resp = []
+    if season:
+        data = notarised.objects.filter(chain=chain, season=season)
     else:
-        return wrap_api("TXID not found!")
+        data = notarised.objects.filter(chain=chain)
+    for item in data:
+        print(item.txid)
+        resp.append(item.txid)
+
+    return resp
 
 def get_btc_txid_single(txid=None):
     resp = []
@@ -925,7 +935,7 @@ def get_epoch_scoring_table(request):
         resp.append({
                 "season":item['season'],
                 "server":item['server'],
-                "epoch":item['epoch'],
+                "epoch":item['epoch'].split("_")[1],
                 "epoch_start":item['epoch_start'],
                 "epoch_end":item['epoch_end'],
                 "start_event":item['start_event'],

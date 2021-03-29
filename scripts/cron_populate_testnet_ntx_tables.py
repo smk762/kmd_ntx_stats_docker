@@ -71,14 +71,14 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
     num_unrecorded_KMD_txids = len(unrecorded_KMD_txids)
     
     for txid in unrecorded_KMD_txids:
-        row_data = get_ntx_data(txid)
+        row_data = get_notarised_data(txid)
         i += 1
 
         if row_data is not None: # ignore TXIDs that are not notarisations
             chain = row_data[0]
 
             if chain != 'KMD': # KMD -> BTC notarisations are requested via BTC blockchain APIs
-                row = ntx_records_row()
+                row = notarised_row()
                 row.chain = chain
                 row.block_height = row_data[1]
                 row.block_time = row_data[2]
