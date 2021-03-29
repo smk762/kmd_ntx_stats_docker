@@ -211,7 +211,7 @@ def get_ntx_scored(season, chain, lowest_block_time, highest_block_time, server)
                     AND block_time >= {lowest_block_time} \
                     AND block_time <= {highest_block_time} \
                     ;"
-    #print(sql)
+    print(sql)
     CURSOR.execute(sql)
     scored_resp = CURSOR.fetchall()
 
@@ -234,9 +234,13 @@ def get_ntx_scored(season, chain, lowest_block_time, highest_block_time, server)
 
     return scored_list, unscored_list
 
-def get_notarised_chains(season=None):
+def get_notarised_chains(season=None, server=None):
     chains = []
-    if season:
+    if season and server:
+        CURSOR.execute(f"SELECT DISTINCT chain FROM notarised WHERE season='{season}' AND server='{server}';")
+    elif season:
+        CURSOR.execute(f"SELECT DISTINCT chain FROM notarised WHERE season='{season}';")
+    elif server:
         CURSOR.execute(f"SELECT DISTINCT chain FROM notarised WHERE season='{season}';")
     else:
         CURSOR.execute("SELECT DISTINCT chain FROM notarised;")
@@ -259,12 +263,12 @@ def get_notarised_seasons(chain=None):
     seasons.reverse()
     return seasons
 
-def get_notarised_servers(season):
+def get_notarised_servers(season=None):
     servers = []
     if season:
         CURSOR.execute(f"SELECT DISTINCT server FROM notarised WHERE season='{season}';")
     else:
-        CURSOR.execute("SELECT DISTINCT season FROM notarised;")
+        CURSOR.execute("SELECT DISTINCT server FROM notarised;")
     servers_results = CURSOR.fetchall()
     for result in servers_results:
         servers.append(result[0])

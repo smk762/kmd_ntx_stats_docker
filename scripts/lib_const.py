@@ -639,7 +639,11 @@ NOTARY_PUBKEYS = {
         "greer": "03c820cd01d0b8b9b4d58c53c31116fb8292a02705ee5564c17c0f88404c5407da",
         "dav": "02924b7c33db64fe3a14007f2d3cf212c08e5f5def2b7a3f93c1a676bc197ab812",
         "decker": "02a50b6acc2d022ecd4807443bf3c981dc0d4f201efa65caac226d88fc793f0959",
-        "rustytwilight": "03491764a17598e32f994fc53ccc515947edd2280a5db669a28a8876ea1a8ced20"
+        "rustytwilight": "03491764a17598e32f994fc53ccc515947edd2280a5db669a28a8876ea1a8ced20",
+        "dathbezumniy0": "02be7fd8f4ad2530375951c0dc9fec73c7588220d0fbfac45ea17eb360aada72bc",
+        "dathbezumniy1": "0332116904ade54b600629823adf62784fd251c71fbc1f019255ea8e23d7ef8eaf",
+        "ocean": "03ca223f9583e770a9641892e8983d7cfa71906818c9717a073079600b5c784882",
+        "jorian1": "0220caf63bff86f2ad9952c95030f525be3e3d4ef467bfc6da45f1bcb77c6a5a1e"
         },
     "Season_5": {}
 }
@@ -851,8 +855,8 @@ OTHER_CLI = {
 }
 
 # Some coins are named differently between dpow and coins repo...
-TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GleecBTC':'GLEEC', "PBC":"SFUSD" }
-BACK_TRANSLATE_COINS = { 'COQUICASH':'COQUI','OUR':'OURC','WLC21':'WLC','GLEEC':'GleecBTC', "SFUSD":"PBC" }
+TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GleecBTC':'GLEEC', "SFUSD":"PBC"  }
+BACK_TRANSLATE_COINS = { 'COQUICASH':'COQUI','OUR':'OURC','WLC21':'WLC','GLEEC':'GleecBTC', "PBC":"SFUSD"}
 
 PARTIAL_SEASON_DPOW_CHAINS = {
     "Season_4": {
@@ -892,7 +896,7 @@ PARTIAL_SEASON_DPOW_CHAINS = {
         },
         "Third_Party": {
             "RICK": {
-                "end_time":1616442129 # KMD Block 2316959
+                "start_time":1616442129 # KMD Block 2316959
             },
             "MORTY": {
                 "start_time":1616442129 # KMD Block 2316959
@@ -939,3 +943,90 @@ DPOW_EXCLUDED_CHAINS = {
     "Season_5": [],
     "Season_5_Testnet": []
 }
+
+
+SCORING_EPOCHS = {
+}
+
+for season in SEASONS_INFO:
+    SCORING_EPOCHS.update({season:{
+        "Main":{},
+        "Third_Party":{}
+    }})
+
+    season_start = SEASONS_INFO[season]["start_time"]
+    season_end = SEASONS_INFO[season]["end_time"]
+
+    if season not in PARTIAL_SEASON_DPOW_CHAINS:
+        SCORING_EPOCHS[season]["Main"].update({
+            f"Epoch_1": {
+                "start":season_start,
+                "end":season_end-1,
+                "start_event":"Season start",
+                "end_event": "Season end"
+            }
+        })
+        SCORING_EPOCHS[season]["Third_Party"].update({
+            f"Epoch_1": {
+                "start":season_start,
+                "end":season_end-1,
+                "start_event":"Season start",
+                "end_event": "Season end"
+            }
+        })
+
+    else:
+        for server in PARTIAL_SEASON_DPOW_CHAINS[season]:
+            epoch_event_times = [season_start, season_end]
+
+            for chain in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
+
+                if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+                    epoch_event_times.append(PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"])
+                if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+                    epoch_event_times.append(PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"])
+
+            epoch_event_times = list(set(epoch_event_times))
+            epoch_event_times.sort()
+            num_epochs = len(epoch_event_times)
+
+            for epoch in range(0,num_epochs-1):
+
+
+                epoch_start_time = epoch_event_times[epoch]
+                epoch_end_time = epoch_event_times[epoch+1]
+
+                epoch_start_events = []
+                epoch_end_events = []
+
+                if epoch_start_time == season_start:
+                    epoch_start_events.append("Season start")
+                if epoch_end_time == season_end:
+                    epoch_end_events.append("Season end")
+
+                for chain in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
+                    if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+
+                        if epoch_start_time == PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"]:
+                            epoch_start_events.append(f"{chain} start")
+
+                        elif epoch_end_time == PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"]:
+                            epoch_end_events.append(f"{chain} start")
+
+                    if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+
+                        if epoch_start_time == PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]:
+                            epoch_start_events.append(f"{chain} end")
+
+                        elif epoch_end_time == PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]:
+                            epoch_end_events.append(f"{chain} end")
+
+
+                SCORING_EPOCHS[season][server].update({
+                    f"Epoch_{epoch}": {
+                        "start":epoch_start_time,
+                        "end":epoch_end_time-1,
+                        "start_event":epoch_start_events,
+                        "end_event":epoch_end_events
+                    }
+                })
