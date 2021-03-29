@@ -244,6 +244,11 @@ urlpatterns = [
     path('sitemap/',
           page_views.sitemap,
           name='sitemap'),
+
+    path('scoring_epochs',
+          page_views.scoring_epochs_view,
+          name='scoring_epochs_view'),
+
     path('testnet_ntx_scoreboard',
           page_views.testnet_ntx_scoreboard,
           name='testnet_ntx_scoreboard'),
@@ -329,6 +334,10 @@ urlpatterns = [
           api_views.split_summary_table,
           name='split_summary_table'),
     
+
+    path('api/table/epoch_scoring',
+          api_tables.epoch_scoring_table,
+          name='epoch_scoring_table'),
 
     path('api/table/mined_count_season',
           api_tables.mined_count_season_table,
