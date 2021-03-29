@@ -12,7 +12,7 @@ from lib_notary import get_new_nn_btc_txids, get_notary_from_btc_address, get_no
 from lib_table_update import update_nn_btc_tx_notary_from_addr
 from lib_table_select import get_existing_nn_btc_txids, get_existing_notarised_btc_txids
 from lib_api import get_btc_tx_info
-from models import tx_row, last_notarised_row, ntx_records_row
+from models import tx_row, last_notarised_row, notarised_row
 from lib_const import *
 from known_txids import *
 
@@ -417,7 +417,7 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
                             ac_ntx_blockhash = kmd_ntx_info['notarised_blockhash']
 
                             # Update "notarised" table
-                            row = ntx_records_row()
+                            row = notarised_row()
                             row.chain = 'BTC'
                             row.block_height = txid_data.block_height
                             row.block_time = int(txid_data.block_time)

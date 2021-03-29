@@ -6,7 +6,7 @@ import logging
 import logging.handlers
 from lib_const import *
 from models import coins_row
-from lib_table_select import get_existing_ntxids, get_notarisations
+from lib_table_select import get_existing_notarised_txids, get_notarisations
 from lib_table_update import update_score_notarised_tbl
 
 logger = logging.getLogger(__name__)

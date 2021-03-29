@@ -13,11 +13,12 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 notarised_seasons = get_notarised_seasons()
-logger.info(f"notarised_seasons: {notarised_seasons}")
+logger.info(f"\n\nnotarised_seasons: {notarised_seasons}")
 
 for season in notarised_seasons:
 	servers = get_notarised_servers(season)
 	logger.info(f"{season} servers: {servers}")
 	for server in servers:
 		notarised_chains = get_notarised_chains(season, server)
+		logger.info(f"{season} {servers} notarised chains {notarised_chains}\n\n")
 		update_ntx_tenure(notarised_chains, season, server)

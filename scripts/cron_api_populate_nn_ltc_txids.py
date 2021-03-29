@@ -16,7 +16,7 @@ from lib_table_select import get_existing_nn_ltc_txids
 
 from lib_api import get_ltc_tx_info
 
-from models import ltc_tx_row, last_notarised_row, ntx_records_row
+from models import ltc_tx_row, last_notarised_row, notarised_row
 
 from lib_const import LTC_NTX_ADDR, NOTARY_LTC_ADDRESSES, NN_LTC_ADDRESSES_DICT, ALL_SEASON_NOTARY_LTC_ADDRESSES, ALL_SEASON_NOTARIES, ALL_SEASON_NN_LTC_ADDRESSES_DICT, THIS_SERVER
 from lib_db import CONN, CURSOR
@@ -400,7 +400,7 @@ for notary_address in NOTARY_LTC_ADDRESSES[season]:
                             ac_ntx_blockhash = kmd_ntx_info['notarised_blockhash']
 
                             # Update "notarised" table
-                            row = ntx_records_row()
+                            row = notarised_row()
                             row.chain = "LTC"
                             row.block_height = txid_data.block_height
                             row.block_time = txid_data.block_time
