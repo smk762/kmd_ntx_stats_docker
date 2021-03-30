@@ -45,7 +45,7 @@ DEVISOR = 10512000
 
 # Some coins are named differently between dpow and coins repo...
 TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GleecBTC':'GLEEC', "SFUSD":"PBC"  }
-BACK_TRANSLATE_COINS = { 'COQUICASH':'COQUI','OUR':'OURC','WLC21':'WLC','GLEEC':'GleecBTC', "PBC":"SFUSD"}
+#BACK_TRANSLATE_COINS = { 'COQUICASH':'COQUI','OUR':'OURC','WLC21':'WLC','GLEEC':'GleecBTC', "PBC":"SFUSD"}
 
 # Coins categorised
 OTHER_COINS = []
