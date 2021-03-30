@@ -649,6 +649,8 @@ NOTARY_PUBKEYS = {
         "dathbezumniy0": "02be7fd8f4ad2530375951c0dc9fec73c7588220d0fbfac45ea17eb360aada72bc",
         "dathbezumniy1": "0332116904ade54b600629823adf62784fd251c71fbc1f019255ea8e23d7ef8eaf",
         "ocean": "03ca223f9583e770a9641892e8983d7cfa71906818c9717a073079600b5c784882",
+        "hsukrd": "03ca35a0c89ba28d3c04f0e73eccf64b4ffe5d477885ff6d532d46cfe5c1c8960a",
+        "block9": "033c51602bd33e29703d370fbcbdf174f80f98ddfbe9423939b5ece4145f871f58",
         "jorian1": "0220caf63bff86f2ad9952c95030f525be3e3d4ef467bfc6da45f1bcb77c6a5a1e"
         },
     "Season_5": {}
@@ -865,28 +867,31 @@ PARTIAL_SEASON_DPOW_CHAINS = {
     "Season_4": {
         "Main": {
             "RFOX": {
-                "end_time":1613856136
+                "end_time":1613856136      # Fri Feb 19 22:22:16 2021 +0100 commit 1c3d3cd06fd2cacc4112c5165d20e9e9fa4dadf0 + 24hr
             },
             "PGT": {
-                "end_time":1616280243
+                "end_time":1616337330      # Sat Mar 20 15:35:30 2021 +0100 commit b70d11a3f356ab2aa7925ba6307a5397ab9623a0 + 24hr
             },
             "STBL": {
-                "end_time":1616280243
+                "end_time":1616337330      # Sat Mar 20 15:35:30 2021 +0100 commit b70d11a3f356ab2aa7925ba6307a5397ab9623a0 + 24hr
+            },
+            "GLEEC": {
+                "start_time":1617095376    # Tue Mar 30 17:09:36 2021 +0800 commit 677700939d5711286f69e1c9bb438ad05782230f
             }
-
         },
         "Third_Party": {
             "PBC": {
-                "start_time":1606302315 # TODO not recognised?
+                "start_time":1606390840    # Wed Nov 25 12:40:40 2020 +0100 commit 774d6aaba0f1ad78f8cf4f6a6591ecd344ff1a60
             },
             "HUSH3": {
-                "end_time":1603661223
+                "start_time":1593331689,   # Sat Jun 27 10:08:09 2020 +0200 commit 09bbc0055be462ad53dbe2c0af2d7202a9c362eb
+                "end_time":1603710234      # Sun Oct 25 12:03:54 2020 +0100 commit 3efe36aa528495223633a560c7d457a31b3a94c3 + 24hr
             },
             "GLEEC": {
-                "start_time":1603562256
+                "start_time":1603623834    # Sun Oct 25 12:03:54 2020 +0100 commit 3efe36aa528495223633a560c7d457a31b3a94c3
             },
             "MCL": {
-                "start_time":1593244139
+                "start_time":1593331689    # Sat Jun 27 10:08:09 2020 +0200 commit 09bbc0055be462ad53dbe2c0af2d7202a9c362eb
             }, 
         }
     },
