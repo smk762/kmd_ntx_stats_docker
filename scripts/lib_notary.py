@@ -114,10 +114,9 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD", chain=No
 
     else:
         season = get_season(time_stamp)
-        if chain and txid and notaries:
-            if chain not in DPOW_EXCLUDED_CHAINS[season]:
-                print(f"\nSetting_season_via_timestamp {season} {chain} {txid} {notaries}")
         return season, "Unofficial"
+
+
 
 def get_notary_from_address(address):
     if address in KNOWN_ADDRESSES:

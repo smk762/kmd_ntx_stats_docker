@@ -125,10 +125,23 @@ def update_validation_notarised_tbl(btc_txid, btc_block_hash, btc_block_ht, opre
         CONN.rollback()
 
 
-def update_server_notarised_tbl(old_server, server):
+def update_server_notarised_tbl(old_server, server, chain=None):
     sql = f"UPDATE notarised SET \
           server='{server}' \
           WHERE server='{old_server}';"
+    try:
+        CURSOR.execute(sql)
+        CONN.commit()
+        print(f"{old_server} reclassed as {server}")
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()
+
+def update_chain_server_season_notarised_tbl(server, season, chain):
+    sql = f"UPDATE notarised SET \
+          server='{server}' \
+          WHERE season='{season}'\
+          AND chain='{chain}';"
     try:
         CURSOR.execute(sql)
         CONN.commit()
@@ -163,11 +176,17 @@ def update_txid_score_notarised_tbl(txid, scored, score_value):
         logger.debug(e)
         CONN.rollback()
 
-def update_season_server_addresses_notarised_tbl(txid, season, server, addresses):
-    sql = f"UPDATE notarised SET \
-          notary_addresses=ARRAY{addresses},  \
-          season='{season}', server='{server}' \
-          WHERE txid='{txid}';"
+def update_season_server_addresses_notarised_tbl(txid, season, server, addresses=None):
+    if addresses:
+        sql = f"UPDATE notarised SET \
+              notary_addresses=ARRAY{addresses},  \
+              season='{season}', server='{server}' \
+              WHERE txid='{txid}';"
+    else:
+        sql = f"UPDATE notarised SET \
+              season='{season}', server='{server}' \
+              WHERE txid='{txid}';"
+
     print(sql)
     try:
         CURSOR.execute(sql)
