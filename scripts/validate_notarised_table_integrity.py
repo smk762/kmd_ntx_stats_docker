@@ -27,17 +27,29 @@ for item in ["chain", "season", "server", "scored", "btc_validated"]:
             cat_rows = CURSOR.fetchall()
             print(cat_rows)
 '''
-# Validate notry addresses match season
+    
 
 # Validate correct servers
+
 notarised_seasons = get_notarised_seasons()
 logger.info(f"notarised_seasons: {notarised_seasons}")
+
 for season in notarised_seasons:
+    notarised_chains = get_notarised_chains(season)
+    logger.info(f"notarised_chains: {notarised_chains}")
+    for chain in notarised_chains:
+        if chain in DPOW_EXCLUDED_CHAINS[season]:
+            print(f">>> Updating Server... {season} {chain} Unofficial")
+            update_chain_server_season_notarised_tbl("Unofficial", season, chain)
+
+
     assert season in list(SEASONS_INFO.keys())
     servers = get_notarised_servers(season)
     logger.info(f"{season} servers: {servers}")
     for server in servers:
         assert server in ["Main", "Third_Party", "Testnet", "Unofficial"]
+
+
 
 logger.info(f"Season / Server validation complete!\n")
 

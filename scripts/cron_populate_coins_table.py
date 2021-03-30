@@ -120,6 +120,9 @@ def parse_coins_repo(dpow):
     for item in coins_repo:
         coin = item['coin']
 
+        if coin == "SFUSD":
+            coin = "PBC"
+
         if coin in TRANSLATE_COINS:
             coin = TRANSLATE_COINS[coin]
 
@@ -193,7 +196,10 @@ def parse_electrum_explorer(dpow, coins_info):
             })
 
         try:
-            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+coin)
+            if coin == "PBC":
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/SFUSD")
+            else:
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+coin)
             electrums = r.json()
 
             for electrum in electrums:
@@ -263,26 +269,6 @@ def get_dpow_tenure():
                                     season_end_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]
                                     tenure[chain][season].update({"last_ntx_block_time":season_end_time})
                                     tenure[chain][season].update({"last_ntx_block":0})
-
-    for chain in TRANSLATE_COINS:
-        try:
-            if TRANSLATE_COINS[chain] not in tenure:
-                tenure.update({TRANSLATE_COINS[chain]:tenure[chain]})
-
-            for season in tenure[chain]:
-                tenure[TRANSLATE_COINS[chain]].update({season:tenure[chain][season]})
-        except:
-            pass
-
-    for chain in BACK_TRANSLATE_COINS:
-        try:
-            if BACK_TRANSLATE_COINS[chain] not in tenure:
-                tenure.update({BACK_TRANSLATE_COINS[chain]:tenure[chain]})
-
-            for season in tenure[chain]:
-                tenure[BACK_TRANSLATE_COINS[chain]].update({season:tenure[chain][season]})
-        except:
-            pass
     return tenure
 
 dpow_tenure = get_dpow_tenure()
