@@ -60,9 +60,17 @@ for chain in chains:
             row.notaries = txid_info["notaries"]
             if len(txid_info["notary_addresses"]) == 0:
                 if row.chain == "BTC":
-                    tx_info = get_btc_tx_info(txid)
-                    row.notary_addresses = tx_info['addresses']
+                    url = f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}"
+                    local_info = requests.get(url).json()["results"][0]
+                    local_addresses = []
+                    for item in local_info:
+                        if item["input_index"] != -1:
+                            local_addresses.append(item["address"])
+                    row.notary_addresses = local_addresses
                     row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time, "BTC", "BTC", txid, row.notaries)
+                    #tx_info = get_btc_tx_info(txid)
+                    #row.notary_addresses = tx_info['addresses']
+                    #row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time, "BTC", "BTC", txid, row.notaries)
                 elif row.chain == "LTC":
                     tx_info = get_ltc_tx_info(txid)
                     row.notary_addresses = tx_info['addresses']
