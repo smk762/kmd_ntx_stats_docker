@@ -53,17 +53,19 @@ class GAME_CoinParams(CoreMainParams):
     BASE58_PREFIXES = {'PUBKEY_ADDR': 38,
                        'SCRIPT_ADDR': 5,
                        'SECRET_KEY': 166}
-
+'''
 class GLEEC_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
     DEFAULT_PORT = 7770
     BASE58_PREFIXES = {'PUBKEY_ADDR': 35,
                        'SCRIPT_ADDR': 38,
                        'SECRET_KEY': 65}
+'''
 
 COIN_PARAMS = {
     "KMD": KMD_CoinParams,
     "MCL": KMD_CoinParams,
+    "GLEEC": KMD_CoinParams,
     "PBC": PBC_CoinParams,
     "CHIPS": KMD_CoinParams,
     "VRSC": KMD_CoinParams,
@@ -72,7 +74,7 @@ COIN_PARAMS = {
     "AYA": AYA_CoinParams,
     "EMC2": EMC2_CoinParams,
     "GAME": GAME_CoinParams,
-    "GLEEC": GLEEC_CoinParams
+    #"GLEEC": GLEEC_CoinParams
 }
 
 def get_addr_from_pubkey(coin, pubkey):
