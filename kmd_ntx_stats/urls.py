@@ -237,6 +237,7 @@ urlpatterns = [
     path('ntx_scoreboard_24hrs/',
           page_views.ntx_scoreboard_24hrs,
           name='ntx_scoreboard_24hrs'),
+    
     path('notarised_tenure/',
           page_views.notarised_tenure_view,
           name='notarised_tenure_view'),

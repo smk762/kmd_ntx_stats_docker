@@ -76,7 +76,7 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
 
         if row_data is not None: # ignore TXIDs that are not notarisations
             chain = row_data[0]
-            
+
             if chain != 'KMD': # KMD -> BTC notarisations are requested via BTC blockchain APIs
                 row = notarised_row()
                 row.chain = chain
@@ -92,7 +92,10 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
                 row.opret = row_data[10]
                 logger.info(f"{row.chain} {row.opret}")
                 row.season = row_data[11]
-                row.server = row_data[12]
+                if chain == "GLEEC":
+                    row.server = get_gleec_ntx_server(row.txid)
+                elif:
+                    row.server = row_data[12]
                 row.score_value = get_dpow_score_value(row.season, row.server, row.chain, row.block_time)
                 if row.score_value > 0:
                     row.scored = True

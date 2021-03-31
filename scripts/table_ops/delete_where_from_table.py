@@ -20,7 +20,7 @@ print(cursor.fetchall())
 #    cursor.execute(f"DELETE FROM {table} WHERE category='{i}';")
 #    conn.commit()
 
-cursor.execute("DELETE FROM "+table+" WHERE chain = 'GLEEC';")
+cursor.execute("DELETE FROM "+table+" WHERE chain='LTC' AND season = 'Season_4';")
 #cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_4';")
 #cursor.execute("DELETE FROM "+table+";")
 conn.commit()

@@ -23,13 +23,6 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-#txids = ['257391b419292dc24c6c762535b82bdcc9212bf187bb60a1d322dbc3e3709c18'] # KNOWN NTX 
-#txids = ['e5f3f5519f48336d3aa6c01dea361a7e703570cea7d4a201610c6df2cc97db5b'] # KNOWN SPLIT 
-#txids = ['03402cc2f09e22d90fb9853db14a71ace0f00eb48646387d6ed89ec7bb7254df'] # KNOWN REPLENISH FROM dragonhound_NA
-#txids = ['c8dbc9e3af7f5a1d8f910ff03e390a8782a911bc34fc567c27c711e9da191894'] # KNOWN REPLENISH FROM Replenish Addr
-#txids = ['03402cc2f09e22d90fb9853db14a71ace0f00eb48646387d6ed89ec7bb7254df', '6a458e37a6b101433cc60e28ccfb8335a29ea3a80e76b69d32f4806f3fb9f040'] # KNOWN REPLENISH FROM Replenish Addr
-#txids = ['03402cc2f09e22d90fb9853db14a71ace0f00eb48646387d6ed89ec7bb7254df', '6a458e37a6b101433cc60e28ccfb8335a29ea3a80e76b69d32f4806f3fb9f040', 'c8dbc9e3af7f5a1d8f910ff03e390a8782a911bc34fc567c27c711e9da191894'] # KNOWN REPLENISH FROM Replenish Addr
-
 def get_linked_addresses(addr=None, notary=None):
     linked_addresses = {}
     sql = f"SELECT DISTINCT address, notary from nn_btc_tx"
@@ -309,7 +302,7 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
             txid_data.block_datetime = dt.utcfromtimestamp(int(txid_data.block_time))
 
             addresses = tx_info['addresses']
-            txid_data.season, txid_data.server = get_season_from_addresses(addresses[:], txid_data.block_time, "BTC")
+            txid_data.season, txid_data.server = get_season_from_addresses(addresses[:], txid_data.block_time, "BTC", "BTC")
 
             vouts = tx_info["outputs"]
             vins = tx_info["inputs"]

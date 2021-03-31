@@ -7,7 +7,7 @@ rows = get_notarised_chain_rows("GLEEC")
 
 for row in rows:
     server = get_gleec_ntx_server(row[9])
-    if server != row[12 ]:
+    if server != row[12]:
         print(f"updating server to {server} for {row[9]}")
         gleec_row = notarised_row()
         gleec_row.chain = row[0]
