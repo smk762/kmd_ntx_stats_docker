@@ -237,7 +237,7 @@ urlpatterns = [
     path('ntx_scoreboard_24hrs/',
           page_views.ntx_scoreboard_24hrs,
           name='ntx_scoreboard_24hrs'),
-    
+
     path('notarised_tenure/',
           page_views.notarised_tenure_view,
           name='notarised_tenure_view'),
@@ -302,6 +302,10 @@ urlpatterns = [
     path('api/info/nn_btc_txid_list',
           api_views.nn_btc_txid_list,
           name='nn_btc_txid_list'),
+
+    path('api/info/nn_ltc_txid_list',
+          api_views.nn_ltc_txid_list,
+          name='nn_ltc_txid_list'),
 
     path('api/info/nn_btc_txid_ntx',
           api_views.nn_btc_txid_ntx,
