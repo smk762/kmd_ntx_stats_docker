@@ -58,7 +58,8 @@ for season in seasons:
                         txid_data.num_inputs = row["num_inputs"]
                         txid_data.num_outputs = row["num_outputs"]
                         txid_data.insert()
-                except:
+                except Excption as e:
+                    logger.error(e)
                     logger.error(f"Something wrong with API? {txid_url}")
 
 CURSOR.close()
