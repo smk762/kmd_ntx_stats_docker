@@ -5,11 +5,11 @@ import logging
 import logging.handlers
 import requests
 from lib_const import NOTARY_BTC_ADDRESSES, OTHER_SERVER
-from lib_notary import get_new_notary_txids, get_season_from_addresses, get_notarised_data
+from lib_notary import *
 from models import notarised_row
 from lib_const import *
 from lib_api import get_btc_tx_info
-from lib_table_select import get_existing_notarised_txids, get_notarised_chains
+from lib_table_select import get_existing_notarised_txids, get_notarised_chains, get_notarised_seasons
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()

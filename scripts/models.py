@@ -778,26 +778,6 @@ class ltc_tx_row():
             logger.warning(f"{OTHER_SERVER}/api/info/nn_ltc_txid?txid={self.txid}")
             logger.warning(f"{row_data}")
 
-    def insert(self):
-        row_data = (
-            self.txid, self.block_hash, self.block_height,
-            self.block_time, self.block_datetime, self.address,
-            self.notary, self.season, self.category, self.input_index,
-            self.input_sats, self.output_index, self.output_sats,
-            self.fees, self.num_inputs, self.num_outputs
-        )
-        if self.validated():
-            if self.input_index != -1:
-                logger.info(f"Inserting {self.season} {self.txid} {self.category} for {self.notary} VIN {self.input_index}")
-            elif self.output_index != -1:
-                logger.info(f"Inserting {self.season} {self.txid} {self.category} for {self.notary} VOUT {self.output_index}")
-            else:
-                logger.info(f"Inserting {self.season} {self.txid} {self.category} for {self.notary}")
-            insert_nn_ltc_tx_row(row_data)
-        else:
-            logger.warning(f"Row data invalid!")
-            logger.warning(f"{OTHER_SERVER}/api/info/nn_ltc_txid?txid={self.txid}")
-            logger.warning(f"{row_data}")
 
     def delete(self):
         delete_nn_ltc_tx_transaction(self.txid)
