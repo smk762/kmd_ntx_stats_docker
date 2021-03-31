@@ -19,7 +19,7 @@ logger.setLevel(logging.INFO)
 seasons = get_notarised_seasons()
 
 for season in seasons:
-    if season not in ["Season_1", "Season_2", "Season_3"]: 
+    if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]: 
         i = 0
         num_addr = len(NOTARY_BTC_ADDRESSES[season])
         for notary_address in NOTARY_BTC_ADDRESSES[season]:
