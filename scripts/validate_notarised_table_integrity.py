@@ -43,7 +43,7 @@ for season in notarised_seasons:
         logger.info(f"{season} notarised_chains: {notarised_chains}")
         tenure_chains = get_tenure_chains(season)
         logger.info(f"{season} tenure_chains: {tenure_chains}")
-        if season not in ["Season_1", "Season_2", "Season_3"]:
+        if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
             assert notarised_chains == tenure_chains
 
         for chain in notarised_chains:
@@ -84,7 +84,7 @@ logger.info(f"Season 4 BTC scores validation complete!\n")
 
 # Validate Other scores
 for season in SCORING_EPOCHS:
-    if season not in ["Season_1", "Season_2", "Season_3"]:
+    if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
         for server in SCORING_EPOCHS[season]:
 
             for epoch in SCORING_EPOCHS[season][server]:
