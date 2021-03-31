@@ -277,7 +277,7 @@ class coins_row():
         )
         print(row_data)
         if self.validated():
-            logger.info(f"Updating COIN TABLE {self.chain} ")
+            logger.info(f"Updating [coins] {self.chain} ")
             update_coins_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
@@ -314,7 +314,7 @@ class funding_row():
             self.category, self.fee, self.address, self.notary, self.season
         )
         if self.validated():
-            logger.info(f"Updating FUNDING TABLE {self.chain} | {self.notary} ")
+            logger.info(f"Updating [funding] {self.chain} | {self.notary} ")
             update_funding_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
@@ -338,7 +338,7 @@ class notarised_chain_daily_row():
             self.chain, self.ntx_count, self.notarised_date
         )
         if self.validated():
-            logger.info(f"Updating notarised_chain_daily TABLE {self.chain} {self.notarised_date}")
+            logger.info(f"Updating [notarised_chain_daily] {self.chain} {self.notarised_date}")
             update_daily_notarised_chain_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
@@ -378,7 +378,7 @@ class notarised_count_daily_row():
             self.notarised_date
         )
         if self.validated():
-            logger.info(f"Updating notarised_count_daily TABLE {self.notary} {self.notarised_date}")
+            logger.info(f"Updating [notarised_count_daily]  {self.notary} {self.notarised_date}")
             update_daily_notarised_count_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
@@ -416,7 +416,7 @@ class notarised_count_season_row():
             self.chain_ntx_pct, self.time_stamp, self.season
         )
         if self.validated():
-            logger.info(f"Updating notarised_count_season TABLE {self.notary} {self.season}")
+            logger.info(f"Updating [notarised_count_season] {self.notary} {self.season}")
             update_season_notarised_count_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
@@ -453,7 +453,7 @@ class notarised_chain_season_row():
             self.ac_ntx_height, self.ac_block_height, self.ntx_lag, self.season
         )
         if self.validated():
-            logger.info(f"Updating notarised_chain_season TABLE {self.chain} {self.season}")
+            logger.info(f"Updating [notarised_chain_season] {self.chain} {self.season}")
             update_season_notarised_chain_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
@@ -512,16 +512,17 @@ class notarised_row():
         self.server = server
         
         self.score_value = score_value
-        if self.score_value > 0:
-            self.scored = True
-        else:
-            self.scored = False
+        self.scored = scored
         self.btc_validated = btc_validated
 
     def validated(self):
         return True
 
     def update(self):
+        if self.score_value > 0:
+            self.scored = True
+        else:
+            self.scored = False
         row_data = (
             self.chain, self.block_height, 
             self.block_time, self.block_datetime, self.block_hash, 
@@ -540,6 +541,8 @@ class notarised_row():
         CURSOR.execute(f"DELETE FROM notarised WHERE txid = '{self.txid}';")
         CONN.commit()
 
+# Can't be having rows that are remnants - delete in effect where this is the case
+# Otherwise epochs get all messed up!
 class ntx_tenure_row():
     def __init__(self, chain='', first_ntx_block='', 
             last_ntx_block='', first_ntx_block_time='',
@@ -559,9 +562,11 @@ class ntx_tenure_row():
         self.season = season
 
     def validated(self):
-        if self.server not in ["Main", "Third_Party", "Testnet", "Unofficial"]:
+        if self.server not in ["Main", "Third_Party", "Testnet"]:
+            logger.warning(f"!!!! Invalid server {server}")
             return False
-        if self.season not in ['Season_5', 'Season_5_Testnet', 'Season_4', 'Season_3', 'Season_2', 'Season_1']:
+        if self.season not in ['Season_5', 'Season_5_Testnet', 'Season_4']:
+            logger.warning(f"!!!! Invalid season {season}")
             return False
         return True
 
@@ -574,15 +579,35 @@ class ntx_tenure_row():
             self.scored_ntx_count, self.season, self.server
         )
         if self.validated():
-            logger.info(f"{self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
+            logger.info(f">>> Updating [notarised_tenure] {self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
             update_notarised_tenure_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
+            logger.info(f"!!! Invalid row [notarised_tenure] {self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
             logger.warning(f"{row_data}")
 
-    def delete(self):
-        CURSOR.execute(f"DELETE FROM notarised_tenure WHERE chain = '{self.chain}'and season='{self.season}';")
-        CONN.commit()
+
+    def delete(self, season=None, server=None, chain=None):
+        if not season and not server and not chain:
+            logger.error("Not deleting, need to specify at least one of chain, season or server")
+        else:
+            sql = f"DELETE FROM notarised_tenure"
+            conditions = []
+            if season:
+                conditions.append(f"season = '{season}'")
+            if server:
+                conditions.append(f"server = '{server}'")
+            if chain:
+                conditions.append(f"chain = '{chain}'")
+
+            if len(conditions) > 0:
+                sql += " WHERE "
+                sql += " AND ".join(conditions)    
+            sql += ";"
+            logger.warning(f"Deleting [notarised_tenure] row: {season} {server} {chain}")
+
+            CURSOR.execute(sql)
+            CONN.commit()
         
 ## KMD MINING CLASSES ###
 
@@ -668,7 +693,7 @@ class daily_mined_count_row():
             self.mined_date, self.time_stamp
         )
         if self.validated():
-            logger.info(f"Updating mined_count_daily TABLE {self.notary} {self.mined_date} ")
+            logger.info(f"Updating [mined_count_daily] {self.notary} {self.mined_date} ")
             update_daily_mined_count_row(row_data)
         else:
             logger.warning(f"Row data invalid!")
@@ -799,14 +824,30 @@ class scoring_epoch_row():
                     self.start_event, self.end_event, self.epoch_chains, self.score_per_ntx)
         if self.validated():
             update_scoring_epoch_row(row_data)
-            logger.info(f"Updated scoring_epoch TABLE {self.season} | {self.server} | {self.epoch} ")
+            logger.info(f"Updated [scoring_epochs] {self.season} | {self.server} | {self.epoch} ")
         else:
             logger.warning(f"Row data invalid!")
             logger.warning(f"{row_data}")
 
-    def delete(self):
-        CURSOR.execute(f"DELETE FROM scoring_epoch WHERE season = '{self.season}' \
-                         AND server = '{self.server}' \
-                         AND epoch = '{self.epoch}' \
-                         ;")
-        CONN.commit()
+    def delete(self, season=None, server=None, epoch=None):
+        if not season and not server and not epoch:
+            logger.error("Not deleting, need to specify at least one of epoch, season or server")
+        else:
+            sql = f"DELETE FROM scoring_epochs"
+            conditions = []
+            if season:
+                conditions.append(f"season = '{season}'")
+            if server:
+                conditions.append(f"server = '{server}'")
+            if epoch:
+                conditions.append(f"epoch = '{epoch}'")
+
+            if len(conditions) > 0:
+                sql += " WHERE "
+                sql += " AND ".join(conditions)    
+            sql += ";"
+            logger.warning(f"Deleting [scoring_epochs] row: {season} {server} {epoch}")
+
+            CURSOR.execute(sql)
+            CONN.commit()
+        

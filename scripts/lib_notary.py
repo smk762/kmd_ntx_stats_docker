@@ -70,6 +70,17 @@ def get_seasons_from_address(addr, chain="KMD"):
                 addr_seasons.append(season)
     return addr_seasons
 
+def get_gleec_ntx_server(txid):
+    raw_tx = RPC["KMD"].getrawtransaction(txid,1)
+    opret = raw_tx['vout'][1]['scriptPubKey']['asm']
+    decoded = requests.get(f"http://116.203.120.91:8762/api/tools/decode_opreturn/?OP_RETURN={opret}").json()
+    if decoded["notarised_block"] < 1000000:
+        return "Main"
+    else:
+        return "Third_Party"
+
+
+
 def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD", chain=None, txid=None, notaries=None):
     if BTC_NTX_ADDR in address_list:
         address_list.remove(BTC_NTX_ADDR)
@@ -78,7 +89,6 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD", chain=No
         tx_chain = "BTC"
     elif chain == "LTC":
         tx_chain = "LTC"
-    #print(address_list)
 
     seasons = list(NOTARY_ADDRESSES_DICT.keys())[::-1]
     notary_seasons = []
@@ -105,10 +115,15 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD", chain=No
         return "Season_5_Testnet", "Testnet"
 
     elif len(notary_seasons) == 13 and len(set(notary_seasons)) == 1:
-        if notary_seasons[0].find("_Third_Party") > -1:
+        if chain == "GLEEC":
+            server = get_gleec_ntx_server(txid)
+
+        elif notary_seasons[0].find("_Third_Party") > -1:
             server = "Third_Party"
+
         else:
             server = "Main"
+
         ntx_season = notary_seasons[0].replace("_Third_Party", "").replace(".5", "")
         return ntx_season, server
 
@@ -183,6 +198,8 @@ def get_notarised_data(txid):
                             chain = get_ticker(scriptPubKeyBinary)
                             if chain.endswith("KMD"):
                                 chain = "KMD"
+                            if chain.endswith("GLEEC"):
+                                chain = "GLEEC"
                             if chain == "KMD":
                                 btc_txid = lil_endian(scriptPubKey_asm[72:136])
                             elif chain not in noMoM:
@@ -199,7 +216,10 @@ def get_notarised_data(txid):
                                 chain = chain.replace('\x00','')
                             # (some s1 op_returns seem to be decoding differently/wrong. This ignores them)
                             if chain.upper() == chain:
-                                season, server = get_season_from_addresses(address_list, block_time, "KMD")
+                                season, server = get_season_from_addresses(address_list, block_time, "KMD", chain, txid)
+                                if chain in DPOW_EXCLUDED_CHAINS[season]:
+                                    season = "Unofficial"
+                                    server = "Unofficial"
                                 row_data = (chain, this_block_height, block_time, block_datetime,
                                             block_hash, notary_list, address_list, ac_ntx_blockhash, ac_ntx_height,
                                             txid, opret, season, server, "N/A")
@@ -229,13 +249,12 @@ def get_dpow_score_value(season, server, coin, timestamp):
 
     if coin in active_chains:
 
-        if coin == "BTC":
+        if coin in ["BTC", "LTC"]:
+
             score = 0.0325
             num_coins = 1
 
         else:
-            
-
             if num_coins > 0:
 
                 if server == "Main":
@@ -263,8 +282,7 @@ def is_coin_is_dpow_active(season, server, coin, timestamp):
     return "Unofficial", False
 
 def get_server_active_dpow_chains_at_time(season, server, timestamp):
-
-    r = requests.get(f"{THIS_SERVER}/api/info/notarised_tenure/?server={server}")
+    r = requests.get(f"{THIS_SERVER}/api/info/notarised_tenure/?server={server}&season={season}")
     tenure = r.json()["results"][0]
     chains = []
     count = 0
@@ -273,7 +291,7 @@ def get_server_active_dpow_chains_at_time(season, server, timestamp):
             for coin in tenure[season][server]:
                 if timestamp >= tenure[season][server][coin]["official_start_block_time"]:
                     if timestamp <= tenure[season][server][coin]["official_end_block_time"]:
-                        if coin != "BTC":
+                        if coin not in ["BTC", "LTC"]:
                             chains.append(coin)
                         
 
@@ -479,50 +497,47 @@ def get_dpow_scoring_window(season, chain, server):
 
     return official_start, official_end, scored_list, unscored_list
 
-def update_ntx_tenure(chains, season, server):
-    for chain in chains:
-        logger.info(f"Getting tenure for {season} {server} {chain}")  
-        ntx_results = get_ntx_min_max(season, chain, server)
-        max_blk = ntx_results[0]
-        max_blk_time = ntx_results[1]
-        min_blk = ntx_results[2]
-        min_blk_time = ntx_results[3]
-        total_ntx_count = ntx_results[4]
+def update_ntx_tenure(chain, season, server):
+    logger.info(f"Getting tenure for {season} {server} {chain}")  
+    ntx_results = get_ntx_min_max(season, chain, server) # from notarised
+    max_blk = ntx_results[0]
+    max_blk_time = ntx_results[1]
+    min_blk = ntx_results[2]
+    min_blk_time = ntx_results[3]
+    total_ntx_count = ntx_results[4]
 
-        if max_blk is not None:
-            scoring_window = get_dpow_scoring_window(season, chain, server)
-            official_start = scoring_window[0]
-            official_end = scoring_window[1]
+    if max_blk is not None:
+        scoring_window = get_dpow_scoring_window(season, chain, server)
+        official_start = scoring_window[0]
+        official_end = scoring_window[1]
 
-            if season in DPOW_EXCLUDED_CHAINS:
-                if chain in DPOW_EXCLUDED_CHAINS[season]:
-                    scored_ntx_count = 0
-                    unscored_ntx_count = len(scoring_window[2])+len(scoring_window[3])
-                else:
-                    scored_ntx_count = len(scoring_window[2])
-                    unscored_ntx_count = len(scoring_window[3])
+        if season in DPOW_EXCLUDED_CHAINS:
+            if chain in DPOW_EXCLUDED_CHAINS[season]:
+                season = "Unofficial"
+                scored_ntx_count = 0
+                unscored_ntx_count = len(scoring_window[2])+len(scoring_window[3])
             else:
                 scored_ntx_count = len(scoring_window[2])
                 unscored_ntx_count = len(scoring_window[3])
-            logger.info(f"scored_ntx_count: {scored_ntx_count}")
-            logger.info(f"unscored_ntx_count: {unscored_ntx_count}")
+        else:
+            scored_ntx_count = len(scoring_window[2])
+            unscored_ntx_count = len(scoring_window[3])
 
 
-            row = ntx_tenure_row()
-            row.chain = chain
-            row.first_ntx_block = min_blk
-            row.last_ntx_block = max_blk
-            row.first_ntx_block_time = min_blk_time
-            row.last_ntx_block_time = max_blk_time
-            row.official_start_block_time = official_start
-            row.official_end_block_time = official_end
-            row.scored_ntx_count = scored_ntx_count
-            row.unscored_ntx_count = unscored_ntx_count
-            # TODO: Add epoch scoring? Add epoch field to notarised table?
-            row.season = season
-            row.server = server
-            row.update()
-    print("\n")
+        row = ntx_tenure_row()
+        row.chain = chain
+        row.first_ntx_block = min_blk
+        row.last_ntx_block = max_blk
+        row.first_ntx_block_time = min_blk_time
+        row.last_ntx_block_time = max_blk_time
+        row.official_start_block_time = official_start
+        row.official_end_block_time = official_end
+        row.scored_ntx_count = scored_ntx_count
+        row.unscored_ntx_count = unscored_ntx_count
+        # TODO: Add epoch scoring? Add epoch field to notarised table?
+        row.season = season
+        row.server = server
+        row.update()
 
 def get_unrecorded_KMD_txids(tip, season):
     recorded_txids = []
