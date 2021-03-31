@@ -144,6 +144,26 @@ def select_from_table(table, cols, conditions=None):
     else:
         return ()
 
+def get_tenure_chains(season=None, server=None):
+    sql = "SELECT DISTINCT chain from notarised_tenure"
+    conditions = []
+    if season:
+        conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+    CURSOR.execute(sql)
+    results = CURSOR.fetchall()
+    resp = []
+    for chain in results:
+        resp.append(chain[0])
+    resp.sort()
+    return resp
+
+
 def get_min_from_table(table, col):
     sql = "SELECT MIN("+col+") FROM "+table
     CURSOR.execute(sql)
@@ -277,6 +297,19 @@ def get_notarised_servers(season=None):
         servers.append(result[0])
     servers.sort()
     return servers
+
+def get_notarised_chain_rows(chain):
+    rows = []
+    CURSOR.execute(f"SELECT chain, block_height, \
+            block_time, block_datetime, block_hash, \
+            notaries, notary_addresses, ac_ntx_blockhash, \
+            ac_ntx_height, txid, opret, season, \
+            server, scored, score_value, btc_validated FROM notarised WHERE chain='{chain}';")
+    servers_results = CURSOR.fetchall()
+    for result in servers_results:
+        rows.append(result)
+    rows.sort()
+    return rows
 
 def get_notary_last_ntx(chain=None):
     # Get chain and time of last ntx

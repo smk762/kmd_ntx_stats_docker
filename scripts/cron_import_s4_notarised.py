@@ -58,6 +58,12 @@ for chain in chains:
             row.block_datetime = txid_info["block_datetime"]
             row.block_hash = txid_info["block_hash"]
             row.notaries = txid_info["notaries"]
+            row.ac_ntx_blockhash = txid_info["ac_ntx_blockhash"]
+            row.ac_ntx_height = txid_info["ac_ntx_height"]
+            row.txid = txid_info["txid"]
+            row.opret = txid_info["opret"]
+            row.btc_validated = txid_info["btc_validated"]
+            
             if len(txid_info["notary_addresses"]) == 0:
                 if row.chain == "BTC":
                     url = f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}"
@@ -72,9 +78,14 @@ for chain in chains:
                     #row.notary_addresses = tx_info['addresses']
                     #row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time, "BTC", "BTC", txid, row.notaries)
                 elif row.chain == "LTC":
-                    tx_info = get_ltc_tx_info(txid)
-                    row.notary_addresses = tx_info['addresses']
-                    row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time, "LTC", "LTC", txid, row.notaries)
+                    url = f"{THIS_SERVER}/api/info/nn_ltc_txid?txid={txid}"
+                    local_info = requests.get(url).json()["results"][0]
+                    local_addresses = []
+                    for item in local_info:
+                        if item["input_index"] != -1:
+                            local_addresses.append(item["address"])
+                    row.notary_addresses = local_addresses
+                    row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time, "BTC", "BTC", txid, row.notaries)
                 else:
                     row_data = get_notarised_data(txid)
                     row.notary_addresses = row_data[6]
@@ -85,13 +96,15 @@ for chain in chains:
                 row.season = txid_info["season"]
                 row.server = txid_info["server"]
 
-            row.ac_ntx_blockhash = txid_info["ac_ntx_blockhash"]
-            row.ac_ntx_height = txid_info["ac_ntx_height"]
-            row.txid = txid_info["txid"]
-            row.opret = txid_info["opret"]
-            row.score_value = txid_info["score_value"]
-            row.scored = txid_info["scored"]
-            row.btc_validated = txid_info["btc_validated"]
+            if row.chain == "GLEEC":
+                row.server = get_gleec_ntx_server(row.txid)
+
+            row.score_value = get_dpow_score_value(row.season, row.server, row.chain, row.block_time) 
+            if row.score_value > 0:
+                row.scored = True
+            else:
+                row.scored = False
+
             row.update()
         except Exception as e:
             logger.error(e)

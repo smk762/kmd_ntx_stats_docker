@@ -418,8 +418,6 @@ NOTARY_PUBKEYS = {
         "patchkez_SH":"03d7c187689bf829ca076a30bbf36d2e67bb74e16a3290d8a55df21d6cb15c80c1",
         "decker_AR":"02a85540db8d41c7e60bf0d33d1364b4151cad883dd032878ea4c037f67b769635"
     },
-
-
     "Season_3.5_Third_Party":{
         "madmax_NA":"02ef81a360411adf71184ff04d0c5793fc41fd1d7155a28dd909f21f35f4883ac1",
         "alright_AR":"036a6bca1c2a8166f79fa8a979662892742346cc972b432f8e61950a358d705517",
@@ -656,7 +654,6 @@ NOTARY_PUBKEYS = {
     "Season_5": {}
 }
 
-# TODO: see if this is better derived from the NTX Tenure table
 SEASONS_INFO = {
     "Season_1": {
             "start_block":1,
@@ -770,6 +767,7 @@ for season in NOTARY_PUBKEYS:
     for notary in notaries:
         if notary not in NOTARY_ADDRESSES_DICT:
             NOTARY_ADDRESSES_DICT[season].update({notary:{}})
+
         for coin in COIN_PARAMS:
             NOTARY_ADDRESSES_DICT[season][notary].update({
                 coin:get_addr_from_pubkey(coin, NOTARY_PUBKEYS[season][notary])

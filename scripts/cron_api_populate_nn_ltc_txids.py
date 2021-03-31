@@ -9,7 +9,7 @@ from datetime import datetime as dt
 import datetime
 import dateutil.parser as dp
 
-from lib_notary import get_new_nn_ltc_txids, get_notary_from_ltc_address, get_notary_last_ntx, get_season_from_addresses
+from lib_notary import get_new_nn_ltc_txids, get_notary_from_ltc_address, get_notary_last_ntx, get_season_from_addresses, get_dpow_score_value
 
 from lib_table_update import update_nn_ltc_tx_notary_from_addr
 from lib_table_select import get_existing_nn_ltc_txids
@@ -53,7 +53,7 @@ def get_linked_addresses(addr=None, notary=None):
             if notary in ALL_SEASON_NOTARIES:
 
                 if notary not in linked_addresses:
-                    if addr not in LL_SEASON_NN_BTC_ADDRESSES_DICT:
+                    if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
                         linked_addresses.update({notary:[address]})
 
                 else:
@@ -74,28 +74,16 @@ def is_notary_address(addr):
     return False
 
 def detect_ntx(vins, vouts):
-    logger.info(f"LTC_NTX_ADDR {LTC_NTX_ADDR}")
-    logger.info(f"addresses {addresses}")
-    logger.info(f"len(vouts) {len(vouts)}")
-
     if LTC_NTX_ADDR in addresses and len(vouts) == 2:
         for vin in vins:
-            logger.info(vin["output_value"])
             if vin["output_value"] != 10000:
-                logger.info('vin["output_value"] != 10000')
                 return False
-            logger.info(vin["addresses"][0])
-            logger.info(ALL_SEASON_NOTARY_LTC_ADDRESSES)
             if vin["addresses"][0] not in ALL_SEASON_NOTARY_LTC_ADDRESSES:
-                logger.info('vin["addresses"][0] not in ALL_SEASON_NOTARY_LTC_ADDRESSES')
                 return False
 
         for vout in vouts:
-            logger.info(f"LTC_NTX_ADDR {LTC_NTX_ADDR}")
-            logger.info(f"vout['addresses'] {vout['addresses']}")
             if vout["addresses"] is not None:
                 if vout["addresses"][0] != LTC_NTX_ADDR:
-                    logger.info('vout["addresses"] != LTC_NTX_ADDR')
                     return False
         return True
     else:
@@ -141,11 +129,11 @@ def detect_replenish(vins, vouts):
 
     if replenish_vin and replenish_vout:
         for addr in vin_non_notary_addresses:
-            if addr not in LL_SEASON_NN_BTC_ADDRESSES_DICT:
+            if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
                 update_nn_ltc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
         for addr in vout_non_notary_addresses:
 
-            if addr not in LL_SEASON_NN_BTC_ADDRESSES_DICT:
+            if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
                 update_nn_ltc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
         return True
     return False
@@ -199,7 +187,7 @@ def update_notary_linked_vins(vins):
 
     if len(list(set(vin_notaries))) == 1 and len(vin_non_notary_addresses) > 0:
         for addr in vin_non_notary_addresses:
-            if addr not in LL_SEASON_NN_BTC_ADDRESSES_DICT:
+            if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
                 update_nn_ltc_tx_notary_from_addr(f"{notary} (linked)", address)
 
 
@@ -311,7 +299,7 @@ for notary_address in NOTARY_LTC_ADDRESSES[season]:
             txid_data.block_datetime = dt.utcfromtimestamp(int(txid_data.block_time))
 
             addresses = tx_info['addresses']
-            txid_data.season, txid_data.server = get_season_from_addresses(addresses[:], txid_data.block_time, "BTC")
+            txid_data.season, txid_data.server = get_season_from_addresses(addresses[:], txid_data.block_time, "LTC", "LTC")
 
 
             vouts = tx_info["outputs"]
@@ -414,6 +402,7 @@ for notary_address in NOTARY_LTC_ADDRESSES[season]:
                             row.opret = opret
                             row.season = txid_data.season
                             row.server = txid_data.server
+                            row.score_value = get_dpow_score_value(row.season, row.server, row.chain, int(row.block_time))
                             row.scored = True
                             row.btc_validated = "N/A"
                             row.update()

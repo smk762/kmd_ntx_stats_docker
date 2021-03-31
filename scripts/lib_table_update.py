@@ -150,6 +150,19 @@ def update_chain_server_season_notarised_tbl(server, season, chain):
         logger.debug(e)
         CONN.rollback()
 
+def update_unofficial_chain_notarised_tbl(season, chain):
+    sql = f"UPDATE notarised SET \
+          season='Unofficial', server='Unofficial' \
+          WHERE season='{season}'\
+          AND chain='{chain}';"
+    try:
+        CURSOR.execute(sql)
+        CONN.commit()
+        print(f"Unofficial chain {chain} updated for {season}")
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()
+
 def update_chain_score_notarised_tbl(chain, score_value, min_time, max_time):
     sql = f"UPDATE notarised SET scored={True}, score_value={score_value} \
           WHERE chain='{chain}' \
@@ -430,7 +443,7 @@ def update_last_ntx_row(row_data):
             season='"+str(row_data[5])+"';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
-        logger.info("Added "+str(row_data))
+        logger.info(f"Added {row_data} to [last_notarised]")
         return 1
     except Exception as e:
         logger.debug(e)
