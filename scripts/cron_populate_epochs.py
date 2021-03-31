@@ -110,7 +110,7 @@ for season in all_notarised_seasons:
                                 epoch_row.end_event = ", ".join(scoring_season_server_epochs[epoch]["end_event"])
 
                             else:
-                                epoch_row.end_event = scoring_season_server_epochs[epoch]["end_event"]
+                                epoch_row.end_event = scoring_season_server_epochs[epoch]["epochnd_event"]
 
 
                             try:

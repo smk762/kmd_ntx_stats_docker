@@ -73,6 +73,7 @@ def get_seasons_from_address(addr, chain="KMD"):
 def get_gleec_ntx_server(txid):
     raw_tx = RPC["KMD"].getrawtransaction(txid,1)
     opret = raw_tx['vout'][1]['scriptPubKey']['asm']
+    opret = opret.replace("OP_RETURN ","")
     decoded = requests.get(f"http://116.203.120.91:8762/api/tools/decode_opreturn/?OP_RETURN={opret}").json()
     if decoded["notarised_block"] < 1000000:
         return "Main"
@@ -252,7 +253,6 @@ def get_dpow_score_value(season, server, coin, timestamp):
         return 0.0325
         
     active_chains, num_coins = get_server_active_dpow_chains_at_time(season, server, timestamp)
-
     if coin in active_chains:
 
         if server == "Main":
