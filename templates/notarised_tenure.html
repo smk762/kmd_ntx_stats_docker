@@ -14,32 +14,29 @@
 										<tr>
 											<th>Chain</th>
 											<th>Season</th>
-											<th>First Ntx Block</th>
-											<th>Last Ntx Block</th>
-											<th>Num Blocks</th>
+											<th>Server</th>
+											<th>Scored NTX</th>
+											<th>Unscored NTX</th>
 											<th>First Ntx Time</th>
 											<th>Last Ntx Time</th>
 											<th>Ntx Days</th>
-											<th>Ntx Count</th>
+
+
 										</tr>
 									</thead>
 									<tbody>
 										{% for item in tenure_data %}
-											{% if item.season == 'Season_3' or item.season == 'Season_4' %}
 											<tr>
 												<td data-data="chain">{{ item.chain }}</td>
-												<td data-data="season">
-													{{ item.season }}
-												</th>
-												<td data-data="first_ntx_block">{{ item.first_ntx_block }}</th>
-												<td data-data="last_ntx_block">{{ item.last_ntx_block }}</th>
-												<td data-data="num_blocks">{{ item.last_ntx_block|sub:item.first_ntx_block }}</th>
-												<td data-data="first_ntx_block_time">{{ item.first_ntx_block_time }}</th>
-												<td data-data="last_ntx_block_time">{{ item.last_ntx_block_time }}</th>
-												<td data-data="num_sec">{{ item.last_ntx_block_time|sub:item.first_ntx_block_time|div:86400|floatformat:-2 }}</th>
-												<td data-data="ntx_count">{{ item.ntx_count }}</th>
+												<td data-data="season">{{ item.season }}</th>
+												<td data-data="server">{{ item.server }}</th>
+												<td data-data="scored_ntx_count">{{ item.scored_ntx_count }}</th>
+												<td data-data="unscored_ntx_count">{{ item.unscored_ntx_count }}</th>
+
+												<td data-data="first_ntx_block_time">{{ item.official_start_block_time }}</th>
+												<td data-data="last_ntx_block_time">{{ item.official_end_block_time }}</th>
+												<td data-data="num_sec">{{ item.official_end_block_time|sub:item.official_start_block_time|div:86400|floatformat:-2 }}</th>
 											</tr>
-											{% endif %}
 										{% endfor %}
 									</tbody>
 								</table>
@@ -60,13 +57,12 @@
 		        	"columns": [
 				        { "data": "chain" },
 				        { "data": "season" },
-				        { "data": "first_ntx_block" },
-				        { "data": "last_ntx_block" },
-				        { "data": "num_blocks" },
+				        { "data": "server" },
+				        { "data": "scored_ntx_count" },
+				        { "data": "unscored_ntx_count" },
 				        { "data": "first_ntx_block_time" },
 				        { "data": "last_ntx_block_time" },	
-				        { "data": "num_sec" },	
-				        { "data": "ntx_count" }
+				        { "data": "num_sec" }
 				    ],
 	        		"columnDefs": [
 	        			{
@@ -78,8 +74,14 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            	if (oData.season == "Season_4") {
-				            		color = "#26456B";
+				            	if (oData.season == "Season_5") {
+				            		color = "#1e5ead";
+				            	}
+				            	else if (oData.season == "Season_5_Testnet") {
+				            		color = "#622C7B";
+				            	}
+				            	else if (oData.season == "Season_4") {
+				            		color = "#47613c";
 				            	}
 				            	else if (oData.season == "Season_3") {
 				            		color = "#8A510D";
@@ -90,31 +92,28 @@
 				            	else if (oData.season == "Season_1") {
 				            		color = "#802F5A";
 				            	}
+				            	else {
+				            		color = "#000";	
+				            	}
 					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-1' style='background-color:"+color+" !important;'>"+oData.season+"</span>");
 					        }
 				        },
 	        			{
 				            "targets": 2,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-
-				            	if (explorers.hasOwnProperty(oData.chain)) {
-				            		$(nTd).html("<a href='"+explorers[oData.chain]+"/block-index/"+oData.first_ntx_block+"'>"+oData.first_ntx_block+"</a>");
-
+				            	if (oData.server == "Main") {
+				            		color = "#6f5f23";
+				            	}
+				            	else if (oData.server == "Third_Party") {
+				            		color = "#225d51";
+				            	}
+				            	else if (oData.server == "Testnet") {
+				            		color = "#622C7B";
 				            	}
 				            	else {
-				            		$(nTd).html(oData.first_ntx_block);
+				            		color = "#000";	
 				            	}
-					        }
-				        },
-	        			{
-				            "targets": 3,
-				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            	if (explorers.hasOwnProperty(oData.chain)) {
-				            		$(nTd).html("<a href='"+explorers[oData.chain]+"/block-index/"+oData.last_ntx_block+"'>"+oData.last_ntx_block+"</a>");
-				            	}
-				            	else {
-				            		$(nTd).html(oData.last_ntx_block);
-				            	}
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-1' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
 					        }
 				        }
 	        		]

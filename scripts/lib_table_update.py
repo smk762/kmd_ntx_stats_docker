@@ -443,7 +443,7 @@ def update_last_ntx_row(row_data):
             season='"+str(row_data[5])+"';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
-        logger.info("Added "+str(row_data))
+        logger.info(f"Added {row_data} to [last_notarised]")
         return 1
     except Exception as e:
         logger.debug(e)

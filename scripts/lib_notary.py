@@ -196,6 +196,8 @@ def get_notarised_data(txid):
                                 sys.exit()
                             scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
                             chain = get_ticker(scriptPubKeyBinary)
+                            if len(chain) > 10:
+                                logger.warning(f"chain = {chain} for {txid}")
                             if chain.endswith("KMD"):
                                 chain = "KMD"
                             if chain.endswith("GLEEC"):
@@ -245,23 +247,22 @@ def get_dpow_score_value(season, server, coin, timestamp):
 
     score  = 0
 
+    if coin in ["BTC", "LTC"]:
+
+        return 0.0325
+        
     active_chains, num_coins = get_server_active_dpow_chains_at_time(season, server, timestamp)
 
     if coin in active_chains:
 
-        if coin in ["BTC", "LTC"]:
+        if server == "Main":
+            score = 0.8698/num_coins
 
-            score = 0.0325
-            num_coins = 1
+        elif server == "Third_Party":
+            score = 0.977/num_coins
 
-        else:
-            if num_coins > 0:
-
-                if server == "Main":
-                    score = 0.8698/num_coins
-
-                if server == "Third_Party":
-                    score = 0.977/num_coins
+        elif server == "Testnet":
+            score = 0.977/num_coins
 
 
     return round(score, 8)
@@ -487,11 +488,14 @@ def get_dpow_scoring_window(season, chain, server):
 
             if chain in PARTIAL_SEASON_DPOW_CHAINS[season][_server]:
 
-                if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]:
-                    official_start = PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]["start_time"]
+                # Overcomes Duel Wielding GLEEC issue.
+                if _server == server:
 
-                if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]:
-                    official_end = PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]["end_time"]
+                    if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]:
+                        official_start = PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]["start_time"]
+
+                    if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]:
+                        official_end = PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]["end_time"]
 
     scored_list, unscored_list = get_ntx_scored(season, chain, official_start, official_end, server)
 
@@ -589,16 +593,28 @@ def get_nn_btc_tx_parts_local(txid):
             tx_vouts.append(part)
     return tx_vins, tx_vouts
 
-def get_new_notary_txids(notary_address, season=None): 
-    if season:
-        existing_txids = get_existing_nn_btc_txids(None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
-        url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={NN_BTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
-        logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
-    else:
-        existing_txids = get_existing_nn_btc_txids(None, None, None, ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address])
-        url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]}"
-        logger.info(f"{len(existing_txids)} existing txids in local DB detected for {ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]} {notary_address}")
+def get_new_notary_txids(notary_address, chain, season=None):
+    if chain == "BTC":
+        if season:
+            existing_txids = get_existing_nn_btc_txids(None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
+            url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={NN_BTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
+            logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
+        else:
+            existing_txids = get_existing_nn_btc_txids(None, None, None, ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address])
+            url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]}"
+            logger.info(f"{len(existing_txids)} existing txids in local DB detected for {ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]} {notary_address}")
+            
+    elif chain == "LTC":
+        if season:
+            existing_txids = get_existing_nn_ltc_txids(None, None, season, NN_LTC_ADDRESSES_DICT[season][notary_address])
+            url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={NN_LTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
+            logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_LTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
+        else:
+            existing_txids = get_existing_nn_ltc_txids(None, None, None, ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address])
+            url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address]}"
+            logger.info(f"{len(existing_txids)} existing txids in local DB detected for {ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address]} {notary_address}")
     
+
     logger.info(url)
     r = requests.get(url)
     resp = r.json()
@@ -610,78 +626,20 @@ def get_new_notary_txids(notary_address, season=None):
             new_txids.append(txid)
     new_txids = list(set(new_txids))
 
-    if season:
-        logger.info(f"{len(new_txids)} extra txids detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
-    else:
-        logger.info(f"{len(new_txids)} extra txids detected for {ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]} {notary_address}")
+    if chain == "BTC":
+        if season:
+            logger.info(f"{len(new_txids)} extra txids detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
+        else:
+            logger.info(f"{len(new_txids)} extra txids detected for {ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]} {notary_address}")
+    
+    if chain == "LTC":
+        if season:
+            logger.info(f"{len(new_txids)} extra txids detected for {NN_LTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
+        else:
+            logger.info(f"{len(new_txids)} extra txids detected for {ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address]} {notary_address}")
+
     return new_txids
 
-def categorize_import_transactions(notary_address, season):
-
-    logger.info(f">>> Categorising {notary_address} for {season}")
-    new_txids = get_new_notary_txids(notary_address)
-    logger.info(f"Processing ETA: {0.02*len(new_txids)} sec")
-    i = 1
-    j = 1
-    for txid in new_txids:
-        txid_data = tx_row()
-        txid_data.txid = txid
-
-        # import NTX if existing on other server
-        url = f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={txid}"
-        r = requests.get(url)
-        time.sleep(0.02)
-        try:
-            resp = r.json()
-            if resp['count'] > 0:
-
-                # Detect NTX season
-                tx_addresses = []
-                for item in resp['results'][0]:
-                    txid_data.block_hash = item["block_hash"]
-                    txid_data.block_height = item["block_height"]
-                    txid_data.block_time = item["block_time"]
-                    txid_data.block_datetime = item["block_datetime"]
-                    txid_data.num_inputs = item["num_inputs"]
-                    txid_data.num_outputs = item["num_outputs"]
-                    txid_data.fees = item["fees"]
-
-                    if item["address"] != BTC_NTX_ADDR:
-                        tx_addresses.append(item["address"])
-                tx_addresses = list(set(tx_addresses))
-
-                txid_data.season = get_season_from_btc_addresses(tx_addresses, resp['results'][0][0]["block_time"])
-
-                tx_vins, tx_vouts = get_nn_btc_tx_parts(txid)
-                txid_data.category = get_category_from_vins_vouts(tx_vins, tx_vouts, txid_data.season)
-
-                for vin in tx_vins:
-                    txid_data.address = vin["address"]
-                    txid_data.notary = get_notary_from_btc_address(vin["address"], txid_data.season, vin["notary"])
-                    txid_data.address = vin["address"]
-                    txid_data.input_index = vin["input_index"]
-                    txid_data.input_sats = vin["input_sats"]
-                    txid_data.output_index = vin["output_index"]
-                    txid_data.output_sats = vin["output_sats"]
-                    txid_data.update()
-
-                for vout in tx_vouts:
-                    txid_data.address = vout["address"]
-                    txid_data.notary = get_notary_from_btc_address(vout["address"], txid_data.season, vout["notary"])                    
-                    txid_data.address = vout["address"]
-                    txid_data.input_index = vout["input_index"]
-                    txid_data.input_sats = vout["input_sats"]
-                    txid_data.output_index = vout["output_index"]
-                    txid_data.output_sats = vout["output_sats"]
-                    txid_data.update()
-
-        except Exception as e:
-            logger.error(e)
-            logger.error(r.text)
-            
-        
-        j += 1
-    i += 1
 
 def get_notary_from_btc_address(address, season=None, notary=None):
     if address == BTC_NTX_ADDR:
@@ -1030,6 +988,7 @@ def validate_ltc_ntx_vouts(vouts):
                 return True
 
     return False
+
 def get_season_from_ltc_addresses(address_list, time_stamp):
     if LTC_NTX_ADDR in address_list:
         address_list.remove(LTC_NTX_ADDR)

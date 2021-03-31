@@ -919,15 +919,15 @@ def get_notary_balances_data(coins_data, balances_data):
 
 def get_epoch_scoring_table(request):
     resp = []
-    data = scoring_epochs.objects.all()
+    
 
     if "season" in request.GET:
         season=request.GET["season"]
+        data = scoring_epochs.objects.filter(season=season)
+    else:
+        data = scoring_epochs.objects.all()
 
-    elif len(data) == len(scoring_epochs.objects.all()):
-        season = get_season()
-        
-    data = scoring_epochs.objects.filter(season=season).order_by('season', 'server').values()
+    data = data.order_by('season', 'server').values()
     for item in data:
 
         resp.append({
@@ -938,7 +938,8 @@ def get_epoch_scoring_table(request):
                 "epoch_end":item['epoch_end'],
                 "start_event":item['start_event'],
                 "end_event":item['end_event'],
-                "epoch_chains":item['epoch_chains'],
+                "epoch_chains":", ".join(item['epoch_chains']),
+                "num_epoch_chains":len(item['epoch_chains']),
                 "score_per_ntx":item['score_per_ntx']
         })
     return resp

@@ -144,6 +144,26 @@ def select_from_table(table, cols, conditions=None):
     else:
         return ()
 
+def get_tenure_chains(season=None, server=None):
+    sql = "SELECT DISTINCT chain from notarised_tenure"
+    conditions = []
+    if season:
+        conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+    CURSOR.execute(sql)
+    results = CURSOR.fetchall()
+    resp = []
+    for chain in results:
+        resp.append(chain[0])
+    resp.sort()
+    return resp
+
+
 def get_min_from_table(table, col):
     sql = "SELECT MIN("+col+") FROM "+table
     CURSOR.execute(sql)
