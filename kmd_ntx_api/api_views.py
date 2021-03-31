@@ -97,6 +97,19 @@ def nn_btc_txid_list(request):
     resp.update({"distinct":distinct})
     return JsonResponse(resp)
 
+def nn_ltc_txid_list(request):
+    if 'season' in request.GET and 'notary' in request.GET:
+        resp = get_ltc_txid_list(request.GET['notary'], request.GET['season'])
+    elif 'notary' in request.GET:
+        resp = get_ltc_txid_list(request.GET['notary'])
+    elif 'season' in request.GET:
+        resp = get_ltc_txid_list(None, request.GET['season'])
+    else:
+        resp = get_ltc_txid_list()
+    distinct = len(list(set(resp['results'][0])))
+    resp.update({"distinct":distinct})
+    return JsonResponse(resp)
+
 
 def chain_notarisation_txid_list(request):
 
