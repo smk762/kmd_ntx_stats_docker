@@ -278,6 +278,19 @@ def get_notarised_servers(season=None):
     servers.sort()
     return servers
 
+def get_notarised_chain_rows(chain):
+    rows = []
+    CURSOR.execute(f"SELECT chain, block_height, \
+            block_time, block_datetime, block_hash, \
+            notaries, notary_addresses, ac_ntx_blockhash, \
+            ac_ntx_height, txid, opret, season, \
+            server, scored, score_value, btc_validated FROM notarised WHERE chain='{chain}';")
+    servers_results = CURSOR.fetchall()
+    for result in servers_results:
+        rows.append(result)
+    rows.sort()
+    return rows
+
 def get_notary_last_ntx(chain=None):
     # Get chain and time of last ntx
     sql = "SELECT notary, chain, block_height from last_notarised"

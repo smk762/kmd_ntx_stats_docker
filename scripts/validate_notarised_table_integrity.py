@@ -35,19 +35,24 @@ notarised_seasons = get_notarised_seasons()
 logger.info(f"notarised_seasons: {notarised_seasons}")
 
 for season in notarised_seasons:
-    notarised_chains = get_notarised_chains(season)
-    logger.info(f"notarised_chains: {notarised_chains}")
-    for chain in notarised_chains:
-        if chain in DPOW_EXCLUDED_CHAINS[season]:
-            print(f">>> Updating Server... {season} {chain} Unofficial")
-            update_chain_server_season_notarised_tbl("Unofficial", season, chain)
+    assert season in list(SEASONS_INFO.keys()) or season == "Unofficial"
+
+    if season != "Unofficial":
+        notarised_chains = get_notarised_chains(season)
+        logger.info(f"{season} notarised_chains: {notarised_chains}")
+
+        for chain in notarised_chains:
+            if season in DPOW_EXCLUDED_CHAINS: 
+                if chain in DPOW_EXCLUDED_CHAINS[season]:
+                    print(f"{chain} excluded from {season}, updating...")
+                    print(f">>> Updating Server... Unofficial {chain} Unofficial")
+                    update_unofficial_chain_notarised_tbl(season, chain)
 
 
-    assert season in list(SEASONS_INFO.keys())
+    
     servers = get_notarised_servers(season)
     logger.info(f"{season} servers: {servers}")
-    for server in servers:
-        assert server in ["Main", "Third_Party", "Testnet", "Unofficial"]
+    assert server in ["Main", "Third_Party", "Testnet", "Unofficial"]
 
 
 
@@ -73,28 +78,29 @@ except Exception as e:
 logger.info(f"Season 4 BTC scores validation complete!\n")
 
 # Validate Other scores
-for server in SCORING_EPOCHS["Season_4"]:
+season = "Season_4"
+for server in SCORING_EPOCHS[season]:
 
-    for epoch in SCORING_EPOCHS["Season_4"][server]:
+    for epoch in SCORING_EPOCHS[season][server]:
 
-        epoch_start = SCORING_EPOCHS["Season_4"][server][epoch]["start"]
-        epoch_end = SCORING_EPOCHS["Season_4"][server][epoch]["end"]
+        epoch_start = SCORING_EPOCHS[season][server][epoch]["start"]
+        epoch_end = SCORING_EPOCHS[season][server][epoch]["end"]
         epoch_midpoint = int((epoch_start + epoch_end)/2)
-        active_chains, num_chains = get_server_active_dpow_chains_at_time("Season_4", server, epoch_midpoint)
-        logger.info(f"epoch: {epoch}")
-        logger.info(f"epoch_start: {epoch_start}")
-        logger.info(f"epoch_end: {epoch_end}")
-        logger.info(f"{num_chains} active at midpoint of {epoch} in Season_4 {server}")
-        logger.info(f"active_chains: {active_chains}")
+        active_chains, num_chains = get_server_active_dpow_chains_at_time(season, server, epoch_midpoint)
+        logger.info(f"{season} {server} epoch: {epoch}")
+        logger.info(f"{season} {server} epoch_start: {epoch_start}")
+        logger.info(f"{season} {server} epoch_end: {epoch_end}")
+        logger.info(f"{season} {num_chains} active at midpoint of {epoch} in Season_4 {server}")
+        logger.info(f"{season} {server} active_chains: {active_chains}")
 
         for chain in active_chains:
 
-            actual_score = get_dpow_score_value("Season_4", server, chain, epoch_midpoint)
+            actual_score = get_dpow_score_value(season, server, chain, epoch_midpoint)
             sql = f"SELECT DISTINCT score_value \
                         FROM notarised \
                         WHERE block_time >= {epoch_start} \
                         AND block_time <= {epoch_end} \
-                        AND season = 'Season_4' \
+                        AND season = '{season}' \
                         AND chain = '{chain}';"
 
             CURSOR.execute(sql)
@@ -103,9 +109,9 @@ for server in SCORING_EPOCHS["Season_4"]:
 
             try:
                 assert len(scores) == 1 and float(scores[0][0]) == actual_score
-                logger.info(f"{chain} scores for Season 4 {server} {epoch} OK...")
+                logger.info(f"{chain} scores for {season} {server} {epoch} OK...")
             except Exception as e:
-                logger.warning(f"Fixing {chain} scores for Season 4 {server} {epoch}")
+                logger.warning(f"Fixing {chain} scores for {season} {server} {epoch}")
                 update_chain_score_notarised_tbl(chain, actual_score, epoch_start, epoch_end)
 
 logger.info(f"Season 4 Other scores validation complete!\n")
@@ -190,3 +196,4 @@ for item in notarised_rows:
 
 
 print(deleted)
+print("Now run to resolve where repaired: ./cron_populate_epochs.py")

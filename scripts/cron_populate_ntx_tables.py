@@ -76,7 +76,7 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
 
         if row_data is not None: # ignore TXIDs that are not notarisations
             chain = row_data[0]
-
+            
             if chain != 'KMD': # KMD -> BTC notarisations are requested via BTC blockchain APIs
                 row = notarised_row()
                 row.chain = chain
