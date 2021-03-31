@@ -199,6 +199,21 @@ def get_btc_txid_list(notary=None, season=None):
     resp = list(set(resp))
     return wrap_api(resp)
 
+def get_ltc_txid_list(notary=None, season=None):
+    resp = []
+    if notary and season:
+        data = nn_ltc_tx.objects.filter(notary=notary, season=season)
+    elif notary:
+        data = nn_ltc_tx.objects.filter(notary=notary)
+    elif season:
+        data = nn_ltc_tx.objects.filter(season=season)
+    else:
+        data = nn_ltc_tx.objects.all()
+    for item in data:
+        resp.append(item.txid)
+    resp = list(set(resp))
+    return wrap_api(resp)
+
 def get_btc_txid_notary(notary=None, category=None):
     resp = {}
     txid_list = []
