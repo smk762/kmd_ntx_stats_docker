@@ -4,9 +4,9 @@ import time
 import logging
 import logging.handlers
 import requests
-from lib_const import NOTARY_BTC_ADDRESSES, OTHER_SERVER
+from lib_const import NOTARY_LTC_ADDRESSES, OTHER_SERVER
 from lib_notary import get_new_notary_txids
-from models import tx_row
+from models import ltc_tx_row
 from lib_const import *
 
 logger = logging.getLogger(__name__)
@@ -20,12 +20,13 @@ seasons = get_notarised_seasons()
 
 for season in seasons:
     if season not in ["Season_1", "Season_2", "Season_3"]: 
+
         i = 0
-        num_addr = len(NOTARY_BTC_ADDRESSES[season])
-        for notary_address in NOTARY_BTC_ADDRESSES[season]:
+        num_addr = len(NOTARY_LTC_ADDRESSES[season])
+        for notary_address in NOTARY_LTC_ADDRESSES[season]:
             i += 1
             logger.info(f">>> Categorising {notary_address} for {season} {i}/{num_addr}")
-            txid_list = get_new_notary_txids(notary_address, "BTC")
+            txid_list = get_new_notary_txids(notary_address, "LTC")
             logger.info(f"Processing ETA: {0.02*len(txid_list)} sec")
 
             j = 0
@@ -33,14 +34,14 @@ for season in seasons:
             for txid in txid_list:
                 j += 1
                 logger.info(f">>> Categorising {txid} for {j}/{num_txid}")
-                txid_url = f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={txid}"
+                txid_url = f"{OTHER_SERVER}/api/info/nn_ltc_txid?txid={txid}"
                 time.sleep(0.02)
                 r = requests.get(txid_url)
                 try:
                     resp = r.json()
                     tx_resp = resp["results"][0]
                     for row in tx_resp:
-                        txid_data = tx_row()
+                        txid_data = ltc_tx_row()
                         txid_data.txid = txid
                         txid_data.block_hash = row["block_hash"]
                         txid_data.block_height = row["block_height"]
