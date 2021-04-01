@@ -81,7 +81,7 @@ def update_ntx_row(row_data):
                 ON CONFLICT ON CONSTRAINT unique_txid DO UPDATE SET \
                 season='{row_data[11]}', server='{row_data[12]}', scored='{row_data[13]}', \
                 notaries=ARRAY{row_data[5]}, notary_addresses=ARRAY{row_data[6]}, \
-                score_value={row_data[14]}, epoch={row_data[16]};"
+                score_value={row_data[14]}, epoch='{row_data[16]}';"
     try:
         CURSOR.execute(sql, row_data)
         logger.info("update_ntx_row executed")
@@ -710,8 +710,47 @@ def update_scoring_epoch_row(row_data):
             logger.debug(row_data)
         CONN.rollback()
 
-def update_notarised_epoch(txid, epoch):
-    sql = f"UPDATE notarised SET epoch='{epoch}' WHERE txid={txid}';"
+def update_notarised_epoch(actual_epoch, season=None, server=None, chain=None, txid=None):
+    sql = f"UPDATE notarised SET epoch='{epoch}'"
+    conditions = []
+    if season:
+        conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
+    if chain:
+        conditions.append(f"chain = '{chain}'")
+    if txid:
+        conditions.append(f"txid = '{txid}'")
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+
+    try:
+        CURSOR.execute(sql)
+        CONN.commit()
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()
+
+def update_chain_notarised_epoch_window(chain, season, server, epoch, epoch_start, epoch_end, score_per_ntx, scored):
+    sql = f"UPDATE notarised SET epoch='{epoch}', score_value={score_per_ntx}, scored={scored}"
+    conditions = []
+    if chain:
+        conditions.append(f"chain = '{chain}'")
+    if season:
+        conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
+    if epoch_start:
+        conditions.append(f"block_time >= {epoch_start}")
+    if epoch_end:
+        conditions.append(f"block_time <= {epoch_end}")
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+
     try:
         CURSOR.execute(sql)
         CONN.commit()

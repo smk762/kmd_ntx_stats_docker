@@ -291,7 +291,6 @@ for coin in coins_info:
     coin_data.explorers = json.dumps(coins_info[coin]['explorers'])
     coin_data.dpow = json.dumps(coins_info[coin]['dpow'])
     if coin in dpow_tenure:
-        print(dpow_tenure[coin])
         coin_data.dpow_tenure = json.dumps(dpow_tenure[coin])
     else:
         coin_data.dpow_tenure = json.dumps({})
@@ -299,18 +298,4 @@ for coin in coins_info:
     coin_data.mm2_compatible = coins_info[coin]['mm2_compatible']
     coin_data.update()
 
-logger.info("dpow count: "+str(len(dpow)))
-logger.info("dpow: "+str(dpow))
-logger.info("dpow_main count: "+str(len(dpow_main)))
-logger.info("dpow_main: "+str(dpow_main))
-logger.info("dpow_3p count: "+str(len(dpow_3p)))
-logger.info("dpow_3p: "+str(dpow_3p))
-logging.info("Finished!")
-
-for season in SEASONS_INFO:
-    try:
-        coin_data = coins_row()
-        coin_data.coin = season
-        coin_data.delete()
-    except:
-        pass
+logging.info("Coins table update complete!")

@@ -14,6 +14,9 @@ logger.setLevel(logging.INFO)
 
 def get_chain_epoch_at(season, server, chain, timestamp):
     epochs = get_epochs(season, server)
+    if coin in ["BTC", "LTC"]:
+        return "Main"
+
     for epoch in epochs:
         #print(epoch)
         #print(f"{chain} in {epoch["epoch_chains"]}?")

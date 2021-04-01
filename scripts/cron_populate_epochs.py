@@ -4,8 +4,9 @@ import logging
 import logging.handlers
 from lib_const import CONN, CURSOR, SCORING_EPOCHS
 from models import scoring_epoch_row, ntx_tenure_row
-from lib_notary import get_server_active_dpow_chains_at_time, get_dpow_score_value, update_ntx_tenure
-from lib_table_select import get_notarised_chains, get_notarised_seasons, get_notarised_servers
+from lib_notary import get_server_active_dpow_chains_at_time, get_dpow_score_value, update_ntx_tenure, get_gleec_ntx_server
+from lib_table_select import get_notarised_chains, get_notarised_seasons, get_notarised_servers, get_epochs
+from lib_table_update import update_chain_notarised_epoch_window
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -48,6 +49,8 @@ for season in all_notarised_seasons:
                         row.delete(season, server, chain)
 
                     else:
+                        if season == "Testnet":
+                            server = "Main"
                         update_ntx_tenure(chain, season, server)
 
 
@@ -122,6 +125,28 @@ for season in all_notarised_seasons:
                                 epoch_row.score_per_ntx = 0
 
                             epoch_row.update()
-            
+
+# Update notarised table epochs and score value
+epochs = get_epochs()
+for epoch in epochs:
+
+    season = epoch['season']
+    server = epoch['server']
+    epoch_id = epoch['epoch']
+    epoch_start = epoch['epoch_start']
+    epoch_end = epoch['epoch_end']
+    start_event = epoch['start_event']
+    end_event = epoch['end_event']
+    epoch_chains = epoch['epoch_chains']
+    score_per_ntx = epoch['score_per_ntx']
+
+    for chain in epoch_chains:
+        if chain == "GLEEC":
+            server = get_gleec_ntx_server(txid)
+        update_chain_notarised_epoch_window(chain, season, server, epoch_id, epoch_start, epoch_end, score_per_ntx, True)
+
+        
+
+
 CURSOR.close()
 CONN.close()
