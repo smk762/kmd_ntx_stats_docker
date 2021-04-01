@@ -19,7 +19,9 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+
 # recorded_txids = get_existing_notarised_txids()
+
 deleted = {}
 
 assert_results = []
@@ -41,9 +43,9 @@ for season in notarised_seasons:
     
     try:
         assert season in list(SEASONS_INFO.keys()) or season == "Unofficial"
-        assert_results.append({f"{season} in SEASONS_INFO":"Pass"})
+        assert_results.append({f"{season} in SEASONS_INFO: Pass"})
     except:
-        assert_results.append({f"{season} in SEASONS_INFO":"Fail"})
+        assert_results.append({f"{season} in SEASONS_INFO: Fail"})
 
     if season != "Unofficial":
         notarised_chains = get_notarised_chains(season)
@@ -51,9 +53,9 @@ for season in notarised_seasons:
         if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
             try:
                 assert notarised_chains == tenure_chains
-                assert_results.append({f"{season} notarised_chains == tenure_chains":"Pass"})
+                assert_results.append({f"{season} notarised_chains == tenure_chains: Pass"})
             except:
-                assert_results.append({f"{season} notarised_chains == tenure_chains":"Fail"})
+                assert_results.append({f"{season} notarised_chains == tenure_chains: Fail"})
 
             
 
@@ -69,9 +71,9 @@ for season in notarised_seasons:
     servers = get_notarised_servers(season)
     try:
         assert server in ["Main", "Third_Party", "Testnet", "Unofficial"]
-        assert_results.append({f"{season} server catgories valid":"Pass"})
+        assert_results.append({f"{season} server catgories valid: Pass"})
     except:
-        assert_results.append({f"{season} server catgories valid":"Fail"})
+        assert_results.append({f"{season} server catgories valid: Fail"})
         
 # Validate BTC scores
 CURSOR.execute(f"SELECT DISTINCT score_value \
@@ -83,7 +85,7 @@ btc_scores = CURSOR.fetchall()
 try:
     assert len(btc_scores) == 1 and float(btc_scores[0][0]) == 0.03250000
     logger.info("BTC scores for Season 4 OK...")
-    assert_results.append({"BTC scores valid":"Pass"})
+    assert_results.append({"BTC scores valid: Pass"})
 except Exception as e:
     logger.warning(">>> Fixing BTC scores for Season 4")
     assert_results.append({"BTC scores valid":"Fail (resolved)"})
@@ -102,7 +104,7 @@ ltc_scores = CURSOR.fetchall()
 try:
     assert len(btc_scores) == 1 and float(btc_scores[0][0]) == 0.03250000
     logger.info("LTC scores for Season_5_Testnet OK...")
-    assert_results.append({"LTC scores valid":"Pass"})
+    assert_results.append({"LTC scores valid: Pass"})
 except Exception as e:
     logger.warning(">>> Fixing LTC scores for Season_5_Testnet")
     assert_results.append({"LTC scores valid":"Fail (resolved)"})
@@ -129,9 +131,9 @@ for season in SCORING_EPOCHS:
                     server_tenure_chains.remove("LTC")
                 try:
                     assert len(set(epoch_active_chains) - set(server_tenure_chains)) == 0
-                    assert_results.append({"all epoch_active_chains in server_tenure_chains":"Pass"})
+                    assert_results.append({"all epoch_active_chains in server_tenure_chains: Pass"})
                 except:
-                    assert_results.append({"all epoch_active_chains in server_tenure_chains":"Fail"})
+                    assert_results.append({"all epoch_active_chains in server_tenure_chains: Fail"})
 
                 logger.info(f"{season} {server} {epoch} server_tenure_chains epoch_match active_chains OK!")
 
@@ -151,19 +153,20 @@ for season in SCORING_EPOCHS:
 
                     try:
                         assert len(scores) == 1 and float(scores[0][0]) == actual_score
-                        assert_results.append({f"{chain} Scoring correct":"Pass"})
+                        assert_results.append({f"{chain} Scoring correct: Pass"})
                         logger.info(f"{chain} scores for {season} {server} {epoch} OK...")
                     except Exception as e:
                         logger.warning(f">>> Fixing {chain} scores for {season} {server} {epoch}")
                         update_chain_score_notarised_tbl(chain, actual_score, epoch_start, epoch_end)
-                        assert_results.append({"{chain} scoring correct":"Fail (resolved)"})
+                        assert_results.append({f"{chain} scoring incorrect":"Fail (resolved)"})
 
         logger.info(f"{season} Other scores validation complete!\n")
 
         CURSOR.execute(f"SELECT notary_addresses, season, chain, block_time, notaries, txid, server, scored, score_value, epoch \
                          FROM notarised \
                          WHERE season = '{season}' \
-                         ORDER BY server DESC, chain ASC, block_time DESC;")
+                         ORDER BY server DESC, chain DESC, block_time DESC;")
+                        # ORDER BY server DESC, chain ASC, block_time DESC;")
 
         notarised_rows = CURSOR.fetchall()
 
@@ -244,7 +247,7 @@ for season in SCORING_EPOCHS:
             except:
                 print(f">>> Updating epoch... {chain} {txid} {address_season} {address_server} {actual_epoch} (not {epoch}) {block_time}")
 
-                update_notarised_epoch(txid, actual_epoch)
+                update_notarised_epoch(actual_epoch, None, None, None, txid)
                 
 
 

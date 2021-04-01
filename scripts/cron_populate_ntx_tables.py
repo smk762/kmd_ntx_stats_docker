@@ -18,6 +18,7 @@ from lib_notary import *
 from lib_table_update import *
 from lib_table_select import *
 from lib_api import *
+from models import notarised_row
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -412,19 +413,30 @@ def update_latest_ntx(season):
 
 
 tip = int(RPC["KMD"].getblockcount())
-'''
+
 seasons = get_notarised_seasons()
 
 for season in seasons:
     if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
 
         if season == get_season(time.time()) and season.find("Testnet") == -1:
-            logger.info(f"Processing notarisations for {season} only")
-            unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season)
-            unrecorded_KMD_txids.sort()
-            update_KMD_notarisations(unrecorded_KMD_txids)
 
-            # TODO: add season / server /epoch to the aggregate tables
+            start_block = SEASONS_INFO[season]["start_block"]
+            end_block = SEASONS_INFO[season]["end_block"]
+
+            windows = []
+            chunk_size = 50000
+            for i in range(start_block, end_block, chunk_size):
+                windows.append((i, i+chunk_size))
+
+            logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
+            for x in windows:
+                logger.info(f"Processing notarisations for blocks {x[0]} - {x[1]}")
+                unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season, x[0], x[1])
+                unrecorded_KMD_txids.sort()
+                update_KMD_notarisations(unrecorded_KMD_txids)
+
+            # TODO: add season / server / epoch to the aggregate tables
             # update_daily_notarised_counts(season)
             # update_daily_notarised_chains(season)
 
@@ -434,13 +446,5 @@ for season in seasons:
 
 CURSOR.close()
 CONN.close()
-'''
-windows = [(2022001, 2032001), (2032001, 2042001), (2042001, 2052001), (2052001, 2062001), (2062001, 2072001), (2072001, 2082001), (2082001, 2092001), (2092001, 2102001)]
-windows = [(2122001, 2132001), (2132001, 2142001), (2142001, 2152001), (2152001, 2162001), (2162001, 2172001), (2172001, 2182001), (2182001, 2192001), (2192001, 2202001)]
-windows = [(2222001, 2232001), (2232001, 2242001), (2242001, 2252001), (2252001, 2262001), (2262001, 2272001), (2272001, 2282001), (2282001, 2292001), (2292001, 2302001)]
-windows = [(2322001, 2332001), (2332001, 2342001), (2342001, 2352001), (2352001, 2362001), (2362001, 2372001), (2372001, 2382001), (2382001, 2392001), (2392001, 2402001)]
 
-for x in windows:
-    unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, "Season_4", windows[x][0], windows[x][1])
-    unrecorded_KMD_txids.sort()
-    update_KMD_notarisations(unrecorded_KMD_txids)
+
