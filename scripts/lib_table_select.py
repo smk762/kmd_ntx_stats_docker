@@ -51,7 +51,7 @@ def get_chain_ntx_date_aggregates(day, season):
         return ()
 
 def get_mined_date_aggregates(day):
-    sql = "SELECT FROM scoring_epochs WHERE \
+    sql = "SELECT FROM mined WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY name;"
     CURSOR.execute(sql)
@@ -69,7 +69,7 @@ def get_mined_date_aggregates(day):
         return ()
 
 def get_epochs(season=None, server=None):
-    sql = "SELECT season, server, epoch,epoch_start, epoch_end, \
+    sql = "SELECT season, server, epoch, epoch_start, epoch_end, \
                     start_event, end_event,  epoch_chains,  score_per_ntx \
                     FROM scoring_epochs"
     conditions = []
