@@ -21,7 +21,7 @@ from lib_const import *
 from lib_api import *
 from lib_table_update import *
 from lib_table_select import *
-from models import *
+from models import daily_mined_count_row, mined_row, ntx_tenure_row
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -167,12 +167,12 @@ def get_notarised_data(txid):
         block_hash = raw_tx['blockhash']
         dest_addrs = raw_tx["vout"][0]['scriptPubKey']['addresses']
         if 'blocktime' in raw_tx:
-            block_time = raw_tx['blocktime']
-
-            block_datetime = dt.utcfromtimestamp(raw_tx['blocktime'])
-            this_block_height = raw_tx['height']
             if len(dest_addrs) > 0:
                 if NTX_ADDR in dest_addrs:
+                    block_time = raw_tx['blocktime']
+
+                    block_datetime = dt.utcfromtimestamp(raw_tx['blocktime'])
+                    this_block_height = raw_tx['height']
                     if len(raw_tx['vin']) > 1:
                         notary_list = []
                         address_list = []
@@ -484,25 +484,25 @@ def get_dpow_scoring_window(season, chain, server):
         official_end = SEASONS_INFO[season]["end_time"]
 
     if season in PARTIAL_SEASON_DPOW_CHAINS:
-        for _server in PARTIAL_SEASON_DPOW_CHAINS[season]:
+        for partial_season_server in PARTIAL_SEASON_DPOW_CHAINS[season]:
 
-            if chain in PARTIAL_SEASON_DPOW_CHAINS[season][_server]:
+            if chain in PARTIAL_SEASON_DPOW_CHAINS[season][partial_season_server]:
 
                 # Overcomes Duel Wielding GLEEC issue.
-                if _server == server:
+                if partial_season_server == server:
 
-                    if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]:
-                        official_start = PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]["start_time"]
+                    if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][partial_season_server][chain]:
+                        official_start = PARTIAL_SEASON_DPOW_CHAINS[season][partial_season_server][chain]["start_time"]
 
-                    if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]:
-                        official_end = PARTIAL_SEASON_DPOW_CHAINS[season][_server][chain]["end_time"]
+                    if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][partial_season_server][chain]:
+                        official_end = PARTIAL_SEASON_DPOW_CHAINS[season][partial_season_server][chain]["end_time"]
 
     scored_list, unscored_list = get_ntx_scored(season, chain, official_start, official_end, server)
 
     return official_start, official_end, scored_list, unscored_list
 
 def update_ntx_tenure(chain, season, server):
-    logger.info(f"Getting tenure for {season} {server} {chain}")  
+    logger.info(f"Updating tenure for {season} {server} {chain}")  
     ntx_results = get_ntx_min_max(season, chain, server) # from notarised
     max_blk = ntx_results[0]
     max_blk_time = ntx_results[1]
@@ -543,10 +543,13 @@ def update_ntx_tenure(chain, season, server):
         row.server = server
         row.update()
 
-def get_unrecorded_KMD_txids(tip, season):
+
+def get_unrecorded_KMD_txids(tip, season, start_block=None, end_block=None):
     recorded_txids = []
-    start_block = SEASONS_INFO[season]["start_block"]
-    end_block = SEASONS_INFO[season]["end_block"]
+    if not start_block:
+        start_block = SEASONS_INFO[season]["start_block"]
+    if not end_block:
+        end_block = SEASONS_INFO[season]["end_block"]
 
     if end_block <= tip:
         tip = end_block
@@ -564,7 +567,10 @@ def get_unrecorded_KMD_txids(tip, season):
         start_block += chunk_size
     all_txids += get_ntx_txids(NTX_ADDR, start_block+1, tip)
     recorded_txids = get_existing_notarised_txids()
-    unrecorded_txids = set(all_txids) - set(recorded_txids)
+    logger.info(f"Scanned txids: {len(all_txids)}")
+    logger.info(f"Recorded txids: {len(recorded_txids)}")
+    unrecorded_txids = list(set(all_txids) - set(recorded_txids))
+    logger.info(f"Unrecorded txids: {len(unrecorded_txids)}")
     return unrecorded_txids
 
 def get_nn_btc_tx_parts(txid):

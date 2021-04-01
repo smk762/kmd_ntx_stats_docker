@@ -1,6 +1,7 @@
 import time
 import logging
 import logging.handlers
+from lib_table_select import get_epochs
 from lib_table_update import *
 from lib_const import CONN, CURSOR
 
@@ -10,6 +11,25 @@ formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
+
+def get_chain_epoch_at(season, server, chain, timestamp):
+    epochs = get_epochs(season, server)
+    for epoch in epochs:
+        #print(epoch)
+        #print(f"{chain} in {epoch["epoch_chains"]}?")
+        if chain in epoch["epoch_chains"]:
+            #print(f"{epoch["epoch_start"]} < {timestamp} < {epoch["epoch_end"]}")
+            if timestamp >= epoch["epoch_start"] and timestamp <= epoch["epoch_end"]:
+                return epoch["epoch"]
+    return "Unofficial"
+
+def get_chain_epoch_score_at(season, server, chain, timestamp):
+    epochs = get_epochs(season, server)
+    for epoch in epochs:
+        if chain in epoch["epoch_chains"]:
+            if timestamp >= epoch["epoch_start"] and timestamp <= epoch["epoch_start"]:
+                return epoch["score_per_ntx"]
+    return 0
 
 class balance_row():
     def __init__(self, notary='', chain='', balance='', address='',
@@ -323,7 +343,8 @@ class funding_row():
     def delete(self):
         CURSOR.execute(f"DELETE FROM funding_transactions WHERE chain = '{self.chain}';")
         CONN.commit()
-        
+
+# TODO: add season / epoch / server to accomodate GLEEC and testnet
 class notarised_chain_daily_row():
     def __init__(self, chain='', ntx_count='', notarised_date=''):
         self.chain = chain
@@ -496,7 +517,7 @@ class notarised_row():
     def __init__(self, chain='', block_height='', 
                 block_time='', block_datetime='', block_hash='', 
                 notaries=list, notary_addresses=list, ac_ntx_blockhash='', ac_ntx_height='', 
-                txid='', opret='', season='', server='', scored=True, score_value=0, btc_validated=''):
+                txid='', opret='', season='', server='', scored=True, score_value=0, btc_validated='', epoch=''):
         self.chain = chain
         self.block_height = block_height
         self.block_time = block_time
@@ -510,6 +531,7 @@ class notarised_row():
         self.opret = opret
         self.season = season
         self.server = server
+        self.epoch = epoch
         
         self.score_value = score_value
         self.scored = scored
@@ -519,19 +541,25 @@ class notarised_row():
         return True
 
     def update(self):
+
+        self.score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
+
         if self.score_value > 0:
             self.scored = True
         else:
             self.scored = False
+
+        self.epoch = get_chain_epoch_at(self.season, self.server, self.chain, self.block_time)
+
         row_data = (
             self.chain, self.block_height, 
             self.block_time, self.block_datetime, self.block_hash, 
             self.notaries, self.notary_addresses, self.ac_ntx_blockhash,
             self.ac_ntx_height, self.txid, self.opret, self.season,
-            self.server, self.scored, self.score_value, self.btc_validated
+            self.server, self.scored, self.score_value, self.btc_validated, self.epoch
         )
         if self.validated():
-            logger.info(f"Updating [notarised] {self.chain} {self.season} {self.server}  {self.scored} {self.score_value}")
+            logger.info(f"Updating [notarised] {self.chain} {self.season} {self.server} {self.epoch} {self.scored} {self.score_value}")
             update_ntx_row(row_data)
         else:
             logger.warning(f"Row data invalid!")

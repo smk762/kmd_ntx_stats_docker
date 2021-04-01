@@ -33,10 +33,7 @@ def get_chain_ntx_season_aggregates(season):
     CURSOR.execute(sql)
     try:
         results = CURSOR.fetchall()
-        if len(results) > 0:
-            return results
-        else:
-            return ()
+        return results
     except:
         return ()
 
@@ -46,32 +43,103 @@ def get_chain_ntx_date_aggregates(day, season):
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY chain;"
     CURSOR.execute(sql)
-    results = CURSOR.fetchall()
-    if len(results) > 0:
+    try:
+        results = CURSOR.fetchall()
         return results
-    else:
+    except:
+        logger.warning(f"No get_chain_ntx_date_aggregates results for {day} {season}")
         return ()
 
 def get_mined_date_aggregates(day):
-    sql = "SELECT name, COALESCE(COUNT(*),0), SUM(value) FROM mined WHERE \
+    sql = "SELECT FROM scoring_epochs WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY name;"
     CURSOR.execute(sql)
-    results = CURSOR.fetchall()
-    if len(results) > 0:
+    try:
+        results = CURSOR.fetchall()
         return results
-    else:
+    except:
         return ()
+
+    CURSOR.execute(sql)
+    try:
+        results = CURSOR.fetchall()
+        return results
+    except:
+        return ()
+
+def get_epochs(season=None, server=None):
+    sql = "SELECT season, server, epoch,epoch_start, epoch_end, \
+                    start_event, end_event,  epoch_chains,  score_per_ntx \
+                    FROM scoring_epochs"
+    conditions = []
+    if season:
+        conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+
+    resp = []
+    try:
+        CURSOR.execute(sql)
+        results = CURSOR.fetchall()
+        for item in results:
+            resp.append({
+                "season":item[0],
+                "server":item[1],
+                "epoch":item[2],
+                "epoch_start":item[3],
+                "epoch_end":item[4],
+                "start_event":item[5],
+                "end_event":item[6],
+                "epoch_chains":item[7],
+                'score_per_ntx':item[8]
+            })
+
+        return resp
+        
+    except Exception as e:
+        logger.error(f"Error in get_epochs: {e}")
+        return []
+
+
+def get_epochs_list(season=None, server=None):
+    sql = "SELECT epoch FROM scoring_epochs"
+    conditions = []
+    if season:
+        conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+
+    resp = []
+    try:
+        CURSOR.execute(sql)
+        results = CURSOR.fetchall()
+        for item in results:
+            resp.append(item[0])
+        return resp
+        
+    except Exception as e:
+        logger.error(f"Error in get_epochs_list: {e}")
+        return []
+
 
 def get_ntx_for_season(season):
     sql = "SELECT chain, notaries \
            FROM notarised WHERE \
            season = '"+str(season)+"';"
     CURSOR.execute(sql)
-    results = CURSOR.fetchall()
-    if len(results) > 0:
+    try:
+        results = CURSOR.fetchall()
         return results
-    else:
+    except:
         return ()
 
 def get_ntx_for_day(day, season):
@@ -79,10 +147,10 @@ def get_ntx_for_day(day, season):
            FROM notarised WHERE season='"+season+"' AND \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
     CURSOR.execute(sql)
-    results = CURSOR.fetchall()
-    if len(results) > 0:
+    try:
+        results = CURSOR.fetchall()
         return results
-    else:
+    except:
         return ()
 
 def get_mined_for_season(season):
@@ -90,17 +158,21 @@ def get_mined_for_season(season):
            FROM mined WHERE \
            season = '"+str(season)+"';"
     CURSOR.execute(sql)
-    return CURSOR.fetchall()
+    try:
+        results = CURSOR.fetchall()
+        return results
+    except:
+        return ()
 
 def get_mined_for_day(day):
     sql = "SELECT * \
            FROM mined WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
     CURSOR.execute(sql)
-    results = CURSOR.fetchall()
-    if len(results) > 0:
+    try:
+        results = CURSOR.fetchall()
         return results
-    else:
+    except:
         return ()
 
 
@@ -264,7 +336,7 @@ def get_notarised_chains(season=None, server=None):
     elif season:
         CURSOR.execute(f"SELECT DISTINCT chain FROM notarised WHERE season='{season}';")
     elif server:
-        CURSOR.execute(f"SELECT DISTINCT chain FROM notarised WHERE season='{season}';")
+        CURSOR.execute(f"SELECT DISTINCT chain FROM notarised WHERE server='{server}';")
     else:
         CURSOR.execute("SELECT DISTINCT chain FROM notarised;")
     chain_results = CURSOR.fetchall()
@@ -305,6 +377,19 @@ def get_notarised_chain_rows(chain):
             notaries, notary_addresses, ac_ntx_blockhash, \
             ac_ntx_height, txid, opret, season, \
             server, scored, score_value, btc_validated FROM notarised WHERE chain='{chain}';")
+    servers_results = CURSOR.fetchall()
+    for result in servers_results:
+        rows.append(result)
+    rows.sort()
+    return rows
+
+def get_notarised_season_rows(chain):
+    rows = []
+    CURSOR.execute(f"SELECT chain, block_height, \
+            block_time, block_datetime, block_hash, \
+            notaries, notary_addresses, ac_ntx_blockhash, \
+            ac_ntx_height, txid, opret, season, \
+            server, scored, score_value, btc_validated FROM notarised WHERE season='{season}';")
     servers_results = CURSOR.fetchall()
     for result in servers_results:
         rows.append(result)

@@ -76,11 +76,12 @@ def update_ntx_row(row_data):
     sql = f"INSERT INTO notarised (chain, block_height, \
                                 block_time, block_datetime, block_hash, \
                                 notaries, notary_addresses, ac_ntx_blockhash, ac_ntx_height, \
-                                txid, opret, season, server, scored, score_value, btc_validated) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                                txid, opret, season, server, scored, score_value, btc_validated, epoch) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
                 ON CONFLICT ON CONSTRAINT unique_txid DO UPDATE SET \
                 season='{row_data[11]}', server='{row_data[12]}', scored='{row_data[13]}', \
-                notaries=ARRAY{row_data[5]}, notary_addresses=ARRAY{row_data[6]}, score_value={row_data[14]};"
+                notaries=ARRAY{row_data[5]}, notary_addresses=ARRAY{row_data[6]}, \
+                score_value={row_data[14]}, epoch={row_data[16]};"
     try:
         CURSOR.execute(sql, row_data)
         logger.info("update_ntx_row executed")
@@ -707,4 +708,13 @@ def update_scoring_epoch_row(row_data):
         logger.debug(e)
         if str(e).find('duplicate') == -1:
             logger.debug(row_data)
+        CONN.rollback()
+
+def update_notarised_epoch(txid, epoch):
+    sql = f"UPDATE notarised SET epoch='{epoch}' WHERE txid={txid}';"
+    try:
+        CURSOR.execute(sql)
+        CONN.commit()
+    except Exception as e:
+        logger.debug(e)
         CONN.rollback()
