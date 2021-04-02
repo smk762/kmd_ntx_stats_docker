@@ -124,7 +124,7 @@ def decode_opret(op_return):
             MoM_hash = lil_endian(op_return[start:end])
             MoM_depth = int(lil_endian(op_return[end:]),16)
         except Exception as e:
-            logger.error(f"Error in decode_opret {e}")
+            logger.error(f"Error in decode_opret [{op_return}] {e}")
     resp = { "chain":chain, "notarised_block":ac_ntx_height, "notarised_blockhash":ac_ntx_blockhash }
     logger.info(f"decode_opret: {resp}")
     return resp
