@@ -244,6 +244,8 @@ def get_notarised_data(txid):
         logger.warning(txid)
         return None
 
+# Deprecate in favour of models.get_chain_epoch_score_at()?
+# need to move numerators to const.py first...
 def get_dpow_score_value(season, server, coin, timestamp):
 
     score  = 0

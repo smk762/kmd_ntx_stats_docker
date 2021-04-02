@@ -6,7 +6,7 @@ import logging.handlers
 import requests
 from lib_const import NOTARY_BTC_ADDRESSES, OTHER_SERVER
 from lib_notary import get_new_notary_txids
-from models import tx_row
+from models import tx_row, get_chain_epoch_score_at, get_chain_epoch_at
 from lib_const import *
 from lib_table_select import get_notarised_seasons
 
@@ -21,6 +21,7 @@ seasons = get_notarised_seasons()
 
 for season in seasons:
     if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]: 
+
         i = 0
         num_addr = len(NOTARY_BTC_ADDRESSES[season])
         for notary_address in NOTARY_BTC_ADDRESSES[season]:
