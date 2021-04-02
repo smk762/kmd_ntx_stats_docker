@@ -196,3 +196,16 @@ def split_summary_table(request):
     return JsonResponse(resp)
 
 
+
+def notarised_season_score(request):
+    if "season" in request.GET and "chain" in request.GET:
+        resp = get_notarised_season_score(request.GET["season"], request.GET["chain"])
+    elif "season" in request.GET:
+        resp = get_notarised_season_score(request.GET["season"])
+    elif "chain" in request.GET:
+        resp = get_notarised_season_score(None, request.GET["chain"])
+    else:
+        resp = get_notarised_season_score()
+    return JsonResponse(resp)
+
+

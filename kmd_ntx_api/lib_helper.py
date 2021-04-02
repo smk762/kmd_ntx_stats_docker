@@ -91,14 +91,16 @@ def decode_opret(op_return):
     try:
         ac_ntx_height = int(lil_endian(op_return[64:72]),16) 
 
-    except:
-        return {"error":f"{op_return} is invalid and can not be decoded."}
+    except Exception as e:
+        err = {"error":f"{op_return} is invalid and can not be decoded. {e}"}
+        logger.error(err)
+        return err
 
     x = binascii.unhexlify(op_return[70:])
     chain = get_ticker(x)
 
     if chain.endswith("PBC"):
-        chain = "PCB"
+        chain = "PBC"
 
     if chain.endswith("KMD"):
         chain = "KMD"
@@ -114,8 +116,10 @@ def decode_opret(op_return):
             MoM_hash = lil_endian(op_return[start:end])
             MoM_depth = int(lil_endian(op_return[end:]),16)
         except Exception as e:
-            logger.debug(e)
-    return { "chain":chain, "notarised_block":ac_ntx_height, "notarised_blockhash":ac_ntx_blockhash }
+            logger.error(f"Error in decode_opret {e}")
+    resp = { "chain":chain, "notarised_block":ac_ntx_height, "notarised_blockhash":ac_ntx_blockhash }
+    logger.info(f"decode_opret: {resp}")
+    return resp
 
 def get_mainnet_chains(coins_data):
     main_chains = []

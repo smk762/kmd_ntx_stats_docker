@@ -6,7 +6,7 @@ from datetime import datetime as dt
 import datetime
 
 from lib_const import SEASONS_INFO, SKIP_PAST_SEASONS, SKIP_UNTIL_YESTERDAY, RPC
-from lib_table_select import select_from_table, get_season_mined_counts, get_mined_date_aggregates
+from lib_table_select import select_from_table, get_season_mined_counts, get_mined_date_aggregates, get_notarised_seasons
 from lib_notary import get_season, update_miner, get_season_notaries, get_daily_mined_counts
 from models import season_mined_count_row, daily_mined_count_row
 
@@ -18,6 +18,8 @@ formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s',
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
+
+rescan_season = True
 
 ''' 
 This script is intended to run as a cronjob every 5-15 minutes.
@@ -40,7 +42,10 @@ def update_mined_blocks(season):
     # re-check last ten recorded blocks in case of orphans
     tip = int(RPC["KMD"].getblockcount())
     start_block = SEASONS_INFO[season]["start_block"]
-    scan_blocks = [*range(tip-100,tip,1)]
+    if not rescan_season:
+        scan_blocks = [*range(tip-100,tip,1)]
+    else:
+        scan_blocks = [*range(start_block,tip,1)]
     all_blocks = [*range(start_block,tip,1)]
 
     # adding new blocks...
@@ -65,31 +70,16 @@ def update_mined_blocks(season):
             update_miner(block)
 
 
-if SKIP_PAST_SEASONS:
-    update_mined_blocks(season)
 
-    season_notaries = get_season_notaries(season)
+seasons = get_notarised_seasons()
 
-    results = get_season_mined_counts(season, season_notaries)
-    for item in results:
-        row = season_mined_count_row()
-        row.notary = item[0]
-        row.season = season
-        row.blocks_mined = int(item[1])
-        row.sum_value_mined = float(item[2])
-        row.max_value_mined = float(item[3])
-        row.last_mined_blocktime = int(item[4])
-        row.last_mined_block = int(item[5])
-        row.update()
-
-else:
-    # updating season mined count aggregate table
-    for season in SEASONS_INFO:
+for season in seasons:
+    if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]: 
         update_mined_blocks(season)
 
         season_notaries = get_season_notaries(season)
-        results = get_season_mined_counts(season, season_notaries)
 
+        results = get_season_mined_counts(season, season_notaries)
         for item in results:
             row = season_mined_count_row()
             row.notary = item[0]
@@ -101,6 +91,7 @@ else:
             row.last_mined_block = int(item[5])
             row.update()
 
+
 # updating daily mined count aggregate table
 
 # start on date of most recent season
@@ -109,7 +100,7 @@ season_start_dt = dt.fromtimestamp(season_start_time)
 start = season_start_dt.date()
 end = datetime.date.today()
 
-if SKIP_UNTIL_YESTERDAY:
+if SKIP_UNTIL_YESTERDAY and not rescan_season:
     start = end - datetime.timedelta(days=7)
 
 delta = datetime.timedelta(days=1)
@@ -120,14 +111,17 @@ time_stamp = int(time.time())
 while day <= end:
     logger.info(f"Aggregating daily mined counts for {day}")
     results = get_mined_date_aggregates(day)
-    
+    logger.info(f"get_mined_date_aggregates results for {day}: {len(results)}")
     for item in results:
-        row = daily_mined_count_row()
-        row.notary = item[0]
-        row.blocks_mined = int(item[1])
-        row.sum_value_mined = float(item[2])
-        row.mined_date = day
-        row.time_stamp = time_stamp
-        row.update()
+        if len(item) > 0:
+            row = daily_mined_count_row()
+            logger.info(item)
+            row.notary = item[0]
+            row.blocks_mined = int(item[1])
+            row.sum_value_mined = float(item[2])
+            row.mined_date = day
+            row.time_stamp = time_stamp
+            logger.info(f"{day} {row.notary} {row.blocks_mined} {row.sum_value_mined}")
+            row.update()
     day += delta
 logger.info("Finished!")

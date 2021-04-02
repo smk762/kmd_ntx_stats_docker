@@ -380,8 +380,9 @@ for notary_address in NOTARY_LTC_ADDRESSES[season]:
                     for vout in vouts:
                         if 'data_hex' in vout:
                             opret = vout['data_hex']
-
-                            r = requests.get(f'{THIS_SERVER}/api/tools/decode_opreturn/?OP_RETURN={opret}')
+                            opret_url = f'{THIS_SERVER}/api/tools/decode_opreturn/?OP_RETURN={opret}'
+                            r = requests.get(opret_url)
+                            print(f'{THIS_SERVER}/api/tools/decode_opreturn/?OP_RETURN={opret}')
                             kmd_ntx_info = r.json()
 
                             ac_ntx_height = kmd_ntx_info['notarised_block']
