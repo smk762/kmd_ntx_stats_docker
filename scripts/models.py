@@ -3,7 +3,7 @@ import logging
 import logging.handlers
 from lib_table_select import get_epochs
 from lib_table_update import *
-from lib_const import CONN, CURSOR
+from lib_const import CONN, CURSOR, TRANSLATE_COINS
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -15,9 +15,9 @@ logger.setLevel(logging.INFO)
 def get_chain_epoch_at(season, server, chain, timestamp):
     epochs = get_epochs(season, server)
     if chain in ["BTC", "LTC"]:
-        if timestamp >= SEASONS_INFO[season]["start_time"] and timestamp <= SEASONS_INFO[season]["end_time"]:
+        if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
             for epoch in epochs:
-                if timestamp >= epoch["epoch_start"] and timestamp <= epoch["epoch_end"]:
+                if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
                     return epoch["epoch"]
 
     for epoch in epochs:
@@ -29,13 +29,13 @@ def get_chain_epoch_at(season, server, chain, timestamp):
 
 def get_chain_epoch_score_at(season, server, chain, timestamp):
     if chain in ["BTC", "LTC"]:
-        if timestamp >= SEASONS_INFO[season]["start_time"] and timestamp <= SEASONS_INFO[season]["end_time"]:
+        if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
             return 0.0325
 
     epochs = get_epochs(season, server)
     for epoch in epochs:
         if chain in epoch["epoch_chains"]:
-            if timestamp >= epoch["epoch_start"] and timestamp <= epoch["epoch_end"]:
+            if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
                 return epoch["score_per_ntx"]
     return 0
 
@@ -73,7 +73,7 @@ class balance_row():
             logger.info(f"Updating balance {self.season} | {self.node} | {self.notary} | {self.chain} | {self.balance} | {self.address}")
             update_balances_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[balance] Row data invalid!")
             logger.warning(f"{row_data}")
 
 
@@ -150,7 +150,7 @@ class tx_row():
                 logger.info(f"Adding {self.season} {self.txid} {self.category} for {self.notary}")
             update_nn_btc_tx_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[btc_tx] Row data invalid!")
             logger.warning(f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={self.txid}")
             logger.warning(f"{row_data}")
 
@@ -171,7 +171,7 @@ class tx_row():
                 logger.info(f"Inserting {self.season} {self.txid} {self.category} for {self.notary}")
             update_nn_btc_tx_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[btc_tx] Row data invalid!")
             logger.warning(f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={self.txid}")
             logger.warning(f"{row_data}")
 
@@ -206,7 +206,7 @@ class nn_social_row():
             logger.info(f"Updating NN social {self.season} | {self.notary}")
             update_nn_social_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[nn_social] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -240,7 +240,7 @@ class coin_social_row():
             logger.info(f"Updating NN social {self.season} | {self.coin}")
             update_coin_social_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[nn_social] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -273,7 +273,7 @@ class rewards_row():
             logger.info(f"Oldest unclaimed block: {self.oldest_utxo_block}")
             update_rewards_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[rewards] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -297,6 +297,8 @@ class coins_row():
         return True
 
     def update(self):
+        if self.chain in TRANSLATE_COINS:
+            self.chain = TRANSLATE_COINS[self.chain]
         row_data = (
             self.chain, self.coins_info, self.electrums,
             self.electrums_ssl, self.explorers, self.dpow,
@@ -307,7 +309,7 @@ class coins_row():
             logger.info(f"Updating [coins] {self.chain} ")
             update_coins_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[coins] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -344,7 +346,7 @@ class funding_row():
             logger.info(f"Updating [funding] {self.chain} | {self.notary} ")
             update_funding_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[funding] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -369,7 +371,7 @@ class notarised_chain_daily_row():
             logger.info(f"Updating [notarised_chain_daily] {self.chain} {self.notarised_date}")
             update_daily_notarised_chain_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[notarised_chain_daily_row] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -409,7 +411,7 @@ class notarised_count_daily_row():
             logger.info(f"Updating [notarised_count_daily]  {self.notary} {self.notarised_date}")
             update_daily_notarised_count_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[notarised_count_daily_row] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -447,7 +449,7 @@ class notarised_count_season_row():
             logger.info(f"Updating [notarised_count_season] {self.notary} {self.season}")
             update_season_notarised_count_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[notarised_count_season] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -484,7 +486,7 @@ class notarised_chain_season_row():
             logger.info(f"Updating [notarised_chain_season] {self.chain} {self.season}")
             update_season_notarised_chain_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[notarised_chain_season_row] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -513,7 +515,7 @@ class last_notarised_row():
             logger.info(f"Updating last_notarised TABLE {self.notary} {self.chain} {self.block_height}")
             update_last_ntx_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[last_notarised] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -547,7 +549,7 @@ class mined_row():
             update_mined_row(row_data)
             logger.info(f"Updated mined TABLE {self.block_height} | {self.name} | {self.value} ")
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[mined] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -580,7 +582,7 @@ class season_mined_count_row():
             logger.info(f"Updating season_mined_count TABLE {self.notary} ")
             update_season_mined_count_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[season_mined_count] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -608,7 +610,7 @@ class daily_mined_count_row():
             logger.info(f"Updating [mined_count_daily] {self.notary} {self.mined_date} ")
             update_daily_mined_count_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[mined_count_daily] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -686,7 +688,7 @@ class ltc_tx_row():
                 logger.info(f"Adding {self.season} {self.txid} {self.category} for {self.notary}")
             update_nn_ltc_tx_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[ltc_tx_row] Row data invalid!")
             logger.warning(f"{OTHER_SERVER}/api/info/nn_ltc_txid?txid={self.txid}")
             logger.warning(f"{row_data}")
 
@@ -722,7 +724,7 @@ class scoring_epoch_row():
             update_scoring_epoch_row(row_data)
             logger.info(f"Updated [scoring_epochs] {self.season} | {self.server} | {self.epoch} ")
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[scoring_epochs] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self, season=None, server=None, epoch=None):
@@ -773,7 +775,8 @@ class notarised_row():
         self.btc_validated = btc_validated
 
     def validated(self):
-        if self.epoch.split()[0] != "Epoch":
+        if self.epoch.find("Epoch") == -1:
+            logger.warning(f"!!!! Invalid epoch {epoch}")
             return False
         return True
 
@@ -805,7 +808,7 @@ class notarised_row():
             logger.info(f"Updating [notarised] {self.chain} {self.season} {self.server} {self.epoch} {self.scored} {self.score_value}")
             update_ntx_row(row_data)
         else:
-            logger.warning(f"Row data invalid!")
+            logger.warning(f"[notarised] row invalid {self.chain} {self.season} {self.server} {self.epoch} {self.scored} {self.score_value}")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -843,11 +846,7 @@ class ntx_tenure_row():
         return True
 
     def update(self):
-
-        epoch = get_chain_epoch_at(self.season, self.server, self.chain, self.block_time)
-        if epoch != self.epoch:
-            logger.warning(f"{self.txid} epoch mismatch calculated {epoch} vs input {self.epoch} | {self.season}, {self.epoch}, {self.server}, {self.chain}, {self.block_time}")
-            self.epoch = epoch
+        # TODO: Validation start / end within season window
 
         row_data = (
             self.chain, self.first_ntx_block, 
@@ -856,12 +855,13 @@ class ntx_tenure_row():
             self.official_end_block_time, self.unscored_ntx_count, 
             self.scored_ntx_count, self.season, self.server
         )
+
         if self.validated():
             logger.info(f">>> Updating [notarised_tenure] {self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
             update_notarised_tenure_row(row_data)
+
         else:
-            logger.warning(f"Row data invalid!")
-            logger.info(f"!!! Invalid row [notarised_tenure] {self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
+            logger.warning(f"!!! Invalid row [notarised_tenure] {self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
             logger.warning(f"{row_data}")
 
 
