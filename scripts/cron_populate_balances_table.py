@@ -46,7 +46,7 @@ def thread_electrum(notary, chain, pubkey, addr, season):
     balance.chain = chain
     balance.pubkey = pubkey
     balance.address = addr
-    balance.season = season
+    balance.season = get_season_num(season)
     balance.node = get_node(season)
     balance.balance = get_balance(balance.chain, balance.pubkey, balance.address, balance.notary, balance.node)
 
