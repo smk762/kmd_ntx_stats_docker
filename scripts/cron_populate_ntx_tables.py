@@ -415,43 +415,44 @@ def update_latest_ntx(season):
 tip = int(RPC["KMD"].getblockcount())
 
 seasons = get_notarised_seasons()
+logger.info(f"Preparing to populate NTX tables...")
 
 for season in seasons:
-    if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
+    if season in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
+        logger.warning(f"Skipping season: {season}")
 
-        if season == get_season(time.time()) and season.find("Testnet") == -1:
+    else:
+        start_block = SEASONS_INFO[season]["start_block"]
+        end_block = SEASONS_INFO[season]["end_block"]
 
-            start_block = SEASONS_INFO[season]["start_block"]
-            end_block = SEASONS_INFO[season]["end_block"]
+        if SKIP_UNTIL_YESTERDAY:
+            start_block = tip - 24*60*2
+            logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
+            unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season)
+            unrecorded_KMD_txids.sort()
+            update_KMD_notarisations(unrecorded_KMD_txids)
 
-            if SKIP_UNTIL_YESTERDAY:
-                start_block = tip - 24*60*2
-                logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
-                unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season)
+        else:
+
+            windows = []
+            chunk_size = 50000
+            for i in range(start_block, end_block, chunk_size):
+                windows.append((i, i+chunk_size))
+
+            windows.reverse()
+            logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
+            for x in windows:
+                logger.info(f"Processing notarisations for blocks {x[0]} - {x[1]}")
+                unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season, x[0], x[1])
                 unrecorded_KMD_txids.sort()
                 update_KMD_notarisations(unrecorded_KMD_txids)
 
-            else:
+        # TODO: add season / server / epoch to the aggregate tables
+        # update_daily_notarised_counts(season)
+        # update_daily_notarised_chains(season)
 
-                windows = []
-                chunk_size = 50000
-                for i in range(start_block, end_block, chunk_size):
-                    windows.append((i, i+chunk_size))
-
-                windows.reverse()
-                logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
-                for x in windows:
-                    logger.info(f"Processing notarisations for blocks {x[0]} - {x[1]}")
-                    unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season, x[0], x[1])
-                    unrecorded_KMD_txids.sort()
-                    update_KMD_notarisations(unrecorded_KMD_txids)
-
-            # TODO: add season / server / epoch to the aggregate tables
-            # update_daily_notarised_counts(season)
-            # update_daily_notarised_chains(season)
-
-            update_season_notarised_counts(season)
-            update_latest_ntx(season)
+        update_season_notarised_counts(season)
+        update_latest_ntx(season)
 
 
 CURSOR.close()
