@@ -299,7 +299,6 @@ class coins_row():
             self.dpow_tenure,
             self.dpow_active, self.mm2_compatible
         )
-        print(row_data)
         if self.validated():
             logger.info(f"Updating [coins] {self.chain} ")
             update_coins_row(row_data)
@@ -557,7 +556,7 @@ class notarised_row():
 
         epoch = get_chain_epoch_at(self.season, self.server, self.chain, self.block_time)
         if epoch != self.epoch:
-            logger.warning(f"epoch mismatch {epoch} vs {self.epoch} | {self.season}, {self.server}, {self.chain}, {self.block_time}")
+            logger.warning(f"epoch mismatch calculated {epoch} vs input {self.epoch} | {self.season}, {self.epoch}, {self.server}, {self.chain}, {self.block_time}")
 
         row_data = (
             self.chain, self.block_height, 
