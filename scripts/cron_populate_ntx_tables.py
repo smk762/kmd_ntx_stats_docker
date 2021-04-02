@@ -3,6 +3,7 @@ import os
 import sys
 import json
 import time
+import random
 import logging
 import logging.handlers
 import psycopg2
@@ -266,10 +267,8 @@ def update_daily_notarised_counts(season):
         day += delta
     logger.info("Notarised blocks daily aggregation for "+season+" notaries finished...")
 
-def update_season_notarised_counts(season):
-    logger.info("Getting "+season+" season_notarised_counts")
 
-    ac_block_heights = get_ac_block_info()
+def get_notary_season_count_pct(season):
     chain_season_ntx_result = get_chain_ntx_season_aggregates(season)
     total_chain_season_ntx = {}
 
@@ -323,17 +322,13 @@ def update_season_notarised_counts(season):
             pct = round(chain_ntx_counts[chain]/total_chain_season_ntx[chain]*100,3)
             notary_season_pct.update({chain:pct})
 
-        row = notarised_count_season_row()
-        row.notary = notary
-        row.btc_count = btc_count
-        row.antara_count = antara_count
-        row.third_party_count = third_party_count
-        row.other_count = other_count
-        row.total_ntx_count = total_ntx_count
-        row.chain_ntx_counts = json.dumps(chain_ntx_counts)
-        row.chain_ntx_pct = json.dumps(notary_season_pct)
-        row.season = season
-        row.update()
+    return chain_ntx_counts, notary_season_pct
+
+
+def update_season_notarised_counts(season):
+    logger.info("Getting "+season+" season_notarised_counts")
+
+    ac_block_heights = get_ac_block_info()
 
 
     results = get_chain_ntx_season_aggregates(season)
@@ -626,15 +621,19 @@ for season in seasons:
                 windows.reverse()
             
             logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
+            '''
+            while len(windows) > 0:
+                window = random.choice(windows)
 
-            for x in windows:
-
-                logger.info(f"Processing notarisations for blocks {x[0]} - {x[1]}")
-                unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season, x[0], x[1])
+                logger.info(f"Processing notarisations for blocks {window[0]} - {window[1]}")
+                unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season, window[0], window[1])
                 unrecorded_KMD_txids.sort()
                 update_KMD_notarisations(unrecorded_KMD_txids)
 
+                windows.remove(window)
+            '''
             ntx_summary, chain_totals = get_notarisation_data(SEASONS_INFO[season]["start_time"], SEASONS_INFO[season]["end_time"])
+            chain_ntx_counts, notary_season_pct = get_notary_season_count_pct(season)
 
             for notary in ntx_summary:
 
@@ -644,15 +643,47 @@ for season in seasons:
                     season_ntx_count_row.notary = notary
                     season_ntx_count_row.season = summary_season
 
-                    season_ntx_count_row.btc_count = ntx_summary[notary]["seasons"][summary_season]['servers']['BTC']
-                    season_ntx_count_row.antara_count = ntx_summary[notary]["seasons"][summary_season]['servers']['Main']
-                    season_ntx_count_row.third_party_count = ntx_summary[notary]["seasons"][summary_season]['servers']['Third_Party']
+                    print()
+                    logger.info(f"notary: {notary} {type(notary)}")
+                    logger.info(f"summary_season: {summary_season} {type(summary_season)}")
+                    servers = ntx_summary[notary]["seasons"][summary_season]['servers']
+
+                    if "BTC" in servers:
+                        season_ntx_count_row.btc_count = servers['BTC']['server_ntx_count']
+
+                    elif "BTC" in servers:
+                        season_ntx_count_row.btc_count = servers['LTC']['server_ntx_count']
+
+                    else: 
+                        season_ntx_count_row.btc_count = 0
+
+                    if 'Main' in servers:
+                        season_ntx_count_row.antara_count = servers['Main']['server_ntx_count']
+
+                    else:
+                        season_ntx_count_row.antara_count = 0
+
+                    if 'Third_Party' in servers:
+                        season_ntx_count_row.third_party_count = servers['Third_Party']['server_ntx_count']
+                        
+                    else:
+                        season_ntx_count_row.third_party_count = 0
+
                     season_ntx_count_row.other_count = 0
                     season_ntx_count_row.total_ntx_count = ntx_summary[notary]["seasons"][summary_season]['season_ntx_count']
 
-                    # season_ntx_count_row.chain_ntx_counts = 
-                    # season_ntx_count_row.chain_ntx_pct = 0
+                    season_ntx_count_row.chain_ntx_counts = json.dumps(chain_ntx_counts)
+                    season_ntx_count_row.chain_ntx_pct = json.dumps(notary_season_pct)
                     season_ntx_count_row.time_stamp = time.time()
+
+                    logger.info(f"btc_count: {season_ntx_count_row.btc_count} {type(season_ntx_count_row.btc_count)}")
+                    logger.info(f"antara_count: {season_ntx_count_row.antara_count} {type(season_ntx_count_row.antara_count)}")
+                    logger.info(f"third_party_count: {season_ntx_count_row.third_party_count} {type(season_ntx_count_row.third_party_count)}")
+                    logger.info(f"other_count: {season_ntx_count_row.other_count} {type(season_ntx_count_row.other_count)}")
+                    logger.info(f"total_ntx_count: {season_ntx_count_row.total_ntx_count} {type(season_ntx_count_row.total_ntx_count)}")
+                    logger.info(f"chain_ntx_counts: {season_ntx_count_row.chain_ntx_counts} {type(season_ntx_count_row.chain_ntx_counts)}")
+                    logger.info(f"chain_ntx_pct: {season_ntx_count_row.chain_ntx_pct} {type(season_ntx_count_row.chain_ntx_pct)}")
+                    logger.info(f"time_stamp: {season_ntx_count_row.time_stamp} {type(season_ntx_count_row.time_stamp)}")
                     season_ntx_count_row.update()
 
         # TODO: add season / server / epoch to the aggregate tables
