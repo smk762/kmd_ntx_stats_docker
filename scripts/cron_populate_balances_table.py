@@ -46,7 +46,7 @@ def thread_electrum(notary, chain, pubkey, addr, season):
     balance.chain = chain
     balance.pubkey = pubkey
     balance.address = addr
-    balance.season = get_season_num(season)
+    balance.season = season
     balance.node = get_node(season)
     balance.balance = get_balance(balance.chain, balance.pubkey, balance.address, balance.notary, balance.node)
 
@@ -60,10 +60,9 @@ def get_node(season):
         return 'main'
 
 def get_season_num(season):
-    if season.find("Season_3") != -1:
-        return "Season_3"
-    if season.find("Season_4") != -1:
-        return "Season_4"
+    season = season.replace("Third_Party", "")
+    season = season.replace("Testnet", "")
+    return season
 
 def get_kmd_rewards(season):
     nn_utxos = {}

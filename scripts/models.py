@@ -806,10 +806,10 @@ class notarised_row():
             self.server, self.scored, self.score_value, self.btc_validated, self.epoch
         )
         if self.validated():
-            logger.info(f"Updating [notarised] {self.chain} {self.season} {self.server} {self.epoch} {self.scored} {self.score_value}")
+            logger.info(f"Updating {self.txid} [notarised] {self.chain} | {self.season} {self.server} {self.epoch} | {self.scored} {self.score_value} | {self.block_datetime}")
             update_ntx_row(row_data)
         else:
-            logger.warning(f"[notarised] row invalid {self.chain} {self.season} {self.server} {self.epoch} {self.scored} {self.score_value}")
+            logger.warning(f"[notarised] row invalid {self.chain} {self.season} {self.server} {self.epoch} {self.scored} {self.score_value} {self.block_datetime}")
             logger.warning(f"{row_data}")
 
     def delete(self):

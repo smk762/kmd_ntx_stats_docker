@@ -110,8 +110,6 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
                 try:
                     pct = round(i/num_unrecorded_KMD_txids*100,3)
                     est_end = int(100/pct*runtime)
-                    if ntx_row.season == "Season_5_Testnet":
-                        logger.info(f"{ntx_row.season} NTX {ntx_row.notaries}")
                     logger.info(str(pct)+"% :"+str(i)+"/"+str(num_unrecorded_KMD_txids)+
                              " records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
                 except:
@@ -395,7 +393,9 @@ def get_notarisation_data(min_time, max_time):
         sql += " AND ".join(where)    
     sql += ";"
 
-    resp = {}
+    ntx_summary = {}
+    chain_totals = {}
+    
     try:
         CURSOR.execute(sql)
         results = CURSOR.fetchall()
@@ -406,11 +406,36 @@ def get_notarisation_data(min_time, max_time):
             season = item[2]
             server = item[3]
             epoch = item[4]
-            score_value = item[5]
+            score_value = round(float(item[5]), 8)
+
+            if chain in ["BTC", "LTC"]:
+                server = chain
+
+            if server not in chain_totals:
+                chain_totals.update({
+                    server: {
+                        chain: {
+                            "count":0,
+                            "total_score":0                        
+                        }
+                    }
+                })
+
+            if chain not in chain_totals[server]:
+                chain_totals[server].update({
+                    chain: {
+                        "count":0,
+                        "total_score":0
+                    }
+                })
+
+            chain_totals[server][chain]["count"] += 1
+            chain_totals[server][chain]["total_score"] += score_value
+
             if "Unofficial" not in [season, server, epoch]:
                 for notary in notaries:
-                    if notary not in resp:
-                        resp.update({
+                    if notary not in ntx_summary:
+                        ntx_summary.update({
                             notary:{
                                 "seasons": {
                                     season: {
@@ -442,8 +467,8 @@ def get_notarisation_data(min_time, max_time):
                             }
                         })
 
-                    if season not in resp[notary]["seasons"]:
-                        resp[notary]["seasons"].update({
+                    if season not in ntx_summary[notary]["seasons"]:
+                        ntx_summary[notary]["seasons"].update({
                             season: {
                                 "servers": {
                                     server: {
@@ -469,8 +494,8 @@ def get_notarisation_data(min_time, max_time):
                             }
                         })
 
-                    if server not in resp[notary]["seasons"][season]["servers"]:
-                        resp[notary]["seasons"][season]["servers"].update({
+                    if server not in ntx_summary[notary]["seasons"][season]["servers"]:
+                        ntx_summary[notary]["seasons"][season]["servers"].update({
                             server: {
                                 "epochs": {
                                     epoch:{
@@ -489,8 +514,8 @@ def get_notarisation_data(min_time, max_time):
                             }
                         })
 
-                    if epoch not in resp[notary]["seasons"][season]["servers"][server]["epochs"]:
-                        resp[notary]["seasons"][season]["servers"][server]["epochs"].update({
+                    if epoch not in ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"]:
+                        ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"].update({
                             epoch:{
                                 "chains": {
                                     chain:{
@@ -504,8 +529,8 @@ def get_notarisation_data(min_time, max_time):
                             }
                         })
 
-                    if chain not in resp[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"]:
-                        resp[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"].update({
+                    if chain not in ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"]:
+                        ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"].update({
                             chain:{
                                 "chain_ntx_count":0,
                                 "chain_ntx_score_sum":0
@@ -513,27 +538,26 @@ def get_notarisation_data(min_time, max_time):
                         })
 
 
-                    resp[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"][chain]["chain_ntx_count"] += 1
-                    resp[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"][chain]["chain_ntx_score_sum"] += score_value
+                    ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"][chain]["chain_ntx_count"] += 1
+                    ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"][chain]["chain_ntx_score_sum"] += score_value
 
-                    resp[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["epoch_ntx_count"] += 1
-                    resp[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["epoch_ntx_score_sum"] += score_value
+                    ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["epoch_ntx_count"] += 1
+                    ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["epoch_ntx_score_sum"] += score_value
 
-                    resp[notary]["seasons"][season]["servers"][server]["server_ntx_count"] += 1
-                    resp[notary]["seasons"][season]["servers"][server]["server_ntx_score_sum"] += score_value
+                    ntx_summary[notary]["seasons"][season]["servers"][server]["server_ntx_count"] += 1
+                    ntx_summary[notary]["seasons"][season]["servers"][server]["server_ntx_score_sum"] += score_value
 
-                    resp[notary]["seasons"][season]["season_ntx_count"] += 1
-                    resp[notary]["seasons"][season]["season_ntx_score_sum"] += score_value
+                    ntx_summary[notary]["seasons"][season]["season_ntx_count"] += 1
+                    ntx_summary[notary]["seasons"][season]["season_ntx_score_sum"] += score_value
 
-                    resp[notary]["notary_ntx_count"] += 1
-                    resp[notary]["notary_ntx_score_sum"] += score_value
+                    ntx_summary[notary]["notary_ntx_count"] += 1
+                    ntx_summary[notary]["notary_ntx_score_sum"] += score_value
 
-
-        return resp
+        return ntx_summary, chain_totals
         
     except Exception as e:
         logger.error(f"Error in get_epochs: {e}")
-        return []
+        return ntx_summary, chain_totals
 
 
 
@@ -610,7 +634,7 @@ for season in seasons:
                 unrecorded_KMD_txids.sort()
                 update_KMD_notarisations(unrecorded_KMD_txids)
 
-            ntx_summary, chain_totals = get_notarisation_data(SEASONS_INFO["Season_4"]["start_time"], SEASONS_INFO[season][season])
+            ntx_summary, chain_totals = get_notarisation_data(SEASONS_INFO[season]["start_time"], SEASONS_INFO[season]["end_time"])
 
             for notary in ntx_summary:
 
