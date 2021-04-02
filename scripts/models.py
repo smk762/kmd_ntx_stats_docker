@@ -486,7 +486,7 @@ class notarised_chain_season_row():
             logger.info(f"Updating [notarised_chain_season] {self.chain} {self.season}")
             update_season_notarised_chain_row(row_data)
         else:
-            logger.warning(f"[notarised_chain_season_row] Row data invalid!")
+            logger.warning(f"[notarised_chain_season] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -777,6 +777,10 @@ class notarised_row():
     def validated(self):
         if self.epoch.find("Epoch") == -1 and self.epoch != "Unofficial":
             logger.warning(f"!!!! Invalid epoch {self.epoch}")
+            if self.epoch == "2":
+                logger.warning(f"[notarised] row invalid {self.chain} {self.season} {self.server} {self.epoch} {self.scored} {self.score_value} {self.block_datetime}")
+                input()
+
             return False
         return True
 
