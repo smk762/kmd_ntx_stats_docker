@@ -92,6 +92,7 @@ for season in seasons:
                             row.notary_addresses = row_data[6]
                             row.season = row_data[11]
                             row.server = row_data[12]                
+                            row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time)
                     else:
                         row.notary_addresses = txid_info["notary_addresses"]
                         row.season = txid_info["season"]

@@ -245,6 +245,7 @@ class notarised(models.Model):
     opret = models.CharField(max_length=2048)
     season = models.CharField(max_length=32)
     server = models.CharField(max_length=32, default='')
+    epoch = models.CharField(max_length=32, default='')
     scored = models.BooleanField(default=True)
     score_value = models.DecimalField(max_digits=18, decimal_places=8, default=0)
     btc_validated = models.CharField(max_length=32, default='')

@@ -343,6 +343,10 @@ urlpatterns = [
           api_views.split_summary_table,
           name='split_summary_table'),
     
+    path('api/info/notarised_season_score',
+          api_views.notarised_season_score,
+          name='notarised_season_score'),
+    
 
     path('api/table/epoch_scoring',
           api_tables.epoch_scoring_table,
