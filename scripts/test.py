@@ -8,6 +8,13 @@ from models import get_chain_epoch_at, get_chain_epoch_score_at
 #all_notarised_servers = get_notarised_servers()
 #all_notarised_chains = get_notarised_chains()
 
+epoch = get_chain_epoch_at("Season_4", "Third_Party", "AYA", 1593793026)
+print(epoch)
+assert epoch == "Epoch_1"
+score  = get_chain_epoch_score_at("Season_4", "Third_Party", "AYA", 1593793026)
+print(score)
+input()
+
 
 print(f"SCORING_EPOCHS: {SCORING_EPOCHS}")
 print()
