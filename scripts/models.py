@@ -547,7 +547,7 @@ class notarised_row():
 
         score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
         if score_value != self.score_value:
-            logger.warning(f"score_value mismatch calculated {score_value} vs input {self.score_value} | {self.season}, {self.server}, {self.chain}, {self.block_time}")
+            logger.warning(f"{self.txid} score_value mismatch calculated {score_value} vs input {self.score_value} | {self.season}, {self.server}, {self.chain}, {self.block_time}")
 
         if self.score_value > 0:
             self.scored = True
@@ -556,7 +556,7 @@ class notarised_row():
 
         epoch = get_chain_epoch_at(self.season, self.server, self.chain, self.block_time)
         if epoch != self.epoch:
-            logger.warning(f"epoch mismatch calculated {epoch} vs input {self.epoch} | {self.season}, {self.epoch}, {self.server}, {self.chain}, {self.block_time}")
+            logger.warning(f"{self.txid} epoch mismatch calculated {epoch} vs input {self.epoch} | {self.season}, {self.epoch}, {self.server}, {self.chain}, {self.block_time}")
 
         row_data = (
             self.chain, self.block_height, 

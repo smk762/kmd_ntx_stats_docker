@@ -13,7 +13,7 @@ for row in rows:
     server = get_gleec_ntx_server(gleec_row.txid)
 
     if server != row[12]:
-        print(f">>> Updating server to {server} for {row[9]} {i}/{len(rows)}")
+        print(f" {i}/{len(rows)} | >>> Updating server to {server} for {row[9]}")
         gleec_row.chain = row[0]
         gleec_row.block_height = row[1]
         gleec_row.block_time = row[2]
@@ -30,4 +30,4 @@ for row in rows:
         gleec_row.score_value = get_dpow_score_value(gleec_row.season, gleec_row.server, "GLEEC", gleec_row.block_time)
         gleec_row.update()
     else:
-        print(f"{gleec_row.txid} {server} for GLEEC OK...")
+        print(f" {i}/{len(rows)} | {gleec_row.txid} {server} for GLEEC OK...")
