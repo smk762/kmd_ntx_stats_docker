@@ -644,11 +644,12 @@ for season in seasons:
                     season_ntx_count_row.season = summary_season
 
                     print()
-                    logger.info(f"notary: {notary} {type(notary)}")
+                    logger.info(f"Getting season summary for {notary}")
                     if notary in KNOWN_NOTARIES:
-                        logger.info(f"summary_season: {summary_season} {type(summary_season)}")
+
                         servers = ntx_summary[notary]["seasons"][summary_season]['servers']
-                        logger.info(f"servers: {servers} {type(servers)}")
+                        #logger.info(f"summary_season: {summary_season} {type(summary_season)}")
+                        #logger.info(f"servers: {servers} {type(servers)}")
 
                         if "BTC" in servers:
                             season_ntx_count_row.btc_count = servers['BTC']['server_ntx_count']
@@ -677,7 +678,7 @@ for season in seasons:
                         season_ntx_count_row.chain_ntx_counts = json.dumps(chain_ntx_counts)
                         season_ntx_count_row.chain_ntx_pct = json.dumps(notary_season_pct)
                         season_ntx_count_row.time_stamp = time.time()
-
+                        '''
                         logger.info(f"btc_count: {season_ntx_count_row.btc_count} {type(season_ntx_count_row.btc_count)}")
                         logger.info(f"antara_count: {season_ntx_count_row.antara_count} {type(season_ntx_count_row.antara_count)}")
                         logger.info(f"third_party_count: {season_ntx_count_row.third_party_count} {type(season_ntx_count_row.third_party_count)}")
@@ -687,6 +688,7 @@ for season in seasons:
                         logger.info(f"chain_ntx_pct: {season_ntx_count_row.chain_ntx_pct} {type(season_ntx_count_row.chain_ntx_pct)}")
                         logger.info(f"time_stamp: {season_ntx_count_row.time_stamp} {type(season_ntx_count_row.time_stamp)}")
                         season_ntx_count_row.update()
+                        '''
 
         # TODO: add season / server / epoch to the aggregate tables
         # update_daily_notarised_counts(season)
