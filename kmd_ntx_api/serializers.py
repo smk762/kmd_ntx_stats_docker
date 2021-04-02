@@ -118,7 +118,7 @@ class NotarisedSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['txid', 'chain', 'block_height', 'block_time',
                   'block_datetime', 'block_hash', 'ac_ntx_blockhash',
                   'ac_ntx_height', 'opret', 'notaries', 'notary_addresses',
-                  'season', 'server', 'scored', 'score_value', 'btc_validated']
+                  'season', 'server', 'epoch', 'scored', 'score_value', 'btc_validated']
 
 class NotarisedChainDailySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

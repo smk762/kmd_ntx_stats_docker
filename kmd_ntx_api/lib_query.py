@@ -140,6 +140,7 @@ def get_notarisation_txid_single(txid=None):
             "opret":item.opret,
             "season":item.season,
             "server":item.server,
+            "epoch":item.epoch,
             "scored":item.scored,
             "score_value":item.score_value,
             "btc_validated":item.btc_validated
