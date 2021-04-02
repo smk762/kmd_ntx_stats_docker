@@ -645,46 +645,48 @@ for season in seasons:
 
                     print()
                     logger.info(f"notary: {notary} {type(notary)}")
-                    logger.info(f"summary_season: {summary_season} {type(summary_season)}")
-                    servers = ntx_summary[notary]["seasons"][summary_season]['servers']
+                    if notary in KNOWN_NOTARIES:
+                        logger.info(f"summary_season: {summary_season} {type(summary_season)}")
+                        servers = ntx_summary[notary]["seasons"][summary_season]['servers']
+                        logger.info(f"servers: {servers} {type(servers)}")
 
-                    if "BTC" in servers:
-                        season_ntx_count_row.btc_count = servers['BTC']['server_ntx_count']
+                        if "BTC" in servers:
+                            season_ntx_count_row.btc_count = servers['BTC']['server_ntx_count']
 
-                    elif "BTC" in servers:
-                        season_ntx_count_row.btc_count = servers['LTC']['server_ntx_count']
+                        elif "BTC" in servers:
+                            season_ntx_count_row.btc_count = servers['LTC']['server_ntx_count']
 
-                    else: 
-                        season_ntx_count_row.btc_count = 0
+                        else: 
+                            season_ntx_count_row.btc_count = 0
 
-                    if 'Main' in servers:
-                        season_ntx_count_row.antara_count = servers['Main']['server_ntx_count']
+                        if 'Main' in servers:
+                            season_ntx_count_row.antara_count = servers['Main']['server_ntx_count']
 
-                    else:
-                        season_ntx_count_row.antara_count = 0
+                        else:
+                            season_ntx_count_row.antara_count = 0
 
-                    if 'Third_Party' in servers:
-                        season_ntx_count_row.third_party_count = servers['Third_Party']['server_ntx_count']
-                        
-                    else:
-                        season_ntx_count_row.third_party_count = 0
+                        if 'Third_Party' in servers:
+                            season_ntx_count_row.third_party_count = servers['Third_Party']['server_ntx_count']
 
-                    season_ntx_count_row.other_count = 0
-                    season_ntx_count_row.total_ntx_count = ntx_summary[notary]["seasons"][summary_season]['season_ntx_count']
+                        else:
+                            season_ntx_count_row.third_party_count = 0
 
-                    season_ntx_count_row.chain_ntx_counts = json.dumps(chain_ntx_counts)
-                    season_ntx_count_row.chain_ntx_pct = json.dumps(notary_season_pct)
-                    season_ntx_count_row.time_stamp = time.time()
+                        season_ntx_count_row.other_count = 0
+                        season_ntx_count_row.total_ntx_count = ntx_summary[notary]["seasons"][summary_season]['season_ntx_count']
 
-                    logger.info(f"btc_count: {season_ntx_count_row.btc_count} {type(season_ntx_count_row.btc_count)}")
-                    logger.info(f"antara_count: {season_ntx_count_row.antara_count} {type(season_ntx_count_row.antara_count)}")
-                    logger.info(f"third_party_count: {season_ntx_count_row.third_party_count} {type(season_ntx_count_row.third_party_count)}")
-                    logger.info(f"other_count: {season_ntx_count_row.other_count} {type(season_ntx_count_row.other_count)}")
-                    logger.info(f"total_ntx_count: {season_ntx_count_row.total_ntx_count} {type(season_ntx_count_row.total_ntx_count)}")
-                    logger.info(f"chain_ntx_counts: {season_ntx_count_row.chain_ntx_counts} {type(season_ntx_count_row.chain_ntx_counts)}")
-                    logger.info(f"chain_ntx_pct: {season_ntx_count_row.chain_ntx_pct} {type(season_ntx_count_row.chain_ntx_pct)}")
-                    logger.info(f"time_stamp: {season_ntx_count_row.time_stamp} {type(season_ntx_count_row.time_stamp)}")
-                    season_ntx_count_row.update()
+                        season_ntx_count_row.chain_ntx_counts = json.dumps(chain_ntx_counts)
+                        season_ntx_count_row.chain_ntx_pct = json.dumps(notary_season_pct)
+                        season_ntx_count_row.time_stamp = time.time()
+
+                        logger.info(f"btc_count: {season_ntx_count_row.btc_count} {type(season_ntx_count_row.btc_count)}")
+                        logger.info(f"antara_count: {season_ntx_count_row.antara_count} {type(season_ntx_count_row.antara_count)}")
+                        logger.info(f"third_party_count: {season_ntx_count_row.third_party_count} {type(season_ntx_count_row.third_party_count)}")
+                        logger.info(f"other_count: {season_ntx_count_row.other_count} {type(season_ntx_count_row.other_count)}")
+                        logger.info(f"total_ntx_count: {season_ntx_count_row.total_ntx_count} {type(season_ntx_count_row.total_ntx_count)}")
+                        logger.info(f"chain_ntx_counts: {season_ntx_count_row.chain_ntx_counts} {type(season_ntx_count_row.chain_ntx_counts)}")
+                        logger.info(f"chain_ntx_pct: {season_ntx_count_row.chain_ntx_pct} {type(season_ntx_count_row.chain_ntx_pct)}")
+                        logger.info(f"time_stamp: {season_ntx_count_row.time_stamp} {type(season_ntx_count_row.time_stamp)}")
+                        season_ntx_count_row.update()
 
         # TODO: add season / server / epoch to the aggregate tables
         # update_daily_notarised_counts(season)

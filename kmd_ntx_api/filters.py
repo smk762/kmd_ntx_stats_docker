@@ -30,7 +30,8 @@ class ntxFilter(FilterSet):
                   'max_ac_block', 'min_blocktime', 'max_blocktime', 
                   'txid', 'chain', 'block_height', 'block_time',
                   'block_datetime', 'block_hash', 'ac_ntx_blockhash',
-                  'ac_ntx_height', 'opret', 'season', 'btc_validated']
+                  'ac_ntx_height', 'opret', 'season', 'server', 'epoch',
+                  'scored', 'btc_validated']
 
 class ntxTenureFilter(FilterSet):
     gte_official_start = NumberFilter(field_name="official_start_block_time", lookup_expr='gte')
