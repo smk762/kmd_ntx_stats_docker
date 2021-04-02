@@ -14,16 +14,24 @@ logger.setLevel(logging.INFO)
 
 def get_chain_epoch_at(season, server, chain, timestamp):
     epochs = get_epochs(season, server)
-    if coin in ["BTC", "LTC"]:
-        return "Main"
+    if chain in ["BTC", "LTC"]:
+        if timestamp >= SEASONS_INFO[season]["start_time"] and timestamp <= SEASONS_INFO[season]["end_time"]:
+            for epoch in epochs:
+                if timestamp >= epoch["epoch_start"] and timestamp <= epoch["epoch_end"]:
+                    return epoch["epoch"]
 
     for epoch in epochs:
         if chain in epoch["epoch_chains"]:
             if timestamp >= epoch["epoch_start"] and timestamp <= epoch["epoch_end"]:
                 return epoch["epoch"]
+
     return "Unofficial"
 
 def get_chain_epoch_score_at(season, server, chain, timestamp):
+    if chain in ["BTC", "LTC"]:
+        if timestamp >= SEASONS_INFO[season]["start_time"] and timestamp <= SEASONS_INFO[season]["end_time"]:
+            return 0.0325
+
     epochs = get_epochs(season, server)
     for epoch in epochs:
         if chain in epoch["epoch_chains"]:

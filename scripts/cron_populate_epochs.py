@@ -110,6 +110,8 @@ for season in all_notarised_seasons:
                 row = scoring_epoch_row()
                 row.delete(season, server)
 
+
+
             else:
                 scoring_season_server_epochs = SCORING_EPOCHS[season][server]
                 logger.info(f"{season} {server} scoring_season_server_epochs: {scoring_season_server_epochs}")
