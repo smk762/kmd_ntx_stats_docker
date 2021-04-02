@@ -774,7 +774,7 @@ class notarised_row():
 
     def validated(self):
         if self.epoch.split()[0] != "Epoch":
-            return false
+            return False
         return True
 
     def update(self):
@@ -782,6 +782,7 @@ class notarised_row():
         score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
         if score_value != self.score_value:
             logger.warning(f"{self.txid} score_value mismatch calculated {score_value} vs input {self.score_value} | {self.season}, {self.server}, {self.epoch}, {self.chain}, {self.block_time}")
+            self.score_value = score_value
 
         if self.score_value > 0:
             self.scored = True
