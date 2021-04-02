@@ -141,9 +141,10 @@ for epoch in epochs:
     score_per_ntx = epoch['score_per_ntx']
 
     for chain in epoch_chains:
-        if chain == "GLEEC":
-            server = get_gleec_ntx_server(txid)
-        update_chain_notarised_epoch_window(chain, season, server, epoch_id, epoch_start, epoch_end, score_per_ntx, True)
+        logger.warning(f"{chain} {season} {server} {epoch_id} | Blocks {epoch_start} - {epoch_end} | scored True {score_per_ntx}")
+
+        if chain != "GLEEC":
+            update_chain_notarised_epoch_window(chain, season, server, epoch_id, epoch_start, epoch_end, score_per_ntx, True)
 
         
 

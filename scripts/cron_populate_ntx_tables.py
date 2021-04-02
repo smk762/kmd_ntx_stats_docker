@@ -18,7 +18,7 @@ from lib_notary import *
 from lib_table_update import *
 from lib_table_select import *
 from lib_api import *
-from models import notarised_row
+from models import notarised_row, notarised_count_season_row, notarised_chain_season_row, notarised_count_daily_row, notarised_chain_daily_row, last_notarised_row
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -424,24 +424,33 @@ for season in seasons:
             start_block = SEASONS_INFO[season]["start_block"]
             end_block = SEASONS_INFO[season]["end_block"]
 
-            windows = []
-            chunk_size = 50000
-            for i in range(start_block, end_block, chunk_size):
-                windows.append((i, i+chunk_size))
-
-            logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
-            for x in windows:
-                logger.info(f"Processing notarisations for blocks {x[0]} - {x[1]}")
-                unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season, x[0], x[1])
+            if SKIP_UNTIL_YESTERDAY:
+                start_block = tip - 24*60*2
+                logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
+                unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season)
                 unrecorded_KMD_txids.sort()
                 update_KMD_notarisations(unrecorded_KMD_txids)
+
+            else:
+
+                windows = []
+                chunk_size = 50000
+                for i in range(start_block, end_block, chunk_size):
+                    windows.append((i, i+chunk_size))
+
+                logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
+                for x in windows:
+                    logger.info(f"Processing notarisations for blocks {x[0]} - {x[1]}")
+                    unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season, x[0], x[1])
+                    unrecorded_KMD_txids.sort()
+                    update_KMD_notarisations(unrecorded_KMD_txids)
 
             # TODO: add season / server / epoch to the aggregate tables
             # update_daily_notarised_counts(season)
             # update_daily_notarised_chains(season)
 
-            # update_season_notarised_counts(season)
-            # update_latest_ntx(season)
+            update_season_notarised_counts(season)
+            update_latest_ntx(season)
 
 
 CURSOR.close()

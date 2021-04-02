@@ -162,7 +162,7 @@ for season in SCORING_EPOCHS:
 
         logger.info(f"{season} Other scores validation complete!\n")
 
-        CURSOR.execute(f"SELECT notary_addresses, season, chain, block_time, notaries, txid, server, scored, score_value, epoch \
+        CURSOR.execute(f"SELECT notarised, season, chain, block_time, notaries, txid, server, scored, score_value, epoch \
                          FROM notarised \
                          WHERE season = '{season}' \
                          ORDER BY server DESC, chain DESC, block_time DESC;")

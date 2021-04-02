@@ -25,6 +25,7 @@ def btc_ntx(request):
         "btc_ntx":btc_ntx,
         "season":season.replace("_"," ")
     }
+
     return render(request, 'btc_ntx.html', context)
 
 def btc_ntx_all(request):
@@ -41,6 +42,7 @@ def btc_ntx_all(request):
         "btc_ntx":btc_ntx,
         "season":season.replace("_"," ")
     }
+
     return render(request, 'btc_ntx_all.html', context)
 
 def chains_last_ntx(request):
@@ -80,6 +82,7 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
     context = {
         "sidebar_links":get_sidebar_links(notaries_list, coins_data)
     }
+    
     if chain:
         balance_data = balances.objects.filter(chain=chain, season=season) \
                                    .order_by('notary') \

@@ -545,14 +545,18 @@ class notarised_row():
 
     def update(self):
 
-        self.score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
+        score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
+        if score_value != self.score_value:
+            logger.warning(f"score_value mismatch {score_value} vs {self.score_value} | {self.season}, {self.server}, {self.chain}, {self.block_time}")
 
         if self.score_value > 0:
             self.scored = True
         else:
             self.scored = False
 
-        self.epoch = get_chain_epoch_at(self.season, self.server, self.chain, self.block_time)
+        epoch = get_chain_epoch_at(self.season, self.server, self.chain, self.block_time)
+        if epoch != self.epoch:
+            logger.warning(f"epoch mismatch {epoch} vs {self.epoch} | {self.season}, {self.server}, {self.chain}, {self.block_time}")
 
         row_data = (
             self.chain, self.block_height, 
