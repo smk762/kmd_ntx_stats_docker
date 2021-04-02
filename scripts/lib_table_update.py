@@ -708,7 +708,7 @@ def update_scoring_epoch_row(row_data):
         CONN.rollback()
 
 def update_notarised_epoch(actual_epoch, season=None, server=None, chain=None, txid=None):
-    sql = f"UPDATE notarised SET epoch='{epoch}'"
+    sql = f"UPDATE notarised SET epoch='{actual_epoch}'"
     conditions = []
     if season:
         conditions.append(f"season = '{season}'")
