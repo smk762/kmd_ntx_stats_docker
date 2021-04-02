@@ -520,133 +520,6 @@ class last_notarised_row():
         CURSOR.execute(f"DELETE FROM last_notarised WHERE notary = '{self.notary}' and chain = '{self.chain}';")
         CONN.commit()
 
-class notarised_row():
-    def __init__(self, chain='', block_height='', 
-                block_time='', block_datetime='', block_hash='', 
-                notaries=list, notary_addresses=list, ac_ntx_blockhash='', ac_ntx_height='', 
-                txid='', opret='', season='', server='', scored=True, score_value=0, btc_validated='', epoch=''):
-        self.chain = chain
-        self.block_height = block_height
-        self.block_time = block_time
-        self.block_datetime = block_datetime
-        self.block_hash = block_hash
-        self.notaries = notaries
-        self.notary_addresses = notary_addresses
-        self.ac_ntx_blockhash = ac_ntx_blockhash
-        self.ac_ntx_height = ac_ntx_height
-        self.txid = txid
-        self.opret = opret
-        self.season = season
-        self.server = server
-        self.epoch = epoch
-        
-        self.score_value = score_value
-        self.scored = scored
-        self.btc_validated = btc_validated
-
-    def validated(self):
-        return True
-
-    def update(self):
-
-        score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
-        if score_value != self.score_value:
-            logger.warning(f"{self.txid} score_value mismatch calculated {score_value} vs input {self.score_value} | {self.season}, {self.server}, {self.epoch}, {self.chain}, {self.block_time}")
-
-        if self.score_value > 0:
-            self.scored = True
-        else:
-            self.scored = False
-
-        epoch = get_chain_epoch_at(self.season, self.server, self.chain, self.block_time)
-        if epoch != self.epoch:
-            logger.warning(f"{self.txid} epoch mismatch calculated {epoch} vs input {self.epoch} | {self.season}, {self.epoch}, {self.server}, {self.chain}, {self.block_time}")
-
-        row_data = (
-            self.chain, self.block_height, 
-            self.block_time, self.block_datetime, self.block_hash, 
-            self.notaries, self.notary_addresses, self.ac_ntx_blockhash,
-            self.ac_ntx_height, self.txid, self.opret, self.season,
-            self.server, self.scored, self.score_value, self.btc_validated, self.epoch
-        )
-        if self.validated():
-            logger.info(f"Updating [notarised] {self.chain} {self.season} {self.server} {self.epoch} {self.scored} {self.score_value}")
-            update_ntx_row(row_data)
-        else:
-            logger.warning(f"Row data invalid!")
-            logger.warning(f"{row_data}")
-
-    def delete(self):
-        CURSOR.execute(f"DELETE FROM notarised WHERE txid = '{self.txid}';")
-        CONN.commit()
-
-# Can't be having rows that are remnants - delete in effect where this is the case
-# Otherwise epochs get all messed up!
-class ntx_tenure_row():
-    def __init__(self, chain='', first_ntx_block='', 
-            last_ntx_block='', first_ntx_block_time='',
-            last_ntx_block_time='',official_start_block_time='',
-            official_end_block_time='', unscored_ntx_count='',
-            scored_ntx_count='', season='', server=''):
-        self.chain = chain
-        self.first_ntx_block = first_ntx_block
-        self.last_ntx_block = last_ntx_block
-        self.first_ntx_block_time = first_ntx_block_time
-        self.last_ntx_block_time = last_ntx_block_time
-        self.official_start_block_time = official_start_block_time
-        self.official_end_block_time = official_end_block_time
-        self.unscored_ntx_count = unscored_ntx_count
-        self.scored_ntx_count = scored_ntx_count
-        self.server = server
-        self.season = season
-
-    def validated(self):
-        if self.server not in ["Main", "Third_Party", "Testnet"]:
-            logger.warning(f"!!!! Invalid server {server}")
-            return False
-        if self.season not in ['Season_5', 'Season_5_Testnet', 'Season_4']:
-            logger.warning(f"!!!! Invalid season {season}")
-            return False
-        return True
-
-    def update(self):
-        row_data = (
-            self.chain, self.first_ntx_block, 
-            self.last_ntx_block, self.first_ntx_block_time,
-            self.last_ntx_block_time, self.official_start_block_time, 
-            self.official_end_block_time, self.unscored_ntx_count, 
-            self.scored_ntx_count, self.season, self.server
-        )
-        if self.validated():
-            logger.info(f">>> Updating [notarised_tenure] {self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
-            update_notarised_tenure_row(row_data)
-        else:
-            logger.warning(f"Row data invalid!")
-            logger.info(f"!!! Invalid row [notarised_tenure] {self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
-            logger.warning(f"{row_data}")
-
-
-    def delete(self, season=None, server=None, chain=None):
-        if not season and not server and not chain:
-            logger.error("Not deleting, need to specify at least one of chain, season or server")
-        else:
-            sql = f"DELETE FROM notarised_tenure"
-            conditions = []
-            if season:
-                conditions.append(f"season = '{season}'")
-            if server:
-                conditions.append(f"server = '{server}'")
-            if chain:
-                conditions.append(f"chain = '{chain}'")
-
-            if len(conditions) > 0:
-                sql += " WHERE "
-                sql += " AND ".join(conditions)    
-            sql += ";"
-            logger.warning(f"Deleting [notarised_tenure] row: {season} {server} {chain}")
-
-            CURSOR.execute(sql)
-            CONN.commit()
         
 ## KMD MINING CLASSES ###
 
@@ -873,4 +746,142 @@ class scoring_epoch_row():
             CURSOR.execute(sql)
             CONN.commit()
             logger.warning(f"Deleted [scoring_epochs] row: {season} {server} {epoch}")
+
+
+class notarised_row():
+    def __init__(self, chain='', block_height='', 
+                block_time='', block_datetime='', block_hash='', 
+                notaries=list, notary_addresses=list, ac_ntx_blockhash='', ac_ntx_height='', 
+                txid='', opret='', season='', server='', scored=True, score_value=0, btc_validated='', epoch=''):
+        self.chain = chain
+        self.block_height = block_height
+        self.block_time = block_time
+        self.block_datetime = block_datetime
+        self.block_hash = block_hash
+        self.notaries = notaries
+        self.notary_addresses = notary_addresses
+        self.ac_ntx_blockhash = ac_ntx_blockhash
+        self.ac_ntx_height = ac_ntx_height
+        self.txid = txid
+        self.opret = opret
+        self.season = season
+        self.server = server
+        self.epoch = epoch
         
+        self.score_value = score_value
+        self.scored = scored
+        self.btc_validated = btc_validated
+
+    def validated(self):
+        if self.epoch.split()[0] != "Epoch":
+            return false
+        return True
+
+    def update(self):
+
+        score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
+        if score_value != self.score_value:
+            logger.warning(f"{self.txid} score_value mismatch calculated {score_value} vs input {self.score_value} | {self.season}, {self.server}, {self.epoch}, {self.chain}, {self.block_time}")
+
+        if self.score_value > 0:
+            self.scored = True
+        else:
+            self.scored = False
+
+        epoch = get_chain_epoch_at(self.season, self.server, self.chain, self.block_time)
+        if epoch != self.epoch:
+            logger.warning(f"{self.txid} epoch mismatch calculated {epoch} vs input {self.epoch} | {self.season}, {self.epoch}, {self.server}, {self.chain}, {self.block_time}")
+            self.epoch = epoch
+            
+        row_data = (
+            self.chain, self.block_height, 
+            self.block_time, self.block_datetime, self.block_hash, 
+            self.notaries, self.notary_addresses, self.ac_ntx_blockhash,
+            self.ac_ntx_height, self.txid, self.opret, self.season,
+            self.server, self.scored, self.score_value, self.btc_validated, self.epoch
+        )
+        if self.validated():
+            logger.info(f"Updating [notarised] {self.chain} {self.season} {self.server} {self.epoch} {self.scored} {self.score_value}")
+            update_ntx_row(row_data)
+        else:
+            logger.warning(f"Row data invalid!")
+            logger.warning(f"{row_data}")
+
+    def delete(self):
+        CURSOR.execute(f"DELETE FROM notarised WHERE txid = '{self.txid}';")
+        CONN.commit()
+
+
+# Can't be having rows that are remnants - delete in effect where this is the case
+# Otherwise epochs get all messed up!
+class ntx_tenure_row():
+    def __init__(self, chain='', first_ntx_block='', 
+            last_ntx_block='', first_ntx_block_time='',
+            last_ntx_block_time='',official_start_block_time='',
+            official_end_block_time='', unscored_ntx_count='',
+            scored_ntx_count='', season='', server=''):
+        self.chain = chain
+        self.first_ntx_block = first_ntx_block
+        self.last_ntx_block = last_ntx_block
+        self.first_ntx_block_time = first_ntx_block_time
+        self.last_ntx_block_time = last_ntx_block_time
+        self.official_start_block_time = official_start_block_time
+        self.official_end_block_time = official_end_block_time
+        self.unscored_ntx_count = unscored_ntx_count
+        self.scored_ntx_count = scored_ntx_count
+        self.server = server
+        self.season = season
+
+    def validated(self):
+        if self.server not in ["Main", "Third_Party"]:
+            logger.warning(f"!!!! Invalid server {server}")
+            return False
+        if self.season not in ['Season_5', 'Season_5_Testnet', 'Season_4']:
+            logger.warning(f"!!!! Invalid season {season}")
+            return False
+        return True
+
+    def update(self):
+
+        epoch = get_chain_epoch_at(self.season, self.server, self.chain, self.block_time)
+        if epoch != self.epoch:
+            logger.warning(f"{self.txid} epoch mismatch calculated {epoch} vs input {self.epoch} | {self.season}, {self.epoch}, {self.server}, {self.chain}, {self.block_time}")
+            self.epoch = epoch
+
+        row_data = (
+            self.chain, self.first_ntx_block, 
+            self.last_ntx_block, self.first_ntx_block_time,
+            self.last_ntx_block_time, self.official_start_block_time, 
+            self.official_end_block_time, self.unscored_ntx_count, 
+            self.scored_ntx_count, self.season, self.server
+        )
+        if self.validated():
+            logger.info(f">>> Updating [notarised_tenure] {self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
+            update_notarised_tenure_row(row_data)
+        else:
+            logger.warning(f"Row data invalid!")
+            logger.info(f"!!! Invalid row [notarised_tenure] {self.chain} {self.season} {self.server} || {self.scored_ntx_count} scored, {self.unscored_ntx_count} unscored")
+            logger.warning(f"{row_data}")
+
+
+    def delete(self, season=None, server=None, chain=None):
+        if not season and not server and not chain:
+            logger.error("Not deleting, need to specify at least one of chain, season or server")
+        else:
+            sql = f"DELETE FROM notarised_tenure"
+            conditions = []
+            if season:
+                conditions.append(f"season = '{season}'")
+            if server:
+                conditions.append(f"server = '{server}'")
+            if chain:
+                conditions.append(f"chain = '{chain}'")
+
+            if len(conditions) > 0:
+                sql += " WHERE "
+                sql += " AND ".join(conditions)    
+            sql += ";"
+            logger.warning(f"Deleting [notarised_tenure] row: {season} {server} {chain}")
+
+            CURSOR.execute(sql)
+            CONN.commit()
