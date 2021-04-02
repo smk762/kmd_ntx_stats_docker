@@ -826,9 +826,11 @@ for season in NOTARY_PUBKEYS:
 # SPECIAL CASE BTC TXIDS
 S4_INIT_BTC_FUNDING_TX = "13fee57ec60ef4ca42dbed5eb77d576bf7545e7042b334b27afdc33051635611"
 
+KNOWN_NOTARIES = []
 KNOWN_ADDRESSES = {}
 for season in NOTARY_ADDRESSES_DICT:
     for notary in NOTARY_ADDRESSES_DICT[season]:
+        KNOWN_NOTARIES.append(notary)
         for coin in NOTARY_ADDRESSES_DICT[season][notary]:
             address = NOTARY_ADDRESSES_DICT[season][notary][coin]
             KNOWN_ADDRESSES.update({address:notary})
