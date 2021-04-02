@@ -5,7 +5,15 @@ import binascii
 from .models import *
 from .lib_const import *
 
-logger = logging.getLogger("mylogger")
+logger = logging.getLogger(__name__)
+
+def get_all_coins():
+
+    resp = []
+    data = coins.objects.all()
+    for item in data:
+        resp.append(item.chain)
+    return resp
     
 def day_hr_min_sec(seconds, granularity=2):
     result = []
@@ -85,7 +93,8 @@ def get_ticker(x):
         chain = "KMD"
     return chain
 
-def decode_opret(op_return):   
+def decode_opret(op_return):  
+    coins_list = get_all_coins() 
     ac_ntx_blockhash = lil_endian(op_return[:64])
 
     try:
@@ -99,11 +108,10 @@ def decode_opret(op_return):
     x = binascii.unhexlify(op_return[70:])
     chain = get_ticker(x)
 
-    if chain.endswith("PBC"):
-        chain = "PBC"
+    for x in coins_list:
 
-    if chain.endswith("KMD"):
-        chain = "KMD"
+        if chain.endswith(x):
+            chain = x
 
     if chain == "KMD":
         btc_txid = lil_endian(op_return[72:136])

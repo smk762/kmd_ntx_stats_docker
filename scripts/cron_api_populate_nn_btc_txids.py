@@ -258,7 +258,10 @@ num_addr = len(NOTARY_BTC_ADDRESSES[season])
 
 notary_last_ntx = get_notary_last_ntx("BTC")
 
-NOTARY_BTC_ADDRESSES[season].reverse()
+if OTHER_SERVER.find("stats") == -1:
+    NOTARY_BTC_ADDRESSES[season].reverse()
+
+
 for notary_address in NOTARY_BTC_ADDRESSES[season]:
     i += 1
 
@@ -271,7 +274,7 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
     existing_notarised_txids = get_existing_notarised_btc_txids()
     existing_txids = list(set(existing_nn_btc_txids)&set(existing_notarised_txids))
     txids = get_new_nn_btc_txids(existing_txids, notary_address)
-    # txids = ["a91ee826138ac209e1c03ea599d86918ece7bed436b14dbeb231e98a82d16317"]
+
 
     logger.info(f"{len(existing_txids)} EXIST IN DB FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
     logger.info(f"{len(txids)} NEW TXIDs TO PROCESS FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
