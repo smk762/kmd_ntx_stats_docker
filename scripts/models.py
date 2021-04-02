@@ -14,15 +14,11 @@ logger.setLevel(logging.INFO)
 
 def get_chain_epoch_at(season, server, chain, timestamp):
     epochs = get_epochs(season, server)
-    logger.info(epochs)
     if coin in ["BTC", "LTC"]:
         return "Main"
 
     for epoch in epochs:
-        #print(epoch)
-        #print(f"{chain} in {epoch["epoch_chains"]}?")
         if chain in epoch["epoch_chains"]:
-            #print(f"{epoch["epoch_start"]} < {timestamp} < {epoch["epoch_end"]}")
             if timestamp >= epoch["epoch_start"] and timestamp <= epoch["epoch_end"]:
                 return epoch["epoch"]
     return "Unofficial"
@@ -31,7 +27,7 @@ def get_chain_epoch_score_at(season, server, chain, timestamp):
     epochs = get_epochs(season, server)
     for epoch in epochs:
         if chain in epoch["epoch_chains"]:
-            if timestamp >= epoch["epoch_start"] and timestamp <= epoch["epoch_start"]:
+            if timestamp >= epoch["epoch_start"] and timestamp <= epoch["epoch_end"]:
                 return epoch["score_per_ntx"]
     return 0
 
