@@ -437,7 +437,8 @@ for season in seasons:
                 chunk_size = 50000
                 for i in range(start_block, end_block, chunk_size):
                     windows.append((i, i+chunk_size))
-
+                    
+                windows.reverse()
                 logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
                 for x in windows:
                     logger.info(f"Processing notarisations for blocks {x[0]} - {x[1]}")
