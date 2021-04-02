@@ -70,7 +70,7 @@ for season in notarised_seasons:
     
     servers = get_notarised_servers(season)
     try:
-        assert server in ["Main", "Third_Party", "Testnet", "Unofficial"]
+        assert server in ["Main", "Third_Party", "Unofficial"]
         assert_results.append({f"{season} server catgories valid: Pass"})
     except:
         assert_results.append({f"{season} server catgories valid: Fail"})
