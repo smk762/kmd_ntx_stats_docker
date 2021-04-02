@@ -194,14 +194,15 @@ def get_notarised_data(txid):
                             ac_ntx_blockhash = lil_endian(scriptPubKey_asm[:64])
                             try:
                                 ac_ntx_height = int(lil_endian(scriptPubKey_asm[64:72]),16) 
-                            except:
-                                logger.info(scriptPubKey_asm)
+                            except Exception as e:
+                                logger.error(f"error {e} scriptPubKey_asm: {scriptPubKey_asm}")
                                 sys.exit()
                             scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
                             chain = get_ticker(scriptPubKeyBinary)
                             if len(chain) > 10:
                                 logger.warning(f"chain = {chain} for {txid}")
 
+                            # TODO: This could potentially misidentify - do better.
                             for x in coins_list:
 
                                 if chain.endswith(x):
