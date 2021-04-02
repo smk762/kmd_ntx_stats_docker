@@ -8,16 +8,6 @@ from models import get_chain_epoch_at, get_chain_epoch_score_at
 #all_notarised_servers = get_notarised_servers()
 #all_notarised_chains = get_notarised_chains()
 
-print(f"SCORING_EPOCHS: {SCORING_EPOCHS}")
-print()
-print(f"SCORING_EPOCHS seasons: {SCORING_EPOCHS.keys()}")
-print()
-for season in list(SCORING_EPOCHS.keys()):
-	print()
-	print(f"SCORING_EPOCHS season {season} servers: {SCORING_EPOCHS[season].keys()}")
-	for server in list(SCORING_EPOCHS[season].keys()):
-		print(f"SCORING_EPOCHS season {season} servers: {SCORING_EPOCHS[season][server]}")
-print()
 
 epochs = get_epochs("Season_5_Testnet", "Main")
 print(epochs)
