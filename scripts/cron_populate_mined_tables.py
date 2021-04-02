@@ -19,7 +19,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-rescan_season = True
+rescan_season = False
 
 ''' 
 This script is intended to run as a cronjob every 5-15 minutes.
@@ -42,30 +42,27 @@ def update_mined_blocks(season):
     # re-check last ten recorded blocks in case of orphans
     tip = int(RPC["KMD"].getblockcount())
     start_block = SEASONS_INFO[season]["start_block"]
-    if not rescan_season:
-        scan_blocks = [*range(tip-100,tip,1)]
-    else:
-        scan_blocks = [*range(start_block,tip,1)]
-    all_blocks = [*range(start_block,tip,1)]
-
-    # adding new blocks...
-    start = time.time()
     existing_blocks = select_from_table('mined', 'block_height')
 
     recorded_blocks = []
     for block in existing_blocks:
         recorded_blocks.append(block[0])
+    logger.info(f"{len(recorded_blocks)} in mined table in db")
 
-    logger.info(f"{len(existing_blocks)} in mined table in db")
-    
+    all_blocks = [*range(start_block,tip,1)]    
     unrecorded_blocks = set(all_blocks) - set(recorded_blocks)
     logger.info(f"{len(unrecorded_blocks)} not in mined table in db")
 
-    scan_blocks = list(set(list(unrecorded_blocks) + scan_blocks))
-    logger.info(f"{len(scan_blocks)} blocks to scan")
+    if not rescan_season:
+        rescan_blocks = [*range(tip-100,tip,1)]
+    else:
+        rescan_blocks = [*range(start_block,tip,1)]
+
+    rescan_blocks = list(set(list(unrecorded_blocks) + rescan_blocks))
+    logger.info(f"{len(rescan_blocks)} blocks to scan")
 
     time.sleep(4)
-    for block in scan_blocks:
+    for block in rescan_blocks:
         if block >= start_block:
             update_miner(block)
 

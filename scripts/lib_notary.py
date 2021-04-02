@@ -113,7 +113,7 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD", chain=No
         last_season_num = season
 
     if "Season_5_Testnet" in notary_seasons and len(set(notary_seasons)) == 1:
-        return "Season_5_Testnet", "Testnet"
+        return "Season_5_Testnet", "Main"
 
     elif len(notary_seasons) == 13 and len(set(notary_seasons)) == 1:
         if chain == "GLEEC":

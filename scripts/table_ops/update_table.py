@@ -4,7 +4,7 @@ import table_lib
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-sql = "UPDATE mined SET season = 'Season_3' WHERE address = 'Season_4';"
+sql = "UPDATE notarised SET server = 'Main' WHERE season = 'Season_5_Testnet';"
 cursor.execute(sql)
 conn.commit()
 

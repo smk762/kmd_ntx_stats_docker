@@ -14,6 +14,7 @@ logger.setLevel(logging.INFO)
 
 def get_chain_epoch_at(season, server, chain, timestamp):
     epochs = get_epochs(season, server)
+    logger.info(epochs)
     if coin in ["BTC", "LTC"]:
         return "Main"
 
@@ -547,7 +548,7 @@ class notarised_row():
 
         score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
         if score_value != self.score_value:
-            logger.warning(f"score_value mismatch {score_value} vs {self.score_value} | {self.season}, {self.server}, {self.chain}, {self.block_time}")
+            logger.warning(f"score_value mismatch calculated {score_value} vs input {self.score_value} | {self.season}, {self.server}, {self.chain}, {self.block_time}")
 
         if self.score_value > 0:
             self.scored = True
@@ -838,6 +839,10 @@ class scoring_epoch_row():
         row_data = (self.season, self.server, self.epoch, self.epoch_start, self.epoch_end, \
                     self.start_event, self.end_event, self.epoch_chains, self.score_per_ntx)
         if self.validated():
+            if self.server == "Testnet":
+                self.server == "Main"
+            if len(self.epoch_chains) == 0:
+                self.epoch_chains = [None]
             update_scoring_epoch_row(row_data)
             logger.info(f"Updated [scoring_epochs] {self.season} | {self.server} | {self.epoch} ")
         else:
@@ -861,8 +866,8 @@ class scoring_epoch_row():
                 sql += " WHERE "
                 sql += " AND ".join(conditions)    
             sql += ";"
-            logger.warning(f"Deleting [scoring_epochs] row: {season} {server} {epoch}")
 
             CURSOR.execute(sql)
             CONN.commit()
+            logger.warning(f"Deleted [scoring_epochs] row: {season} {server} {epoch}")
         
