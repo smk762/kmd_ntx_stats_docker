@@ -63,6 +63,7 @@ for season in seasons:
                     row.ac_ntx_height = txid_info["ac_ntx_height"]
                     row.txid = txid_info["txid"]
                     row.opret = txid_info["opret"]
+                    row.epoch = txid_info["epoch"]
                     row.btc_validated = txid_info["btc_validated"]
 
                     if len(txid_info["notary_addresses"]) == 0:
