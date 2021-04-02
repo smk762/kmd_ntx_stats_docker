@@ -22,7 +22,7 @@ def get_chain_epoch_at(season, server, chain, timestamp):
 
     for epoch in epochs:
         if chain in epoch["epoch_chains"]:
-            if timestamp >= epoch["epoch_start"] and timestamp <= epoch["epoch_end"]:
+            if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
                 return epoch["epoch"]
 
     return "Unofficial"
@@ -775,12 +775,13 @@ class notarised_row():
         self.btc_validated = btc_validated
 
     def validated(self):
-        if self.epoch.find("Epoch") == -1:
-            logger.warning(f"!!!! Invalid epoch {epoch}")
+        if self.epoch.find("Epoch") == -1 and self.epoch != "Unofficial":
+            logger.warning(f"!!!! Invalid epoch {self.epoch}")
             return False
         return True
 
     def update(self):
+
         self.score_value = round(self.score_value, 8)
         score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
         if round(score_value, 8) != round(self.score_value, 8):
