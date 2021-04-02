@@ -5,6 +5,9 @@ from lib_table_update import *
 from lib_table_select import *
 from lib_api import *
 
+
+#TODO: Add assert reporting.
+
 deleted = []
 def get_existing_nn_btc_txids(address=None, category=None, season=None):
     recorded_txids = []

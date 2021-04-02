@@ -5,11 +5,15 @@ from lib_table_select import get_notarised_chain_rows
 
 rows = get_notarised_chain_rows("GLEEC")
 
+i = 0
 for row in rows:
-    server = get_gleec_ntx_server(row[9])
+    i += 1
+    gleec_row = notarised_row()
+    gleec_row.txid = row[9]
+    server = get_gleec_ntx_server(gleec_row.txid)
+
     if server != row[12]:
-        print(f"updating server to {server} for {row[9]}")
-        gleec_row = notarised_row()
+        print(f">>> Updating server to {server} for {row[9]} {i}/{len(rows)}")
         gleec_row.chain = row[0]
         gleec_row.block_height = row[1]
         gleec_row.block_time = row[2]
@@ -19,10 +23,11 @@ for row in rows:
         gleec_row.notary_addresses = row[6]
         gleec_row.ac_ntx_blockhash = row[7]
         gleec_row.ac_ntx_height = row[8]
-        gleec_row.txid = row[9]
         gleec_row.opret = row[10]
         gleec_row.season = row[11]
         gleec_row.server = server        
         gleec_row.btc_validated = row[14]
         gleec_row.score_value = get_dpow_score_value(gleec_row.season, gleec_row.server, "GLEEC", gleec_row.block_time)
         gleec_row.update()
+    else:
+        print(f"{gleec_row.txid} {server} for GLEEC OK...")
