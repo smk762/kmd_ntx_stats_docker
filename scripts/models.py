@@ -778,7 +778,7 @@ class notarised_row():
         return True
 
     def update(self):
-
+        self.score_value = round(self.score_value, 8)
         score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
         if score_value != self.score_value:
             logger.warning(f"{self.txid} score_value mismatch calculated {score_value} vs input {self.score_value} | {self.season}, {self.server}, {self.epoch}, {self.chain}, {self.block_time}")
