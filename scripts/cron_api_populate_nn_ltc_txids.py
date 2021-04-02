@@ -18,7 +18,7 @@ from lib_api import get_ltc_tx_info
 
 from models import ltc_tx_row, last_notarised_row, notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
 
-from lib_const import LTC_NTX_ADDR, NOTARY_LTC_ADDRESSES, NN_LTC_ADDRESSES_DICT, ALL_SEASON_NOTARY_LTC_ADDRESSES, ALL_SEASON_NOTARIES, ALL_SEASON_NN_LTC_ADDRESSES_DICT, THIS_SERVER
+from lib_const import LTC_NTX_ADDR, NOTARY_LTC_ADDRESSES, NN_LTC_ADDRESSES_DICT, ALL_SEASON_NOTARY_LTC_ADDRESSES, ALL_SEASON_NOTARIES, ALL_SEASON_NN_LTC_ADDRESSES_DICT, THIS_SERVER, OTHER_SERVER
 from lib_db import CONN, CURSOR
 from known_txids import *
 
@@ -257,7 +257,9 @@ num_addr = len(NOTARY_LTC_ADDRESSES[season])
 
 notary_last_ntx = get_notary_last_ntx("LTC")
 
-NOTARY_LTC_ADDRESSES[season].reverse()
+if OTHER_SERVER.find("stats") == -1:
+    NOTARY_LTC_ADDRESSES[season].reverse()
+
 for notary_address in NOTARY_LTC_ADDRESSES[season]:
     i += 1
 

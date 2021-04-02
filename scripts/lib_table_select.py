@@ -358,6 +358,16 @@ def get_notarised_seasons(chain=None):
     seasons.reverse()
     return seasons
 
+def get_all_coins():
+    coins = []
+    CURSOR.execute("SELECT DISTINCT chain FROM coins;")
+    results = CURSOR.fetchall()
+    for result in results:
+        coins.append(result[0])
+    coins.sort()
+    coins.reverse()
+    return coins
+
 def get_notarised_servers(season=None):
     servers = []
     if season:

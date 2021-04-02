@@ -162,6 +162,8 @@ def get_ticker(scriptPubKeyBinary):
     return str(chain)
 
 def get_notarised_data(txid):
+    coins_list = get_all_coins()
+
     try:
         raw_tx = RPC["KMD"].getrawtransaction(txid,1)
         block_hash = raw_tx['blockhash']
@@ -199,10 +201,12 @@ def get_notarised_data(txid):
                             chain = get_ticker(scriptPubKeyBinary)
                             if len(chain) > 10:
                                 logger.warning(f"chain = {chain} for {txid}")
-                            if chain.endswith("KMD"):
-                                chain = "KMD"
-                            if chain.endswith("GLEEC"):
-                                chain = "GLEEC"
+
+                            for x in coins_list:
+
+                                if chain.endswith(x):
+                                    chain = x
+
                             if chain == "KMD":
                                 btc_txid = lil_endian(scriptPubKey_asm[72:136])
                             elif chain not in noMoM:
