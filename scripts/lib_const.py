@@ -911,10 +911,7 @@ PARTIAL_SEASON_DPOW_CHAINS = {
             "LTC": {
                 "start_time":1616508400,
                 "start_time_comment": "LTC Block 2022000"
-            }
-
-        },
-        "Third_Party": {
+            },
             "RICK": {
                 "start_time":1616442129,
                 "start_time_comment": "KMD Block 2316959"

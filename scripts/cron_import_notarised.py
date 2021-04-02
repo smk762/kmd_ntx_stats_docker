@@ -66,6 +66,7 @@ for season in seasons:
                     row.btc_validated = txid_info["btc_validated"]
 
                     if len(txid_info["notary_addresses"]) == 0:
+
                         if row.chain == "BTC":
                             url = f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}"
                             local_info = requests.get(url).json()["results"][0]
@@ -75,9 +76,7 @@ for season in seasons:
                                     local_addresses.append(item["address"])
                             row.notary_addresses = local_addresses
                             row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time, "BTC", "BTC", txid, row.notaries)
-                            #tx_info = get_btc_tx_info(txid)
-                            #row.notary_addresses = tx_info['addresses']
-                            #row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time, "BTC", "BTC", txid, row.notaries)
+
                         elif row.chain == "LTC":
                             url = f"{THIS_SERVER}/api/info/nn_ltc_txid?txid={txid}"
                             local_info = requests.get(url).json()["results"][0]
@@ -87,12 +86,14 @@ for season in seasons:
                                     local_addresses.append(item["address"])
                             row.notary_addresses = local_addresses
                             row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time, "BTC", "BTC", txid, row.notaries)
+
                         else:
                             row_data = get_notarised_data(txid)
                             row.notary_addresses = row_data[6]
                             row.season = row_data[11]
                             row.server = row_data[12]                
                             row.season, row.server = get_season_from_addresses(row.notary_addresses, row.block_time)
+                            
                     else:
                         row.notary_addresses = txid_info["notary_addresses"]
                         row.season = txid_info["season"]
