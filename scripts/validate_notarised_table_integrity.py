@@ -257,4 +257,3 @@ print(deleted)
 print(long_chain_names)
 for result in assert_results:
     print(result)
-print("Now run to resolve where repaired: ./cron_populate_epochs.py")

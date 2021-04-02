@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import time
+import random
 import logging
 import logging.handlers
 import requests
@@ -25,7 +26,8 @@ for season in seasons:
         chains = get_notarised_chains(season)
 
         i = 0
-        for chain in chains:
+        while len(chains) > 0:
+            chain = random.choice(chains)
 
             i += 1
             logger.info(f">>> Importing {chain} for {season} {i}/{len(chains)}")
@@ -113,6 +115,8 @@ for season in seasons:
                 except Exception as e:
                     logger.error(e)
                     logger.error(f"Something wrong with API? {txid_url}")
+                    
+            chains.remove(chain)
 
 CURSOR.close()
 CONN.close()
