@@ -15,9 +15,10 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-#all_notarised_seasons = get_notarised_seasons()
-#all_notarised_servers = get_notarised_servers()
-#all_notarised_chains = get_notarised_chains()
+all_notarised_seasons = get_notarised_seasons()
+all_notarised_servers = get_notarised_servers()
+all_notarised_epochs = get_notarised_epochs()
+all_notarised_chains = get_notarised_chains()
 
 def get_notarisation_data(min_time, max_time):
 
@@ -202,6 +203,10 @@ def get_notarisation_data(min_time, max_time):
         return ntx_summary, chain_totals
 
 print(get_all_coins())
+print(all_notarised_chains)
+print(all_notarised_servers)
+print(all_notarised_epochs)
+print(all_notarised_chains)
 
 sys.exit()
 notarisation_data, chain_totals = get_notarisation_data(SEASONS_INFO["Season_4"]["start_time"], SEASONS_INFO["Season_4"]["end_time"])

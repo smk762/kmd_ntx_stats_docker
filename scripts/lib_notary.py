@@ -204,9 +204,9 @@ def get_notarised_data(txid):
 
                             # TODO: This could potentially misidentify - do better.
                             for x in coins_list:
-
-                                if chain.endswith(x):
-                                    chain = x
+                                if x not in ['D']:
+                                    if chain.endswith(x):
+                                        chain = x
 
                             if chain == "KMD":
                                 btc_txid = lil_endian(scriptPubKey_asm[72:136])

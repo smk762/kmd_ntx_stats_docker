@@ -345,6 +345,22 @@ def get_notarised_chains(season=None, server=None):
     chains.sort()
     return chains
 
+def get_notarised_epochs(season=None, server=None):
+    epoch = []
+    if season and server:
+        CURSOR.execute(f"SELECT DISTINCT epoch FROM notarised WHERE season='{season}' AND server='{server}';")
+    elif season:
+        CURSOR.execute(f"SELECT DISTINCT epoch FROM notarised WHERE season='{season}';")
+    elif server:
+        CURSOR.execute(f"SELECT DISTINCT epoch FROM notarised WHERE server='{server}';")
+    else:
+        CURSOR.execute("SELECT DISTINCT epoch FROM notarised;")
+    chain_results = CURSOR.fetchall()
+    for result in chain_results:
+        epoch.append(result[0])
+    epoch.sort()
+    return epoch
+
 def get_notarised_seasons(chain=None):
     seasons = []
     if chain:
