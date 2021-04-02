@@ -6,7 +6,7 @@ import logging.handlers
 import requests
 from lib_const import NOTARY_LTC_ADDRESSES, OTHER_SERVER
 from lib_notary import get_new_notary_txids
-from models import ltc_tx_row
+from models import ltc_tx_row, get_chain_epoch_score_at, get_chain_epoch_at
 from lib_const import *
 from lib_table_select import get_notarised_seasons
 

@@ -16,7 +16,7 @@ from lib_table_select import get_existing_nn_ltc_txids
 
 from lib_api import get_ltc_tx_info
 
-from models import ltc_tx_row, last_notarised_row, notarised_row
+from models import ltc_tx_row, last_notarised_row, notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
 
 from lib_const import LTC_NTX_ADDR, NOTARY_LTC_ADDRESSES, NN_LTC_ADDRESSES_DICT, ALL_SEASON_NOTARY_LTC_ADDRESSES, ALL_SEASON_NOTARIES, ALL_SEASON_NN_LTC_ADDRESSES_DICT, THIS_SERVER
 from lib_db import CONN, CURSOR
@@ -280,30 +280,30 @@ for notary_address in NOTARY_LTC_ADDRESSES[season]:
         j += 1
         # Get tx data from Blockcypher API
         logger.info(f">>> Processing txid {j}/{num_txids}")
-        tx_info = get_ltc_tx_info(txid)
-        if 'fees' in tx_info:
+        ltc_row = get_ltc_tx_info(txid)
+        if 'fees' in ltc_row:
             txid_data = ltc_tx_row()
             txid_data.txid = txid
             txid_data.address = notary_address
-            txid_data.fees = tx_info['fees']
+            txid_data.fees = ltc_row['fees']
 
-            txid_data.num_inputs = tx_info['vin_sz']
-            txid_data.num_outputs = tx_info['vout_sz']
+            txid_data.num_inputs = ltc_row['vin_sz']
+            txid_data.num_outputs = ltc_row['vout_sz']
 
-            txid_data.block_hash = tx_info['block_hash']
-            txid_data.block_height = tx_info['block_height']
+            txid_data.block_hash = ltc_row['block_hash']
+            txid_data.block_height = ltc_row['block_height']
 
-            block_time_iso8601 = tx_info['confirmed']
+            block_time_iso8601 = ltc_row['confirmed']
             parsed_time = dp.parse(block_time_iso8601)
             txid_data.block_time = parsed_time.strftime('%s')
             txid_data.block_datetime = dt.utcfromtimestamp(int(txid_data.block_time))
 
-            addresses = tx_info['addresses']
+            addresses = ltc_row['addresses']
             txid_data.season, txid_data.server = get_season_from_addresses(addresses[:], txid_data.block_time, "LTC", "LTC")
 
 
-            vouts = tx_info["outputs"]
-            vins = tx_info["inputs"]
+            vouts = ltc_row["outputs"]
+            vins = ltc_row["inputs"]
             update_notary_linked_vins(vins)
 
             ## CATEGORIES ##
@@ -362,21 +362,21 @@ for notary_address in NOTARY_LTC_ADDRESSES[season]:
                     notary_list = []
                     notary_addresses = []
                     for vin in vins:
-                        row = last_notarised_row()
-                        row.notary = get_notary_from_ltc_address(vin["addresses"][0], season)
-                        notary_list.append(row.notary)
+                        last_ntx_row = last_notarised_row()
+                        last_ntx_row.notary = get_notary_from_ltc_address(vin["addresses"][0], season)
+                        notary_list.append(last_ntx_row.notary)
                         notary_addresses.append(vin["addresses"][0])
-                        if row.notary in notary_last_ntx:
-                            last_ltc_ntx_ht = notary_last_ntx[row.notary]["LTC"]
+                        if last_ntx_row.notary in notary_last_ntx:
+                            last_ltc_ntx_ht = notary_last_ntx[last_ntx_row.notary]["LTC"]
                         else:
                             last_ltc_ntx_ht = 0
                         if last_ltc_ntx_ht < txid_data.block_height:
-                            row.season = season
-                            row.chain = "LTC"
-                            row.txid = txid_data.txid
-                            row.block_height = txid_data.block_height
-                            row.block_time = txid_data.block_time
-                            row.update()
+                            last_ntx_row.season = season
+                            last_ntx_row.chain = "LTC"
+                            last_ntx_row.txid = txid_data.txid
+                            last_ntx_row.block_height = txid_data.block_height
+                            last_ntx_row.block_time = txid_data.block_time
+                            last_ntx_row.update()
                     for vout in vouts:
                         if 'data_hex' in vout:
                             opret = vout['data_hex']
@@ -389,24 +389,28 @@ for notary_address in NOTARY_LTC_ADDRESSES[season]:
                             ac_ntx_blockhash = kmd_ntx_info['notarised_blockhash']
 
                             # Update "notarised" table
-                            row = notarised_row()
-                            row.chain = "LTC"
-                            row.block_height = txid_data.block_height
-                            row.block_time = txid_data.block_time
-                            row.block_datetime = txid_data.block_datetime
-                            row.block_hash = txid_data.block_hash
-                            row.notaries = notary_list
-                            row.notary_addresses = notary_addresses
-                            row.ac_ntx_blockhash = ac_ntx_blockhash
-                            row.ac_ntx_height = ac_ntx_height
-                            row.txid = txid_data.txid
-                            row.opret = opret
-                            row.season = txid_data.season
-                            row.server = txid_data.server
-                            row.score_value = get_dpow_score_value(row.season, row.server, row.chain, int(row.block_time))
-                            row.scored = True
-                            row.btc_validated = "N/A"
-                            row.update()
+                            ntx_row = notarised_row()
+                            ntx_row.chain = "LTC"
+                            ntx_row.block_height = txid_data.block_height
+                            ntx_row.block_time = txid_data.block_time
+                            ntx_row.block_datetime = txid_data.block_datetime
+                            ntx_row.block_hash = txid_data.block_hash
+                            ntx_row.notaries = notary_list
+                            ntx_row.notary_addresses = notary_addresses
+                            ntx_row.ac_ntx_blockhash = ac_ntx_blockhash
+                            ntx_row.ac_ntx_height = ac_ntx_height
+                            ntx_row.txid = txid_data.txid
+                            ntx_row.opret = opret
+                            ntx_row.season = txid_data.season
+                            ntx_row.server = txid_data.server
+                            ntx_row.score_value = get_chain_epoch_score_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
+                            ntx_row.epoch = get_chain_epoch_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
+                            if ntx_row.score_value > 0:
+                                ntx_row.scored = True
+                            else:
+                                ntx_row.scored = False
+                            ntx_row.btc_validated = "N/A"
+                            ntx_row.update()
 
             logger.info(f"TXID: {txid} ({txid_data.category})")
         else:
