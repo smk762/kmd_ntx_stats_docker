@@ -18,7 +18,7 @@ from lib_notary import *
 from lib_table_update import *
 from lib_table_select import *
 from lib_api import *
-from models import notarised_row, notarised_count_season_row, notarised_chain_season_row, notarised_count_daily_row, notarised_chain_daily_row, last_notarised_row
+from models import notarised_row, notarised_count_season_row, notarised_chain_season_row, notarised_count_daily_row, notarised_chain_daily_row, last_notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -80,38 +80,38 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
             chain = row_data[0]
 
             if chain != 'KMD': # KMD -> BTC notarisations are requested via BTC blockchain APIs
-                row = notarised_row()
-                row.chain = chain
-                row.block_height = row_data[1]
-                row.block_time = row_data[2]
-                row.block_datetime = row_data[3]
-                row.block_hash = row_data[4]
-                row.notaries = row_data[5]
-                row.notary_addresses = row_data[6]
-                row.ac_ntx_blockhash = row_data[7]
-                row.ac_ntx_height = row_data[8]
-                row.txid = row_data[9]
-                row.opret = row_data[10]
-                row.season = row_data[11]
+                ntx_row = notarised_row()
+                ntx_row.chain = chain
+                ntx_row.block_height = row_data[1]
+                ntx_row.block_time = row_data[2]
+                ntx_row.block_datetime = row_data[3]
+                ntx_row.block_hash = row_data[4]
+                ntx_row.notaries = row_data[5]
+                ntx_row.notary_addresses = row_data[6]
+                ntx_row.ac_ntx_blockhash = row_data[7]
+                ntx_row.ac_ntx_height = row_data[8]
+                ntx_row.txid = row_data[9]
+                ntx_row.opret = row_data[10]
+                ntx_row.season = row_data[11]
                 if chain == "GLEEC":
-                    row.server = get_gleec_ntx_server(row.txid)
+                    ntx_row.server = get_gleec_ntx_server(ntx_row.txid)
                 else:
-                    row.server = row_data[12]
-                row.score_value = get_dpow_score_value(row.season, row.server, row.chain, row.block_time)
-                if row.score_value > 0:
-                    row.scored = True
+                    ntx_row.server = row_data[12]
+                ntx_row.score_value = get_chain_epoch_score_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
+                ntx_row.epoch = get_chain_epoch_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
+                if ntx_row.score_value > 0:
+                    ntx_row.scored = True
                 else:
-                    row.scored = False
-                
-                row.btc_validated =  "N/A"
-                row.update()
+                    ntx_row.scored = False
+                ntx_row.btc_validated = "N/A"
+                ntx_row.update()
 
                 runtime = int(time.time()-start)
                 try:
                     pct = round(i/num_unrecorded_KMD_txids*100,3)
                     est_end = int(100/pct*runtime)
-                    if row.season == "Season_5_Testnet":
-                        logger.info(f"{row.season} NTX {row.notaries}")
+                    if ntx_row.season == "Season_5_Testnet":
+                        logger.info(f"{ntx_row.season} NTX {ntx_row.notaries}")
                     logger.info(str(pct)+"% :"+str(i)+"/"+str(num_unrecorded_KMD_txids)+
                              " records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
                 except:
@@ -437,7 +437,7 @@ for season in seasons:
                 chunk_size = 50000
                 for i in range(start_block, end_block, chunk_size):
                     windows.append((i, i+chunk_size))
-                    
+
                 windows.reverse()
                 logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
                 for x in windows:
