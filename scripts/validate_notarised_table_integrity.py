@@ -209,31 +209,33 @@ for season in SCORING_EPOCHS:
 
             # Validate Season / Server from addresses
             if len(address_list) == 0:
+
                 if chain == "BTC":
                     url = f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}"
                     local_info = requests.get(url).json()["results"][0]
                     local_addresses = []
+
                     for item in local_info:
                         if item["input_index"] != -1:
                             local_addresses.append(item["address"])
+
                     notary_addresses = local_addresses
-                    season, server = get_season_from_addresses(local_addresses, block_time, "BTC", "BTC", txid, notaries)
-                    #tx_info = get_btc_tx_info(txid)
-                    #address_list = tx_info['addresses']
-                    #address_season, address_server = get_season_from_addresses(address_list, block_time, ntx_chain, chain, txid, notaries)
                     print(f">>> Updating Addresses... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {local_addresses}")
                     update_season_server_addresses_notarised_tbl(txid, address_season, address_server, local_addresses)
+
                 else:
                     row_data = get_notarised_data(txid)
+
                     if row_data is not None:
                         address_list = row_data[6]
                         address_season = row_data[11]
                         address_server = row_data[12]
+                        
                         print(f">>> Updating Addresses... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
                         update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
 
 
-            elif season != address_season:
+            if season != address_season:
                 print(f">>> Updating Season... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
                 update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
 

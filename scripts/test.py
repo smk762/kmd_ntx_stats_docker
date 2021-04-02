@@ -2,7 +2,8 @@
 import sys
 from lib_const import SCORING_EPOCHS, NOTARY_PUBKEYS, CURSOR, CONN, SEASONS_INFO
 from lib_table_select import *
-from lib_notary import get_dpow_scoring_window
+from lib_table_update import *
+from lib_notary import *
 from models import get_chain_epoch_at, get_chain_epoch_score_at
 
 import logging
@@ -207,6 +208,94 @@ print(all_notarised_chains)
 print(all_notarised_servers)
 print(all_notarised_epochs)
 print(all_notarised_chains)
+
+CURSOR.execute(f"SELECT notary_addresses, season, chain, block_time, notaries, txid, server, scored, score_value, epoch \
+                 FROM notarised \
+                 WHERE server = 'Testnet' \
+                 ORDER BY server DESC, chain ASC, block_time DESC;")
+                # ORDER BY server DESC, chain ASC, block_time DESC;")
+
+notarised_rows = CURSOR.fetchall()
+i = 0
+start = int(time.time())
+num_rows = len(notarised_rows)
+long_chain_names = []
+
+for item in notarised_rows:
+    i += 1
+    if i%100 == 0:
+        now = int(time.time())
+        duration = now - start
+        pct_done = i/num_rows*100
+        eta = duration*100/pct_done
+        logger.info(f"{pct_done}% done. ETA {duration}/{eta} sec")
+        
+    address_list = item[0]
+    season = item[1]
+    chain = item[2]
+    if len(chain) > 10:
+        logger.warning(f"chain = {chain} for {txid}")
+        long_chain_names.append(chain)
+
+    block_time = item[3]
+    notaries = item[4]
+    txid = item[5]
+    server = item[6]
+    scored = item[7]
+    score_value = item[8]
+    epoch = item[9]
+
+    logger.info(f"Processing {i}/{num_rows} | {chain} | {season} | {server} | {score_value} | {scored}")
+    if chain not in ["KMD", "BTC"]:
+        ntx_chain = "KMD"
+    else:
+        ntx_chain = chain
+
+    address_season, address_server = get_season_from_addresses(address_list, block_time, ntx_chain, chain, txid, notaries)
+
+    # Validate Season / Server from addresses
+    if len(address_list) == 0:
+
+        if chain == "BTC":
+            url = f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}"
+            local_info = requests.get(url).json()["results"][0]
+            local_addresses = []
+
+            for item in local_info:
+                if item["input_index"] != -1:
+                    local_addresses.append(item["address"])
+
+            notary_addresses = local_addresses
+            print(f">>> Updating Addresses... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {local_addresses}")
+            update_season_server_addresses_notarised_tbl(txid, address_season, address_server, local_addresses)
+
+        else:
+            row_data = get_notarised_data(txid)
+
+            if row_data is not None:
+                address_list = row_data[6]
+                address_season = row_data[11]
+                address_server = row_data[12]
+                
+                print(f">>> Updating Addresses... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
+                update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
+
+
+    if season != address_season:
+        print(f">>> Updating Season... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
+        update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
+
+    elif server != address_server:
+        print(f">>> Updating Server... {chain} {txid} {address_server} {block_time} {address_server} {notaries} {address_list}")
+        update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
+
+    actual_epoch = get_chain_epoch_at(address_season, address_server, chain, block_time)
+    try:
+        assert actual_epoch == epoch and epoch != ''
+    except:
+        print(f">>> Updating epoch... {chain} {txid} {address_season} {address_server} {actual_epoch} (not {epoch}) {block_time}")
+
+        update_notarised_epoch(actual_epoch, None, None, None, txid)
 
 sys.exit()
 notarisation_data, chain_totals = get_notarisation_data(SEASONS_INFO["Season_4"]["start_time"], SEASONS_INFO["Season_4"]["end_time"])
