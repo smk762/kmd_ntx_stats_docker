@@ -421,7 +421,7 @@ class notarised_count_daily_row():
 class notarised_count_season_row():
     def __init__(self, notary='', btc_count='', antara_count='', 
         third_party_count='', other_count='', 
-        total_ntx_count='', chain_ntx_counts='', 
+        total_ntx_count='', chain_ntx_counts='', season_score='', 
         chain_ntx_pct='', time_stamp=int(time.time()),
         season=''):
         self.notary = notary
@@ -431,6 +431,7 @@ class notarised_count_season_row():
         self.other_count = other_count
         self.total_ntx_count = total_ntx_count
         self.chain_ntx_counts = chain_ntx_counts
+        self.season_score = season_score
         self.chain_ntx_pct = chain_ntx_pct
         self.time_stamp = time_stamp
         self.season = season
@@ -442,11 +443,11 @@ class notarised_count_season_row():
         row_data = (
             self.notary, self.btc_count, self.antara_count, 
             self.third_party_count, self.other_count, 
-            self.total_ntx_count, self.chain_ntx_counts, 
+            self.total_ntx_count, self.chain_ntx_counts, self.season_score, 
             self.chain_ntx_pct, self.time_stamp, self.season
         )
         if self.validated():
-            logger.info(f"Updating [notarised_count_season] {self.notary} {self.season}")
+            logger.info(f"Updating [notarised_count_season] {self.notary} {self.season} {self.season_score}")
             update_season_notarised_count_row(row_data)
         else:
             logger.warning(f"[notarised_count_season] Row data invalid!")

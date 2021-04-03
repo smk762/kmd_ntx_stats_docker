@@ -299,7 +299,7 @@ def get_server_active_dpow_chains_at_time(season, server, timestamp):
             for coin in tenure[season][server]:
                 if timestamp >= tenure[season][server][coin]["official_start_block_time"]:
                     if timestamp <= tenure[season][server][coin]["official_end_block_time"]:
-                        if coin not in ["BTC", "LTC"]:
+                        if coin not in ["BTC", "LTC"] and coin not in DPOW_EXCLUDED_CHAINS[season]:
                             chains.append(coin)
                         
 

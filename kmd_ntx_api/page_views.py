@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import time
+import random
 import numpy as np
 from django.shortcuts import render
 
@@ -131,7 +132,7 @@ def dash_view(request, dash_name=None):
     html = 'dash_index.html'
     season = get_season()
     notaries_list = get_notary_list(season)
-    coins_list = get_dpow_coins_list()
+    coins_list = get_dpow_coins_list(season)
     if dash_name:
         if dash_name.find('table') != -1:
             if dash_name == 'balances_table':
@@ -196,7 +197,10 @@ def dash_view(request, dash_name=None):
             "show_ticker":True
         })
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    server_chains = get_server_chains(coins_data)
+    if not season:
+        season = "Season_4"
+    coins_dict = get_dpow_server_coins_dict(season)
+    server_chains = get_server_chains(coins_dict)
     context.update({
         "gets":gets,
         "sidebar_links":get_sidebar_links(notaries_list ,coins_data),
@@ -279,7 +283,7 @@ def funding(request):
     notaries_list = get_notary_list(season)
 
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    chain_list = get_dpow_coins_list()
+    chain_list = get_dpow_coins_list(season)
 
     num_chains = len(chain_list)
     num_notaries = len(notaries_list)
@@ -397,30 +401,17 @@ def ntx_24hrs(request):
     }
     return render(request, 'ntx_24hrs.html', context)
 
-def ntx_scoreboard_24hrs(request):
-    season = get_season()
-    notaries_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-
-    context = {
-        "daily_stats_sorted":get_daily_stats_sorted(notaries_list),
-        "sidebar_links":get_sidebar_links(notaries_list ,coins_data),
-        "eco_data_link":get_eco_data_link(),
-        "nn_social":get_nn_social()
-    }
-    return render(request, 'ntx_scoreboard_24hrs.html', context)
-
 def ntx_scoreboard(request):
     season = get_season()
     notary_list = get_notary_list(season)
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
- 
+    
     coin_notariser_ranks = get_coin_notariser_ranks(season)
     notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
     region_score_stats = get_region_score_stats(notarisation_scores)
 
     context = {
-        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "sidebar_links":get_sidebar_links(notary_list, coins_data),
         "eco_data_link":get_eco_data_link(),
         "notarisation_scores":notarisation_scores,
         "region_score_stats":region_score_stats,
@@ -428,13 +419,39 @@ def ntx_scoreboard(request):
     }
     return render(request, 'ntx_scoreboard.html', context)
 
+def notary_epoch_scoring_table(request):
+    if not "season" in request.GET:
+        season = "Season_4"
+    else:
+        season = request.GET["season"]
+
+    notary_list = get_notary_list(season)
+    if not "notary" in request.GET:
+        notary = random.choice(notary_list)
+    else:
+        notary = request.GET["notary"]
+
+    scoring_table, total = get_notary_epoch_scoring_table(notary, season)
+    
+
+    context = {
+        "sidebar_links":get_sidebar_links(notary_list),
+        "eco_data_link":get_eco_data_link(),
+        "notary":notary,
+        "season":season,
+        "scoring_table":scoring_table,
+        "total":total,
+        "nn_social":get_nn_social()
+    }
+    return render(request, 'notary_epoch_scoring_table.html', context)
+
 def notarised_tenure_view(request):
     season = get_season()
     notary_list = get_notary_list(season)
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
     tenure_data = notarised_tenure.objects.all().values()
     context = {
-        "sidebar_links":get_sidebar_links(notary_list ,coins_data),
+        "sidebar_links":get_sidebar_links(notary_list),
         "tenure_data":tenure_data,
         "eco_data_link":get_eco_data_link()
     }

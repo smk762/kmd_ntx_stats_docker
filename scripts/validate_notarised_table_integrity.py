@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import json
 import logging
 import logging.handlers
 
@@ -20,242 +21,279 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 
-# recorded_txids = get_existing_notarised_txids()
 
-deleted = {}
 
-assert_results = []
-'''
-for item in ["chain", "season", "server", "scored", "btc_validated"]:
+def validate_servers(season):
+    logger.info(f"Validating servers for {season}...")
 
-            print(f"{item} in DB:")
-            CURSOR.execute(f"SELECT DISTINCT {item} FROM notarised;")
-            cat_rows = CURSOR.fetchall()
-            print(cat_rows)
-'''
-    
+    results = []
 
-# Validate correct servers
-
-notarised_seasons = get_notarised_seasons()
-
-for season in notarised_seasons:
-    
     try:
-        assert season in list(SEASONS_INFO.keys()) or season == "Unofficial"
-        assert_results.append({f"{season} in SEASONS_INFO: Pass"})
+        assert season in list(SEASONS_INFO.keys())
+        results.append({f"{season} in SEASONS_INFO: Pass"})
+
     except:
-        assert_results.append({f"{season} in SEASONS_INFO: Fail"})
+        results.append({f"{season} in SEASONS_INFO: Fail"})
 
-    if season != "Unofficial":
-        notarised_chains = get_notarised_chains(season)
-        tenure_chains = get_tenure_chains(season)
-        if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
-            try:
-                assert notarised_chains == tenure_chains
-                assert_results.append({f"{season} notarised_chains == tenure_chains: Pass"})
-            except:
-                assert_results.append({f"{season} notarised_chains == tenure_chains: Fail"})
-
-            
-
-        for chain in notarised_chains:
-            if season in DPOW_EXCLUDED_CHAINS: 
-                if chain in DPOW_EXCLUDED_CHAINS[season]:
-                    print(f"{chain} excluded from {season}, updating...")
-                    print(f">>> Updating Server... Unofficial {chain} Unofficial")
-                    update_unofficial_chain_notarised_tbl(season, chain)
-
-
-    
+    notarised_chains = get_notarised_chains(season)
+    tenure_chains = get_tenure_chains(season)
     servers = get_notarised_servers(season)
+
     try:
-        assert server in ["Main", "Third_Party", "Unofficial"]
-        assert_results.append({f"{season} server catgories valid: Pass"})
+        assert notarised_chains == tenure_chains
+        results.append({f"{season} notarised_chains == tenure_chains: Pass"})
+
     except:
-        assert_results.append({f"{season} server catgories valid: Fail"})
-        
-# Validate BTC scores
-CURSOR.execute(f"SELECT DISTINCT score_value \
-                 FROM notarised \
-                 WHERE season = 'Season_4' \
-                 AND chain = 'BTC';")
-btc_scores = CURSOR.fetchall()
+        results.append({f"{season} notarised_chains == tenure_chains: Fail | {notarised_chains} vs {tenure_chains} "})
 
-try:
-    assert len(btc_scores) == 1 and float(btc_scores[0][0]) == 0.03250000
-    logger.info("BTC scores for Season 4 OK...")
-    assert_results.append({"BTC scores valid: Pass"})
-except Exception as e:
-    logger.warning(">>> Fixing BTC scores for Season 4")
-    assert_results.append({"BTC scores valid":"Fail (resolved)"})
-    if len(btc_scores) > 1:
-        update_chain_score_notarised_tbl("BTC", 0.03250000, SEASONS_INFO["Season_4"]["start_time"], SEASONS_INFO["Season_4"]["end_time"])
+    for chain in notarised_chains:
 
-logger.info(f"Season 4 BTC scores validation complete!\n")
-        
-# Validate LTC scores
-CURSOR.execute(f"SELECT DISTINCT score_value \
-                 FROM notarised \
-                 WHERE season = 'Season_5_Testnet' \
-                 AND chain = 'LTC';")
-ltc_scores = CURSOR.fetchall()
+        if chain in DPOW_EXCLUDED_CHAINS: 
 
-try:
-    assert len(btc_scores) == 1 and float(btc_scores[0][0]) == 0.03250000
-    logger.info("LTC scores for Season_5_Testnet OK...")
-    assert_results.append({"LTC scores valid: Pass"})
-except Exception as e:
-    logger.warning(">>> Fixing LTC scores for Season_5_Testnet")
-    assert_results.append({"LTC scores valid":"Fail (resolved)"})
-    if len(ltc_scores) > 1:
-        update_chain_score_notarised_tbl("LTC", 0.03250000, SEASONS_INFO["Season_5_Testnet"]["start_time"], SEASONS_INFO["Season_5_Testnet"]["end_time"])
+            if chain in DPOW_EXCLUDED_CHAINS[season]:
+                logger.info(f"{chain} excluded from {season}, updating...")
+                logger.info(f">>> Updating Server... Unofficial {chain} Unofficial")
+                update_unofficial_chain_notarised_tbl(season, chain)
 
-logger.info(f"Season_5_Testnet LTC scores validation complete!\n")
+    try:
+        assert server not in EXCLUDED_SERVERS
+        results.append({f"{season} server catgories valid: Pass"})
 
-# Validate Other scores
-for season in SCORING_EPOCHS:
-    if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
-        for server in SCORING_EPOCHS[season]:
+    except:
+        results.append({f"{season} server catgories valid: Fail"})
 
-            for epoch in SCORING_EPOCHS[season][server]:
+    return results
 
-                epoch_start = SCORING_EPOCHS[season][server][epoch]["start"]
-                epoch_end = SCORING_EPOCHS[season][server][epoch]["end"]
-                epoch_midpoint = int((epoch_start + epoch_end)/2)
-                epoch_active_chains, num_chains = get_server_active_dpow_chains_at_time(season, server, epoch_midpoint)
-                server_tenure_chains = get_tenure_chains(season, server)
-                if "BTC" in server_tenure_chains:
-                    server_tenure_chains.remove("BTC")
-                if "LTC" in server_tenure_chains:
-                    server_tenure_chains.remove("LTC")
-                try:
-                    assert len(set(epoch_active_chains) - set(server_tenure_chains)) == 0
-                    assert_results.append({"all epoch_active_chains in server_tenure_chains: Pass"})
-                except:
-                    assert_results.append({"all epoch_active_chains in server_tenure_chains: Fail"})
+def validate_BTC_scores(season):
+    logger.info(f"Validating BTC scores for {season}...")
+    results = []
 
-                logger.info(f"{season} {server} {epoch} server_tenure_chains epoch_match active_chains OK!")
+    CURSOR.execute(f"SELECT DISTINCT score_value \
+                     FROM notarised \
+                     WHERE season = '{season}' \
+                     AND chain = 'BTC' AND server != 'Unofficial' \
+                     AND epoch != 'Unofficial';")
+    btc_scores = CURSOR.fetchall()
 
-                for chain in epoch_active_chains:
+    if len(btc_scores) > 0:
+        try:
+            assert len(btc_scores) == 1 and float(btc_scores[0][0]) == 0.03250000
+            logger.info(f"BTC scores for {season} OK...")
+            results.append({f"{season} BTC scores valid: Pass"})
 
-                    actual_score = get_dpow_score_value(season, server, chain, epoch_midpoint)
-                    sql = f"SELECT DISTINCT score_value \
-                                FROM notarised \
-                                WHERE block_time >= {epoch_start} \
-                                AND block_time <= {epoch_end} \
-                                AND season = '{season}' \
-                                AND chain = '{chain}';"
+        except Exception as e:
+            bad_scores = []
+            for item in btc_scores:
+                bad_scores.append(float(item))
+            logger.error(f">>> Fixing BTC scores for {season} | Set to 0.0325 not {bad_scores}")
+            results.append({f"{season} BTC scores valid":f"Fail (resolved) | Set to 0.0325 not {btc_scores}"})
+            if len(btc_scores) > 1:
+                update_chain_score_notarised_tbl("BTC", 0.03250000, SEASONS_INFO[season]["start_time"], SEASONS_INFO[season]["end_time"])
+    else:
+        logger.warning(f"Zero BTC scores for {season} {server} {epoch}!")
 
-                    CURSOR.execute(sql)
+    logger.info(f"{season} BTC scores validation complete!\n")
+    return results
 
-                    scores = CURSOR.fetchall()
+def validate_LTC_scores(season):
+    logger.info(f"Validating LTC scores for {season}...")
+    results = []
 
+    CURSOR.execute(f"SELECT DISTINCT score_value \
+                     FROM notarised \
+                     WHERE season = '{season}' \
+                     AND chain = 'LTC' AND server != 'Unofficial' \
+                     AND epoch != 'Unofficial';")
+    ltc_scores = CURSOR.fetchall()
+
+    if len(ltc_scores) > 0:
+        try:
+            assert len(ltc_scores) == 1 and float(ltc_scores[0][0]) == 0.03250000
+            logger.info(f"LTC scores for {season} OK...")
+            results.append({f"{season} LTC scores valid: Pass"})
+
+        except Exception as e:
+            bad_scores = []
+            for item in ltc_scores:
+                bad_scores.append(float(item))
+            logger.error(f">>> Fixing BTC scores for {season} | Set to 0.0325 not {bad_scores}")
+            results.append({f"{season} LTC scores valid":f"Fail (resolved) | Set to 0.0325 not {ltc_scores}"})
+            if len(ltc_scores) > 1:
+                update_chain_score_notarised_tbl("LTC", 0.03250000, SEASONS_INFO[season]["start_time"], SEASONS_INFO[season]["end_time"])
+    else:
+        logger.warning(f"Zero LTC scores for {season} {server} {epoch}!")
+
+    logger.info(f"{season} LTC scores validation complete!\n")
+    return results
+
+def validate_other_scores(season):
+    results = []
+
+    for server in SCORING_EPOCHS[season]:
+
+        for epoch in SCORING_EPOCHS[season][server]:
+
+            epoch_start = SCORING_EPOCHS[season][server][epoch]["start"]
+            epoch_end = SCORING_EPOCHS[season][server][epoch]["end"]
+            epoch_midpoint = int((epoch_start + epoch_end)/2)
+            epoch_active_chains, num_chains = get_server_active_dpow_chains_at_time(season, server, epoch_midpoint)
+            server_tenure_chains = get_tenure_chains(season, server)
+
+            if "BTC" in server_tenure_chains:
+                server_tenure_chains.remove("BTC")
+
+            if "LTC" in server_tenure_chains:
+                server_tenure_chains.remove("LTC")
+
+            try:
+                assert len(set(epoch_active_chains) - set(server_tenure_chains)) == 0
+                results.append({f"all {season} {server} {epoch} epoch_active_chains in server_tenure_chains: Pass"})
+
+            except:
+                results.append({f"all {season} {server} {epoch} epoch_active_chains in server_tenure_chains: Fail"})
+
+            logger.info(f"{season} {server} {epoch} server_tenure_chains epoch_match active_chains OK!")
+
+            for chain in epoch_active_chains:
+
+                logger.info(f"Validating {chain} scores for {season} {server} {epoch}...")
+
+                actual_score = get_dpow_score_value(season, server, chain, epoch_midpoint)
+                sql = f"SELECT DISTINCT score_value \
+                            FROM notarised \
+                            WHERE block_time >= {epoch_start} \
+                            AND block_time <= {epoch_end} \
+                            AND season = '{season}' \
+                            AND server = '{server}' \
+                            AND chain = '{chain}';"
+
+                CURSOR.execute(sql)
+
+                scores = CURSOR.fetchall()
+                if len(scores) > 0:
                     try:
                         assert len(scores) == 1 and float(scores[0][0]) == actual_score
-                        assert_results.append({f"{chain} Scoring correct: Pass"})
+                        results.append({f"{chain} Scoring correct: Pass"})
                         logger.info(f"{chain} scores for {season} {server} {epoch} OK...")
+
                     except Exception as e:
-                        logger.warning(f">>> Fixing {chain} scores for {season} {server} {epoch}")
+                        bad_scores = []
+                        for item in scores:
+                            bad_scores.append(float(item))
+                        logger.error(f">>> Fixing {chain} scores for {season} {server} {epoch} | Set to {actual_score} not {bad_scores}")
                         update_chain_score_notarised_tbl(chain, actual_score, epoch_start, epoch_end)
-                        assert_results.append({f"{chain} scoring incorrect":"Fail (resolved)"})
-
-        logger.info(f"{season} Other scores validation complete!\n")
-
-        CURSOR.execute(f"SELECT notarised, season, chain, block_time, notaries, txid, server, scored, score_value, epoch \
-                         FROM notarised \
-                         WHERE season = '{season}' \
-                         ORDER BY server DESC, chain DESC, block_time DESC;")
-                        # ORDER BY server DESC, chain ASC, block_time DESC;")
-
-        notarised_rows = CURSOR.fetchall()
-
-        i = 0
-        start = int(time.time())
-        num_rows = len(notarised_rows)
-        long_chain_names = []
-
-        for item in notarised_rows:
-            i += 1
-            if i%100 == 0:
-                now = int(time.time())
-                duration = now - start
-                pct_done = i/num_rows*100
-                eta = duration*100/pct_done
-                logger.info(f"{pct_done}% done. ETA {duration}/{eta} sec")
-                
-            address_list = item[0]
-            season = item[1]
-            chain = item[2]
-            if len(chain) > 10:
-                logger.warning(f"chain = {chain} for {txid}")
-                long_chain_names.append(chain)
-
-            block_time = item[3]
-            notaries = item[4]
-            txid = item[5]
-            server = item[6]
-            scored = item[7]
-            score_value = item[8]
-            epoch = item[9]
-
-            logger.info(f"Processing {i}/{num_rows} | {chain} | {season} | {server} | {score_value} | {scored}")
-            if chain not in ["KMD", "BTC"]:
-                ntx_chain = "KMD"
-            else:
-                ntx_chain = chain
-
-            address_season, address_server = get_season_from_addresses(address_list, block_time, ntx_chain, chain, txid, notaries)
-
-            # Validate Season / Server from addresses
-            if len(address_list) == 0:
-
-                if chain == "BTC":
-                    url = f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}"
-                    local_info = requests.get(url).json()["results"][0]
-                    local_addresses = []
-
-                    for item in local_info:
-                        if item["input_index"] != -1:
-                            local_addresses.append(item["address"])
-
-                    notary_addresses = local_addresses
-                    print(f">>> Updating Addresses... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {local_addresses}")
-                    update_season_server_addresses_notarised_tbl(txid, address_season, address_server, local_addresses)
-
+                        results.append({f"{chain} {season} {server} {epoch} scoring incorrect":f"Fail (resolved) Set to {actual_score} not {scores[0]}"})
                 else:
-                    row_data = get_notarised_data(txid)
-
-                    if row_data is not None:
-                        address_list = row_data[6]
-                        address_season = row_data[11]
-                        address_server = row_data[12]
-                        
-                        print(f">>> Updating Addresses... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
-                        update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
+                    logger.warning(f"Zero {chain} scores for {season} {server} {epoch}!")
 
 
-            if season != address_season:
-                print(f">>> Updating Season... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
-                update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
+    logger.info(f"{season} Other scores validation complete!\n")
+    return results
 
-            elif server != address_server:
-                print(f">>> Updating Server... {chain} {txid} {address_server} {block_time} {address_server} {notaries} {address_list}")
-                update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
+def validate_addresses(season):
+    results = []
 
-            actual_epoch = get_chain_epoch_at(address_season, address_server, chain, block_time)
-            try:
-                assert actual_epoch == epoch and epoch != ''
-            except:
-                print(f">>> Updating epoch... {chain} {txid} {address_season} {address_server} {actual_epoch} (not {epoch}) {block_time}")
+    CURSOR.execute(f"SELECT notarised, season, chain, block_time, notaries, txid, server, scored, score_value, epoch \
+                     FROM notarised \
+                     WHERE season = '{season}' \
+                     ORDER BY server DESC, chain DESC, block_time DESC;")
 
-                update_notarised_epoch(actual_epoch, None, None, None, txid)
-                
+    notarised_rows = CURSOR.fetchall()
+
+    i = 0
+    start = int(time.time())
+    num_rows = len(notarised_rows)
+    long_chain_names = []
+
+    for item in notarised_rows:
+        i += 1
+        if i%100 == 0:
+            now = int(time.time())
+            duration = now - start
+            pct_done = i/num_rows*100
+            eta = duration*100/pct_done
+            logger.info(f"{pct_done}% done. ETA {duration}/{eta} sec")
+            logger.info(f"Processing {i}/{num_rows} | {chain} | {season} | {server} ")
+            
+        address_list = item[0]
+        season = item[1]
+        chain = item[2]
+        block_time = item[3]
+        notaries = item[4]
+        txid = item[5]
+        server = item[6]
+        scored = item[7]
+        score_value = item[8]
+        epoch = item[9]
+
+        if chain not in ["KMD", "BTC"]:
+            ntx_chain = "KMD"
+        else:
+            ntx_chain = chain
+
+        address_season, address_server = get_season_from_addresses(address_list, block_time, ntx_chain, chain, txid, notaries)
+
+        if len(address_list) == 0:
+            logger.warning(f">>> Updating missing addresses for {chain}: {txid}")
+
+            if chain == "BTC":
+                url = f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}"
+                local_info = requests.get(url).json()["results"][0]
+                notary_addresses = []
+
+                for item in local_info:
+                    if item["input_index"] != -1:
+                        local_addresses.append(item["address"])
+
+                update_season_server_addresses_notarised_tbl(txid, address_season, address_server, notary_addresses)
+                logger.warning(f">>> Updated missing addresses | {chain} {txid} {address_season} {block_time} {address_season} {notaries} {notary_addresses}")
+
+            else:
+                row_data = get_notarised_data(txid)
+
+                if row_data is not None:
+                    address_list = row_data[6]
+                    address_season = row_data[11]
+                    address_server = row_data[12]
+                    
+                    update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
+                    logger.warning(f">>> Updated missing addresses | {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
 
 
+        if season != address_season:
+            update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
+            logger.warning(f">>> Updated Season... {chain} {txid} {address_season} {block_time} {address_season} {notaries} {address_list}")
 
-print(get_notarised_chains())
-print(deleted)
-print(long_chain_names)
-for result in assert_results:
-    print(result)
+        elif server != address_server:
+            update_season_server_addresses_notarised_tbl(txid, address_season, address_server, address_list)
+            logger.warning(f">>> Updated Server... {chain} {txid} {address_server} {block_time} {address_server} {notaries} {address_list}")
+
+        actual_epoch = get_chain_epoch_at(address_season, address_server, chain, block_time)
+
+        try:
+            assert actual_epoch == epoch and epoch != ''
+        except:
+            update_notarised_epoch(actual_epoch, None, None, None, txid)
+            logger.info(f">>> Updating epoch... {chain} {txid} {address_season} {address_server} {actual_epoch} (not {epoch}) {block_time}")
+
+    return results
+
+
+if __name__ == "__main__":
+
+    assert_results = []
+    notarised_seasons = get_notarised_seasons()
+
+    for season in notarised_seasons:
+        if season not in EXCLUDED_SEASONS:
+            assert_results += validate_servers(season)
+            assert_results += validate_BTC_scores(season)
+            assert_results += validate_LTC_scores(season)
+            assert_results += validate_other_scores(season)
+
+            # this takes a while, run if you have reason or periodically
+            # assert_results += validate_addresses(season)
+
+    
+    logger.info(assert_results)
+    #logger.info(json.dumps(assert_results, indent=4))
