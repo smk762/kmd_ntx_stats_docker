@@ -73,7 +73,7 @@ def is_notary_address(addr):
         return True
     return False
 
-def detect_ntx(vins, vouts):
+def detect_ntx(vins, vouts, addresses):
     if LTC_NTX_ADDR in addresses and len(vouts) == 2:
         for vin in vins:
             if vin["output_value"] != 10000:
@@ -325,7 +325,7 @@ def scan_ltc_transactions(season):
                     logger.info("SPLIT detected")
 
                 else:                    
-                    if detect_ntx(vins, vouts):
+                    if detect_ntx(vins, vouts, addresses):
                         txid_data.category = "NTX"
                     elif detect_replenish(vins, vouts):
                         txid_data.category = "Replenish"

@@ -41,21 +41,32 @@ router.register(r'info/mined_count_date',
 router.register(r'info/notarised_chain_season',
                 api_filtered_viewsets.notarised_chain_season_filter,
                 basename='notarised_chain_season_filter')
+
+
+router.register(r'info/notarisation',
+                api_filtered_viewsets.notarised_filter,
+                basename='notarised_filter')
+
 router.register(r'info/notarised_count_season',
                 api_filtered_viewsets.notarised_count_season_filter,
                 basename='notarised_count_season_filter')
+
 router.register(r'info/notarised_chain_date',
                 api_filtered_viewsets.notarised_chain_date_filter,
                 basename='notarised_chain_date_filter')
+
 router.register(r'info/notarised_count_date',
                 api_filtered_viewsets.notarised_count_date_filter,
                 basename='notarised_count_date_filter')
+
 router.register(r'info/notarised_tenure',
                 api_filtered_viewsets.notarised_tenure_filter,
                 basename='notarised_tenure_filter')
+
 router.register(r'info/notary_nodes',
                 api_filtered_viewsets.notary_nodes_filter,
                 basename='notary_nodes_filter')
+
 router.register(r'info/notary_rewards',
                 api_filtered_viewsets.notary_rewards_filter,
                 basename='notary_rewards_filter')
@@ -72,6 +83,7 @@ router.register(r'info/last_notarised',
 router.register(r'info/last_btc_notarised',
                 api_filtered_viewsets.last_btc_ntx_filter,
                 basename='last_btc_ntx_filter')
+
 
 # Tools 
 router.register(r'tools/decode_opreturn',
@@ -284,6 +296,7 @@ urlpatterns = [
     path('api/info/notarisation_txid',
           api_views.notarisation_txid,
           name='notarisation_txid'),
+
 
     path('api/info/chain_notarisation_txid_list',
           api_views.chain_notarisation_txid_list,

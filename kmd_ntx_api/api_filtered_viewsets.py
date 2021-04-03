@@ -124,7 +124,6 @@ class mined_count_date_filter(viewsets.ViewSet):
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
-
 class notarised_chain_season_filter(viewsets.ViewSet):
     """
     API endpoint showing notary node mined blocks
@@ -319,3 +318,22 @@ class notarised_tenure_filter(viewsets.ViewSet):
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
+
+class notarised_filter(viewsets.ViewSet):
+    """
+    Returns chain notarisation tenure, nested by Season > Chain \n
+    Default filter returns current NN Season \n
+
+    """
+    serializer_class = NotarisedSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        filters = self.serializer_class.Meta.fields
+        resp = get_notarised_data(request)
+        api_resp = wrap_api(resp, filters)
+        return Response(api_resp)
