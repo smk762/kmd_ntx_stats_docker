@@ -7,9 +7,11 @@ from kmd_ntx_api.lib_helper import *
 from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_query import *
 
-def notary_profile_view(request, notary=None):
+def notary_profile_view(request, notary=None, season=None):
     # Populate sidebar
-    season = get_season()
+    if not season:
+        season="Season_4"
+    
     notaries_list = get_notary_list(season)
     active_dpow_coins = get_active_dpow_coins()
 

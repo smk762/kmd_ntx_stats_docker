@@ -234,9 +234,6 @@ urlpatterns = [
     path('ntx_scoreboard/',
           page_views.ntx_scoreboard,
           name='ntx_scoreboard'),
-    path('ntx_scoreboard_24hrs/',
-          page_views.ntx_scoreboard_24hrs,
-          name='ntx_scoreboard_24hrs'),
 
     path('notarised_tenure/',
           page_views.notarised_tenure_view,
@@ -253,6 +250,11 @@ urlpatterns = [
     path('testnet_ntx_scoreboard',
           page_views.testnet_ntx_scoreboard,
           name='testnet_ntx_scoreboard'),
+
+    path('notary_epoch_scoring_table/',
+          page_views.notary_epoch_scoring_table,
+          name='notary_epoch_scoring_table'),
+    
 
     # OTHER API
     
@@ -352,9 +354,15 @@ urlpatterns = [
           api_tables.epoch_scoring_table,
           name='epoch_scoring_table'),
 
+    path('api/table/notary_epoch_scoring',
+          api_tables.api_table_notary_epoch_scoring,
+          name='api_table_notary_epoch_scoring'),
+
     path('api/table/mined_count_season',
           api_tables.mined_count_season_table,
           name='mined_count_season_table'),
+
+    # PENDING
 
     # REVIEW? DEPRECATED?
     path('review/funding/',
