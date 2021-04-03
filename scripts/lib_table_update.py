@@ -161,16 +161,30 @@ def update_unofficial_chain_notarised_tbl(season, chain):
         logger.debug(e)
         CONN.rollback()
 
-def update_chain_score_notarised_tbl(chain, score_value, min_time, max_time):
-    sql = f"UPDATE notarised SET scored={True}, score_value={score_value} \
-          WHERE chain='{chain}' \
-          AND block_time >= {min_time}\
-          AND block_time <= {max_time};"
+def update_chain_score_notarised_tbl(chain, score_value, scored, min_time=None, max_time=None, season=None, server=None, epoch=None):
+    sql = f"UPDATE notarised SET scored={scored}, score_value={score_value}"
+    conditions = []
+    if chain:
+        conditions.append(f"chain = '{chain}'")
+    if min_time:
+        conditions.append(f"block_time >= {min_time}")
+    if max_time:
+        conditions.append(f"block_time <= {max_time}")
+    if season:
+        conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
+    if epoch:
+        conditions.append(f"epoch = '{epoch}'")
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+
     try:
-        #print(sql)
         CURSOR.execute(sql)
         CONN.commit()
-        print(f"{txid} tagged as {scored} ({score_value})")
+        logger.info(f"UPDATED [notarised]: Set score_value to {score_value} WHERE {conditions}")
     except Exception as e:
         logger.debug(e)
         CONN.rollback()

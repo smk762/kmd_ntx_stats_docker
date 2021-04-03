@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import time
+import logging
 import datetime
 
 from .models import *
 from .serializers import *
 from .lib_helper import get_season, paginate_wrap, wrap_api
 
+logger = logging.getLogger(__name__)
 
 def apply_filters(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
@@ -199,6 +201,35 @@ def get_mined_count_daily_data(request):
     url = request.build_absolute_uri('/api/mined_stats/daily/')
     return paginate_wrap(resp, url, "mined_date",
                          str(yesterday), str(tomorrow))
+
+def get_notarised_data(request):
+
+    resp = {}
+    logger.info(f"request.GET: {request.GET}")
+    data = notarised.objects.all()
+    if "notary" in request.GET:
+        data = data.filter(notaries__contains=[request.GET["notary"]])
+    if "address" in request.GET:
+        data = data.filter(notary_addresses__contains=[request.GET["address"]])
+
+    if "chain" in request.GET:
+        data = data.filter(chain=request.GET["chain"])
+    else:
+        data = data.filter(chain="BTC")
+
+    data = apply_filters(request, NotarisedSerializer, data) \
+            .order_by('-season', 'chain') \
+            .values()
+
+    for item in data:
+        logger.info(item)
+        resp.update({item["txid"]:{}})
+        for x in item.keys():
+            if x != "txid":
+                resp[item["txid"]].update({x:item[x]})
+
+    return resp
+
 
 def get_notarised_chain_season_data(request):
     resp = {}

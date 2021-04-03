@@ -14,7 +14,7 @@ from kmd_ntx_api.api_viewsets import *
 from kmd_ntx_api.page_views import *
 from kmd_ntx_api.notary_views import *
 
-logger = logging.getLogger("mylogger")
+logger = logging.getLogger(__name__)
 
 def address_btc_txids(request):
     if 'address' in request.GET and 'category' in request.GET:
