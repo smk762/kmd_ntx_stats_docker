@@ -15,6 +15,14 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+# First tenure then epochs
+
+all_notarised_seasons = get_notarised_seasons()
+
+all_notarised_servers = get_notarised_servers()
+
+all_notarised_chains = get_notarised_chains()
+
 def update_season_tenure(season):
     season_servers = get_notarised_servers(season)
     logger.info(f"{season} servers: {season_servers}")
@@ -39,13 +47,6 @@ def update_season_tenure(season):
                 else:
                     update_ntx_tenure(chain, season, server)
 
-# First tenure then epochs
-
-all_notarised_seasons = get_notarised_seasons()
-
-all_notarised_servers = get_notarised_servers()
-
-all_notarised_chains = get_notarised_chains()
 
 all_scoring_epochs = []
 for season in SCORING_EPOCHS:

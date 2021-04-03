@@ -15,18 +15,29 @@ formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
-
+'''
 all_notarised_seasons = get_notarised_seasons()
 all_notarised_servers = get_notarised_servers()
 all_notarised_epochs = get_notarised_epochs()
 all_notarised_chains = get_notarised_chains()
 
-def get_notarisation_data(min_time, max_time):
+print(get_all_coins())
+print(all_notarised_chains)
+print(all_notarised_servers)
+print(all_notarised_epochs)
+print(all_notarised_chains)
+'''
+
+
+def get_notarisation_data(season):
+    logger.info(f"Getting ntx data for {season}")
 
     sql = f"SELECT chain, notaries, \
                     season, server, epoch, score_value \
                      FROM notarised"
     where = []
+    if season:
+        where.append(f"season >= '{season}'")
     if min_time:
         where.append(f"block_time >= '{min_time}'")
     if max_time:
@@ -34,7 +45,7 @@ def get_notarisation_data(min_time, max_time):
 
     if len(where) > 0:
         sql += " WHERE "
-        sql += " AND ".join(where)    
+        sql += " AND ".join(where)
     sql += ";"
 
     ntx_summary = {}
@@ -50,6 +61,7 @@ def get_notarisation_data(min_time, max_time):
             season = item[2]
             server = item[3]
             epoch = item[4]
+
             score_value = round(float(item[5]), 8)
 
             if chain in ["BTC", "LTC"]:
@@ -78,6 +90,7 @@ def get_notarisation_data(min_time, max_time):
 
             if "Unofficial" not in [season, server, epoch]:
                 for notary in notaries:
+                    logger.info(f"Adding {notary} {season} {server} {epoch} {chain} {score_value}")
                     if notary not in ntx_summary:
                         ntx_summary.update({
                             notary:{
@@ -90,24 +103,22 @@ def get_notarisation_data(min_time, max_time):
                                                         "chains": {
                                                             chain:{
                                                                 "chain_ntx_count":0,
-                                                                "chain_ntx_score_sum":0
+                                                                "chain_score":0
                                                             }                                                    
                                                         },
                                                         "score_per_ntx":score_value,
                                                         "epoch_ntx_count":0,
-                                                        "epoch_ntx_score_sum":0
+                                                        "epoch_score":0
                                                     }
                                                 },
                                                 "server_ntx_count":0,
-                                                "server_ntx_score_sum":0
+                                                "server_score":0
                                             }
                                         },
                                         "season_ntx_count":0,
-                                        "season_ntx_score_sum":0
+                                        "season_score":0
                                     }
-                                },
-                                "notary_ntx_count":0,
-                                "notary_ntx_score_sum":0
+                                }
                             }
                         })
 
@@ -121,20 +132,20 @@ def get_notarisation_data(min_time, max_time):
                                                 "chains": {
                                                     chain:{
                                                         "chain_ntx_count":0,
-                                                        "chain_ntx_score_sum":0
+                                                        "chain_score":0
                                                     }                                                    
                                                 },
                                                 "score_per_ntx":score_value,
                                                 "epoch_ntx_count":0,
-                                                "epoch_ntx_score_sum":0
+                                                "epoch_score":0
                                             }
                                         },
                                         "server_ntx_count":0,
-                                        "server_ntx_score_sum":0
+                                        "server_score":0
                                     }
                                 },
                                 "season_ntx_count":0,
-                                "season_ntx_score_sum":0
+                                "season_score":0
                             }
                         })
 
@@ -146,15 +157,16 @@ def get_notarisation_data(min_time, max_time):
                                         "chains": {
                                             chain:{
                                                 "chain_ntx_count":0,
-                                                "chain_ntx_score_sum":0
+                                                "chain_score":0
                                             }                                                    
                                         },
+                                        "score_per_ntx":score_value,
                                         "epoch_ntx_count":0,
-                                        "epoch_ntx_score_sum":0
+                                        "epoch_score":0
                                     }
                                 },
                                 "server_ntx_count":0,
-                                "server_ntx_score_sum":0
+                                "server_score":0                                    
                             }
                         })
 
@@ -164,12 +176,12 @@ def get_notarisation_data(min_time, max_time):
                                 "chains": {
                                     chain:{
                                         "chain_ntx_count":0,
-                                        "chain_ntx_score_sum":0
+                                        "chain_score":0
                                     }                                                    
                                 },
                                 "score_per_ntx":score_value,
                                 "epoch_ntx_count":0,
-                                "epoch_ntx_score_sum":0
+                                "epoch_score":0
                             }
                         })
 
@@ -177,25 +189,25 @@ def get_notarisation_data(min_time, max_time):
                         ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"].update({
                             chain:{
                                 "chain_ntx_count":0,
-                                "chain_ntx_score_sum":0
+                                "chain_score":0
                             }
                         })
 
 
                     ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"][chain]["chain_ntx_count"] += 1
-                    ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"][chain]["chain_ntx_score_sum"] += score_value
+                    ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["chains"][chain]["chain_score"] += score_value
 
                     ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["epoch_ntx_count"] += 1
-                    ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["epoch_ntx_score_sum"] += score_value
+                    ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"][epoch]["epoch_score"] += score_value
 
                     ntx_summary[notary]["seasons"][season]["servers"][server]["server_ntx_count"] += 1
-                    ntx_summary[notary]["seasons"][season]["servers"][server]["server_ntx_score_sum"] += score_value
+                    ntx_summary[notary]["seasons"][season]["servers"][server]["server_score"] += score_value
 
                     ntx_summary[notary]["seasons"][season]["season_ntx_count"] += 1
-                    ntx_summary[notary]["seasons"][season]["season_ntx_score_sum"] += score_value
+                    ntx_summary[notary]["seasons"][season]["season_score"] += score_value
 
                     ntx_summary[notary]["notary_ntx_count"] += 1
-                    ntx_summary[notary]["notary_ntx_score_sum"] += score_value
+                    ntx_summary[notary]["notary_season_score"] += score_value
 
         return ntx_summary, chain_totals
         
@@ -203,11 +215,15 @@ def get_notarisation_data(min_time, max_time):
         logger.error(f"Error in get_epochs: {e}")
         return ntx_summary, chain_totals
 
-print(get_all_coins())
-print(all_notarised_chains)
-print(all_notarised_servers)
-print(all_notarised_epochs)
-print(all_notarised_chains)
+
+notarisation_data, chain_totals = get_notarisation_data(season)
+
+for notary in notarisation_data:
+    if notary in ["dragonhound_NA", "dudezmobi_AR"]:
+        print(f"'{notary}': {notarisation_data[notary]}\n")
+        print(f"'{chain_totals}': {chain_totals}\n")
+
+sys.exit()
 
 CURSOR.execute(f"SELECT notary_addresses, season, chain, block_time, notaries, txid, server, scored, score_value, epoch \
                  FROM notarised \
@@ -297,13 +313,6 @@ for item in notarised_rows:
 
         update_notarised_epoch(actual_epoch, None, None, None, txid)
 
-sys.exit()
-notarisation_data, chain_totals = get_notarisation_data(SEASONS_INFO["Season_4"]["start_time"], SEASONS_INFO["Season_4"]["end_time"])
-
-for notary in notarisation_data:
-    if notary == "dragonhound_NA":
-        print(f"'{notary}': {notarisation_data[notary]}\n")
-        print(f"'{chain_totals}': {chain_totals}\n")
 
 epochs = get_epochs()
 print(epochs)
