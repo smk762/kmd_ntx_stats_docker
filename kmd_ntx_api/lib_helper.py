@@ -4,6 +4,14 @@ import logging
 import binascii
 from .models import *
 from .lib_const import *
+from .lib_info import get_dpow_server_coins_dict
+
+def get_server_chains(coins_dict):
+    server_chains = {
+        "main":get_mainnet_chains(coins_dict),
+        "third_party":get_third_party_chains(coins_dict)
+    }
+    return server_chains
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +40,7 @@ def get_season(time_stamp=None):
     for season in SEASONS_INFO:
         if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= SEASONS_INFO[season]['end_time']:
             return season
-    return "season_undefined"
+    return "Unofficial"
 
 def get_notary_region(notary):
     return notary.split("_")[-1]
@@ -129,44 +137,20 @@ def decode_opret(op_return):
     logger.info(f"decode_opret: {resp}")
     return resp
 
-def get_mainnet_chains(coins_data):
-    main_chains = []
-    for item in coins_data:
-        if item['dpow']['server'].lower() == "dpow-mainnet":
-            main_chains.append(item['chain'])
-    main_chains.sort()
-    return main_chains
+def get_mainnet_chains(coins_dict):
+    if "Main" in coins_dict:
+        return coins_dict["Main"]
+    return []
 
-def get_third_party_chains(coins_data):
-    third_chains = []
-    for item in coins_data:
-        if item['dpow']['server'].lower() == "dpow-3p":
-            third_chains.append(item['chain'])
-    third_chains.sort()
-    return third_chains
-
-def get_server_chains(coins_data):
-    server_chains = {
-        "main":get_mainnet_chains(coins_data),
-        "third_party":get_third_party_chains(coins_data)
-    }
-    return server_chains
+def get_third_party_chains(coins_dict):
+    if "Third_Party" in coins_dict:
+        return coins_dict["Third_Party"]
+    return []
 
 
 
 
 
-# TODO: use notarised table values
-def get_ntx_score(btc_ntx, main_ntx, third_party_ntx):
-    coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
-    third_party = get_third_party_chains(coins_data)
-    main_chains = get_mainnet_chains(coins_data)
-    if 'BTC' in main_chains:
-        main_chains.remove('BTC')
-    if 'KMD' in main_chains:
-        main_chains.remove('KMD')
-    return btc_ntx*0.0325 + main_ntx*0.8698/len(main_chains) + third_party_ntx*0.0977/len(third_party)
- 
 
 
 
@@ -182,14 +166,11 @@ def prepare_notary_balance_graph_data(chain_low_balance_notary_counts):
     labels = list(chain_low_balance_notary_counts.keys())
     labels.sort()
         
-    third_chains = []
-    main_chains = []
-    coins_data = coins.objects.filter(dpow_active=1).values('chain','dpow')
-    for item in coins_data:
-        if item['dpow']['server'] == "dPoW-mainnet":
-            main_chains.append(item['chain'])
-        if item['dpow']['server'] == "dPoW-3P":
-            third_chains.append(item['chain'])
+    if not season:
+        season = "Season_4"
+    coins_dict = get_dpow_server_coins_dict(season)
+    main_chains = get_mainnet_chains(coins_dict)
+    third_chains = get_third_party_chains(coins_dict)
 
     for label in labels:
         if label in third_chains:

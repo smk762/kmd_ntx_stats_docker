@@ -346,6 +346,7 @@ class notarised_count_season(models.Model):
     total_ntx_count = models.PositiveIntegerField(default=0)
     chain_ntx_counts = JSONField(default=dict)
     chain_ntx_pct = JSONField(default=dict)
+    season_score = models.DecimalField(max_digits=18, decimal_places=8, default=0)
     time_stamp = models.PositiveIntegerField(default=0)
     season = models.CharField(max_length=34)
 
