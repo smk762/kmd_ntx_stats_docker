@@ -970,6 +970,9 @@ DPOW_EXCLUDED_CHAINS = {
 }
 
 
+EXCLUDED_SERVERS = ["Unofficial"]
+EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial"]
+
 SCORING_EPOCHS = {
 
 }

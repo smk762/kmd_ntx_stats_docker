@@ -297,14 +297,15 @@ def update_season_notarised_count_row(row_data):
     sql = "INSERT INTO notarised_count_season \
         (notary, btc_count, antara_count, \
         third_party_count, other_count, \
-        total_ntx_count, chain_ntx_counts, \
+        total_ntx_count, chain_ntx_counts, season_score, \
         chain_ntx_pct, time_stamp, season) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_notary_season DO UPDATE SET \
         btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
         third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
         total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
-        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
+        season_score='"+str(row_data[7])+"', chain_ntx_pct='"+str(row_data[8])+"', \
+        time_stamp="+str(row_data[9])+";"
     CURSOR.execute(sql, row_data)
     CONN.commit()
 
