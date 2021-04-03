@@ -530,26 +530,28 @@ def get_notary_epoch_scoring_table(notary=None, season=None):
                     server_epoch_chains = ["BTC"]
                 else:
                     server_epoch_chains = epoch_chains_dict[season][server][epoch]
-                logger.info(server_epoch_chains)
+
                 for chain in chain_ntx["servers"][server]["epochs"][epoch]["chains"]:
                     chain_stats = chain_ntx["servers"][server]["epochs"][epoch]["chains"][chain]
-
+                    score_per_ntx = chain_ntx["servers"][server]["epochs"][epoch]["score_per_ntx"]
+                    epoch_chain_ntx_count = chain_stats["chain_ntx_count"]
+                    epoch_chain_score = chain_stats["chain_score"]
+                    
                     row = {
                         "notary":notary,
                         "season":season.replace("_", " "),
                         "server":server,
                         "epoch":epoch.split("_")[1],
                         "chain":chain,
-                        "score_per_ntx":chain_ntx["servers"][server]["epochs"][epoch]["score_per_ntx"],
-                        "epoch_chain_ntx_count":chain_stats["chain_ntx_count"],
-                        "epoch_chain_score":chain_stats["chain_score"]
+                        "score_per_ntx":score_per_ntx,
+                        "epoch_chain_ntx_count":epoch_chain_ntx_count,
+                        "epoch_chain_score":epoch_chain_score
                     }
 
                     server_epoch_chains.remove(chain)
                     total += chain_stats["chain_score"]
                     rows.append(row)
 
-                logger.info(server_epoch_chains)
                 for chain in server_epoch_chains:
                     row = {
                         "notary":notary,

@@ -47,7 +47,7 @@ def get_linked_addresses(addr=None, notary=None):
             if notary in ALL_SEASON_NOTARIES:
 
                 if notary not in linked_addresses:
-                    if addr not in ALL_SEASON_NN_BTC_ADDRESSES_DICT:
+                    if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
                         linked_addresses.update({notary:[address]})
 
                 else:
@@ -67,7 +67,7 @@ def is_notary_address(addr):
         return True
     return False
 
-def detect_ntx(vins, vouts):
+def detect_ntx(vins, vouts, addresses):
     if BTC_NTX_ADDR in addresses and len(vins) == 13 and len(vouts) == 2:
         for vin in vins:
             if vin["output_value"] != 10000:
@@ -131,10 +131,10 @@ def detect_replenish(vins, vouts):
     if replenish_vin and replenish_vout:
         for addr in vin_non_notary_addresses:
 
-            if addr not in ALL_SEASON_NN_BTC_ADDRESSES_DICT:
+            if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
                 update_nn_btc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
         for addr in vout_non_notary_addresses:
-            if addr not in ALL_SEASON_NN_BTC_ADDRESSES_DICT:
+            if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
                 update_nn_btc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
         return True
     return False
@@ -166,10 +166,10 @@ def detect_consolidate(vins, vouts):
         if len(list(set(vout_notaries))) == 1 and is_notary_address(vouts[0]["addresses"][0]):
             if notary == vout_notaries[0]:
                 for addr in vin_non_notary_addresses:
-                    if addr not in ALL_SEASON_NN_BTC_ADDRESSES_DICT:
+                    if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
                         update_nn_btc_tx_notary_from_addr(f"{notary} (linked)", addr)
                 for addr in vout_non_notary_addresses:
-                    if addr not in ALL_SEASON_NN_BTC_ADDRESSES_DICT:
+                    if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
                         update_nn_btc_tx_notary_from_addr(f"{notary} (linked)", addr)
                 return True
 
@@ -188,7 +188,7 @@ def update_notary_linked_vins(vins):
 
     if len(list(set(vin_notaries))) == 1 and len(vin_non_notary_addresses) > 0:
         for addr in vin_non_notary_addresses:
-            if addr not in ALL_SEASON_NN_BTC_ADDRESSES_DICT:
+            if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
                 update_nn_btc_tx_notary_from_addr(f"{notary} (linked)", address)
 
 
@@ -348,7 +348,7 @@ for notary_address in NOTARY_BTC_ADDRESSES[season]:
                 #elif txid in pungo_other:
                 #    btc_row.category = "Other"
                     
-                elif detect_ntx(vins, vouts):
+                elif detect_ntx(vins, vouts, addresses):
                     btc_row.category = "NTX"
                 elif detect_replenish(vins, vouts):
                     btc_row.category = "Replenish"

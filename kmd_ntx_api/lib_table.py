@@ -9,7 +9,7 @@ import logging
 import logging.handlers
 from .lib_const import *
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("mylogger")
 
 load_dotenv()
 

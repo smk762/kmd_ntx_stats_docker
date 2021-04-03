@@ -405,6 +405,7 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
         sql += " AND ".join(where)
     sql += ";"
 
+    logger.info(f"Processing for ntx summary {where}")
     ntx_summary = {}
     chain_totals = {}
     
@@ -418,38 +419,36 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
             season = item[2]
             server = item[3]
             epoch = item[4]
-
             score_value = round(float(item[5]), 8)
 
-            if chain in ["BTC", "LTC"]:
-                server = chain
+            if "Unofficial" not in [season, server, epoch]:
+                if chain in ["BTC", "LTC"]:
+                    server = chain
 
-            if server not in chain_totals:
-                chain_totals.update({
-                    server: {
+                if server not in chain_totals:
+                    chain_totals.update({
+                        server: {
+                            chain: {
+                                "count":0,
+                                "total_score":0                        
+                            }
+                        }
+                    })
+
+                if chain not in chain_totals[server]:
+                    chain_totals[server].update({
                         chain: {
                             "count":0,
-                            "total_score":0                        
+                            "total_score":0
                         }
-                    }
-                })
+                    })
 
-            if chain not in chain_totals[server]:
-                chain_totals[server].update({
-                    chain: {
-                        "count":0,
-                        "total_score":0
-                    }
-                })
+                chain_totals[server][chain]["count"] += 1
+                chain_totals[server][chain]["total_score"] += score_value
 
-            chain_totals[server][chain]["count"] += 1
-            chain_totals[server][chain]["total_score"] += score_value
-
-            if "Unofficial" not in [season, server, epoch]:
 
                 for notary in notaries:
                     if (notary_name is None or notary_name == notary) and (chain_name is None or chain_name == chain):
-                        logger.info(f"Adding {notary} {season} {server} {epoch} {chain} {score_value}")
                         if notary not in ntx_summary:
                             ntx_summary.update({
                                 notary:{
@@ -645,15 +644,14 @@ def scan_rpc_for_ntx(season):
     for notary in ntx_summary:
 
         for summary_season in ntx_summary[notary]["seasons"]:
-            print()
             logger.info(f"Getting season summary for {notary} {summary_season}")
 
-            season_ntx_count_row = notarised_count_season_row()
-            season_ntx_count_row.notary = notary
-            season_ntx_count_row.season = summary_season
 
             if notary in KNOWN_NOTARIES:
 
+                season_ntx_count_row = notarised_count_season_row()
+                season_ntx_count_row.notary = notary
+                season_ntx_count_row.season = summary_season
                 servers = ntx_summary[notary]["seasons"][summary_season]['servers']
 
                 if "BTC" in servers:

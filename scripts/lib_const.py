@@ -966,7 +966,9 @@ DPOW_EXCLUDED_CHAINS = {
         "LTC"
     ],
     "Season_5": [],
-    "Season_5_Testnet": []
+    "Season_5_Testnet": [
+        "BLUR"
+        ]
 }
 
 
