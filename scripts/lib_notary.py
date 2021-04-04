@@ -202,9 +202,9 @@ def get_notarised_data(txid):
                             if len(chain) > 10:
                                 logger.warning(f"chain = {chain} for {txid}")
 
-                            # TODO: This could potentially misidentify - do better.
+                            # TODO: This could potentially misidentify - be vigilant.
                             for x in coins_list:
-                                if x not in ['D']:
+                                if len(x) > 2 and x not in EXCLUDE_DECODE_OPRET_COINS:
                                     if chain.endswith(x):
                                         chain = x
 

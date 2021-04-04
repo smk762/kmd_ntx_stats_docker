@@ -68,14 +68,14 @@ COIN_PARAMS = {
     "GLEEC": KMD_CoinParams
 }
 
-def get_addr_from_pubkey(coin, pubkey):
+def calc_addr_from_pubkey(coin, pubkey):
     bitcoin.params = COIN_PARAMS[coin]
     try:
       return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
     except Exception as e:
       return str(e)
 
-def get_addr_tool(pubkey, pub_addr, script_addr, secret_key):
+def calc_addr_tool(pubkey, pub_addr, script_addr, secret_key):
     class CoinParams(CoreMainParams):
         MESSAGE_START = b'\x24\xe9\x27\x64'
         DEFAULT_PORT = 7770

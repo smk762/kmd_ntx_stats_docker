@@ -51,36 +51,37 @@ TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GleecBTC':'G
 OTHER_COINS = []
 ANTARA_COINS = []
 THIRD_PARTY_COINS = []
-
+RETIRED_SMARTCHAINS = ["HUSH3"]
 # Electrum server:port for all dpow coins
+
+
+r = requests.get(f'{THIS_SERVER}/api/info/coins/')
+COINS_INFO = r.json()['results'][0]
+
+r = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins')
+SEASON_SERVER_DPOW_COINS = r.json()
+
+ANTARA_COINS = SEASON_SERVER_DPOW_COINS["Main"]
+THIRD_PARTY_COINS = SEASON_SERVER_DPOW_COINS["Third_Party"]
+
+ALL_COINS = ANTARA_COINS + THIRD_PARTY_COINS + ['BTC', 'KMD', 'LTC']
+ALL_ANTARA_COINS = ANTARA_COINS + RETIRED_SMARTCHAINS # add retired smartchains here
+
 ELECTRUMS = {}
-r = requests.get(f'{THIS_SERVER}/api/info/coins/?dpow_active=1')
-DPOW_COINS = r.json()['results'][0]
-for coin in DPOW_COINS:
-    if len(DPOW_COINS[coin]['electrums']) > 0:
-        electrum = DPOW_COINS[coin]['electrums'][0].split(":") 
-        ELECTRUMS.update({
-            coin:{
-                "url":electrum[0],
-                "port":electrum[1]
-                }
-            })
-    nn_server = DPOW_COINS[coin]['dpow']['server']
-    if coin == "SFUSD":
-        coin = "PBC"
-    if nn_server == 'dpow-mainnet':
-        if coin not in ['KMD', 'BTC']:
-            ANTARA_COINS.append(coin)
-    elif nn_server == 'dpow-3p':
-        THIRD_PARTY_COINS.append(coin)
-    else:
-        OTHER_COINS.append(coin)
-                   
-ALL_COINS = ANTARA_COINS + THIRD_PARTY_COINS + ['BTC', 'KMD']
-ALL_ANTARA_COINS = ANTARA_COINS +[] # add retired smartchains here
+
+for coin in ALL_COINS:
+    if coin in COINS_INFO:
+        if len(COINS_INFO[coin]['electrums']) > 0:
+            electrum = COINS_INFO[coin]['electrums'][0].split(":") 
+            ELECTRUMS.update({
+                coin:{
+                    "url":electrum[0],
+                    "port":electrum[1]
+                    }
+                })
 
 # DEFINE BASE_58 COIN PARAMS
-for coin in ANTARA_COINS:
+for coin in ALL_ANTARA_COINS:
     COIN_PARAMS.update({coin:COIN_PARAMS["KMD"]})
 
 for coin in THIRD_PARTY_COINS:
@@ -967,10 +968,12 @@ DPOW_EXCLUDED_CHAINS = {
     ],
     "Season_5": [],
     "Season_5_Testnet": [
-        "BLUR"
+        "BLUR",
+        "LABS",
         ]
 }
 
+EXCLUDE_DECODE_OPRET_COINS = ['D']
 
 EXCLUDED_SERVERS = ["Unofficial"]
 EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial"]

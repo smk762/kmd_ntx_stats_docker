@@ -22,7 +22,7 @@
 													{% endfor %}
 										    	</div>
 										    	<div class="col-12">
-										    		<a class="badge kmd_ui_dark1_bg" style="font-size: 1.3em" href="http://{{ request.get_host }}/notary_profile/{{ item.notary }}"> {{ item.notary }} <br /><span style="font-size: 1.2em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
+										    		<a class="badge kmd_ui_dark1_bg" style="font-size: 1.1em" href="http://{{ request.get_host }}/notary_profile/{{ notary }}"> {{ item.notary }} <br /><span style="font-size: 1.3em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
 										    	</div>
 										    	{% if region == 'AR' %}
 												<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2 mt-0">

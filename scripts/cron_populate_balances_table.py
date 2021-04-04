@@ -7,6 +7,7 @@ import logging.handlers
 from lib_notary import get_season
 import threading
 from lib_const import *
+from lib_table_select import get_notarised_seasons, get_notarised_servers, get_notarised_chains
 from models import balance_row, rewards_row
 from lib_electrum import get_balance
 from base_58 import get_addr_from_pubkey
@@ -19,7 +20,6 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-kmd_tiptime = RPC["KMD"].getinfo()['tiptime']
 
 
 '''
@@ -60,12 +60,13 @@ def get_node(season):
         return 'main'
 
 def get_season_num(season):
-    season = season.replace("Third_Party", "")
-    season = season.replace("Testnet", "")
+    season = season.replace("_Third_Party", "")
+    #season = season.replace("Testnet", "")
     return season
 
 def get_kmd_rewards(season):
     nn_utxos = {}
+    kmd_tiptime = RPC["KMD"].getinfo()['tiptime']
     for notary in NOTARY_PUBKEYS[season]:
         rewards = rewards_row()
         rewards.addr = get_addr_from_pubkey("KMD", NOTARY_PUBKEYS[season][notary])
@@ -133,35 +134,49 @@ def get_balances(this_season):
 
     for season in NOTARY_PUBKEYS:
 
-        # update only current season
         if season.find(this_season) != -1:
 
             for notary in NOTARY_PUBKEYS[season]:
                 thread_list.update({notary:[]})
+                logger.info(f"Getting servers for {notary} {season}...")
+                servers = get_notarised_servers(this_season)
 
-                for chain in NOTARY_ADDRESSES_DICT[season][notary]:
-                    addr = NOTARY_ADDRESSES_DICT[season][notary][chain]
-                    pubkey = NOTARY_PUBKEYS[season][notary]
+                for server in servers:
+                    chains = get_notarised_chains(this_season, server)
+                    chains += ["KMD", "BTC", "LTC"]
+                    chains = list(set(chains))
+                    for chain in chains:
+                        if chain not in DPOW_EXCLUDED_CHAINS[this_season]:
+                            addr = NOTARY_ADDRESSES_DICT[season][notary][chain]
+                            pubkey = NOTARY_PUBKEYS[season][notary]
 
-                    check_bal = False
-                    if chain == "KMD":
-                        check_bal = True
-                    elif season.find("Third_Party") != -1 and chain in THIRD_PARTY_COINS:
-                        check_bal = True
-                    elif  season.find("Third_Party") == -1 and chain not in THIRD_PARTY_COINS:
-                        check_bal = True
+                            check_bal = False
+                            if chain in ["KMD", "BTC", "LTC"]:
+                                check_bal = True
+                            elif season.find("Third_Party") != -1 and chain in THIRD_PARTY_COINS:
+                                check_bal = True
+                            elif season.find("Third_Party") == -1 and chain not in THIRD_PARTY_COINS:
+                                check_bal = True
+                            elif season.find("Testnet") == -1:
+                                check_bal = True
 
-                    if check_bal:
-                        thread_list[notary].append(electrum_thread(notary, chain, pubkey, addr, season))
+                            if check_bal:
+                                thread_list[notary].append(electrum_thread(notary, chain, pubkey, addr, season))
 
                 for thread in thread_list[notary]:
                     thread.start()
-                time.sleep(4) # 4 sec sleep = 15 min runtime.
+            time.sleep(4) # 4 sec sleep = 15 min runtime.
 
-season = get_season(int(time.time()))
+if __name__ == "__main__":
+    seasons = get_notarised_seasons()
+    logger.info(f"Preparing to populate NTX tables...")
 
-get_balances(season)
-get_kmd_rewards(season)
+    for season in seasons:
+        if season in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
+            logger.warning(f"Skipping season: {season}")
+        else:
+            get_balances(season)
+            get_kmd_rewards(season)
 
-CURSOR.close()
-CONN.close()
+    CURSOR.close()
+    CONN.close()
