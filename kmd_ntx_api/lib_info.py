@@ -16,6 +16,13 @@ logger = logging.getLogger("mylogger")
 
 load_dotenv()
 
+
+def create_dict(key_list):
+    new_dict = {}
+    for key in key_list:
+        new_dict.update({key:{}})
+    return new_dict
+    
 def get_low_nn_balances():
     url = "http://138.201.207.24/nn_balances_report"
     r = requests.get(url)
