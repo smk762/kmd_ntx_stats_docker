@@ -22,7 +22,17 @@ def create_dict(key_list):
     for key in key_list:
         new_dict.update({key:{}})
     return new_dict
-    
+
+def add_numeric_dict_nest(old_dict, new_key):
+    for key in old_dict:
+        old_dict[key].update({new_key:0})
+    return old_dict
+
+def add_string_dict_nest(old_dict, new_key):
+    for key in old_dict:
+        old_dict[key].update({new_key:""})
+    return old_dict
+
 def get_low_nn_balances():
     url = "http://138.201.207.24/nn_balances_report"
     r = requests.get(url)
@@ -758,6 +768,25 @@ def get_btc_split_stats(address):
 
     return wrap_api(resp)
 
+
+def paginate_wrap(resp, url, field, prev_value, next_value):
+    api_resp = {
+        "count":len(resp),
+        "next":url+"?"+field+"="+next_value,
+        "previous":url+"?"+field+"="+prev_value,
+        "results":[resp]
+    }
+    return api_resp
+
+def wrap_api(resp, filters=None):
+    api_resp = {
+        "count":len(resp),
+        "results":[resp]
+    }
+    if filters:
+        api_resp.update({"filters":filters})
+    return api_resp
+    
 def get_notary_region(notary):
     return notary.split("_")[-1]
 

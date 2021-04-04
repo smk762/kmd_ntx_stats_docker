@@ -194,12 +194,6 @@ def prepare_notary_balance_graph_data(chain_low_balance_notary_counts):
     } 
     return data
 
-def create_dict(key_list):
-    new_dict = {}
-    for key in key_list:
-        new_dict.update({key:{}})
-    return new_dict
-
 def add_dict_nest(old_dict, new_key):
     for key in old_dict:
         old_dict[key].update({new_key:{}})
