@@ -28,7 +28,10 @@ class balances_graph(viewsets.ViewSet):
         return Task(id=None, **validated_data)
    
     def get(self, request, format = None): 
-        season = get_season()
+        if "season" in request.GET:
+            season = request.GET["season"]
+        else:
+            season = "Season_4"
         filter_kwargs = {'season':season}
 
         for field in BalancesSerializer.Meta.fields:
@@ -56,7 +59,10 @@ class daily_ntx_graph(viewsets.ViewSet):
         return Task(id=None, **validated_data)
    
     def get(self, request, format = None): 
-        season = get_season()
+        if "season" in request.GET:
+            season = request.GET["season"]
+        else:
+            season = "Season_4"
         filter_kwargs = {'season':season}
 
         for field in NotarisedCountDailySerializer.Meta.fields:
@@ -65,6 +71,6 @@ class daily_ntx_graph(viewsets.ViewSet):
             if val is not None:
                 filter_kwargs.update({field:val}) 
 
-        data = get_daily_ntx_graph_data(request)
+        data = get_daily_ntx_graph_data(request, filter_kwargs)
 
         return Response(data) 

@@ -75,6 +75,8 @@ for season in all_notarised_seasons:
         update_season_tenure(season)
         pass
 
+# TODO: I dont think this will initialise s5 coins until they have recieved a notarisation. 
+# Should probably augment with dpow readme parsing.
 # Update epochs
 #for season in ["Season_5_Testnet"]:
 for season in all_notarised_seasons:

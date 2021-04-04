@@ -231,7 +231,7 @@ def get_notarised_data(request):
         data = data.filter(notary_addresses__contains=[request.GET["address"]])
 
     if "season" in request.GET:
-        data = data.filter(season=[request.GET["season"]])
+        data = data.filter(season=request.GET["season"])
 
     else:
         data = data.filter(season="Season_4")
