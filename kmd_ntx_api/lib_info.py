@@ -953,8 +953,7 @@ def get_split_stats_table():
     split_rows = []
     for nn in split_summary:
         if nn != 'non-NN':
-            row = split_summary[nn]['Season_4']
-            row.append(nn)
+            row = split_summary[nn]
             split_rows.append(row)
     return split_rows
 

@@ -4,7 +4,8 @@ import time
 import random
 import numpy as np
 from django.shortcuts import render
-
+from kmd_ntx_api.pages import *
+from kmd_ntx_api.endpoints import *
 from kmd_ntx_api.lib_helper import *
 from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_query import *
@@ -510,6 +511,10 @@ def testnet_ntx_scoreboard(request):
     return render(request, 'testnet_scoreboard.html', context)
 
 def sitemap(request):
-    context = {}
+
+    context = {
+        "endpoints":ENDPOINTS,
+        "pages":PAGES
+    }
     return render(request, 'sitemap.html', context)
 

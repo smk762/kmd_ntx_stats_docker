@@ -223,7 +223,7 @@ def split_summary_api(request):
 
 def split_summary_table(request):
     resp = get_split_stats_table()
-    return JsonResponse(resp)
+    return JsonResponse(resp, safe=False)
 
 
 

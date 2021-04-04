@@ -53,8 +53,7 @@ def get_balances_graph_data(request, filter_kwargs):
     bg_color = []
     border_color = []
 
-    if not season:
-        season = "Season_4"
+    season = filter_kwargs["season"]
     coins_dict = get_dpow_server_coins_dict(season)
     main_chains = get_mainnet_chains(coins_dict)
     third_chains = get_third_party_chains(coins_dict)
@@ -446,7 +445,7 @@ def get_chain_sync_data(request):
 
 
 ## TODO: MOVE TO LIB_GRAPH?
-def get_daily_ntx_graph_data(request):
+def get_daily_ntx_graph_data(request, filter_kwargs):
     ntx_dict = {}
     bg_color = []
     border_color = []
@@ -454,6 +453,8 @@ def get_daily_ntx_graph_data(request):
     main_chains = []
     notary_list = []                                                                         
     chain_list = []
+    labels = []
+    chartdata = []
     filter_kwargs = {}
 
     if 'notarised_date' in request.GET:
@@ -483,8 +484,8 @@ def get_daily_ntx_graph_data(request):
 
     notary_list.sort()
     notary_list = region_sort(notary_list)
-    if not season:
-        season = "Season_4"
+    print(filter_kwargs)
+    season = "Season_4"
     coins_dict = get_dpow_server_coins_dict(season)
     main_chains = get_mainnet_chains(coins_dict)
     third_chains = get_third_party_chains(coins_dict)
@@ -505,7 +506,8 @@ def get_daily_ntx_graph_data(request):
             else:
                 bg_color.append(LT_ORANGE)
             border_color.append(BLACK)
-    else:
+
+    elif len(notary_list) == 1:
         notary = notary_list[0]
         labels = chain_list
         chartLabel = notary+ " Notarisations"
@@ -529,7 +531,7 @@ def get_daily_ntx_graph_data(request):
 
     data = { 
         "labels":labels, 
-        "chartLabel":chartLabel, 
+        "chartLabel":chartdata, 
         "chartdata":chartdata, 
         "bg_color":bg_color, 
         "border_color":border_color, 
@@ -776,20 +778,15 @@ def get_mined_count_season_table(request):
 
 def get_nn_social_data(request):
     if "season" in request.GET and "notary" in request.GET:
-        return nn_social.objects.filter(season=season, notary=notary) \
-                               .order_by('-season','notary', 'chain', 'balance') \
-                               .values()        
-    if "season" in request.GET:
-        return nn_social.objects.filter(season=season) \
-                               .order_by('-season','notary', 'chain', 'balance') \
-                               .values()
-    if "notary" in request.GET:
-        return nn_social.objects.filter(notary=notary) \
-                               .order_by('-season','notary', 'chain', 'balance') \
-                               .values()
-    return nn_social.objects.all() \
-                           .order_by('-season','notary', 'chain', 'balance') \
-                           .values()
+        data = nn_social.objects.filter(season=season, notary=notary)
+    elif "season" in request.GET:
+        data = nn_social.objects.filter(season=season)
+    elif "notary" in request.GET:
+        data = nn_social.objects.filter(notary=notary) 
+    else:
+        data = nn_social.objects.all()
+
+    return data.order_by('-season','notary').values()
  
 
 def get_notary_addresses(notary, season=None):

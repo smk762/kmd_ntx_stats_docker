@@ -28,6 +28,7 @@
 											<th>3rd Party</th>
 											<th>Mining</th>
 											<th>Scoring</th>
+											<th>Detail</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -38,12 +39,13 @@
 										  			{{ notary_data.rank }}
 										  		</span>
 										  	</td>
-											<td data-data="chain">{{ notary }}</th>
+											<td data-data="notary">{{ notary }}</th>
 											<td data-data="btc">{{ notary_data.btc }}</th>
 											<td data-data="main">{{ notary_data.main }}</th>
 											<td data-data="third_party">{{ notary_data.third_party }}</th>
 											<td data-data="mining">{{ notary_data.mining }}</th>
 											<td data-data="score">{{ notary_data.score|floatformat:-3 }}</th>
+											<td data-data="detail"><a href="//{{ request.get_host }}/notary_epoch_scoring_table/?notary={{ notary }}">More Info</a></th>
 										</tr>
 										{% endfor %}
 									</tbody>
@@ -107,7 +109,8 @@
 				        { "data": "main" },
 				        { "data": "third_party" },	
 				        { "data": "mining" },
-				        { "data": "score" }
+				        { "data": "score" },
+				        { "data": "detail" }
 				    ],
 	        		"columnDefs": [
 	        			{

@@ -2,7 +2,7 @@
 from rest_framework.response import Response
 from rest_framework import permissions, viewsets, authentication
 from kmd_ntx_api.serializers import addrFromBase58Serializer, addrFromPubkeySerializer, decodeOpRetSerializer
-from kmd_ntx_api.lib_info import get_all_coins
+from kmd_ntx_api.lib_info import get_all_coins, get_address_from_pubkey
 from kmd_ntx_api.base_58 import calc_addr_from_pubkey, calc_addr_tool, COIN_PARAMS
 from kmd_ntx_api.lib_helper import decode_opret
 

@@ -1,0 +1,105 @@
+{% load static %}
+
+    <ul class="c-sidebar-nav kmd_ui_dark1_bg">
+       
+        
+        <i class="cil-transfer"></i>  <span style="padding-left: 12px;">PAGES</span> 
+        <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'index' %}"> index</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'btc_ntx' %}"> btc_ntx</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'btc_ntx_all' %}"> btc_ntx_all</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'chains_last_ntx' %}"> chains_last_ntx</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'chain_sync' %}"> chain_sync</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'coin_profile' %}"> coin_profile</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'faucet' %}"> faucet</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'mining_24hrs' %}"> mining_24hrs</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'mining_overview' %}"> mining_overview</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notary_profile' %}"> notary_profile</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'ntx_24hrs' %}"> ntx_24hrs</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'ntx_scoreboard' %}"> ntx_scoreboard</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'ntx_scoreboard_24hrs' %}"> ntx_scoreboard_24hrs</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notarised_tenure_view' %}"> notarised_tenure</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'sitemap' %}"> sitemap</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'scoring_epochs_view' %}"> scoring_epochs_view</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'testnet_ntx_scoreboard' %}"> testnet_ntx_scoreboard</a></li>
+        </ul>
+
+        <i class="cil-transfer"></i>  <span style="padding-left: 12px;">SOURCE API</span>
+        <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'addressesViewSet-list' %}"> api/source/addresses</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'balancesViewSet-list' %}"> api/source/balances</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'coinsViewSet-list' %}"> api/source/coins</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'lastNtxViewSet-list' %}"> api/source/last_notarised</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'lastBtcNtxViewSet-list' %}"> source/info/last_btc_notarised</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'MinedCountSeasonViewSet-list' %}"> api/source/mined_count_season</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'MinedCountDayViewSet-list' %}"> api/source/mined_count_date</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'MinedViewSet-list' %}"> api/source/mined</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'nn_socialViewSet-list' %}"> api/source/nn_social</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'ntxViewSet-list' %}"> api/source/notarised</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'ntxChainSeasonViewSet-list' %}"> api/source/notarised_chain_season</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'ntxCountSeasonViewSet-list' %}"> api/source/notarised_count_season</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'ntxChainDateViewSet-list' %}"> api/source/notarised_chain_date</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'ntxCountDateViewSet-list' %}"> api/source/notarised_count_date</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'rewardsViewSet-list' %}"> api/source/notary_rewards</a></li>
+        </ul>
+
+        <i class="cil-transfer"></i>  <span style="padding-left: 12px;">INFO API</span> 
+        <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'addresses_filter-list' %}"> api/info/addresses</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'balances_filter-list' %}"> api/info/balances</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'coins_filter-list' %}"> api/info/coins</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'explorers_filter-list' %}"> api/info/explorers</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'last_btc_ntx_filter-list' %}"> api/info/last_notarised</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'last_btc_ntx_filter-list' %}"> api/info/last_btc_notarised</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'mined_count_season_filter-list' %}"> api/info/mined_count_season</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'mined_count_date_filter-list' %}"> api/info/mined_count_date</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notary_nodes_filter-list' %}"> api/info/notary_nodes</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notary_social_filter-list' %}"> api/info/nn_social</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notarised_chain_season_filter-list' %}"> api/info/notarised_chain_season</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notarised_count_season_filter-list' %}"> api/info/notarised_count_season</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notarised_chain_date_filter-list' %}"> api/info/notarised_chain_date</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notarised_count_date_filter-list' %}"> api/info/notarised_count_date</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notary_rewards_filter-list' %}"> api/info/notary_rewards</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notarised_tenure_filter-list' %}"> api/info/notarised_tenure</a></li>
+        </ul>
+        
+        <i class="cil-transfer"></i>  <span style="padding-left: 12px;">TOOLS API</span> 
+        <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'api_decode_op_return_tool-list' %}"> api/tools/decode_opreturn</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'api_address_from_pubkey_tool-list' %}"> api/tools/address_from_pubkey</a></li>        
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'api_addr_from_base58_tool-list' %}"> api/tools/addr_from_base58</a></li>
+        </ul>
+        
+        <i class="cil-transfer"></i>  <span style="padding-left: 12px;">GRAPH API</span> 
+        <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'balances_graph-list' %}"> api/graph_json/balances</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'daily_ntx_graph-list' %}"> api/graph_json/daily_ntx</a></li>
+        </ul>
+        
+        <i class="cil-transfer"></i>  <span style="padding-left: 12px;">BTC TXID API</span> 
+        <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'address_btc_txids' %}"> api/info/address_btc_txids</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notary_btc_txids' %}"> api/info/notary_btc_txids</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'nn_btc_txid' %}"> api/info/nn_btc_txid</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'nn_btc_txid_splits' %}"> api/info/nn_btc_txid_splits</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'split_summary_api' %}"> api/info/split_summary_api</a></li>
+        </ul>
+        
+        <i class="cil-transfer"></i>  <span style="padding-left: 12px;">TESTNET API</span> 
+        <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'api_testnet_totals' %}"> api/testnet/totals</a></li>
+        </ul>
+        
+        <i class="cil-transfer"></i>  <span style="padding-left: 12px;">OTHER API</span> 
+        <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'chain_sync_api' %}"> api/info/chain_sync</a></li>
+        </ul>
+
+        <i class="cil-transfer"></i>  <span style="padding-left: 12px;">REVIEW / DEPRECATED </span> 
+        <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'funding' %}"> funding</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'funds_sent' %}"> funds_sent</a></li>
+        </ul>
+        
+    </ul>
+        

@@ -37,7 +37,7 @@ for season in all_notarised_seasons:
         for epoch in notarised_epochs:
             notarised_chains = get_notarised_chains(season, server, epoch)
             logger.info(f"{season} {server} {epoch} notarised_chains: {notarised_chains}")
-
+'''
 epochs = get_epochs()
 print(epochs)
 
@@ -85,6 +85,7 @@ print(epochs)
 print(get_chain_epoch_at("Season_5_Testnet", "Main", "MORTY", 1617319854))
 
 print(get_chain_epoch_score_at("Season_5_Testnet", "Main", "MORTY", 1617319854))
+'''
 '''
 get_tenure_chains("Season_4", "Third_Party")
 

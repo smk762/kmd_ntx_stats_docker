@@ -25,7 +25,11 @@
 											<td data-data="server">{{ row.server }}</th>
 											<td data-data="epoch">{{ row.epoch }}</th>
 											<td data-data="chain">{{ row.chain }}</th>
-											<td data-data="epoch_chain_ntx_count">{{ row.epoch_chain_ntx_count }}</th>
+											{% if row.server == 'BTC' %}
+												<td data-data="epoch_chain_ntx_count">{{ row.epoch_chain_ntx_count }} <a style="font-size: 0.9em;" href="//{{ request.get_host }}/api/info/notarisation/?notary={{ notary }}&chain={{ row.chain }}&season={{ season }}&epoch=Epoch_{{ row.epoch }}&server=Main">[tx]</a></th>
+											{% else %}
+												<td data-data="epoch_chain_ntx_count">{{ row.epoch_chain_ntx_count }} <a style="font-size: 0.9em;" href="//{{ request.get_host }}/api/info/notarisation/?notary={{ notary }}&chain={{ row.chain }}&season={{ season }}&epoch=Epoch_{{ row.epoch }}&server={{ row.server }}">[tx]</a></th>
+											{% endif %}
 											<td data-data="score_per_ntx">{{ row.score_per_ntx }}</th>
 											<td data-data="epoch_chain_score">{{ row.epoch_chain_score|floatformat:-3 }}</th>
 										</tr>
