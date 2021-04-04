@@ -16,16 +16,19 @@ router = routers.DefaultRouter()
 router.register(r'users', api_viewsets.UserViewSet)
 router.register(r'groups', api_viewsets.GroupViewSet)
 
-# info
+# Trailing #$ denotes inclusion in sidebar
 router.register(r'info/addresses',
                 api_filtered_viewsets.addresses_filter,
-                basename='addresses_filter') # 
+                basename='addresses_filter') #$
+
 router.register(r'info/balances',
                 api_filtered_viewsets.balances_filter,
-                basename='balances_filter')
+                basename='balances_filter') #$
+
 router.register(r'info/coins',
                 api_filtered_viewsets.coins_filter,
                 basename='coins_filter')
+
 router.register(r'info/explorers',
                 api_filtered_viewsets.explorers_filter,
                 basename='explorers_filter')
@@ -41,7 +44,6 @@ router.register(r'info/mined_count_date',
 router.register(r'info/notarised_chain_season',
                 api_filtered_viewsets.notarised_chain_season_filter,
                 basename='notarised_chain_season_filter')
-
 
 router.register(r'info/notarisation',
                 api_filtered_viewsets.notarised_filter,
@@ -71,7 +73,6 @@ router.register(r'info/notary_rewards',
                 api_filtered_viewsets.notary_rewards_filter,
                 basename='notary_rewards_filter')
 
-
 router.register(r'info/nn_social',
                 api_filtered_viewsets.notary_social_filter,
                 basename='notary_social_filter')
@@ -83,7 +84,6 @@ router.register(r'info/last_notarised',
 router.register(r'info/last_btc_notarised',
                 api_filtered_viewsets.last_btc_ntx_filter,
                 basename='last_btc_ntx_filter')
-
 
 # Tools 
 router.register(r'tools/decode_opreturn',
@@ -129,10 +129,6 @@ router.register(r'source/last_notarised',
 router.register(r'source/mined',
                 api_viewsets.MinedViewSet,
                 basename='MinedViewSet') 
-
-router.register(r'source/mined_count_date',
-                api_viewsets.MinedCountDayViewSet,
-                basename='MinedCountDayViewSet')
 
 router.register(r'source/mined_count_date',
                 api_viewsets.MinedCountDayViewSet,
@@ -208,7 +204,8 @@ urlpatterns = [
 
     path('coin_profile/',
           page_views.coin_profile_view,
-          name='coin_profile'),                       
+          name='coin_profile'),        
+
     path('coin_profile/<str:chain>/',
           page_views.coin_profile_view,
           name='coin_profile_view'),
@@ -228,6 +225,7 @@ urlpatterns = [
     path('mining_24hrs/',
           page_views.mining_24hrs,
           name='mining_24hrs'),
+
     path('mining_overview/',
           page_views.mining_overview,
           name='mining_overview'),
@@ -235,6 +233,7 @@ urlpatterns = [
     path('notary_profile/',
           notary_views.notary_profile_view,
           name='notary_profile'),
+
     path('notary_profile/<str:notary>/',
           notary_views.notary_profile_view,
           name='notary_profile_view'),
@@ -350,21 +349,17 @@ urlpatterns = [
           api_views.nn_ltc_txid,
           name='nn_ltc_txid'),
 
-    path('api/nn_mined_4hrs_count/',
+    path('api/info/nn_mined_4hrs_count',
           api_views.nn_mined_4hrs_api,
           name='nn_mined_4hrs_api'),
     
-    path('api/nn_mined_last_api/',
+    path('api/info/nn_mined_last_api',
           api_views.nn_mined_last_api,
           name='nn_mined_last_api'),
 
-    path('api/ntx_24hrs/',
+    path('api/info/ntx_24hrs/',
           api_views.ntx_24hrs_api,
           name='ntx_24hrs_api'),
-
-    path('api/info/split_summary_api',
-          api_views.split_summary_api,
-          name='split_summary_api'),
 
     path('api/info/split_summary_api',
           api_views.split_summary_api,
