@@ -778,9 +778,6 @@ class notarised_row():
     def validated(self):
         if self.epoch.find("Epoch") == -1 and self.epoch != "Unofficial":
             logger.warning(f"!!!! Invalid epoch {self.epoch}")
-            if self.epoch == "2":
-                logger.warning(f"[notarised] row invalid {self.chain} {self.season} {self.server} {self.epoch} {self.scored} {self.score_value} {self.block_datetime}")
-                input()
 
             return False
         return True

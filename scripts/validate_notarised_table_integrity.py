@@ -207,25 +207,32 @@ def validate_epochs():
 def zero_unofficial_notarisation_scores():
 
         sql = f"SELECT score_value, scored  \
-                    FROM notarised WHERE \
-                    season = 'Unofficial' \
-                    OR server = 'Unofficial' \
-                    OR epoch = 'Unofficial';"
-        CURSOR.execute(sql)
-        scores = CURSOR.fetchall()
-        logger.warning(f"{len(scores)} Unofficial scores detected - zeroing them out...")
-
-        sql = f"UPDATE notarised SET scored={False}, score_value=0  \
+                    FROM notarised \
                     WHERE \
                     (season = 'Unofficial' \
                     OR server = 'Unofficial' \
                     OR epoch = 'Unofficial') \
                     AND \
-                    (score_value = 0 \
+                    (score_value != 0 \
                     OR scored = True );"
         CURSOR.execute(sql)
-        CONN.commit()
+        scores = CURSOR.fetchall()
 
+        if len(scores) > 0:
+            logger.warning(f"{len(scores)} Unofficial scores detected - zeroing them out...")
+
+            sql = f"UPDATE notarised SET scored={False}, score_value=0  \
+                        WHERE \
+                        (season = 'Unofficial' \
+                        OR server = 'Unofficial' \
+                        OR epoch = 'Unofficial') \
+                        AND \
+                        (score_value != 0 \
+                        OR scored = True );"
+            CURSOR.execute(sql)
+            CONN.commit()
+        else:
+            logger.warning(f"{len(scores)} Unofficial scores detected!")
 
 def validate_addresses(season):
     results = {}
@@ -318,7 +325,7 @@ def validate_addresses(season):
 
 if __name__ == "__main__":
 
-
+    Failed = None
     zero_unofficial_notarisation_scores()
 
     assert_results = {}

@@ -6,7 +6,6 @@ import logging.handlers
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from kmd_ntx_api.lib_helper import *
 from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_query import *
 
@@ -29,6 +28,37 @@ def api_btc_ntx_lag(request):
     resp = get_btc_ntx_lag(request)
     return JsonResponse(resp)
     
+
+
+def api_dpow_server_coins_dict(request):
+    if 'season' in request.GET:
+        season = request.GET["season"]
+    else:
+        season = "Season_4"
+    resp = get_dpow_server_coins_dict(season)
+    return JsonResponse(resp)
+
+
+
+def api_server_chains(request):
+    if 'season' in request.GET:
+        season = request.GET["season"]
+    else:
+        season = "Season_4"
+    resp = get_server_chains(season)
+    return JsonResponse(resp)
+
+
+def api_sidebar_links(request):
+    if 'season' in request.GET:
+        season = request.GET["season"]
+    else:
+        season = "Season_4"
+    resp = get_sidebar_links(season)
+    return JsonResponse(resp)
+
+
+
 def api_testnet_totals(request):
     resp = get_api_testnet(request)
     return JsonResponse(resp)

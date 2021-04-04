@@ -1,4 +1,3 @@
-
 import requests
 from django.contrib import messages
 
@@ -41,28 +40,6 @@ SEASONS_INFO = {
         }
 }
 
-'''
-s4_numchains = {
-    "1921458": {
-        "phase":"S4 start",
-        "main": ['KMD', 'BTC', 'AXO', 'BET', 'BOTS', 'BTCH', 'CCL',
-                 'COQUICASH', 'CRYPTO', 'DEX', 'HODL', 'ILN', 'JUMBLR',
-                 'KOIN', 'MESH', 'MGW', 'MORTY', 'MSHARK', 'NINJA', 'OOT',
-                 'PANGEA', 'PGT', 'PIRATE', 'REVS', 'RFOX', 'RICK', 'STBL',
-                 'SUPERNET', 'THC', 'WLC21', 'ZILLA'],
-        "third party": ['AYA', 'CHIPS', 'EMC2', 'HUSH3', 'VRSC']
-    },
-    "1939795": {
-        "phase":"add MCL",
-        "main": ['KMD', 'BTC', 'AXO', 'BET', 'BOTS', 'BTCH', 'CCL',
-                 'COQUICASH', 'CRYPTO', 'DEX', 'HODL', 'ILN', 'JUMBLR',
-                 'KOIN', 'MESH', 'MGW', 'MORTY', 'MSHARK', 'NINJA', 'OOT',
-                 'PANGEA', 'PGT', 'PIRATE', 'REVS', 'RFOX', 'RICK', 'STBL',
-                 'SUPERNET', 'THC', 'WLC21', 'ZILLA'],
-        "third party": ['AYA', 'CHIPS', 'EMC2', 'HUSH3', 'MCL', 'VRSC']
-    },
-}
-'''
 
 # convert timestamp to human time 
 intervals = (
@@ -75,9 +52,11 @@ intervals = (
 
 noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA', 'MCL', 'VRSC']
 
+EXCLUDE_DECODE_OPRET_COINS = []
+
 url = "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json"
 r = requests.get(url)
-eco_data = r.json()
+ECO_DATA = r.json()
 
 #TESTNET_CHAINS = ["RICK", "MORTY", "LTC"]
 

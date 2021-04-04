@@ -1,3 +1,12 @@
+# Deprecated by get_dpow_coins_list() so season removed coins are included.
+def get_active_dpow_coins():
+    dpow_chains = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    chains_list = []
+    for item in dpow_chains:
+        if item['chain'] not in chains_list:
+            chains_list.append(item['chain'])
+    chains_list.sort()
+    return chains_list
 
 # No longer used
 def get_nn_health():
@@ -134,6 +143,18 @@ def get_nn_health():
         return {}
 
 
+def get_balances_dict(filter_kwargs):
+    balances_dict = {}
+    balances_data = balances.objects.filter(**filter_kwargs).order_by('notary', 'chain').values('notary', 'chain', 'balance')
+    for item in balances_data:
+        if item['notary'] not in balances_dict:
+            balances_dict.update({item['notary']:{}})
+        if item['chain'] not in balances_dict[item['notary']]:
+            balances_dict[item['notary']].update({item['chain']:item['balance']})
+        else:
+            bal = balances_dict[item['notary']][item['chain']] + item['balance']
+            balances_dict[item['notary']].update({item['chain']:bal})
+    return balances_dict  
 
 # Response too large
 def get_mined_data(request):
@@ -184,62 +205,3 @@ class mined_filter(viewsets.ViewSet):
     def get(self, request, format=None):
         api_resp = get_mined_data(request)
         return Response(api_resp)
-
-# Response too large
-class notarised_filter(viewsets.ViewSet):
-    """
-    API endpoint showing notary node mined blocks
-    """
-    serializer_class = NotarisedSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-
-    def create(self, validated_data):
-        return Task(id=None, **validated_data)
-
-    def get(self, request, format=None):
-        api_resp = get_notarised_data(request)
-        return Response(api_resp)
-        
-# Response too large
-def get_notarised_data(request):
-    resp = {}
-    data = notarised.objects.all()
-    data = apply_filters(request, NotarisedSerializer, data)
-    if len(data) == len(notarised.objects.all()):
-        yesterday = int(time.time()-60*60*24)
-        data = notarised.objects.filter(block_time__gte=yesterday) \
-            .order_by('season', 'chain', '-block_height') \
-            .values()
-
-    for item in data:
-        txid = item['txid']
-        chain = item['chain']
-        block_hash = item['block_hash']
-        block_time = item['block_time']
-        block_datetime = item['block_datetime']
-        block_height = item['block_height']
-        ac_ntx_blockhash = item['ac_ntx_blockhash']
-        ac_ntx_height = item['ac_ntx_height']
-        season = item['season']
-        opret = item['opret']
-
-        if season not in resp:
-            resp.update({season:{}})
-
-        if chain not in resp[season]:
-            resp[season].update({chain:{}})
-
-        resp[season][chain].update({
-            block_height:{
-                "block_hash":block_hash,
-                "block_time":block_time,
-                "block_datetime":block_datetime,
-                "txid":txid,
-                "ac_ntx_blockhash":ac_ntx_blockhash,
-                "ac_ntx_height":ac_ntx_height,
-                "opret":opret
-            }
-        })
-
-    return wrap_api(resp)

@@ -329,71 +329,139 @@ def get_ntx_scored(season, chain, lowest_block_time, highest_block_time, server)
 
     return scored_list, unscored_list
 
-def get_notarised_chains(season=None, server=None):
+# TODO: add WHERE conditions list
+def get_notarised_chains(season=None, server=None, epoch=None):
+
+    sql = "SELECT DISTINCT chain FROM notarised"
+    conditions = []
+    if season:
+        conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
+    if epoch:
+        conditions.append(f"epoch = '{epoch}'")
+
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+
+    CURSOR.execute(sql)
+
     chains = []
-    if season and server:
-        CURSOR.execute(f"SELECT DISTINCT chain FROM notarised WHERE season='{season}' AND server='{server}';")
-    elif season:
-        CURSOR.execute(f"SELECT DISTINCT chain FROM notarised WHERE season='{season}';")
-    elif server:
-        CURSOR.execute(f"SELECT DISTINCT chain FROM notarised WHERE server='{server}';")
-    else:
-        CURSOR.execute("SELECT DISTINCT chain FROM notarised;")
-    chain_results = CURSOR.fetchall()
-    for result in chain_results:
-        chains.append(result[0])
-    chains.sort()
+    try:
+        chain_results = CURSOR.fetchall()
+        for result in chain_results:
+            chains.append(result[0])
+        chains.sort()
+        
+    except Exception as e:
+        logger.warning(f"No [get_notarised_chains] results for {season} {server}? {e}")
+
     return chains
 
+# TODO: add WHERE conditions list
 def get_notarised_epochs(season=None, server=None):
-    epoch = []
-    if season and server:
-        CURSOR.execute(f"SELECT DISTINCT epoch FROM notarised WHERE season='{season}' AND server='{server}';")
-    elif season:
-        CURSOR.execute(f"SELECT DISTINCT epoch FROM notarised WHERE season='{season}';")
-    elif server:
-        CURSOR.execute(f"SELECT DISTINCT epoch FROM notarised WHERE server='{server}';")
-    else:
-        CURSOR.execute("SELECT DISTINCT epoch FROM notarised;")
-    chain_results = CURSOR.fetchall()
-    for result in chain_results:
-        epoch.append(result[0])
-    epoch.sort()
-    return epoch
 
+    sql = "SELECT DISTINCT epoch FROM notarised"
+    conditions = []
+    if season:
+        conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
+
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+
+    CURSOR.execute(sql)
+
+    epochs = []
+
+    try:
+        epoch_results = CURSOR.fetchall()
+        for result in epoch_results:
+            epochs.append(result[0])
+        epochs.sort()
+        
+    except Exception as e:
+        logger.warning(f"No [get_notarised_epochs] results for {season} {server}? {e}")
+
+    return epochs
+
+# TODO: add WHERE conditions list
 def get_notarised_seasons(chain=None):
-    seasons = []
+
+    sql = "SELECT DISTINCT season FROM notarised"
+
+    conditions = []
+
     if chain:
-        CURSOR.execute(f"SELECT DISTINCT season FROM notarised WHERE chain='{chain}';")
-    else:
-        CURSOR.execute("SELECT DISTINCT season FROM notarised;")
-    season_results = CURSOR.fetchall()
-    for result in season_results:
-        seasons.append(result[0])
-    seasons.sort()
-    seasons.reverse()
+        conditions.append(f"chain = '{chain}'")
+
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+
+    CURSOR.execute(sql)
+
+    seasons = []
+
+    try:
+        season_results = CURSOR.fetchall()
+        for result in season_results:
+            seasons.append(result[0])
+        seasons.sort()
+        seasons.reverse()
+        
+    except Exception as e:
+        logger.warning(f"No [get_notarised_seasons] results for {chain}? {e}")
+
     return seasons
 
 def get_all_coins():
     coins = []
     CURSOR.execute("SELECT DISTINCT chain FROM coins;")
-    results = CURSOR.fetchall()
-    for result in results:
-        coins.append(result[0])
-    coins.sort()
-    coins.reverse()
+    try:
+        results = CURSOR.fetchall()
+        for result in results:
+            coins.append(result[0])
+        coins.sort()
+        coins.reverse()
+        
+    except Exception as e:
+        logger.warning(f"No [get_all_coins] results? {e}")
+
     return coins
 
+# TODO: add WHERE conditions list
 def get_notarised_servers(season=None):
-    servers = []
+
+    sql = "SELECT DISTINCT server FROM notarised"
+    conditions = []
     if season:
-        CURSOR.execute(f"SELECT DISTINCT server FROM notarised WHERE season='{season}';")
-    else:
-        CURSOR.execute("SELECT DISTINCT server FROM notarised;")
-    servers_results = CURSOR.fetchall()
-    for result in servers_results:
-        servers.append(result[0])
-    servers.sort()
+        conditions.append(f"season = '{season}'")
+
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+    sql += ";"
+
+    CURSOR.execute(sql)
+
+    servers = []
+
+    try:
+        servers_results = CURSOR.fetchall()
+        for result in servers_results:
+            servers.append(result[0])
+        servers.sort()
+        
+    except Exception as e:
+        logger.warning(f"No [get_notarised_servers] results for {season}? {e}")
+
     return servers
 
 def get_notarised_chain_rows(chain):

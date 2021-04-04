@@ -9,31 +9,44 @@ from .lib_helper import get_season, paginate_wrap, wrap_api
 
 logger = logging.getLogger(__name__)
 
+
 def apply_filters(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
         filter_kwargs = {}
+
     for field in serializer.Meta.fields:
         val = request.query_params.get(field, None)
         if val is not None:
             filter_kwargs.update({field:val}) 
+
     if 'from_block' in request.GET:
-        filter_kwargs.update({'block_height__gte':request.GET['from_block']})  
+        filter_kwargs.update({'block_height__gte':request.GET['from_block']}) 
+
     if 'to_block' in request.GET:
         filter_kwargs.update({'block_height__lte':request.GET['to_block']})  
+
     if 'from_timestamp' in request.GET:
-        filter_kwargs.update({'block_time__gte':request.GET['from_timestamp']})  
+        filter_kwargs.update({'block_time__gte':request.GET['from_timestamp']}) 
+
     if 'to_timestamp' in request.GET:
         filter_kwargs.update({'block_time__lte':request.GET['to_timestamp']})
+
     if table in ['daily_mined_count']:
+
         if 'from_date' in request.GET:
             filter_kwargs.update({'mined_date__gte':request.GET['from_date']})  
+
         if 'to_date' in request.GET:
-            filter_kwargs.update({'mined_date__lte':request.GET['to_date']})          
+            filter_kwargs.update({'mined_date__lte':request.GET['to_date']})   
+
     if table in ['daily_notarised_chain', 'daily_notarised_count']:
+
         if 'from_date' in request.GET:
-            filter_kwargs.update({'notarised_date__gte':request.GET['from_date']})  
+            filter_kwargs.update({'notarised_date__gte':request.GET['from_date']}) 
+
         if 'to_date' in request.GET:
-            filter_kwargs.update({'notarised_date__lte':request.GET['to_date']})          
+            filter_kwargs.update({'notarised_date__lte':request.GET['to_date']})  
+
     if len(filter_kwargs) > 0:
         queryset = queryset.filter(**filter_kwargs)
     return queryset
@@ -119,6 +132,7 @@ def get_coins_data(request):
 
     return resp
 
+
 def get_explorers_data():
     resp = {}
     coins_data = coins.objects.all().values('chain','explorers')
@@ -128,6 +142,7 @@ def get_explorers_data():
             chain = item['chain']
             resp.update({chain:explorers})
     return resp
+
 
 def get_mined_count_season_data(request):
     resp = {}
@@ -202,18 +217,28 @@ def get_mined_count_daily_data(request):
     return paginate_wrap(resp, url, "mined_date",
                          str(yesterday), str(tomorrow))
 
+
 def get_notarised_data(request):
 
     resp = {}
-    logger.info(f"request.GET: {request.GET}")
+
     data = notarised.objects.all()
+
     if "notary" in request.GET:
         data = data.filter(notaries__contains=[request.GET["notary"]])
+
     if "address" in request.GET:
         data = data.filter(notary_addresses__contains=[request.GET["address"]])
 
+    if "season" in request.GET:
+        data = data.filter(season=[request.GET["season"]])
+
+    else:
+        data = data.filter(season="Season_4")
+
     if "chain" in request.GET:
         data = data.filter(chain=request.GET["chain"])
+
     else:
         data = data.filter(chain="BTC")
 
@@ -273,6 +298,7 @@ def get_notarised_chain_season_data(request):
 
     return resp
 
+
 def get_notarised_count_season_data(request):
     resp = {}
     data = notarised_count_season.objects.all()
@@ -326,6 +352,7 @@ def get_notarised_count_season_data(request):
 
     return resp
 
+
 def get_notarised_chain_daily_data(request):
     resp = {}
     data = notarised_chain_daily.objects.all()
@@ -360,6 +387,7 @@ def get_notarised_chain_daily_data(request):
     url = request.build_absolute_uri('/api/chain_stats/daily/')
     return paginate_wrap(resp, url, "notarised_date",
                          str(yesterday), str(tomorrow))
+
 
 def get_notarised_count_date_data(request):
     resp = {}
@@ -419,6 +447,36 @@ def get_notarised_count_date_data(request):
                          str(yesterday), str(tomorrow))
 
 
+def get_notarised_tenure_data(request):
+    resp = {}
+    data = notarised_tenure.objects.all()
+    data = apply_filters(request, ntxTenureSerializer, data)
+    data = data.order_by('chain', 'season').values()
+    for item in data:
+
+        if item["season"] not in resp: 
+            resp.update({item["season"]:{}})
+
+        if item["server"] not in resp[item["season"]]: 
+            resp[item["season"]].update({item["server"]:{}})
+
+        if item["chain"] not in resp[item["season"]][item["server"]]:
+            resp[item["season"]][item["server"]].update({
+                item["chain"]: {
+                    "first_ntx_block":item["first_ntx_block"],
+                    "last_ntx_block":item["last_ntx_block"], 
+                    "first_ntx_block_time":item["first_ntx_block_time"],
+                    "last_ntx_block_time":item["last_ntx_block_time"],
+                    "official_start_block_time":item["official_start_block_time"],
+                    "official_end_block_time":item["official_end_block_time"],
+                    "scored_ntx_count":item["scored_ntx_count"],
+                    "unscored_ntx_count":item["unscored_ntx_count"]
+                }
+            })
+
+    return resp
+
+
 def get_rewards_data(request):
     address_data = addresses.objects.filter(chain='KMD')
     if 'season' in request.GET:
@@ -471,33 +529,3 @@ def get_rewards_data(request):
 
 
     return resp
-
-def get_notarised_tenure_data(request):
-    resp = {}
-    data = notarised_tenure.objects.all()
-    data = apply_filters(request, ntxTenureSerializer, data)
-    data = data.order_by('chain', 'season').values()
-    for item in data:
-
-        if item["season"] not in resp: 
-            resp.update({item["season"]:{}})
-
-        if item["server"] not in resp[item["season"]]: 
-            resp[item["season"]].update({item["server"]:{}})
-
-        if item["chain"] not in resp[item["season"]][item["server"]]:
-            resp[item["season"]][item["server"]].update({
-                item["chain"]: {
-                    "first_ntx_block":item["first_ntx_block"],
-                    "last_ntx_block":item["last_ntx_block"], 
-                    "first_ntx_block_time":item["first_ntx_block_time"],
-                    "last_ntx_block_time":item["last_ntx_block_time"],
-                    "official_start_block_time":item["official_start_block_time"],
-                    "official_end_block_time":item["official_end_block_time"],
-                    "scored_ntx_count":item["scored_ntx_count"],
-                    "unscored_ntx_count":item["unscored_ntx_count"]
-                }
-            })
-
-    return resp
-
