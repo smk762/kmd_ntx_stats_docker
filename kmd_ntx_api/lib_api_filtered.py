@@ -317,6 +317,8 @@ def get_notarised_count_season_data(request):
                 }
             })
         for chain in chain_ntx_pct:
+            if chain not in resp[season][notary]["chains"]:
+                resp[season][notary]["chains"].update({chain:{}})
             resp[season][notary]["chains"][chain].update({
                 "percentage":chain_ntx_pct[chain]
             }),
