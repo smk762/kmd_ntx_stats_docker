@@ -342,3 +342,7 @@ if __name__ == "__main__":
         if len(assert_results[item]["FAIL"]) > 0:
             for result in assert_results[item]["FAIL"]:
                 logger.warning(result)
+                Failed = True
+
+    if not Failed:
+        logger.info("All tests Passed!")
