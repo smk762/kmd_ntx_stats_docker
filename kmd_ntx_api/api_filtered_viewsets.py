@@ -223,8 +223,8 @@ class notary_nodes_filter(viewsets.ViewSet):
         season = get_season()
         if "season" in request.GET:
             season = request.GET["season"]
-        notaries_list = get_notary_list(season)
-        api_resp = wrap_api(notaries_list)
+        notary_list = get_notary_list(season)
+        api_resp = wrap_api(notary_list)
         return Response(api_resp)
 
 class notary_rewards_filter(viewsets.ViewSet):
@@ -333,7 +333,10 @@ class notarised_filter(viewsets.ViewSet):
         return Task(id=None, **validated_data)
 
     def get(self, request, format=None):
+        
         filters = self.serializer_class.Meta.fields
         resp = get_notarised_data(request)
+
+        # TODO: include custom filters in wrap_api resp
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)

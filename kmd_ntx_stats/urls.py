@@ -247,6 +247,10 @@ urlpatterns = [
           page_views.ntx_scoreboard,
           name='ntx_scoreboard'),
 
+    path('ntx_scoreboard_24hrs/',
+          page_views.ntx_scoreboard_24hrs,
+          name='ntx_scoreboard_24hrs'),
+
     path('notarised_tenure/',
           page_views.notarised_tenure_view,
           name='notarised_tenure_view'),
@@ -276,6 +280,18 @@ urlpatterns = [
     path('api/info/address_btc_txids',
           api_views.address_btc_txids,
           name='address_btc_txids'),
+
+    path('api/info/sidebar_links',
+          api_views.api_sidebar_links,
+          name='api_sidebar_links'),
+
+    path('api/info/server_chains',
+          api_views.api_server_chains,
+          name='api_server_chains'),
+
+    path('api/info/dpow_server_coins',
+          api_views.api_dpow_server_coins_dict,
+          name='api_dpow_server_coins_dict'),
 
     path('api/info/btc_ntx_lag',
           api_views.api_btc_ntx_lag,

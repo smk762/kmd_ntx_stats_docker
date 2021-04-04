@@ -12,11 +12,8 @@ def notary_profile_view(request, notary=None, season=None):
     if not season:
         season="Season_4"
     
-    notaries_list = get_notary_list(season)
-    active_dpow_coins = get_active_dpow_coins()
-
     context = {
-        "sidebar_links":get_sidebar_links(notaries_list ,active_dpow_coins),
+        "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link()
     }
 
@@ -24,13 +21,11 @@ def notary_profile_view(request, notary=None, season=None):
 
         region = get_notary_region(notary)
 
-        notary_balances = get_notary_balances(notary, season)
-
-        coin_notariser_ranks = get_coin_notariser_ranks(season)
+        # coin_notariser_ranks = get_coin_notariser_ranks(season)
         
-        notarisation_scores = get_notarisation_scores(season, coin_notariser_ranks)
+        notarisation_scores = get_notarisation_scores(season)
         
-        notary_balances_list, notary_balances_graph = get_notary_balances_data(active_dpow_coins, notary_balances)
+        notary_balances_list, notary_balances_graph = get_notary_balances_data(notary, season)
 
         context.update({
             "notary_name": notary,

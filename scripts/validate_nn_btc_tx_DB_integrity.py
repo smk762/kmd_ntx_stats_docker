@@ -134,14 +134,16 @@ def validate_notaries_by_address(address, season):
                 CONN.commit()
                 print(f"Updated {txid} {notary} {address} {season}")
 
-
+# TODO: change delete to update from input()
+# TODO: Add reporting
 validate_ntx_row_counts()
 validate_split_rows()
 validate_ntx_addr()
 for season in NN_BTC_ADDRESSES_DICT:
-    if season in ["Season_3", "Season_4"]:
+    if season not in EXCLUDED_SEASONS:
         for address in NN_BTC_ADDRESSES_DICT[season]:
             validate_notaries_by_address(address, season)
+
 
 print(f"Categories in DB:")
 CURSOR.execute(f"SELECT DISTINCT category FROM nn_btc_tx;")

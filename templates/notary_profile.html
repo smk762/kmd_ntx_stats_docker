@@ -126,7 +126,7 @@
 									    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 										    	Notarisation Score
 										    	<span class="badge kmd_ui_dark1_bg p-1">
-										    		<a href="//{{ request.get_host }}/ntx_scoreboard">{{ ntx_summary.premining_ntx_score|floatformat:-3 }}</a>
+										    		<a href="//{{ request.get_host }}/ntx_scoreboard">{{ ntx_summary.season.score|floatformat:-3 }}</a>
 										    	</span>
 											</div>
 										</li>

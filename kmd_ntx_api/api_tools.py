@@ -2,9 +2,9 @@
 from rest_framework.response import Response
 from rest_framework import permissions, viewsets, authentication
 from kmd_ntx_api.serializers import addrFromBase58Serializer, addrFromPubkeySerializer, decodeOpRetSerializer
+from kmd_ntx_api.lib_info import get_all_coins
+from kmd_ntx_api.base_58 import calc_addr_from_pubkey, calc_addr_tool, COIN_PARAMS
 from kmd_ntx_api.lib_helper import decode_opret
-from kmd_ntx_api.base_58 import get_addr_from_pubkey, get_addr_tool, COIN_PARAMS
-
 
 # Tool views
 
@@ -30,7 +30,7 @@ class api_addr_from_base58_tool(viewsets.ViewSet):
             error = f"You need to specify params like '?{params}'"
             return Response({"error":f"Missing params: {error}"})
 
-        resp = get_addr_tool(request.GET["pubkey"], request.GET["pub_addr"],
+        resp = calc_addr_tool(request.GET["pubkey"], request.GET["pub_addr"],
                              request.GET["script_addr"], request.GET["secret_key"])
         return Response(resp)
 
@@ -46,23 +46,7 @@ class api_address_from_pubkey_tool(viewsets.ViewSet):
         """
         Returns address from pubkey using CONST base 58 params
         """
-        chain = "KMD"
-        if "chain" in request.GET:
-            if request.GET["chain"] in COIN_PARAMS:
-                chain = request.GET["chain"]
-
-        if "pubkey" in request.GET:
-            pubkey = request.GET["pubkey"]
-            resp = {
-                "chain": chain,
-                "pubkey": pubkey,
-                "address": get_addr_from_pubkey(chain, pubkey)
-            }
-
-        else:
-            resp ={
-                "Error": "You need to specify a pubkey and coin like '?coin=KMD&pubkey=<YOUR_PUBKEY>' If coin not specified or unknown, will revert to KMD"
-            }
+        resp = get_address_from_pubkey(request)
         return Response(resp)
 
 class api_decode_op_return_tool(viewsets.ViewSet):
@@ -82,8 +66,9 @@ class api_decode_op_return_tool(viewsets.ViewSet):
         Returns decoded notarisation information from OP_RETURN strings
         """
         if 'OP_RETURN' in request.GET:
-
-            decoded = decode_opret(request.GET['OP_RETURN'])
+ 
+            coins_list = get_all_coins() 
+            decoded = decode_opret(request.GET['OP_RETURN'], coins_list)
         else:
             decoded = {"error":"needs parm like ?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400"}
         return Response(decoded)
