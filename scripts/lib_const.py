@@ -983,13 +983,37 @@ SCORING_EPOCHS = {
 }
 
 for season in SEASONS_INFO:
-    SCORING_EPOCHS.update({season:{
-        "Main":{},
-        "Third_Party":{}
-    }})
-
     season_start = SEASONS_INFO[season]["start_time"]
     season_end = SEASONS_INFO[season]["end_time"]
+
+    SCORING_EPOCHS.update({season:{
+        "Main":{},
+        "Third_Party":{},
+        "KMD": {
+            f"Epoch_KMD": {
+                "start":season_start,
+                "end":season_end-1,
+                "start_event":"Season start",
+                "end_event": "Season end"
+            }
+        },
+        "BTC": {
+            f"Epoch_BTC": {
+                "start":season_start,
+                "end":season_end-1,
+                "start_event":"Season start",
+                "end_event": "Season end"
+            }
+        },
+        "LTC": {
+            f"Epoch_LTC": {
+                "start":season_start,
+                "end":season_end-1,
+                "start_event":"Season start",
+                "end_event": "Season end"
+            }
+        }
+    }})
 
     if season not in PARTIAL_SEASON_DPOW_CHAINS:
         SCORING_EPOCHS[season]["Main"].update({

@@ -623,21 +623,21 @@ def get_new_notary_txids(notary_address, chain, season=None):
     if chain == "BTC":
 
         if season:
-            #existing_txids = get_existing_nn_btc_txids(None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
+            existing_txids = get_existing_nn_btc_txids(None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
             url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={NN_BTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
             logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
         else:
-            #existing_txids = get_existing_nn_btc_txids(None, None, None, ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address])
+            existing_txids = get_existing_nn_btc_txids(None, None, None, ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address])
             url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]}"
             logger.info(f"{len(existing_txids)} existing txids in local DB detected for {ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]} {notary_address}")
             
     elif chain == "LTC":
         if season:
-            #existing_txids = get_existing_nn_ltc_txids(None, None, season, NN_LTC_ADDRESSES_DICT[season][notary_address])
+            existing_txids = get_existing_nn_ltc_txids(None, None, season, NN_LTC_ADDRESSES_DICT[season][notary_address])
             url = f"{OTHER_SERVER}/api/info/nn_ltc_txid_list?notary={NN_LTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
             logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_LTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
         else:
-            #existing_txids = get_existing_nn_ltc_txids(None, None, None, ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address])
+            existing_txids = get_existing_nn_ltc_txids(None, None, None, ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address])
             url = f"{OTHER_SERVER}/api/info/nn_ltc_txid_list?notary={ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address]}"
             logger.info(f"{len(existing_txids)} existing txids in local DB detected for {ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address]} {notary_address}")
     
