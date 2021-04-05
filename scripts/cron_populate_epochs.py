@@ -2,11 +2,11 @@
 import requests
 import logging
 import logging.handlers
-from lib_const import CONN, CURSOR, SCORING_EPOCHS
+from lib_const import CONN, CURSOR, SCORING_EPOCHS, DPOW_EXCLUDED_CHAINS, SEASONS_INFO, EXCLUDED_SEASONS
 from models import scoring_epoch_row, ntx_tenure_row
 from lib_notary import get_server_active_dpow_chains_at_time, get_dpow_score_value, update_ntx_tenure, get_gleec_ntx_server
 from lib_table_select import get_notarised_chains, get_notarised_seasons, get_notarised_servers, get_epochs
-from lib_table_update import update_chain_notarised_epoch_window
+from lib_table_update import update_chain_notarised_epoch_window, update_unofficial_chain_notarised_tbl
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -22,6 +22,20 @@ all_notarised_seasons = get_notarised_seasons()
 all_notarised_servers = get_notarised_servers()
 
 all_notarised_chains = get_notarised_chains()
+
+all_scoring_epochs = []
+for season in SCORING_EPOCHS:
+    for server in SCORING_EPOCHS[season]:
+        for epoch in SCORING_EPOCHS[season][server]:
+            all_scoring_epochs.append(epoch)
+all_scoring_epochs = list(set(all_scoring_epochs))
+
+# Clear invalid servers
+invalid_servers = ["Testnet", "Unofficial"]
+for server in invalid_servers:
+    row = ntx_tenure_row()
+    row.delete(None, server)
+    logger.info(f">>> Deleting {season} ntx_tenure_row, not in valid server")
 
 def update_season_tenure(season):
     season_servers = get_notarised_servers(season)
@@ -40,50 +54,33 @@ def update_season_tenure(season):
 
             for chain in all_notarised_chains:
 
-                if chain not in season_server_chains:
+                if chain not in season_server_chains or chain in DPOW_EXCLUDED_CHAINS[season]:
                     row = ntx_tenure_row()
                     row.delete(season, server, chain)
 
                 else:
                     update_ntx_tenure(chain, season, server)
 
-
-all_scoring_epochs = []
-for season in SCORING_EPOCHS:
-    for server in SCORING_EPOCHS[season]:
-        for epoch in SCORING_EPOCHS[season][server]:
-            all_scoring_epochs.append(epoch)
-all_scoring_epochs = list(set(all_scoring_epochs))
-
-# Clear invalid servers
-invalid_servers = ["Testnet", "Unofficial"]
-for server in invalid_servers:
-    row = ntx_tenure_row()
-    row.delete(None, server)
-    logger.info(f">>> Deleting {season} ntx_tenure_row, not in valid server")
-
-
 # Update Tenure
-for season in all_notarised_seasons:
-
-    if season in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
+def update_tenure(season):
+    if season in EXCLUDED_SEASONS:
         row = ntx_tenure_row()
         row.delete(season)
         logger.info(f">>> Deleting {season} ntx_tenure_row, not in valid seasons")
 
     else:
         update_season_tenure(season)
-        pass
 
 # TODO: I dont think this will initialise s5 coins until they have recieved a notarisation. 
 # Should probably augment with dpow readme parsing.
 # Update epochs
 #for season in ["Season_5_Testnet"]:
-for season in all_notarised_seasons:
+
+def update_epochs(season):
     logger.info(f"Processing {season}...")
 
     print('\n')
-    if season in ["Season_1", "Season_2", "Season_3", "Unofficial"]:
+    if season in EXCLUDED_SEASONS:
         logger.info(f">>> Deleting {season} epoch_row, not in valid seasons")
         row = scoring_epoch_row()
         row.delete(season)
@@ -98,7 +95,6 @@ for season in all_notarised_seasons:
         scoring_season_servers = SCORING_EPOCHS[season]
         logger.info(f"{season} scoring_season_servers: {scoring_season_servers}")
         logger.info(f"all_notarised_servers: {all_notarised_servers}")
-
 
         for server in all_notarised_servers:
             print('\n')
@@ -175,29 +171,36 @@ for season in all_notarised_seasons:
 
 
 # Update notarised table epochs and score value
-epochs = get_epochs()
-logger.info(f">>> Updating notarised table epochs and score value...\n")
-for epoch in epochs:
+def update_notarised_epoch_scoring():
+    epochs = get_epochs()
+    logger.info(f">>> Updating notarised table epochs and score value...\n")
 
-    season = epoch['season']
-    server = epoch['server']
-    epoch_id = epoch['epoch']
-    epoch_start = epoch['epoch_start']
-    epoch_end = epoch['epoch_end']
-    start_event = epoch['start_event']
-    end_event = epoch['end_event']
-    epoch_chains = epoch['epoch_chains']
-    score_per_ntx = epoch['score_per_ntx']
-    logger.info(f">>> Updating notarised table epochs and score value for {season} {server} {epoch_id} {score_per_ntx}...\n")
 
-    for chain in epoch_chains:
-        logger.info(f"{chain} {season} {server} {epoch_id} | Blocks {epoch_start} - {epoch_end} | scored True {score_per_ntx}\n")
+    for epoch in epochs:
 
-        if chain != "GLEEC":
-            update_chain_notarised_epoch_window(chain, season, server, epoch_id, epoch_start, epoch_end, score_per_ntx, True)
+        season = epoch['season']
+        server = epoch['server']
+        epoch_id = epoch['epoch']
+        epoch_start = epoch['epoch_start']
+        epoch_end = epoch['epoch_end']
+        start_event = epoch['start_event']
+        end_event = epoch['end_event']
+        epoch_chains = epoch['epoch_chains']
+        score_per_ntx = epoch['score_per_ntx']
+        logger.info(f">>> Updating notarised table epochs and score value for {season} {server} {epoch_id} {score_per_ntx}...\n")
 
-        
+        for chain in epoch_chains:
+            logger.info(f"{chain} {season} {server} {epoch_id} | Blocks {epoch_start} - {epoch_end} | scored True {score_per_ntx}\n")
 
+            if chain != "GLEEC":
+                update_chain_notarised_epoch_window(chain, season, server, epoch_id, epoch_start, epoch_end, score_per_ntx, True)
+
+
+for season in all_notarised_seasons:
+    update_tenure(season)
+    update_epochs(season)
+
+update_notarised_epoch_scoring()
 
 CURSOR.close()
 CONN.close()
