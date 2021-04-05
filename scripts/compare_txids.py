@@ -4,6 +4,7 @@ import json
 import math
 import time
 import requests
+from cron_populate_ntx_tables import *
 from lib_const import CONN, CURSOR, RPC
 
 CURSOR.execute("SELECT txid, chain FROM notarised WHERE season='Season_4';")
@@ -50,9 +51,55 @@ with open('s4-stats-txes-time.csv', 'r') as csv_file:
         else:
             decker_txid_list.append(txid)
 
-from cron_populate_ntx_tables import update_KMD_notarisations
 
 update_KMD_notarisations(decker_KMD_block_list)
+ntx_summary, chain_totals = get_notarisation_data(season)
+chain_ntx_counts, notary_season_pct = get_notary_season_count_pct(season)
+
+for notary in ntx_summary:
+
+    for summary_season in ntx_summary[notary]["seasons"]:
+        logger.info(f"Getting season summary for {notary} {summary_season}")
+
+
+        if notary in KNOWN_NOTARIES:
+
+            season_ntx_count_row = notarised_count_season_row()
+            season_ntx_count_row.notary = notary
+            season_ntx_count_row.season = summary_season
+            servers = ntx_summary[notary]["seasons"][summary_season]['servers']
+
+            if "KMD" in servers:
+                season_ntx_count_row.btc_count = servers['KMD']['server_ntx_count']
+
+            elif "LTC" in servers:
+                season_ntx_count_row.btc_count = servers['LTC']['server_ntx_count']
+
+            else: 
+                season_ntx_count_row.btc_count = 0
+
+            if 'Main' in servers:
+                season_ntx_count_row.antara_count = servers['Main']['server_ntx_count']
+
+            else:
+                season_ntx_count_row.antara_count = 0
+
+            if 'Third_Party' in servers:
+                season_ntx_count_row.third_party_count = servers['Third_Party']['server_ntx_count']
+
+            else:
+                season_ntx_count_row.third_party_count = 0
+
+            season_ntx_count_row.other_count = 0
+            season_ntx_count_row.total_ntx_count = ntx_summary[notary]["seasons"][summary_season]['season_ntx_count']
+
+            season_ntx_count_row.season_score = ntx_summary[notary]["seasons"][summary_season]["season_score"]
+            season_ntx_count_row.chain_ntx_counts = json.dumps(ntx_summary[notary])
+            season_ntx_count_row.chain_ntx_pct = json.dumps(notary_season_pct)
+            season_ntx_count_row.time_stamp = time.time()
+            season_ntx_count_row.update()
+
+
 '''
 missing_txids = list(set(decker_txid_list).difference(set(smk_txid_list)))
 decker_missing_txids = list(set(smk_txid_list).difference(set(decker_txid_list)))

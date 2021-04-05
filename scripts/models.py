@@ -13,30 +13,32 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 def get_chain_epoch_at(season, server, chain, timestamp):
-    if chain not in DPOW_EXCLUDED_CHAINS[season]:
-        if chain in ["KMD", "BTC", "LTC"]:
-            if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
-                return f"Epoch_{chain}"
+    if season in DPOW_EXCLUDED_CHAINS: 
+        if chain not in DPOW_EXCLUDED_CHAINS[season]:
+            if chain in ["KMD", "BTC", "LTC"]:
+                if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
+                    return f"Epoch_{chain}"
 
-        epochs = get_epochs(season, server)
-        for epoch in epochs:
-            if chain in epoch["epoch_chains"]:
-                if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
-                    return epoch["epoch"]
+            epochs = get_epochs(season, server)
+            for epoch in epochs:
+                if chain in epoch["epoch_chains"]:
+                    if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
+                        return epoch["epoch"]
 
     return "Unofficial"
 
 def get_chain_epoch_score_at(season, server, chain, timestamp):
-    if chain not in DPOW_EXCLUDED_CHAINS[season]:
-        if chain in ["KMD"]:
-            if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
-                return 0.0325
+    if season in DPOW_EXCLUDED_CHAINS: 
+        if chain not in DPOW_EXCLUDED_CHAINS[season]:
+            if chain in ["KMD"]:
+                if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
+                    return 0.0325
 
-        epochs = get_epochs(season, server)
-        for epoch in epochs:
-            if chain in epoch["epoch_chains"]:
-                if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
-                    return round(epoch["score_per_ntx"], 8)
+            epochs = get_epochs(season, server)
+            for epoch in epochs:
+                if chain in epoch["epoch_chains"]:
+                    if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
+                        return round(epoch["score_per_ntx"], 8)
     return 0
 
 class balance_row():
@@ -712,10 +714,13 @@ class scoring_epoch_row():
         self.score_per_ntx = score_per_ntx
 
     def validated(self):
+        if self.season in DPOW_EXCLUDED_CHAINS:
+            return False
         for chain in self.epoch_chains:
-            if chain in DPOW_EXCLUDED_CHAINS[self.season]:
-                self.delete(season, server, epoch)
-                return False
+            if self.season in DPOW_EXCLUDED_CHAINS:
+                if chain in DPOW_EXCLUDED_CHAINS[self.season]:
+                    self.delete(season, server, epoch)
+                    return False
         return True
 
     def update(self):
@@ -791,19 +796,26 @@ class notarised_row():
 
     def update(self):
 
-        if chain in DPOW_EXCLUDED_CHAINS[self.season]:
+        if self.season == '':
             self.season = "Unofficial"
             self.server = "Unofficial"
             self.epoch = "Unofficial"
+        if self.season in DPOW_EXCLUDED_CHAINS:
+            if self.chain in DPOW_EXCLUDED_CHAINS[self.season]:
+                self.season = "Unofficial"
+                self.server = "Unofficial"
+                self.epoch = "Unofficial"
 
         if self.chain in ["KMD" ,"LTC", "BTC"]:
             self.server = self.chain
+            self.epoch = f"Epoch_{self.chain}"
 
         if self.chain in ["KMD"]:
-            if self.epoch != "Unofficial":
+            if int(self.block_time) >= SEASONS_INFO[self.season]['start_time'] and int(self.block_time) <= SEASONS_INFO[self.season]['end_time']:
                 self.score_value = 0.0325
             else:
                 self.score_value = 0
+                self.epoch = "Unofficial"
         elif self.chain in ["LTC", "BTC"]:
             self.score_value = 0
         else:
