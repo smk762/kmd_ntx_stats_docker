@@ -10,7 +10,7 @@ from lib_const import *
 from lib_table_update import *
 from lib_table_select import *
 from lib_api import *
-from models import get_chain_epoch_at
+from models import *
 
 
 logger = logging.getLogger(__name__)
@@ -19,6 +19,30 @@ formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
+
+
+def rescan_chain(season, chain):
+    if chain in ["KMD", "BTC", "LTC"]
+        sql = f"SELECT txid  \
+                FROM notarised \
+                WHERE \
+                chain = '{chain}' and season = '{season}';"
+        CURSOR.execute(sql)
+        results = CURSOR.fetchall()
+        for item in results:
+            txid = item[0]
+        row = notarised_row()
+        row.txid = txid
+        if chain in ["LTC", "BTC"]:
+            row.score = False
+            row.score_value = 0
+        else:
+            row.score = False
+            row.score_value = 0.0325
+
+        row.server = chain
+        row.epoch = f"Epoch_{chain}"
+        row.update()
 
 
 
@@ -467,6 +491,8 @@ if __name__ == "__main__":
 
         for season in notarised_seasons:
             if season not in EXCLUDED_SEASONS:
+                for chain in ["KMD", "BTC", "LTC"]
+                    rescan_chain(season, chain)
                 assert_results.update({"validate_servers":validate_servers(season)})
                 assert_results.update({"validate_epochs":validate_epochs(season)}) 
                 assert_results.update({"validate_chains":validate_chains(season)}) 
