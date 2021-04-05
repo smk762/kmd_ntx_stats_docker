@@ -2,6 +2,7 @@
 import json
 import time
 import logging
+import random
 import logging.handlers
 import requests
 from lib_const import NOTARY_BTC_ADDRESSES, OTHER_SERVER
@@ -24,7 +25,9 @@ for season in seasons:
 
         i = 0
         num_addr = len(NOTARY_BTC_ADDRESSES[season])
-        for notary_address in NOTARY_BTC_ADDRESSES[season]:
+        addresses = list(NOTARY_BTC_ADDRESSES[season])
+        while len(addresses) > 0:
+            notary_address = random.choice(addresses)
             i += 1
             logger.info(f">>> Categorising {notary_address} for {season} {i}/{num_addr}")
             txid_list = get_new_notary_txids(notary_address, "BTC")
@@ -63,6 +66,8 @@ for season in seasons:
                 except Exception as e:
                     logger.error(e)
                     logger.error(f"Something wrong with API? {txid_url}")
+            addresses.remove(notary_address)
+
 
 CURSOR.close()
 CONN.close()

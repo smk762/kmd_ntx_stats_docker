@@ -4,4 +4,9 @@
 *_7776
 *.tar.gz
 *.csv
-
+*decker
+*smk
+*missing
+*notarised_table_validation.json
+deprecated.py
+table_ops
