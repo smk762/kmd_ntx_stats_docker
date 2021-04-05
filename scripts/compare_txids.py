@@ -6,7 +6,7 @@ import time
 import requests
 from lib_const import CONN, CURSOR, RPC
 
-CURSOR.execute("SELECT txid, ac_ntx_height, chain FROM notarised;")
+CURSOR.execute("SELECT txid, chain FROM notarised WHERE season='Season_4';")
 
 results = CURSOR.fetchall()
 print(f"{len(results)} txids in [notarised] table")
@@ -20,7 +20,7 @@ decker_KMD_block_list = []
 for item in results:
     smk_txid_list.append(item[0])
 
-    if item[2] == "BTC":
+    if item[1] == "BTC":
         smk_KMD_block_list.append(item[1])
 
 
@@ -46,6 +46,8 @@ with open('s4-stats-txes-time.csv', 'r') as csv_file:
             decker_txid_list.append(txid)
 
 missing_txids = list(set(decker_txid_list).difference(set(smk_txid_list)))
+decker_missing_txids = list(set(smk_txid_list).difference(set(decker_txid_list)))
+
 print(f"{len(missing_txids)} missing txids (KMD/BTC not included)")
 
 if len(missing_txids) > 0:

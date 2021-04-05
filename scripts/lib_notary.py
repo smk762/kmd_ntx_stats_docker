@@ -266,10 +266,10 @@ def get_dpow_score_value(season, server, coin, timestamp):
             score = 0.8698/num_coins
 
         elif server == "Third_Party":
-            score = 0.977/num_coins
+            score = 0.0977/num_coins
 
         elif server == "Testnet":
-            score = 0.977/num_coins
+            score = 0.0977/num_coins
 
 
     return round(score, 8)
