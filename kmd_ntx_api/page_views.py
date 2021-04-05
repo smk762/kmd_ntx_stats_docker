@@ -99,12 +99,8 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
             max_tick = 10
         coin_notariser_ranks = get_coin_notariser_ranks(season)
         top_region_notarisers = get_top_region_notarisers(coin_notariser_ranks)
-        if chain == "KMD":
-            top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, "BTC")
-            chain_ntx_summary = get_coin_ntx_summary("BTC")
-        else:
-            top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
-            chain_ntx_summary = get_coin_ntx_summary(chain)
+        top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
+        chain_ntx_summary = get_coin_ntx_summary(chain)
         season_chain_ntx_data = get_season_chain_ntx_data(season)
 
         context.update({
@@ -486,7 +482,7 @@ def scoring_epochs_view(request):
     return render(request, 'scoring_epochs.html', context)
         
 def testnet_ntx_scoreboard(request):
-    season = get_season()
+    season = "Season_5_Testnet"
     notary_list = get_notary_list(season)
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
  

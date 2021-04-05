@@ -14,13 +14,11 @@ logger.setLevel(logging.INFO)
 
 def get_chain_epoch_at(season, server, chain, timestamp):
     if chain not in DPOW_EXCLUDED_CHAINS[season]:
-        epochs = get_epochs(season, server)
-        if chain in ["BTC", "LTC"]:
+        if chain in ["KMD", "BTC", "LTC"]:
             if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
-                for epoch in epochs:
-                    if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
-                        return epoch["epoch"]
+                return f"Epoch_{chain}"
 
+        epochs = get_epochs(season, server)
         for epoch in epochs:
             if chain in epoch["epoch_chains"]:
                 if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
@@ -30,7 +28,7 @@ def get_chain_epoch_at(season, server, chain, timestamp):
 
 def get_chain_epoch_score_at(season, server, chain, timestamp):
     if chain not in DPOW_EXCLUDED_CHAINS[season]:
-        if chain in ["BTC", "LTC"]:
+        if chain in ["KMD"]:
             if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
                 return 0.0325
 
@@ -783,19 +781,37 @@ class notarised_row():
         self.btc_validated = btc_validated
 
     def validated(self):
+
         if self.epoch.find("Epoch") == -1 and self.epoch != "Unofficial":
             logger.warning(f"!!!! Invalid epoch {self.epoch}")
-
             return False
+
+        for chain in self.epoch_chains:
+            if chain in DPOW_EXCLUDED_CHAINS[self.season]:
+                return False
+
         return True
 
     def update(self):
 
-        self.score_value = round(self.score_value, 8)
-        score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
-        if round(score_value, 8) != round(self.score_value, 8):
-            logger.warning(f"{self.txid} score_value mismatch calculated {score_value} vs input {self.score_value} | {self.season}, {self.server}, {self.epoch}, {self.chain}, {self.block_time}")
-            self.score_value = score_value
+        if self.chain in ["KMD" ,"LTC", "BTC"]:
+            self.server = self.chain
+
+        if self.chain in ["KMD"]:
+            if self.epoch != "Unofficial":
+                self.score_value = 0.0325
+            else:
+                self.score_value = 0
+        elif self.chain in ["LTC", "BTC"]:
+            self.score_value = 0
+        else:
+
+            self.score_value = round(self.score_value, 8)
+            score_value = get_chain_epoch_score_at(self.season, self.server, self.chain, self.block_time)
+
+            if round(score_value, 8) != round(self.score_value, 8):
+                logger.warning(f"{self.txid} score_value mismatch calculated {score_value} vs input {self.score_value} | {self.season}, {self.server}, {self.epoch}, {self.chain}, {self.block_time}")
+                self.score_value = score_value
 
         if self.score_value > 0:
             self.scored = True
@@ -806,7 +822,7 @@ class notarised_row():
         if epoch != self.epoch:
             logger.warning(f"{self.txid} epoch mismatch calculated {epoch} vs input {self.epoch} | {self.season}, {self.epoch}, {self.server}, {self.chain}, {self.block_time}")
             self.epoch = epoch
-            
+
         row_data = (
             self.chain, self.block_height, 
             self.block_time, self.block_datetime, self.block_hash, 
@@ -847,7 +863,7 @@ class ntx_tenure_row():
         self.season = season
 
     def validated(self):
-        if self.server not in ["Main", "Third_Party"]:
+        if self.server not in ["Main", "Third_Party", "KMD", "BTC", "LTC"]:
             logger.warning(f"!!!! Invalid server {server}")
             return False
         if self.season not in ['Season_5', 'Season_5_Testnet', 'Season_4']:
@@ -857,6 +873,14 @@ class ntx_tenure_row():
 
     def update(self):
         # TODO: Validation start / end within season window
+
+        if self.chain in ["KMD" ,"LTC", "BTC"]:
+            self.server = self.chain
+
+        if self.chain in ["LTC", "BTC"]:
+            self.unscored_ntx_count = self.unscored_ntx_count + self.scored_ntx_count
+            self.scored_ntx_count = 0
+
 
         row_data = (
             self.chain, self.first_ntx_block, 

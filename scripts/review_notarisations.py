@@ -12,7 +12,7 @@ for txid in txids:
 	if row_data is not None: # ignore TXIDs that are not notarisations
 	    chain = row_data[0]
 
-	    if chain not in ['KMD', 'BTC']: # KMD -> BTC notarisations are requested via BTC blockchain APIs
+	    if chain not in ['BTC']: # KMD -> BTC notarisations are requested via BTC blockchain APIs
 	        row = notarised_row()
 	        row.chain = chain
 	        row.block_height = row_data[1]

@@ -240,10 +240,10 @@ def get_notarised_data(request):
         data = data.filter(chain=request.GET["chain"])
 
     else:
-        data = data.filter(chain="BTC")
+        data = data.filter(chain="KMD")
 
     data = apply_filters(request, NotarisedSerializer, data) \
-            .order_by('-season', 'chain') \
+            .order_by('-season', 'chain', "-block_time") \
             .values()
 
     for item in data:

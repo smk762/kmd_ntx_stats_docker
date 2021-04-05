@@ -27,7 +27,7 @@ def get_balances_graph_data(request, filter_kwargs):
     elif 'notary' in request.GET:
         filter_kwargs.update({'notary':request.GET['notary']})
     else:
-        filter_kwargs.update({'chain':'BTC'})
+        filter_kwargs.update({'chain':'KMD'})
 
     data = balances.objects.filter(**filter_kwargs).values('notary', 'chain', 'balance')
     notary_list = []                                                                          
@@ -901,6 +901,8 @@ def get_notary_epoch_scoring_table(notary=None, season=None):
             for epoch in chain_ntx["servers"][server]["epochs"]:
                 if server == "BTC":
                     server_epoch_chains = ["BTC"]
+                elif server == "KMD":
+                    server_epoch_chains = ["KMD"]
                 else:
                     server_epoch_chains = epoch_chains_dict[season][server][epoch]
 
@@ -1072,7 +1074,7 @@ def get_notarised_season_score(season=None, chain=None):
     if not season:
         season = get_season()
     if not chain:
-        chain = "BTC"
+        chain = "KMD"
 
     notarised_data = notarised.objects.filter(season=season, chain=chain).values()
 
@@ -1099,6 +1101,9 @@ def get_notarised_season_score(season=None, chain=None):
         if chain == "BTC":
             server = "BTC"
             epoch_id = "epoch_BTC"
+        if chain == "KMD":
+            server = "KMD"
+            epoch_id = "epoch_KMD"
 
         else:
             epoch_id = get_epoch_id(season, server, block_time)

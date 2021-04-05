@@ -1,0 +1,477 @@
+{
+    "validate_servers": {
+        "PASS": [
+            {
+                "Season_4 in SEASONS_INFO": "Pass"
+            },
+            {
+                "Season_4 notarised_chains == tenure_chains": "Pass"
+            },
+            {
+                "Season_4 server catgories valid": "Pass"
+            }
+        ],
+        "FAIL": []
+    },
+    "validate_BTC_scores": {
+        "PASS": [
+            {
+                "Season_4 BTC scores valid": "Pass"
+            }
+        ],
+        "FAIL": []
+    },
+    "validate_LTC_scores": {
+        "PASS": [],
+        "FAIL": []
+    },
+    "validate_other_scores": {
+        "PASS": [
+            {
+                "all Season_4 Main Epoch_0 epoch_active_chains in server_tenure_chains": "Pass"
+            },
+            {
+                "AXO Scoring correct": "Pass"
+            },
+            {
+                "BET Scoring correct": "Pass"
+            },
+            {
+                "BOTS Scoring correct": "Pass"
+            },
+            {
+                "BTCH Scoring correct": "Pass"
+            },
+            {
+                "CCL Scoring correct": "Pass"
+            },
+            {
+                "COQUICASH Scoring correct": "Pass"
+            },
+            {
+                "CRYPTO Scoring correct": "Pass"
+            },
+            {
+                "DEX Scoring correct": "Pass"
+            },
+            {
+                "HODL Scoring correct": "Pass"
+            },
+            {
+                "ILN Scoring correct": "Pass"
+            },
+            {
+                "JUMBLR Scoring correct": "Pass"
+            },
+            {
+                "KOIN Scoring correct": "Pass"
+            },
+            {
+                "MESH Scoring correct": "Pass"
+            },
+            {
+                "MGW Scoring correct": "Pass"
+            },
+            {
+                "MORTY Scoring correct": "Pass"
+            },
+            {
+                "MSHARK Scoring correct": "Pass"
+            },
+            {
+                "NINJA Scoring correct": "Pass"
+            },
+            {
+                "OOT Scoring correct": "Pass"
+            },
+            {
+                "PANGEA Scoring correct": "Pass"
+            },
+            {
+                "PGT Scoring correct": "Pass"
+            },
+            {
+                "PIRATE Scoring correct": "Pass"
+            },
+            {
+                "REVS Scoring correct": "Pass"
+            },
+            {
+                "RFOX Scoring correct": "Pass"
+            },
+            {
+                "RICK Scoring correct": "Pass"
+            },
+            {
+                "STBL Scoring correct": "Pass"
+            },
+            {
+                "SUPERNET Scoring correct": "Pass"
+            },
+            {
+                "THC Scoring correct": "Pass"
+            },
+            {
+                "WLC21 Scoring correct": "Pass"
+            },
+            {
+                "ZILLA Scoring correct": "Pass"
+            },
+            {
+                "all Season_4 Main Epoch_1 epoch_active_chains in server_tenure_chains": "Pass"
+            },
+            {
+                "AXO Scoring correct": "Pass"
+            },
+            {
+                "BET Scoring correct": "Pass"
+            },
+            {
+                "BOTS Scoring correct": "Pass"
+            },
+            {
+                "BTCH Scoring correct": "Pass"
+            },
+            {
+                "CCL Scoring correct": "Pass"
+            },
+            {
+                "COQUICASH Scoring correct": "Pass"
+            },
+            {
+                "CRYPTO Scoring correct": "Pass"
+            },
+            {
+                "DEX Scoring correct": "Pass"
+            },
+            {
+                "HODL Scoring correct": "Pass"
+            },
+            {
+                "ILN Scoring correct": "Pass"
+            },
+            {
+                "JUMBLR Scoring correct": "Pass"
+            },
+            {
+                "KOIN Scoring correct": "Pass"
+            },
+            {
+                "MESH Scoring correct": "Pass"
+            },
+            {
+                "MGW Scoring correct": "Pass"
+            },
+            {
+                "MORTY Scoring correct": "Pass"
+            },
+            {
+                "MSHARK Scoring correct": "Pass"
+            },
+            {
+                "NINJA Scoring correct": "Pass"
+            },
+            {
+                "OOT Scoring correct": "Pass"
+            },
+            {
+                "PANGEA Scoring correct": "Pass"
+            },
+            {
+                "PGT Scoring correct": "Pass"
+            },
+            {
+                "PIRATE Scoring correct": "Pass"
+            },
+            {
+                "REVS Scoring correct": "Pass"
+            },
+            {
+                "RICK Scoring correct": "Pass"
+            },
+            {
+                "STBL Scoring correct": "Pass"
+            },
+            {
+                "SUPERNET Scoring correct": "Pass"
+            },
+            {
+                "THC Scoring correct": "Pass"
+            },
+            {
+                "WLC21 Scoring correct": "Pass"
+            },
+            {
+                "ZILLA Scoring correct": "Pass"
+            },
+            {
+                "all Season_4 Main Epoch_2 epoch_active_chains in server_tenure_chains": "Pass"
+            },
+            {
+                "AXO Scoring correct": "Pass"
+            },
+            {
+                "BET Scoring correct": "Pass"
+            },
+            {
+                "BOTS Scoring correct": "Pass"
+            },
+            {
+                "BTCH Scoring correct": "Pass"
+            },
+            {
+                "CCL Scoring correct": "Pass"
+            },
+            {
+                "COQUICASH Scoring correct": "Pass"
+            },
+            {
+                "CRYPTO Scoring correct": "Pass"
+            },
+            {
+                "DEX Scoring correct": "Pass"
+            },
+            {
+                "HODL Scoring correct": "Pass"
+            },
+            {
+                "ILN Scoring correct": "Pass"
+            },
+            {
+                "JUMBLR Scoring correct": "Pass"
+            },
+            {
+                "KOIN Scoring correct": "Pass"
+            },
+            {
+                "MESH Scoring correct": "Pass"
+            },
+            {
+                "MGW Scoring correct": "Pass"
+            },
+            {
+                "MORTY Scoring correct": "Pass"
+            },
+            {
+                "MSHARK Scoring correct": "Pass"
+            },
+            {
+                "NINJA Scoring correct": "Pass"
+            },
+            {
+                "OOT Scoring correct": "Pass"
+            },
+            {
+                "PANGEA Scoring correct": "Pass"
+            },
+            {
+                "PIRATE Scoring correct": "Pass"
+            },
+            {
+                "REVS Scoring correct": "Pass"
+            },
+            {
+                "RICK Scoring correct": "Pass"
+            },
+            {
+                "SUPERNET Scoring correct": "Pass"
+            },
+            {
+                "THC Scoring correct": "Pass"
+            },
+            {
+                "WLC21 Scoring correct": "Pass"
+            },
+            {
+                "ZILLA Scoring correct": "Pass"
+            },
+            {
+                "all Season_4 Main Epoch_3 epoch_active_chains in server_tenure_chains": "Pass"
+            },
+            {
+                "AXO Scoring correct": "Pass"
+            },
+            {
+                "BET Scoring correct": "Pass"
+            },
+            {
+                "BOTS Scoring correct": "Pass"
+            },
+            {
+                "BTCH Scoring correct": "Pass"
+            },
+            {
+                "CCL Scoring correct": "Pass"
+            },
+            {
+                "COQUICASH Scoring correct": "Pass"
+            },
+            {
+                "CRYPTO Scoring correct": "Pass"
+            },
+            {
+                "DEX Scoring correct": "Pass"
+            },
+            {
+                "GLEEC Scoring correct": "Pass"
+            },
+            {
+                "HODL Scoring correct": "Pass"
+            },
+            {
+                "ILN Scoring correct": "Pass"
+            },
+            {
+                "JUMBLR Scoring correct": "Pass"
+            },
+            {
+                "KOIN Scoring correct": "Pass"
+            },
+            {
+                "MESH Scoring correct": "Pass"
+            },
+            {
+                "MGW Scoring correct": "Pass"
+            },
+            {
+                "MORTY Scoring correct": "Pass"
+            },
+            {
+                "MSHARK Scoring correct": "Pass"
+            },
+            {
+                "NINJA Scoring correct": "Pass"
+            },
+            {
+                "OOT Scoring correct": "Pass"
+            },
+            {
+                "PANGEA Scoring correct": "Pass"
+            },
+            {
+                "PIRATE Scoring correct": "Pass"
+            },
+            {
+                "REVS Scoring correct": "Pass"
+            },
+            {
+                "RICK Scoring correct": "Pass"
+            },
+            {
+                "SUPERNET Scoring correct": "Pass"
+            },
+            {
+                "THC Scoring correct": "Pass"
+            },
+            {
+                "VOTE2021 Scoring correct": "Pass"
+            },
+            {
+                "WLC21 Scoring correct": "Pass"
+            },
+            {
+                "ZILLA Scoring correct": "Pass"
+            },
+            {
+                "all Season_4 Third_Party Epoch_0 epoch_active_chains in server_tenure_chains": "Pass"
+            },
+            {
+                "AYA Scoring correct": "Pass"
+            },
+            {
+                "CHIPS Scoring correct": "Pass"
+            },
+            {
+                "EMC2 Scoring correct": "Pass"
+            },
+            {
+                "VRSC Scoring correct": "Pass"
+            },
+            {
+                "all Season_4 Third_Party Epoch_1 epoch_active_chains in server_tenure_chains": "Pass"
+            },
+            {
+                "AYA Scoring correct": "Pass"
+            },
+            {
+                "CHIPS Scoring correct": "Pass"
+            },
+            {
+                "EMC2 Scoring correct": "Pass"
+            },
+            {
+                "HUSH3 Scoring correct": "Pass"
+            },
+            {
+                "MCL Scoring correct": "Pass"
+            },
+            {
+                "VRSC Scoring correct": "Pass"
+            },
+            {
+                "all Season_4 Third_Party Epoch_2 epoch_active_chains in server_tenure_chains": "Pass"
+            },
+            {
+                "AYA Scoring correct": "Pass"
+            },
+            {
+                "CHIPS Scoring correct": "Pass"
+            },
+            {
+                "EMC2 Scoring correct": "Pass"
+            },
+            {
+                "MCL Scoring correct": "Pass"
+            },
+            {
+                "VRSC Scoring correct": "Pass"
+            },
+            {
+                "all Season_4 Third_Party Epoch_3 epoch_active_chains in server_tenure_chains": "Pass"
+            },
+            {
+                "AYA Scoring correct": "Pass"
+            },
+            {
+                "CHIPS Scoring correct": "Pass"
+            },
+            {
+                "EMC2 Scoring correct": "Pass"
+            },
+            {
+                "GLEEC Scoring correct": "Pass"
+            },
+            {
+                "MCL Scoring correct": "Pass"
+            },
+            {
+                "VRSC Scoring correct": "Pass"
+            },
+            {
+                "all Season_4 Third_Party Epoch_4 epoch_active_chains in server_tenure_chains": "Pass"
+            },
+            {
+                "AYA Scoring correct": "Pass"
+            },
+            {
+                "CHIPS Scoring correct": "Pass"
+            },
+            {
+                "EMC2 Scoring correct": "Pass"
+            },
+            {
+                "GLEEC Scoring correct": "Pass"
+            },
+            {
+                "MCL Scoring correct": "Pass"
+            },
+            {
+                "PBC Scoring correct": "Pass"
+            },
+            {
+                "VRSC Scoring correct": "Pass"
+            }
+        ],
+        "FAIL": []
+    }
+}
