@@ -26,7 +26,11 @@
 											<td data-data="epoch">{{ row.epoch }}</th>
 											<td data-data="chain">{{ row.chain }}</th>
 											{% if row.server == 'BTC' %}
-												<td data-data="epoch_chain_ntx_count">{{ row.epoch_chain_ntx_count }} <a style="font-size: 0.9em;" href="//{{ request.get_host }}/api/info/notarisation/?notary={{ notary }}&chain={{ row.chain }}&season={{ season }}&epoch=Epoch_{{ row.epoch }}&server=Main">[tx]</a></th>
+												<td data-data="epoch_chain_ntx_count">{{ row.epoch_chain_ntx_count }} <a style="font-size: 0.9em;" href="//{{ request.get_host }}/api/info/notarisation/?notary={{ notary }}&chain={{ row.chain }}&season={{ season }}&epoch=Epoch_BTC&server=BTC">[tx]</a></th>
+											{% elif row.server == 'KMD' %}
+												<td data-data="epoch_chain_ntx_count">{{ row.epoch_chain_ntx_count }} <a style="font-size: 0.9em;" href="//{{ request.get_host }}/api/info/notarisation/?notary={{ notary }}&chain={{ row.chain }}&season={{ season }}&epoch=Epoch_KMD&server=KMD">[tx]</a></th>
+											{% elif row.server == 'LTC' %}
+												<td data-data="epoch_chain_ntx_count">{{ row.epoch_chain_ntx_count }} <a style="font-size: 0.9em;" href="//{{ request.get_host }}/api/info/notarisation/?notary={{ notary }}&chain={{ row.chain }}&season={{ season }}&epoch=Epoch_LTC&server=LTC">[tx]</a></th>
 											{% else %}
 												<td data-data="epoch_chain_ntx_count">{{ row.epoch_chain_ntx_count }} <a style="font-size: 0.9em;" href="//{{ request.get_host }}/api/info/notarisation/?notary={{ notary }}&chain={{ row.chain }}&season={{ season }}&epoch=Epoch_{{ row.epoch }}&server={{ row.server }}">[tx]</a></th>
 											{% endif %}
