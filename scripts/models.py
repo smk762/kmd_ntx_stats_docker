@@ -3,7 +3,7 @@ import logging
 import logging.handlers
 from lib_table_select import get_epochs
 from lib_table_update import *
-from lib_const import CONN, CURSOR, TRANSLATE_COINS
+from lib_const import CONN, CURSOR, TRANSLATE_COINS, DPOW_EXCLUDED_CHAINS
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -13,30 +13,32 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 def get_chain_epoch_at(season, server, chain, timestamp):
-    epochs = get_epochs(season, server)
-    if chain in ["BTC", "LTC"]:
-        if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
-            for epoch in epochs:
+    if chain not in DPOW_EXCLUDED_CHAINS[season]:
+        epochs = get_epochs(season, server)
+        if chain in ["BTC", "LTC"]:
+            if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
+                for epoch in epochs:
+                    if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
+                        return epoch["epoch"]
+
+        for epoch in epochs:
+            if chain in epoch["epoch_chains"]:
                 if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
                     return epoch["epoch"]
-
-    for epoch in epochs:
-        if chain in epoch["epoch_chains"]:
-            if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
-                return epoch["epoch"]
 
     return "Unofficial"
 
 def get_chain_epoch_score_at(season, server, chain, timestamp):
-    if chain in ["BTC", "LTC"]:
-        if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
-            return 0.0325
+    if chain not in DPOW_EXCLUDED_CHAINS[season]:
+        if chain in ["BTC", "LTC"]:
+            if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
+                return 0.0325
 
-    epochs = get_epochs(season, server)
-    for epoch in epochs:
-        if chain in epoch["epoch_chains"]:
-            if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
-                return round(epoch["score_per_ntx"], 8)
+        epochs = get_epochs(season, server)
+        for epoch in epochs:
+            if chain in epoch["epoch_chains"]:
+                if int(timestamp) >= epoch["epoch_start"] and int(timestamp) <= epoch["epoch_end"]:
+                    return round(epoch["score_per_ntx"], 8)
     return 0
 
 class balance_row():
@@ -712,9 +714,14 @@ class scoring_epoch_row():
         self.score_per_ntx = score_per_ntx
 
     def validated(self):
+        for chain in self.epoch_chains:
+            if chain in DPOW_EXCLUDED_CHAINS[self.season]:
+                self.delete(season, server, epoch)
+                return False
         return True
 
     def update(self):
+
         row_data = (self.season, self.server, self.epoch, self.epoch_start, self.epoch_end, \
                     self.start_event, self.end_event, self.epoch_chains, self.score_per_ntx)
         if self.validated():

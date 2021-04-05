@@ -697,11 +697,11 @@ if __name__ == "__main__":
             scan_rpc_for_ntx(season)
 
             # TODO: add season / server / epoch to the aggregate tables
-            # update_daily_notarised_counts(season)
-            # update_daily_notarised_chains(season)
+            update_daily_notarised_counts(season)
+            update_daily_notarised_chains(season)
 
-            #update_season_notarised_counts(season)
-            #update_latest_ntx(season)
+            update_season_notarised_counts(season)
+            update_latest_ntx(season)
 
     CURSOR.close()
     CONN.close()

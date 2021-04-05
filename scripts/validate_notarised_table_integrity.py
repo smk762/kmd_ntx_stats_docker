@@ -60,10 +60,10 @@ def validate_servers(season):
 
     try:
         assert server not in EXCLUDED_SERVERS
-        results["PASS"].append({f"{season} server catgories valid": "Pass"})
+        results["PASS"].append({f"{season} server categories valid": "Pass"})
 
     except:
-        results["FAIL"].append({f"{season} server catgories valid": "Fail"})
+        results["FAIL"].append({f"{season} server categories valid": "Fail"})
 
     return results
 
@@ -201,8 +201,91 @@ def validate_other_scores(season):
     return results
 
 # TODO: handled in model, but might be good here too...
-def validate_epochs():
-    pass
+def validate_epochs(season):
+
+    results = {
+        "PASS":[],
+        "FAIL":[]
+    }
+
+    for server in SCORING_EPOCHS[season]:
+        logger.info(f"Validating {season} {server} epochs\n")
+        for epoch in SCORING_EPOCHS[season][server]:
+            epoch_start = SCORING_EPOCHS[season][server][epoch]["start"]
+            epoch_end = SCORING_EPOCHS[season][server][epoch]["end"]
+            epoch_midpoint = int((epoch_start + epoch_end)/2)
+            epoch_active_chains, num_chains = get_server_active_dpow_chains_at_time(season, server, epoch_midpoint)
+            server_tenure_chains = get_tenure_chains(season, server)
+
+            for chain in epoch_active_chains:
+                sql = f"SELECT txid  \
+                            FROM notarised \
+                            WHERE \
+                            season = '{season}' \
+                            AND epoch = 'Unofficial' \
+                            AND chain = '{chain}' \
+                            AND block_time >= '{epoch_start}' \
+                            AND block_time <= '{epoch_end}' \
+                            AND server = '{server}';"
+                CURSOR.execute(sql)
+                epochs = CURSOR.fetchall()
+
+                if len(epochs) > 0:
+                    score = get_dpow_score_value(season, server, chain, epoch_midpoint)
+                    logger.warning(f"{len(epochs)} {chain} records with wrong epoch detected in {season} {server}...")
+                    logger.error(f">>> Fixing {chain} epoch for {season} {server} | Set to {epoch} not Unofficial")
+                    update_chain_notarised_epoch_window(chain, season, server, epoch, epoch_start, epoch_end, score, True)
+                    results["FAIL"].append({f"{chain} {season} {server} epoch incorrect":f"Fail (resolved) Set to {epoch} not Unofficial"})
+                else:
+                    results["PASS"].append({f"{chain} {season} {server} epoch correct": "Pass"})
+                    logger.info(f"{chain} {season} {server} {epoch} epoch OK...")
+
+    logger.info(f"{season} Epoch validation complete!\n")
+    return results
+
+
+def validate_chains(season):
+
+    results = {
+        "PASS":[],
+        "FAIL":[]
+    }
+
+    for server in SCORING_EPOCHS[season]:
+        logger.info(f"Validating {season} {server} chains\n")
+        for epoch in SCORING_EPOCHS[season][server]:
+            epoch_start = SCORING_EPOCHS[season][server][epoch]["start"]
+            epoch_end = SCORING_EPOCHS[season][server][epoch]["end"]
+            epoch_midpoint = int((epoch_start + epoch_end)/2)
+            epoch_active_chains, num_chains = get_server_active_dpow_chains_at_time(season, server, epoch_midpoint)
+            server_tenure_chains = get_tenure_chains(season, server)
+            notarised_chains = get_notarised_chains(season, server)
+
+            for chain in notarised_chains:
+                if chain not in server_tenure_chains:
+                    sql = f"SELECT txid  \
+                                FROM notarised \
+                                WHERE \
+                                season = '{season}' \
+                                AND epoch = '{epoch}' \
+                                AND chain = '{chain}' \
+                                AND block_time >= '{epoch_start}' \
+                                AND block_time <= '{epoch_end}' \
+                                AND server = '{server}';"
+                    CURSOR.execute(sql)
+                    epochs = CURSOR.fetchall()
+
+                    if len(epochs) > 0:
+                        logger.warning(f"{len(epochs)} {chain} records with wrong epoch detected in {season} {server}...")
+                        logger.error(f">>> Fixing {chain} epoch for {season} {server} | Set to {epoch} Unofficial")
+                        update_chain_notarised_epoch_window(chain, season, server, epoch, epoch_start, epoch_end, 0, False)
+                        results["FAIL"].append({f"{chain} {season} {server} epoch incorrect":f"Fail (resolved) Set to {epoch} Unofficial"})
+                    else:
+                        results["PASS"].append({f"{chain} {season} {server} epoch correct": "Pass"})
+                        logger.info(f"{chain} {season} {server} {epoch} epoch OK...")
+
+    logger.info(f"{season} {server} {epoch} Chain validation complete!\n")
+    return results
 
 def zero_unofficial_notarisation_scores():
 
@@ -326,30 +409,44 @@ def validate_addresses(season):
 if __name__ == "__main__":
 
     Failed = None
-    zero_unofficial_notarisation_scores()
 
-    assert_results = {}
-    notarised_seasons = get_notarised_seasons()
 
-    for season in notarised_seasons:
-        if season not in EXCLUDED_SEASONS:
-            assert_results.update({"validate_servers":validate_servers(season)})
-            assert_results.update({"validate_BTC_scores":validate_BTC_scores(season)}) 
-            assert_results.update({"validate_LTC_scores":validate_LTC_scores(season)}) 
-            assert_results.update({"validate_other_scores":validate_other_scores(season)}) 
+    for season in get_notarised_seasons():
+        if season in DPOW_EXCLUDED_CHAINS:
+            for chain in DPOW_EXCLUDED_CHAINS[season]:
+                if chain in get_notarised_chains(season):
+                    logger.warning(f"Setting {season} {chain} to Unofficial")
+                    update_unofficial_chain_notarised_tbl(season, chain)
+                    row = ntx_tenure_row()
+                    row.delete(season, None, chain)
 
-            # this takes a while, run if you have reason or periodically
-            # assert_results += validate_addresses(season)
+        zero_unofficial_notarisation_scores()
 
-    with open("notarised_table_validation.json", "w") as f:
-        json.dump(assert_results, f, indent=4)
+        assert_results = {}
+        notarised_seasons = get_notarised_seasons()
 
-    logger.info("Results saved to notarised_table_validation.json")
-    for item in assert_results:
-        if len(assert_results[item]["FAIL"]) > 0:
-            for result in assert_results[item]["FAIL"]:
-                logger.warning(result)
-                Failed = True
+        for season in notarised_seasons:
+            if season not in EXCLUDED_SEASONS:
+                assert_results.update({"validate_servers":validate_servers(season)})
+                assert_results.update({"validate_epochs":validate_epochs(season)}) 
+                assert_results.update({"validate_chains":validate_chains(season)}) 
+                assert_results.update({"validate_BTC_scores":validate_BTC_scores(season)}) 
+                assert_results.update({"validate_LTC_scores":validate_LTC_scores(season)}) 
+                assert_results.update({"validate_other_scores":validate_other_scores(season)}) 
 
-    if not Failed:
-        logger.info("All tests Passed!")
+
+                # this takes a while, run if you have reason or periodically
+                # assert_results += validate_addresses(season)
+
+        with open("notarised_table_validation.json", "w") as f:
+            json.dump(assert_results, f, indent=4)
+
+        logger.info("Results saved to notarised_table_validation.json")
+        for item in assert_results:
+            if len(assert_results[item]["FAIL"]) > 0:
+                for result in assert_results[item]["FAIL"]:
+                    logger.warning(result)
+                    Failed = True
+
+        if not Failed:
+            logger.info("All tests Passed!")

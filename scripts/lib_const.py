@@ -699,7 +699,7 @@ SEASONS_INFO = {
             "start_block":2299140,
             "end_block":2436999,
             "start_time":1615367302,
-            "end_time":1617364800, # April 2nd 2021 12pm,
+            "end_time":1618660800, # April 17th 2021 12pm,
             "notaries":[]
         }
 }

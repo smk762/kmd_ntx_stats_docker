@@ -28,7 +28,21 @@ print(all_notarised_servers)
 print(all_notarised_epochs)
 print(all_notarised_chains)
 '''
-for season in all_notarised_seasons:
+
+sql = f"DELETE FROM scoring_epochs"
+conditions = []
+conditions.append(f"season = 'Season_5_Testnet'")
+
+if len(conditions) > 0:
+    sql += " WHERE "
+    sql += " AND ".join(conditions)    
+sql += ";"
+
+CURSOR.execute(sql)
+CONN.commit()
+logger.warning(f"Deleted [scoring_epochs] row: {season} {server} {epoch}")
+
+for season in ["Season_5_Testnet"]:
     notarised_servers = get_notarised_servers(season)
     logger.info(f"{season} notarised_servers: {notarised_servers}")
     for server in notarised_servers:

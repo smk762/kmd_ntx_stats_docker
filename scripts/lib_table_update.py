@@ -150,7 +150,7 @@ def update_chain_server_season_notarised_tbl(server, season, chain):
 
 def update_unofficial_chain_notarised_tbl(season, chain):
     sql = f"UPDATE notarised SET \
-          season='Unofficial', server='Unofficial' \
+          season='Unofficial', server='Unofficial', epoch='Unofficial' \
           WHERE season='{season}'\
           AND chain='{chain}';"
     try:
@@ -732,7 +732,7 @@ def update_notarised_epoch(actual_epoch, season=None, server=None, chain=None, t
     if chain:
         conditions.append(f"chain = '{chain}'")
     if txid:
-        conditions.append(f"txid = '{txid}'")
+        conditions.append(f"txid = '{txid}'") 
     if len(conditions) > 0:
         sql += " WHERE "
         sql += " AND ".join(conditions)    
