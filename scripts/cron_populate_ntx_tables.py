@@ -84,41 +84,41 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
         if row_data is not None: # ignore TXIDs that are not notarisations
             chain = row_data[0]
 
-            if chain != 'KMD': # KMD -> BTC notarisations are requested via BTC blockchain APIs
-                ntx_row = notarised_row()
-                ntx_row.chain = chain
-                ntx_row.block_height = row_data[1]
-                ntx_row.block_time = row_data[2]
-                ntx_row.block_datetime = row_data[3]
-                ntx_row.block_hash = row_data[4]
-                ntx_row.notaries = row_data[5]
-                ntx_row.notary_addresses = row_data[6]
-                ntx_row.ac_ntx_blockhash = row_data[7]
-                ntx_row.ac_ntx_height = row_data[8]
-                ntx_row.txid = row_data[9]
-                ntx_row.opret = row_data[10]
-                ntx_row.season = row_data[11]
-                if chain == "GLEEC":
-                    ntx_row.server = get_gleec_ntx_server(ntx_row.txid)
-                else:
-                    ntx_row.server = row_data[12]
-                ntx_row.score_value = get_chain_epoch_score_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
-                ntx_row.epoch = get_chain_epoch_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
-                if ntx_row.score_value > 0:
-                    ntx_row.scored = True
-                else:
-                    ntx_row.scored = False
-                ntx_row.btc_validated = "N/A"
-                ntx_row.update()
+            #if chain != 'KMD': # KMD -> BTC notarisations are requested via BTC blockchain APIs
+            ntx_row = notarised_row()
+            ntx_row.chain = chain
+            ntx_row.block_height = row_data[1]
+            ntx_row.block_time = row_data[2]
+            ntx_row.block_datetime = row_data[3]
+            ntx_row.block_hash = row_data[4]
+            ntx_row.notaries = row_data[5]
+            ntx_row.notary_addresses = row_data[6]
+            ntx_row.ac_ntx_blockhash = row_data[7]
+            ntx_row.ac_ntx_height = row_data[8]
+            ntx_row.txid = row_data[9]
+            ntx_row.opret = row_data[10]
+            ntx_row.season = row_data[11]
+            if chain == "GLEEC":
+                ntx_row.server = get_gleec_ntx_server(ntx_row.txid)
+            else:
+                ntx_row.server = row_data[12]
+            ntx_row.score_value = get_chain_epoch_score_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
+            ntx_row.epoch = get_chain_epoch_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
+            if ntx_row.score_value > 0:
+                ntx_row.scored = True
+            else:
+                ntx_row.scored = False
+            ntx_row.btc_validated = "N/A"
+            ntx_row.update()
 
-                runtime = int(time.time()-start)
-                try:
-                    pct = round(i/num_unrecorded_KMD_txids*100,3)
-                    est_end = int(100/pct*runtime)
-                    logger.info(str(pct)+"% :"+str(i)+"/"+str(num_unrecorded_KMD_txids)+
-                             " records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
-                except:
-                    pass
+            runtime = int(time.time()-start)
+            try:
+                pct = round(i/num_unrecorded_KMD_txids*100,3)
+                est_end = int(100/pct*runtime)
+                logger.info(str(pct)+"% :"+str(i)+"/"+str(num_unrecorded_KMD_txids)+
+                         " records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
+            except:
+                pass
 
     logger.info("Notarised blocks updated!")
 
@@ -222,7 +222,7 @@ def update_daily_notarised_counts(season):
                 }})
 
             for chain in notary_ntx_counts[notary]:
-                if chain == "BTC":
+                if chain == "KMD":
                     count = node_counts[notary]["btc_count"]+notary_ntx_counts[notary][chain]
                     node_counts[notary].update({"btc_count":count})
                 elif chain in ALL_ANTARA_COINS:
@@ -313,7 +313,7 @@ def get_notary_season_count_pct(season):
 
         notary_season_pct = {}
         for chain in chain_ntx_counts:
-            if chain == "BTC":
+            if chain == "KMD":
                 btc_count += chain_ntx_counts[chain]
                 total_ntx_count += chain_ntx_counts[chain]
             elif chain in THIRD_PARTY_COINS:
@@ -422,7 +422,7 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
             score_value = round(float(item[5]), 8)
 
             if "Unofficial" not in [season, server, epoch]:
-                if chain in ["BTC", "LTC"]:
+                if chain in ["BTC", "LTC", "KMD"]:
                     server = chain
 
                 if server not in chain_totals:
@@ -654,10 +654,10 @@ def scan_rpc_for_ntx(season):
                 season_ntx_count_row.season = summary_season
                 servers = ntx_summary[notary]["seasons"][summary_season]['servers']
 
-                if "BTC" in servers:
-                    season_ntx_count_row.btc_count = servers['BTC']['server_ntx_count']
+                if "KMD" in servers:
+                    season_ntx_count_row.btc_count = servers['KMD']['server_ntx_count']
 
-                elif "BTC" in servers:
+                elif "LTC" in servers:
                     season_ntx_count_row.btc_count = servers['LTC']['server_ntx_count']
 
                 else: 

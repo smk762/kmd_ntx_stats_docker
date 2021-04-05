@@ -18,10 +18,11 @@ decker_txid_list = []
 decker_KMD_block_list = []
 
 for item in results:
-    smk_txid_list.append(item[0])
 
     if item[1] == "BTC":
         smk_KMD_block_list.append(item[1])
+    else:
+        smk_txid_list.append(item[0])
 
 
 with open('s4-stats-txes-time.csv', 'r') as csv_file:
@@ -39,22 +40,38 @@ with open('s4-stats-txes-time.csv', 'r') as csv_file:
         block = row[3]
         #timestamp = row[4]
 
+
+
+
+
         if coin == "KMD":
-            decker_KMD_block_list.append(int(block))
+            decker_KMD_block_list.append(txid)
 
         else:
             decker_txid_list.append(txid)
 
+from cron_populate_ntx_tables import update_KMD_notarisations
+
+update_KMD_notarisations(decker_KMD_block_list)
+'''
 missing_txids = list(set(decker_txid_list).difference(set(smk_txid_list)))
 decker_missing_txids = list(set(smk_txid_list).difference(set(decker_txid_list)))
 
 print(f"{len(missing_txids)} missing txids (KMD/BTC not included)")
+print(f"{len(decker_missing_txids)} decker_missing_txids txids (KMD/BTC not included)")
 
 if len(missing_txids) > 0:
     print(f"{len(missing_txids)} missing txids to verify")
     with open("missing_txids.json", "w") as f:
         json.dump(list(missing_txids), f)
 
+if len(decker_missing_txids) > 0:
+    print(f"{len(decker_missing_txids)} missing txids to verify")
+    with open("decker_missing_txids.json", "w") as f:
+        json.dump(list(decker_missing_txids), f)
+
+'''
+'''
 decker_blockhashes = []
 for block in decker_KMD_block_list:
     blockhash = RPC["KMD"].getblock(str(block),1)["hash"]
@@ -65,8 +82,8 @@ for block in decker_KMD_block_list:
     # linking to https://kmd.explorer.dexstats.info/block/02f9affaaa2c94fe863da0eadf694a468ff414d5914d68b4cb723a6896fc33e8 [block 2271340]
     time.sleep(0.002)
     decker_blockhashes.append(blockhash)
-
-
+'''
+'''
 smk_notarised = []
 
 cols = ["chain", "block_height", "block_time",
@@ -98,3 +115,4 @@ with open("smk_notarised.json", "w") as f:
     json.dump(list(smk_notarised), f)
 
 CONN.close()
+'''

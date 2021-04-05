@@ -88,6 +88,8 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD", chain=No
 
     if chain == "BTC":
         tx_chain = "BTC"
+    if chain == "KMD":
+        tx_chain = "KMD"
     elif chain == "LTC":
         tx_chain = "LTC"
 
@@ -255,9 +257,15 @@ def get_dpow_score_value(season, server, coin, timestamp):
 
     score  = 0
 
+    if coin in ["KMD"]:
+        if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
+            return 0.0325
+
+        return 0
+
     if coin in ["BTC", "LTC"]:
 
-        return 0.0325
+        return 0
         
     active_chains, num_coins = get_server_active_dpow_chains_at_time(season, server, timestamp)
     if coin in active_chains:
@@ -299,7 +307,7 @@ def get_server_active_dpow_chains_at_time(season, server, timestamp):
             for coin in tenure[season][server]:
                 if timestamp >= tenure[season][server][coin]["official_start_block_time"]:
                     if timestamp <= tenure[season][server][coin]["official_end_block_time"]:
-                        if coin not in ["BTC", "LTC"] and coin not in DPOW_EXCLUDED_CHAINS[season]:
+                        if coin not in ["BTC", "LTC", "KMD"] and coin not in DPOW_EXCLUDED_CHAINS[season]:
                             chains.append(coin)
                         
 
@@ -530,6 +538,9 @@ def update_ntx_tenure(chain, season, server):
             else:
                 scored_ntx_count = len(scoring_window[2])
                 unscored_ntx_count = len(scoring_window[3])
+        elif chain in ["LTC", "BTC"]:
+            scored_ntx_count = 0
+            unscored_ntx_count = len(scoring_window[2])+len(scoring_window[3])
         else:
             scored_ntx_count = len(scoring_window[2])
             unscored_ntx_count = len(scoring_window[3])
@@ -607,23 +618,26 @@ def get_nn_btc_tx_parts_local(txid):
     return tx_vins, tx_vouts
 
 def get_new_notary_txids(notary_address, chain, season=None):
+
+    existing_txids = []
     if chain == "BTC":
+
         if season:
-            existing_txids = get_existing_nn_btc_txids(None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
+            #existing_txids = get_existing_nn_btc_txids(None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
             url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={NN_BTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
             logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
         else:
-            existing_txids = get_existing_nn_btc_txids(None, None, None, ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address])
+            #existing_txids = get_existing_nn_btc_txids(None, None, None, ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address])
             url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]}"
             logger.info(f"{len(existing_txids)} existing txids in local DB detected for {ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]} {notary_address}")
             
     elif chain == "LTC":
         if season:
-            existing_txids = get_existing_nn_ltc_txids(None, None, season, NN_LTC_ADDRESSES_DICT[season][notary_address])
+            #existing_txids = get_existing_nn_ltc_txids(None, None, season, NN_LTC_ADDRESSES_DICT[season][notary_address])
             url = f"{OTHER_SERVER}/api/info/nn_ltc_txid_list?notary={NN_LTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
             logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_LTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
         else:
-            existing_txids = get_existing_nn_ltc_txids(None, None, None, ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address])
+            #existing_txids = get_existing_nn_ltc_txids(None, None, None, ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address])
             url = f"{OTHER_SERVER}/api/info/nn_ltc_txid_list?notary={ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address]}"
             logger.info(f"{len(existing_txids)} existing txids in local DB detected for {ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address]} {notary_address}")
     
