@@ -786,13 +786,15 @@ class notarised_row():
             logger.warning(f"!!!! Invalid epoch {self.epoch}")
             return False
 
-        for chain in self.epoch_chains:
-            if chain in DPOW_EXCLUDED_CHAINS[self.season]:
-                return False
 
         return True
 
     def update(self):
+
+        if chain in DPOW_EXCLUDED_CHAINS[self.season]:
+            self.season = "Unofficial"
+            self.server = "Unofficial"
+            self.epoch = "Unofficial"
 
         if self.chain in ["KMD" ,"LTC", "BTC"]:
             self.server = self.chain
