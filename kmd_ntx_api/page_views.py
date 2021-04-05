@@ -486,7 +486,7 @@ def scoring_epochs_view(request):
     return render(request, 'scoring_epochs.html', context)
         
 def testnet_ntx_scoreboard(request):
-    season = get_season()
+    season = "Season_5_Testnet"
     notary_list = get_notary_list(season)
     coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
  
