@@ -37,44 +37,41 @@ for server in invalid_servers:
     row.delete(None, server)
     logger.info(f">>> Deleting {season} ntx_tenure_row, not in valid server")
 
-def update_season_tenure(season):
-    season_servers = get_notarised_servers(season)
-    logger.info(f"{season} servers: {season_servers}")
-
-    for server in all_notarised_servers:
-
-        if server not in season_servers:
-            row = ntx_tenure_row()
-            row.delete(season, server)
-            logger.info(f">>> Deleting {season} {server} ntx_tenure_row, not a valid server")
-
-        else:
-            season_server_chains = get_notarised_chains(season, server)
-            logger.info(f"{season} {server} chains: {season_server_chains}")
-
-            for chain in all_notarised_chains:
-
-                if chain not in season_server_chains or chain in DPOW_EXCLUDED_CHAINS[season]:
-                    row = ntx_tenure_row()
-                    row.delete(season, server, chain)
-
-                else:
-                    update_ntx_tenure(chain, season, server)
 
 # Update Tenure
-def update_tenure(season):
+def update_tenure(season, server=None):
     if season in EXCLUDED_SEASONS:
         row = ntx_tenure_row()
         row.delete(season)
         logger.info(f">>> Deleting {season} ntx_tenure_row, not in valid seasons")
 
     else:
-        update_season_tenure(season)
+        season_servers = get_notarised_servers(season)
+        logger.info(f"{season} servers: {season_servers}")
+
+        for server in all_notarised_servers:
+
+            if server not in season_servers:
+                row = ntx_tenure_row()
+                row.delete(season, server)
+                logger.info(f">>> Deleting {season} {server} ntx_tenure_row, not a valid server")
+
+            else:
+                season_server_chains = get_notarised_chains(season, server)
+                logger.info(f"{season} {server} chains: {season_server_chains}")
+
+                for chain in all_notarised_chains:
+
+                    if chain not in season_server_chains or chain in DPOW_EXCLUDED_CHAINS[season]:
+                        row = ntx_tenure_row()
+                        row.delete(season, server, chain)
+
+                    else:
+                        update_ntx_tenure(chain, season, server)
 
 # TODO: I dont think this will initialise s5 coins until they have recieved a notarisation. 
 # Should probably augment with dpow readme parsing.
 # Update epochs
-#for season in ["Season_5_Testnet"]:
 
 def update_epochs(season):
     logger.info(f"Processing {season}...")
@@ -195,8 +192,12 @@ def update_notarised_epoch_scoring():
             if chain != "GLEEC":
                 update_chain_notarised_epoch_window(chain, season, server, epoch_id, epoch_start, epoch_end, score_per_ntx, True)
 
+update_tenure("Season_4", "KMD")
+update_tenure("Season_4", "BTC")
+update_epochs("Season_4")
 
 for season in all_notarised_seasons:
+
     update_tenure(season)
     update_epochs(season)
 

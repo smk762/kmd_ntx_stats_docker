@@ -22,27 +22,33 @@ logger.setLevel(logging.INFO)
 
 
 def rescan_chain(season, chain):
-    if chain in ["KMD", "BTC", "LTC"]
-        sql = f"SELECT txid  \
+    if chain in ["KMD", "BTC", "LTC"]:
+        sql = f"SELECT txid, block_time  \
                 FROM notarised \
                 WHERE \
-                chain = '{chain}' and season = '{season}';"
+                chain = '{chain}' \
+                AND block_time >= {SEASONS_INFO[season]['start_time']} \
+                AND block_time <= {SEASONS_INFO[season]['end_time']};"
         CURSOR.execute(sql)
         results = CURSOR.fetchall()
         for item in results:
-            txid = item[0]
-        row = notarised_row()
-        row.txid = txid
-        if chain in ["LTC", "BTC"]:
-            row.score = False
-            row.score_value = 0
-        else:
-            row.score = False
-            row.score_value = 0.0325
 
-        row.server = chain
-        row.epoch = f"Epoch_{chain}"
-        row.update()
+            row = notarised_row()
+            row.txid = item[0]
+            row.block_time = item[1]
+            row.chain = chain
+            row.season = season
+            if chain in ["LTC", "BTC"]:
+                row.score = False
+                row.score_value = 0
+            else:
+                row.score = True
+                row.score_value = 0.0325
+
+            row.server = chain
+            row.epoch = f"Epoch_{chain}"
+            logger.info(f"{row.chain} {row.season} {row.server} {row.epoch} {row.score} {row.score_value}")
+            row.update()
 
 
 
@@ -491,7 +497,7 @@ if __name__ == "__main__":
 
         for season in notarised_seasons:
             if season not in EXCLUDED_SEASONS:
-                for chain in ["KMD", "BTC", "LTC"]
+                for chain in ["KMD", "BTC", "LTC"]:
                     rescan_chain(season, chain)
                 assert_results.update({"validate_servers":validate_servers(season)})
                 assert_results.update({"validate_epochs":validate_epochs(season)}) 
