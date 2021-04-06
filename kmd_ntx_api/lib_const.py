@@ -8,7 +8,6 @@ MESSAGE_TAGS = {
     messages.WARNING: 'alert-warning',
     messages.ERROR: 'alert-danger',
 }
-
 SEASONS_INFO = {
     "Season_1": {
             "start_block":1,
@@ -32,13 +31,30 @@ SEASONS_INFO = {
             "notaries":[]
         },
     "Season_4": {
-            "start_block":1922000,
-            "end_block":2444000,
-            "start_time":1592146800,
-            "end_time":1751328000,
+            "start_block":1922000, # https://github.com/KomodoPlatform/komodo/blob/master/src/komodo_globals.h#L47 (block_time 1592172139)
+            "end_block":2436999,
+            "start_time":1592146800, # https://github.com/KomodoPlatform/komodo/blob/master/src/komodo_globals.h#L48
+            "end_time":1617364800, # April 2nd 2021 12pm
+            "post_season_end_time":1623682799,
+            "notaries":[]
+        },
+    "Season_5": {
+            "start_block":2437000,
+            "end_block":3437000,
+            "start_time":1623682800,
+            "end_time":1773682800,
+            "notaries":[]
+        },
+    "Season_5_Testnet": {
+            "start_block":2299140,
+            "end_block":2436999,
+            "start_time":1615367302,
+            "end_time":1618660800, # April 17th 2021 12pm,
             "notaries":[]
         }
 }
+# set at post season to use "post_season_end_time" for aggreagates (e.g. mining)
+POSTSEASON = True
 
 
 # convert timestamp to human time 

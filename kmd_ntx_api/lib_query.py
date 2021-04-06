@@ -757,6 +757,7 @@ def get_mined_count_season_table(request):
         blocks_mined = item['blocks_mined']
         if blocks_mined > 10:
             notary = item['notary']
+            address = item['address']
             sum_value_mined = item['sum_value_mined']
             max_value_mined = item['max_value_mined']
             last_mined_block = item['last_mined_block']
@@ -766,6 +767,7 @@ def get_mined_count_season_table(request):
 
             resp.append({
                     "notary":notary,
+                    "address":address,
                     "blocks_mined":blocks_mined,
                     "sum_value_mined":sum_value_mined,
                     "max_value_mined":max_value_mined,

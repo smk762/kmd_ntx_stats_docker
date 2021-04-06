@@ -132,11 +132,11 @@ def update_mined_tbl(conn, cursor, row_data):
 def update_season_mined_count_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO  mined_count_season \
-            (notary, season, blocks_mined, sum_value_mined, \
+            (notary, address, season, blocks_mined, sum_value_mined, \
             max_value_mined, last_mined_blocktime, last_mined_block, \
             time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_notary_season_mined DO UPDATE SET \
-            blocks_mined="+str(row_data[2])+", sum_value_mined="+str(row_data[3])+", \
+            address="+str(row_data[1])+", blocks_mined="+str(row_data[2])+", sum_value_mined="+str(row_data[3])+", \
             max_value_mined="+str(row_data[4])+", last_mined_blocktime="+str(row_data[5])+", \
             last_mined_block="+str(row_data[6])+", time_stamp='"+str(row_data[7])+"';"
         cursor.execute(sql, row_data)
@@ -238,20 +238,6 @@ def get_latest_chain_ntx_info(cursor, chain, height):
 
 # MINED OPS
 
-def get_season_mined_counts(conn, cursor, season):
-    sql = "SELECT name, COUNT(*), SUM(value), MAX(value), max(block_time), \
-           max(block_height) FROM mined WHERE block_time >= "+str(SEASONS_INFO[season]['start_time'])+" \
-           AND block_time <= "+str(SEASONS_INFO[season]['end_time'])+" GROUP BY name;"
-    cursor.execute(sql)
-    results = cursor.fetchall()
-    time_stamp = int(time.time())
-    for item in results:
-        row_data = (item[0], season, int(item[1]), float(item[2]), float(item[3]),
-                    int(item[4]), int(item[5]), int(time_stamp))
-        if item[0] in notary_info:
-            logger.info("Adding "+str(row_data)+" to season_mined_counts table")
-        result = update_season_mined_count_tbl(conn, cursor, row_data)
-    return result
 
 
 # AGGREGATES

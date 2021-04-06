@@ -3,7 +3,7 @@ import logging
 import logging.handlers
 from lib_table_select import get_epochs
 from lib_table_update import *
-from lib_const import CONN, CURSOR, TRANSLATE_COINS, DPOW_EXCLUDED_CHAINS
+from lib_const import CONN, CURSOR, TRANSLATE_COINS, DPOW_EXCLUDED_CHAINS, KNOWN_ADDRESSES
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -544,26 +544,34 @@ class mined_row():
         return True
 
     def update(self):
+
+        if self.address in KNOWN_ADDRESSES:
+            self.name = KNOWN_ADDRESSES[self.address]
+
         row_data = (
             self.block_height, self.block_time, self.block_datetime, 
             self.value, self.address, self.name, self.txid, self.season
         )
+
         if self.validated():
             update_mined_row(row_data)
-            logger.info(f"Updated mined TABLE {self.block_height} | {self.name} | {self.value} ")
+            logger.info(f"Updated [mined] {self.block_height} | {self.name} | {self.value} ")
+
         else:
             logger.warning(f"[mined] Row data invalid!")
             logger.warning(f"{row_data}")
+
 
     def delete(self):
         CURSOR.execute(f"DELETE FROM mined WHERE name = '{self.name}';")
         CONN.commit()
 
 class season_mined_count_row():
-    def __init__(self, notary='', season='', blocks_mined='', sum_value_mined='', 
+    def __init__(self, notary='', address='', season='', blocks_mined='', sum_value_mined='', 
             max_value_mined='', last_mined_blocktime='', last_mined_block='', 
             time_stamp=int(time.time())):
         self.notary = notary
+        self.address = address
         self.season = season
         self.blocks_mined = blocks_mined
         self.sum_value_mined = sum_value_mined
@@ -577,7 +585,7 @@ class season_mined_count_row():
 
     def update(self):
         row_data = (
-            self.notary, self.season, self.blocks_mined, 
+            self.notary, self.season, self.address, self.blocks_mined, 
             self.sum_value_mined, self.max_value_mined,
             self.last_mined_blocktime, self.last_mined_block, self.time_stamp
         )

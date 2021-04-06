@@ -41,23 +41,26 @@ def get_season_notaries(season):
 
 def get_season(time_stamp):
     # detect & convert js timestamps
-    time_stamp = int(time_stamp)
-    if round((time_stamp/1000)/time.time()) == 1:
-        time_stamp = time_stamp/1000
+    if not time_stamp:
+        time_stamp = int(time.time())
     for season in SEASONS_INFO:
         if season.find("Testnet") == -1:
-            if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= SEASONS_INFO[season]['end_time']:
-                return season
-        else:
-            return season
-    return None
+            if POSTSEASON:
+                if 'post_season_end_time' in SEASONS_INFO[season]:
+                    end_time = SEASONS_INFO[season]['post_season_end_time']
+                else:
+                    end_time = SEASONS_INFO[season]['end_time']
+            else:
+                end_time = SEASONS_INFO[season]['end_time']
+    return "Unofficial"
 
 def get_season_from_block(block):
     if not isinstance(block, int):
         block = int(block)
     for season in SEASONS_INFO:
         if season.find("Testnet") == -1:
-            if block >= SEASONS_INFO[season]['start_block'] and block <= SEASONS_INFO[season]['end_block']:
+            end_block = SEASONS_INFO[season]['end_block']
+            if block >= SEASONS_INFO[season]['start_block'] and block <= end_block:
                 return season
     return None
 
@@ -428,32 +431,6 @@ def get_notaries_from_addresses(addresses):
 
 # MINED OPS
 
-def update_miner(block):
-    logger.info("Getting mining data for block "+str(block))
-    blockinfo = RPC["KMD"].getblock(str(block), 2)
-    for tx in blockinfo['tx']:
-        if len(tx['vin']) > 0:
-            if 'coinbase' in tx['vin'][0]:
-                if 'addresses' in tx['vout'][0]['scriptPubKey']:
-                    address = tx['vout'][0]['scriptPubKey']['addresses'][0]
-                    if address in KNOWN_ADDRESSES:
-                        name = KNOWN_ADDRESSES[address]
-                    else:
-                        name = address
-                else:
-                    address = "N/A"
-                    name = "non-standard"
-
-                row = mined_row()
-                row.block_height = block
-                row.block_time = blockinfo['time']
-                row.block_datetime = dt.utcfromtimestamp(blockinfo['time'])
-                row.address = address
-                row.name = name
-                row.txid = tx['txid']
-                row.season = get_season_from_block(block)
-                row.value = Decimal(tx['vout'][0]['value'])
-                row.update()
 
 def get_daily_mined_counts(day):
     result = 0
