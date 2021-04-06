@@ -274,11 +274,11 @@ def update_mined_row(row_data):
 def update_season_mined_count_row(row_data):
     try:
         sql = "INSERT INTO  mined_count_season \
-            (notary, season, blocks_mined, sum_value_mined, \
+            (notary, season, address, blocks_mined, sum_value_mined, \
             max_value_mined, last_mined_blocktime, last_mined_block, \
             time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_notary_season_mined DO UPDATE SET \
-            blocks_mined="+str(row_data[2])+", sum_value_mined="+str(row_data[3])+", \
+            address="+str(row_data[1])+", blocks_mined="+str(row_data[2])+", sum_value_mined="+str(row_data[3])+", \
             max_value_mined="+str(row_data[4])+", last_mined_blocktime="+str(row_data[5])+", \
             last_mined_block="+str(row_data[6])+", time_stamp='"+str(row_data[7])+"';"
         CURSOR.execute(sql, row_data)

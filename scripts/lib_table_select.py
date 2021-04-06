@@ -267,7 +267,8 @@ def get_table_names():
         tables_list.append(table[0])
     return tables_list
 
-def get_season_mined_counts(season, season_notaries, postseason=False):
+
+def get_season_mined_counts(season, postseason=False):
     if postseason:
         if 'post_season_end_time' in SEASONS_INFO[season]:
             end_time = SEASONS_INFO[season]['post_season_end_time']
@@ -276,9 +277,9 @@ def get_season_mined_counts(season, season_notaries, postseason=False):
     else:
         end_time = SEASONS_INFO[season]['end_time']
 
-    sql = "SELECT name, COUNT(*), SUM(value), MAX(value), max(block_time), \
+    sql = "SELECT name, address, COUNT(*), SUM(value), MAX(value), max(block_time), \
            max(block_height) FROM mined WHERE block_time >= "+str(SEASONS_INFO[season]['start_time'])+" \
-           AND block_time <= "+str(end_time)+" GROUP BY name;"
+           AND block_time <= "+str(end_time)+" GROUP BY name, address;"
 
     CURSOR.execute(sql)
     results = CURSOR.fetchall()
