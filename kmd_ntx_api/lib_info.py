@@ -467,10 +467,12 @@ def get_funding_totals(funding_data):
     return funding_totals
 
 
-def get_nn_info():
+def get_nn_info(season=None):
+    if not season:
+        season = "Season_4"
     # widget using this has been deprecated, but leaving code here for reference
     # to use in potential replacement functions.
-    season = get_season()
+    #season = get_season()
     notary_list = get_notary_list(season)
     regions_info = get_regions_info(notary_list)
     nn_info = {
@@ -479,8 +481,10 @@ def get_nn_info():
     return nn_info
 
 
-def get_nn_mining_summary(notary):
-    season = get_season()
+def get_nn_mining_summary(notary, season=None):
+    if not season:
+        season = "Season_4"
+    
     now = int(time.time())
     day_ago = now - 24*60*60
     week_ago = now - 24*60*60*7
@@ -617,7 +621,7 @@ def get_nn_season_ntx_counts(season):
     return nn_season_ntx_counts
 
 
-def get_nn_social(notary_name=None):
+def get_nn_social(notary_name=None, season=None):
     season = get_season()
     nn_social_info = {}
     if notary_name:
