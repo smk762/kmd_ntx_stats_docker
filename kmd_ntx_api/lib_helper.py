@@ -16,12 +16,13 @@ def get_season(time_stamp=None):
     for season in SEASONS_INFO:
         if season.find("Testnet") == -1:
             if POSTSEASON:
-                if 'post_season_end_time' in SEASONS_INFO[season]:
-                    end_time = SEASONS_INFO[season]['post_season_end_time']
+                if season in SEASONS_INFO:
+                    if 'post_season_end_time' in SEASONS_INFO[season]:
+                        end_time = SEASONS_INFO[season]['post_season_end_time']
+                    else:
+                        end_time = SEASONS_INFO[season]['end_time']
                 else:
                     end_time = SEASONS_INFO[season]['end_time']
-            else:
-                end_time = SEASONS_INFO[season]['end_time']
     return "Unofficial"
 
 def add_dict_nest(old_dict, new_key):
