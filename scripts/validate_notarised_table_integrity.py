@@ -106,7 +106,9 @@ def validate_BTC_scores(season):
 
     CURSOR.execute(f"SELECT DISTINCT score_value \
                      FROM notarised \
-                     WHERE chain = 'BTC';")
+                     WHERE chain = 'BTC' \
+                     AND block_time >= 0 \
+                     AND block_time <= 1917364800;")
     btc_scores = CURSOR.fetchall()
 
     if len(btc_scores) > 0:
@@ -122,7 +124,7 @@ def validate_BTC_scores(season):
             logger.error(f">>> Fixing BTC scores for {season} | Set to 0 not {bad_scores}")
             results["FAIL"].append({f"{season} BTC scores valid":f"Fail (resolved) | Set to 0 not {bad_scores}"})
             if len(btc_scores) > 1:
-                update_chain_score_notarised_tbl("BTC", 0, True, SEASONS_INFO[season]["start_time"], SEASONS_INFO[season]["end_time"], season)
+                update_chain_score_notarised_tbl("BTC", 0, True, 0, 1917364800, season)
     else:
         logger.warning(f"Zero BTC scores for {season} {server} {epoch}!")
 
@@ -138,8 +140,9 @@ def validate_KMD_scores(season):
 
     CURSOR.execute(f"SELECT DISTINCT score_value \
                      FROM notarised \
-                     WHERE season = '{season}' \
-                     AND chain = 'KMD';")
+                     WHERE chain = 'KMD' \
+                     AND block_time >= {SEASONS_INFO[season]['start_time']} \
+                     AND block_time <= {SEASONS_INFO[season]['end_time']};")
     KMD_scores = CURSOR.fetchall()
 
     if len(KMD_scores) > 0:
@@ -171,7 +174,9 @@ def validate_LTC_scores(season):
 
     CURSOR.execute(f"SELECT DISTINCT score_value \
                      FROM notarised \
-                     WHERE chain = 'LTC';")
+                     WHERE chain = 'LTC' \
+                     AND block_time >= 0 \
+                     AND block_time <= 1917364800;")
     ltc_scores = CURSOR.fetchall()
 
     if len(ltc_scores) > 0:
@@ -184,10 +189,10 @@ def validate_LTC_scores(season):
             bad_scores = []
             for item in ltc_scores:
                 bad_scores.append(float(item[0]))
-            logger.error(f">>> Fixing BTC scores for {season} | Set to 0 not {bad_scores}")
+            logger.error(f">>> Fixing LTC scores for {season} | Set to 0 not {bad_scores}")
             results["FAIL"].append({f"{season} LTC scores valid":f"Fail (resolved) | Set to 0 not {bad_scores}"})
             if len(ltc_scores) > 1:
-                update_chain_score_notarised_tbl("LTC", 0, False,  SEASONS_INFO[season]["start_time"], SEASONS_INFO[season]["end_time"], season)
+                update_chain_score_notarised_tbl("LTC", 0, False, 0, 1917364800, season)
     else:
         logger.warning(f"Zero LTC scores for {season} {server} {epoch}!")
 
@@ -497,8 +502,8 @@ if __name__ == "__main__":
 
         for season in notarised_seasons:
             if season not in EXCLUDED_SEASONS:
-                for chain in ["KMD", "BTC", "LTC"]:
-                    rescan_chain(season, chain)
+                #for chain in ["KMD", "BTC", "LTC"]:
+                #    rescan_chain(season, chain)
                 assert_results.update({"validate_servers":validate_servers(season)})
                 assert_results.update({"validate_epochs":validate_epochs(season)}) 
                 assert_results.update({"validate_chains":validate_chains(season)}) 
