@@ -28,17 +28,29 @@ print(all_notarised_servers)
 print(all_notarised_epochs)
 print(all_notarised_chains)
 '''
-sql = f"SELECT txid  \
-        FROM notarised \
-        WHERE \
-        chain = '{chain}' \
-        AND block_time >= {SEASONS_INFO[season]['start_time']} \
-        AND block_time <= {SEASONS_INFO[season]['end_time']};"
+
+sql = f"DELETE FROM scoring_epochs"
+conditions = []
+conditions.append(f"season = 'Season_5_Testnet'")
+
+if len(conditions) > 0:
+    sql += " WHERE "
+    sql += " AND ".join(conditions)    
+sql += ";"
+
 CURSOR.execute(sql)
-results = CURSOR.fetchall()
-for item in results:
-    txid = item[0]
-    print(txid) 
+CONN.commit()
+logger.warning(f"Deleted [scoring_epochs] row: {season} {server} {epoch}")
+
+for season in ["Season_5_Testnet"]:
+    notarised_servers = get_notarised_servers(season)
+    logger.info(f"{season} notarised_servers: {notarised_servers}")
+    for server in notarised_servers:
+        notarised_epochs = get_notarised_epochs(season, server)
+        logger.info(f"{season} {server} notarised_epochs: {notarised_epochs}")
+        for epoch in notarised_epochs:
+            notarised_chains = get_notarised_chains(season, server, epoch)
+            logger.info(f"{season} {server} {epoch} notarised_chains: {notarised_chains}")
 '''
 epochs = get_epochs()
 print(epochs)

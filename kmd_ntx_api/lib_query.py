@@ -903,6 +903,8 @@ def get_notary_epoch_scoring_table(notary=None, season=None):
                     server_epoch_chains = ["BTC"]
                 elif server == "KMD":
                     server_epoch_chains = ["KMD"]
+                elif server == "LTC":
+                    server_epoch_chains = ["LTC"]
                 else:
                     server_epoch_chains = epoch_chains_dict[season][server][epoch]
 
@@ -926,8 +928,8 @@ def get_notary_epoch_scoring_table(notary=None, season=None):
                     server_epoch_chains.remove(chain)
                     total += chain_stats["chain_score"]
                     rows.append(row)
-
-                for chain in server_epoch_chains:
+                '''
+                if chain not in server_epoch_chains:
                     row = {
                         "notary":notary,
                         "season":season.replace("_", " "),
@@ -939,7 +941,7 @@ def get_notary_epoch_scoring_table(notary=None, season=None):
                         "epoch_chain_score":0
                     }
                     rows.append(row)
-
+                '''
 
 
     return rows, total
