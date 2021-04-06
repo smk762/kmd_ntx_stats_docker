@@ -214,6 +214,7 @@ class mined_count_daily(models.Model):
 
 class mined_count_season(models.Model):
     notary = models.CharField(max_length=64)
+    address = models.CharField(max_length=64, default='f')
     blocks_mined = models.PositiveIntegerField(default=0)
     sum_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
     max_value_mined = models.DecimalField(max_digits=18, decimal_places=8)

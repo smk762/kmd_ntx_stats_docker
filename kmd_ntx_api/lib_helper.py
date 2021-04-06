@@ -14,8 +14,14 @@ def get_season(time_stamp=None):
     if not time_stamp:
         time_stamp = int(time.time())
     for season in SEASONS_INFO:
-        if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= SEASONS_INFO[season]['end_time']:
-            return season
+        if season.find("Testnet") == -1:
+            if POSTSEASON:
+                if 'post_season_end_time' in SEASONS_INFO[season]:
+                    end_time = SEASONS_INFO[season]['post_season_end_time']
+                else:
+                    end_time = SEASONS_INFO[season]['end_time']
+            else:
+                end_time = SEASONS_INFO[season]['end_time']
     return "Unofficial"
 
 def add_dict_nest(old_dict, new_key):
@@ -89,8 +95,12 @@ def get_regions_info(notary_list):
             }
     }
     for notary in notary_list:
-        region = notary.split('_')[-1]
-        regions_info[region]['nodes'].append(notary)
+        try:
+            region = notary.split('_')[-1]
+            regions_info[region]['nodes'].append(notary)
+        except:
+            pass
+
     return regions_info
 
 def day_hr_min_sec(seconds, granularity=2):

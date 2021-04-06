@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-				<div class="row">
+				<div class="row m-auto">
 					<div class="card kmd_ui_light4">
 						<div class="card-header kmd_ui_dark1_bg">
 							Mining Last 24hrs
@@ -56,7 +56,7 @@
 			            	if (oData.name.length != 34) {
 				            	$(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.name+"'>"+oData.name+"</a>");
 				            } else {
-				            	$(nTd).html("<a href='https://www.komodod.com/a/"+oData.name+"'>"+oData.name+"</a>");
+				            	$(nTd).html("<a href='https://komodod.com/a/"+oData.name+"'>"+oData.name+"</a>");
 				            }
 				        }
 			        },
@@ -64,7 +64,7 @@
 			            "data": 'txid',
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='https://www.komodod.com/t/"+oData.txid+"'>"+oData.txid.slice(0, 3)+"..."+oData.txid.slice(-3)+"</a>");
+				            $(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.txid.slice(0, 3)+"..."+oData.txid.slice(-3)+"</a>");
 				        }
 			        },
         			{

@@ -265,6 +265,23 @@ for season in NOTARY_ADDRESSES_DICT:
             address = NOTARY_ADDRESSES_DICT[season][notary][coin]
             KNOWN_ADDRESSES.update({address:notary})
 
+NON_NOTARY_ADDRESSES = {
+    "RRDRX84ETUUeAU2bFZr2TScYazYxziofYd":"Luxor (Mining Pool)",
+    "RSXGTHQSqwcMw1vowKfEE7sQ8fAmv1tmso":"LuckPool (Mining Pool)",
+    "RR7MvgQikm5Mt2wAaRMmWy1qfwAZTQ5eaV":"ZergPool (Mining Pool)",
+    "RVtg94k4yjx5JznUt47fpHZkWC2wA5KqCQ":"ZPool (Mining Pool)",
+    "RKA3nd9q1s9fqyBCDLMDkK3TAjTgdUxbEV":"Mining-Dutch (Mining Pool)",
+    "RAE4r5zQg2jzBq6yHt3DpKppf6hFTpVW2m":"SoloPool (Mining Pool)",
+    "RDPYwhSRoE5XRe15WwXQpxL4D9Y6dAhihy":"MiningFool (Mining Pool)",
+    "RKLBUAQjAQSP4wybMiVWSFGvFP7nQHcEbN":"Mining-Dutch (Mining Pool)",
+    "RHEx3ZVnK9u1AVroUfW3YBCEb7YLuzx775":"Tangery (Mining Pool)",
+    "RH9Ti1vkrtE2RMcYCZG1f9UWeaoHPuN24K":"CoolMine (Mining Pool)",
+    "RT2v445xYCHZYnQytczFqAwegP6ossURME":"k1pool"
+}
+
+KNOWN_ADDRESSES.update(NON_NOTARY_ADDRESSES)
+
+
 OTHER_LAUNCH_PARAMS = {
     "BTC":"~/bitcoin/src/bitcoind",
     "KMD":"~/komodo/src/komodod", 

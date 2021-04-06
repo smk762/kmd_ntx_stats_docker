@@ -11,6 +11,7 @@
 								<thead>
 									<tr>
 										<th data-data="notary">NOTARY</th>
+										<th data-data="address">NOTARY</th>
 										<th data-data="blocks_mined">BLOCKS MINED</th>
 										<th data-data="sum_value_mined">SUM MINED</th>
 										<th data-data="max_value_mined">BIGGEST BLOCK</th>
@@ -23,6 +24,7 @@
 								{% for row in mined_season %}
 									<tr>
 										<td data-data="notary">{{ row.notary }}</td>
+										<td data-data="address">{{ row.notary }}</td>
 										<td data-data="blocks_mined">{{ row.blocks_mined }}</td>
 										<td data-data="sum_value_mined">{{ row.sum_value_mined }}</td>
 										<td data-data="max_value_mined">{{ row.max_value_mined }}</td>
@@ -51,23 +53,24 @@
 			            "data": 'notary',
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	if (oData.notary.length != 34) {
-				            	$(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
-				            } else {
-				            	$(nTd).html("<a href='https://www.komodod.com/a/"+oData.notary+"'>"+oData.notary+"</a>");
-				            }
+				            	$(nTd).html("<a href='https://komodod.com/a/"+oData.address+"'>"+oData.address+"</a>");
 				        }
 			        },
+		            {
+			            "data": 'address',
+		                "targets": [ 1 ],
+		                "visible": false
+		            },
         			{
 			            "data": 'last_mined_block',
-			            "targets": 4,
+			            "targets": 5,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            $(nTd).html("<a href='"+explorers['KMD']+'block-index/'+oData.last_mined_block+"'>"+oData.last_mined_block+"</a>");
 				        }
 			        },
         			{
 			            "data": 'last_mined_blocktime',
-			            "targets": 5,
+			            "targets": 6,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	var time_now = Date.now()/1000;
 			            	totalSeconds = time_now-oData.last_mined_blocktime
