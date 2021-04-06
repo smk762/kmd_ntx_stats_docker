@@ -877,11 +877,11 @@ class ntx_tenure_row():
         self.season = season
 
     def validated(self):
-        if self.server not in ["Main", "Third_Party", "KMD", "BTC", "LTC"]:
-            logger.warning(f"!!!! Invalid server {server}")
+        if self.server not in VALID_SERVERS:
+            logger.warning(f"!!!!  [notarised_tenure] Invalid server {server}")
             return False
         if self.season not in ['Season_5', 'Season_5_Testnet', 'Season_4']:
-            logger.warning(f"!!!! Invalid season {season}")
+            logger.warning(f"!!!! [notarised_tenure] Invalid season {season}")
             return False
         return True
 
