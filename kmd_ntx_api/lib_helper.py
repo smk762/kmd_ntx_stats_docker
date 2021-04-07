@@ -23,6 +23,8 @@ def get_season(time_stamp=None):
                         end_time = SEASONS_INFO[season]['end_time']
                 else:
                     end_time = SEASONS_INFO[season]['end_time']
+        if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= end_time:
+            return season
     return "Unofficial"
 
 def add_dict_nest(old_dict, new_key):
