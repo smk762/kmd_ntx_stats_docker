@@ -39,19 +39,25 @@ def get_season_notaries(season):
                     notaries.append(notary)
     return notaries
 
-def get_season(time_stamp):
+def get_season(time_stamp=None):
     # detect & convert js timestamps
     if not time_stamp:
         time_stamp = int(time.time())
+    time_stamp = int(time_stamp)
+    if round((time_stamp/1000)/time.time()) == 1:
+        time_stamp = time_stamp/1000
     for season in SEASONS_INFO:
         if season.find("Testnet") == -1:
             if POSTSEASON:
-                if 'post_season_end_time' in SEASONS_INFO[season]:
-                    end_time = SEASONS_INFO[season]['post_season_end_time']
+                if season in SEASONS_INFO:
+                    if 'post_season_end_time' in SEASONS_INFO[season]:
+                        end_time = SEASONS_INFO[season]['post_season_end_time']
+                    else:
+                        end_time = SEASONS_INFO[season]['end_time']
                 else:
                     end_time = SEASONS_INFO[season]['end_time']
-            else:
-                end_time = SEASONS_INFO[season]['end_time']
+        if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= end_time:
+            return season
     return "Unofficial"
 
 def get_season_from_block(block):
