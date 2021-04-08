@@ -8,7 +8,7 @@ from rest_framework import permissions, viewsets
 
 from kmd_ntx_api.serializers import *
 from kmd_ntx_api.models import *
-from kmd_ntx_api.lib_query import *
+from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_api_filtered import *
 
 
