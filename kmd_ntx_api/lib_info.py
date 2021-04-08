@@ -1118,7 +1118,7 @@ def get_ntx_score(btc_ntx, main_ntx, third_party_ntx, season=None):
         return 0
 
 
-def get_btc_ntx_lag():
+def get_btc_ntx_lag(request):
     data = get_notarised_data(None, "BTC").values()
     block_time_list = []
     for item in data:
