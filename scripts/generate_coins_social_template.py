@@ -7,7 +7,7 @@ from lib_const import *
 r = requests.get(f"{THIS_SERVER}/api/info/coins/?dpow_active=1")
 coins_data = r.json()
 
-coins_list = list(coins_data['results'][0].keys())
+coins_list = list(coins_data['results'].keys())
 
 template = {}
 for chain in coins_list:

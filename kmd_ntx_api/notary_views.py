@@ -3,9 +3,9 @@
 import time
 from django.shortcuts import render
 
-from kmd_ntx_api.lib_helper import *
 from kmd_ntx_api.lib_info import *
-from kmd_ntx_api.lib_query import *
+from kmd_ntx_api.lib_stats import *
+from kmd_ntx_api.lib_graph import *
 
 def notary_profile_view(request, notary=None, season=None):
     # Populate sidebar
@@ -25,11 +25,11 @@ def notary_profile_view(request, notary=None, season=None):
         
         notarisation_scores = get_notarisation_scores(season)
         
-        notary_balances_list, notary_balances_graph = get_notary_balances_data(notary, season)
+        notary_balances_list, notary_balances_graph = get_notary_balances_graph(notary, season)
 
         context.update({
             "notary_name": notary,
-            "notary_addresses": get_notary_addresses(notary, season),
+            "notary_addresses": get_notary_addresses_data(notary, season),
             "nn_social": get_nn_social(notary), # Social Media Links
             "ntx_summary": get_nn_ntx_summary(notary), # Notarisation Summary
             "mining_summary": get_nn_mining_summary(notary), #  Mining Summary

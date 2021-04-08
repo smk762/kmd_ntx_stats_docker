@@ -55,7 +55,7 @@ THIRD_PARTY_COINS = []
 RETIRED_SMARTCHAINS = ["HUSH3"]
 # Electrum server:port for all dpow coins
 
-COINS_INFO = requests.get(f'{THIS_SERVER}/api/info/coins/').json()['results'][0]
+COINS_INFO = requests.get(f'{THIS_SERVER}/api/info/coins/').json()['results']
 
 SEASON_SERVER_DPOW_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins').json()
 
