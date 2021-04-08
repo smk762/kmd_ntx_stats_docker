@@ -73,7 +73,7 @@ for season in seasons:
 
                         if ntx_row.chain == "BTC":
                             url = f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}"
-                            local_info = requests.get(url).json()["results"][0]
+                            local_info = requests.get(url).json()["results"]
                             local_addresses = []
                             for item in local_info:
                                 if item["input_index"] != -1:
@@ -83,7 +83,7 @@ for season in seasons:
 
                         elif ntx_row.chain == "LTC":
                             url = f"{THIS_SERVER}/api/info/nn_ltc_txid?txid={txid}"
-                            local_info = requests.get(url).json()["results"][0]
+                            local_info = requests.get(url).json()["results"]
                             local_addresses = []
                             for item in local_info:
                                 if item["input_index"] != -1:
