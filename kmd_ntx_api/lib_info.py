@@ -492,31 +492,6 @@ def get_mined_data_24hr():
 def get_notarised_data_24hr(season=None, chain=None):
     return get_notarised_data(season, chain).filter(block_time__gt=str(int(time.time()-24*60*60)))
 
-def get_nn_ltc_tx_txid(txid=None):
-    resp = []
-    filter_kwargs = {}
-    data = get_nn_ltc_tx_data().filter(txid=txid)
-    for item in data:
-        row = {
-            "txid":item.txid,
-            "block_hash":item.block_hash,
-            "block_height":item.block_height,
-            "block_time":item.block_time,
-            "block_datetime":item.block_datetime,
-            "address":item.address,
-            "notary":item.notary,
-            "season":item.season,
-            "category":item.category,
-            "input_index":item.input_index,
-            "input_sats":item.input_sats,
-            "output_index":item.output_index,
-            "output_sats":item.output_sats,
-            "num_inputs":item.num_inputs,
-            "num_outputs":item.num_outputs,
-            "fees":item.fees
-        }
-        resp.append(row)
-    return resp
 
 def get_nn_btc_tx_txid_list(notary=None, season=None):
     data = get_nn_btc_tx_data(season, notary)
@@ -1176,7 +1151,7 @@ def get_ltc_txid_list(notary=None, season=None):
     return resp
 
 
-def get_ltc_txid_single(txid=None):
+def get_nn_ltc_tx_txid(txid=None):
     resp = []
     filter_kwargs = {}
     data = get_nn_ltc_tx_data().filter(txid=txid)
@@ -1201,3 +1176,4 @@ def get_ltc_txid_single(txid=None):
         }
         resp.append(row)
     return resp
+    
