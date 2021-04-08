@@ -6,9 +6,9 @@ from datetime import datetime as dt
 import datetime
 from decimal import Decimal
 
-from lib_const import SEASONS_INFO, SKIP_PAST_SEASONS, SKIP_UNTIL_YESTERDAY, RPC, POSTSEASON, KNOWN_ADDRESSES, CONN, CURSOR, NON_NOTARY_ADDRESSES
+from lib_const import SEASONS_INFO, SKIP_UNTIL_YESTERDAY, RPC, POSTSEASON, KNOWN_ADDRESSES, CURSOR, NON_NOTARY_ADDRESSES
 from lib_table_select import select_from_table, get_season_mined_counts, get_mined_date_aggregates, get_notarised_seasons
-from lib_notary import get_season, get_season_notaries, get_daily_mined_counts, get_season_from_block
+from lib_notary import get_season_from_block
 from models import season_mined_count_row, daily_mined_count_row, mined_row
 
 

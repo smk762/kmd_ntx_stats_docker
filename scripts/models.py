@@ -545,6 +545,8 @@ class mined_row():
 
     def update(self):
 
+        self.season = get_season_from_block(self.block_height)
+
         if self.address in KNOWN_ADDRESSES:
             self.name = KNOWN_ADDRESSES[self.address]
 
