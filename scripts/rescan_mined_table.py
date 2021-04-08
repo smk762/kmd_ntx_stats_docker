@@ -27,32 +27,38 @@ logger.info(f"{len(results)} seasons in mined_count_season table: {results}")
 
 
 sql = "DELETE \
-       FROM mined_count_season \
-       WHERE season = 'Season_5_Testnet';"
-CURSOR.execute(sql)
-results = CURSOR.fetchall()
-logger.info(f"{len(results)} seasons in mined_count_season table: {results}")
+      FROM mined_count_season \
+      WHERE season = 'Season_5_Testnet';"
+try:
+    CURSOR.execute(sql)
+    results = CURSOR.fetchall()
+    logger.info(f"{len(results)} seasons in mined_count_season table: {results}")
+except:
+    pass
 
 
 sql = "SELECT block_height, block_time, block_datetime, \
               value, address, name, txid, season \
-       FROM mined WHERE \
-       season = 'Season_5_Testnet';"
-CURSOR.execute(sql)
-results = CURSOR.fetchall()
-logger.info(f"{len(results)} records to rescan...")
+      FROM mined WHERE \
+      season = 'Season_5_Testnet';"
+try:
+    CURSOR.execute(sql)
+    results = CURSOR.fetchall()
+    logger.info(f"{len(results)} records to rescan...")
+    i = 0
+    for item in results:
+        i += 1
+        logger.info(f"Processing {i}/{len(results)}")
+        row = mined_row()
+        row.block_height = item["block_height"]
+        row.block_time = item["block_time"]
+        row.block_datetime = item["block_datetime"]
+        row.value = item["value"]
+        row.address = item["address"]
+        row.name = item["name"]
+        row.txid = item["txid"]
+        row.season = item["season"]
+        row.update()
+except:
+    pass
 
-i = 0
-for item in results:
-    i += 1
-    logger.info(f"Processing {i}/{len(results)}")
-    row = mined_row()
-    row.block_height = item["block_height"]
-    row.block_time = item["block_time"]
-    row.block_datetime = item["block_datetime"]
-    row.value = item["value"]
-    row.address = item["address"]
-    row.name = item["name"]
-    row.txid = item["txid"]
-    row.season = item["season"]
-    row.update()

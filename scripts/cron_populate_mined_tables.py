@@ -53,7 +53,6 @@ def update_mined_known_address(address):
 
 
 def update_miner(block):
-    logger.info("Getting mining data for block "+str(block))
     blockinfo = RPC["KMD"].getblock(str(block), 2)
     for tx in blockinfo['tx']:
         if len(tx['vin']) > 0:
@@ -143,6 +142,7 @@ def process_aggregates(season):
         day += delta
     logger.info("Finished!")
 
+
 def update_season_mined_counts(season):
     results = get_season_mined_counts(season, POSTSEASON)
 
@@ -157,6 +157,7 @@ def update_season_mined_counts(season):
         row.last_mined_blocktime = int(item[5])
         row.last_mined_block = int(item[6])
         row.update()
+
 
 if __name__ == "__main__":
 
