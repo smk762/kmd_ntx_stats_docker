@@ -1,199 +1,5 @@
-import time
-import datetime
-import logging
-from django.db.models import Count, Min, Max, Sum
 from .lib_query import *
-from .base_58 import calc_addr_from_pubkey, calc_addr_tool, COIN_PARAMS
-
-logger = logging.getLogger("mylogger")
-
-
-
-# TODO: cater for coins without params etc.
-def get_address_from_pubkey(request):
-
-    if "coin" in request.GET and "pubkey" in request.GET:
-
-        if request.GET["coin"] in COIN_PARAMS:
-
-            coin = request.GET["coin"]
-            pubkey = request.GET["pubkey"]
-
-            return {
-                "coin": coin,
-                "pubkey": pubkey,
-                "address": calc_addr_from_pubkey(coin, pubkey)
-            }
-
-        else:
-            return {
-                "error": f"{coin} does not have locally defined COIN_PARAMS. If you know what these are, you can try the /api/tools/addr_from_base58 endpoint instead."
-            }
-
-    else:
-        return {
-            "error": "You need to specify a pubkey and coin like '?coin=KMD&pubkey=<YOUR_PUBKEY>'\nIf coin not specified or unknown, will revert to KMD"
-        }
-
-
-def get_all_coins():
-
-    resp = []
-    data = coins.objects.all()
-    for item in data:
-        resp.append(item.chain)
-    return resp
-
-
-def get_api_testnet(request):
-    season = "Season_5_Testnet"
-
-    # Prepare ntx data
-    ntx_data = notarised.objects.filter(season=season) \
-            .order_by('chain', '-block_height') \
-            .values()
-
-    # Prepare 24hr ntx data
-    ntx_data_24hr = notarised.objects.filter(season=season, 
-        block_time__gt=str(int(time.time()-24*60*60))) \
-        .order_by('chain', '-block_height') \
-        .values()
-
-    ntx_dict = {}
-    ntx_dict_24hr = {}
-
-    for item in ntx_data:
-        chain = item['chain']
-        if chain not in ntx_dict:
-            ntx_dict.update({chain:[]})
-            ntx_dict_24hr.update({chain:[]})
-        # RICK/MORTY heights from gcharang
-        # https://discord.com/channels/412898016371015680/455755767132454913/823823358768185344
-        if chain in ["RICK", "MORTY"] and item["block_height"] >= 2316959:
-            ntx_dict[chain].append(item)
-        elif chain in ["LTC"] and item["block_height"] >= 2022000:
-            ntx_dict[chain].append(item)
-            print(item)
-
-
-    for item in ntx_data_24hr:
-        chain = item['chain']
-        if chain in ["RICK", "MORTY"] and item["block_height"] >= 2316959:
-            ntx_dict_24hr[chain].append(item)
-        elif chain in ["LTC"] and item["block_height"] >= 2022000:
-            ntx_dict_24hr[chain].append(item)
-            print(item)
-
-    testnet_chains = list(ntx_dict.keys())
-
-    testnet_stats_dict = get_testnet_stats_dict(season, testnet_chains)
-
-    last_notarisations = get_last_nn_chain_ntx(season)
-
-    for chain in testnet_chains:
-
-        # Get last notarised times
-        for notary in testnet_stats_dict:
-            try:
-                last_chain_ntx = last_notarisations[notary][chain]["time_since"]
-                testnet_stats_dict[notary].update({f"Last_{chain}":last_chain_ntx})
-            except Exception as e:
-                print(e)
-                testnet_stats_dict[notary].update({f"Last_{chain}":"> 24hrs"})
-
-        # Get notarisation counts
-        for item in ntx_dict[chain]:
-            ntx_notaries = item["notaries"]
-
-            for notary in ntx_notaries:
-                if notary in testnet_stats_dict:
-
-                    if testnet_stats_dict[notary]["Total"] == 0:
-                        testnet_stats_dict[notary].update({"Total":1})
-
-                    else:
-                        count = testnet_stats_dict[notary]["Total"]+1
-                        testnet_stats_dict[notary].update({"Total":count})
-
-                    if testnet_stats_dict[notary][chain] == 0:
-                        testnet_stats_dict[notary].update({chain:1})
-                        testnet_stats_dict[notary].update({chain:1})
-                        
-                    else:
-                        count = testnet_stats_dict[notary][chain]+1
-                        testnet_stats_dict[notary].update({chain:count})
-                else:
-                    print(item)
-
-        # Get notarisation counts 24hr
-        for item in ntx_dict_24hr[chain]:
-            ntx_notaries = item["notaries"]
-
-            for notary in ntx_notaries:
-                if notary in testnet_stats_dict:
-
-                    if testnet_stats_dict[notary]["24hr_Total"] == 0:
-                        testnet_stats_dict[notary].update({"24hr_Total":1})
-
-                    else:
-                        count = testnet_stats_dict[notary]["24hr_Total"]+1
-                        testnet_stats_dict[notary].update({"24hr_Total":count})
-
-                    if testnet_stats_dict[notary][chain] == 0:
-                        testnet_stats_dict[notary].update({f"24hr_{chain}":1})
-                        testnet_stats_dict[notary].update({f"24hr_{chain}":1})
-                        
-                    else:
-                        count = testnet_stats_dict[notary][f"24hr_{chain}"]+1
-                        testnet_stats_dict[notary].update({f"24hr_{chain}":count})
-                else:
-                    print(item)
-
-
-    # Get notarisation rank
-    notary_totals = {}
-    for notary in testnet_stats_dict:
-        notary_totals.update({notary:testnet_stats_dict[notary]["Total"]})
-    ranked_totals = {k: v for k, v in sorted(notary_totals.items(), key=lambda x: x[1])}
-    ranked_totals = dict(reversed(list(ranked_totals.items()))) 
-
-    i = 0
-    for notary in ranked_totals:
-        i += 1
-        testnet_stats_dict[notary].update({"Rank":i})
-
-    # Get 24hr notarisation rank
-    notary_totals_24hr = {}
-    for notary in testnet_stats_dict:
-        notary_totals_24hr.update({notary:testnet_stats_dict[notary]["24hr_Total"]})
-    ranked_totals_24hr = {k: v for k, v in sorted(notary_totals_24hr.items(), key=lambda x: x[1])}
-    ranked_totals_24hr = dict(reversed(list(ranked_totals_24hr.items()))) 
-
-    i = 0
-    for notary in ranked_totals_24hr:
-        i += 1
-        testnet_stats_dict[notary].update({"24hr_Rank":i})
-
-    return wrap_api(testnet_stats_dict)
-
-
-
-
-def get_btc_split_stats(address):
-    resp = {}
-    filter_kwargs = {}
-    data = nn_btc_tx.objects.filter(category="Split or Consolidate").filter(address=address)
-    sum_fees = data.annotate(Sum("fees"))
-    num_splits = data.exclude().distinct("txid")
-    avg_split_size = 0
-    for item in data:        
-        address = item['address']
-
-        if address not in resp:
-            resp.update({address:[]})
-        resp[address].append(item)
-
-    return wrap_api(resp)
+from .lib_helper import *
 
 
 def get_coin_info():
@@ -207,8 +13,92 @@ def get_coin_info():
     }
     return coins_info
 
+def get_epochs_dict(season=None):
+    if not season:
+        season = get_season()
 
-def get_coin_ntx_summary(coin):
+    epoch_data = get_scoring_epochs_data(season).values()
+    epochs = {}
+    for item in epoch_data:
+
+        server = item['server']
+        epoch_id = item['epoch']
+        start = item['epoch_start']
+        end = item['epoch_end']
+        start_event = item['start_event']
+        end_event = item['end_event']
+        epoch_chains = item['epoch_chains']
+        score_per_ntx = item['score_per_ntx']
+
+        if season not in epochs:
+            epochs.update({season:{}})
+
+        if server not in epochs[season]:
+            epochs[season].update({server:{}})
+
+        if epoch_id not in epochs[season][server]:
+            epochs[season][server].update({epoch_id:{
+                "start":start,
+                "end":end,
+                "start_event":start_event,
+                "end_event":end_event,
+                "score_per_ntx":score_per_ntx
+            }})
+
+    return epochs
+
+def get_dpow_server_coins_dict(season):
+    dpow_chains = get_scoring_epochs_data(season).values('epoch_chains', 'server')
+    chains_dict = {}
+
+    for item in dpow_chains:
+        epoch_chains = item['epoch_chains']
+        server = item["server"]
+        if server not in chains_dict:
+            chains_dict.update({server:[]})
+        chains_dict[server] += epoch_chains
+
+    for server in chains_dict:
+        chains_dict[server] = list(set(chains_dict[server]))
+        chains_dict[server].sort()
+
+    return chains_dict
+
+def get_epoch_id(season, server, block_time):
+    epochs = get_epochs_dict()
+    for epoch_id in epochs[season][server]:
+        if block_time > epochs[season][server][epoch_id]["start"]:
+            if block_time < epochs[season][server][epoch_id]["end"]:
+                return epoch_id
+
+
+def get_btc_txid_single(txid=None):
+    resp = []
+    filter_kwargs = {}
+    data = get_nn_btc_tx_data().filter(txid=txid)
+    for item in data:
+        row = {
+            "txid":item.txid,
+            "block_hash":item.block_hash,
+            "block_height":item.block_height,
+            "block_time":item.block_time,
+            "block_datetime":item.block_datetime,
+            "address":item.address,
+            "notary":item.notary,
+            "season":item.season,
+            "category":item.category,
+            "input_index":item.input_index,
+            "input_sats":item.input_sats,
+            "output_index":item.output_index,
+            "output_sats":item.output_sats,
+            "num_inputs":item.num_inputs,
+            "num_outputs":item.num_outputs,
+            "fees":item.fees
+        }
+        resp.append(row)
+    return resp
+
+def get_coin_ntx_summary(chain):
     now = int(time.time())
     season = get_season(now)
 
@@ -227,40 +117,195 @@ def get_coin_ntx_summary(coin):
     # today's ntx stats
     today = datetime.date.today()
     # 24hr ntx 
-    chain_ntx_24hr = notarised.objects.filter(
-        block_time__gt=str(now-24*60*60), chain=coin).count()
+    chain_ntx_24hr = get_notarised_data_24hr(season, chain).count()
 
     chain_ntx_summary.update({
         'chain_ntx_today':chain_ntx_24hr
     })
 
     # season ntx stats
-    ntx_season = notarised_chain_season.objects \
-                                    .filter(season=season, chain=coin) \
-                                    .values()
-    if len(ntx_season) > 0:
-        time_since_last_ntx = now - int(ntx_season[0]['kmd_ntx_blocktime'])
+    chain_ntx_season = get_notarised_chain_season_data(season, chain).values()
+    if len(chain_ntx_season) > 0:
+        time_since_last_ntx = now - int(chain_ntx_season[0]['kmd_ntx_blocktime'])
         time_since_last_ntx = day_hr_min_sec(time_since_last_ntx)
         chain_ntx_summary.update({
-            'chain_ntx_season':ntx_season[0]['ntx_count'],
-            'last_ntx_time':ntx_season[0]['kmd_ntx_blocktime'],
+            'chain_ntx_season':chain_ntx_season[0]['ntx_count'],
+            'last_ntx_time':chain_ntx_season[0]['kmd_ntx_blocktime'],
             'time_since_ntx':time_since_last_ntx,
-            'last_ntx_block':ntx_season[0]['block_height'],
-            'last_ntx_hash':ntx_season[0]['kmd_ntx_blocktime'],
-            'last_ntx_ac_block':ntx_season[0]['ac_ntx_height'],
-            'last_ntx_ac_hash':ntx_season[0]['ac_ntx_blockhash'],
-            'ntx_lag':ntx_season[0]['ntx_lag']
+            'last_ntx_block':chain_ntx_season[0]['block_height'],
+            'last_ntx_hash':chain_ntx_season[0]['kmd_ntx_blocktime'],
+            'last_ntx_ac_block':chain_ntx_season[0]['ac_ntx_height'],
+            'last_ntx_ac_hash':chain_ntx_season[0]['ac_ntx_blockhash'],
+            'ntx_lag':chain_ntx_season[0]['ntx_lag']
         })
     return chain_ntx_summary
+
+
+def get_btc_txid_notary(notary=None, category=None):
+    resp = {}
+    txid_list = []
+    txid_season_list = {}
+    data = get_nn_btc_tx_data(None, notary, category).values()
+
+    for item in data:
+
+        if item['season'] not in resp:
+            resp.update({item['season']:{}})
+            txid_season_list.update({item['season']:[]})
+
+        if item['category'] not in resp[item['season']]:
+            resp[item['season']].update({item['category']:{}})
+
+        if item['txid'] not in resp[item['season']][item['category']]:
+            resp[item['season']][item['category']].update({item['txid']:[item]})
+            
+        else:
+            resp[item['season']][item['category']][item['txid']].append(item)
+
+        txid_list.append(item['txid'])
+        txid_season_list[item['season']].append(item['txid'])
+
+    api_resp = {
+        "count":len(list(set(txid_list))),
+        "results":{}
+    }
+    for season in resp:
+        if season not in api_resp["results"]:
+            api_resp["results"].update({season:{"count":len(list(set(txid_season_list[season])))}})
+        for category in resp[season]:
+            api_resp["results"][season].update({
+                category:{
+                    "count":len(resp[season][category]),
+                    "txids":resp[season][category]
+                }
+            })
+    return api_resp
+
+
+# TODO: REVIEW - does this include dpow partial season chains?
+def get_dpow_explorers():
+    resp = {}
+    coins_data = get_coins_data(1).values('chain','explorers')
+    for item in coins_data:
+        explorers = item['explorers']
+        if len(explorers) > 0:
+            chain = item['chain']
+            resp.update({chain:explorers[0].replace('tx/','')})
+    return resp
+
+
+def get_chain_sync_data(request):
+    season = get_season()
+    coins_data = get_coins_data(1).values('chain', 'dpow')
+    context = {}
+    r = requests.get('http://138.201.207.24/show_sync_node_data')
+    try:
+        chain_sync_data = r.json()
+        sync_data_keys = list(chain_sync_data.keys())
+        chain_count = 0
+        sync_count = 0
+        for chain in sync_data_keys:
+            if chain == 'last_updated':
+                last_data_update = day_hr_min_sec(
+                    int(time.time()) - int(chain_sync_data['last_updated'])
+                )
+                chain_sync_data.update({
+                    "last_data_update": last_data_update
+                })
+            elif chain.find('last') == -1:
+                chain_count += 1
+                if "last_sync_blockhash" in chain_sync_data[chain]:
+                    if chain_sync_data[chain]["last_sync_blockhash"] == chain_sync_data[chain]["last_sync_dexhash"]:
+                        sync_count += 1
+                if 'last_sync_timestamp' in chain_sync_data[chain] :
+                    last_sync_update = day_hr_min_sec(
+                        int(time.time()) - int(chain_sync_data[chain]['last_sync_timestamp'])
+                    )
+                else:
+                    last_sync_update = "-"
+                chain_sync_data[chain].update({
+                    "last_sync_update": last_sync_update
+                })
+        sync_pct = round(sync_count/chain_count*100,3)
+        context.update({
+            "chain_sync_data":chain_sync_data,
+            "sync_count":sync_count,
+            "sync_pct":sync_pct,
+            "chain_count":chain_count
+        })
+    except Exception as e:
+        logger.error(f"[get_chain_sync_data] Exception: {e}")
+        messages.error(request, 'Sync Node API not Responding!')
+    return context
+
+
+def get_all_coins():
+    resp = []
+    data = get_coins_data()
+    for item in data:
+        resp.append(item.chain)
+    return resp
+
+
+def get_btc_txid_data(category=None):
+    resp = {}
+    filter_kwargs = {}
+    data = get_nn_btc_tx_data(None, None, category).exclude(category="SPAM")
+
+    data = data.order_by('-block_height','address').values()
+
+    for item in data:        
+        address = item['address']
+
+        if address not in resp:
+            resp.update({address:[]})
+        resp[address].append(item)
+
+    return resp
+
+
+def get_btc_txid_address(address, category=None):
+    resp = {}
+    txid_list = []
+    txid_season_list = {}
+    data = get_nn_btc_tx_data(None, None, category, address).values()
+    for item in data:
+        if item['season'] not in resp:
+            resp.update({item['season']:{}})
+            txid_season_list.update({item['season']:[]})
+        if item['category'] not in resp[item['season']]:
+            resp[item['season']].update({item['category']:{}})
+        if item['txid'] not in resp[item['season']][item['category']]:
+            resp[item['season']][item['category']].update({item['txid']:[item]})
+        else:
+            resp[item['season']][item['category']][item['txid']].append(item)
+        txid_list.append(item['txid'])
+        txid_season_list[item['season']].append(item['txid'])
+
+    api_resp = {
+        "count":len(list(set(txid_list))),
+        "results":{}
+    }
+    for season in resp:
+        if season not in api_resp["results"]:
+            api_resp["results"].update({season:{"count":len(list(set(txid_season_list[season])))}})
+        for category in resp[season]:
+            api_resp["results"][season].update({
+                category:{
+                    "count":len(resp[season][category]),
+                    "txids":resp[season][category]
+                }
+            })
+    return api_resp
 
 
 def get_coin_social(coin=None):
     season = get_season()
     coin_social_info = {}
     if coin:
-        coin_social_data = coin_social.objects.filter(season=season, chain=coin).values()
+        coin_social_data = get_coin_social_data(season, coin).values()
     else:
-        coin_social_data = coin_social.objects.all().values()
+        coin_social_data = get_coin_social_data().values()
     for item in coin_social_data:
         coin_social_info.update(items_row_to_dict(item,'chain'))
     for coin in coin_social_info:
@@ -276,92 +321,11 @@ def get_coin_social(coin=None):
                 coin_social_info[coin][item] = coin_social_info[coin][item].replace("www.youtube.com/", "")
     return coin_social_info
 
-
-def get_daily_stats_sorted(season=None):
-    if not season:
-        season = "Season_4"
-
-    notary_list = get_notary_list(season)
-    
-    now = int(time.time())
-    day_ago = now - 24*60*60
-    mined_last_24hrs = mined.objects.filter(block_time__gte=str(day_ago), block_time__lte=str(now)) \
-                      .values('name').annotate(mined_24hrs=Sum('value'), blocks_24hrs=Count('value'))
-
-    nn_mined_last_24hrs = {}
-    for item in mined_last_24hrs:
-        nn_mined_last_24hrs.update({item['name']:item['blocks_24hrs']})
-
-    ntx_24hr = notarised.objects.filter(
-        block_time__gt=str(int(time.time()-24*60*60))
-        ).values()
-
-    daily_stats = {}
-    for notary_name in notary_list:
-        region = get_notary_region(notary_name)
-        notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary_name)
-
-        if region not in daily_stats:
-            daily_stats.update({region:[]})
-
-        if notary_name not in nn_mined_last_24hrs:
-            nn_mined_last_24hrs.update({notary_name:0})
-
-        daily_stats[region].append({
-            "notary":notary_name,
-            "btc":notary_ntx_24hr_summary["btc_ntx"],
-            "main":notary_ntx_24hr_summary["main_ntx"],
-            "third_party":notary_ntx_24hr_summary["third_party_ntx"],
-            "mining":nn_mined_last_24hrs[notary_name],
-            "score":notary_ntx_24hr_summary["score"]
-        })
-
-    daily_stats_sorted = {}
-    for region in daily_stats:
-        daily_stats_sorted.update({region:[]})
-        scores_dict = {}
-        for item in daily_stats[region]:
-            scores_dict.update({item['notary']:item['score']})
-        sorted_scores = {k: v for k, v in sorted(scores_dict.items(), key=lambda x: x[1])}
-        dec_sorted_scores = dict(reversed(list(sorted_scores.items()))) 
-        i = 1
-        for notary in dec_sorted_scores:
-            for item in daily_stats[region]:
-                if notary == item['notary']:
-                    new_item = item.copy()
-                    new_item.update({"rank":i})
-                    daily_stats_sorted[region].append(new_item)
-            i += 1
-    return daily_stats_sorted
-
-
-def get_dpow_coins_list(season):
-    dpow_chains = scoring_epochs.objects.filter(season=season).values('epoch_chains')
-    chains_list = []
-    for item in dpow_chains:
-        chains_list += item['epoch_chains']
-    chains_list = list(set(chains_list))
-    chains_list.sort()
-    return chains_list
-
-
-# TODO: REVIEW - does this include dpow partial season chains?
-def get_dpow_explorers():
-    resp = {}
-    coins_data = coins.objects.filter(dpow_active=1).values('chain','explorers')
-    for item in coins_data:
-        explorers = item['explorers']
-        if len(explorers) > 0:
-            chain = item['chain']
-            resp.update({chain:explorers[0].replace('tx/','')})
-    return resp
  
 
 # notary > chain > data
 def get_last_nn_chain_ntx(season):
-    ntx_last = last_notarised.objects \
-                             .filter(season=season) \
-                             .values()
+    ntx_last = get_last_notarised_data(season).values()
     last_nn_chain_ntx = {}
     for item in ntx_last:
         notary = item['notary']
@@ -399,45 +363,6 @@ def get_low_balances(notary_list, balances_dict, ignore_chains):
                     else:
                         sufficient_balance_count += 1
     return low_balances_dict, low_balance_count, sufficient_balance_count
-
-
-def get_low_balance_tooltip(low_balances, ignore_chains):
-    low_balances_dict = low_balances[0]
-    low_balance_count = low_balances[1]
-    sufficient_balance_count = low_balances[2]
-    low_balances_pct = round(sufficient_balance_count/(low_balance_count+sufficient_balance_count)*100,2)
-    low_balances_tooltip = "<h4 class='kmd_teal'>"+str(sufficient_balance_count)+"/"+str(low_balance_count+sufficient_balance_count)+" ("+str(low_balances_pct)+"%)</h4>\n"
-    low_balances_tooltip += "<h6 class='kmd_ui_light1'>where balances < 0.03 </h6>\n"
-    low_balances_tooltip += "<h6 class='kmd_ui_light1'>"+str(ignore_chains)+" ignored (no electrum) </h6>\n"
-    # open container
-    low_balances_tooltip += "<div class='container m-auto' style='width:100%;'>\n"
-    i = 1
-    notaries = list(low_balances_dict.keys())
-    notaries.sort()
-    notaries = region_sort(notaries)
-    for notary in notaries:
-        if i == 1:
-            # open row
-            low_balances_tooltip += "<div class='row m-auto py-1' style='width:100%;'>\n"
-        # open col
-        low_balances_tooltip += "<div class='col'><b class='kmd_teal'>"+notary.upper()+"</b><br />"
-        if len(low_balances_dict[notary]) > 3:
-            low_balances_tooltip += "<b class='kmd_secondary_red'>>3 CHAINS<br /> LOW BALANCE!!!<br /></b>"
-        else:
-            for chain in low_balances_dict[notary]:
-                bal = low_balances_dict[notary][chain]
-                low_balances_tooltip += "<b>"+chain+": </b>"+bal+"<br />"
-        low_balances_tooltip += "</div>\n"
-        # close col
-        if i == 5 or notary == notaries[-1]:
-            i = 0
-            # close row
-            low_balances_tooltip += "</div>\n"
-        i += 1
-    # close container
-    low_balances_tooltip += "</div>"
-    return low_balances_tooltip
-
 
 
 def get_funding_totals(funding_data):
@@ -498,7 +423,6 @@ def get_nn_mining_summary(notary, season=None):
         "last_mined_datetime": -1,
         "time_since_mined": -1,
     }
-    # notary_season_mined = get_notary_season_mined(season, notary)
 
     mined_this_season = get_notary_season_aggr(season, notary)
     mined_last_24hrs = get_notary_mined_last_24hrs(notary)
@@ -520,8 +444,147 @@ def get_nn_mining_summary(notary, season=None):
             "time_since_mined": time_since_mined,
             "largest_block_height": int(mined_this_season[0]['last_mined_block']),
         })
-    logger.info(mining_summary)
     return mining_summary
+
+def get_notarised_data_txid(txid=None):
+
+    data = get_notarised_data().filter(txid=txid)
+
+    for item in data:
+
+        return {
+            "chain":item.chain,
+            "txid":item.txid,
+            "block_hash":item.block_hash,
+            "block_height":item.block_height,
+            "block_time":item.block_time,
+            "block_datetime":item.block_datetime,
+            "notaries":item.notaries,
+            "notary_addresses":item.notary_addresses,
+            "ac_ntx_blockhash":item.ac_ntx_blockhash,
+            "ac_ntx_height":item.ac_ntx_height,
+            "opret":item.opret,
+            "season":item.season,
+            "server":item.server,
+            "epoch":item.epoch,
+            "scored":item.scored,
+            "score_value":item.score_value,
+            "btc_validated":item.btc_validated
+        }
+
+    return {"error":"TXID not found!"}
+
+
+def get_mined_season(season, notary=None):
+     return get_mined_data(season, notary).values('name').annotate(season_blocks_mined=Count('value'))
+
+def get_chain_notarisation_txid_list(chain, season=None):
+    resp = []
+    data = get_notarised_data(season, chain)
+    for item in data:
+        resp.append(item.txid)
+
+    return resp
+
+def get_mined_data_24hr():
+    return get_mined_data().filter(block_time__gt=str(int(time.time()-24*60*60)))
+
+def get_notarised_data_24hr(season=None, chain=None):
+    return get_notarised_data(season, chain).filter(block_time__gt=str(int(time.time()-24*60*60)))
+
+def get_nn_ltc_tx_txid(txid=None):
+    resp = []
+    filter_kwargs = {}
+    data = get_nn_ltc_tx_data().filter(txid=txid)
+    for item in data:
+        row = {
+            "txid":item.txid,
+            "block_hash":item.block_hash,
+            "block_height":item.block_height,
+            "block_time":item.block_time,
+            "block_datetime":item.block_datetime,
+            "address":item.address,
+            "notary":item.notary,
+            "season":item.season,
+            "category":item.category,
+            "input_index":item.input_index,
+            "input_sats":item.input_sats,
+            "output_index":item.output_index,
+            "output_sats":item.output_sats,
+            "num_inputs":item.num_inputs,
+            "num_outputs":item.num_outputs,
+            "fees":item.fees
+        }
+        resp.append(row)
+    return resp
+
+def get_nn_btc_tx_txid_list(notary=None, season=None):
+    data = get_nn_btc_tx_data(season, notary)
+    resp = []
+    for item in data:
+        resp.append(item.txid)
+    resp = list(set(resp))
+    return resp
+
+def get_dpow_coins_list(season=None, server=None, epoch=None):
+    dpow_chains = get_scoring_epochs_data(season, server, epoch).values('epoch_chains')
+    
+    chains_list = []
+    for item in dpow_chains:
+        chains_list += item['epoch_chains']
+    chains_list = list(set(chains_list))
+    chains_list.sort()
+    return chains_list
+
+def get_testnet_addresses(season):
+    addresses_dict = {}
+    addresses_data = get_chain_addresses('KMD', "Season_5_Testnet")
+
+    for item in addresses_data:
+        if item["notary"] not in addresses_dict: 
+            addresses_dict.update({item["notary"]:item['address']})
+
+    return addresses_dict
+
+
+def get_notary_balances(notary, season=None):
+    data = get_balances_data(season, None, notary)
+    return data.order_by('-season','notary', 'chain', 'balance').values()
+
+def get_chain_balances(chain, season=None):
+    data = get_balances_data(season, chain)
+    return data.order_by('-season','notary', 'chain', 'balance').values()
+
+
+def get_chain_addresses(chain, season=None):
+    data = get_addresses_data(season, chain)
+    return data.order_by('notary').values('notary','address')
+
+
+def get_notary_addresses_data(notary, season=None):
+    data = get_addresses_data(season, None, notary)
+    return data.order_by('chain').values('chain','address')
+
+
+def get_notary_season_aggr(season, notary):
+    now = int(time.time())
+    return get_mined_data(season, notary).values('name').annotate(
+                season_value_mined=Sum('value'),\
+                season_blocks_mined=Count('value'),
+                season_largest_block=Max('value'),
+                last_mined_datetime=Max('block_datetime'),
+                last_mined_block=Max('block_height'),
+                last_mined_time=Max('block_time')
+            )
+
+
+
+def get_notary_mined_last_24hrs(notary):
+    now = int(time.time())
+    day_ago = now - 24*60*60
+    data = get_mined_data(None, notary)
+    return data.filter(block_time__gte=str(day_ago), block_time__lte=str(now)) \
+                      .values('name').annotate(mined_24hrs=Sum('value'))
 
 
 def get_nn_ntx_summary(notary):
@@ -553,18 +616,14 @@ def get_nn_ntx_summary(notary):
     }
 
     # 24hr ntx 
-    ntx_24hr = notarised.objects.filter(
-        block_time__gt=str(int(time.time()-24*60*60))
-        ).values()
+    ntx_24hr = get_notarised_data_24hr().values()
 
     notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary)
     ntx_summary.update({"today":notary_ntx_24hr_summary})
 
 
     # season ntx stats
-    ntx_season = notarised_count_season.objects \
-                                    .filter(season=season, notary=notary) \
-                                    .values()
+    ntx_season = get_notarised_count_season_data(season, notary).values()
 
     if len(ntx_season) > 0:
         chains_ntx_season = ntx_season[0]['chain_ntx_counts']
@@ -580,9 +639,7 @@ def get_nn_ntx_summary(notary):
         })
 
     #last ntx data
-    ntx_last = last_notarised.objects \
-                             .filter(season=season, notary=notary) \
-                             .values()
+    ntx_last = get_last_notarised_data(season, notary).values()
     last_chain_ntx_times = {}
     for item in ntx_last:
         last_chain_ntx_times.update({item['chain']:item['block_time']})
@@ -610,9 +667,7 @@ def get_nn_ntx_summary(notary):
 
 # notary > chain > count
 def get_nn_season_ntx_counts(season):
-    ntx_season = notarised_count_season.objects \
-                                    .filter(season=season) \
-                                    .values()
+    ntx_season = get_notarised_count_season_data().values()
     nn_season_ntx_counts = {}
     for item in ntx_season:
         nn_season_ntx_counts.update({
@@ -624,10 +679,7 @@ def get_nn_season_ntx_counts(season):
 def get_nn_social(notary_name=None, season=None):
     season = get_season()
     nn_social_info = {}
-    if notary_name:
-        nn_social_data = nn_social.objects.filter(season=season, notary=notary_name).values()
-    else:
-        nn_social_data = nn_social.objects.all().values()
+    nn_social_data = get_nn_social_data(season, notary_name).values()
     for item in nn_social_data:
         nn_social_info.update(items_row_to_dict(item,'notary'))
     for notary in nn_social_info:
@@ -708,25 +760,6 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None):
 
 
 
-def get_notary_season_aggr(season, notary):
-    now = int(time.time())
-    return mined.objects.filter(name=notary, block_time__gte=SEASONS_INFO[season]['start_time'],
-                          block_time__lte=str(now)) \
-                         .values('name').annotate(season_value_mined=Sum('value'),\
-                                            season_blocks_mined=Count('value'),
-                                            season_largest_block=Max('value'),
-                                            last_mined_datetime=Max('block_datetime'),
-                                            last_mined_block=Max('block_height'),
-                                            last_mined_time=Max('block_time'))
-
-
-def get_notary_mined_last_24hrs(notary):
-    now = int(time.time())
-    day_ago = now - 24*60*60
-    return mined.objects.filter(name=notary, block_time__gte=str(day_ago), block_time__lte=str(now)) \
-                      .values('name').annotate(mined_24hrs=Sum('value'))
-
-
 # TODO: use notarised table values
 def get_ntx_score(btc_ntx, main_ntx, third_party_ntx, season=None):
     if not season:
@@ -765,9 +798,7 @@ def get_region_rank(region_notarisation_scores, notary_score):
 
 # chain > data
 def get_season_chain_ntx_data(season):
-    ntx_season = notarised_chain_season.objects \
-                                    .filter(season=season) \
-                                    .values()
+    ntx_season = get_notarised_chain_season_data(season).values()
     dpow_coins_list = get_dpow_coins_list(season)
     season_chain_ntx_data = {}
     if len(ntx_season) > 0:
@@ -899,8 +930,8 @@ def get_server_info(coins_list, season=None):
 def get_split_stats():
     resp = get_btc_txid_data("splits")
     split_summary = {}
-    for address in resp["results"][0]:
-        for tx in resp["results"][0][address]:
+    for address in resp:
+        for tx in resp[address]:
 
             nn_name = tx["notary"]
             if nn_name not in split_summary:
@@ -958,16 +989,6 @@ def get_split_stats_table():
     return split_rows
 
 
-def get_testnet_addresses(season):
-    addresses_dict = {}
-    addresses_data = addresses.objects.filter(season=season, chain="KMD")
-    addresses_data = addresses_data.order_by('notary').values()
-
-    for item in addresses_data:
-        if item["notary"] not in addresses_dict: 
-            addresses_dict.update({item["notary"]:item['address']})
-
-    return addresses_dict
 
 
 def get_testnet_stats_dict(season, testnet_chains):
@@ -993,3 +1014,163 @@ def get_testnet_stats_dict(season, testnet_chains):
             testnet_stats_dict[notary].update({"Address":address})
     return testnet_stats_dict
 
+
+def get_sidebar_links(season=None):
+    if not season:
+        season = "Season_4"
+    notary_list = get_notary_list(season)
+    region_notaries = get_regions_info(notary_list)
+    coins_dict = get_dpow_server_coins_dict(season)
+    server_chains = get_server_chains(season)
+    sidebar_links = {
+        "server":os.getenv("SERVER"),
+        "chains_menu":server_chains,
+        "notaries_menu":region_notaries,
+    }
+    return sidebar_links
+
+def get_server_chains(season=None):
+    if not season:
+        season = "Season_4"
+    coins_dict = get_dpow_server_coins_dict(season)
+    server_chains = {
+        "main":get_mainnet_chains(coins_dict),
+        "third_party":get_third_party_chains(coins_dict)
+    }
+    return server_chains
+
+def get_server_chains_lists(season):
+
+    dpow_chains = get_scoring_epochs_data(season).values('epoch_chains', 'server')
+    
+    main_chains = []
+    third_chains = []
+
+    for item in dpow_chains:
+        epoch_chains = item['epoch_chains']
+        server = item["server"]
+        if server == "Main":
+            main_chains += epoch_chains
+        elif server == "Third_Party":
+            third_chains += epoch_chains
+    main_chains = list(set(main_chains))
+    third_chains = list(set(third_chains))
+    third_chains.append("KMD_3P")
+    main_chains.sort()
+    third_chains.sort()
+
+    return main_chains, third_chains
+
+
+def get_ltc_txid_notary(season=None, notary=None, category=None):
+    resp = {}
+    txid_list = []
+    txid_season_list = {}
+
+    for item in get_nn_ltc_tx_data(season, notary, category).values():
+
+        if item['season'] not in resp:
+            resp.update({item['season']:{}})
+            txid_season_list.update({item['season']:[]})
+
+        if item['category'] not in resp[item['season']]:
+            resp[item['season']].update({item['category']:{}})
+
+        if item['txid'] not in resp[item['season']][item['category']]:
+            resp[item['season']][item['category']].update({item['txid']:[item]})
+            
+        else:
+            resp[item['season']][item['category']][item['txid']].append(item)
+
+        txid_list.append(item['txid'])
+        txid_season_list[item['season']].append(item['txid'])
+
+    api_resp = {
+        "count":len(list(set(txid_list))),
+        "results":{}
+    }
+    for season in resp:
+        if season not in api_resp["results"]:
+            api_resp["results"].update({season:{"count":len(list(set(txid_season_list[season])))}})
+        for category in resp[season]:
+            api_resp["results"][season].update({
+                category:{
+                    "count":len(resp[season][category]),
+                    "txids":resp[season][category]
+                }
+            })
+    return api_resp
+
+# TODO: Deprecated? use notarised table values
+def get_ntx_score(btc_ntx, main_ntx, third_party_ntx, season=None):
+    if not season:
+        season = "Season_4"
+    coins_dict = get_dpow_server_coins_dict(season)
+    third_party = get_third_party_chains(coins_dict)
+    main_chains = get_mainnet_chains(coins_dict)
+    try:
+        if 'BTC' in main_chains:
+            main_chains.remove('BTC')
+        if 'KMD' in main_chains:
+            main_chains.remove('KMD')
+        return btc_ntx*0.0325 + main_ntx*0.8698/len(main_chains) + third_party_ntx*0.0977/len(third_party)
+    except:
+        return 0
+
+
+def get_btc_ntx_lag():
+    data = get_notarised_data(None, "BTC").values()
+    block_time_list = []
+    for item in data:
+        block_time_list.append(item["block_time"])
+    block_time_list = list(set(block_time_list))
+    block_time_list.sort()
+
+    max_lags = []
+    max_lag_vals = []
+    while len(max_lags) < 25:
+        max_blocktime_lag = 0
+        for block_time in block_time_list:
+            try:
+                blocktime_lag = block_time - last_blocktime
+
+                if blocktime_lag > max_blocktime_lag and blocktime_lag not in max_lag_vals:
+                    max_blocktime_lag = blocktime_lag
+                    max_lag_blocktime = block_time
+            except:
+                pass
+            last_blocktime = block_time
+
+        lagged_blocks = []
+        for item in data:
+            if item["block_time"] == max_lag_blocktime:
+                lagged_blocks.append(item)
+
+        max_lags.append({
+            "max_blocktime_lag_sec":max_blocktime_lag,
+            "max_blocktime_lag":day_hr_min_sec(max_blocktime_lag),
+            "max_lag_blocktime":max_lag_blocktime,
+            "max_lag_block_datetime":dt.fromtimestamp(max_lag_blocktime),
+            "num_lagged_blocks":len(lagged_blocks),
+            "lagged_blocks":lagged_blocks
+        })
+        max_lag_vals.append(max_blocktime_lag)
+    return {"max_lags":max_lags}
+
+
+def get_notary_list(season):
+    notaries = get_nn_social_data(season).values('notary')
+    notary_list = []
+    for item in notaries:
+        if item['notary'] not in notary_list:
+            notary_list.append(item['notary'])
+    notary_list.sort()
+    return notary_list
+
+
+def get_ltc_txid_list(notary=None, season=None):
+    resp = []
+    for item in get_nn_ltc_tx_data(season, notary):
+        resp.append(item.txid)
+    resp = list(set(resp))
+    return resp

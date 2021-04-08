@@ -628,7 +628,7 @@ def get_new_notary_txids(notary_address, chain, season=None):
     logger.info(url)
     r = requests.get(url)
     resp = r.json()
-    txids = resp['results'][0]
+    txids = resp['results']
 
     new_txids = []
     for txid in txids:

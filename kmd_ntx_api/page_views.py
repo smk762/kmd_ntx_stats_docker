@@ -6,17 +6,17 @@ import numpy as np
 from django.shortcuts import render
 from kmd_ntx_api.pages import *
 from kmd_ntx_api.endpoints import *
-from kmd_ntx_api.lib_helper import *
-from kmd_ntx_api.lib_info import *
-from kmd_ntx_api.lib_query import *
+from kmd_ntx_api.lib_stats import *
 from kmd_ntx_api.api_tables import *
+from kmd_ntx_api.lib_testnet import *
+
 
 ## DASHBOARD        
 
 def btc_ntx(request):
     season = get_season()
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    btc_ntx = notarised_btc.objects.filter(
+    coins_data = get_coins_data(1).values('chain', 'dpow')
+    btc_ntx = get_notarised_btc_data(season).filter(
                             season=season).values()
 
     context = {
@@ -32,9 +32,8 @@ def btc_ntx(request):
 def btc_ntx_all(request):
     season = get_season()
     notary_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    btc_ntx = notarised.objects.filter(
-                            season=season, chain='BTC').values()
+    coins_data = get_coins_data(1).values('chain', 'dpow')
+    btc_ntx = get_notarised_data(season, "BTC").values()
 
     context = {
         "sidebar_links":get_sidebar_links(season),
@@ -48,7 +47,7 @@ def btc_ntx_all(request):
 
 def chains_last_ntx(request):
     season = get_season()
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    coins_data = get_coins_data(1).values('chain', 'dpow')
     notary_list = get_notary_list(season)
 
     season_chain_ntx_data = get_season_chain_ntx_data(season)
@@ -66,7 +65,7 @@ def chain_sync(request):
     season = get_season()
     context = get_chain_sync_data(request)
     notary_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    coins_data = get_coins_data(1).values('chain', 'dpow')
 
     context.update({
         "sidebar_links":get_sidebar_links(season),
@@ -78,16 +77,14 @@ def chain_sync(request):
 def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY PROFILE
     season = get_season()
     notary_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    coins_data = get_coins_data(1).values('chain', 'dpow')
 
     context = {
         "sidebar_links":get_sidebar_links(season)
     }
     
     if chain:
-        balance_data = balances.objects.filter(chain=chain, season=season) \
-                                   .order_by('notary') \
-                                   .values('notary','address', 'balance')
+        balance_data = get_balances_data(season, chain).order_by('notary').values('notary','address', 'balance')
 
         max_tick = 0
         for item in balance_data:
@@ -177,17 +174,15 @@ def dash_view(request, dash_name=None):
                 html = 'graphs/daily_ntx_graph.html'
     else:
         coin_notariser_ranks = get_coin_notariser_ranks(season)
-        ntx_24hr = notarised.objects.filter(
+        ntx_24hr = get_notarised_data().filter(
             block_time__gt=str(int(time.time()-24*60*60))
             ).count()
         try:
-            mined_24hr = mined.objects.filter(
-                block_time__gt=str(int(time.time()-24*60*60))
-                ).values('season').annotate(sum_mined=Sum('value'))[0]['sum_mined']
+            mined_24hr = get_mined_data_24hr().values('season').annotate(sum_mined=Sum('value'))[0]['sum_mined']
         except:
             # no records returned
             mined_24hr = 0
-        biggest_block = mined.objects.filter(season=season).order_by('-value').first()
+        biggest_block = get_mined_data(season).order_by('-value').first()
         
         notarisation_scores = get_notarisation_scores(season)
         
@@ -229,7 +224,6 @@ def faucet(request):
         if 'address' in request.POST:
             address = request.POST['address'].strip()
         url = f'https://faucet.komodo.live/faucet/{coin}/{address}'
-        print(url)
         r = requests.get(url)
         try:
             resp = r.json()
@@ -241,6 +235,7 @@ def faucet(request):
             else:
                 context.update({"result":"fail"})
         except Exception as e:
+            logger.error(f"[faucet] Exception: {e}")
             messages.success(request, f"Something went wrong... {e}")
             context.update({"result":"fail"})
 
@@ -249,7 +244,7 @@ def faucet(request):
 def funds_sent(request):
     season = get_season()
     notary_list = get_notary_list(season)
-    funding_data = funding_transactions.objects.filter(season=season).values()
+    funding_data = get_funding_transactions_data(season).values()
     funding_totals = get_funding_totals(funding_data)
 
     context = {
@@ -281,7 +276,7 @@ def funding(request):
     season = get_season()
     notary_list = get_notary_list(season)
 
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    coins_data = get_coins_data(1).values('chain', 'dpow')
     chain_list = get_dpow_coins_list(season)
 
     num_chains = len(chain_list)
@@ -355,10 +350,8 @@ def funding(request):
 def mining_24hrs(request):
     season = get_season()
     notary_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    mined_24hrs = mined.objects.filter(
-        block_time__gt=str(int(time.time()-24*60*60))
-        ).values()
+    coins_data = get_coins_data(1).values('chain', 'dpow')
+    mined_24hrs = get_mined_data_24hr().values()
 
     context = {
         "sidebar_links":get_sidebar_links(season),
@@ -372,13 +365,13 @@ def mining_24hrs(request):
 def mining_overview(request):
     season = get_season()
     notary_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    coins_data = get_coins_data(1).values('chain', 'dpow')
 
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "explorers":get_dpow_explorers(),
-        "mined_season":get_mined_count_season_table(request),
+        "mined_season":get_mined_count_season_data_table(request),
         "season":season.replace("_"," ")
     }
     return render(request, 'mining_overview.html', context)
@@ -387,10 +380,8 @@ def mining_overview(request):
 def ntx_24hrs(request):
     season = get_season()
     notary_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    ntx_24hrs = notarised.objects.filter(
-        block_time__gt=str(int(time.time()-24*60*60))
-        ).values()
+    coins_data = get_coins_data(1).values('chain', 'dpow')
+    ntx_24hrs = get_notarised_data_24hr().values()
 
     context = {
         "sidebar_links":get_sidebar_links(season),
@@ -461,8 +452,8 @@ def notary_epoch_scoring_table(request):
 def notarised_tenure_view(request):
     season = get_season()
     notary_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
-    tenure_data = notarised_tenure.objects.all().values()
+    coins_data = get_coins_data(1).values('chain', 'dpow')
+    tenure_data = get_notarised_tenure_data().values()
     context = {
         "sidebar_links":get_sidebar_links(season),
         "tenure_data":tenure_data,
@@ -473,7 +464,7 @@ def notarised_tenure_view(request):
 def scoring_epochs_view(request):
     season = get_season()
     notary_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    coins_data = get_coins_data(1).values('chain', 'dpow')
     context = {
         "sidebar_links":get_sidebar_links(season),
         "epochs":get_epoch_scoring_table(request),
@@ -484,9 +475,9 @@ def scoring_epochs_view(request):
 def testnet_ntx_scoreboard(request):
     season = "Season_5_Testnet"
     notary_list = get_notary_list(season)
-    coins_data = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
+    coins_data = get_coins_data(1).values('chain', 'dpow')
  
-    testnet_ntx_counts = get_api_testnet(request)["results"][0]
+    testnet_ntx_counts = get_api_testnet(request)
     num_notaries = len(testnet_ntx_counts)
 
     combined_total = 0

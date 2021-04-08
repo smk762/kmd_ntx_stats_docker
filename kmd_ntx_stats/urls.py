@@ -277,8 +277,8 @@ urlpatterns = [
 
     # API views (simple)
     path('api/info/address_btc_txids',
-          api_views.address_btc_txids,
-          name='address_btc_txids'),
+          api_views.api_address_btc_txids,
+          name='api_address_btc_txids'),
 
     path('api/info/sidebar_links',
           api_views.api_sidebar_links,
@@ -301,12 +301,12 @@ urlpatterns = [
           name='api_testnet_totals'),
 
     path('api/info/chain_sync',
-          api_views.chain_sync_api,
-          name='chain_sync_api'),
+          api_views.api_chain_sync,
+          name='api_chain_sync'),
 
     path('api/info/mining_24hrs',
-          api_views.mining_24hrs_api,
-          name='mining_24hrs_api'),
+          api_views.api_mining_24hrs,
+          name='api_mining_24hrs'),
 
     path('api/info/notarisation_txid',
           api_views.notarisation_txid,

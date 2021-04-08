@@ -2,9 +2,8 @@
 from rest_framework.response import Response
 from rest_framework import permissions, viewsets, authentication
 from kmd_ntx_api.serializers import addrFromBase58Serializer, addrFromPubkeySerializer, decodeOpRetSerializer
-from kmd_ntx_api.lib_info import get_all_coins, get_address_from_pubkey
-from kmd_ntx_api.base_58 import calc_addr_from_pubkey, calc_addr_tool, COIN_PARAMS
-from kmd_ntx_api.lib_helper import decode_opret
+from kmd_ntx_api.lib_info import get_all_coins
+from kmd_ntx_api.base_58 import *
 
 # Tool views
 
@@ -34,6 +33,7 @@ class api_addr_from_base58_tool(viewsets.ViewSet):
                              request.GET["script_addr"], request.GET["secret_key"])
         return Response(resp)
 
+
 class api_address_from_pubkey_tool(viewsets.ViewSet):
     serializer_class = addrFromPubkeySerializer
     authentication_classes = [authentication.TokenAuthentication]
@@ -48,6 +48,7 @@ class api_address_from_pubkey_tool(viewsets.ViewSet):
         """
         resp = get_address_from_pubkey(request)
         return Response(resp)
+
 
 class api_decode_op_return_tool(viewsets.ViewSet):
     """
@@ -72,3 +73,31 @@ class api_decode_op_return_tool(viewsets.ViewSet):
         else:
             decoded = {"error":"needs parm like ?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400"}
         return Response(decoded)
+
+
+# TODO: cater for coins without params etc.
+def get_address_from_pubkey(request):
+
+    if "coin" in request.GET and "pubkey" in request.GET:
+
+        if request.GET["coin"] in COIN_PARAMS:
+
+            coin = request.GET["coin"]
+            pubkey = request.GET["pubkey"]
+
+            return {
+                "coin": coin,
+                "pubkey": pubkey,
+                "address": calc_addr_from_pubkey(coin, pubkey)
+            }
+
+        else:
+            return {
+                "error": f"{coin} does not have locally defined COIN_PARAMS. If you know what these are, you can try the /api/tools/addr_from_base58 endpoint instead."
+            }
+
+    else:
+        return {
+            "error": "You need to specify a pubkey and coin like '?coin=KMD&pubkey=<YOUR_PUBKEY>'\nIf coin not specified or unknown, will revert to KMD"
+        }
+
