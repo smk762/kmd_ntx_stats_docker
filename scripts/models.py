@@ -567,7 +567,7 @@ class mined_row():
 
         if self.validated():
             update_mined_row(row_data)
-            logger.info(f"Updated [mined] {self.block_height} | {self.name} | {self.value} ")
+            logger.info(f"Updated [mined] {self.block_height} | {self.name} | {self.season} | {self.value} ")
 
         else:
             logger.warning(f"[mined] Row data invalid!")
