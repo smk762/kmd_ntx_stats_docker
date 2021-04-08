@@ -619,6 +619,14 @@ class season_mined_count_row():
     def delete_season(self):
         CURSOR.execute(f"DELETE FROM mined_count_season WHERE season = '{self.season}';")
         CONN.commit()
+        
+    def delete_address(self):
+        CURSOR.execute(f"DELETE FROM mined_count_season WHERE address = '{self.address}';")
+        CONN.commit()
+
+    def delete_notary(self):
+        CURSOR.execute(f"DELETE FROM mined_count_season WHERE notary = '{self.notary}';")
+        CONN.commit()
 
 class daily_mined_count_row():
     def __init__(self, notary='', blocks_mined='', sum_value_mined='', \

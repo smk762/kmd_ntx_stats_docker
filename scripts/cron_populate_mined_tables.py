@@ -32,11 +32,13 @@ tables with aggregated stats for each notary season.
 '''
 
 def update_mined_known_address(address):
-    sql = f"SELECT block_height, block_time, block_datetime, value, address, name, txid, season FROM mined WHERE address = '{address}';"
+    sql = f"SELECT block_height, block_time, block_datetime, value, address, name, txid, season \
+            FROM mined WHERE address='{address}' AND name='{address}';"
     CURSOR.execute(sql)
     results = CURSOR.fetchall()
     for result in results:
         if result[4] in NON_NOTARY_ADDRESSES:
+
             row = mined_row()
             row.block_height = result[0]
             row.block_time = result[1]
@@ -47,6 +49,11 @@ def update_mined_known_address(address):
             row.txid = result[6]
             row.season = get_season_from_block(row.block_height)
             row.update()
+
+            row = season_mined_count_row()
+            row.address = result[4]
+            row.delete_address()
+
             logger.info(f"Updating, address {row.address} as {row.name}")
         else:
             logger.info(f"Not updating, address {row.address} not in NON_NOTARY_ADDRESSES")
@@ -144,10 +151,7 @@ def process_aggregates(season):
 
 
 def update_season_mined_counts(season):
-    row = season_mined_count_row()
-    row.season = "Season_5_Testnet"
-    row.delete_season()
-    
+
     results = get_season_mined_counts(season, POSTSEASON)
 
     for item in results:
