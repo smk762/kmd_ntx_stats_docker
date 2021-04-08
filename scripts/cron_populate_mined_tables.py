@@ -144,6 +144,10 @@ def process_aggregates(season):
 
 
 def update_season_mined_counts(season):
+    row = season_mined_count_row()
+    row.season = "Season_5_Testnet"
+    row.delete_season()
+    
     results = get_season_mined_counts(season, POSTSEASON)
 
     for item in results:
