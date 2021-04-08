@@ -551,6 +551,8 @@ class mined_row():
         self.season = season
 
     def validated(self):
+        if not self.season:
+            return False
         return True
 
     def update(self):
@@ -593,6 +595,8 @@ class season_mined_count_row():
         self.time_stamp = time_stamp
 
     def validated(self):
+        if self.season.find("Testnet") != -1:
+            return False
         return True
 
     def update(self):
@@ -603,13 +607,17 @@ class season_mined_count_row():
         )
         if self.validated():
             update_season_mined_count_row(row_data)
-            logger.info(f"[season_mined_count] updated: {self.notary} {self.season}")
+            logger.info(f"[mined_count_season] updated: {self.notary} {self.season} {self.last_mined_block} {self.sum_value_mined}")
         else:
-            logger.warning(f"[season_mined_count] Row data invalid!")
+            logger.warning(f"[mined_count_season] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
-        CURSOR.execute(f"DELETE FROM season_mined_count WHERE notary = '{self.notary}';")
+        CURSOR.execute(f"DELETE FROM mined_count_season WHERE notary = '{self.notary}';")
+        CONN.commit()
+
+    def delete_season(self):
+        CURSOR.execute(f"DELETE FROM mined_count_season WHERE season = '{self.season}';")
         CONN.commit()
 
 class daily_mined_count_row():

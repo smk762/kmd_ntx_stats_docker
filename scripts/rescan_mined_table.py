@@ -26,17 +26,6 @@ results = CURSOR.fetchall()
 logger.info(f"{len(results)} seasons in mined_count_season table: {results}")
 
 
-sql = "DELETE \
-      FROM mined_count_season \
-      WHERE season = 'Season_5_Testnet';"
-try:
-    CURSOR.execute(sql)
-    results = CURSOR.fetchall()
-    logger.info(f"{len(results)} seasons in mined_count_season table: {results}")
-except:
-    pass
-
-
 sql = "SELECT block_height, block_time, block_datetime, \
               value, address, name, txid, season \
       FROM mined WHERE \
