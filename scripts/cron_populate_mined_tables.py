@@ -174,9 +174,14 @@ if __name__ == "__main__":
     seasons = get_notarised_seasons()
 
     # Uncomment to update addresses in DB after updating NON_NOTARY_ADDRESSES
-    # for address in NON_NOTARY_ADDRESSES:
-    #   update_mined_known_address(address)
-
+    '''
+    for address in NON_NOTARY_ADDRESSES:
+        row = season_mined_count_row()
+        row.address = address
+        row.delete_address()
+        update_mined_known_address(address)
+    '''
+    
     for season in seasons:
 
         if season not in EXCLUDED_SEASONS:
