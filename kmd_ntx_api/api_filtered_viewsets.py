@@ -8,8 +8,8 @@ from rest_framework import permissions, viewsets
 
 from kmd_ntx_api.serializers import *
 from kmd_ntx_api.models import *
-from kmd_ntx_api.lib_query import get_notary_list, get_nn_social_data
-from kmd_ntx_api.lib_api_filtered import * 
+from kmd_ntx_api.lib_query import *
+from kmd_ntx_api.lib_api_filtered import *
 
 
 class addresses_filter(viewsets.ViewSet):
@@ -27,7 +27,7 @@ class addresses_filter(viewsets.ViewSet):
 
     def get(self, request, format=None):
         filters = self.serializer_class.Meta.fields
-        resp = get_addresses_data(request)
+        resp = get_addresses_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -47,7 +47,7 @@ class balances_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_balances_data(request)
+        resp = get_balances_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -66,7 +66,7 @@ class coins_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_coins_data(request)
+        resp = get_coins_data_api(request)
         api_resp = wrap_api(resp, filters)        
         return Response(api_resp)
 
@@ -83,7 +83,7 @@ class explorers_filter(viewsets.ViewSet):  # TODO: add coin type filter
 
     def get(self, request, format=None):
         filters = self.serializer_class.Meta.fields
-        resp = get_explorers_data()
+        resp = get_explorers_data_api()
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -102,7 +102,7 @@ class mined_count_season_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_mined_count_season_data(request)
+        resp = get_mined_count_season_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -120,7 +120,7 @@ class mined_count_date_filter(viewsets.ViewSet):
 
     def get(self, request, format=None):
         filters = self.serializer_class.Meta.fields
-        resp = get_mined_count_daily_data(request)
+        resp = get_mined_count_daily_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -139,7 +139,7 @@ class notarised_chain_season_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_notarised_chain_season_data(request)
+        resp = get_notarised_chain_season_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -158,7 +158,7 @@ class notarised_count_season_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_notarised_count_season_data(request)
+        resp = get_notarised_count_season_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -178,7 +178,7 @@ class notarised_chain_date_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_notarised_chain_daily_data(request)
+        resp = get_notarised_chain_daily_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -197,7 +197,7 @@ class notarised_count_date_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_notarised_count_date_data(request)
+        resp = get_notarised_count_date_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -242,7 +242,7 @@ class notary_rewards_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_rewards_data(request)
+        resp = get_rewards_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -261,10 +261,11 @@ class notary_social_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_nn_social_data(request)
+        resp = get_nn_social_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
+# TODO: add to lib_api_filtered
 class last_ntx_filter(viewsets.ViewSet):
     """
     API endpoint showing notary rewards pending
@@ -279,9 +280,11 @@ class last_ntx_filter(viewsets.ViewSet):
     def get(self, request, format=None):
         """
         """
-        last_ntx_data = last_notarised.objects.all().values()
+        last_ntx_data = get_last_notarised_data().values()
         return Response(last_ntx_data)
 
+
+# TODO: add to lib_api_filtered
 class last_btc_ntx_filter(viewsets.ViewSet):
     """
     API endpoint showing notary rewards pending
@@ -296,8 +299,9 @@ class last_btc_ntx_filter(viewsets.ViewSet):
     def get(self, request, format=None):
         """
         """
-        last_btc_ntx_data = last_btc_notarised.objects.all().values()
+        last_btc_ntx_data = get_last_btc_notarised_data().values()
         return Response(last_btc_ntx_data)
+
 
 class notarised_tenure_filter(viewsets.ViewSet):
     """
@@ -314,7 +318,7 @@ class notarised_tenure_filter(viewsets.ViewSet):
 
     def get(self, request, format=None):
         filters = self.serializer_class.Meta.fields
-        resp = get_notarised_tenure_data(request)
+        resp = get_notarised_tenure_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -335,7 +339,7 @@ class notarised_filter(viewsets.ViewSet):
     def get(self, request, format=None):
         
         filters = self.serializer_class.Meta.fields
-        resp = get_notarised_data(request)
+        resp = get_notarised_data_api(request)
 
         # TODO: include custom filters in wrap_api resp
         api_resp = wrap_api(resp, filters)

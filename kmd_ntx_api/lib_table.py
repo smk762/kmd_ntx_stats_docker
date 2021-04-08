@@ -1,392 +1,142 @@
-#!/usr/bin/env python3
-import os
-import time
-from datetime import datetime
-from dotenv import load_dotenv
-import psycopg2
-from decimal import *
-import logging
-import logging.handlers
-from .lib_const import *
 
-logger = logging.getLogger("mylogger")
+from kmd_ntx_api.lib_info import *
 
-load_dotenv()
+def get_mined_count_season_data_table(request):
 
-def connect_db():
-    conn = psycopg2.connect(
-        host='localhost',
-        user=os.getenv("USER"),
-        password=os.getenv("PASSWORD"),
-        port = "7654",
-        database='postgres'
-    )
-    return conn
+    if "season" in request.GET:
+        data = get_mined_count_season_data(request.GET["season"])
+    else:
+        data = get_mined_count_season_data(get_season())
+        
+    data = data.order_by('season', 'notary').values()
 
-# TABLE UPDATES
+    resp = []
+    # name num sum max last
+    for item in data:
+        blocks_mined = item['blocks_mined']
+        if blocks_mined > 10:
+            notary = item['notary']
+            address = item['address']
+            sum_value_mined = item['sum_value_mined']
+            max_value_mined = item['max_value_mined']
+            last_mined_block = item['last_mined_block']
+            last_mined_blocktime = item['last_mined_blocktime']
+            time_stamp = item['time_stamp']
+            season = item['season']
 
-def update_addresses_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO addresses \
-              (season, owner_name, notary_id, chain, pubkey, address) \
-               VALUES (%s, %s, %s, %s, %s, %s) \
-               ON CONFLICT ON CONSTRAINT unique_season_chain_address DO UPDATE SET \
-               owner_name='"+str(row_data[1])+"', pubkey='"+str(row_data[4])+"', \
-               address='"+str(row_data[5])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        logger.debug(e)
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
+            resp.append({
+                    "notary":notary,
+                    "address":address,
+                    "blocks_mined":blocks_mined,
+                    "sum_value_mined":sum_value_mined,
+                    "max_value_mined":max_value_mined,
+                    "last_mined_block":last_mined_block,
+                    "last_mined_blocktime":last_mined_blocktime
+            })
 
-def update_balances_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO balances \
-            (notary, chain, balance, address, season, update_time) \
-            VALUES (%s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_chain_season_balance DO UPDATE SET \
-            balance="+str(row_data[2])+", \
-            update_time="+str(row_data[5])+";"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_rewards_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO rewards \
-            (address, notary, utxo_count, eligible_utxo_count, \
-            oldest_utxo_block, balance, rewards, update_time) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_reward_address DO UPDATE SET \
-            notary='"+str(row_data[1])+"', utxo_count="+str(row_data[2])+", \
-            eligible_utxo_count="+str(row_data[3])+", oldest_utxo_block="+str(row_data[4])+", \
-            balance="+str(row_data[5])+", rewards="+str(row_data[6])+", \
-            update_time="+str(row_data[7])+";"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_coins_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO coins \
-            (chain, coins_info, electrums, electrums_ssl, explorers, dpow, dpow_active, mm2_compatible) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_coin DO UPDATE SET \
-            coins_info='"+str(row_data[1])+"', \
-            electrums='"+str(row_data[2])+"', \
-            electrums_ssl='"+str(row_data[3])+"', \
-            explorers='"+str(row_data[4])+"', \
-            dpow='"+str(row_data[5])+"', \
-            dpow_active='"+str(row_data[6])+"', \
-            mm2_compatible='"+str(row_data[7])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_mined_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO mined \
-            (block_height, block_time, block_datetime, value, address, name, txid, season) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_block DO UPDATE SET \
-            block_time='"+str(row_data[1])+"', \
-            block_datetime='"+str(row_data[2])+"', \
-            value='"+str(row_data[3])+"', \
-            address='"+str(row_data[4])+"', \
-            name='"+str(row_data[5])+"', \
-            txid='"+str(row_data[6])+"', \
-            season='"+str(row_data[7])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        logger.debug(e)
-        if str(e).find('Duplicate') == -1:
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_season_mined_count_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO  mined_count_season \
-            (notary, address, season, blocks_mined, sum_value_mined, \
-            max_value_mined, last_mined_blocktime, last_mined_block, \
-            time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_season_mined DO UPDATE SET \
-            address="+str(row_data[1])+", blocks_mined="+str(row_data[2])+", sum_value_mined="+str(row_data[3])+", \
-            max_value_mined="+str(row_data[4])+", last_mined_blocktime="+str(row_data[5])+", \
-            last_mined_block="+str(row_data[6])+", time_stamp='"+str(row_data[7])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_season_notarised_chain_tbl(conn, cursor, row_data):
-    sql = "INSERT INTO notarised_chain_season \
-         (chain, ntx_count, block_height, kmd_ntx_blockhash,\
-          kmd_ntx_txid, lastnotarization, opret, ac_ntx_block_hash, \
-          ac_ntx_height, ac_block_height, ntx_lag, season) \
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_notarised_chain_season DO UPDATE \
-          SET ntx_count="+str(row_data[1])+", block_height="+str(row_data[2])+", \
-          kmd_ntx_blockhash='"+str(row_data[3])+"', kmd_ntx_txid='"+str(row_data[4])+"', \
-          lastnotarization="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
-          ac_ntx_block_hash='"+str(row_data[7])+"', ac_ntx_height="+str(row_data[8])+", \
-          ac_block_height='"+str(row_data[9])+"', ntx_lag='"+str(row_data[10])+"';"
-         
-    cursor.execute(sql, row_data)
-    conn.commit()
-
-def update_season_notarised_count_tbl(conn, cursor, row_data): 
-    conf = "btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
-        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
-        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
-    sql = "INSERT INTO notarised_count_season \
-        (notary, btc_count, antara_count, \
-        third_party_count, other_count, \
-        total_ntx_count, chain_ntx_counts, \
-        chain_ntx_pct, time_stamp, season) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-        ON CONFLICT ON CONSTRAINT unique_notary_season DO UPDATE SET \
-        btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
-        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
-        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
-    cursor.execute(sql, row_data)
-    conn.commit()
-
-def update_daily_mined_count_tbl(conn, cursor, row_data):
-    try:
-        sql = "INSERT INTO mined_count_daily \
-            (notary, blocks_mined, sum_value_mined, \
-            mined_date, time_stamp) VALUES (%s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_daily_mined DO UPDATE SET \
-            blocks_mined="+str(row_data[1])+", sum_value_mined="+str(row_data[2])+", \
-            time_stamp='"+str(row_data[7])+"';"
-        cursor.execute(sql, row_data)
-        conn.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        conn.rollback()
-        return 0
-
-def update_daily_notarised_chain_tbl(conn, cursor, row_data):
-    sql = "INSERT INTO notarised_chain_daily \
-         (chain, ntx_count, notarised_date) \
-          VALUES (%s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_notarised_chain_date DO UPDATE \
-          SET ntx_count="+str(row_data[1])+";"
-    cursor.execute(sql, row_data)
-    conn.commit()
-
-def update_daily_notarised_count_tbl(conn, cursor, row_data): 
-    sql = "INSERT INTO notarised_count_daily \
-        (notary, btc_count, antara_count, \
-        third_party_count, other_count, \
-        total_ntx_count, chain_ntx_counts, \
-        chain_ntx_pct, time_stamp, season, notarised_date) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-        ON CONFLICT ON CONSTRAINT unique_notary_date DO UPDATE SET \
-        btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
-        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
-        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+",  \
-        season='"+str(row_data[9])+"', notarised_date='"+str(row_data[10])+"';"
-    cursor.execute(sql, row_data)
-    conn.commit()
-
-# NOTARISATION OPS
-
-def get_latest_chain_ntx_info(cursor, chain, height):
-    sql = "SELECT prev_block_hash, prev_block_height, opret, block_hash, txid \
-           FROM notarised WHERE chain = '"+chain+"' AND block_height = "+str(height)+";"
-    cursor.execute(sql)
-    chains_resp = cursor.fetchone()
-    return chains_resp
-
-# MINED OPS
+    return resp
 
 
+def get_notary_epoch_scoring_table(notary=None, season=None):
 
-# AGGREGATES
+    if not notary:
+        notary_list = get_notary_list(season)
+        notary = random.choice(notary_list)
 
-def get_chain_ntx_season_aggregates(cursor, season):
-    sql = "SELECT chain, MAX(block_height), MAX(block_time), COUNT(*) \
-           FROM notarised WHERE \
-           season = '"+str(season)+"' \
-           GROUP BY chain;"
-    cursor.execute(sql)
-    return cursor.fetchall()
+    if not season:
+        season = "Season_4"
 
-def get_chain_ntx_date_aggregates(cursor, day):
-    sql = "SELECT chain, MAX(block_height), MAX(block_time), COUNT(*) \
-           FROM notarised WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
-           GROUP BY chain;"
-    cursor.execute(sql)
-    return cursor.fetchall()
+    notary_epoch_scores = get_notarised_count_season_data(season, notary).values()
 
-def get_mined_date_aggregates(cursor, day):
-    sql = "SELECT name, COUNT(*), SUM(value), MAX(value), MAX(block_time), \
-           MAX(block_height) FROM mined WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
-           GROUP BY name;"
-    cursor.execute(sql)
-    return cursor.fetchall()
+    epoch_chains_dict = {}
+    epoch_chains_queryset = get_scoring_epochs_data(season).values()
+    for item in epoch_chains_queryset:
+        if item["season"] not in epoch_chains_dict:
+            epoch_chains_dict.update({item["season"]:{}})
+        if item["server"] not in epoch_chains_dict[item["season"]]:
+            epoch_chains_dict[item["season"]].update({item["server"]:{}})
+        if item["epoch"] not in epoch_chains_dict[season][item["server"]]:
+            epoch_chains_dict[item["season"]][item["server"]].update({item["epoch"]:item["epoch_chains"]})
+    rows = []
+    total = 0
 
-# SEASON / DAY FILTERED
+    for item in notary_epoch_scores:
+        notary = item["notary"]
+        chain_ntx = item["chain_ntx_counts"]["seasons"][season]
 
-def get_ntx_for_season(cursor, season):
-    sql = "SELECT chain, notaries \
-           FROM notarised WHERE \
-           season = '"+str(season)+"';"
-    cursor.execute(sql)
-    return cursor.fetchall()
+        for server in chain_ntx["servers"]:
 
-def get_ntx_for_day(cursor, day):
-    sql = "SELECT chain, notaries \
-           FROM notarised WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
-    cursor.execute(sql)
-    return cursor.fetchall()
+            for epoch in chain_ntx["servers"][server]["epochs"]:
+                if server == "BTC":
+                    server_epoch_chains = ["BTC"]
+                elif server == "KMD":
+                    server_epoch_chains = ["KMD"]
+                elif server == "LTC":
+                    server_epoch_chains = ["LTC"]
+                else:
+                    server_epoch_chains = epoch_chains_dict[season][server][epoch]
 
-def get_mined_for_season(cursor, season):
-    sql = "SELECT * \
-           FROM mined WHERE \
-           season = '"+str(season)+"';"
-    cursor.execute(sql)
-    return cursor.fetchall()
+                for chain in chain_ntx["servers"][server]["epochs"][epoch]["chains"]:
+                    chain_stats = chain_ntx["servers"][server]["epochs"][epoch]["chains"][chain]
+                    score_per_ntx = chain_ntx["servers"][server]["epochs"][epoch]["score_per_ntx"]
+                    epoch_chain_ntx_count = chain_stats["chain_ntx_count"]
+                    epoch_chain_score = chain_stats["chain_score"]
 
-def get_mined_for_day(cursor, day):
-    sql = "SELECT * \
-           FROM mined WHERE \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
-    cursor.execute(sql)
-    return cursor.fetchall()
+                    row = {
+                        "notary":notary,
+                        "season":season.replace("_", " "),
+                        "server":server,
+                        "epoch":epoch.split("_")[1],
+                        "chain":chain,
+                        "score_per_ntx":score_per_ntx,
+                        "epoch_chain_ntx_count":epoch_chain_ntx_count,
+                        "epoch_chain_score":epoch_chain_score
+                    }
 
-
-# QUICK QUERIES
-
-def get_dates_list(cursor, table, date_col):
-    sql = "SELECT DATE_TRUNC('day', "+date_col+") as day \
-           FROM "+table+" \
-           GROUP BY day;"
-    cursor.execute(sql)
-    dates = cursor.fetchall()
-    date_list = []
-    for date in dates:
-        date_list.append(date[0])
-    return date_list
-
-def get_existing_dates_list(cursor, table, date_col):
-    sql = "SELECT "+date_col+" \
-           FROM "+table+";"
-    cursor.execute(sql)
-    dates = cursor.fetchall()
-    date_list = []
-    for date in dates:
-        date_list.append(date[0])
-    return date_list
-
-def get_records_for_date(cursor, table, date_col, date):
-    sql = "SELECT * \
-           FROM "+table+" WHERE \
-           DATE_TRUNC('day',"+date_col+") = '"+str(date)+"';"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-def select_from_table(cursor, table, cols, conditions=None):
-    sql = "SELECT "+cols+" FROM "+table
-    if conditions:
-        sql = sql+" WHERE "+conditions
-    sql = sql+";"
-    cursor.execute(sql)
-    return cursor.fetchall()
-
-def get_min_from_table(cursor, table, col):
-    sql = "SELECT MIN("+col+") FROM "+table
-    cursor.execute(sql)
-    return cursor.fetchone()[0]
-
-def get_max_from_table(cursor, table, col):
-    sql = "SELECT MAX("+col+") FROM "+table
-    cursor.execute(sql)
-    return cursor.fetchone()[0]
-
-def get_count_from_table(cursor, table, col):
-    sql = "SELECT COUNT("+col+") FROM "+table
-    cursor.execute(sql)
-    return cursor.fetchone()[0]
-
-def get_sum_from_table(cursor, table, col):
-    sql = "SELECT SUM("+col+") FROM "+table
-    cursor.execute(sql)
-    return cursor.fetchone()[0]
+                    server_epoch_chains.remove(chain)
+                    total += chain_stats["chain_score"]
+                    rows.append(row)
+                '''
+                if chain not in server_epoch_chains:
+                    row = {
+                        "notary":notary,
+                        "season":season.replace("_", " "),
+                        "server":server,
+                        "epoch":epoch.split("_")[1],
+                        "chain":chain,
+                        "score_per_ntx":chain_ntx["servers"][server]["epochs"][epoch]["score_per_ntx"],
+                        "epoch_chain_ntx_count":0,
+                        "epoch_chain_score":0
+                    }
+                    rows.append(row)
+                '''
 
 
-# MISC TABLE OPS
+    return rows, total
 
-def get_table_names(cursor):
-    sql = "SELECT tablename FROM pg_catalog.pg_tables \
-           WHERE schemaname != 'pg_catalog' \
-           AND schemaname != 'information_schema';"
-    cursor.execute(sql)
-    tables = cursor.fetchall()
-    tables_list = []
-    for table in tables:
-        tables_list.append(table[0])
-    return tables_list
+def get_epoch_scoring_table(request):
+    resp = []
+    
+    if "season" in request.GET:
+        season=request.GET["season"]
+        data = get_scoring_epochs_data(season)
+    else:
+        data = get_scoring_epochs_data()
 
-def delete_from_table(conn, cursor, table, condition=None):
-    sql = "TRUNCATE "+table
-    if condition:
-        sql = sql+" WHERE "+condition
-    sql = sql+";"
-    cursor.execute()
-    conn.commit()
+    data = data.order_by('season', 'server').values()
+    for item in data:
 
-def ts_col_to_dt_col(conn, cursor, ts_col, dt_col, table):
-    sql = "UPDATE "+table+" SET "+dt_col+"=to_timestamp("+ts_col+");"
-    cursor.execute(sql)
-    conn.commit()
-
-def ts_col_to_season_col(conn, cursor, ts_col, season_col, table):
-    for season in SEASONS_INFO:
-        sql = "UPDATE "+table+" \
-               SET "+season_col+"='"+season+"' \
-               WHERE "+ts_col+" > "+str(SEASONS_INFO[season]['start_time'])+" \
-               AND "+ts_col+" < "+str(SEASONS_INFO[season]['end_time'])+";"
-        cursor.execute(sql)
-        conn.commit()
+        resp.append({
+                "season":item['season'],
+                "server":item['server'],
+                "epoch":item['epoch'].split("_")[1],
+                "epoch_start":dt.fromtimestamp(item['epoch_start']),
+                "epoch_end":dt.fromtimestamp(item['epoch_end']),
+                "duration":item['epoch_end']-item['epoch_start'],
+                "start_event":item['start_event'],
+                "end_event":item['end_event'],
+                "epoch_chains":", ".join(item['epoch_chains']),
+                "num_epoch_chains":len(item['epoch_chains']),
+                "score_per_ntx":item['score_per_ntx']
+        })
+    return resp

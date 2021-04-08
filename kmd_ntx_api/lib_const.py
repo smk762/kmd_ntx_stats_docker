@@ -1,5 +1,8 @@
 import requests
+import logging
 from django.contrib import messages
+
+logger = logging.getLogger("mylogger")
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
@@ -8,6 +11,8 @@ MESSAGE_TAGS = {
     messages.WARNING: 'alert-warning',
     messages.ERROR: 'alert-danger',
 }
+
+
 SEASONS_INFO = {
     "Season_1": {
             "start_block":1,
@@ -53,12 +58,14 @@ SEASONS_INFO = {
             "notaries":[]
         }
 }
+
+
 # set at post season to use "post_season_end_time" for aggreagates (e.g. mining)
 POSTSEASON = True
 
 
 # convert timestamp to human time 
-intervals = (
+INTERVALS = (
     ('wks', 604800),  # 60 * 60 * 24 * 7
     ('days', 86400),    # 60 * 60 * 24
     ('hrs', 3600),    # 60 * 60
@@ -66,18 +73,19 @@ intervals = (
     ('sec', 1),
     )
 
+
 noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA', 'MCL', 'VRSC']
+
 
 EXCLUDE_DECODE_OPRET_COINS = []
 
+# Links to ecosystem sites
 url = "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json"
 r = requests.get(url)
 ECO_DATA = r.json()
 
-#TESTNET_CHAINS = ["RICK", "MORTY", "LTC"]
 
 # COLORS
-
 BLACK = "#000"
 RED = "#DC0333"
 LT_GREEN = "#2FEA8B"

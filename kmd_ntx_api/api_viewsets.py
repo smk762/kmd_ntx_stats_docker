@@ -6,6 +6,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework import permissions, viewsets
 
 from kmd_ntx_api.models import *
+from kmd_ntx_api.lib_query import *
 from kmd_ntx_api.serializers import *
 from kmd_ntx_api.filters import minedFilter, ntxFilter, ntxTenureFilter
 
@@ -151,7 +152,7 @@ class ntxCountDateViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing notarisations table data
     """
-    queryset = notarised_count_daily.objects.all()
+    queryset = get_notarised_count_daily_data()
     serializer_class = NotarisedCountDailySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]

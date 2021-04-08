@@ -5,12 +5,13 @@ import datetime
 
 from .models import *
 from .serializers import *
-from .lib_helper import get_season, paginate_wrap, wrap_api
+from .lib_helper import get_season
+from .lib_api import paginate_wrap, wrap_api
 
 logger = logging.getLogger(__name__)
 
 
-def apply_filters(request, serializer, queryset, table=None, filter_kwargs=None):
+def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
         filter_kwargs = {}
 
@@ -52,10 +53,10 @@ def apply_filters(request, serializer, queryset, table=None, filter_kwargs=None)
     return queryset
 
 
-def get_addresses_data(request):
+def get_addresses_data_api(request):
     resp = {}
     data = addresses.objects.all()
-    data = apply_filters(request, AddressesSerializer, data) \
+    data = apply_filters_api(request, AddressesSerializer, data) \
             .order_by('notary','season', 'chain') \
             .values()
 
@@ -81,10 +82,10 @@ def get_addresses_data(request):
     return resp
 
 
-def get_balances_data(request):
+def get_balances_data_api(request):
     resp = {}
     data = balances.objects.all()
-    data = apply_filters(request, BalancesSerializer, data) \
+    data = apply_filters_api(request, BalancesSerializer, data) \
             .order_by('-season','notary', 'chain', 'balance') \
             .values()
 
@@ -109,10 +110,10 @@ def get_balances_data(request):
     return resp
 
 
-def get_coins_data(request):
+def get_coins_data_api(request):
     resp = {}
     data = coins.objects.all()
-    data = apply_filters(request, CoinsSerializer, data) \
+    data = apply_filters_api(request, CoinsSerializer, data) \
             .order_by('chain') \
             .values()
 
@@ -133,7 +134,7 @@ def get_coins_data(request):
     return resp
 
 
-def get_explorers_data():
+def get_explorers_data_api():
     resp = {}
     coins_data = coins.objects.all().values('chain','explorers')
     for item in coins_data:
@@ -144,10 +145,10 @@ def get_explorers_data():
     return resp
 
 
-def get_mined_count_season_data(request):
+def get_mined_count_season_data_api(request):
     resp = {}
     data = mined_count_season.objects.all()
-    data = apply_filters(request, MinedCountSeasonSerializer, data)
+    data = apply_filters_api(request, MinedCountSeasonSerializer, data)
     if len(data) == len(mined_count_season.objects.all()):
         season = get_season()
         data = mined_count_season.objects.filter(season=season)
@@ -181,11 +182,10 @@ def get_mined_count_season_data(request):
     return resp
 
 
-def get_mined_count_daily_data(request):
+def get_mined_count_daily_data_api(request):
     resp = {}
     data = mined_count_daily.objects.all()
-    data = apply_filters(request, MinedCountDailySerializer, data, 'daily_mined_count')
-    print(len(data))
+    data = apply_filters_api(request, MinedCountDailySerializer, data, 'daily_mined_count')
     # default filter if none set.
     if len(data) == len(mined_count_daily.objects.all()) or len(data) == 0:
         today = datetime.date.today()
@@ -218,7 +218,7 @@ def get_mined_count_daily_data(request):
                          str(yesterday), str(tomorrow))
 
 
-def get_notarised_data(request):
+def get_notarised_data_api(request):
 
     resp = {}
 
@@ -242,12 +242,11 @@ def get_notarised_data(request):
     else:
         data = data.filter(chain="KMD")
 
-    data = apply_filters(request, NotarisedSerializer, data) \
+    data = apply_filters_api(request, NotarisedSerializer, data) \
             .order_by('-season', 'chain', "-block_time") \
             .values()
 
     for item in data:
-        logger.info(item)
         resp.update({item["txid"]:{}})
         for x in item.keys():
             if x != "txid":
@@ -256,10 +255,10 @@ def get_notarised_data(request):
     return resp
 
 
-def get_notarised_chain_season_data(request):
+def get_notarised_chain_season_data_api(request):
     resp = {}
     data = notarised_chain_season.objects.all()
-    data = apply_filters(request, NotarisedChainSeasonSerializer, data) \
+    data = apply_filters_api(request, NotarisedChainSeasonSerializer, data) \
             .order_by('-season', 'chain') \
             .values()
 
@@ -299,10 +298,10 @@ def get_notarised_chain_season_data(request):
     return resp
 
 
-def get_notarised_count_season_data(request):
+def get_notarised_count_season_data_api(request):
     resp = {}
     data = notarised_count_season.objects.all()
-    data = apply_filters(request, NotarisedCountSeasonSerializer, data)
+    data = apply_filters_api(request, NotarisedCountSeasonSerializer, data)
     # default filter if none set.
     if len(data) == notarised_count_season.objects.count() or len(data) == 0:
         season = get_season()
@@ -353,10 +352,10 @@ def get_notarised_count_season_data(request):
     return resp
 
 
-def get_notarised_chain_daily_data(request):
+def get_notarised_chain_daily_data_api(request):
     resp = {}
     data = notarised_chain_daily.objects.all()
-    data = apply_filters(request, NotarisedChainDailySerializer, data, 'daily_notarised_chain')
+    data = apply_filters_api(request, NotarisedChainDailySerializer, data, 'daily_notarised_chain')
     # default filter if none set.
     if len(data) == len(notarised_chain_daily.objects.all()):
         today = datetime.date.today()
@@ -389,14 +388,14 @@ def get_notarised_chain_daily_data(request):
                          str(yesterday), str(tomorrow))
 
 
-def get_notarised_count_date_data(request):
+def get_notarised_count_date_data_api(request):
     resp = {}
-    data = notarised_count_daily.objects.all()
-    data = apply_filters(request, NotarisedCountDailySerializer, data, 'daily_notarised_count')
+    data = get_notarised_count_daily_data()
+    data = apply_filters_api(request, NotarisedCountDailySerializer, data, 'daily_notarised_count')
     # default filter if none set.
-    if len(data) == len(notarised_count_daily.objects.all()):
+    if len(data) == len(get_notarised_count_daily_data()):
         today = datetime.date.today()
-        data = notarised_count_daily.objects.filter(notarised_date=today)
+        data = get_notarised_count_daily_data().filter(notarised_date=today)
     data = data.order_by('notarised_date', 'notary').values()
     if len(data) > 0:
         for item in data:
@@ -447,10 +446,10 @@ def get_notarised_count_date_data(request):
                          str(yesterday), str(tomorrow))
 
 
-def get_notarised_tenure_data(request):
+def get_notarised_tenure_data_api(request):
     resp = {}
     data = notarised_tenure.objects.all()
-    data = apply_filters(request, ntxTenureSerializer, data)
+    data = apply_filters_api(request, ntxTenureSerializer, data)
     data = data.order_by('chain', 'season').values()
     for item in data:
 
@@ -477,7 +476,7 @@ def get_notarised_tenure_data(request):
     return resp
 
 
-def get_rewards_data(request):
+def get_rewards_data_api(request):
     address_data = addresses.objects.filter(chain='KMD')
     if 'season' in request.GET:
         season = request.GET['season']
@@ -495,7 +494,7 @@ def get_rewards_data(request):
 
     resp = {}
     data = rewards.objects.all()
-    data = apply_filters(request, RewardsSerializer, data) \
+    data = apply_filters_api(request, RewardsSerializer, data) \
             .order_by('notary') \
             .values()
 
@@ -529,3 +528,17 @@ def get_rewards_data(request):
 
 
     return resp
+
+
+def get_nn_social_data_api(request):
+    if "season" in request.GET and "notary" in request.GET:
+        data = nn_social.objects.filter(season=season, notary=notary)
+    elif "season" in request.GET:
+        data = nn_social.objects.filter(season=season)
+    elif "notary" in request.GET:
+        data = nn_social.objects.filter(notary=notary) 
+    else:
+        data = nn_social.objects.all()
+
+    return data.order_by('-season','notary').values()
+

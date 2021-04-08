@@ -8,7 +8,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework import permissions, viewsets
 
 from kmd_ntx_api.serializers import BalancesSerializer, NotarisedCountDailySerializer
-from kmd_ntx_api.lib_query import get_balances_graph_data, get_daily_ntx_graph_data
+from kmd_ntx_api.lib_graph import get_balances_graph_data, get_daily_ntx_graph_data
 from kmd_ntx_api.lib_helper import get_season
 
 # Graphs
