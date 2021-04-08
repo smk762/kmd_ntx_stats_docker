@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from lib_const import CURSOR
-from models import mined_row
+from models import mined_row, season_mined_count_row
 
 import logging
 import logging.handlers
@@ -17,6 +17,22 @@ sql = "SELECT DISTINCT season \
 CURSOR.execute(sql)
 results = CURSOR.fetchall()
 logger.info(f"{len(results)} seasons in mined table: {results}")
+
+
+sql = "SELECT DISTINCT season \
+       FROM mined_count_season;"
+CURSOR.execute(sql)
+results = CURSOR.fetchall()
+logger.info(f"{len(results)} seasons in mined_count_season table: {results}")
+
+
+sql = "DELETE \
+       FROM mined_count_season \
+       WHERE season = 'Season_5_Testnet';"
+CURSOR.execute(sql)
+results = CURSOR.fetchall()
+logger.info(f"{len(results)} seasons in mined_count_season table: {results}")
+
 
 sql = "SELECT block_height, block_time, block_datetime, \
               value, address, name, txid, season \

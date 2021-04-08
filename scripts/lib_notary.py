@@ -60,15 +60,6 @@ def get_season(time_stamp=None):
             return season
     return "Unofficial"
 
-def get_season_from_block(block):
-    if not isinstance(block, int):
-        block = int(block)
-    for season in SEASONS_INFO:
-        if season.find("Testnet") == -1:
-            end_block = SEASONS_INFO[season]['end_block']
-            if block >= SEASONS_INFO[season]['start_block'] and block <= end_block:
-                return season
-    return None
 
 def get_seasons_from_address(addr, chain="KMD"):
     addr_seasons = []

@@ -6,10 +6,9 @@ from datetime import datetime as dt
 import datetime
 from decimal import Decimal
 
-from lib_const import SEASONS_INFO, SKIP_UNTIL_YESTERDAY, RPC, POSTSEASON, KNOWN_ADDRESSES, CURSOR, NON_NOTARY_ADDRESSES
+from lib_const import *
 from lib_table_select import select_from_table, get_season_mined_counts, get_mined_date_aggregates, get_notarised_seasons
-from lib_notary import get_season_from_block
-from models import season_mined_count_row, daily_mined_count_row, mined_row
+from models import season_mined_count_row, daily_mined_count_row, mined_row, get_season_from_block
 
 
 logger = logging.getLogger(__name__)
@@ -80,6 +79,7 @@ def update_miner(block):
                 row.value = Decimal(tx['vout'][0]['value'])
                 row.update()
 
+
 def update_mined_blocks(season):
 
     # re-check last ten recorded blocks in case of orphans
@@ -96,7 +96,7 @@ def update_mined_blocks(season):
     unrecorded_blocks = set(all_blocks) - set(recorded_blocks)
     logger.info(f"{len(unrecorded_blocks)} not in mined table in db")
 
-    if not rescan_season:
+    if not RESCAN_SEASON:
         rescan_blocks = [*range(tip-100,tip,1)]
     else:
         rescan_blocks = [*range(start_block,tip,1)]
@@ -110,8 +110,6 @@ def update_mined_blocks(season):
             update_miner(block)
 
 
-
-
 # updating daily mined count aggregate table
 def process_aggregates(season):
     season_start_time = SEASONS_INFO[season]["start_time"]
@@ -119,7 +117,7 @@ def process_aggregates(season):
     start = season_start_dt.date()
     end = datetime.date.today()
 
-    if SKIP_UNTIL_YESTERDAY and not rescan_season:
+    if SKIP_UNTIL_YESTERDAY and not RESCAN_SEASON:
         start = end - datetime.timedelta(days=7)
 
     delta = datetime.timedelta(days=1)
@@ -145,10 +143,24 @@ def process_aggregates(season):
         day += delta
     logger.info("Finished!")
 
+def update_season_mined_counts(season):
+    results = get_season_mined_counts(season, POSTSEASON)
+
+    for item in results:
+        row = season_mined_count_row()
+        row.notary = item[0]
+        row.address = item[1]
+        row.season = season
+        row.blocks_mined = int(item[2])
+        row.sum_value_mined = float(item[3])
+        row.max_value_mined = float(item[4])
+        row.last_mined_blocktime = int(item[5])
+        row.last_mined_block = int(item[6])
+        row.update()
 
 if __name__ == "__main__":
 
-    rescan_season = False
+    RESCAN_SEASON = False
     scan_depth = 100
     seasons = get_notarised_seasons()
 
@@ -157,22 +169,13 @@ if __name__ == "__main__":
     #   update_mined_known_address(address)
 
     for season in seasons:
-        if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]: 
 
-            update_mined_blocks(season)
+        if season not in EXCLUDED_SEASONS:
 
-            results = get_season_mined_counts(season, POSTSEASON)
+            if season.find("Testnet") == -1:
 
-            for item in results:
-                row = season_mined_count_row()
-                row.notary = item[0]
-                row.address = item[1]
-                row.season = season
-                row.blocks_mined = int(item[2])
-                row.sum_value_mined = float(item[3])
-                row.max_value_mined = float(item[4])
-                row.last_mined_blocktime = int(item[5])
-                row.last_mined_block = int(item[6])
-                row.update()
+                update_mined_blocks(season)
 
-            process_aggregates(season)
+                update_season_mined_counts(season)
+
+                process_aggregates(season)

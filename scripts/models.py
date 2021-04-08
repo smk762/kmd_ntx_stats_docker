@@ -12,6 +12,16 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+def get_season_from_block(block):
+    if not isinstance(block, int):
+        block = int(block)
+    for season in SEASONS_INFO:
+        if season.find("Testnet") == -1:
+            end_block = SEASONS_INFO[season]['end_block']
+            if block >= SEASONS_INFO[season]['start_block'] and block <= end_block:
+                return season
+    return None
+
 def get_chain_epoch_at(season, server, chain, timestamp):
     if season in DPOW_EXCLUDED_CHAINS: 
         if chain not in DPOW_EXCLUDED_CHAINS[season]:
@@ -592,8 +602,8 @@ class season_mined_count_row():
             self.last_mined_blocktime, self.last_mined_block, self.time_stamp
         )
         if self.validated():
-            logger.info(f"Updating season_mined_count TABLE {self.notary} ")
             update_season_mined_count_row(row_data)
+            logger.info(f"[season_mined_count] updated: {self.notary} {self.season}")
         else:
             logger.warning(f"[season_mined_count] Row data invalid!")
             logger.warning(f"{row_data}")
