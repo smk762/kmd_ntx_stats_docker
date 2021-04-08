@@ -366,7 +366,7 @@ def get_notarised_chains(season=None, server=None, epoch=None):
         chains.sort()
         
     except Exception as e:
-        logger.warning(f"No [get_notarised_chains] results for {season} {server}? {e}")
+        logger.warning(f"No [get_notarised_chains] results for {season} {server} {epoch} | {sql}? {e}")
 
     return chains
 
@@ -396,7 +396,7 @@ def get_notarised_epochs(season=None, server=None):
         epochs.sort()
         
     except Exception as e:
-        logger.warning(f"No [get_notarised_epochs] results for {season} {server}? {e}")
+        logger.warning(f"No [get_notarised_epochs] results for {season} {server}| {sql}? {e}")
 
     return epochs
 
@@ -427,7 +427,7 @@ def get_notarised_seasons(chain=None):
         seasons.reverse()
         
     except Exception as e:
-        logger.warning(f"No [get_notarised_seasons] results for {chain}? {e}")
+        logger.warning(f"No [get_notarised_seasons] results for {chain}| {sql}? {e}")
 
     return seasons
 
@@ -470,7 +470,7 @@ def get_notarised_servers(season=None):
         servers.sort()
         
     except Exception as e:
-        logger.warning(f"No [get_notarised_servers] results for {season}? {e}")
+        logger.warning(f"No [get_notarised_servers] results for {season} | {sql}? {e}")
 
     return servers
 
