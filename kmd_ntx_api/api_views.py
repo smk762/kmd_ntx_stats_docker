@@ -104,7 +104,12 @@ def notary_ltc_txids(request):
 
 def nn_btc_txid(request):
     if 'txid' in request.GET:
-        resp = get_btc_txid_single(request.GET['txid'])
+        results = get_btc_txid_single(request.GET['txid'])
+        resp = {
+            "results":results,
+            "count":len(results)
+        }
+
     else:
         resp = {"error":"You need to specify a TXID like '/nn_btc_txid?txid=86e23d8415737f1f6a723d1996f3e373e77d7e16a7ae8548b4928eb019237321'"}
     return JsonResponse(resp)
@@ -125,6 +130,18 @@ def nn_btc_txid_list(request):
         "count":len(resp)
     }
     return JsonResponse(api_resp)
+
+def nn_ltc_txid(request):
+    if 'txid' in request.GET:
+        results = get_ltc_txid_single(request.GET['txid'])
+        resp = {
+            "results":results,
+            "count":len(results)
+        }
+
+    else:
+        resp = {"error":"You need to specify a TXID like '/nn_ltc_txid?txid=86e23d8415737f1f6a723d1996f3e373e77d7e16a7ae8548b4928eb019237321'"}
+    return JsonResponse(resp)
 
 def nn_ltc_txid_list(request):
     if 'season' in request.GET and 'notary' in request.GET:

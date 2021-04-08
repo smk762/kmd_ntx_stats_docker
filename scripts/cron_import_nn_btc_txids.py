@@ -43,7 +43,7 @@ for season in seasons:
                 r = requests.get(txid_url)
                 try:
                     resp = r.json()
-                    tx_resp = resp["results"][0]
+                    tx_resp = resp["results"]
                     for row in tx_resp:
                         txid_data = tx_row()
                         txid_data.txid = txid
