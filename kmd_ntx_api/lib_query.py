@@ -45,6 +45,7 @@ def get_balances_data(season=None, chain=None, notary=None):
     return data
 
 
+# TODO: Awaiting delegation to crons / db table
 def get_chain_sync_data(chain=None):
     data = chain_sync.objects.all()
     if chain:

@@ -4,15 +4,6 @@ import json
 from lib_const import *
 from cron_populate_ntx_tables import get_notarisation_data
 from lib_notary import get_dpow_score_value
-import logging
-import logging.handlers
-
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 season = "Season_4"
 server = "Main"

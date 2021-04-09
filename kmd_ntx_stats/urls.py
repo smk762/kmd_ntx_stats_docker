@@ -190,14 +190,12 @@ urlpatterns = [
     path('btc_ntx/',
           page_views.btc_ntx,
           name='btc_ntx'),
-    path('btc_ntx_all/',
-          page_views.btc_ntx_all,
-          name='btc_ntx_all'),
 
     path('chains_last_ntx/',
           page_views.chains_last_ntx,
           name='chains_last_ntx'),
-
+    
+    # TODO: Awaiting delegation to crons / db table
     path('chain_sync/',
           page_views.chain_sync,
           name='chain_sync'),

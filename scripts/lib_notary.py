@@ -2,7 +2,6 @@
 import os
 import time
 import json
-import logging
 import binascii
 import datetime
 from datetime import datetime as dt
@@ -14,8 +13,6 @@ from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
 from datetime import datetime as dt
 import dateutil.parser as dp
-import logging
-import logging.handlers
 from base_58 import *
 from lib_const import *
 from lib_api import *
@@ -23,12 +20,6 @@ from lib_table_update import *
 from lib_table_select import *
 from models import daily_mined_count_row, mined_row, ntx_tenure_row
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 def get_season_notaries(season):
     notaries = []

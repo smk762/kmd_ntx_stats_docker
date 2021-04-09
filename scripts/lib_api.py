@@ -1,16 +1,8 @@
 import requests
 import json
 import time
-import logging
-import logging.handlers
 from lib_const import *
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 def get_btc_address_txids(address, before=None):
     logger.info(f"getting BTC TXIDs for {address} before block {before}")

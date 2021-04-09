@@ -1,16 +1,7 @@
 #!/usr/bin/env python3
-import logging
-import logging.handlers
 import os
 import time
 from lib_const import *
-
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 def get_latest_chain_ntx_info(chain, height):
     sql = "SELECT ac_ntx_blockhash, ac_ntx_height, opret, block_hash, txid \

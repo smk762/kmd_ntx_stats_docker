@@ -4,12 +4,20 @@
        
     <ul class="c-sidebar-nav kmd_ui_dark1_bg">
         {% for page, item in pages.items %}
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/{{page}}"> {{page}}</a></li>
+            {% if item.review %}
+                <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/{{page}}"> {{page}} (review)</a></li>
+            {% else %}
+                <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/{{page}}"> {{page}}</a></li>
+            {% endif %}
         {% endfor %}
     </ul>
         <br />
         {% for endpoint, item in endpoints.items %}
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/{{endpoint}}"> {{endpoint}}</a></li>
+            {% if item.review %}
+                <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/{{endpoint}}"> {{endpoint}} (review)</a></li>
+            {% else %}
+                <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/{{endpoint}}"> {{endpoint}}</a></li>
+            {% endif %}
         {% endfor %}
 
     </ul>

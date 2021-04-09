@@ -8,6 +8,20 @@ def get_active_dpow_coins():
     chains_list.sort()
     return chains_list
 
+def btc_ntx_all(request):
+    season = get_season()
+    btc_ntx = get_notarised_data(season, "BTC").values()
+
+    context = {
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link(),
+        "explorers":get_dpow_explorers(),
+        "btc_ntx":btc_ntx,
+        "season":season.replace("_"," ")
+    }
+
+    return render(request, 'btc_ntx_all.html', context)
+    
 # TODO: Unassigned - is this a duplicate?
 def get_btc_split_stats(address):
     resp = {}

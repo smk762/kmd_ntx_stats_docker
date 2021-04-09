@@ -1,16 +1,8 @@
 import time
-import logging
-import logging.handlers
 from lib_table_select import get_epochs
 from lib_table_update import *
-from lib_const import CONN, CURSOR, TRANSLATE_COINS, DPOW_EXCLUDED_CHAINS, KNOWN_ADDRESSES
+from lib_const import *
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 def get_season_from_block(block):
     if not isinstance(block, int):
@@ -551,6 +543,9 @@ class mined_row():
         self.season = season
 
     def validated(self):
+        for item in [self.address, self.name, self.season]:
+            if item == '':
+                return False
         if not self.season:
             return False
         return True
@@ -579,6 +574,14 @@ class mined_row():
     def delete(self):
         CURSOR.execute(f"DELETE FROM mined WHERE name = '{self.name}';")
         CONN.commit()
+        
+    def delete_address(self):
+        CURSOR.execute(f"DELETE FROM mined WHERE address = '{self.address}';")
+        CONN.commit()
+        
+    def delete_name(self):
+        CURSOR.execute(f"DELETE FROM mined WHERE name = '{self.name}';")
+        CONN.commit()
 
 class season_mined_count_row():
     def __init__(self, notary='', address='', season='', blocks_mined='', sum_value_mined='', 
@@ -595,6 +598,9 @@ class season_mined_count_row():
         self.time_stamp = time_stamp
 
     def validated(self):
+        for item in [self.address, self.notary, self.season]:
+            if item == '':
+                return False
         if self.season.find("Testnet") != -1:
             return False
         return True
@@ -619,10 +625,11 @@ class season_mined_count_row():
     def delete_season(self):
         CURSOR.execute(f"DELETE FROM mined_count_season WHERE season = '{self.season}';")
         CONN.commit()
-        
+
     def delete_address(self):
         CURSOR.execute(f"DELETE FROM mined_count_season WHERE address = '{self.address}';")
         CONN.commit()
+        logger.info(f"[mined_count_season] {self.address} rows deleted")
 
     def delete_notary(self):
         CURSOR.execute(f"DELETE FROM mined_count_season WHERE notary = '{self.notary}';")
@@ -822,6 +829,8 @@ class notarised_row():
         self.btc_validated = btc_validated
 
     def validated(self):
+        if len(self.chain) > 12:
+            return False
 
         if self.epoch.find("Epoch") == -1 and self.epoch != "Unofficial":
             logger.warning(f"!!!! Invalid epoch {self.epoch}")

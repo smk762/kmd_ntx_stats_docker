@@ -1,47 +1,46 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-				<div class="row">
-					<div class="card kmd_ui_light4">
-						<div class="card-header kmd_ui_dark1_bg">
-							Notarised Last 24hrs
-						</div>
-						
-						<div class="card-body kmd_ui_dark1_bg">
-							<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
-								<thead>
-									<tr>
-										<th data-data="chain">CHAIN</th>
-										<th data-data="block_height">BLOCK HEIGHT</th>
-										<th data-data="txid">TXID</th>
-										<th data-data="ac_ntx_height">NTX HEIGHT</th>
-										<th data-data="opret">OP RETURN</th>
-										<th data-data="block_time">LAST NTX</th>
-									</tr>
-								</thead>
-								<tbody>
-								{% for row in ntx_24hrs %}
-									<tr>
-										<th data-data="chain">{{ row.chain }}</th>
-										<th data-data="block_height">{{ row.block_height }}</th>
-										<th data-data="txid">{{ row.txid }}</th>
-										<th data-data="ac_ntx_height">{{ row.ac_ntx_height }}</th>
-										<th data-data="opret">{{ row.opret }}</th>
-										<th data-data="block_time">{{ row.block_time }}</th>
-									</tr>
-								{% endfor %}
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
+	<div class="row col-12 mx-auto my-2" style="color:#FFF;">
+		<div class="card kmd_ui_dark1_bg m-auto">
+			<div class="card-header kmd_ui_dark1_bg m-auto">
+				<h4>{{ season }} Last 200 Notarised</h4>
+			</div>
+			<div class="card-body kmd_ui_dark1_bg m-auto">
+				<table id="ntx_24hr_tbl" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+					<thead>
+						<tr>
+							<th data-data="chain">CHAIN</th>
+							<th data-data="block_height">BLOCK HEIGHT</th>
+							<th data-data="txid">TXID</th>
+							<th data-data="ac_ntx_height">NTX HEIGHT</th>
+							<th data-data="opret">OP RETURN</th>
+							<th data-data="block_time">LAST NTX</th>
+						</tr>
+					</thead>
+					<tbody>
+					{% for row in ntx_24hrs %}
+						<tr>
+							<th data-data="chain">{{ row.chain }}</th>
+							<th style="font-size: 0.9em;" data-data="block_height">{{ row.block_height }}</th>
+							<th style="font-size: 0.6em;" data-data="txid">{{ row.txid }}</th>
+							<th style="font-size: 0.9em;" data-data="ac_ntx_height">{{ row.ac_ntx_height }}</th>
+							<th style="font-size: 0.6em;" data-data="opret">{{ row.opret }}</th>
+							<th style="font-size: 0.8em;" data-data="block_time">{{ row.block_time }}</th>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
     <!-- jquery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     {{ explorers|json_script:"explorers-data" }}
 	<script type="text/javascript">
 	    $(document).ready(function() {
 	    var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
-	        $('#table_id').DataTable({
+	        $('#ntx_24hr_tbl').DataTable({
         		order: [[ 5, 'desc' ]],
         		"columnDefs": [
         			{
@@ -66,7 +65,7 @@
 			            "data": 'txid',
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.txid.slice(0, 3)+"..."+oData.txid.slice(-3)+"</a>");
+				            $(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.txid.slice(0, 12)+"..."+oData.txid.slice(-12)+"</a>");
 				        }
 			        },
         			{
@@ -86,7 +85,7 @@
 			            		op_return = oData.opret
 			            	}
 
-				            $(nTd).html("<a href='//{{ request.get_host }}/api/tools/decode_opreturn/?OP_RETURN="+op_return+"'>"+op_return.slice(0, 3)+"..."+op_return.slice(-3)+"</a>");
+				            $(nTd).html("<a href='//{{ request.get_host }}/api/tools/decode_opreturn/?OP_RETURN="+op_return+"'>"+op_return.slice(0, 12)+"..."+op_return.slice(-12)+"</a>");
 				        }
 			        },
         			{

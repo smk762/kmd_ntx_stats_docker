@@ -1,78 +1,79 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-				<div class="row my-3">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mt-auto shadow-none">
-							<div class="card-body kmd_ui_dark2_bg p-0">
-								<p class="card-text">
-									<ul class="list-group">
-									  <li class="list-group-item border-0">
-									  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
-									  	<h4 class='kmd_teal'>{{ sync_count }}/{{ chain_count }} ({{ sync_pct }}%) chains are sufficiently funded</h4>">
-				                            <a class="dropdown-item d-block" href="#">
-				                                <div class="mb-1">
-				                                    <i class="cil-layers"></i> Chains with matching sync blockhashes (Sync node vs Explorers)
-				                                </div>
-				                                <span class="progress">
-				                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ sync_pct }}%" aria-valuenow="{{ sync_pct }}" aria-valuemin="0" aria-valuemax="100">{{ sync_pct }}%</div>
-				                                </span>
-				                                <small class="text-uppercase text-muted">{{ sync_count }}/{{ chain_count }} chains have matching sync block hashes</small>
-				                            </a>
-				                        </span>								    
-									  </li>
-									</ul> 						
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>	
-				<div class="row my-3">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card kmd_ui_light4">
-							<div class="card-header kmd_ui_dark1_bg">
-								dPoW Chains Sync hash comparison<br />
-								Last updated {{ last_data_update }}
-							</div>
-							<div class="card-body kmd_ui_dark1_bg">
-								<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
-									<thead>
-										<tr>
-											<th>CHAIN</th>
-											<th>SYNC BLOCK</th>
-											<th>SYNC HASH</th>
-											<th>DEXSTATS HASH</th>
-											<th>STATUS</th>
-											<th>TIME SINCE SYNC</th>
-										</tr>
-									</thead>
-									<tbody>
-										{% for chain, data in chain_sync_data.items %}
-											{% if "last_" not in chain %}
-												<tr>
-													<td>{{ chain }}</td>
-													<td>{{ data.last_sync_block }}</td>
-													<td>{{ data.last_sync_blockhash }}</td>
-													<td>{{ data.last_sync_dexhash }}</td>
-													{% if data.last_sync_dexhash == data.last_sync_blockhash %}
-														<td class="kmd_secondary_green">Matching</td>
-													{% elif data.last_sync_dexhash == 'no data' %}
-														<td class="kmd_secondary_orange">Insufficient data</td>
-													{% elif not data.last_sync_dexhash or not data.last_sync_blockhash or not data.last_sync_block %}
-														<td class="kmd_secondary_orange">Awaiting data</td>
-													{% else %}
-														<td class="kmd_secondary_red">Potential Fork!</td>
-													{% endif %}
-													<td>{{ data.last_sync_timestamp }}</td>
-												</tr>
-											{% endif %}
-										{% endfor %}
-									</tbody>
-								</table>
-							</div>
-						</div>	
-					</div>
+	<!-- TODO: Pending delegation to crons and db table -->
+	<div class="row col-12 m-auto" style="color:#FFF;">
+		<div class="card kmd_ui_dark1_bg m-auto">
+			<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mt-auto shadow-none">
+				<div class="card-body kmd_ui_dark2_bg p-0">
+					<p class="card-text">
+						<ul class="list-group">
+						  <li class="list-group-item border-0">
+						  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
+						  	<h4 class='kmd_teal'>{{ sync_count }}/{{ chain_count }} ({{ sync_pct }}%) chains are sufficiently funded</h4>">
+	                            <a class="dropdown-item d-block" href="#">
+	                                <div class="mb-1">
+	                                    <i class="cil-layers"></i> Chains with matching sync blockhashes (Sync node vs Explorers)
+	                                </div>
+	                                <span class="progress">
+	                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ sync_pct }}%" aria-valuenow="{{ sync_pct }}" aria-valuemin="0" aria-valuemax="100">{{ sync_pct }}%</div>
+	                                </span>
+	                                <small class="text-uppercase text-muted">{{ sync_count }}/{{ chain_count }} chains have matching sync block hashes</small>
+	                            </a>
+	                        </span>								    
+						  </li>
+						</ul> 						
+					</p>
 				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row col-12 m-auto" style="color:#FFF;">
+		<div class="card kmd_ui_dark1_bg m-auto">
+			<div class="card-header kmd_ui_dark1_bg m-auto">
+				<h4>{{ season }}dPoW Chains Sync Block Hash Comparison</h4>
+				<span>Last updated: {{ last }}</span>
+			</div>
+			<div class="card-body kmd_ui_dark1_bg m-auto">
+				<div class="card-body kmd_ui_dark1_bg m-auto">
+					<table id="chain_sync_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+						<thead>
+							<tr>
+								<th>CHAIN</th>
+								<th>SYNC BLOCK</th>
+								<th>SYNC HASH</th>
+								<th>DEXSTATS HASH</th>
+								<th>STATUS</th>
+								<th>TIME SINCE SYNC</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for chain, data in chain_sync_data.items %}
+								{% if "last_" not in chain %}
+									<tr>
+										<td>{{ chain }}</td>
+										<td>{{ data.last_sync_block }}</td>
+										<td>{{ data.last_sync_blockhash }}</td>
+										<td>{{ data.last_sync_dexhash }}</td>
+										{% if data.last_sync_dexhash == data.last_sync_blockhash %}
+											<td class="kmd_secondary_green">Matching</td>
+										{% elif data.last_sync_dexhash == 'no data' %}
+											<td class="kmd_secondary_orange">Insufficient data</td>
+										{% elif not data.last_sync_dexhash or not data.last_sync_blockhash or not data.last_sync_block %}
+											<td class="kmd_secondary_orange">Awaiting data</td>
+										{% else %}
+											<td class="kmd_secondary_red">Potential Fork!</td>
+										{% endif %}
+										<td>{{ data.last_sync_timestamp }}</td>
+									</tr>
+								{% endif %}
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>	
+		</div>
+	</div>
     <!-- jquery -->
   
   	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
@@ -83,7 +84,7 @@
 	    $(document).ready(function() {
 	       	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 
-	        $('#table_id').DataTable({
+	        $('#chain_sync_table').DataTable({
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "chain" },

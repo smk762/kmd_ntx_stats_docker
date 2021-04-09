@@ -13,13 +13,6 @@ PAGES = {
 		"description": "",
 		"sidebar": False
 	},
-	"btc_ntx_all": {
-		"category": "wallets",
-		"filters": [],
-		"example": "",
-		"description": "",
-		"sidebar": False
-	},
 	"chains_last_ntx": {
 		"category": "wallets",
 		"filters": [],
@@ -32,7 +25,8 @@ PAGES = {
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": False,
+		"review": True
 	},
 	"coin_profile": {
 		"category": "wallets",

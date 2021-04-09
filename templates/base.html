@@ -9,7 +9,6 @@
         <meta name="author" content="smk762">
         <meta name="keyword" content="komodo,kmd,notary,stats">
         <title>Komodo Notary Stats - {{ page_title }}</title>
-
         <link rel="icon" type="image/png" href="{% static 'img/brand/favicon.png' %}" />
         <!-- Google Fonts -->
         <link href='https://fonts.googleapis.com/css?family=Rubik' rel='stylesheet'>
@@ -36,6 +35,14 @@
         <!-- Komodo Pallet -->
         <link href="{% static 'css/kmd.css' %}" rel="stylesheet">
 
+        <style type="text/css">
+            body {
+                text-transform: unset !important;
+            }
+            th {
+                text-transform: uppercase; !important;
+            }
+        </style>
     </head>
     <body class="c-app">
         {% include "base_sidebar.html" %}
@@ -48,7 +55,7 @@
                         <div class="fade-in">
                             {% if messages %}
                                 {% for message in messages %}
-                                  <div class="m-auto col-8 alert {{ message.tags }} alert-dismissible" role="alert">
+                                  <div class="mx-auto my-2 col-8 alert {{ message.tags }} alert-dismissible" role="alert">
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                       <span aria-hidden="true">&times;</span>
                                     </button>
@@ -57,14 +64,14 @@
                                 {% endfor %}
                             {% endif %}
                             {% if sidebar_links.server == 'dev' %}
-                                  <div class="m-auto col-8 alert alert-warning alert-dismissible" role="alert">
+                                  <div class="mx-auto my-2 col-8 alert alert-warning alert-dismissible" role="alert">
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                       <span aria-hidden="true">&times;</span>
                                     </button>
                                     This domain is now being used for development. Update your bookmarks to link to <span class='badge kmd_ui_dark1_bg p-2'><a href="https://stats.kmd.io">stats.kmd.io</a></span>
                                   </div>                    
                             {% endif %}
-                                  <div class="m-auto col-8 alert alert-warning alert-dismissible" role="alert">
+                                  <div class="mx-auto my-2 col-8 alert alert-warning alert-dismissible" role="alert">
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                       <span aria-hidden="true">&times;</span>
                                     </button>

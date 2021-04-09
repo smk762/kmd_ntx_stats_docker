@@ -5,10 +5,10 @@ import datetime
 
 from .models import *
 from .serializers import *
-from .lib_helper import get_season
+from .lib_query import *
 from .lib_api import paginate_wrap, wrap_api
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("mylogger")
 
 
 def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=None):
