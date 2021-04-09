@@ -263,7 +263,7 @@ def scan_btc_transactions(season):
 
     while len(season_btc_addresses) > 0:
         if BTC_NTX_ADDR in season_btc_addresses:
-            notary_address = LTC_NTX_ADDR
+            notary_address = BTC_NTX_ADDR
         else:
             notary_address = random.choice(season_btc_addresses)
         i += 1
