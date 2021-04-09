@@ -200,6 +200,7 @@ def select_from_table(table, cols, conditions=None):
     if conditions:
         sql = sql+" WHERE "+conditions
     sql = sql+";"
+    logger.info(sql)
     CURSOR.execute(sql)
     results = CURSOR.fetchall()
     if len(results) > 0:
@@ -558,9 +559,9 @@ def get_existing_nn_btc_txids(address=None, category=None, season=None, notary=N
         recorded_txids.append(txid[0])
     return recorded_txids
 
-def get_existing_notarised_btc_txids():
+def get_existing_notarised_txids(chain):
     recorded_txids = []
-    sql = f"SELECT DISTINCT txid from notarised where chain='BTC';"
+    sql = f"SELECT DISTINCT txid from notarised where chain='{chain}';"
 
     CURSOR.execute(sql)
     existing_txids = CURSOR.fetchall()

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import time
+import random
 import requests
 from decimal import *
 from datetime import datetime as dt
@@ -8,8 +9,9 @@ import datetime
 import dateutil.parser as dp
 from lib_notary import get_new_nn_btc_txids, get_notary_from_btc_address, get_notary_last_ntx, get_season_from_addresses, get_dpow_score_value
 from lib_table_update import update_nn_btc_tx_notary_from_addr
-from lib_table_select import get_existing_nn_btc_txids, get_existing_notarised_btc_txids
+from lib_table_select import get_existing_nn_btc_txids, get_existing_notarised_txids, get_notarised_seasons
 from lib_api import get_btc_tx_info
+
 from models import tx_row, last_notarised_row, notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
 from lib_const import *
 from known_txids import *
@@ -249,195 +251,192 @@ def detect_split(btc_row, addresses):
         return True
     return False
 
-season = "Season_4"
-i = 0
-num_addr = len(NOTARY_BTC_ADDRESSES[season])
 
 
-notary_last_ntx = get_notary_last_ntx("BTC")
+def scan_btc_transactions(season):
+    season_btc_addresses = NOTARY_BTC_ADDRESSES[season][:]
+    num_addr = len(season_btc_addresses)
+    notary_last_ntx = get_notary_last_ntx("BTC")
 
-if OTHER_SERVER.find("stats") == -1:
-    NOTARY_BTC_ADDRESSES[season].reverse()
-
-
-for notary_address in NOTARY_BTC_ADDRESSES[season]:
-    i += 1
-
-    if notary_address in NN_BTC_ADDRESSES_DICT[season]:
-        notary_name = NN_BTC_ADDRESSES_DICT[season][notary_address]
-    else:
-        notary_name = "non-NN"
-
-    existing_nn_btc_txids = get_existing_nn_btc_txids(notary_address)
-    existing_notarised_txids = get_existing_notarised_btc_txids()
-    existing_txids = list(set(existing_nn_btc_txids)&set(existing_notarised_txids))
-    txids = get_new_nn_btc_txids(existing_txids, notary_address)
+    i = 0
 
 
-    logger.info(f"{len(existing_txids)} EXIST IN DB FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
-    logger.info(f"{len(txids)} NEW TXIDs TO PROCESS FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
+    while len(season_btc_addresses) > 0:
+        notary_address = random.choice(season_btc_addresses)
+        i += 1
 
-    num_txids = len(txids)
+        if notary_address in NN_BTC_ADDRESSES_DICT[season]:
+            notary_name = NN_BTC_ADDRESSES_DICT[season][notary_address]
+        else:
+            notary_name = "non-NN"
 
-    j = 0
-    for txid in txids:
-        j += 1
-        # Get tx data from Blockcypher API
-        logger.info(f">>> Processing txid {j}/{num_txids}")
-        tx_info = get_btc_tx_info(txid)
-        if 'fees' in tx_info:
-            btc_row = tx_row()
-            btc_row.txid = txid
-            btc_row.address = notary_address
-            btc_row.fees = tx_info['fees']
+        existing_nn_btc_txids = get_existing_nn_btc_txids(notary_address)
+        existing_notarised_txids = get_existing_notarised_txids("BTC")
+        existing_txids = list(set(existing_nn_btc_txids)&set(existing_notarised_txids))
+        txids = get_new_nn_btc_txids(existing_txids, notary_address)
 
-            btc_row.num_inputs = tx_info['vin_sz']
-            btc_row.num_outputs = tx_info['vout_sz']
+        logger.info(f"{len(existing_txids)} EXIST IN DB FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
+        logger.info(f"{len(txids)} NEW TXIDs TO PROCESS FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
 
-            btc_row.block_hash = tx_info['block_hash']
-            btc_row.block_height = tx_info['block_height']
+        num_txids = len(txids)
 
-            block_time_iso8601 = tx_info['confirmed']
-            parsed_time = dp.parse(block_time_iso8601)
-            btc_row.block_time = parsed_time.strftime('%s')
-            btc_row.block_datetime = dt.utcfromtimestamp(int(btc_row.block_time))
+        j = 0
+        for txid in txids:
+            j += 1
+            # Get tx data from Blockcypher API
+            logger.info(f">>> Processing txid {j}/{num_txids}")
+            tx_info = get_btc_tx_info(txid)
+            if 'fees' in tx_info:
+                btc_row = tx_row()
+                btc_row.txid = txid
+                btc_row.address = notary_address
+                btc_row.fees = tx_info['fees']
 
-            addresses = tx_info['addresses']
-            btc_row.season, btc_row.server = get_season_from_addresses(addresses[:], btc_row.block_time, "BTC", "BTC")
+                btc_row.num_inputs = tx_info['vin_sz']
+                btc_row.num_outputs = tx_info['vout_sz']
 
-            vouts = tx_info["outputs"]
-            vins = tx_info["inputs"]
-            update_notary_linked_vins(vins)
+                btc_row.block_hash = tx_info['block_hash']
+                btc_row.block_height = tx_info['block_height']
 
-            ## CATEGORIES ##
-            # SPAM index/outputs = 0
-            # NTX
-            # SPLIT index/outputs = -99
-            # CONSOLIDATE (Add Later)
-            #   - vins from notary or linked address, to same notary or linked address. If single non-NN vout, tag as NN-linked.
-            #   - Could be confused with REPLENISH, make sure no other notaries involved.
-            # REPLENISH (Add Later)
-            #   - large sat value (0.01 BTC or higher) to multiple notaries, generally from dragonhound or dragonhound linked address. Single non-NN vout, tag as dragonhound linked.
-            #   - very large sat value to dragonhound (0.4 BTC or higher). tag vins as REPLENISH SOURCE.
-            # OTHER (FALL BACK)
+                block_time_iso8601 = tx_info['confirmed']
+                parsed_time = dp.parse(block_time_iso8601)
+                btc_row.block_time = parsed_time.strftime('%s')
+                btc_row.block_datetime = dt.utcfromtimestamp(int(btc_row.block_time))
 
-            # single row for memo.sv spam
-            if detect_spam(btc_row, addresses):
-                logger.info("SPAM detected")
+                addresses = tx_info['addresses']
+                btc_row.season, btc_row.server = get_season_from_addresses(addresses[:], btc_row.block_time, "BTC", "BTC")
 
-            elif detect_cipi_faucet(btc_row, addresses, vins):
-                logger.info("CIPI_FAUCET detected")
+                vouts = tx_info["outputs"]
+                vins = tx_info["inputs"]
+                update_notary_linked_vins(vins)
 
-            # Detect Split (single row only)
-            elif detect_split(btc_row, addresses):
-                logger.info("SPLIT detected")
+                # single row for memo.sv spam
+                if detect_spam(btc_row, addresses):
+                    logger.info("SPAM detected")
 
-            else:
-                if txid in MadMax_personal_top_up:
-                    btc_row.category = "MadMax personal top up"
-                elif txid in BTC_NTX_ADDR_consolidate:
-                    btc_row.category = "BTC_NTX_ADDR consolidate"
-                elif txid in previous_season_funds_transfer:
-                    btc_row.category = "previous season funds transfer"
-                elif txid in team_incoming:
-                    btc_row.category = "team_incoming"
-                elif txid in REPORTED:
-                    btc_row.category = "REPORTED"
-                #elif txid in pungo_other:
-                #    btc_row.category = "Other"
-                    
-                elif detect_ntx(vins, vouts, addresses):
-                    btc_row.category = "NTX"
-                elif detect_replenish(vins, vouts):
-                    btc_row.category = "Replenish"
-                elif detect_consolidate(vins, vouts) or txid in dragonhound_consolidate or txid in strob_consolidate or txid in webworker_2step_consolidate:
-                    btc_row.category = "Consolidate"
-                elif detect_intra_notary(vins, vouts):
-                    btc_row.category = "Intra-Notary"
+                elif detect_cipi_faucet(btc_row, addresses, vins):
+                    logger.info("CIPI_FAUCET detected")
+
+                # Detect Split (single row only)
+                elif detect_split(btc_row, addresses):
+                    logger.info("SPLIT detected")
+
                 else:
-                    btc_row.category = "Other"
+                    if txid in MadMax_personal_top_up:
+                        btc_row.category = "MadMax personal top up"
+                    elif txid in BTC_NTX_ADDR_consolidate:
+                        btc_row.category = "BTC_NTX_ADDR consolidate"
+                    elif txid in previous_season_funds_transfer:
+                        btc_row.category = "previous season funds transfer"
+                    elif txid in team_incoming:
+                        btc_row.category = "team_incoming"
+                    elif txid in REPORTED:
+                        btc_row.category = "REPORTED"
+                    #elif txid in pungo_other:
+                    #    btc_row.category = "Other"
+                        
+                    elif detect_ntx(vins, vouts, addresses):
+                        btc_row.category = "NTX"
+                    elif detect_replenish(vins, vouts):
+                        btc_row.category = "Replenish"
+                    elif detect_consolidate(vins, vouts) or txid in dragonhound_consolidate or txid in strob_consolidate or txid in webworker_2step_consolidate:
+                        btc_row.category = "Consolidate"
+                    elif detect_intra_notary(vins, vouts):
+                        btc_row.category = "Intra-Notary"
+                    else:
+                        btc_row.category = "Other"
 
-                input_index = 0
-                for vin in vins:
-                    btc_row.output_sats = -1
-                    btc_row.output_index = -1
-                    btc_row.input_sats = vin['output_value']
-                    btc_row.input_index = input_index
-                    btc_row.address = vin["addresses"][0]
-                    btc_row.notary = get_notary_from_btc_address(btc_row.address, btc_row.season)
-                    btc_row.update()
-                    input_index += 1
-
-                output_index = 0
-                for vout in vouts:
-                    if vout["addresses"] is not None:
-                        btc_row.input_index = -1
-                        btc_row.input_sats = -1
-                        btc_row.address = vout["addresses"][0]
-                        btc_row.notary = get_notary_from_btc_address(btc_row.address, btc_row.season)
-                        btc_row.output_sats = vout['value']
-                        btc_row.output_index = output_index
-                        btc_row.update()
-                        output_index += 1
-
-                # update notary_last_ntx
-                if btc_row.category == "NTX":
-                    notary_list = []
-                    notary_addresses = []
+                    input_index = 0
                     for vin in vins:
-                        last_ntx_row = last_notarised_row()
-                        last_ntx_row.notary = get_notary_from_btc_address(vin["addresses"][0], season)
-                        notary_list.append(last_ntx_row.notary)
-                        notary_addresses.append(vin["addresses"][0])
-                        if last_ntx_row.notary in notary_last_ntx:
-                            last_btc_ntx_ht = notary_last_ntx[last_ntx_row.notary]["BTC"]
-                        else:
-                            last_btc_ntx_ht = 0
-                        if last_btc_ntx_ht < btc_row.block_height:
-                            last_ntx_row.season = season
-                            last_ntx_row.chain = "BTC"
-                            last_ntx_row.txid = btc_row.txid
-                            last_ntx_row.block_height = btc_row.block_height
-                            last_ntx_row.block_time = btc_row.block_time
-                            last_ntx_row.update()
+                        btc_row.output_sats = -1
+                        btc_row.output_index = -1
+                        btc_row.input_sats = vin['output_value']
+                        btc_row.input_index = input_index
+                        btc_row.address = vin["addresses"][0]
+                        btc_row.notary = get_notary_from_btc_address(btc_row.address, btc_row.season)
+                        btc_row.update()
+                        input_index += 1
+
+                    output_index = 0
                     for vout in vouts:
-                        if 'data_hex' in vout:
-                            opret = vout['data_hex']
+                        if vout["addresses"] is not None:
+                            btc_row.input_index = -1
+                            btc_row.input_sats = -1
+                            btc_row.address = vout["addresses"][0]
+                            btc_row.notary = get_notary_from_btc_address(btc_row.address, btc_row.season)
+                            btc_row.output_sats = vout['value']
+                            btc_row.output_index = output_index
+                            btc_row.update()
+                            output_index += 1
 
-                            r = requests.get(f'{THIS_SERVER}/api/tools/decode_opreturn/?OP_RETURN={opret}')
-                            kmd_ntx_info = r.json()
-
-                            ac_ntx_height = kmd_ntx_info['notarised_block']
-                            ac_ntx_blockhash = kmd_ntx_info['notarised_blockhash']
-
-                            # Update "notarised" table
-                            ntx_row = notarised_row()
-                            ntx_row.chain = 'BTC'
-                            ntx_row.block_height = btc_row.block_height
-                            ntx_row.block_time = int(btc_row.block_time)
-                            ntx_row.block_datetime = btc_row.block_datetime
-                            ntx_row.block_hash = btc_row.block_hash
-                            ntx_row.notaries = notary_list
-                            ntx_row.notary_addresses = notary_addresses
-                            ntx_row.ac_ntx_blockhash = ac_ntx_blockhash
-                            ntx_row.ac_ntx_height = ac_ntx_height
-                            ntx_row.txid = btc_row.txid
-                            ntx_row.opret = opret
-                            ntx_row.season = btc_row.season
-                            ntx_row.server = btc_row.server
-                            ntx_row.score_value = get_chain_epoch_score_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
-                            ntx_row.epoch = get_chain_epoch_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
-                            if ntx_row.score_value > 0:
-                                ntx_row.scored = True
+                    # update notary_last_ntx
+                    if btc_row.category == "NTX":
+                        notary_list = []
+                        notary_addresses = []
+                        for vin in vins:
+                            last_ntx_row = last_notarised_row()
+                            last_ntx_row.notary = get_notary_from_btc_address(vin["addresses"][0], season)
+                            notary_list.append(last_ntx_row.notary)
+                            notary_addresses.append(vin["addresses"][0])
+                            if last_ntx_row.notary in notary_last_ntx:
+                                last_btc_ntx_ht = notary_last_ntx[last_ntx_row.notary]["BTC"]
                             else:
-                                ntx_row.scored = False
-                            ntx_row.btc_validated = "true"
-                            ntx_row.update()
+                                last_btc_ntx_ht = 0
+                            if last_btc_ntx_ht < btc_row.block_height:
+                                last_ntx_row.season = season
+                                last_ntx_row.chain = "BTC"
+                                last_ntx_row.txid = btc_row.txid
+                                last_ntx_row.block_height = btc_row.block_height
+                                last_ntx_row.block_time = btc_row.block_time
+                                last_ntx_row.update()
+                        for vout in vouts:
+                            if 'data_hex' in vout:
+                                opret = vout['data_hex']
+
+                                opret_url = f'{THIS_SERVER}/api/tools/decode_opreturn/?OP_RETURN={opret}'
+                                r = requests.get(opret_url)
+                                kmd_ntx_info = r.json()
+
+                                ac_ntx_height = kmd_ntx_info['notarised_block']
+                                ac_ntx_blockhash = kmd_ntx_info['notarised_blockhash']
+
+                                # Update "notarised" table
+                                ntx_row = notarised_row()
+                                ntx_row.chain = 'BTC'
+                                ntx_row.block_height = btc_row.block_height
+                                ntx_row.block_time = int(btc_row.block_time)
+                                ntx_row.block_datetime = btc_row.block_datetime
+                                ntx_row.block_hash = btc_row.block_hash
+                                ntx_row.notaries = notary_list
+                                ntx_row.notary_addresses = notary_addresses
+                                ntx_row.ac_ntx_blockhash = ac_ntx_blockhash
+                                ntx_row.ac_ntx_height = ac_ntx_height
+                                ntx_row.txid = btc_row.txid
+                                ntx_row.opret = opret
+                                ntx_row.season = btc_row.season
+                                ntx_row.server = btc_row.server
+                                ntx_row.score_value = get_chain_epoch_score_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
+                                ntx_row.epoch = get_chain_epoch_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
+                                if ntx_row.score_value > 0:
+                                    ntx_row.scored = True
+                                else:
+                                    ntx_row.scored = False
+                                ntx_row.btc_validated = "true"
+                                ntx_row.update()
 
             logger.info(f"TXID: {txid} ({btc_row.category})")
         else:
             logger.warning(f"Fees not in txinfo for {txid}! Likely unconfirmed...")
+        season_btc_addresses.remove(notary_address)
 
-CURSOR.close()
-CONN.close()
+if __name__ == "__main__":
+    
+    seasons = get_notarised_seasons()
+
+    for season in seasons:
+        if season not in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]: 
+            scan_btc_transactions(season)
+
+            CURSOR.close()
+            CONN.close()
 
