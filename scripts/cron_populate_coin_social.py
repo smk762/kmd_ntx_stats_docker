@@ -3,17 +3,9 @@ import os
 import json
 import time
 import requests
-import logging
-import logging.handlers
-from lib_const import CONN, CURSOR
+from lib_const import *
 from models import coin_social_row
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 #r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/season4/coin_social.json")
 #coin_social = r.json()

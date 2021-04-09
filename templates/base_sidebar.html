@@ -4,7 +4,7 @@
     <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show kmd_ui_dark3_bg" id="sidebar" style="border-right: 1px solid #000 !important;    ">
       <div class="c-sidebar-brand d-md-down-none kmd_ui_dark1_bg">
         <a href="//{{ request.get_host }}">
-            <img class="c-sidebar-brand-full"height="46" alt="Komodo Logo" src="{% static 'img/brand/KMD_Horiz_Light.png' %}" />
+            <img class="c-sidebar-brand-full"height="46" alt="Komodo Logo" src="//{{ request.get_host }}/static/img/brand/KMD_Horiz_Light.png" />
             <img class="c-sidebar-brand-minimized" width="46" height="46" alt="Komodo Logo" src="{% static 'img/brand/KMD_Mark_Color.png' %}" />
         </a>
       </div>
@@ -77,7 +77,7 @@
             {% endfor %}
             </ul>
         </li>
-        <!--
+        <!-- TODO: Review
         <li class="c-sidebar-nav-dropdown">
             <a class="c-sidebar-nav-dropdown-toggle" href="#">
                 <i class="cib-bitcoin"></i>  
@@ -95,6 +95,7 @@
             </ul>
         </li>
         -->
+        <!-- TODO: Awaiting delegation to crons / db table
         <li class="c-sidebar-nav-dropdown">
             <a class="c-sidebar-nav-dropdown-toggle" href="#">
                 <i class="cil-check-circle"></i>  
@@ -107,6 +108,7 @@
                 </li>
             </ul>
         </li>
+        -->
         <li class="c-sidebar-nav-dropdown">
             <a class="c-sidebar-nav-dropdown-toggle" href="#">
                 <i class="cil-library-building"></i>   
@@ -114,17 +116,19 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard"> Season Scoreboard
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/btc_ntx"> BTC Notarisations
+                    </a>
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard"> {{ season }} Scoreboard
                     </a>
                     <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard_24hrs"> 24hr Scoreboard
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/chains_last_ntx"> Last Notarised
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/chains_last_ntx"> Last Chain Notarisation
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_24hrs"> Notarised last 24hrs
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_24hrs"> Last 200 Notarisations
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_tenure"> Tenure
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_tenure"> Chain dPoW Tenure
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/scoring_epochs"> Scoring Epochs
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/scoring_epochs"> dPoW Scoring Epochs
                     </a>
                 </li>
             </ul>
@@ -132,7 +136,7 @@
         <li class="c-sidebar-nav-dropdown">
             <a class="c-sidebar-nav-dropdown-toggle" href="#">
                 <i class="cil-diamond"></i>   
-                <span style="padding-left: 12px;">Mining</span>
+                <span style="padding-left: 12px;">MINING</span>
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
@@ -152,7 +156,7 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/faucet"> RICK / MORTY FAUCET
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/faucet"> RICK / MORTY Faucet
                     </a>
                 </li>
             </ul>

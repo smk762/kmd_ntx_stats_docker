@@ -4,8 +4,6 @@ import sys
 import json
 import time
 import random
-import logging
-import logging.handlers
 import psycopg2
 import requests
 import threading
@@ -21,12 +19,6 @@ from lib_table_select import *
 from lib_api import *
 from models import notarised_row, notarised_count_season_row, notarised_chain_season_row, notarised_count_daily_row, notarised_chain_daily_row, last_notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 '''
 This script scans the blockchain for notarisation txids that are not already recorded in the database.
@@ -62,9 +54,7 @@ def thread_chain_ntx_daily_aggregate(season, day):
             row.update()
 
         except Exception as e:
-            logger.warning("Error in thread_chain_ntx_daily_aggregate: "+str(e))
-            logger.warning("Error in thread_chain_ntx_daily_aggregate: "+str(item))
-            logger.warning("Error in thread_chain_ntx_daily_aggregate: "+str(day))
+            logger.error("Exception in [thread_chain_ntx_daily_aggregate]: "+str(e))
 
 
 # Process KMD notarisation transactions from KMD OpReturns
@@ -346,36 +336,39 @@ def update_season_notarised_counts(season):
         ntx_count = item[3]
         cols = 'block_hash, txid, block_time, opret, ac_ntx_blockhash, ac_ntx_height'
         conditions = "block_height="+str(block_height)+" AND chain='"+chain+"'"
-        last_ntx_result = select_from_table('notarised', cols, conditions)[0]
-        kmd_ntx_blockhash = last_ntx_result[0]
-        kmd_ntx_txid = last_ntx_result[1]
-        kmd_ntx_blocktime = last_ntx_result[2]
-        opret = last_ntx_result[3]
-        ac_ntx_blockhash = last_ntx_result[4]
-        ac_ntx_height = last_ntx_result[5]
+        try:
+            last_ntx_result = select_from_table('notarised', cols, conditions)[0]
+            kmd_ntx_blockhash = last_ntx_result[0]
+            kmd_ntx_txid = last_ntx_result[1]
+            kmd_ntx_blocktime = last_ntx_result[2]
+            opret = last_ntx_result[3]
+            ac_ntx_blockhash = last_ntx_result[4]
+            ac_ntx_height = last_ntx_result[5]
 
-        if chain in ac_block_heights:
-            ac_block_height = ac_block_heights[chain]['height']
-            ntx_lag = ac_block_height - ac_ntx_height
-        else:
-            ac_block_height = 0
-            ntx_lag = "-"
+            if chain in ac_block_heights:
+                ac_block_height = ac_block_heights[chain]['height']
+                ntx_lag = ac_block_height - ac_ntx_height
+            else:
+                ac_block_height = 0
+                ntx_lag = "-"
 
-        if run_updates():
-            row = notarised_chain_season_row()
-            row.chain = chain
-            row.ntx_count = ntx_count
-            row.block_height = block_height
-            row.kmd_ntx_blockhash = kmd_ntx_blockhash
-            row.kmd_ntx_txid = kmd_ntx_txid
-            row.kmd_ntx_blocktime = kmd_ntx_blocktime
-            row.opret = opret
-            row.ac_ntx_blockhash = ac_ntx_blockhash
-            row.ac_ntx_height = ac_ntx_height
-            row.ac_block_height = ac_block_height
-            row.ntx_lag = ntx_lag
-            row.season = season
-            row.update()
+            if run_updates():
+                row = notarised_chain_season_row()
+                row.chain = chain
+                row.ntx_count = ntx_count
+                row.block_height = block_height
+                row.kmd_ntx_blockhash = kmd_ntx_blockhash
+                row.kmd_ntx_txid = kmd_ntx_txid
+                row.kmd_ntx_blocktime = kmd_ntx_blocktime
+                row.opret = opret
+                row.ac_ntx_blockhash = ac_ntx_blockhash
+                row.ac_ntx_height = ac_ntx_height
+                row.ac_block_height = ac_block_height
+                row.ntx_lag = ntx_lag
+                row.season = season
+                row.update()
+        except Exception as e:
+            logger.error(f"Exception in [update_season_notarised_counts] : {e}")
 
     logger.info(f"{season} season_notarised_counts complete")
 
@@ -452,56 +445,14 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
                         if notary not in ntx_summary:
                             ntx_summary.update({
                                 notary:{
-                                    "seasons": {
-                                        season: {
-                                            "servers": {
-                                                server: {
-                                                    "epochs": {
-                                                        epoch:{
-                                                            "chains": {
-                                                                chain:{
-                                                                    "chain_ntx_count":0,
-                                                                    "chain_score":0
-                                                                }                                                    
-                                                            },
-                                                            "score_per_ntx":score_value,
-                                                            "epoch_ntx_count":0,
-                                                            "epoch_score":0
-                                                        }
-                                                    },
-                                                    "server_ntx_count":0,
-                                                    "server_score":0
-                                                }
-                                            },
-                                            "season_ntx_count":0,
-                                            "season_score":0
-                                        }
-                                    }
+                                    "seasons": {}
                                 }
                             })
 
                         if season not in ntx_summary[notary]["seasons"]:
                             ntx_summary[notary]["seasons"].update({
                                 season: {
-                                    "servers": {
-                                        server: {
-                                            "epochs": {
-                                                epoch:{
-                                                    "chains": {
-                                                        chain:{
-                                                            "chain_ntx_count":0,
-                                                            "chain_score":0
-                                                        }                                                    
-                                                    },
-                                                    "score_per_ntx":score_value,
-                                                    "epoch_ntx_count":0,
-                                                    "epoch_score":0
-                                                }
-                                            },
-                                            "server_ntx_count":0,
-                                            "server_score":0
-                                        }
-                                    },
+                                    "servers": {},
                                     "season_ntx_count":0,
                                     "season_score":0
                                 }
@@ -510,19 +461,7 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
                         if server not in ntx_summary[notary]["seasons"][season]["servers"]:
                             ntx_summary[notary]["seasons"][season]["servers"].update({
                                 server: {
-                                    "epochs": {
-                                        epoch:{
-                                            "chains": {
-                                                chain:{
-                                                    "chain_ntx_count":0,
-                                                    "chain_score":0
-                                                }                                                    
-                                            },
-                                            "score_per_ntx":score_value,
-                                            "epoch_ntx_count":0,
-                                            "epoch_score":0
-                                        }
-                                    },
+                                    "epochs": {},
                                     "server_ntx_count":0,
                                     "server_score":0                                    
                                 }
@@ -531,12 +470,7 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
                         if epoch not in ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"]:
                             ntx_summary[notary]["seasons"][season]["servers"][server]["epochs"].update({
                                 epoch:{
-                                    "chains": {
-                                        chain:{
-                                            "chain_ntx_count":0,
-                                            "chain_score":0
-                                        }                                                    
-                                    },
+                                    "chains": {},
                                     "score_per_ntx":score_value,
                                     "epoch_ntx_count":0,
                                     "epoch_score":0
@@ -568,7 +502,7 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
         return ntx_summary, chain_totals
         
     except Exception as e:
-        logger.error(f"Error in get_epochs: {e}")
+        logger.error(f"Error in [get_notarisation_data]: {e}")
         return ntx_summary, chain_totals
 
 
@@ -578,31 +512,41 @@ def update_latest_ntx(season):
            FROM notarised WHERE \
            season = '"+str(season)+"' \
            GROUP BY chain;"
-    CURSOR.execute(sql)
-    resp = CURSOR.fetchall()
 
-    for item in resp:
-        chain = item[0]
-        block_time = item[1]
-        sql = "SELECT block_height, txid, notaries \
-               FROM notarised WHERE season='"+season+"' AND \
-               chain='"+str(chain)+"' AND block_time="+str(block_time)+";"
+    try:
         CURSOR.execute(sql)
-        rows = CURSOR.fetchall()
+        resp = CURSOR.fetchall()
 
-        for x in rows:
-            block_height = x[0]
-            txid = x[1]
-            notaries = x[2]
-            for notary in notaries:
-                row = last_notarised_row()
-                row.notary = notary
-                row.chain = chain
-                row.txid = txid
-                row.block_height = block_height
-                row.block_time = block_time
-                row.season = season
-                row.update()
+        for item in resp:
+            chain = item[0]
+            block_time = item[1]
+            sql = "SELECT block_height, txid, notaries \
+                   FROM notarised WHERE season='"+season+"' AND \
+                   chain='"+str(chain)+"' AND block_time="+str(block_time)+";"
+
+            try:
+
+                CURSOR.execute(sql)
+                rows = CURSOR.fetchall()
+                for x in rows:
+                    block_height = x[0]
+                    txid = x[1]
+                    notaries = x[2]
+                    for notary in notaries:
+                        row = last_notarised_row()
+                        row.notary = notary
+                        row.chain = chain
+                        row.txid = txid
+                        row.block_height = block_height
+                        row.block_time = block_time
+                        row.season = season
+                        row.update()
+
+            except Exception as e:
+                logger.error(f"Exception in [update_latest_ntx]: {e}")
+
+    except Exception as e:
+        logger.error(f"Exception in [update_latest_ntx]: {e}")
 
 
 def scan_rpc_for_ntx(season):

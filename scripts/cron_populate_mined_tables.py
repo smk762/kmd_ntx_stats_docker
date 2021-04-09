@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 import time
-import logging
-import logging.handlers
 from datetime import datetime as dt
 import datetime
 from decimal import Decimal
@@ -9,15 +7,6 @@ from decimal import Decimal
 from lib_const import *
 from lib_table_select import select_from_table, get_season_mined_counts, get_mined_date_aggregates, get_notarised_seasons
 from models import season_mined_count_row, daily_mined_count_row, mined_row, get_season_from_block
-
-
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s',
-                              datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 
 ''' 
@@ -31,33 +20,24 @@ Lastly, it updates the mined_count_season and mined_count_daily
 tables with aggregated stats for each notary season.
 '''
 
-def update_mined_known_address(address):
+def clear_known_address(address):
+
     sql = f"SELECT block_height, block_time, block_datetime, value, address, name, txid, season \
-            FROM mined WHERE address='{address}' AND name='{address}';"
+            FROM mined WHERE name='{address}' OR name='{address}' ORDER BY block_height;"
     CURSOR.execute(sql)
     results = CURSOR.fetchall()
-    for result in results:
-        if result[4] in NON_NOTARY_ADDRESSES:
+    
+    row = season_mined_count_row()
+    row.address = address
+    row.delete_address()
+    row.notary = address
+    row.delete_notary()
 
-            row = mined_row()
-            row.block_height = result[0]
-            row.block_time = result[1]
-            row.block_datetime = result[2]
-            row.value = result[3]
-            row.address = result[4]
-            row.name = NON_NOTARY_ADDRESSES[row.address]
-            row.txid = result[6]
-            row.season = get_season_from_block(row.block_height)
-            row.update()
-
-            row = season_mined_count_row()
-            row.address = result[4]
-            row.delete_address()
-
-            logger.info(f"Updating, address {row.address} as {row.name}")
-        else:
-            logger.info(f"Not updating, address {row.address} not in NON_NOTARY_ADDRESSES")
-
+    row = mined_row()
+    row.name = address
+    row.delete_name()
+    row.address = address
+    row.delete_address()
 
 def update_miner(block):
     blockinfo = RPC["KMD"].getblock(str(block), 2)
@@ -176,12 +156,10 @@ if __name__ == "__main__":
     # Uncomment to update addresses in DB after updating NON_NOTARY_ADDRESSES
     '''
     for address in NON_NOTARY_ADDRESSES:
-        row = season_mined_count_row()
-        row.address = address
-        row.delete_address()
-        update_mined_known_address(address)
+        logger.info(f"updating {address}")
+        clear_known_address(address)
     '''
-    
+
     for season in seasons:
 
         if season not in EXCLUDED_SEASONS:

@@ -40,6 +40,7 @@ class balances(models.Model):
         ]
 
 
+# TODO: Awaiting delegation to crons / db table
 class chain_sync(models.Model):
     chain = models.CharField(max_length=64)
     block_height = models.PositiveIntegerField(default=0)
@@ -499,4 +500,4 @@ class scoring_epochs(models.Model):
 
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"
-
+# to update static files, use "docker-compose run web python3 manage.py collectstatic"

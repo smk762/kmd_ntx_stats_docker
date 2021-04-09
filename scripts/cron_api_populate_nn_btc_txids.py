@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import json
 import time
-import logging
-import logging.handlers
 import requests
 from decimal import *
 from datetime import datetime as dt
@@ -16,7 +14,7 @@ from models import tx_row, last_notarised_row, notarised_row, get_chain_epoch_sc
 from lib_const import *
 from known_txids import *
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)

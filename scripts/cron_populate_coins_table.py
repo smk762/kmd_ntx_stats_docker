@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
 import json
 import requests
-import logging
-import logging.handlers
 from lib_const import *
 from models import coins_row
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 '''
 This script scans the coins and dpow repositories and updates contexual info about the chains in the "coins" table.

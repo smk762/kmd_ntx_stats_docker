@@ -2,67 +2,63 @@
 {% load static %}
 {% block content %}
 
-        		{% include "snippets/region_ntx_leaders_2.html" %}
+	{% include "snippets/region_ntx_leaders_2.html" %}
 
-				{% for region, region_data in notarisation_scores.items %}
-				<div class="row my-3">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card kmd_ui_light4">
-							<div class="card-header kmd_ui_dark1_bg">
-								<a id="{{region}}_table" class="section-anchor"></a>
-								<h3>{{ region }} Notarisation rankings</h3>
-								{% for reg, stats in region_score_stats.items %}
-									{% if reg == region %}
-										<h6>Average: {{ stats.average_score|floatformat:-2 }}</h6>
-									{% endif %}
-								{% endfor%}
-							</div>
-							<div class="card-body kmd_ui_dark1_bg">
-								<table id="{{ region }}_notarisations" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
-									<thead>
-										<tr>
-											<th>Rank</th>
-											<th>Notary</th>
-											<th>BTC</th>
-											<th>Main</th>
-											<th>3rd Party</th>
-											<th>Mining</th>
-											<th>Scoring</th>
-											<th>Detail</th>
-										</tr>
-									</thead>
-									<tbody>
-										{% for notary, notary_data in region_data.items %}
-										<tr>
-											<td data-data="rank">
-										  		<span class="badge kmd_ui_dark1_bg p-2">
-										  			{{ notary_data.rank }}
-										  		</span>
-										  	</td>
-											<td data-data="notary">{{ notary }}</th>
-											<td data-data="btc">{{ notary_data.btc }}</th>
-											<td data-data="main">{{ notary_data.main }}</th>
-											<td data-data="third_party">{{ notary_data.third_party }}</th>
-											<td data-data="mining">{{ notary_data.mining }}</th>
-											<td data-data="score">{{ notary_data.score|floatformat:-3 }}</th>
-											<td data-data="detail"><a href="//{{ request.get_host }}/notary_epoch_scoring_table/?notary={{ notary }}">More Info</a></th>
-										</tr>
-										{% endfor %}
-									</tbody>
-								</table>
-							</div>
-						</div>	
-					</div>
+	{% for region, region_data in notarisation_scores.items %}
+		<div class="row col-12 mx-auto my-2" style="color:#FFF;">
+			<div class="card kmd_ui_dark1_bg m-auto">
+				<div class="card-header kmd_ui_dark1_bg m-auto">
+					<a id="{{region}}_table" class="section-anchor"></a>
+					<h4>{{ season }} {{ region }} Notarisation rankings</h4>
+					{% for reg, stats in region_score_stats.items %}
+						{% if reg == region %}
+							<h6>Average: {{ stats.average_score|floatformat:-2 }}</h6>
+						{% endif %}
+					{% endfor%}
 				</div>
-				{% endfor %}
+				<div class="card-body kmd_ui_dark1_bg m-auto">
+					<table id="{{ region }}_notarisations" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+						<thead>
+							<tr>
+								<th>Rank</th>
+								<th>Notary</th>
+								<th>BTC</th>
+								<th>Main</th>
+								<th>3rd Party</th>
+								<th>Mining</th>
+								<th>Scoring</th>
+								<th>Detail</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for notary, notary_data in region_data.items %}
+							<tr>
+								<td data-data="rank">
+							  		<span class="badge kmd_ui_dark1_bg p-2">
+							  			{{ notary_data.rank }}
+							  		</span>
+							  	</td>
+								<td style="font-size: 1.1em" data-data="notary">{{ notary }}</th>
+								<td data-data="btc">{{ notary_data.btc }}</th>
+								<td data-data="main">{{ notary_data.main }}</th>
+								<td data-data="third_party">{{ notary_data.third_party }}</th>
+								<td data-data="mining">{{ notary_data.mining }}</th>
+								<td style="font-size: 1.1em"  data-data="score">{{ notary_data.score|floatformat:-3 }}</th>
+								<td style="font-size: 0.9em" data-data="detail"><a href="//{{ request.get_host }}/notary_epoch_scoring_table/?notary={{ notary }}">More Info</a></th>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>	
+		</div>
+	{% endfor %}
     <!-- jquery -->
   
   	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-    {{ explorers|json_script:"explorers-data" }}
   	<script>
 	    $(document).ready(function() {
-	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 		        AR_table = $('#AR_notarisations').DataTable({    
 		        	"paging": false,
 	        		order: [[ 0, 'asc' ]],

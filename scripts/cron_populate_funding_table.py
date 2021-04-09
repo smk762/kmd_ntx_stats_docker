@@ -1,16 +1,8 @@
 #!/usr/bin/env python3
-import logging
-import logging.handlers
 import requests
+from lib_const import *
 from lib_notary import get_notary_from_address, get_season
 from models import funding_row
-
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 try:
     r = requests.get('http://138.201.207.24/funding_tx')

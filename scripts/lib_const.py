@@ -9,7 +9,7 @@ from base_58 import COIN_PARAMS, get_addr_from_pubkey
 from lib_rpc import def_credentials
 from notary_pubkeys import NOTARY_PUBKEYS
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)

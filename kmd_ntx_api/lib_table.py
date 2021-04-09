@@ -1,14 +1,45 @@
 
 from kmd_ntx_api.lib_info import *
 
+logger = logging.getLogger("mylogger")
+
+def get_epoch_scoring_table(request):
+    resp = []
+    
+    if "season" in request.GET:
+        season=request.GET["season"]
+        data = get_scoring_epochs_data(season)
+    else:
+        data = get_scoring_epochs_data()
+
+    data = data.order_by('season', 'server').values()
+    for item in data:
+
+        resp.append({
+                "season":item['season'],
+                "server":item['server'],
+                "epoch":item['epoch'].split("_")[1],
+                "epoch_start":dt.fromtimestamp(item['epoch_start']),
+                "epoch_end":dt.fromtimestamp(item['epoch_end']),
+                "duration":item['epoch_end']-item['epoch_start'],
+                "start_event":item['start_event'],
+                "end_event":item['end_event'],
+                "epoch_chains":", ".join(item['epoch_chains']),
+                "num_epoch_chains":len(item['epoch_chains']),
+                "score_per_ntx":item['score_per_ntx']
+        })
+    return resp
+
+
 def get_mined_count_season_data_table(request):
 
     if "season" in request.GET:
-        data = get_mined_count_season_data(request.GET["season"])
+        season = request.GET["season"]
     else:
-        data = get_mined_count_season_data(get_season())
-        
-    data = data.order_by('season', 'notary').values()
+        season = get_season()
+
+    data = get_mined_count_season_data(season).order_by('season', 'notary').values()
+    logger.info(f"[get_mined_count_season_data_table] getting data for {season}")
 
     resp = []
     # name num sum max last
@@ -113,30 +144,3 @@ def get_notary_epoch_scoring_table(notary=None, season=None):
 
 
     return rows, total
-
-def get_epoch_scoring_table(request):
-    resp = []
-    
-    if "season" in request.GET:
-        season=request.GET["season"]
-        data = get_scoring_epochs_data(season)
-    else:
-        data = get_scoring_epochs_data()
-
-    data = data.order_by('season', 'server').values()
-    for item in data:
-
-        resp.append({
-                "season":item['season'],
-                "server":item['server'],
-                "epoch":item['epoch'].split("_")[1],
-                "epoch_start":dt.fromtimestamp(item['epoch_start']),
-                "epoch_end":dt.fromtimestamp(item['epoch_end']),
-                "duration":item['epoch_end']-item['epoch_start'],
-                "start_event":item['start_event'],
-                "end_event":item['end_event'],
-                "epoch_chains":", ".join(item['epoch_chains']),
-                "num_epoch_chains":len(item['epoch_chains']),
-                "score_per_ntx":item['score_per_ntx']
-        })
-    return resp
