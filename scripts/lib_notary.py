@@ -311,7 +311,7 @@ def get_btc_ntxids(stop_block, exit=None):
     ntx_txids = []
     page = 1
     exit_loop = False
-    existing_txids = get_existing_btc_ntxids()
+    existing_txids = get_existing_notarised_txids("BTC")
     while has_more:
         logger.info(f"Getting TXIDs from API Page {page}...")
         resp = get_btc_address_txids(BTC_NTX_ADDR, before_block)
