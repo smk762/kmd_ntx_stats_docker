@@ -1,157 +1,158 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-				<div class="row my-3">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mt-auto shadow-none">
-							<div class="card-body kmd_ui_dark2_bg p-0">
-								<p class="card-text">
-									<!--
-									<p>{{ notary_funding }}</p>
-									<p>{{ bot_balance_deltas }}</p>
-									-->
-									<ul class="list-group">
-									  <li class="list-group-item border-0">
-									  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
-									  	<h4 class='kmd_teal'>{{ num_ok_balance_addresses }}/{{ num_addresses }} ({{ addresses_funded_pct }}%) chains are sufficiently funded</h4>
-										<h5 class='kmd_secondary_red'>{{ num_low_balance_addresses }} addresses have a low balance </h5>">
-				                            <a class="dropdown-item d-block" href="#">
-				                                <div class="mb-1">
-				                                    <i class="cil-layers"></i> Addresses Funding
-				                                </div>
-				                                <span class="progress">
-				                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ addresses_funded_pct }}%" aria-valuenow="{{ addresses_funded_pct }}" aria-valuemin="0" aria-valuemax="100">{{ addresses_funded_pct }}%</div>
-				                                </span>
-				                                <small class="text-uppercase text-muted">{{ num_ok_balance_addresses }}/{{ num_addresses }} notary addresses with sufficient funding</small>
-				                            </a>
-				                        </span>								    
-									  </li>
-									  <li class="list-group-item border-0">
-									  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
-									  	<h4 class='kmd_teal'>{{ ok_balance_chains|length }}/{{ chain_list|length }} ({{ chains_funded_pct }}%) chains are sufficiently funded</h4>
-										<h5 class='kmd_secondary_green'>{{ ok_balance_chains }}<br /> are sufficiently funded with all notaries</h5>
-										<h5 class='kmd_secondary_orange'>{{ no_data_chains }}<br /> are not returning data</h5>
-										<h5 class='kmd_secondary_red'>{{ low_balance_chains }}<br /> have at least 1 notary with a low balance </h5>">
-				                            <a class="dropdown-item d-block" href="#">
-				                                <div class="mb-1">
-				                                    <i class="cil-layers"></i> dPoW Chains Funding
-				                                </div>
-				                                <span class="progress">
-				                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ chains_funded_pct }}%" aria-valuenow="{{ chains_funded_pct }}" aria-valuemin="0" aria-valuemax="100">{{ chains_funded_pct }}%</div>
-				                                </span>
-				                                <small class="text-uppercase text-muted">{{ ok_balance_chains|length }}/{{ chain_list|length }} dPoW chains with sufficient funding for all notaries</small>
-				                            </a>
-				                        </span>								    
-									  </li>
-									  <li class="list-group-item border-0">
-									  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
-									  	<h4 class='kmd_teal'>{{ ok_balance_notaries|length }}/{{ notaries_list|length }} ({{ notaries_funded_pct }}%) chains are sufficiently funded</h4>
-										<h5 class='kmd_secondary_green'>{{ ok_balance_notaries }}<br /> have sufficient balance on all chains</h5>
-										<h5 class='kmd_secondary_red'>{{ low_balance_notaries }}<br /> have a low balance on at least 1 chain</h5>">
-				                            <a class="dropdown-item d-block" href="#">
-				                                <div class="mb-1">
-				                                    <i class="cil-balance-scale"></i> Notary Funding
-				                                </div>
-				                                <span class="progress">
-				                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ notaries_funded_pct }}%" aria-valuenow="{{ notaries_funded_pct }}" aria-valuemin="0" aria-valuemax="100">{{ notaries_funded_pct }}%</div>
-				                                </span>
-				                                <small class="text-uppercase text-muted">{{ ok_balance_notaries|length }}/{{ notaries_list|length }} Notaries with sufficient funding on all chains</small>
-				                            </a>
-				                        </span>								    
-									  </li>
-									  <li class="list-group-item border-0">
-										<span class='kmd_secondary_orange'>{{ no_data_chains }} are not returning data</span>
-									  </li>
-									</ul> 						
-								</p>
-							</div>
-						</div>
+	<!-- Awaiting review -->
+	<div class="row my-3">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mt-auto shadow-none">
+				<div class="card-body kmd_ui_dark2_bg p-0">
+					<p class="card-text">
+						<!--
+						<p>{{ notary_funding }}</p>
+						<p>{{ bot_balance_deltas }}</p>
+						-->
+						<ul class="list-group">
+						  <li class="list-group-item border-0">
+						  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
+						  	<h4 class='kmd_teal'>{{ num_ok_balance_addresses }}/{{ num_addresses }} ({{ addresses_funded_pct }}%) chains are sufficiently funded</h4>
+							<h5 class='kmd_secondary_red'>{{ num_low_balance_addresses }} addresses have a low balance </h5>">
+	                            <a class="dropdown-item d-block" href="#">
+	                                <div class="mb-1">
+	                                    <i class="cil-layers"></i> Addresses Funding
+	                                </div>
+	                                <span class="progress">
+	                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ addresses_funded_pct }}%" aria-valuenow="{{ addresses_funded_pct }}" aria-valuemin="0" aria-valuemax="100">{{ addresses_funded_pct }}%</div>
+	                                </span>
+	                                <small class="text-uppercase text-muted">{{ num_ok_balance_addresses }}/{{ num_addresses }} notary addresses with sufficient funding</small>
+	                            </a>
+	                        </span>								    
+						  </li>
+						  <li class="list-group-item border-0">
+						  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
+						  	<h4 class='kmd_teal'>{{ ok_balance_chains|length }}/{{ chain_list|length }} ({{ chains_funded_pct }}%) chains are sufficiently funded</h4>
+							<h5 class='kmd_secondary_green'>{{ ok_balance_chains }}<br /> are sufficiently funded with all notaries</h5>
+							<h5 class='kmd_secondary_orange'>{{ no_data_chains }}<br /> are not returning data</h5>
+							<h5 class='kmd_secondary_red'>{{ low_balance_chains }}<br /> have at least 1 notary with a low balance </h5>">
+	                            <a class="dropdown-item d-block" href="#">
+	                                <div class="mb-1">
+	                                    <i class="cil-layers"></i> dPoW Chains Funding
+	                                </div>
+	                                <span class="progress">
+	                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ chains_funded_pct }}%" aria-valuenow="{{ chains_funded_pct }}" aria-valuemin="0" aria-valuemax="100">{{ chains_funded_pct }}%</div>
+	                                </span>
+	                                <small class="text-uppercase text-muted">{{ ok_balance_chains|length }}/{{ chain_list|length }} dPoW chains with sufficient funding for all notaries</small>
+	                            </a>
+	                        </span>								    
+						  </li>
+						  <li class="list-group-item border-0">
+						  	<span data-toggle="tooltip" data-placement="left" data-html="true" title="" data-original-title="
+						  	<h4 class='kmd_teal'>{{ ok_balance_notaries|length }}/{{ notaries_list|length }} ({{ notaries_funded_pct }}%) chains are sufficiently funded</h4>
+							<h5 class='kmd_secondary_green'>{{ ok_balance_notaries }}<br /> have sufficient balance on all chains</h5>
+							<h5 class='kmd_secondary_red'>{{ low_balance_notaries }}<br /> have a low balance on at least 1 chain</h5>">
+	                            <a class="dropdown-item d-block" href="#">
+	                                <div class="mb-1">
+	                                    <i class="cil-balance-scale"></i> Notary Funding
+	                                </div>
+	                                <span class="progress">
+	                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ notaries_funded_pct }}%" aria-valuenow="{{ notaries_funded_pct }}" aria-valuemin="0" aria-valuemax="100">{{ notaries_funded_pct }}%</div>
+	                                </span>
+	                                <small class="text-uppercase text-muted">{{ ok_balance_notaries|length }}/{{ notaries_list|length }} Notaries with sufficient funding on all chains</small>
+	                            </a>
+	                        </span>								    
+						  </li>
+						  <li class="list-group-item border-0">
+							<span class='kmd_secondary_orange'>{{ no_data_chains }} are not returning data</span>
+						  </li>
+						</ul> 						
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>	
+	<div class="row my-3">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card kmd_ui_light4">
+				<div class="card-header kmd_ui_dark1_bg">
+					{{ notary_name }} LOW BALANCE ADDRESSES<br />
+					Last updated: {{ last_balances_update }} ago
+	                <h5>Reference only - still in testing</h5>
+				</div>
+				<div class="card-body kmd_ui_dark1_bg">
+					<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+						<thead>
+							<tr>
+								<th>NOTARY</th>
+								<th>CHAIN</th>
+								<th>ADDRESS</th>
+								<th>BALANCE</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for notary, notary_data in low_nn_balances.items %}
+								{% for chain, chain_data in notary_data.items %}
+									<tr>
+										{% if chain == "KMD_3P" %}
+										<td>{{ notary }}</td>
+										<td>KMD</td>
+										<td style="text-transform: none;">{{ chain_data.address }}</td>
+										<td>{{ chain_data.balance }} (3P)</td>
+										{% else %}
+										<td>{{ notary }}</td>
+										<td>{{ chain }}</td>
+										<td style="text-transform: none;">{{ chain_data.address }}</td>
+										<td>{{ chain_data.balance }}</td>
+										{% endif %}
+									</tr>
+								{% endfor %}
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>	
+		</div>
+	</div>
+	<div class="row my-3">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
+				<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
+					<div class="my-auto">
+						Number of chains with low balance
 					</div>
-				</div>	
-				<div class="row my-3">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card kmd_ui_light4">
-							<div class="card-header kmd_ui_dark1_bg">
-								{{ notary_name }} LOW BALANCE ADDRESSES<br />
-								Last updated: {{ last_balances_update }} ago
-				                <h5>Reference only - still in testing</h5>
-							</div>
-							<div class="card-body kmd_ui_dark1_bg">
-								<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
-									<thead>
-										<tr>
-											<th>NOTARY</th>
-											<th>CHAIN</th>
-											<th>ADDRESS</th>
-											<th>BALANCE</th>
-										</tr>
-									</thead>
-									<tbody>
-										{% for notary, notary_data in low_nn_balances.items %}
-											{% for chain, chain_data in notary_data.items %}
-												<tr>
-													{% if chain == "KMD_3P" %}
-													<td>{{ notary }}</td>
-													<td>KMD</td>
-													<td style="text-transform: none;">{{ chain_data.address }}</td>
-													<td>{{ chain_data.balance }} (3P)</td>
-													{% else %}
-													<td>{{ notary }}</td>
-													<td>{{ chain }}</td>
-													<td style="text-transform: none;">{{ chain_data.address }}</td>
-													<td>{{ chain_data.balance }}</td>
-													{% endif %}
-												</tr>
-											{% endfor %}
-										{% endfor %}
-									</tbody>
-								</table>
-							</div>
-						</div>	
+					<div>
+					    <span class="badge kmd_ui_dark1_bg m-2 p-2">AR <i class="fa fa-circle" aria-hidden="true" style="color:#dc0333"></i></span>
+					    <span class="badge kmd_ui_dark1_bg m-2 p-2">EU <i class="fa fa-circle" aria-hidden="true" style="color:#2fea8b"></i></span>
+					    <span class="badge kmd_ui_dark1_bg m-2 p-2">NA <i class="fa fa-circle" aria-hidden="true" style="color:#b541ea"></i></span>
+					    <span class="badge kmd_ui_dark1_bg m-2 p-2">SH <i class="fa fa-circle" aria-hidden="true" style="color:#00e2ff"></i></span>
+					    <span class="badge kmd_ui_dark1_bg m-2 p-2">DEV <i class="fa fa-circle" aria-hidden="true" style="color:#f7931a"></i></span>
 					</div>
 				</div>
-				<div class="row my-3">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
-							<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
-								<div class="my-auto">
-									Number of chains with low balance
-								</div>
-								<div>
-								    <span class="badge kmd_ui_dark1_bg m-2 p-2">AR <i class="fa fa-circle" aria-hidden="true" style="color:#dc0333"></i></span>
-								    <span class="badge kmd_ui_dark1_bg m-2 p-2">EU <i class="fa fa-circle" aria-hidden="true" style="color:#2fea8b"></i></span>
-								    <span class="badge kmd_ui_dark1_bg m-2 p-2">NA <i class="fa fa-circle" aria-hidden="true" style="color:#b541ea"></i></span>
-								    <span class="badge kmd_ui_dark1_bg m-2 p-2">SH <i class="fa fa-circle" aria-hidden="true" style="color:#00e2ff"></i></span>
-								    <span class="badge kmd_ui_dark1_bg m-2 p-2">DEV <i class="fa fa-circle" aria-hidden="true" style="color:#f7931a"></i></span>
-								</div>
-							</div>
-							<div class="card-body kmd_ui_dark1_bg">
-								<span id="graph_title"></span>
-							    <canvas id="ChainsBarGraph"></canvas> 
-							</div>	
-						</div>	
-					</div>	
+				<div class="card-body kmd_ui_dark1_bg">
+					<span id="graph_title"></span>
+				    <canvas id="ChainsBarGraph"></canvas> 
 				</div>	
-				<div class="row my-3">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
-							<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
-								<div class="my-auto">
-									Number of Notaries with low balance
-								</div>
-								<div>
-								    <span class="badge m-2 p-2 kmd_ui_dark1_bg">MAIN <i class="fa fa-circle" aria-hidden="true" style="color:#2fea8b"></i></span>
-								    <span class="badge m-2 p-2 kmd_ui_dark1_bg">3RD PARTY <i class="fa fa-circle" aria-hidden="true" style="color:#b541ea"></i></span>
-								    <span class="badge m-2 p-2 kmd_ui_dark1_bg">BTC / KMD <i class="fa fa-circle" aria-hidden="true" style="color:#f7931a"></i></span>
-								</div>
-							</div>
-							<div class="card-body kmd_ui_dark1_bg">
-								<span id="graph_title"></span>
-							    <canvas id="NotaryBarGraph"></canvas> 
-							</div>	
-						</div>	
-					</div>	
+			</div>	
+		</div>	
+	</div>	
+	<div class="row my-3">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
+				<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
+					<div class="my-auto">
+						Number of Notaries with low balance
+					</div>
+					<div>
+					    <span class="badge m-2 p-2 kmd_ui_dark1_bg">MAIN <i class="fa fa-circle" aria-hidden="true" style="color:#2fea8b"></i></span>
+					    <span class="badge m-2 p-2 kmd_ui_dark1_bg">3RD PARTY <i class="fa fa-circle" aria-hidden="true" style="color:#b541ea"></i></span>
+					    <span class="badge m-2 p-2 kmd_ui_dark1_bg">BTC / KMD <i class="fa fa-circle" aria-hidden="true" style="color:#f7931a"></i></span>
+					</div>
+				</div>
+				<div class="card-body kmd_ui_dark1_bg">
+					<span id="graph_title"></span>
+				    <canvas id="NotaryBarGraph"></canvas> 
 				</div>	
+			</div>	
+		</div>	
+	</div>	
 
     <!-- jquery -->
   

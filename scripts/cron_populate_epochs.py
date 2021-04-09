@@ -1,19 +1,11 @@
 #!/usr/bin/env python3
 import requests
-import logging
-import logging.handlers
-from lib_const import CONN, CURSOR, SCORING_EPOCHS, DPOW_EXCLUDED_CHAINS, SEASONS_INFO, EXCLUDED_SEASONS
+from lib_const import *
 from models import scoring_epoch_row, ntx_tenure_row
 from lib_notary import get_server_active_dpow_chains_at_time, get_dpow_score_value, update_ntx_tenure, get_gleec_ntx_server
 from lib_table_select import get_notarised_chains, get_notarised_seasons, get_notarised_servers, get_epochs
 from lib_table_update import update_chain_notarised_epoch_window, update_unofficial_chain_notarised_tbl
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 # First tenure then epochs
 

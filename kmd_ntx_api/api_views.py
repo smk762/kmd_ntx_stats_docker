@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import time
-import logging
 
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -12,7 +11,7 @@ from kmd_ntx_api.page_views import *
 from kmd_ntx_api.notary_views import *
 from kmd_ntx_api.lib_testnet import get_api_testnet
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("mylogger")
 
 def api_address_btc_txids(request):
     if 'address' in request.GET and 'category' in request.GET:
@@ -55,11 +54,12 @@ def api_sidebar_links(request):
     return JsonResponse(resp)
 
 
-
 def api_testnet_totals(request):
     resp = get_api_testnet(request)
     return JsonResponse(resp)
 
+
+# TODO: Awaiting delegation to crons / db table
 def api_chain_sync(request):
     r = requests.get('http://138.201.207.24/show_sync_node_data')
     try:
@@ -140,7 +140,7 @@ def nn_ltc_txid(request):
     else:
         resp = {"error":"You need to specify a TXID like '/nn_ltc_txid?txid=86e23d8415737f1f6a723d1996f3e373e77d7e16a7ae8548b4928eb019237321'"}
     return JsonResponse(resp)
-    
+
 
 def nn_ltc_txid_list(request):
     if 'season' in request.GET and 'notary' in request.GET:

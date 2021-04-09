@@ -2,7 +2,6 @@
 import os
 import json
 import time
-import logging
 import telebot
 import datetime
 import threading
@@ -41,7 +40,7 @@ class LogstashFormatter(Formatter):
 
         return "<i>{datetime}</i><pre>\n{message}</pre>".format(message=record.msg, datetime=t)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 logger.setLevel(logging.WARNING)
 
 handler = RequestsHandler()

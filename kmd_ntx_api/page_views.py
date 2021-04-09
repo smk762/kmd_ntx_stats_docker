@@ -15,9 +15,13 @@ from kmd_ntx_api.lib_testnet import *
 
 def btc_ntx(request):
     season = get_season()
-    coins_data = get_coins_data(1).values('chain', 'dpow')
     btc_ntx = get_notarised_btc_data(season).filter(
-                            season=season).values()
+                            season=season).order_by('btc_block_time').values()[:100]
+    for item in btc_ntx:
+        # TODO: these fields are not actually populated, 
+        # need to add to cron scripts
+        lag = item["btc_block_time"]-item["kmd_block_time"]
+        item.update({"lag":lag})
 
     context = {
         "sidebar_links":get_sidebar_links(season),
@@ -29,25 +33,9 @@ def btc_ntx(request):
 
     return render(request, 'btc_ntx.html', context)
 
-def btc_ntx_all(request):
-    season = get_season()
-    notary_list = get_notary_list(season)
-    coins_data = get_coins_data(1).values('chain', 'dpow')
-    btc_ntx = get_notarised_data(season, "BTC").values()
-
-    context = {
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link(),
-        "explorers":get_dpow_explorers(),
-        "btc_ntx":btc_ntx,
-        "season":season.replace("_"," ")
-    }
-
-    return render(request, 'btc_ntx_all.html', context)
 
 def chains_last_ntx(request):
     season = get_season()
-    coins_data = get_coins_data(1).values('chain', 'dpow')
     notary_list = get_notary_list(season)
 
     season_chain_ntx_data = get_season_chain_ntx_data(season)
@@ -61,11 +49,11 @@ def chains_last_ntx(request):
 
     return render(request, 'last_notarised.html', context)
 
+
+# TODO: Awaiting delegation to crons / db table
 def chain_sync(request):
     season = get_season()
     context = get_chain_sync_data(request)
-    notary_list = get_notary_list(season)
-    coins_data = get_coins_data(1).values('chain', 'dpow')
 
     context.update({
         "sidebar_links":get_sidebar_links(season),
@@ -74,10 +62,9 @@ def chain_sync(request):
         })
     return render(request, 'chain_sync.html', context)
 
+
 def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY PROFILE
     season = get_season()
-    notary_list = get_notary_list(season)
-    coins_data = get_coins_data(1).values('chain', 'dpow')
 
     context = {
         "sidebar_links":get_sidebar_links(season)
@@ -364,7 +351,6 @@ def mining_24hrs(request):
 
 def mining_overview(request):
     season = get_season()
-    notary_list = get_notary_list(season)
     coins_data = get_coins_data(1).values('chain', 'dpow')
 
     context = {
@@ -379,9 +365,8 @@ def mining_overview(request):
 
 def ntx_24hrs(request):
     season = get_season()
-    notary_list = get_notary_list(season)
     coins_data = get_coins_data(1).values('chain', 'dpow')
-    ntx_24hrs = get_notarised_data_24hr().values()
+    ntx_24hrs = get_notarised_data_24hr().order_by('-block_time').values()[:200]
 
     context = {
         "sidebar_links":get_sidebar_links(season),

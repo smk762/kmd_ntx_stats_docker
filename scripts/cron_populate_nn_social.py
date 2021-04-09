@@ -3,15 +3,9 @@ import time
 import requests
 import logging
 import logging.handlers
-from lib_const import NOTARY_PUBKEYS, CONN, CURSOR
+from lib_const import *
 from models import nn_social_row
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/season4/elected_nn_social.json")
 elected_nn_social = r.json()

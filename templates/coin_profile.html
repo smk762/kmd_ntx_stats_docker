@@ -1,204 +1,204 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-				<div class="row">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0 mt-auto shadow-none">
-							<div class="card-body kmd_ui_dark2_bg p-0">
-								<ul class="list-group">
-								  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
-										    Notarised Last 24hrs
-										    <span class="badge p-2 kmd_ui_dark4_bg">
-										    	{{ chain_ntx_summary.chain_ntx_today }}
-										    </span>
-										</button>
-								  	</li>
-								 	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
-									    	Notarised Season
-										    <span class="badge p-2 kmd_ui_dark4_bg">
-										    	{{ chain_ntx_summary.chain_ntx_season }}
-										    </span>
-										</button>									    
-								  	</li>
-								  	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
-										    Last Notarisation
-										    <span class="badge p-2 kmd_ui_dark4_bg">
-										    	{{ chain_ntx_summary.time_since_ntx }}
-										    </span>
-										</button>
-								  	</li>
-								</ul> 	
-							</div>
+	<div class="row">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0 mt-auto shadow-none">
+				<div class="card-body kmd_ui_dark2_bg p-0">
+					<ul class="list-group">
+					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+						    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+							    Notarised Last 24hrs
+							    <span class="badge p-2 kmd_ui_dark4_bg">
+							    	{{ chain_ntx_summary.chain_ntx_today }}
+							    </span>
+							</button>
+					  	</li>
+					 	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+						    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+						    	Notarised Season
+							    <span class="badge p-2 kmd_ui_dark4_bg">
+							    	{{ chain_ntx_summary.chain_ntx_season }}
+							    </span>
+							</button>									    
+					  	</li>
+					  	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+						    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+							    Last Notarisation
+							    <span class="badge p-2 kmd_ui_dark4_bg">
+							    	{{ chain_ntx_summary.time_since_ntx }}
+							    </span>
+							</button>
+					  	</li>
+					</ul> 	
+				</div>
+			</div>
+        	<div class="card kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0 mt-auto shadow-none">
+        		<div class="row d-flex justify-content-between align-items-center">
+        			<a href="//{{ request.get_host }}/coin_profile/{{ chain }}">
+	            		<div class="p-1 col-4">
+							{% for coin, site_links in coin_social.items %}
+								{% if chain == coin and site_links.icon != '' %}
+									<img class="card-img-top m-auto auto-width p-2" height='96px' src="{{ site_links.icon }}" alt="{{ chain }} image here" style="border-radius: 50%;">
+								{% else %}
+									<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/coins/icon/' %}{{ chain|lower }}.png" alt="{{ chain }} image" style="border-radius: 50%;">
+								{% endif %}
+							{% endfor %}
 						</div>
-		            	<div class="card kmd_ui_dark2_bg kmd_ui_light3 col-4 px-0 mt-auto shadow-none">
-		            		<div class="row d-flex justify-content-between align-items-center">
-		            			<a href="//{{ request.get_host }}/coin_profile/{{ chain }}">
-				            		<div class="p-1 col-4">
-										{% for coin, site_links in coin_social.items %}
-											{% if chain == coin and site_links.icon != '' %}
-												<img class="card-img-top m-auto auto-width p-2" height='96px' src="{{ site_links.icon }}" alt="{{ chain }} image here" style="border-radius: 50%;">
-											{% else %}
-												<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/coins/icon/' %}{{ chain|lower }}.png" alt="{{ chain }} image" style="border-radius: 50%;">
-											{% endif %}
-										{% endfor %}
-									</div>
-									<div class="text-left my-auto p-0 col-7">
-									{% for coin, site_links in coin_social.items %}
-										{% if chain == coin %}
-											{% for site, link in site_links.items %}
-												{% if site == 'twitter' and link != '' %}
-													<i class="fab fa-twitter mr-2"></i>  <a class="sml-social" href="https://twitter.com/{{ link }}">{{ link }}</a><br />
-												{% elif site == 'discord' and link != '' %}
-													<i class="fab fa-discord mr-2"></i> <a class="sml-social" href="https://discordapp.com/users/{{ link }}">{{ link }}</a><br />
-												{% elif site == 'github' and link != '' %}
-													<i class="fab fa-github mr-2"></i> <a class="sml-social" href="https://github.com/{{ link }}">{{ link }}</a><br />
-												{% elif site == 'youtube' and link != '' %}
-													<i class="fab fa-youtube mr-2"></i> <a class="sml-social" href="https://www.youtube.com/channel{{ link }}"> Youtube Channel</a><br />
-												{% elif site == 'telegram' and link != '' %}
-													<i class="fab fa-telegram-plane mr-2"></i> <a class="sml-social" href="https://t.me/{{ link }}">{{ link }}</a><br />
-												{% elif site == 'explorer' and link != '' %}
-													<i class="fas fa-search mr-2"></i> <a class="sml-social" href="https://{{ link }}">{{ link }}</a><br />
-												{% elif site == 'website' and link != '' %}
-													<i class="fas fa-desktop mr-2"></i> <a class="sml-social" href="https://{{ link }}">{{ link }}</a><br />
-												{% endif %}
-											{% endfor %}
-										{% endif %}
+						<div class="text-left my-auto p-0 col-7">
+						{% for coin, site_links in coin_social.items %}
+							{% if chain == coin %}
+								{% for site, link in site_links.items %}
+									{% if site == 'twitter' and link != '' %}
+										<i class="fab fa-twitter mr-2"></i>  <a class="sml-social" href="https://twitter.com/{{ link }}">{{ link }}</a><br />
+									{% elif site == 'discord' and link != '' %}
+										<i class="fab fa-discord mr-2"></i> <a class="sml-social" href="https://discordapp.com/users/{{ link }}">{{ link }}</a><br />
+									{% elif site == 'github' and link != '' %}
+										<i class="fab fa-github mr-2"></i> <a class="sml-social" href="https://github.com/{{ link }}">{{ link }}</a><br />
+									{% elif site == 'youtube' and link != '' %}
+										<i class="fab fa-youtube mr-2"></i> <a class="sml-social" href="https://www.youtube.com/channel{{ link }}"> Youtube Channel</a><br />
+									{% elif site == 'telegram' and link != '' %}
+										<i class="fab fa-telegram-plane mr-2"></i> <a class="sml-social" href="https://t.me/{{ link }}">{{ link }}</a><br />
+									{% elif site == 'explorer' and link != '' %}
+										<i class="fas fa-search mr-2"></i> <a class="sml-social" href="https://{{ link }}">{{ link }}</a><br />
+									{% elif site == 'website' and link != '' %}
+										<i class="fas fa-desktop mr-2"></i> <a class="sml-social" href="https://{{ link }}">{{ link }}</a><br />
+									{% endif %}
+								{% endfor %}
+							{% endif %}
+						{% endfor %}
+						</div>	
+					</a>									
+				</div>
+        		<div class="row d-flex justify-content-between align-items-center m-auto">
+        			<a href="//{{ request.get_host }}/notary_profile/{{ chain }}" class="text-uppercase">
+        				<h3 style="margin:0.75rem;" class="">{{ chain }}</h3>
+					</a>								
+				</div>
+			</div>
+			<div class="card text-center kmd_ui_dark4_bg kmd_ui_light1 col-12 px-0 mt-auto shadow-none">
+				<div class="card-body kmd_ui_dark2_bg p-0">
+					<ul class="list-group">
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+						    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+						    	{% if chain != 'KMD' %}
+							    	Last Notarisation Block (KMD)
+							    {% else %}
+							    	Last Notarisation Block (BTC)
+							    {% endif %}
+							    <span class="badge p-2 kmd_ui_dark4_bg">
+							    	{{ chain_ntx_summary.last_ntx_block }}
+							    </span>
+							</button>
+					    </li>
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+						    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+							    Last Notarisation Block ({{ chain }})
+							    <span class="badge p-2 kmd_ui_dark4_bg">
+							    	{{ chain_ntx_summary.last_ntx_ac_block }}
+							    </span>
+							</button>
+					    </li>
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+						    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
+							    Lag
+							    <span class="badge p-2 kmd_ui_dark4_bg">
+							    	{{ chain_ntx_summary.ntx_lag }}
+							    </span>
+							</button>
+					    </li>
+					</ul> 
+				</div>
+			</div>
+		</div>
+	</div>	
+	<div class="row">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto shadow-none">
+			<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mt-auto shadow-none">
+				<div class="card-body kmd_ui_dark2_bg p-0 shadow-none">
+					<ul class="list-group">
+						<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+							<button type="button" class="btn col-12 shadow-none">
+							    <div class="col-12 d-flex justify-content-between align-items-center">
+								    {% for region, data in top_coin_notarisers.items %}
+									    <span class="badge kmd_ui_dark4_bg m-2" style="width:16%; background-color: #26456B !important;">
+									    	<div class="col-12">
+									    		<i class="fas fa-trophy"></i>
+									    	</div>
+									    	<div class="col-12">
+									    		{{ data.top_notary }}<br />{{ data.top_ntx_count }}
+									    	</div>
+									    </span>
 									{% endfor %}
-									</div>	
-								</a>									
-							</div>
-		            		<div class="row d-flex justify-content-between align-items-center m-auto">
-		            			<a href="//{{ request.get_host }}/notary_profile/{{ chain }}" class="text-uppercase">
-		            				<h3 style="margin:0.75rem;" class="">{{ chain }}</h3>
-								</a>								
-							</div>
-						</div>
-						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light1 col-12 px-0 mt-auto shadow-none">
-							<div class="card-body kmd_ui_dark2_bg p-0">
-								<ul class="list-group">
-								    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
-									    	{% if chain != 'KMD' %}
-										    	Last Notarisation Block (KMD)
-										    {% else %}
-										    	Last Notarisation Block (BTC)
-										    {% endif %}
-										    <span class="badge p-2 kmd_ui_dark4_bg">
-										    	{{ chain_ntx_summary.last_ntx_block }}
-										    </span>
-										</button>
-								    </li>
-								    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
-										    Last Notarisation Block ({{ chain }})
-										    <span class="badge p-2 kmd_ui_dark4_bg">
-										    	{{ chain_ntx_summary.last_ntx_ac_block }}
-										    </span>
-										</button>
-								    </li>
-								    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-									    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
-										    Lag
-										    <span class="badge p-2 kmd_ui_dark4_bg">
-										    	{{ chain_ntx_summary.ntx_lag }}
-										    </span>
-										</button>
-								    </li>
-								</ul> 
-							</div>
-						</div>
-					</div>
-				</div>	
-				<div class="row">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto shadow-none">
-						<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mt-auto shadow-none">
-							<div class="card-body kmd_ui_dark2_bg p-0 shadow-none">
-								<ul class="list-group">
-									<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-										<button type="button" class="btn col-12 shadow-none">
-										    <div class="col-12 d-flex justify-content-between align-items-center">
-											    {% for region, data in top_coin_notarisers.items %}
-												    <span class="badge kmd_ui_dark4_bg m-2" style="width:16%; background-color: #26456B !important;">
-												    	<div class="col-12">
-												    		<i class="fas fa-trophy"></i>
-												    	</div>
-												    	<div class="col-12">
-												    		{{ data.top_notary }}<br />{{ data.top_ntx_count }}
-												    	</div>
-												    </span>
-												{% endfor %}
-											</div>
-										</button>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#ntx"><span class='badge kmd_ui_dark1_bg p-2'>Notarisations</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#balances"><span class='badge kmd_ui_dark1_bg p-2'>Balances</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#addresses"><span class='badge kmd_ui_dark1_bg p-2'>Addresses</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#funding"><span class='badge kmd_ui_dark1_bg p-2'>Funding</span></a>
-						</h4>
-					</div>
-				</div>
-				<div class="row my-3">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
-							<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
-								<div class="my-auto">
-									{{ chain }} Wallet Balances
 								</div>
-								<div>
-								    <span class="badge kmd_ui_dark1_bg m-2 p-2">AR <i class="fa fa-circle" aria-hidden="true" style="color:#dc0333"></i></span>
-								    <span class="badge kmd_ui_dark1_bg m-2 p-2">EU <i class="fa fa-circle" aria-hidden="true" style="color:#2fea8b"></i></span>
-								    <span class="badge kmd_ui_dark1_bg m-2 p-2">NA <i class="fa fa-circle" aria-hidden="true" style="color:#b541ea"></i></span>
-								    <span class="badge kmd_ui_dark1_bg m-2 p-2">SH <i class="fa fa-circle" aria-hidden="true" style="color:#00e2ff"></i></span>
-								    <span class="badge kmd_ui_dark1_bg m-2 p-2">DEV <i class="fa fa-circle" aria-hidden="true" style="color:#f7931a"></i></span>
-								</div>
-							</div>
-							<div class="card-body kmd_ui_dark1_bg">
-								<span id="graph_title"></span>
-							    <canvas id="myChartBar"></canvas> 
-							</div>	
-						</div>	
-					</div>	
-				</div>	
-				<div class="row my-3">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<div class="card kmd_ui_light4">
-							<div class="card-header kmd_ui_dark1_bg">
-								{{ chain }} ADDRESSES & BALANCES
-							</div>
-							<div class="card-body kmd_ui_dark1_bg">
-								<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%"  data-ajax="{% url 'balancesViewSet-list' %}?format=datatables&chain={{ chain }}">
-									<thead>
-										<tr>
-											<th data-data="chain">CHAIN</th>
-											<th data-data="notary">NOTARY</th>
-											<th data-data="address">ADDRESS</th>
-											<th data-data="balance">BALANCE</th>
-											<th data-data="season">SEASON</th>
-											<th data-data="node">NODE</th>
-										</tr>
-									</thead>
-								</table>
-							</div>
-						</div>	
+							</button>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#ntx"><span class='badge kmd_ui_dark1_bg p-2'>Notarisations</span></a>
+			</h4>
+			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#balances"><span class='badge kmd_ui_dark1_bg p-2'>Balances</span></a>
+			</h4>
+			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#addresses"><span class='badge kmd_ui_dark1_bg p-2'>Addresses</span></a>
+			</h4>
+			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#funding"><span class='badge kmd_ui_dark1_bg p-2'>Funding</span></a>
+			</h4>
+		</div>
+	</div>
+	<div class="row my-3">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
+				<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
+					<div class="my-auto">
+						{{ chain }} Wallet Balances
+					</div>
+					<div>
+					    <span class="badge kmd_ui_dark1_bg m-2 p-2">AR <i class="fa fa-circle" aria-hidden="true" style="color:#dc0333"></i></span>
+					    <span class="badge kmd_ui_dark1_bg m-2 p-2">EU <i class="fa fa-circle" aria-hidden="true" style="color:#2fea8b"></i></span>
+					    <span class="badge kmd_ui_dark1_bg m-2 p-2">NA <i class="fa fa-circle" aria-hidden="true" style="color:#b541ea"></i></span>
+					    <span class="badge kmd_ui_dark1_bg m-2 p-2">SH <i class="fa fa-circle" aria-hidden="true" style="color:#00e2ff"></i></span>
+					    <span class="badge kmd_ui_dark1_bg m-2 p-2">DEV <i class="fa fa-circle" aria-hidden="true" style="color:#f7931a"></i></span>
 					</div>
 				</div>
+				<div class="card-body kmd_ui_dark1_bg">
+					<span id="graph_title"></span>
+				    <canvas id="myChartBar"></canvas> 
+				</div>	
+			</div>	
+		</div>	
+	</div>	
+	<div class="row my-3">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card kmd_ui_light4">
+				<div class="card-header kmd_ui_dark1_bg">
+					{{ chain }} ADDRESSES & BALANCES
+				</div>
+				<div class="card-body kmd_ui_dark1_bg">
+					<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%"  data-ajax="{% url 'balancesViewSet-list' %}?format=datatables&chain={{ chain }}">
+						<thead>
+							<tr>
+								<th data-data="chain">CHAIN</th>
+								<th data-data="notary">NOTARY</th>
+								<th data-data="address">ADDRESS</th>
+								<th data-data="balance">BALANCE</th>
+								<th data-data="season">SEASON</th>
+								<th data-data="node">NODE</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>	
+		</div>
+	</div>
     <!-- jquery -->
   
   	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 

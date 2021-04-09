@@ -13,16 +13,20 @@ def get_season(time_stamp=None):
         time_stamp = int(time.time())
     for season in SEASONS_INFO:
         if season.find("Testnet") == -1:
-            if POSTSEASON:
-                if season in SEASONS_INFO:
+            if season in SEASONS_INFO:
+                if POSTSEASON:
                     if 'post_season_end_time' in SEASONS_INFO[season]:
                         end_time = SEASONS_INFO[season]['post_season_end_time']
                     else:
                         end_time = SEASONS_INFO[season]['end_time']
                 else:
                     end_time = SEASONS_INFO[season]['end_time']
-        if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= end_time:
-            return season
+                if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= end_time:
+                    return season
+            else:
+                logger.warning(f"[get_season] unrecognised season (not in SEASONS_INFO): {season}")
+        else:
+            logger.warning(f"[get_season] ignoring season: {season}")
     return "Unofficial"
 
 

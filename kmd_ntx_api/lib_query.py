@@ -7,6 +7,7 @@ import random
 from datetime import datetime as dt
 from .models import *
 from .lib_const import *
+from .lib_helper import *
 
 from dotenv import load_dotenv
 from django.db.models import Count, Min, Max, Sum
@@ -45,6 +46,7 @@ def get_balances_data(season=None, chain=None, notary=None):
     return data
 
 
+# TODO: Awaiting delegation to crons / db table
 def get_chain_sync_data(chain=None):
     data = chain_sync.objects.all()
     if chain:

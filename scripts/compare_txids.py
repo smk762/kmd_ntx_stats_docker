@@ -6,7 +6,7 @@ import time
 import requests
 from lib_notary import *
 from cron_populate_ntx_tables import *
-from lib_const import CONN, CURSOR, RPC
+from lib_const import *
 
 chain_epochs = {
   "AYA": {

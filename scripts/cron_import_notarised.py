@@ -2,22 +2,13 @@
 import json
 import time
 import random
-import logging
-import logging.handlers
 import requests
-from lib_const import NOTARY_BTC_ADDRESSES, OTHER_SERVER
 from lib_notary import *
 from models import notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
 from lib_const import *
 from lib_api import get_btc_tx_info
 from lib_table_select import get_existing_notarised_txids, get_notarised_chains, get_notarised_seasons
 
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 seasons = get_notarised_seasons()
 

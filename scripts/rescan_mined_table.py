@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
-from lib_const import CURSOR
+from lib_const import *
 from models import mined_row, season_mined_count_row
-
-import logging
-import logging.handlers
-
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 sql = "SELECT DISTINCT season \
        FROM mined;"

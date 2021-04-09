@@ -291,7 +291,8 @@ ENDPOINTS = {
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": False,
+		"review": True
 	},
 	"info/mining_24hrs": {
 		"category": "wallets",

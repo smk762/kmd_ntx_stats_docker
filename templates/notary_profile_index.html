@@ -1,83 +1,83 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-				<div class="row m-4">
-					<div class="card-deck d-flex justify-content-between col-12 m-auto">
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#AR"><span class='badge kmd_ui_dark1_bg p-2'>Asia & Russia</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#EU"><span class='badge kmd_ui_dark1_bg p-2'>European Union</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#NA"><span class='badge kmd_ui_dark1_bg p-2'>North America</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#SH"><span class='badge kmd_ui_dark1_bg p-2'>Southern Hemisphere</span></a>
-						</h4>
-						<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-							<a href="#DEV"><span class='badge kmd_ui_dark1_bg p-2'>Developers</span></a>
-						</h4>
-					</div>
-				</div>
-            	{% for region, info in nn_info.regions_info.items %}	
-				<div class="card text-center">	
-					<div class="card-header kmd_ui_dark1_bg">
-						<a id="{{region}}" class="section-anchor">
-							<h4 class="text-uppercase kmd_teal">{{ info.name }}</h4>
-						</a>
-					</div>		
-					<div class="card-body kmd_ui_dark1_bg">
-						<div class="row m-1 d-flex justify-content-between">	
-			            	{% for node in info.nodes %}
-			            	<div class="card kmd_ui_dark3_bg kmd_ui_light3 col-2 px-0 mx-1">
-			            		<a href="//{{ request.get_host }}/notary_profile/{{ node }}">
+	<div class="row m-4">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#AR"><span class='badge kmd_ui_dark1_bg p-2'>Asia & Russia</span></a>
+			</h4>
+			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#EU"><span class='badge kmd_ui_dark1_bg p-2'>European Union</span></a>
+			</h4>
+			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#NA"><span class='badge kmd_ui_dark1_bg p-2'>North America</span></a>
+			</h4>
+			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#SH"><span class='badge kmd_ui_dark1_bg p-2'>Southern Hemisphere</span></a>
+			</h4>
+			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#DEV"><span class='badge kmd_ui_dark1_bg p-2'>Developers</span></a>
+			</h4>
+		</div>
+	</div>
+	{% for region, info in nn_info.regions_info.items %}	
+	<div class="card text-center">	
+		<div class="card-header kmd_ui_dark1_bg">
+			<a id="{{region}}" class="section-anchor">
+				<h4 class="text-uppercase kmd_teal">{{ info.name }}</h4>
+			</a>
+		</div>		
+		<div class="card-body kmd_ui_dark1_bg">
+			<div class="row m-1 d-flex justify-content-between">	
+            	{% for node in info.nodes %}
+            	<div class="card kmd_ui_dark3_bg kmd_ui_light3 col-2 px-0 mx-1">
+            		<a href="//{{ request.get_host }}/notary_profile/{{ node }}">
 
-				            		<div class="p-2">
-									{% for nn, site_links in nn_social.items %}
-										{% if node == nn %}
-											{% if site_links.icon != '' %}
-												<img class="card-img-top m-auto auto-width" height='96px' src="{{ site_links.icon }}" alt="{{ node }} image" style="border-radius: 50%;">
-											{% else %}
-												<img class="card-img-top m-auto auto-width" height='96px' src="{% static 'img/notary/icon/' %}{{ node }}.png" alt="{{ node }} image" style="border-radius: 50%;">
-											{% endif %}
+	            		<div class="p-2">
+						{% for nn, site_links in nn_social.items %}
+							{% if node == nn %}
+								{% if site_links.icon != '' %}
+									<img class="card-img-top m-auto auto-width" height='96px' src="{{ site_links.icon }}" alt="{{ node }} image" style="border-radius: 50%;">
+								{% else %}
+									<img class="card-img-top m-auto auto-width" height='96px' src="{% static 'img/notary/icon/' %}{{ node }}.png" alt="{{ node }} image" style="border-radius: 50%;">
+								{% endif %}
+							{% endif %}
+						{% endfor %}
+						</div>
+					</a>	
+					<div class="card-body kmd_ui_dark4_bg" style="padding: 1rem; ">
+						<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
+	            			<a href="//{{ request.get_host }}/notary_profile/{{ node }}">
+	            				{{ node }}
+							</a><br />
+							{% for nn, site_links in nn_social.items %}
+								{% if node == nn %}
+									{% for site, link in site_links.items %}
+										{% if site == 'twitter' and link != '' %}
+											<a href="{{ link }}"><i class="fab fa-twitter"></i></a>
+										{% elif site == 'discord' and link != '' %}
+											<a href="https://discordapp.com/users/{{ link }}"><i class="fab fa-discord"></i></a>
+										{% elif site == 'github' and link != '' %}
+											<a href="{{ link }}"><i class="fab fa-github"></i></a>
+										{% elif site == 'youtube' and link != '' %}
+											<a href="{{ link }}"><i class="fab fa-youtube"></i></a>
+										{% elif site == 'keybase' and link != '' %}
+											<a href="https://keybase.io/{{ link }}"><i class="fab fa-keybase"></i></a>
+										{% elif site == 'telegram' and link != '' %}
+											<a href="https://t.me/{{ link }}"><i class="fab fa-telegram-plane"></i></a>
+										{% elif site == 'website' and link != '' %}
+											<a href="{{ link }}"><i class="fas fa-desktop"></i></a>
 										{% endif %}
 									{% endfor %}
-									</div>
-								</a>	
-								<div class="card-body kmd_ui_dark4_bg" style="padding: 1rem; ">
-									<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
-				            			<a href="//{{ request.get_host }}/notary_profile/{{ node }}">
-				            				{{ node }}
-										</a><br />
-										{% for nn, site_links in nn_social.items %}
-											{% if node == nn %}
-												{% for site, link in site_links.items %}
-													{% if site == 'twitter' and link != '' %}
-														<a href="{{ link }}"><i class="fab fa-twitter"></i></a>
-													{% elif site == 'discord' and link != '' %}
-														<a href="https://discordapp.com/users/{{ link }}"><i class="fab fa-discord"></i></a>
-													{% elif site == 'github' and link != '' %}
-														<a href="{{ link }}"><i class="fab fa-github"></i></a>
-													{% elif site == 'youtube' and link != '' %}
-														<a href="{{ link }}"><i class="fab fa-youtube"></i></a>
-													{% elif site == 'keybase' and link != '' %}
-														<a href="https://keybase.io/{{ link }}"><i class="fab fa-keybase"></i></a>
-													{% elif site == 'telegram' and link != '' %}
-														<a href="https://t.me/{{ link }}"><i class="fab fa-telegram-plane"></i></a>
-													{% elif site == 'website' and link != '' %}
-														<a href="{{ link }}"><i class="fas fa-desktop"></i></a>
-													{% endif %}
-												{% endfor %}
-											{% endif %}
-										{% endfor %}
-									</p>
-								</div>
-							</div>	
-			                {% endfor %}
-						</div>		
-					</div>		
-				</div>		
-            	{% endfor %}
+								{% endif %}
+							{% endfor %}
+						</p>
+					</div>
+				</div>	
+                {% endfor %}
+			</div>		
+		</div>		
+	</div>		
+	{% endfor %}
 {% endblock %}
 
