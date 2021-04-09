@@ -45,6 +45,7 @@ def run_updates():
 def thread_chain_ntx_daily_aggregate(season, day):
 
     chains_aggr_resp = get_chain_ntx_date_aggregates(day, season)
+    logger.info(f"[chains_aggr_resp]: {chains_aggr_resp}")
     for item in chains_aggr_resp:
         try:
             row = notarised_chain_daily_row()
@@ -328,7 +329,8 @@ def update_season_notarised_counts(season):
 
 
     results = get_chain_ntx_season_aggregates(season)
-
+    logger.info(f"get_chain_ntx_season_aggregates(season): {results}")
+    
     for item in results:
         chain = item[0]
         block_height = item[1]
@@ -338,6 +340,7 @@ def update_season_notarised_counts(season):
         conditions = "block_height="+str(block_height)+" AND chain='"+chain+"'"
         try:
             last_ntx_result = select_from_table('notarised', cols, conditions)[0]
+            logger.info(f"last_ntx_result: {last_ntx_result}")
             kmd_ntx_blockhash = last_ntx_result[0]
             kmd_ntx_txid = last_ntx_result[1]
             kmd_ntx_blocktime = last_ntx_result[2]
@@ -647,7 +650,5 @@ if __name__ == "__main__":
             update_season_notarised_counts(season)
             update_latest_ntx(season)
 
-    CURSOR.close()
-    CONN.close()
 
 
