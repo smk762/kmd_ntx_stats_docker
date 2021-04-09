@@ -77,12 +77,12 @@ class api_decode_op_return_tool(viewsets.ViewSet):
 
 # TODO: cater for coins without params etc.
 def get_address_from_pubkey(request):
-
-    if "coin" in request.GET and "pubkey" in request.GET:
-
-        if request.GET["coin"] in COIN_PARAMS:
-
-            coin = request.GET["coin"]
+    if "coin" in request.GET:
+        coin = request.GET["coin"]
+    else:
+        coin = "KMD"
+    if "pubkey" in request.GET:
+        if coin in COIN_PARAMS:
             pubkey = request.GET["pubkey"]
 
             return {
