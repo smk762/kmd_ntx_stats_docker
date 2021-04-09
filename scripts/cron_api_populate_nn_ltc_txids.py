@@ -276,8 +276,8 @@ def scan_ltc_transactions(season):
             j += 1
             # Get tx data from Blockcypher API
             logger.info(f">>> Processing txid {j}/{num_txids}")
-            ltc_row = get_ltc_tx_info(txid)
-            if 'fees' in ltc_row:
+            tx_info = get_ltc_tx_info(txid)
+            if 'fees' in tx_info:
                 ltc_row = ltc_tx_row()
                 ltc_row.txid = txid
                 ltc_row.address = notary_address
