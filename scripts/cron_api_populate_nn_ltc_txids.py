@@ -247,13 +247,16 @@ def detect_split(txid_data, addresses):
     return False
 
 def scan_ltc_transactions(season):
-    season_ltc_addresses = NOTARY_LTC_ADDRESSES[season][:]
+    season_ltc_addresses = NOTARY_LTC_ADDRESSES[season][:]+[LTC_NTX_ADDR]
     num_addr = len(season_ltc_addresses)
     notary_last_ntx = get_notary_last_ntx("LTC")
 
     i = 0
     while len(season_ltc_addresses) > 0:
-        notary_address = random.choice(season_ltc_addresses)
+        if LTC_NTX_ADDR in season_ltc_addresses:
+            notary_address = LTC_NTX_ADDR
+        else:
+            notary_address = random.choice(season_ltc_addresses)
         i += 1
 
         if notary_address in NN_LTC_ADDRESSES_DICT[season]:

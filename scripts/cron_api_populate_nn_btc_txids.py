@@ -254,7 +254,7 @@ def detect_split(btc_row, addresses):
 
 
 def scan_btc_transactions(season):
-    season_btc_addresses = NOTARY_BTC_ADDRESSES[season][:]
+    season_btc_addresses = NOTARY_BTC_ADDRESSES[season][:]+[BTC_NTX_ADDR]
     num_addr = len(season_btc_addresses)
     notary_last_ntx = get_notary_last_ntx("BTC")
 
@@ -262,7 +262,10 @@ def scan_btc_transactions(season):
 
 
     while len(season_btc_addresses) > 0:
-        notary_address = random.choice(season_btc_addresses)
+        if BTC_NTX_ADDR in season_btc_addresses:
+            notary_address = LTC_NTX_ADDR
+        else:
+            notary_address = random.choice(season_btc_addresses)
         i += 1
 
         if notary_address in NN_BTC_ADDRESSES_DICT[season]:
