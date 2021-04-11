@@ -64,6 +64,11 @@ def get_dpow_server_coins_dict(season):
 
     return chains_dict
 
+def get_server_chains(season=None):
+    if not season:
+        season = "Season_4"
+    return get_dpow_server_coins_dict(season)
+    
 def get_epoch_id(season, server, block_time):
     epochs = get_epochs_dict()
     for epoch_id in epochs[season][server]:
@@ -960,15 +965,6 @@ def get_sidebar_links(season=None):
     }
     return sidebar_links
 
-def get_server_chains(season=None):
-    if not season:
-        season = "Season_4"
-    coins_dict = get_dpow_server_coins_dict(season)
-    server_chains = {
-        "main":get_mainnet_chains(coins_dict),
-        "third_party":get_third_party_chains(coins_dict)
-    }
-    return server_chains
 
 def get_server_chains_lists(season):
 

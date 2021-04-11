@@ -83,8 +83,12 @@ def parse_dpow_coins(coins_data):
 
             version = info[2]
             server = info[4].lower()
+            if server == "dpow-3p":
+                server = "Third_Party"
+            elif server == "dpow-mainnet":
+                server = "Main"
 
-            if coin == "GleecBTC" and server == "dpow-3p":
+            if coin == "GleecBTC" and server == "Third_Party":
                 logger.warning(f"[parse_dpow_coins] Translating GleecBTC to GLEEC-OLD")
                 coin = "GLEEC-OLD"
             elif coin in TRANSLATE_COINS:

@@ -21,7 +21,7 @@ class AddressesSerializer(serializers.HyperlinkedModelSerializer):
 
 class addrFromBase58Serializer(serializers.Serializer):
     class Meta:
-        fields = ["pubkey", "pub_addr", "script_addr", "secret_key"]
+        fields = ["pubkey", "pubtype", "wiftype", "p2shtype"]
 
 class addrFromPubkeySerializer(serializers.Serializer):
     class Meta:

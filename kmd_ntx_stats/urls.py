@@ -33,9 +33,17 @@ router.register(r'info/balances',
                 api_filtered_viewsets.balances_filter,
                 basename='balances_filter') 
 
+router.register(r'info/base_58',
+                api_filtered_viewsets.base_58_filter,
+                basename='base_58_filter')
+
 router.register(r'info/coins',
                 api_filtered_viewsets.coins_filter,
                 basename='coins_filter')
+
+router.register(r'info/daemon_cli',
+                api_filtered_viewsets.daemon_cli_filter,
+                basename='daemon_cli_filter')
 
 router.register(r'info/explorers',
                 api_filtered_viewsets.explorers_filter,
@@ -49,9 +57,6 @@ router.register(r'info/launch_params',
                 api_filtered_viewsets.launch_params_filter,
                 basename='launch_params_filter')
 
-router.register(r'info/daemon_cli',
-                api_filtered_viewsets.daemon_cli_filter,
-                basename='daemon_cli_filter')
 
 router.register(r'info/electrums_ssl',
                 api_filtered_viewsets.electrums_ssl_filter,
@@ -311,10 +316,6 @@ urlpatterns = [
     path('api/info/sidebar_links',
           api_views.api_sidebar_links,
           name='api_sidebar_links'),
-
-    path('api/info/server_chains',
-          api_views.api_server_chains,
-          name='api_server_chains'),
 
     path('api/info/dpow_server_coins',
           api_views.api_dpow_server_coins_dict,

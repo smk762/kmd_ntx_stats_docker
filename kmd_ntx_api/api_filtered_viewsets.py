@@ -28,6 +28,11 @@ class addresses_filter(viewsets.ViewSet):
 
     def get(self, request, format=None):
         filters = self.serializer_class.Meta.fields
+        if 'chain' not in request.GET and 'notary' not in request.GET and 'season' not in request.GET:
+            return JsonResponse({
+                "error":"You need to specify at least one of the following filter parameters: ['chain', 'notary', 'season']",
+                "filters":filters,
+                })
         resp = get_addresses_data_api(request)
         return JsonResponse({
             "count":len(resp),
@@ -58,6 +63,26 @@ class balances_filter(viewsets.ViewSet):
             "results":resp
             })
 
+
+class base_58_filter(viewsets.ViewSet):  # TODO: add coin type filter
+
+    """
+    Returns explorers sourced from coins repo
+    """    
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        
+        resp = get_base_58_data_api()
+        return JsonResponse({
+            "count":len(resp),
+            "results":resp
+            })
+
+
 class coins_filter(viewsets.ViewSet):
     """
     API endpoint showing coininfo from coins and dpow repositories
@@ -79,6 +104,33 @@ class coins_filter(viewsets.ViewSet):
             "filters":filters,
             "results":resp
             })
+
+
+class daemon_cli_filter(viewsets.ViewSet):  # TODO: add coin type filter
+
+    """
+    Returns explorers sourced from coins repo
+    """    
+    serializer_class = DaemonCliSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        filters = self.serializer_class.Meta.fields
+
+        chain = None
+        if 'chain' in request.GET:
+            chain = request.GET["chain"]
+        
+        resp = get_daemon_cli_data_api(chain)
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":resp
+            })
+
 
 class electrums_filter(viewsets.ViewSet):  # TODO: add coin type filter
 
@@ -103,6 +155,7 @@ class electrums_filter(viewsets.ViewSet):  # TODO: add coin type filter
             "results":resp
             })
 
+
 class electrums_ssl_filter(viewsets.ViewSet):  # TODO: add coin type filter
 
     """
@@ -125,6 +178,7 @@ class electrums_ssl_filter(viewsets.ViewSet):  # TODO: add coin type filter
             "filters":filters,
             "results":resp
             })
+
 
 class explorers_filter(viewsets.ViewSet):  # TODO: add coin type filter
 
@@ -174,30 +228,6 @@ class launch_params_filter(viewsets.ViewSet):  # TODO: add coin type filter
             "results":resp
             })
 
-class daemon_cli_filter(viewsets.ViewSet):  # TODO: add coin type filter
-
-    """
-    Returns explorers sourced from coins repo
-    """    
-    serializer_class = DaemonCliSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def create(self, validated_data):
-        return Task(id=None, **validated_data)
-
-    def get(self, request, format=None):
-        filters = self.serializer_class.Meta.fields
-
-        chain = None
-        if 'chain' in request.GET:
-            chain = request.GET["chain"]
-        
-        resp = get_daemon_cli_data_api(chain)
-        return JsonResponse({
-            "count":len(resp),
-            "filters":filters,
-            "results":resp
-            })
 
 
 

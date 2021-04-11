@@ -95,6 +95,29 @@ def get_balances_data_api(request):
     return resp
 
 
+def get_base_58_data_api():
+    coins_data = coins.objects.all()
+    coins_data = coins_data.order_by('chain').values('chain', 'coins_info')
+    
+    resp = {}
+    for item in coins_data:
+        coins_info = item['coins_info']
+        chain = item['chain']
+        if len(coins_info) > 0:
+            if "pubtype" in coins_info and "wiftype" in coins_info and "p2shtype" in coins_info:
+                pubtype = coins_info["pubtype"]
+                wiftype = coins_info["wiftype"]
+                p2shtype = coins_info["p2shtype"]
+                resp.update({
+                    chain: {
+                        "pubtype":pubtype,
+                        "wiftype":wiftype,
+                        "p2shtype":p2shtype
+                    }
+                })
+    return resp
+
+
 def get_coins_data_api(request):
     resp = {}
     data = coins.objects.all()
@@ -116,6 +139,24 @@ def get_coins_data_api(request):
             },
         })
 
+    return resp
+
+
+def get_daemon_cli_data_api(chain=None):
+    coins_data = coins.objects.all()
+    if chain:
+        coins_data = coins_data.filter(chain=chain)
+
+    coins_data = coins_data.order_by('chain').values('chain', 'coins_info')
+    
+    resp = {}
+    for item in coins_data:
+        coins_info = item['coins_info']
+        chain = item['chain']
+        if len(coins_info) > 0:
+            if "cli" in coins_info:
+                cli = coins_info["cli"]
+                resp.update({chain:cli})
     return resp
 
 
@@ -180,22 +221,6 @@ def get_launch_params_data_api(chain=None):
                 resp.update({chain:launch_params})
     return resp
 
-def get_daemon_cli_data_api(chain=None):
-    coins_data = coins.objects.all()
-    if chain:
-        coins_data = coins_data.filter(chain=chain)
-
-    coins_data = coins_data.order_by('chain').values('chain', 'coins_info')
-    
-    resp = {}
-    for item in coins_data:
-        coins_info = item['coins_info']
-        chain = item['chain']
-        if len(coins_info) > 0:
-            if "cli" in coins_info:
-                cli = coins_info["cli"]
-                resp.update({chain:cli})
-    return resp
 
 def get_mined_count_season_data_api(request):
     resp = {}
