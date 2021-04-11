@@ -10,7 +10,7 @@ def get_balances_graph_data(request, filter_kwargs):
     else:
         filter_kwargs.update({'chain':'KMD'})
 
-    data = get_balances_data().filter(**filter_kwargs).values('notary', 'chain', 'balance')
+    data = get_balances_data().filter(**filter_kwargs).values()
     notary_list = []                                                                          
     chain_list = []
     balances_dict = {}

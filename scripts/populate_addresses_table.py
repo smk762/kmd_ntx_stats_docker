@@ -1,50 +1,69 @@
 #!/usr/bin/env python3
-import logging
-import logging.handlers
-from lib_notary import *
+import requests
 from lib_const import *
-from lib_table_update import update_addresses_tbl
+from models import addresses_row
+from base_58 import get_addr_from_pubkey
 
-''' You should only need to run this once per season, unless notary pubkeys change. 
-Dont forget to update the pubkeys in py
+''' 
+You should only need to run this once per season, unless notary pubkeys change
+or coins with new parmas are added.
 TODO: auto grab from repo?
 '''
 
-# http://kmd.explorer.dexstats.info/insight-api-komodo/addr/RNJmgYaFF5DbnrNUX6pMYz9rcnDKC2tuAc
+def populate_addresses(season):
+    season_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins?season={season}').json()
 
-logger = logging.getLogger()
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+    if len(season_coins) > 0:
+        
+        for pubkey_season in NOTARY_PUBKEYS:
 
-for season in NOTARY_ADDRESSES_DICT:
-    if season.lower().find("third") != -1:
-        node = 'third party'
-    else:
-        node = 'main'
+            if pubkey_season.find(season) != -1:
 
-    for notary in NOTARY_ADDRESSES_DICT[season]:
-        pubkey = NOTARY_PUBKEYS[season][notary]
-
-        for chain in NOTARY_ADDRESSES_DICT[season][notary]:
-            is_main_server = (node == 'main' and chain in ANTARA_COINS or chain == 'BTC')
-            is_3p_server = (node == 'third party' and chain in THIRD_PARTY_COINS)
-            # ignore non notarising addresses
-            if chain in ['KMD', 'LTC', 'BTC'] or is_main_server or is_3p_server:
-                address = NOTARY_ADDRESSES_DICT[season][notary][chain]
-                kmd_addr = NOTARY_ADDRESSES_DICT[season][notary]["KMD"]
-                notary_id = ADDRESS_INFO[season][kmd_addr]['Notary_id']
-                row_data = (season, node, notary, notary_id, chain, pubkey, address)
-                result = update_addresses_tbl(row_data)
-                if result == 0:
-                    result = "[FAILED]"
+                if pubkey_season.find("Third_Party") != -1:
+                    coins = season_coins["Third_Party"][:]
+                    server = "Third_Party"
                 else:
-                    result = "[SUCCESS]"
-                if chain == 'GleecBTC':
-                    print(" | "+result+" | "+pubkey+" | "+address+" | "+season+" | "+node+" | "+notary+" | "+chain+" | ")
+                    coins = season_coins["Main"][:]
+                    server = "Main"
 
-CURSOR.close()
+                coins += ["BTC", "KMD", "LTC"]
+                coins.sort()
 
-CONN.close()
+                i = 0
+
+                for notary in NOTARY_PUBKEYS[pubkey_season]:
+                    pubkey = NOTARY_PUBKEYS[pubkey_season][notary]
+
+                    for coin in coins:
+                        row = addresses_row()
+                        row.chain = coin
+                        row.season = season
+                        row.server = server
+                        row.notary_id = i
+                        row.notary = notary
+                        row.pubkey = pubkey
+                        if coin == "GLEEC":
+                            if server == "Third_Party":
+                                coin = "GLEEC_3P"
+                            else:
+                                coin = "GLEEC_AC"
+                        row.address = get_addr_from_pubkey(coin, pubkey)
+                        row.update()
+
+                i += 1
+
+if __name__ == "__main__":
+
+    logger.info(f"Preparing to populate [addresses] table...")
+
+    # uncomment to clear table
+    '''
+    CURSOR.execute(f"DELETE FROM addresses;")
+    CONN.commit()
+    '''
+
+    for season in SEASONS_INFO:
+        if season in EXCLUDED_SEASONS:
+            logger.warning(f"Skipping season: {season}")
+        else:
+            populate_addresses(season)

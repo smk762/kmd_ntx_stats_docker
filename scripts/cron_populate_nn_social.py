@@ -32,11 +32,28 @@ r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/m
 elected_nn_social = r.json()
 
 season = "Season_5_Testnet"
-for notary in NOTARY_PUBKEYS['Season_5_Testnet']:
+for notary in NOTARY_PUBKEYS[season]:
     nn_social = nn_social_row()
     nn_social.notary = f"{notary}"
     nn_social.season = season
     nn_social.update()
+
+# e.g. jorian changed name, used same pubkey in testnet
+sql = "SELECT notary FROM nn_social WHERE \
+       season = '"+str(season)+"' ORDER BY notary ASC;"
+CURSOR.execute(sql)
+try:
+    results = CURSOR.fetchall()
+    for item in results:
+        if item[0] not in NOTARY_PUBKEYS[season]:
+            sql = f"DELETE FROM nn_social WHERE notary = '{item[0]}' AND season = '{season}';"
+            logger.warning(f"Deleting [nn_social] row: {season} {item[0]}")
+            CURSOR.execute(sql)
+            CONN.commit()
+except:
+    pass
+
     
+
 CURSOR.close()
 CONN.close()

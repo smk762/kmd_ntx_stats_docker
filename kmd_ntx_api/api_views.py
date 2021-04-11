@@ -99,7 +99,7 @@ def notary_ltc_txids(request):
     elif 'category' in request.GET:
         resp = get_ltc_txid_notary(None, None, request.GET['category'])
     else:
-        resp = {"error":"You need to specify a NOTARY or CATEGORY like '/nn_ltc_txid?notary=dragonhound_NA' or '/nn_btc_txid?notary=dragonhound_NA&category=NTX'"}
+        resp = {"error":"You need to specify a NOTARY or CATEGORY like '/nn_ltc_txid?notary=dragonhound_NA' or '/nn_ltc_txid?notary=dragonhound_NA&category=NTX'"}
     return JsonResponse(resp)
 
 def nn_btc_txid(request):

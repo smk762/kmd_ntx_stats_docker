@@ -440,6 +440,4 @@ if __name__ == "__main__":
         if season not in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]: 
             scan_btc_transactions(season)
 
-            CURSOR.close()
-            CONN.close()
 

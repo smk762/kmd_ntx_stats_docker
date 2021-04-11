@@ -81,20 +81,23 @@ def get_dexstats_balance(chain, addr):
     balance = r.json()['balance']
     return balance
 
-def get_balance(chain, pubkey, addr, notary, node):
+def get_balance(chain, pubkey, addr, server):
     balance = -1
-    check_bal = False
     try:
         if chain in ELECTRUMS:
             try:
-                url = ELECTRUMS[chain]["url"]
-                port = ELECTRUMS[chain]["port"]
+                if chain == "GLEEC" and server == "Third_Party":
+                    electrum = ELECTRUMS["GLEEC-OLD"][0].split(":")
+                else:
+                    electrum = ELECTRUMS[chain][0].split(":")
+                url = electrum[0]
+                port = electrum[1]
                 balance = get_full_electrum_balance(pubkey, url, port)
             except Exception as e:
                 logger.warning(">>>>> "+chain+" via ["+url+":"+str(port)+"] FAILED | addr: "+addr+" | "+str(e))
                 try:
                     balance = get_dexstats_balance(chain, addr)
-                    logger.warning(">>>>> "+chain+" via [DEXSTATS] OK | addr: "+addr+" | balance: "+str(balance))
+                    logger.info(f"{chain} via [DEXSTATS] OK | addr: {addr} | balance: {balance}")
                 except Exception as e:
                     logger.warning(">>>>> "+chain+" via [DEXSTATS] FAILED | addr: "+addr+" | "+str(e))
 
@@ -113,7 +116,7 @@ def get_balance(chain, pubkey, addr, notary, node):
                 logger.warning(">>>>> "+chain+" via explorer.aryacoin.io FAILED | addr: "+addr+" | "+str(r.text))
 
     except Exception as e:
-        logger.warning(">>>>> "+chain+" FAILED ALL METHODS | addr: "+addr+" | "+str(e))
+        logger.error(">>>>> "+chain+" FAILED ALL METHODS | addr: "+addr+" | "+str(e))
     return balance
 
 def get_listunspent(chain, pubkey):
