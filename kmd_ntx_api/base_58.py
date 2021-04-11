@@ -86,22 +86,22 @@ def calc_addr_from_pubkey(coin, pubkey):
         return str(e)
 
 
-def calc_addr_tool(pubkey, pub_addr, script_addr, secret_key):
+def calc_addr_tool(pubkey, pubtype, p2shtype, wiftype):
     class CoinParams(CoreMainParams):
         MESSAGE_START = b'\x24\xe9\x27\x64'
         DEFAULT_PORT = 7770
-        BASE58_PREFIXES = {'PUBKEY_ADDR': int(pub_addr),
-                           'SCRIPT_ADDR': int(script_addr),
-                           'SECRET_KEY': int(secret_key)}
+        BASE58_PREFIXES = {'PUBKEY_ADDR': int(pubtype),
+                           'SCRIPT_ADDR': int(p2shtype),
+                           'SECRET_KEY': int(wiftype)}
     bitcoin.params = CoinParams
 
     try:
         address = str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
         return {
             "pubkey":pubkey,
-            "pub_addr_param":pub_addr,
-            "script_addr_param":script_addr,
-            "secret_key_param":secret_key,
+            "pubtype":pubtype,
+            "p2shtype":p2shtype,
+            "wiftype":wiftype,
             "address":address
         }
 

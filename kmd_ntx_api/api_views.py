@@ -35,16 +35,6 @@ def api_dpow_server_coins_dict(request):
     return JsonResponse(resp)
 
 
-
-def api_server_chains(request):
-    if 'season' in request.GET:
-        season = request.GET["season"]
-    else:
-        season = "Season_4"
-    resp = get_server_chains(season)
-    return JsonResponse(resp)
-
-
 def api_sidebar_links(request):
     if 'season' in request.GET:
         season = request.GET["season"]

@@ -22,15 +22,15 @@ class api_addr_from_base58_tool(viewsets.ViewSet):
         missing_params = []
         for x in addrFromBase58Serializer.Meta.fields:
             if x not in request.GET:
-                missing_params.append(f"{x}=<{x}>")
+                example_params = "?pubkey=03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828&pubtype=60&wiftype=188&p2shtype=85"
+                error = f"You need to specify params like '{example_params}'"
+                return Response({
+                    "error":f"{error}",
+                    "note":f"Parameter values for some coins available at /api/info/base_58/"
+                    })
 
-        if len(missing_params) > 0:
-            params = '&'.join(missing_params)
-            error = f"You need to specify params like '?{params}'"
-            return Response({"error":f"Missing params: {error}"})
-
-        resp = calc_addr_tool(request.GET["pubkey"], request.GET["pub_addr"],
-                             request.GET["script_addr"], request.GET["secret_key"])
+        resp = calc_addr_tool(request.GET["pubkey"], request.GET["pubtype"],
+                             request.GET["p2shtype"], request.GET["wiftype"])
         return Response(resp)
 
 
@@ -71,7 +71,7 @@ class api_decode_op_return_tool(viewsets.ViewSet):
             coins_list = get_all_coins() 
             decoded = decode_opret(request.GET['OP_RETURN'], coins_list)
         else:
-            decoded = {"error":"needs parm like ?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400"}
+            decoded = {"error":"You need to include an OP_RETURN, e.g. '?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400'"}
         return Response(decoded)
 
 
@@ -98,6 +98,6 @@ def get_address_from_pubkey(request):
 
     else:
         return {
-            "error": "You need to specify a pubkey and coin like '?coin=KMD&pubkey=<YOUR_PUBKEY>'\nIf coin not specified or unknown, will revert to KMD"
+            "error": "You need to specify a pubkey and coin, e.g '?coin=BTC&pubkey=03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828' (if coin not specified, it will default to KMD)"
         }
 
