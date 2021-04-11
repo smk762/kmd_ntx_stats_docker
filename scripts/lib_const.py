@@ -53,9 +53,9 @@ OTHER_COINS = []
 ANTARA_COINS = []
 THIRD_PARTY_COINS = []
 RETIRED_SMARTCHAINS = ["HUSH3"]
-# Electrum server:port for all dpow coins
 
 COINS_INFO = requests.get(f'{THIS_SERVER}/api/info/coins/').json()['results']
+ELECTRUMS = requests.get(f'{THIS_SERVER}/api/info/electrums/').json()['results']
 
 SEASON_SERVER_DPOW_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins').json()
 
@@ -65,18 +65,6 @@ THIRD_PARTY_COINS = SEASON_SERVER_DPOW_COINS["Third_Party"]
 ALL_COINS = ANTARA_COINS + THIRD_PARTY_COINS + ['BTC', 'KMD', 'LTC']
 ALL_ANTARA_COINS = ANTARA_COINS + RETIRED_SMARTCHAINS # add retired smartchains here
 
-# Defines available electrum servers
-ELECTRUMS = {}
-for coin in ALL_COINS:
-    if coin in COINS_INFO:
-        if len(COINS_INFO[coin]['electrums']) > 0:
-            electrum = COINS_INFO[coin]['electrums'][0].split(":") 
-            ELECTRUMS.update({
-                coin:{
-                    "url":electrum[0],
-                    "port":electrum[1]
-                    }
-                })
 
 # Defines BASE_58 coin parameters
 for coin in ALL_ANTARA_COINS:
@@ -288,29 +276,35 @@ OTHER_LAUNCH_PARAMS = {
     "AYA":"~/AYAv2/src/aryacoind",
     "CHIPS":"~/chips3/src/chipsd",
     "EMC2":"~/einsteinium/src/einsteiniumd",
-    "VRSC":"~/VerusCoin/src/verusd",   
-    "GLEEC":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",
+    "VRSC":"~/VerusCoin/src/verusd",
+    "GLEEC":"~/komodo/src/komodod -ac_name=GLEEC -ac_supply=210000000 -ac_public=1 -ac_staked=100 -addnode=95.217.161.126",
+    "VOTE2021":"~/komodo/src/komodod  -ac_name=VOTE2021 -ac_public=1 -ac_supply=129848152 -addnode=77.74.197.115",
+    "GLEEC-OLD":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",
     "MCL":"~/komodo/src/komodod -ac_name=MCL -ac_supply=2000000 -ac_cc=2 -addnode=37.148.210.158 -addnode=37.148.212.36 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000"
 }
 OTHER_CONF_FILE = {
     "BTC":"~/.bitcoin/bitcoin.conf",
     "KMD":"~/.komodo/komodo.conf",   
-    "MCL":"~/.komodo/MCL/MCL.conf",
+    "MCL":"~/.komodo/MCL/MCL.conf", 
+    "VOTE2021":"~/.komodo/VOTE2021/VOTE2021.conf",
     "AYA":"~/.aryacoin/aryacoin.conf",
     "CHIPS":"~/.chips/chips.conf",
     "EMC2":"~/.einsteinium/einsteinium.conf",
     "VRSC":"~/.komodo/VRSC/VRSC.conf",   
-    "GLEEC":"~/.gleecbtc/gleecbtc.conf",   
+    "GLEEC":"~/.komodo/GLEEC/GLEEC.conf",
+    "GLEEC-OLD":"~/.gleecbtc/gleecbtc.conf",   
 }
 OTHER_CLI = {
     "BTC":"~/bitcoin/src/bitcoin-cli",
     "KMD":"~/komodo/src/komodo-cli",
     "MCL":"~/komodo/src/komodo-cli -ac_name=MCL",
+    "GLEEC":"~/komodo/src/komodo-cli -ac_name=GLEEC",
+    "VOTE2021":"~/komodo/src/komodo-cli -ac_name=VOTE2021",
     "AYA":"~/AYAv2/src/aryacoin-cli",
     "CHIPS":"~/chips3/src/chips-cli",
     "EMC2":"~/einsteinium/src/einsteinium-cli",
     "VRSC":"~/VerusCoin/src/verus",   
-    "GLEEC":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
+    "GLEEC-OLD":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
 }
 
 

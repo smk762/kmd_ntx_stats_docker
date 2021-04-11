@@ -15,7 +15,7 @@ def btc_ntx_all(request):
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(),
         "btc_ntx":btc_ntx,
         "season":season.replace("_"," ")
     }

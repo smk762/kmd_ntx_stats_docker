@@ -54,30 +54,15 @@ def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=N
 
 
 def get_addresses_data_api(request):
-    resp = {}
+    print(request)
+    resp = []
     data = addresses.objects.all()
     data = apply_filters_api(request, AddressesSerializer, data) \
-            .order_by('notary','season', 'chain') \
+            .order_by('season', 'notary', 'chain') \
             .values()
 
     for item in data:
-
-        if item["notary"] not in resp: 
-            resp.update({item["notary"]:{}})
-
-        if item["season"] not in resp[item["notary"]]:
-            resp[item["notary"]].update({
-                item["season"]: {
-                    "notary_id":item["notary_id"],
-                    "pubkey":item["pubkey"],
-                    "addresses":{}
-                }
-            })
-
-        if item["chain"] not in resp[item["notary"]][item["season"]]["addresses"]:
-            resp[item["notary"]][item["season"]]["addresses"].update({
-                item["chain"]: item['address']
-            })
+        resp.append(item)
 
     return resp
 
@@ -134,9 +119,42 @@ def get_coins_data_api(request):
     return resp
 
 
+def get_electrums_data_api(chain=None):
+    resp = {}
+    coins_data = coins.objects.all().order_by('chain')
+
+    if chain:
+        coins_data = coins_data.filter(chain=chain)
+
+    coins_data = coins_data.values('chain','electrums')
+
+    for item in coins_data:
+        electrums = item['electrums']
+        if len(electrums) > 0:
+            chain = item['chain']
+            resp.update({chain:electrums})
+    return resp
+
+
+def get_electrums_ssl_data_api(chain=None):
+    resp = {}
+    coins_data = coins.objects.all().order_by('chain')
+    if chain:
+        coins_data = coins_data.filter(chain=chain)
+
+    coins_data = coins_data.values('chain','electrums_ssl')
+    
+    for item in coins_data:
+        electrums_ssl = item['electrums_ssl']
+        if len(electrums_ssl) > 0:
+            chain = item['chain']
+            resp.update({chain:electrums_ssl})
+    return resp
+
+
 def get_explorers_data_api():
     resp = {}
-    coins_data = coins.objects.all().values('chain','explorers')
+    coins_data = coins.objects.all().order_by('chain').values('chain','explorers')
     for item in coins_data:
         explorers = item['explorers']
         if len(explorers) > 0:
@@ -144,6 +162,28 @@ def get_explorers_data_api():
             resp.update({chain:explorers})
     return resp
 
+
+def get_launch_params_data_api(chain=None):
+    coins_data = coins.objects.all()
+    if chain:
+        coins_data = coins_data.filter(chain=chain)
+
+    coins_data = coins_data.order_by('chain').values('chain', 'dpow')
+    
+    resp = {}
+    for item in coins_data:
+        dpow_info = item['dpow']
+        chain = item['chain']
+        if len(dpow_info) > 0:
+            server = dpow_info['server']
+            if "launch_params" in dpow_info:
+                launch_params = dpow_info["launch_params"]
+            else:
+                launch_params = ''
+            if server not in resp:
+                resp.update({server:{}})
+            resp[server].update({chain:launch_params})
+    return resp
 
 def get_mined_count_season_data_api(request):
     resp = {}

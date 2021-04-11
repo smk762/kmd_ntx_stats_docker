@@ -48,6 +48,7 @@ def thread_chain_ntx_daily_aggregate(season, day):
     logger.info(f"[chains_aggr_resp]: {chains_aggr_resp}")
     for item in chains_aggr_resp:
         try:
+            print(item)
             row = notarised_chain_daily_row()
             row.chain = item[0]
             row.ntx_count = item[3]
@@ -401,7 +402,7 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
         sql += " AND ".join(where)
     sql += ";"
 
-    logger.info(f"Processing for ntx summary {where}")
+    logger.info(f"[get_notarisation_data] {where}")
     ntx_summary = {}
     chain_totals = {}
     
@@ -631,7 +632,66 @@ def scan_rpc_for_ntx(season):
                 season_ntx_count_row.time_stamp = time.time()
                 season_ntx_count_row.update()
 
+
+def rescan_notaries(season):
+    sql = f"SELECT chain, block_height, block_time, block_datetime, block_hash, \
+            notaries, notary_addresses, ac_ntx_blockhash, \
+            ac_ntx_height, txid, opret, season,\
+            server, epoch, score_value, scored, btc_validated \
+            FROM notarised"
+    where = []
+    if season:
+        where.append(f"season = '{season}'")
+
+    if len(where) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(where)
+    sql += ";"
+
+    try:
+        CURSOR.execute(sql)
+        results = CURSOR.fetchall()
+        print(len(results))
+        for item in results:
+            notaries = item[5][:]
+            for notary in notaries:
+                if len(notary) > 20:
+                    # e.g. record input as address before pubkey added
+                    try:
+                        notaries.remove(notary)
+                        notaries.append(KNOWN_ADDRESSES[notary])
+                        logger.warning(f"!!!! {item[9]} Invalid notary {notary} set to {KNOWN_ADDRESSES[notary]}")
+                    except:
+                        logger.warning(f"!!!! {item[9]} Invalid notary {notary}")
+            if notaries != item[5]:
+                row = notarised_row()
+                row.chain = item[0]
+                row.block_height = item[1]
+                row.block_time = item[2]
+                row.block_datetime = item[3]
+                row.block_hash = item[4]
+                row.notaries = notaries
+                row.notary_addresses = item[6]
+                row.ac_ntx_blockhash = item[7]
+                row.ac_ntx_height = item[8]
+                row.txid = item[9]
+                row.opret = item[10]
+                row.season = item[11]
+                row.server = item[12]
+                row.epoch = item[13]
+                row.score_value = item[14]
+                row.scored = item[15]
+                row.btc_validated = item[16]
+                row.update()
+
+    except Exception as e:
+        logger.error(f"Exception in [rescan_notaries]: {e}")
+
 if __name__ == "__main__":
+
+    # Uncomment if record contains address rather than notary in [notaries] list (e.g. saved before pubkeys updated)
+    rescan_notaries("Season_5_Testnet")
+
     tip = int(RPC["KMD"].getblockcount())
 
     seasons = get_notarised_seasons()

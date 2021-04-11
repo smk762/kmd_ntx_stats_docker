@@ -2,6 +2,7 @@
 
 from django_filters.rest_framework import DjangoFilterBackend
 
+from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
 from rest_framework import permissions, viewsets
@@ -14,7 +15,7 @@ from kmd_ntx_api.lib_api_filtered import *
 
 class addresses_filter(viewsets.ViewSet):
     """
-    Returns Notary Node addresses, nested by Name > Season > Chain \n
+    Returns Source Notary Node addresses data \n
     Default filter returns current NN Season \n
 
     """
@@ -28,8 +29,11 @@ class addresses_filter(viewsets.ViewSet):
     def get(self, request, format=None):
         filters = self.serializer_class.Meta.fields
         resp = get_addresses_data_api(request)
-        api_resp = wrap_api(resp, filters)
-        return Response(api_resp)
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":resp
+            })
 
 
 class balances_filter(viewsets.ViewSet):
@@ -48,8 +52,11 @@ class balances_filter(viewsets.ViewSet):
         """
         filters = self.serializer_class.Meta.fields
         resp = get_balances_data_api(request)
-        api_resp = wrap_api(resp, filters)
-        return Response(api_resp)
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":resp
+            })
 
 class coins_filter(viewsets.ViewSet):
     """
@@ -66,9 +73,58 @@ class coins_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_coins_data_api(request)
-        api_resp = wrap_api(resp, filters)        
-        return Response(api_resp)
+        resp = get_coins_data_api(request)      
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":resp
+            })
+
+class electrums_filter(viewsets.ViewSet):  # TODO: add coin type filter
+
+    """
+    Returns explorers sourced from coins repo
+    """    
+    serializer_class = ElectrumsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        filters = self.serializer_class.Meta.fields
+        if 'chain' in request.GET:
+            resp = get_electrums_data_api(request.GET["chain"])
+        else:
+            resp = get_electrums_data_api()
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":resp
+            })
+
+class electrums_ssl_filter(viewsets.ViewSet):  # TODO: add coin type filter
+
+    """
+    Returns explorers sourced from coins repo
+    """    
+    serializer_class = ElectrumsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        filters = self.serializer_class.Meta.fields
+        if 'chain' in request.GET:
+            resp = get_electrums_ssl_data_api(request.GET["chain"])
+        else:
+            resp = get_electrums_ssl_data_api()
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":resp
+            })
 
 class explorers_filter(viewsets.ViewSet):  # TODO: add coin type filter
 
@@ -83,9 +139,40 @@ class explorers_filter(viewsets.ViewSet):  # TODO: add coin type filter
 
     def get(self, request, format=None):
         filters = self.serializer_class.Meta.fields
-        resp = get_explorers_data_api()
-        api_resp = wrap_api(resp, filters)
-        return Response(api_resp)
+        if 'chain' in request.GET:
+            resp = get_explorers_data_api(request.GET["chain"])
+        else:
+            resp = get_explorers_data_api()
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":resp
+            })
+
+class launch_params_filter(viewsets.ViewSet):  # TODO: add coin type filter
+
+    """
+    Returns explorers sourced from coins repo
+    """    
+    serializer_class = LaunchParamsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        filters = self.serializer_class.Meta.fields
+
+        chain = None
+        if 'chain' in request.GET:
+            chain = request.GET["chain"]
+        
+        resp = get_launch_params_data_api(chain)
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":resp
+            })
 
 class mined_count_season_filter(viewsets.ViewSet):
     """

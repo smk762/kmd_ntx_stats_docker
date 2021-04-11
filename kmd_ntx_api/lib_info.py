@@ -182,10 +182,9 @@ def get_btc_txid_notary(notary=None, category=None):
     return api_resp
 
 
-# TODO: REVIEW - does this include dpow partial season chains?
-def get_dpow_explorers():
+def get_explorers():
     resp = {}
-    coins_data = get_coins_data(1).values('chain','explorers')
+    coins_data = get_coins_data().values('chain','explorers')
     for item in coins_data:
         explorers = item['explorers']
         if len(explorers) > 0:
@@ -478,21 +477,21 @@ def get_testnet_addresses(season):
 
 
 def get_notary_balances(notary, season=None):
-    data = get_balances_data(season, None, notary)
-    return data.order_by('-season','notary', 'chain', 'balance').values()
+    data = get_balances_data(season, None, None, notary)
+    return data.values()
 
 def get_chain_balances(chain, season=None):
-    data = get_balances_data(season, chain)
-    return data.order_by('-season','notary', 'chain', 'balance').values()
+    data = get_balances_data(season, None, chain, None)
+    return data.values()
 
 
 def get_chain_addresses(chain, season=None):
-    data = get_addresses_data(season, chain)
+    data = get_addresses_data(season, None, chain)
     return data.order_by('notary').values('notary','address')
 
 
 def get_notary_addresses_data(notary, season=None):
-    data = get_addresses_data(season, None, notary)
+    data = get_addresses_data(season, None, None, notary)
     return data.order_by('chain').values('chain','address')
 
 
@@ -919,8 +918,6 @@ def get_split_stats_table():
     return split_rows
 
 
-
-
 def get_testnet_stats_dict(season, testnet_chains):
     notaries = get_notary_list(season)
     testnet_stats_dict = create_dict(notaries)
@@ -942,6 +939,10 @@ def get_testnet_stats_dict(season, testnet_chains):
         if notary in addresses_dict:
             address = addresses_dict[notary]
             testnet_stats_dict[notary].update({"Address":address})
+        else:
+            logger.warning(f"[get_testnet_stats_dict] {notary} not in addresses_dict (address: {address})")
+            logger.warning(f"[addresses_dict] {addresses_dict}")
+            logger.warning(f"[notaries] {notaries}")
     return testnet_stats_dict
 
 

@@ -37,7 +37,7 @@ def notary_profile_view(request, notary=None, season=None):
             "notary_balances_graph_data": notary_balances_graph, # Balances in graph format
             "notary_balances_table_data": notary_balances_list, # Balances in table format
             "season_nn_chain_ntx_data": get_season_nn_chain_ntx_data(season), # Season Notarisation Stats
-            "explorers": get_dpow_explorers() # For hyperlinking addresses
+            "explorers": get_explorers() # For hyperlinking addresses
             # "region_score_stats": get_region_score_stats(notarisation_scores),
             # "notary_ntx_counts":coin_notariser_ranks[region][notary],
         })

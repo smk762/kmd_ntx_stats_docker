@@ -17,7 +17,7 @@ class AddressesSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = addresses
         fields = ['notary_id', 'notary', 'address', 'chain',
-                  'pubkey', 'season', 'node']
+                  'pubkey', 'season', 'server']
 
 class addrFromBase58Serializer(serializers.Serializer):
     class Meta:
@@ -31,14 +31,14 @@ class BalancesSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = balances
         fields = ['notary', 'chain', 'balance', 'address',
-                  'update_time', 'season', 'node']
+                  'update_time', 'season', 'server']
 
 class BtcTxidSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = nn_btc_tx
         fields = ['txid', 'address', 'block_height', 'block_time', 'category', 'fees']
 
-class CoinsSerializer (serializers.HyperlinkedModelSerializer):
+class CoinsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = coins
         fields = ['chain', 'coins_info', 'electrums', 'electrums_ssl',
@@ -67,13 +67,19 @@ class ElectrumsSerializer(serializers.HyperlinkedModelSerializer):
     electrums = serializers.CharField()
     electrums_ssl = serializers.CharField()
     class Meta:
-        fields = ['chain', 'explorer']
+        fields = ['chain']
 
 class ExplorersSerializer(serializers.HyperlinkedModelSerializer):
     chain = serializers.CharField()
     explorer = serializers.CharField()
     class Meta:
-        fields = ['chain', 'explorer']
+        fields = ['chain']
+
+class LaunchParamsSerializer(serializers.HyperlinkedModelSerializer):
+    chain = serializers.CharField()
+    server = serializers.CharField()
+    class Meta:
+        fields = ['chain']
 
 class LastNotarisedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

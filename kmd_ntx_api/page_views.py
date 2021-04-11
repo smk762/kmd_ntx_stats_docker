@@ -26,7 +26,7 @@ def btc_ntx(request):
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(),
         "btc_ntx":btc_ntx,
         "season":season.replace("_"," ")
     }
@@ -43,7 +43,7 @@ def chains_last_ntx(request):
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(),
         "season_chain_ntx_data":season_chain_ntx_data
     }
 
@@ -57,7 +57,7 @@ def chain_sync(request):
 
     context.update({
         "sidebar_links":get_sidebar_links(season),
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(),
         "eco_data_link":get_eco_data_link()
         })
     return render(request, 'chain_sync.html', context)
@@ -71,7 +71,7 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
     }
     
     if chain:
-        balance_data = get_balances_data(season, chain).order_by('notary').values('notary','address', 'balance')
+        balance_data = get_balances_data(season, None, chain, None).values()
 
         max_tick = 0
         for item in balance_data:
@@ -89,7 +89,7 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
 
         context.update({
             "chain":chain,
-            "explorers":get_dpow_explorers(),
+            "explorers":get_explorers(),
             "eco_data_link":get_eco_data_link(),
             "max_tick": max_tick,
             "coin_social": get_coin_social(chain),
@@ -202,7 +202,7 @@ def faucet(request):
     notary_list = get_notary_list(season)
     context = {
         "sidebar_links":get_sidebar_links(season),
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(),
         "eco_data_link":get_eco_data_link()
         }
     if request.method == 'POST':
@@ -236,7 +236,7 @@ def funds_sent(request):
 
     context = {
         "sidebar_links":get_sidebar_links(season),
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(),
         "eco_data_link":get_eco_data_link(),
         "funding_data":funding_data,
         "funding_totals":funding_totals,
@@ -263,7 +263,6 @@ def funding(request):
     season = get_season()
     notary_list = get_notary_list(season)
 
-    coins_data = get_coins_data(1).values('chain', 'dpow')
     chain_list = get_dpow_coins_list(season)
 
     num_chains = len(chain_list)
@@ -326,7 +325,7 @@ def funding(request):
         "notaries_list":notary_list,
         "last_balances_update":last_balances_update,
         "sidebar_links":get_sidebar_links(season),
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(),
         "low_nn_balances":low_nn_balances['low_balances'],
         "notary_funding":get_notary_funding(),
         "bot_balance_deltas":get_bot_balance_deltas(),
@@ -337,26 +336,24 @@ def funding(request):
 def mining_24hrs(request):
     season = get_season()
     notary_list = get_notary_list(season)
-    coins_data = get_coins_data(1).values('chain', 'dpow')
     mined_24hrs = get_mined_data_24hr().values()
 
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "mined_24hrs":mined_24hrs,
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(),
         "season":season.replace("_"," ")
     }
     return render(request, 'mining_24hrs.html', context)
 
 def mining_overview(request):
     season = get_season()
-    coins_data = get_coins_data(1).values('chain', 'dpow')
 
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(),
         "mined_season":get_mined_count_season_data_table(request),
         "season":season.replace("_"," ")
     }
@@ -365,14 +362,13 @@ def mining_overview(request):
 
 def ntx_24hrs(request):
     season = get_season()
-    coins_data = get_coins_data(1).values('chain', 'dpow')
     ntx_24hrs = get_notarised_data_24hr().order_by('-block_time').values()[:200]
 
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "ntx_24hrs":ntx_24hrs,
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(),
         "season":season.replace("_"," ")
     }
     return render(request, 'ntx_24hrs.html', context)
@@ -437,7 +433,6 @@ def notary_epoch_scoring_table(request):
 def notarised_tenure_view(request):
     season = get_season()
     notary_list = get_notary_list(season)
-    coins_data = get_coins_data(1).values('chain', 'dpow')
     tenure_data = get_notarised_tenure_data().values()
     context = {
         "sidebar_links":get_sidebar_links(season),
@@ -449,7 +444,6 @@ def notarised_tenure_view(request):
 def scoring_epochs_view(request):
     season = get_season()
     notary_list = get_notary_list(season)
-    coins_data = get_coins_data(1).values('chain', 'dpow')
     context = {
         "sidebar_links":get_sidebar_links(season),
         "epochs":get_epoch_scoring_table(request),
@@ -460,7 +454,6 @@ def scoring_epochs_view(request):
 def testnet_ntx_scoreboard(request):
     season = "Season_5_Testnet"
     notary_list = get_notary_list(season)
-    coins_data = get_coins_data(1).values('chain', 'dpow')
  
     testnet_ntx_counts = get_api_testnet(request)
     num_notaries = len(testnet_ntx_counts)

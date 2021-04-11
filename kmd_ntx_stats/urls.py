@@ -7,8 +7,14 @@ from kmd_ntx_api import api_viewsets
 from kmd_ntx_api import api_filtered_viewsets
 from kmd_ntx_api import api_tools
 from kmd_ntx_api import api_graph
+from kmd_ntx_api import api_wallet
 from kmd_ntx_api import page_views
 from kmd_ntx_api import notary_views
+
+handler404 = 'kmd_ntx_api.error_views.error_404'
+#handler500 = 'kmd_ntx_api.error_views.error_500'
+#handler403 = 'kmd_ntx_api.error_views.error_403'
+#handler400 = 'kmd_ntx_api.error_views.error_400'
 
 router = routers.DefaultRouter()
 
@@ -16,14 +22,16 @@ router = routers.DefaultRouter()
 router.register(r'users', api_viewsets.UserViewSet)
 router.register(r'groups', api_viewsets.GroupViewSet)
 
-# Trailing #$ denotes inclusion in sidebar
-router.register(r'info/addresses',
-                api_filtered_viewsets.addresses_filter,
-                basename='addresses_filter') #$
+# /api/info/{endpoint} will be deprecated
+# /api/table/{endpoint} returns full list of data
+# /api/graph/{endpoint} returns data formated with graph specific fileds (labels, colors etc)
+# /api/source/{endpoint} returns paginated full list of data
+# /api/{category}/{endpoint} returns formated data dict
+
 
 router.register(r'info/balances',
                 api_filtered_viewsets.balances_filter,
-                basename='balances_filter') #$
+                basename='balances_filter') 
 
 router.register(r'info/coins',
                 api_filtered_viewsets.coins_filter,
@@ -33,6 +41,18 @@ router.register(r'info/explorers',
                 api_filtered_viewsets.explorers_filter,
                 basename='explorers_filter')
 
+router.register(r'info/electrums',
+                api_filtered_viewsets.electrums_filter,
+                basename='electrums_filter')
+
+router.register(r'info/launch_params',
+                api_filtered_viewsets.launch_params_filter,
+                basename='launch_params_filter')
+
+router.register(r'info/electrums_ssl',
+                api_filtered_viewsets.electrums_ssl_filter,
+                basename='electrums_ssl_filter')
+
 router.register(r'info/mined_count_season',
                 api_filtered_viewsets.mined_count_season_filter,
                 basename='mined_count_season_filter')
@@ -41,25 +61,25 @@ router.register(r'info/mined_count_date',
                 api_filtered_viewsets.mined_count_date_filter,
                 basename='mined_count_date_filter')
 
-router.register(r'info/notarised_chain_season',
-                api_filtered_viewsets.notarised_chain_season_filter,
-                basename='notarised_chain_season_filter')
-
 router.register(r'info/notarisation',
                 api_filtered_viewsets.notarised_filter,
                 basename='notarised_filter')
-
-router.register(r'info/notarised_count_season',
-                api_filtered_viewsets.notarised_count_season_filter,
-                basename='notarised_count_season_filter')
 
 router.register(r'info/notarised_chain_date',
                 api_filtered_viewsets.notarised_chain_date_filter,
                 basename='notarised_chain_date_filter')
 
+router.register(r'info/notarised_chain_season',
+                api_filtered_viewsets.notarised_chain_season_filter,
+                basename='notarised_chain_season_filter')
+
 router.register(r'info/notarised_count_date',
                 api_filtered_viewsets.notarised_count_date_filter,
                 basename='notarised_count_date_filter')
+
+router.register(r'info/notarised_count_season',
+                api_filtered_viewsets.notarised_count_season_filter,
+                basename='notarised_count_season_filter')
 
 router.register(r'info/notarised_tenure',
                 api_filtered_viewsets.notarised_tenure_filter,
@@ -89,9 +109,11 @@ router.register(r'info/last_btc_notarised',
 router.register(r'tools/decode_opreturn',
                 api_tools.api_decode_op_return_tool,
                 basename='api_decode_op_return_tool')
+
 router.register(r'tools/address_from_pubkey',
                 api_tools.api_address_from_pubkey_tool,
                 basename='api_address_from_pubkey_tool')
+
 router.register(r'tools/addr_from_base58',
                 api_tools.api_addr_from_base58_tool,
                 basename='api_addr_from_base58_tool')
@@ -100,6 +122,7 @@ router.register(r'tools/addr_from_base58',
 router.register(r'graph_json/balances',
                 api_graph.balances_graph,
                 basename='balances_graph')
+
 router.register(r'graph_json/daily_ntx',
                 api_graph.daily_ntx_graph,
                 basename='daily_ntx_graph')
@@ -109,6 +132,10 @@ router.register(r'graph_json/daily_ntx',
 router.register(r'source/addresses',
                 api_viewsets.addressesViewSet,
                 basename='addressesViewSet')
+
+router.register(r'table/addresses',
+                api_filtered_viewsets.addresses_filter,
+                basename='addresses_filter') 
 
 router.register(r'source/balances',
                 api_viewsets.balancesViewSet,
@@ -137,7 +164,6 @@ router.register(r'source/mined_count_date',
 router.register(r'source/mined_count_season',
                 api_viewsets.MinedCountSeasonViewSet,
                 basename='MinedCountSeasonViewSet')
-
 
 router.register(r'source/nn_social',
                 api_viewsets.nn_socialViewSet,
@@ -194,7 +220,7 @@ urlpatterns = [
     path('chains_last_ntx/',
           page_views.chains_last_ntx,
           name='chains_last_ntx'),
-    
+
     # TODO: Awaiting delegation to crons / db table
     path('chain_sync/',
           page_views.chain_sync,
@@ -310,7 +336,6 @@ urlpatterns = [
           api_views.notarisation_txid,
           name='notarisation_txid'),
 
-
     path('api/info/chain_notarisation_txid_list',
           api_views.chain_notarisation_txid_list,
           name='chain_notarisation_txid_list'),
@@ -331,10 +356,6 @@ urlpatterns = [
           api_views.nn_btc_txid_list,
           name='nn_btc_txid_list'),
 
-    path('api/info/nn_ltc_txid_list',
-          api_views.nn_ltc_txid_list,
-          name='nn_ltc_txid_list'),
-
     path('api/info/nn_btc_txid_ntx',
           api_views.nn_btc_txid_ntx,
           name='nn_btc_txid_ntx'),
@@ -346,6 +367,10 @@ urlpatterns = [
     path('api/info/nn_ltc_txid',
           api_views.nn_ltc_txid,
           name='nn_ltc_txid'),
+
+    path('api/info/nn_ltc_txid_list',
+          api_views.nn_ltc_txid_list,
+          name='nn_ltc_txid_list'),
 
     path('api/info/nn_mined_4hrs_count',
           api_views.nn_mined_4hrs_api,
@@ -371,7 +396,6 @@ urlpatterns = [
           api_views.notarised_season_score,
           name='notarised_season_score'),
     
-
     path('api/table/epoch_scoring',
           api_tables.epoch_scoring_table,
           name='epoch_scoring_table'),
@@ -383,6 +407,23 @@ urlpatterns = [
     path('api/table/mined_count_season',
           api_tables.mined_count_season_table,
           name='mined_count_season_table'),
+
+    path('api/wallet/notary_addresses',
+          api_wallet.get_notary_addresses_api,
+          name='notary_addresses_api'),
+
+    path('api/wallet/chain_addresses',
+          api_wallet.get_chain_addresses_api,
+          name='chain_addresses_api'),
+
+    path('api/wallet/notary_balances',
+          api_wallet.get_notary_balances_api,
+          name='notary_balances_api'),
+
+    path('api/wallet/chain_balances',
+          api_wallet.get_chain_balances_api,
+          name='chain_balances_api'),
+
 
     # PENDING
 

@@ -18,32 +18,38 @@ logger = logging.getLogger("mylogger")
 load_dotenv()
 
 
-def get_addresses_data(season=None, chain=None, notary=None):
+def get_addresses_data(season=None, server=None, chain=None, notary=None):
     data = addresses.objects.all()
     if season:
         data = data.filter(season=season)
 
+    if server:
+        data = data.filter(server=server)
+
     if notary:
         data = data.filter(notary=notary)
 
     if chain:
         data = data.filter(chain=chain)
 
-    return data
+    return data.order_by('-season', 'server', 'chain', 'notary')
 
 
-def get_balances_data(season=None, chain=None, notary=None):
+def get_balances_data(season=None, server=None, chain=None, notary=None):
     data = balances.objects.all()
     if season:
         data = data.filter(season=season)
 
+    if server:
+        data = data.filter(server=server)
+
     if notary:
         data = data.filter(notary=notary)
 
     if chain:
         data = data.filter(chain=chain)
 
-    return data
+    return data.order_by('-season', 'server', 'chain', 'notary')
 
 
 # TODO: Awaiting delegation to crons / db table
@@ -57,7 +63,7 @@ def get_chain_sync_data(chain=None):
 def get_coins_data(dpow_active=None):
     data = coins.objects.all()
     if dpow_active:
-        data = data.filter(dpow_active=1)
+        data = data.filter(dpow_active=dpow_active)
     return data
 
 

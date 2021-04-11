@@ -4,12 +4,12 @@ from django.contrib.postgres.fields import ArrayField, JSONField
 
 class addresses(models.Model):
     season = models.CharField(max_length=34)
+    server = models.CharField(max_length=34)
     notary = models.CharField(max_length=34)
     notary_id = models.CharField(max_length=34)
-    chain = models.CharField(max_length=34)
     address = models.CharField(max_length=34)
     pubkey = models.CharField(max_length=66)
-    node = models.CharField(max_length=34)
+    chain = models.CharField(max_length=34)
 
     class Meta:
         db_table = 'addresses'
@@ -22,12 +22,12 @@ class addresses(models.Model):
 
 
 class balances(models.Model):
+    season = models.CharField(max_length=34)
+    server = models.CharField(max_length=34)
     notary = models.CharField(max_length=34)
+    address = models.CharField(max_length=34)
     chain = models.CharField(max_length=34)
     balance = models.DecimalField(max_digits=18, decimal_places=8)
-    address = models.CharField(max_length=34)
-    season = models.CharField(max_length=34)
-    node = models.CharField(max_length=34)
     update_time = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -203,7 +203,7 @@ class mined_count_daily(models.Model):
 
 class mined_count_season(models.Model):
     notary = models.CharField(max_length=64)
-    address = models.CharField(max_length=64, default='f')
+    address = models.CharField(max_length=64, default='')
     blocks_mined = models.PositiveIntegerField(default=0)
     sum_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
     max_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
@@ -263,9 +263,9 @@ class nn_ltc_tx(models.Model):
     category = models.CharField(max_length=32)
 
     input_index = models.IntegerField(default=-1)
-    input_sats = models.IntegerField(default=-1)
+    input_sats = models.BigIntegerField(default=-1)
     output_index = models.IntegerField(default=-1)
-    output_sats = models.IntegerField(default=-1)
+    output_sats = models.BigIntegerField(default=-1)
     num_inputs = models.PositiveIntegerField(default=0)
     num_outputs = models.PositiveIntegerField(default=0)
     fees = models.PositiveIntegerField(default=0)
