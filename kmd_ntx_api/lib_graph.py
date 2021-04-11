@@ -188,17 +188,17 @@ def get_notary_balances_graph(notary, season=None):
     notary_balances_list = []
     for item in notary_balances:
 
-        if item['node'] == 'third party' and item['chain'] == "KMD":
+        if item['server'] == 'Third_Party' and item['chain'] == "KMD":
             chain = "KMD_3P"
 
         else: 
             chain = item['chain']
 
-        if chain in main_chains and item["node"] == 'main':
+        if chain in main_chains and item["server"] == 'Main':
             notary_balances_list.append(item)
             balances_graph_dict.update({chain:float(item['balance'])})
 
-        elif item["node"] == 'third party' and chain in third_chains or chain == "KMD_3P":
+        elif item["server"] == 'Third_Party' and chain in third_chains or chain == "KMD_3P":
             balances_graph_dict.update({chain:float(item['balance'])})
             notary_balances_list.append(item)
 

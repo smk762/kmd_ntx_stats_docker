@@ -259,7 +259,7 @@ def get_mined_data(request):
 # Response too large
 class mined_filter(viewsets.ViewSet):
     """
-    API endpoint showing notary node mined blocks. 
+    API endpoint showing notary mined blocks. 
     Use filters or be patient, this is a big dataset.
     """
     serializer_class = MinedSerializer

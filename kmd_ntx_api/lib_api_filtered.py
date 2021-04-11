@@ -143,7 +143,7 @@ def get_electrums_ssl_data_api(chain=None):
         coins_data = coins_data.filter(chain=chain)
 
     coins_data = coins_data.values('chain','electrums_ssl')
-    
+
     for item in coins_data:
         electrums_ssl = item['electrums_ssl']
         if len(electrums_ssl) > 0:
@@ -168,21 +168,33 @@ def get_launch_params_data_api(chain=None):
     if chain:
         coins_data = coins_data.filter(chain=chain)
 
-    coins_data = coins_data.order_by('chain').values('chain', 'dpow')
+    coins_data = coins_data.order_by('chain').values('chain', 'coins_info')
     
     resp = {}
     for item in coins_data:
-        dpow_info = item['dpow']
+        coins_info = item['coins_info']
         chain = item['chain']
-        if len(dpow_info) > 0:
-            server = dpow_info['server']
-            if "launch_params" in dpow_info:
-                launch_params = dpow_info["launch_params"]
-            else:
-                launch_params = ''
-            if server not in resp:
-                resp.update({server:{}})
-            resp[server].update({chain:launch_params})
+        if len(coins_info) > 0:
+            if "launch_params" in coins_info:
+                launch_params = coins_info["launch_params"]
+                resp.update({chain:launch_params})
+    return resp
+
+def get_daemon_cli_data_api(chain=None):
+    coins_data = coins.objects.all()
+    if chain:
+        coins_data = coins_data.filter(chain=chain)
+
+    coins_data = coins_data.order_by('chain').values('chain', 'coins_info')
+    
+    resp = {}
+    for item in coins_data:
+        coins_info = item['coins_info']
+        chain = item['chain']
+        if len(coins_info) > 0:
+            if "cli" in coins_info:
+                cli = coins_info["cli"]
+                resp.update({chain:cli})
     return resp
 
 def get_mined_count_season_data_api(request):
@@ -253,7 +265,7 @@ def get_mined_count_daily_data_api(request):
     delta = datetime.timedelta(days=1)
     yesterday = mined_date-delta
     tomorrow = mined_date+delta
-    url = request.build_absolute_uri('/api/mined_stats/daily/')
+    url = request.build_absolute_uri('/api/info/mined_count_date/')
     return paginate_wrap(resp, url, "mined_date",
                          str(yesterday), str(tomorrow))
 
@@ -423,7 +435,7 @@ def get_notarised_chain_daily_data_api(request):
         delta = datetime.timedelta(days=1)
         yesterday = today-delta
         tomorrow = today+delta
-    url = request.build_absolute_uri('/api/chain_stats/daily/')
+    url = request.build_absolute_uri('/api/info/notarised_chain_date/')
     return paginate_wrap(resp, url, "notarised_date",
                          str(yesterday), str(tomorrow))
 
@@ -481,7 +493,7 @@ def get_notarised_count_date_data_api(request):
         yesterday = today-delta
         tomorrow = today+delta
 
-    url = request.build_absolute_uri('/api/notary_stats/daily/')
+    url = request.build_absolute_uri('/api/info/notarised_count_date/')
     return paginate_wrap(resp, url, "notarised_date",
                          str(yesterday), str(tomorrow))
 

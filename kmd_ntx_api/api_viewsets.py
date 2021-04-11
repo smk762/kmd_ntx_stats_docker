@@ -48,7 +48,7 @@ class balancesViewSet(viewsets.ModelViewSet):
     serializer_class = BalancesSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['chain', 'notary', 'season', 'node']
+    filterset_fields = ['chain', 'notary', 'season', 'server']
     ordering_fields = ['chain', 'notary', 'season']
     ordering = ['-season', 'notary', 'chain']
 

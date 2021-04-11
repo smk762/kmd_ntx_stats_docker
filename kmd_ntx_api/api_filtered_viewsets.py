@@ -38,7 +38,7 @@ class addresses_filter(viewsets.ViewSet):
 
 class balances_filter(viewsets.ViewSet):
     """
-    API endpoint showing notary node balances
+    API endpoint showing notary balances
     """
     serializer_class = BalancesSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -174,6 +174,33 @@ class launch_params_filter(viewsets.ViewSet):  # TODO: add coin type filter
             "results":resp
             })
 
+class daemon_cli_filter(viewsets.ViewSet):  # TODO: add coin type filter
+
+    """
+    Returns explorers sourced from coins repo
+    """    
+    serializer_class = DaemonCliSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        filters = self.serializer_class.Meta.fields
+
+        chain = None
+        if 'chain' in request.GET:
+            chain = request.GET["chain"]
+        
+        resp = get_daemon_cli_data_api(chain)
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":resp
+            })
+
+
+
 class mined_count_season_filter(viewsets.ViewSet):
     """
     API endpoint showing mined blocks by notary/address (minimum 10 blocks mined)
@@ -213,7 +240,7 @@ class mined_count_date_filter(viewsets.ViewSet):
 
 class notarised_chain_season_filter(viewsets.ViewSet):
     """
-    API endpoint showing notary node mined blocks
+    API endpoint showing notary mined blocks
     """
     serializer_class = NotarisedChainSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -232,7 +259,7 @@ class notarised_chain_season_filter(viewsets.ViewSet):
 
 class notarised_count_season_filter(viewsets.ViewSet):
     """
-    API endpoint showing notary node mined blocks
+    API endpoint showing notary mined blocks
     """
     serializer_class = NotarisedCountSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -251,7 +278,7 @@ class notarised_count_season_filter(viewsets.ViewSet):
 
 class notarised_chain_date_filter(viewsets.ViewSet):
     """
-    API endpoint showing notary node mined blocks. \n
+    API endpoint showing notary mined blocks. \n
     Defaults to filtering by todays date \n
     """
     serializer_class = NotarisedChainDailySerializer
@@ -271,7 +298,7 @@ class notarised_chain_date_filter(viewsets.ViewSet):
 
 class notarised_count_date_filter(viewsets.ViewSet):
     """
-    API endpoint showing notary node mined blocks
+    API endpoint showing notary mined blocks
     """
     serializer_class = NotarisedCountDailySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
