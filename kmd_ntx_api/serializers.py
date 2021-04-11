@@ -64,20 +64,21 @@ class decodeOpRetSerializer(serializers.Serializer):
 
 class ElectrumsSerializer(serializers.HyperlinkedModelSerializer):
     chain = serializers.CharField()
-    electrums = serializers.CharField()
-    electrums_ssl = serializers.CharField()
     class Meta:
         fields = ['chain']
 
 class ExplorersSerializer(serializers.HyperlinkedModelSerializer):
     chain = serializers.CharField()
-    explorer = serializers.CharField()
     class Meta:
         fields = ['chain']
 
 class LaunchParamsSerializer(serializers.HyperlinkedModelSerializer):
     chain = serializers.CharField()
-    server = serializers.CharField()
+    class Meta:
+        fields = ['chain']
+
+class DaemonCliSerializer(serializers.HyperlinkedModelSerializer):
+    chain = serializers.CharField()
     class Meta:
         fields = ['chain']
 

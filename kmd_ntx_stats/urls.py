@@ -49,6 +49,10 @@ router.register(r'info/launch_params',
                 api_filtered_viewsets.launch_params_filter,
                 basename='launch_params_filter')
 
+router.register(r'info/daemon_cli',
+                api_filtered_viewsets.daemon_cli_filter,
+                basename='daemon_cli_filter')
+
 router.register(r'info/electrums_ssl',
                 api_filtered_viewsets.electrums_ssl_filter,
                 basename='electrums_ssl_filter')
