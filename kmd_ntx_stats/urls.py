@@ -307,10 +307,14 @@ urlpatterns = [
     
 
     # TOOLS VIEWS
-    
+
     path('tools/decode_opret/',
           tool_views.decode_opret_view,
           name='decode_opret_view'),
+    
+    path('tools/launch_params/',
+          tool_views.launch_params_view,
+          name='launch_params_view'),
 
     path('tools/pubkey_addresses/',
           tool_views.pubkey_addresses_view,

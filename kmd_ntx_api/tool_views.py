@@ -68,4 +68,22 @@ def decode_opret_view(request):
     return render(request, 'tool_opret.html', context)
 
 
+def launch_params_view(request):
+    context = {
+        "sidebar_links":get_sidebar_links(),
+        "eco_data_link":get_eco_data_link()
+    }
+
+    url = f"http://116.203.120.91:8762/api/info/launch_params"
+    launch_params = requests.get(url).json()["results"]
+
+    launch_param_rows = []
+    for chain in launch_params:
+        launch_param_rows.append({"chain":chain, "launch_params":launch_params[chain]})
+
+    context.update({
+        "launch_param_rows": launch_param_rows,
+    })
+
+    return render(request, 'tool_launch_params.html', context)
 
