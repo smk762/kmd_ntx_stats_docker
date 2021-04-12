@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
+import time
+import math
 from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework import permissions, viewsets, authentication
 from kmd_ntx_api.serializers import addrFromBase58Serializer, addrFromPubkeySerializer, decodeOpRetSerializer
 from kmd_ntx_api.lib_info import get_all_coins
 from kmd_ntx_api.base_58 import *
+
 
 # Tool views
 
@@ -108,3 +112,73 @@ def validate_opret(OP_RETURN):
     if "error" in decoded:
         return False
     return True
+
+def get_kmd_rewards_api(request):
+    address = None
+    if "address" in request.GET:
+        address = request.GET["address"]
+    return JsonResponse(get_kmd_rewards(address))
+
+def get_kmd_rewards(address=None):
+    if not address:
+        return {"error":"You need to specify an adddress, e.g ?address=RCyANUW2H5985zk8p6NHJfPyNBXnTVzGDh"}
+    else:
+
+        kmd_tiptime = time.time()
+        try:
+            resp = requests.get(f"https://kmd.explorer.dexstats.info/insight-api-komodo/addr/{address}/utxo")
+            utxos = resp.json()
+        except:
+            return  {"error":f"{resp.text}"}
+        utxo_count = len(utxos)
+        rewards_info = {
+            "address": address,
+            "utxo_count": utxo_count,
+            "eligible_utxos":{}
+        }
+        total_rewards = 0
+        balance = 0
+        oldest_utxo_block = 99999999999
+        for utxo in utxos:
+            balance += utxo['satoshis']/100000000
+            if "height" in utxo:
+                if utxo['height'] < oldest_utxo_block:
+                    oldest_utxo_block = utxo['height']
+                if utxo['height'] < KOMODO_ENDOFERA and utxo['satoshis'] >= MIN_SATOSHIS:
+                    try:
+                        url = f"https://kmd.explorer.dexstats.info/insight-api-komodo/tx/{utxo['txid']}"
+                        print(url)
+                        locktime = requests.get(url).json()['locktime']
+                        coinage = math.floor((kmd_tiptime-locktime)/ONE_HOUR)
+                        if coinage >= ONE_HOUR and locktime >= LOCKTIME_THRESHOLD:
+                            limit = ONE_YEAR
+                            if utxo['height'] >= ONE_MONTH_CAP_HARDFORK:
+                                limit = ONE_MONTH
+                            reward_period = min(coinage, limit) - 59
+                            utxo_rewards = math.floor(utxo['satoshis']/DEVISOR)*reward_period
+                            if utxo_rewards < 0:
+                                logger.info("Rewards should never be negative!")
+                            rewards_info['eligible_utxos'].update({
+                                utxo['txid']:{
+                                    "locktime":locktime,
+                                    "utxo_value":utxo['amount'],
+                                    "sat_rewards":utxo_rewards,
+                                    "kmd_rewards":utxo_rewards/100000000,
+                                    "satoshis":utxo['satoshis'],
+                                    "block_height":utxo['height']
+                                }
+                            })
+                            total_rewards += utxo_rewards/100000000
+                    except Exception as e:
+                        logger.error(f"Exception in [get_kmd_rewards]: {e}")
+                        pass
+        eligible_utxo_count = len(rewards_info['eligible_utxos'])
+        if oldest_utxo_block == 99999999999:
+            oldest_utxo_block = 0
+        rewards_info.update({
+            "eligible_utxo_count":eligible_utxo_count,
+            "oldest_utxo_block":oldest_utxo_block,
+            "kmd_balance":balance,
+            "total_rewards":total_rewards
+        })
+        return rewards_info

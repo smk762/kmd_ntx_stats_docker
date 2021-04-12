@@ -128,10 +128,12 @@ router.register(r'tools/addr_from_base58',
                 api_tools.api_addr_from_base58_tool,
                 basename='api_addr_from_base58_tool')
 
+
 # Graphs
 router.register(r'graph_json/balances',
                 api_graph.balances_graph,
                 basename='balances_graph')
+
 
 router.register(r'graph_json/daily_ntx',
                 api_graph.daily_ntx_graph,
@@ -311,7 +313,7 @@ urlpatterns = [
     path('tools/decode_opret/',
           tool_views.decode_opret_view,
           name='decode_opret_view'),
-    
+
     path('tools/launch_params/',
           tool_views.launch_params_view,
           name='launch_params_view'),
@@ -319,6 +321,10 @@ urlpatterns = [
     path('tools/pubkey_addresses/',
           tool_views.pubkey_addresses_view,
           name='pubkey_addresses_view'),
+
+    path('tools/kmd_rewards/',
+          tool_views.kmd_rewards_view,
+          name='kmd_rewards_view'),
 
     # OTHER API
     
@@ -420,6 +426,11 @@ urlpatterns = [
     path('api/table/epoch_scoring',
           api_tables.epoch_scoring_table,
           name='epoch_scoring_table'),
+
+    path('api/tools/kmd_rewards',
+          api_tools.get_kmd_rewards_api,
+          name='get_kmd_rewards_api'),
+
 
     path('api/table/notary_epoch_scoring',
           api_tables.api_table_notary_epoch_scoring,

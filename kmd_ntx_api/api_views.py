@@ -35,6 +35,15 @@ def api_dpow_server_coins_dict(request):
     return JsonResponse(resp)
 
 
+def api_kmd_rewards(request):
+    if 'address' in request.GET:
+        address = request.GET["address"]
+    else:
+        address = None
+    resp = get_kmd_rewards(address)
+    return JsonResponse(resp)
+
+
 def api_sidebar_links(request):
     if 'season' in request.GET:
         season = request.GET["season"]
