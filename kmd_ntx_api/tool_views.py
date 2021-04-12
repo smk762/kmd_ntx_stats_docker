@@ -87,3 +87,35 @@ def launch_params_view(request):
 
     return render(request, 'tool_launch_params.html', context)
 
+
+
+def kmd_rewards_view(request):
+    context = {
+        "sidebar_links":get_sidebar_links(),
+        "eco_data_link":get_eco_data_link()
+    }
+    if "address" in request.GET:
+        address = request.GET["address"]
+        resp = get_kmd_rewards(address)
+        print(resp)
+        if "error" in resp:
+            messages.error(request, resp["error"])
+        else:
+            kmd_rewards_rows = []
+            for utxo in resp["eligible_utxos"]:
+                row = {"txid":utxo}
+                row.update(resp["eligible_utxos"][utxo])
+                kmd_rewards_rows.append(row)
+
+            context.update({
+                "address": address,
+                "kmd_balance": resp["kmd_balance"],
+                "total_rewards": round(resp["total_rewards"],4),
+                "utxo_count": resp["utxo_count"],
+                "eligible_utxo_count": resp["eligible_utxo_count"],
+                "oldest_utxo_block": resp["oldest_utxo_block"],
+                "kmd_rewards_rows": kmd_rewards_rows,
+            })
+
+    return render(request, 'tool_kmd_rewards.html', context)
+
