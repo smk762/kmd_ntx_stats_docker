@@ -101,3 +101,10 @@ def get_address_from_pubkey(request):
             "error": "You need to specify a pubkey and coin, e.g '?coin=BTC&pubkey=03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828' (if coin not specified, it will default to KMD)"
         }
 
+
+def validate_opret(OP_RETURN):
+    coins_list = get_all_coins() 
+    decoded = decode_opret(OP_RETURN, coins_list)
+    if "error" in decoded:
+        return False
+    return True
