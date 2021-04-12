@@ -83,7 +83,7 @@ def calc_addr_from_pubkey(coin, pubkey):
         return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
     except Exception as e:
         logger.error(f"[calc_addr_from_pubkey] Exception: {e}")
-        return str(e)
+        return {"error":str(e)}
 
 
 def calc_addr_tool(pubkey, pubtype, p2shtype, wiftype):
@@ -114,6 +114,11 @@ def calc_addr_tool(pubkey, pubtype, p2shtype, wiftype):
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
 
+def validate_pubkey(pubkey):
+    resp = calc_addr_from_pubkey("KMD", pubkey)
+    if "error" in resp:
+        return False
+    return True
     
 def get_ticker(x):
     chain = ''
@@ -133,6 +138,7 @@ def get_ticker(x):
 
 
 def decode_opret(op_return, coins_list):  
+    
     ac_ntx_blockhash = lil_endian(op_return[:64])
 
     try:

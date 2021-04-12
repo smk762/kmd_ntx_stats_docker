@@ -10,6 +10,7 @@ from kmd_ntx_api import api_graph
 from kmd_ntx_api import api_wallet
 from kmd_ntx_api import page_views
 from kmd_ntx_api import notary_views
+from kmd_ntx_api import tool_views
 
 handler404 = 'kmd_ntx_api.error_views.error_404'
 #handler500 = 'kmd_ntx_api.error_views.error_500'
@@ -291,6 +292,7 @@ urlpatterns = [
           page_views.sitemap,
           name='sitemap'),
 
+
     path('scoring_epochs',
           page_views.scoring_epochs_view,
           name='scoring_epochs_view'),
@@ -303,6 +305,16 @@ urlpatterns = [
           page_views.notary_epoch_scoring_table,
           name='notary_epoch_scoring_table'),
     
+
+    # TOOLS VIEWS
+    
+    path('tools/decode_opret/',
+          tool_views.decode_opret_view,
+          name='decode_opret_view'),
+
+    path('tools/pubkey_addresses/',
+          tool_views.pubkey_addresses_view,
+          name='pubkey_addresses_view'),
 
     # OTHER API
     
