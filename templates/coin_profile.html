@@ -10,7 +10,7 @@
 						    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
 							    Notarised Last 24hrs
 							    <span class="badge p-2 kmd_ui_dark4_bg">
-							    	{{ chain_ntx_summary.chain_ntx_today }}
+							    	{{ chain_ntx_summary.num_chain_ntx_24hr }}
 							    </span>
 							</button>
 					  	</li>
@@ -18,7 +18,7 @@
 						    <button type="button" class="btn kmd_blue_bg col-12 d-flex justify-content-between align-items-center">
 						    	Notarised Season
 							    <span class="badge p-2 kmd_ui_dark4_bg">
-							    	{{ chain_ntx_summary.chain_ntx_season }}
+							    	{{ chain_ntx_summary.num_chain_ntx_season }}
 							    </span>
 							</button>									    
 					  	</li>
@@ -138,6 +138,7 @@
 			</div>
 		</div>
 	</div>
+	<!--
 	<div class="row">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
@@ -154,6 +155,7 @@
 			</h4>
 		</div>
 	</div>
+	-->
 	<div class="row my-3">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
@@ -183,17 +185,29 @@
 					{{ chain }} ADDRESSES & BALANCES
 				</div>
 				<div class="card-body kmd_ui_dark1_bg">
-					<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%"  data-ajax="{% url 'balancesViewSet-list' %}?format=datatables&chain={{ chain }}">
+					<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
 						<thead>
 							<tr>
-								<th data-data="chain">CHAIN</th>
 								<th data-data="notary">NOTARY</th>
 								<th data-data="address">ADDRESS</th>
 								<th data-data="balance">BALANCE</th>
 								<th data-data="season">SEASON</th>
 								<th data-data="server">SERVER</th>
+								<th data-data="update">UPDATED</th>
 							</tr>
 						</thead>
+						<tbody>
+							{% for item in chain_balances %}
+							<tr>
+								<td data-data="notary">{{ item.notary }}</td>
+								<td data-data="address">{{ item.address }}</td>
+								<td data-data="balance">{{ item.balance|floatformat:-3 }}</td>
+								<td data-data="season">{{ item.season }}</td>
+								<td data-data="server">{{ item.server }}</td>
+								<td data-data="update">{{ item.update_time }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
 					</table>
 				</div>
 			</div>	
@@ -208,6 +222,7 @@
 	    $(document).ready(function() {
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	        $('#table_id').DataTable({
+	           "pageLength": 64,
         		order: [[ 5, 'asc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
         		"columnDefs": [
         			{
@@ -232,11 +247,11 @@
 	    });
 	    $.ajax({ 
 	      method: "GET", 
-	      url: '//{{ request.get_host }}/api/graph_json/balances/?chain={{ chain }}', 
+	      url: '//{{ request.get_host }}/api/graph/balances/?season={{ season }}&server={{ server }}&chain={{ chain }}', 
 	      success: function(data) { 
 	      	//document.getElementById('graph_title').innerHTML = data.chartLabel;
 	        //drawLineGraph(data, 'myChartline'); 
-	        drawBarGraph(data, 'myChartBar'); 
+	        drawBarGraph(data['results'], 'myChartBar'); 
 	        console.log("drawing"); 
 	      }, 
 	      error: function(error_data) { 

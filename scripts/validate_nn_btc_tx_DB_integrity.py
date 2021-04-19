@@ -48,7 +48,8 @@ def validate_ntx_addr():
                 CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
                 CONN.commit()
                 print(f"deleted {txid}")
-
+                next
+                
         if category != "NTX":
             print(f"BTC_NTX_ADDR {txid} IMPROPER CATEGORY {category}")
             delete = input("Delete? (y/n)")
@@ -56,6 +57,7 @@ def validate_ntx_addr():
                 CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
                 CONN.commit()
                 print(f"deleted {txid}")
+                next
 
 
 def validate_ntx_row_counts():

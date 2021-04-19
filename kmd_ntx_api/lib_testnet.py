@@ -73,7 +73,7 @@ def get_api_testnet(request):
                         count = testnet_stats_dict[notary][chain]+1
                         testnet_stats_dict[notary].update({chain:count})
                 else:
-                    logger.warning(f"[get_api_testnet] {notary} not found in ntx_notaries: {item}")
+                    logger.warning(f"[get_api_testnet] {notary} not found in testnet_stats_dict: {item}")
 
         # Get notarisation counts 24hr
         for item in ntx_dict_24hr[chain]:
@@ -125,3 +125,4 @@ def get_api_testnet(request):
         testnet_stats_dict[notary].update({"24hr_Rank":i})
 
     return testnet_stats_dict
+

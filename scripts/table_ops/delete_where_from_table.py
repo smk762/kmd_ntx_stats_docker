@@ -9,9 +9,11 @@ cursor = conn.cursor()
 #table = 'mined'
 #table = 'mined_count_season'
 #table = 'notarised_tenure'
-table = 'notarised'
+#table = 'notarised'
 #table = 'coins'
 #table = "scoring_epochs"
+#table = 'nn_ltc_tx'
+table = 'addresses'
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
 
@@ -23,13 +25,15 @@ print(cursor.fetchall())
 
 #cursor.execute("DELETE FROM "+table+" WHERE chain='LTC' AND season = 'Season_4';")
 #cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_4';")
-cursor.execute("DELETE FROM "+table+" WHERE CHAIN = 'GLEEC';")
+#cursor.execute("DELETE FROM nn_ltc_tx WHERE category = 'Other';")
+cursor.execute("DELETE FROM "+table+";")
+
 conn.commit()
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
 
-cursor.execute("SELECT DISTINCT category FROM "+table+";")
+cursor.execute("SELECT DISTINCT category FROM nn_btc_tx;")
 print(cursor.fetchall())
 
 cursor.close()

@@ -1,38 +1,11 @@
 #!/usr/bin/env python3
 from django.http import JsonResponse
 
-from kmd_ntx_api.lib_info import *
-
-
-# ADDRESSES
-
-def get_source_addresses_api(request):
-
-    if 'season' in request.GET:
-        season = request.GET["season"]
-    else:
-        season = None
-
-    if 'server' in request.GET:
-        server = request.GET["server"]
-    else:
-        server = None
-
-    if 'chain' in request.GET:
-        chain = request.GET["chain"]
-    else:
-        chain = None
-
-    if 'notary' in request.GET:
-        notary = request.GET["notary"]
-    else:
-        notary = None
-
-    return get_addresses_data(season, server, chain, notary)
+from kmd_ntx_api.lib_wallet import *
 
 # Season > Server > Notary > Chain
-def get_notary_addresses_api(request):
-    data = get_source_addresses_api(request).values()
+def notary_addresses_wallet(request):
+    data = get_source_addresses(request).values()
     resp = {}
     for item in data:
         season = item["season"]
@@ -59,8 +32,8 @@ def get_notary_addresses_api(request):
     return JsonResponse(resp)
 
 # Season > Server > Chain > Notary
-def get_chain_addresses_api(request):
-    data = get_source_addresses_api(request).values()
+def chain_addresses_wallet(request):
+    data = get_source_addresses(request).values()
     resp = {}
     for item in data:
         season = item["season"]
@@ -81,36 +54,9 @@ def get_chain_addresses_api(request):
 
     return JsonResponse(resp)
 
-
-# BALANCES
-
-def get_source_balances_api(request):
-
-    if 'season' in request.GET:
-        season = request.GET["season"]
-    else:
-        season = None
-
-    if 'server' in request.GET:
-        server = request.GET["server"]
-    else:
-        server = None
-
-    if 'chain' in request.GET:
-        chain = request.GET["chain"]
-    else:
-        chain = None
-
-    if 'notary' in request.GET:
-        notary = request.GET["notary"]
-    else:
-        notary = None
-
-    return get_balances_data(season, server, chain, notary)
-
 # Season > Server > Notary > Chain
-def get_notary_balances_api(request):
-    data = get_source_balances_api(request).values()
+def notary_balances_wallet(request):
+    data = get_source_balances(request).values()
     resp = {}
     for item in data:
         season = item["season"]
@@ -134,8 +80,8 @@ def get_notary_balances_api(request):
     return JsonResponse(resp)
 
 # Season > Server > Chain > Notary
-def get_chain_balances_api(request):
-    data = get_source_balances_api(request).values()
+def chain_balances_wallet(request):
+    data = get_source_balances(request).values()
     resp = {}
     for item in data:
         season = item["season"]

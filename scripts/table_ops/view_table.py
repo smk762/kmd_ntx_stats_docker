@@ -4,7 +4,7 @@ import table_lib
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-#table = 'balances'
+table = 'balances'
 #table = 'coin_social'
 #table = 'funding_transactions'
 #table = 'last_notarised'
@@ -14,7 +14,7 @@ cursor = conn.cursor()
 #table = 'coins'
 #table = 'notarised_btc'
 #table = 'btc_address_deltas'
-table = 'notarised'
+#table = 'notarised'
 #table = 'nn_ltc_tx'
 #table = 'notarised_tenure'
 
@@ -24,6 +24,12 @@ table = 'notarised'
 
 #cursor.execute(sql)
 #cursor.execute("SELECT * FROM "+table+" WHERE chain = 'BTC' AND btc_validated = 'false';")
+
+sql = "SELECT chain, MAX(block_height), MAX(block_time), COALESCE(COUNT(*), 0) \
+       FROM notarised WHERE \
+       season = 'Season_4' \
+       GROUP BY chain;"
+cursor.execute(sql)
 
 results = cursor.fetchall()
 print(results)

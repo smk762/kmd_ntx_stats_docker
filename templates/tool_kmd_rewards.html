@@ -18,10 +18,10 @@
 				</form>
 
 				{% if address %}
-				<h6>Address: {{ address }}</h6>
-				<h6>Balance: {{ kmd_balance }}</h6>
-				<h6>UTXOs eligible: {{ eligible_utxo_count }}/{{ utxo_count }}</h6>
-				<h6>Total rewards: {{ total_rewards }} KMD</h6>
+				<h6><b>Address:</b> <a href='https://komodod.com/b/{{ address }}'>{{ address }}</a></h6>
+				<h6><b>Balance:</b> {{ kmd_balance }}</h6>
+				<h6><b>UTXOs eligible:</b> {{ eligible_utxo_count }}/{{ utxo_count }}</h6>
+				<h6><b>Total rewards:</b> {{ total_rewards }} KMD</h6>
 				{% endif %}
 
 				{% if kmd_rewards_rows %}
@@ -63,7 +63,21 @@
 			        { "data": "txid" },
 			        { "data": "amount" },
 			        { "data": "reward" }
-			    ]
+			    ],
+        		"columnDefs": [
+        			{
+			            "targets": 0,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='https://komodod.com/b/"+oData.block_height+"'>"+oData.block_height+"</a>");
+				        }
+			        },
+        			{
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.txid+"</a>");
+				        }
+			        }
+        		]
 	        });
 	    });
     </script> 

@@ -26,8 +26,8 @@ for season in seasons:
             existing_notarised_txids = get_existing_notarised_txids(chain, season)
             logger.info(f"existing_notarised_txids: {len(existing_notarised_txids)}")
 
-            import_txids_url = f"{OTHER_SERVER}/api/info/chain_notarisation_txid_list?chain={chain}&season={season}"
-            import_txids = requests.get(import_txids_url).json()["notarisation_txid_list"]
+            import_txids_url = f"{OTHER_SERVER}/api/info/notarisation_txid_list?season={season}&server={server}&chain={chain}"
+            import_txids = requests.get(import_txids_url).json()["results"]
             logger.info(f"import_txids: {len(import_txids)}")
 
             
@@ -63,7 +63,7 @@ for season in seasons:
                     if len(txid_info["notary_addresses"]) == 0:
 
                         if ntx_row.chain == "BTC":
-                            url = f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}"
+                            url = f"{THIS_SERVER}/api/info/notary_btc_txid?txid={txid}"
                             local_info = requests.get(url).json()["results"]
                             local_addresses = []
                             for item in local_info:
@@ -73,7 +73,7 @@ for season in seasons:
                             ntx_row.season, ntx_row.server = get_season_from_addresses(ntx_row.notary_addresses, ntx_row.block_time, "BTC", "BTC", txid, ntx_row.notaries)
 
                         elif ntx_row.chain == "LTC":
-                            url = f"{THIS_SERVER}/api/info/nn_ltc_txid?txid={txid}"
+                            url = f"{THIS_SERVER}/api/info/notary_ltc_txid?txid={txid}"
                             local_info = requests.get(url).json()["results"]
                             local_addresses = []
                             for item in local_info:

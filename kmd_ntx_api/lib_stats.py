@@ -183,7 +183,6 @@ def get_coin_notariser_ranks(season):
     return region_notary_ranks
 
 
-
 def get_notarisation_scores(season):
     notarisation_scores = {}
     # set coins lists
@@ -191,7 +190,7 @@ def get_notarisation_scores(season):
         season = "Season_4"
     coin_notariser_ranks = get_coin_notariser_ranks(season)
     coins_dict = get_dpow_server_coins_dict(season)
-    server_chains = get_server_chains(season)
+    server_chains = get_dpow_server_coins_dict(season)
     main_chains = get_mainnet_chains(coins_dict)
     third_chains = get_third_party_chains(coins_dict)
 
@@ -227,21 +226,23 @@ def get_notarisation_scores(season):
         notary = item['notary']
         try:
             region = get_notary_region(notary)
-            notarisation_scores[region][notary].update({
-                "btc":item["btc_count"]
-            })
-            notarisation_scores[region][notary].update({
-                "main":item["antara_count"]
-            })
-            notarisation_scores[region][notary].update({
-                "third_party":item["third_party_count"]
-            })
-            notarisation_scores[region][notary].update({
-                "score":item["season_score"]
-            })
-            notarisation_scores[region][notary].update({
-                "chain_counts":item["chain_ntx_counts"]
-            })
+            if region in notarisation_scores:
+                if notary in notarisation_scores[region]:
+                    notarisation_scores[region][notary].update({
+                        "btc":item["btc_count"]
+                    })
+                    notarisation_scores[region][notary].update({
+                        "main":item["antara_count"]
+                    })
+                    notarisation_scores[region][notary].update({
+                        "third_party":item["third_party_count"]
+                    })
+                    notarisation_scores[region][notary].update({
+                        "score":item["season_score"]
+                    })
+                    notarisation_scores[region][notary].update({
+                        "chain_counts":item["chain_ntx_counts"]
+                    })
         except Exception as e:
             logger.error(f"[get_notarisation_scores] Exception: {e}")
             pass
@@ -262,128 +263,4 @@ def get_notarisation_scores(season):
 
 
     return notarisation_scores
-
-
-def get_notarised_season_score(season=None, chain=None):
-    if not season:
-        season = get_season()
-    if not chain:
-        chain = "KMD"
-
-    notarised_data = get_notarised_data(season, chain).values()
- 
-    resp = {}
-    for item in notarised_data:
-
-        txid = item['txid']
-        chain = item['chain']
-        block_hash = item['block_hash']
-        block_time = item['block_time']
-        block_datetime = item['block_datetime']
-        block_height = item['block_height']
-        notaries = item['notaries']
-        notary_addresses = item['notary_addresses']
-        ac_ntx_blockhash = item['ac_ntx_blockhash']
-        ac_ntx_height = item['ac_ntx_height']
-        opret = item['opret']
-        season = item['season']
-        server = item['server']
-        scored = item['scored']
-        score_value = item['score_value']
-        btc_validated = item['btc_validated']
-
-        if chain == "BTC":
-            server = "BTC"
-            epoch_id = "epoch_BTC"
-        if chain == "KMD":
-            server = "KMD"
-            epoch_id = "epoch_KMD"
-
-        else:
-            epoch_id = get_epoch_id(season, server, block_time)
-
-        if not epoch_id:
-            logger.warning(f"[get_notarised_season_score] no epoch for txid {txid}")
-
-        else:
-            for notary in notaries:
-                if notary not in resp:
-                    resp.update({
-                        notary:{
-                            "servers": {
-                                server:{
-                                    "epochs":{
-                                        epoch_id:{
-                                            "chains": {
-                                                chain:{
-                                                    "chain_ntx":0,
-                                                    "chain_score":0
-                                                },
-                                            },
-                                            "epoch_ntx":0,
-                                            "epoch_score":0
-                                        }
-                                    },
-                                    "server_ntx":0,
-                                    "server_score":0
-                                }
-                            },
-                            "season_score":0
-                        }
-                    })
-
-                if server not in resp[notary]["servers"]:
-                    resp[notary]["servers"].update({
-                        server:{
-                            "epochs":{
-                                epoch_id:{
-                                    "chains": {
-                                        chain:{
-                                            "chain_ntx":0,
-                                            "chain_score":0
-                                        },
-                                    },
-                                    "epoch_ntx":0,
-                                    "epoch_score":0
-                                }
-                            },
-                            "server_ntx":0,
-                            "server_score":0
-                        }
-                    })
-
-                if epoch_id not in resp[notary]["servers"][server]["epochs"]:
-                    resp[notary]["servers"][server]["epochs"].update({
-                        epoch_id:{
-                            "chains": {
-                                chain:{
-                                    "chain_ntx":0,
-                                    "chain_score":0
-                                },
-                            },
-                            "epoch_ntx":0,
-                            "epoch_score":0
-                        }
-                    })
-
-                if chain not in resp[notary]["servers"][server]["epochs"][epoch_id]["chains"]:
-                    resp[notary]["servers"][server]["epochs"][epoch_id]["chains"].update({
-                        chain:{
-                            "chain_ntx":0,
-                            "chain_score":0
-                        },
-                    })
-
-                resp[notary]["season_score"] += score_value
-
-                resp[notary]["servers"][server]["server_ntx"] += 1
-                resp[notary]["servers"][server]["server_score"] += score_value
-
-                resp[notary]["servers"][server]["epochs"][epoch_id]["epoch_ntx"] += 1
-                resp[notary]["servers"][server]["epochs"][epoch_id]["epoch_score"] += score_value
-
-                resp[notary]["servers"][server]["epochs"][epoch_id]["chains"][chain]["chain_ntx"] += 1
-                resp[notary]["servers"][server]["epochs"][epoch_id]["chains"][chain]["chain_score"] += score_value
-           
-    return resp
 

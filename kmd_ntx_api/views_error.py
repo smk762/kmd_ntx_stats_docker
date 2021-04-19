@@ -18,13 +18,13 @@ def error_404(request, exception):
         }
         return render(request,'error/generic_error.html', context)
 
-def error_500(request,  exception):
+def error_500(request):
         context = {
         	"error":"500 - Internal Server Error"
         }
         return render(request,'error/generic_error.html', context)
 
-def error_502(request,  exception):
+def error_502(request, exception):
         context = {
         	"error":"502 - Naughty Gateway"
         }

@@ -30,8 +30,8 @@ def clear_known_address(address):
     row = season_mined_count_row()
     row.address = address
     row.delete_address()
-    row.notary = address
-    row.delete_notary()
+    row.name = address
+    row.delete_name()
 
     row = mined_row()
     row.name = address
@@ -104,7 +104,7 @@ def process_aggregates(season):
     end = datetime.date.today()
 
     if SKIP_UNTIL_YESTERDAY and not RESCAN_SEASON:
-        start = end - datetime.timedelta(days=7)
+        start = end - datetime.timedelta(days=20)
 
     delta = datetime.timedelta(days=1)
     logger.info("Aggregating daily mined counts from "+str(start)+" to "+str(end))
@@ -136,7 +136,7 @@ def update_season_mined_counts(season):
 
     for item in results:
         row = season_mined_count_row()
-        row.notary = item[0]
+        row.name = item[0]
         row.address = item[1]
         row.season = season
         row.blocks_mined = int(item[2])

@@ -1,8 +1,17 @@
 import requests
 import logging
+import os
+from dotenv import load_dotenv
 from django.contrib import messages
 
+# ENV VARS
+load_dotenv()
+OTHER_SERVER = os.getenv("OTHER_SERVER") # set to IP or domain to allow for external imports of data to avoid API limits
+THIS_SERVER = os.getenv("THIS_SERVER") # IP / domain of the local server
+
+
 logger = logging.getLogger("mylogger")
+
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
@@ -12,6 +21,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
+SEASON = "Season_4"
 
 SEASONS_INFO = {
     "Season_1": {
@@ -94,6 +104,7 @@ ONE_HOUR = 60
 ONE_MONTH = 31 * 24 * 60
 ONE_YEAR = 365 * 24 * 60
 DEVISOR = 10512000
+
 
 # COLORS
 BLACK = "#000"

@@ -1,76 +1,35 @@
 #!/usr/bin/env python3
-import time
-
-from django_filters.rest_framework import DjangoFilterBackend
-
-from rest_framework.response import Response
-from rest_framework.filters import OrderingFilter
-from rest_framework import permissions, viewsets
-
-from kmd_ntx_api.serializers import BalancesSerializer, NotarisedCountDailySerializer
-from kmd_ntx_api.lib_graph import get_balances_graph_data, get_daily_ntx_graph_data
-from kmd_ntx_api.lib_helper import get_season
+from django.http import JsonResponse
+from kmd_ntx_api.lib_graph import *
 
 # Graphs
 
-class balances_graph(viewsets.ViewSet):
+def balances_graph(request):
 
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['chain', 'notary', 'season']
+    resp = get_balances_graph_data(request)
+    filters = ['season', 'server', 'chain', 'notary']
+    if "error" in resp:
+        return JsonResponse({
+            "error":resp["error"],
+            "filters":filters
+        })
+    return JsonResponse({
+        "count":len(resp),
+        "filters":filters,
+        "results":resp
+    })
 
-    ordering_fields = ['chain', 'notary', 'season']
-    ordering = ['-season', 'notary', 'chain']
 
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly] 
-    serializer_class = BalancesSerializer
-
-    def create(self, validated_data):
-        return Task(id=None, **validated_data)
-   
-    def get(self, request, format = None): 
-        if "season" in request.GET:
-            season = request.GET["season"]
-        else:
-            season = "Season_4"
-        filter_kwargs = {'season':season}
-
-        for field in BalancesSerializer.Meta.fields:
-            val = request.query_params.get(field, None)
-
-            if val is not None:
-                filter_kwargs.update({field:val}) 
-
-        data = get_balances_graph_data(request, filter_kwargs)
-
-        return Response(data) 
-
-class daily_ntx_graph(viewsets.ViewSet):
-
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['notarised_date', 'notary']
-
-    ordering_fields = ['notarised_date', 'notary']
-    ordering = ['-notarised_date', 'notary']
-
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    serializer_class = NotarisedCountDailySerializer
-
-    def create(self, validated_data):
-        return Task(id=None, **validated_data)
-   
-    def get(self, request, format = None): 
-        if "season" in request.GET:
-            season = request.GET["season"]
-        else:
-            season = "Season_4"
-        filter_kwargs = {'season':season}
-
-        for field in NotarisedCountDailySerializer.Meta.fields:
-            val = request.query_params.get(field, None)
-
-            if val is not None:
-                filter_kwargs.update({field:val}) 
-
-        data = get_daily_ntx_graph_data(request, filter_kwargs)
-
-        return Response(data) 
+def daily_ntx_graph(request):
+    filters = ['notarised_date', 'server', 'chain', 'notary']
+    resp = get_daily_ntx_graph_data(request)
+    if "error" in resp:
+        return JsonResponse({
+            "error":resp["error"],
+            "filters":filters
+        })
+    return JsonResponse({
+        "count":len(resp),
+        "filters":filters,
+        "results":resp
+    })

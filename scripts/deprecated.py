@@ -1,4 +1,50 @@
 
+
+def get_btc_ntxids(stop_block, exit=None):
+    has_more=True
+    before_block=None
+    ntx_txids = []
+    page = 1
+    exit_loop = False
+    existing_txids = get_existing_notarised_txids("BTC")
+    while has_more:
+        logger.info(f"Getting TXIDs from API Page {page}...")
+        resp = get_btc_address_txids(BTC_NTX_ADDR, before_block)
+        # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
+        if page > API_PAGE_BREAK:
+            break
+        if "error" in resp:
+            exit_loop = api_sleep_or_exit(resp, exit )
+        else:
+            page += 1
+            if 'txrefs' in resp:
+                tx_list = resp['txrefs']
+                for tx in tx_list:
+                    if tx['tx_hash'] not in ntx_txids and tx['tx_hash'] not in existing_txids:
+                        ntx_txids.append(tx['tx_hash'])
+                logger.info(str(len(ntx_txids))+" txids scanned...")
+
+            if 'hasMore' in resp:
+                has_more = resp['hasMore']
+                if has_more:
+                    before_block = tx_list[-1]['block_height']
+                    if before_block < stop_block:
+                        logger.info("Scanned to start of s4")
+                        exit_loop = True
+                    time.sleep(1)
+                else:
+                    logger.info("No more!")
+                    exit_loop = True
+
+            else:
+                logger.info("No more tx to scan!")
+                exit_loop = True
+                
+        if exit_loop or page >= API_PAGE_BREAK:
+            logger.info("exiting address txid loop!")
+            break
+    ntx_txids = list(set((ntx_txids)))
+    return ntx_txids
 def categorize_import_transactions(notary_address, season):
 
     logger.info(f">>> Categorising {notary_address} for {season}")

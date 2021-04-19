@@ -1,430 +1,521 @@
 ENDPOINTS = {
-	"info/addresses": {
-		"category": "wallets",
-		"filters": [],
-		"example": "",
-		"description": "",
-		"sidebar": False
+	"index/": {
+		"category": "index",
+		"filters": "N/A",
+		"example": "N/A",
+		"description": "Index of all available endpoints, with contextual info on usage, filters, examples and inclusion in front-end sidebar",
+		"sidebar": "False"
 	},
-	"info/balances": {
-		"category": "wallets",
-		"filters": [],
-		"example": "",
-		"description": "",
-		"sidebar": False
+	"pages_index/": {
+		"category": "index",
+		"filters": "N/A",
+		"example": "N/A",
+		"description": "Index of all available pages, with contextual info on usage, filters, examples and inclusion in front-end sidebar",
+		"sidebar": "False"
 	},
-	"info/coins": {
-		"category": "wallets",
+
+	"graph/balances": {
+		"category": "graph",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/mined_count_season": {
-		"category": "wallets",
+	"graph/daily_ntx/": {
+		"category": "graph",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/mined_count_date": {
-		"category": "wallets",
+
+	"info/base_58/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/notarised_chain_season": {
-		"category": "wallets",
+	"info/balances/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/notarisation": {
-		"category": "wallets",
+	"info/btc_txid_list/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/notarised_count_season": {
-		"category": "wallets",
+	"info/chain_sync/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/notarised_tenure": {
-		"category": "wallets",
+	"info/coins/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/notary_nodes": {
-		"category": "wallets",
+	"info/daemon_cli/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/notary_rewards": {
-		"category": "wallets",
+	"info/dpow_server_coins/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/nn_social": {
-		"category": "wallets",
+	"info/explorers/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/last_notarised": {
-		"category": "wallets",
+	"info/electrums/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/last_btc_notarised": {
-		"category": "wallets",
+	"info/electrums_ssl/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"tools/decode_opreturn": {
-		"category": "wallets",
+	"info/launch_params/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"tools/address_from_pubkey": {
-		"category": "wallets",
+	"info/ltc_txid_list/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"tools/addr_from_base58": {
-		"category": "wallets",
+	"info/mined_count_daily/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"graph_json/balances": {
-		"category": "wallets",
+	"info/nn_mined_4hrs_count/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"graph_json/daily_ntx": {
-		"category": "wallets",
+	"info/nn_social/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/addresses": {
-		"category": "wallets",
+	"info/notarisation_txid_list/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/balances": {
-		"category": "wallets",
+	"info/notarised_chain_daily/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/coins": {
-		"category": "wallets",
+	"info/notarised_count_daily/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/last_btc_notarised": {
-		"category": "wallets",
+	"info/notarised_txid/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/last_notarised": {
-		"category": "wallets",
+	"info/notary_nodes/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/mined": {
-		"category": "wallets",
+	"info/notary_btc_txid/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/mined_count_date": {
-		"category": "wallets",
+	"info/notary_btc_transactions/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/mined_count_season": {
-		"category": "wallets",
+	"info/notary_ltc_txid/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/nn_social": {
-		"category": "wallets",
+	"info/notary_ltc_transactions/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/notarised": {
-		"category": "wallets",
+	"info/sidebar_links/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/notarised_count_date": {
-		"category": "wallets",
+	"info/split_summary_api/": {
+		"category": "info",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/notarised_count_season": {
-		"category": "wallets",
+
+
+
+
+
+
+	"source/addresses/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/notarised_chain_date": {
-		"category": "wallets",
+	"source/balances/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/notarised_chain_season": {
-		"category": "wallets",
+	"source/coins/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/notarised_tenure": {
-		"category": "wallets",
+	"source/coin_social/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"source/notary_rewards": {
-		"category": "wallets",
+	"source/last_notarised/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/address_btc_txids": {
-		"category": "wallets",
+	"source/mined/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/sidebar_links": {
-		"category": "wallets",
+	"source/mined_count_daily/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/server_chains": {
-		"category": "wallets",
+	"source/mined_count_season/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/dpow_server_coins": {
-		"category": "wallets",
+	"source/nn_btc_tx/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/btc_ntx_lag": {
-		"category": "wallets",
+	"source/nn_ltc_tx/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"testnet/totals": {
-		"category": "wallets",
+	"source/nn_social/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/chain_sync": {
-		"category": "wallets",
+	"source/notarised/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False,
-		"review": True
+		"sidebar": "False"
 	},
-	"info/mining_24hrs": {
-		"category": "wallets",
+	"source/notarised_chain_daily/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/notarisation_txid": {
-		"category": "wallets",
+	"source/notarised_chain_season/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/chain_notarisation_txid_list": {
-		"category": "wallets",
+	"source/notarised_count_daily/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/notary_btc_txids": {
-		"category": "wallets",
+	"source/notarised_count_season/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/notary_ltc_txids": {
-		"category": "wallets",
+	"source/notarised_tenure/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/nn_btc_txid": {
-		"category": "wallets",
+	"source/scoring_epochs/": {
+		"category": "source",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/nn_btc_txid_list": {
-		"category": "wallets",
+
+
+
+
+
+
+
+	"table/addresses/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/nn_ltc_txid_list": {
-		"category": "wallets",
+	"table/balances/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/nn_btc_txid_ntx": {
-		"category": "wallets",
+	"table/last_mined/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/nn_ltc_txid": {
-		"category": "wallets",
+	"table/last_notarised/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/nn_mined_4hrs_count": {
-		"category": "wallets",
+	"table/mined_24hrs/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/nn_mined_last_api": {
-		"category": "wallets",
+	"table/mined_count_season/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/ntx_24hrs": {
-		"category": "wallets",
+	"table/notarised_24hrs/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/split_summary_api": {
-		"category": "wallets",
+	"table/notarised_chain_season/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/split_summary_table": {
-		"category": "wallets",
+	"table/notarised_count_season/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"info/notarised_season_score": {
-		"category": "wallets",
+	"table/notary_epoch_scores/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"table/epoch_scoring": {
-		"category": "wallets",
+	"table/notarised_tenure/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"table/notary_epoch_scoring": {
-		"category": "wallets",
+	"table/notary_profile_summary_table/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
 	},
-	"table/mined_count_season": {
-		"category": "wallets",
+	"table/scoring_epochs/": {
+		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
-		"sidebar": False
+		"sidebar": "False"
+	},
+	"table/split_stats/": {
+		"category": "table",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": "False"
+	},
+
+
+
+	"testnet/totals/": {
+		"category": "testnet",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": "False"
+	},
+
+
+	"tools/addr_from_base58/": {
+		"category": "tools",
+		"filters": ['name', 'address'],
+		"example": "",
+		"description": "",
+		"sidebar": "False"
+	},
+	"tools/address_from_pubkey/": {
+		"category": "tools",
+		"filters": ['name', 'address'],
+		"example": "",
+		"description": "",
+		"sidebar": "False"
+	},
+	"tools/decode_opreturn/": {
+		"category": "tools",
+		"filters": ['name', 'address'],
+		"example": "",
+		"description": "",
+		"sidebar": "False"
+	},
+	"tools/kmd_rewards/": {
+		"category": "tools",
+		"filters": ['name', 'address'],
+		"example": "",
+		"description": "",
+		"sidebar": "False"
+	},
+
+
+	"wallet/chain_addresses/": {
+		"category": "wallet",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": "False"
+	},
+	"wallet/chain_balances/": {
+		"category": "wallet",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": "False"
+	},
+	"wallet/notary_addresses/": {
+		"category": "wallet",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": "False"
+	},
+	"wallet/notary_balances/": {
+		"category": "wallet",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": "True"
 	}
 }

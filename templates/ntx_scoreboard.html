@@ -44,7 +44,7 @@
 								<td data-data="third_party">{{ notary_data.third_party }}</th>
 								<td data-data="mining">{{ notary_data.mining }}</th>
 								<td style="font-size: 1.1em"  data-data="score">{{ notary_data.score|floatformat:-3 }}</th>
-								<td style="font-size: 0.9em" data-data="detail"><a href="//{{ request.get_host }}/notary_epoch_scoring_table/?notary={{ notary }}">More Info</a></th>
+								<td style="font-size: 0.9em" data-data="detail"><a href="//{{ request.get_host }}/notary_epoch_scores/?notary={{ notary }}">More Info</a></th>
 							</tr>
 							{% endfor %}
 						</tbody>

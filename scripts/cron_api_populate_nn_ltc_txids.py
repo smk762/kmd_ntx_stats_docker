@@ -18,12 +18,6 @@ from models import ltc_tx_row, last_notarised_row, notarised_row, get_chain_epoc
 from lib_const import *
 from known_txids import *
 
-logger = logging.getLogger()
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 def get_linked_addresses(addr=None, notary=None):
     linked_addresses = {}
@@ -204,7 +198,8 @@ def detect_intra_notary(vins, vouts):
 
     return True
 
-def detect_spam(txid_data, addresses):
+# Filters spam message.sv transactions
+def detect_spam(txid_data, addresses, vouts):
     if '1See1xxxx1memo1xxxxxxxxxxxxxBuhPF' in addresses:        
         txid_data.input_sats = 0
         txid_data.output_sats = 0
@@ -279,8 +274,10 @@ def scan_ltc_transactions(season):
             j += 1
             # Get tx data from Blockcypher API
             logger.info(f">>> Processing txid {j}/{num_txids}")
-            tx_info = get_ltc_tx_info(txid)
-            if 'fees' in tx_info:
+            tx_info = get_ltc_tx_info(txid, True, True)
+            if 'error' in tx_info:
+                pass
+            elif 'fees' in tx_info:
                 ltc_row = ltc_tx_row()
                 ltc_row.txid = txid
                 ltc_row.address = notary_address
@@ -303,7 +300,7 @@ def scan_ltc_transactions(season):
 
                 vouts = tx_info["outputs"]
                 vins = tx_info["inputs"]
-                update_notary_linked_vins(vins)
+                # update_notary_linked_vins(vins)
 
                 # Detect Split (single row only)
                 if detect_split(ltc_row, addresses):
@@ -359,6 +356,7 @@ def scan_ltc_transactions(season):
                                 last_ltc_ntx_ht = 0
                             if last_ltc_ntx_ht < ltc_row.block_height:
                                 last_ntx_row.season = season
+                                last_ntx_row.server = ltc_row.server
                                 last_ntx_row.chain = "LTC"
                                 last_ntx_row.txid = ltc_row.txid
                                 last_ntx_row.block_height = ltc_row.block_height
@@ -402,6 +400,7 @@ def scan_ltc_transactions(season):
                 logger.info(f"TXID: {txid} ({ltc_row.category})")
             else:
                 logger.warning(f"Fees not in txinfo for {txid}! Likely unconfirmed...")
+                logger.warning(tx_info)
         season_ltc_addresses.remove(notary_address)
 
 if __name__ == "__main__":
