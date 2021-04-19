@@ -80,7 +80,7 @@ class nnBtcTxSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['txid', 'block_hash', 'block_height', 'block_time',
                   'block_datetime', 'address', 'notary', 'season',
                   'category', 'input_index', 'input_sats', 'output_index',
-                  'num_inputs', 'num_outputs', 'fees']
+                  'output_sats', 'num_inputs', 'num_outputs', 'fees']
 
 
 class nnLtcTxSerializer(serializers.HyperlinkedModelSerializer):
@@ -89,7 +89,7 @@ class nnLtcTxSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['txid', 'block_hash', 'block_height', 'block_time',
                   'block_datetime', 'address', 'notary', 'season',
                   'category', 'input_index', 'input_sats', 'output_index',
-                  'num_inputs', 'num_outputs', 'fees']
+                  'output_sats', 'num_inputs', 'num_outputs', 'fees']
 
 
 class nnSocialSerializer(serializers.HyperlinkedModelSerializer):
