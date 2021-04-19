@@ -276,7 +276,7 @@ def get_dpow_score_value(season, server, coin, timestamp):
 
 def is_coin_is_dpow_active(season, server, coin, timestamp):
 
-    r = requests.get(f"{THIS_SERVER}/api/info/notarised_tenure/?chain={coin}")
+    r = requests.get(f"{THIS_SERVER}/api/table/notarised_tenure/?chain={coin}")
     tenure = r.json()["results"][0]
 
     if season in tenure:
@@ -289,67 +289,22 @@ def is_coin_is_dpow_active(season, server, coin, timestamp):
     return "Unofficial", False
 
 def get_server_active_dpow_chains_at_time(season, server, timestamp):
-    r = requests.get(f"{THIS_SERVER}/api/info/notarised_tenure/?server={server}&season={season}")
-    tenure = r.json()["results"][0]
+    url = f"{THIS_SERVER}/api/table/notarised_tenure/?server={server}&season={season}"
+    logger.info(url)
+    r = requests.get(url)
+    tenure = r.json()["results"]
     chains = []
     count = 0
-    if season in tenure:
-        if server in tenure[season]:
-            for coin in tenure[season][server]:
-                if timestamp >= tenure[season][server][coin]["official_start_block_time"]:
-                    if timestamp <= tenure[season][server][coin]["official_end_block_time"]:
-                        if coin not in ["BTC", "LTC", "KMD"] and coin not in DPOW_EXCLUDED_CHAINS[season]:
-                            chains.append(coin)
-                        
+    for item in tenure:
+
+        if timestamp >= item["official_start_block_time"]:
+            if timestamp <= item["official_end_block_time"]:
+                if coin not in ["BTC", "LTC", "KMD"] and coin not in DPOW_EXCLUDED_CHAINS[season]:
+                    chains.append(coin)
+                
 
     return chains, len(list(set(chains)))
 
-
-def get_btc_ntxids(stop_block, exit=None):
-    has_more=True
-    before_block=None
-    ntx_txids = []
-    page = 1
-    exit_loop = False
-    existing_txids = get_existing_notarised_txids("BTC")
-    while has_more:
-        logger.info(f"Getting TXIDs from API Page {page}...")
-        resp = get_btc_address_txids(BTC_NTX_ADDR, before_block)
-        # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
-        if page > API_PAGE_BREAK:
-            break
-        if "error" in resp:
-            exit_loop = api_sleep_or_exit(resp, exit)
-        else:
-            page += 1
-            if 'txrefs' in resp:
-                tx_list = resp['txrefs']
-                for tx in tx_list:
-                    if tx['tx_hash'] not in ntx_txids and tx['tx_hash'] not in existing_txids:
-                        ntx_txids.append(tx['tx_hash'])
-                logger.info(str(len(ntx_txids))+" txids scanned...")
-
-            if 'hasMore' in resp:
-                has_more = resp['hasMore']
-                if has_more:
-                    before_block = tx_list[-1]['block_height']
-                    if before_block < stop_block:
-                        logger.info("Scanned to start of s4")
-                        exit_loop = True
-                    time.sleep(1)
-                else:
-                    logger.info("No more!")
-                    exit_loop = True
-
-            else:
-                logger.info("No more tx to scan!")
-                exit_loop = True
-                
-        if exit_loop or page >= API_PAGE_BREAK:
-            logger.info("exiting address txid loop!")
-            break
-    ntx_txids = list(set((ntx_txids)))
-    return ntx_txids
 
 def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None, stop_block=None):
     before_block=None
@@ -373,7 +328,7 @@ def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None, stop_b
         resp = get_btc_address_txids(notary_address, before_block)
         if "error" in resp:
             logger.info(f"Error in resp: {resp}")
-            exit_loop = api_sleep_or_exit(resp, exit=None)
+            exit_loop = api_sleep_or_exit(resp, exit=True)
         else:
             page += 1
             if 'txrefs' in resp:
@@ -582,31 +537,19 @@ def get_nn_btc_tx_parts_local(txid):
             tx_vouts.append(part)
     return tx_vins, tx_vouts
 
-def get_new_notary_txids(notary_address, chain, season=None):
+def get_new_notary_txids(notary_address, chain, season):
 
     existing_txids = []
     if chain == "BTC":
-
-        if season:
-            existing_txids = get_existing_nn_btc_txids(None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
-            url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={NN_BTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
-            logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
-        else:
-            existing_txids = get_existing_nn_btc_txids(None, None, None, ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address])
-            url = f"{OTHER_SERVER}/api/info/nn_btc_txid_list?notary={ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]}"
-            logger.info(f"{len(existing_txids)} existing txids in local DB detected for {ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]} {notary_address}")
-            
+        existing_txids = get_existing_nn_btc_txids(None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
+        url = f"{OTHER_SERVER}/api/info/btc_txid_list?notary={NN_BTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
+        logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
+           
     elif chain == "LTC":
-        if season:
-            existing_txids = get_existing_nn_ltc_txids(None, None, season, NN_LTC_ADDRESSES_DICT[season][notary_address])
-            url = f"{OTHER_SERVER}/api/info/nn_ltc_txid_list?notary={NN_LTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
-            logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_LTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
-        else:
-            existing_txids = get_existing_nn_ltc_txids(None, None, None, ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address])
-            url = f"{OTHER_SERVER}/api/info/nn_ltc_txid_list?notary={ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address]}"
-            logger.info(f"{len(existing_txids)} existing txids in local DB detected for {ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address]} {notary_address}")
-    
-
+        existing_txids = get_existing_nn_ltc_txids(None, None, season, NN_LTC_ADDRESSES_DICT[season][notary_address])
+        url = f"{OTHER_SERVER}/api/info/ltc_txid_list?notary={NN_LTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
+        logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_LTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
+     
     logger.info(url)
     r = requests.get(url)
     resp = r.json()
@@ -619,16 +562,10 @@ def get_new_notary_txids(notary_address, chain, season=None):
     new_txids = list(set(new_txids))
 
     if chain == "BTC":
-        if season:
-            logger.info(f"{len(new_txids)} extra txids detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
-        else:
-            logger.info(f"{len(new_txids)} extra txids detected for {ALL_SEASON_NN_BTC_ADDRESSES_DICT[notary_address]} {notary_address}")
+        logger.info(f"{len(new_txids)} extra txids detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
     
     if chain == "LTC":
-        if season:
-            logger.info(f"{len(new_txids)} extra txids detected for {NN_LTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
-        else:
-            logger.info(f"{len(new_txids)} extra txids detected for {ALL_SEASON_NN_LTC_ADDRESSES_DICT[notary_address]} {notary_address}")
+        logger.info(f"{len(new_txids)} extra txids detected for {NN_LTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
 
     return new_txids
 
@@ -790,7 +727,7 @@ def get_new_nn_ltc_txids(existing_txids, notary_address):
         resp = get_ltc_address_txids(notary_address, before_block)
         if "error" in resp:
             logger.info(f"Error in resp: {resp}")
-            exit_loop = api_sleep_or_exit(resp, exit=None)
+            exit_loop = api_sleep_or_exit(resp, exit=True)
         else:
             page += 1
             if 'txrefs' in resp:

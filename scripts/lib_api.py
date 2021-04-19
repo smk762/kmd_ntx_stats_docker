@@ -1,4 +1,5 @@
 import requests
+import sys
 import json
 import time
 from lib_const import *
@@ -18,7 +19,7 @@ def get_btc_address_txids(address, before=None):
         logger.warning(e)
         return {"error":str(e)}
 
-def get_btc_tx_info(tx_hash, wait=True):
+def get_btc_tx_info(tx_hash, wait=True, exit_script=False):
     exit_loop = False
     resp = {}
     i = 0
@@ -31,10 +32,13 @@ def get_btc_tx_info(tx_hash, wait=True):
             url = 'https://api.blockcypher.com/v1/btc/main/txs/'+tx_hash+'?limit=800'
             headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
             r = requests.get(url, headers=headers)
-            resp = r.json()
+            return r.json()
         except Exception as e:
             logger.warning(e)
             print("err in get_btc_tx_info")
+        if exit_script:
+            logger.warning("Exiting script to avoid API rate limits...")
+            sys.exit()
         if wait:
             exit_loop = api_sleep_or_exit(resp)
         else:
@@ -73,7 +77,7 @@ def get_ltc_address_txids(address, before=None):
         logger.warning(e)
         return {"error":str(e)}
 
-def get_ltc_tx_info(tx_hash, wait=True):
+def get_ltc_tx_info(tx_hash, wait=True, exit_script=False):
     exit_loop = False
     resp = {}
     i = 0
@@ -86,10 +90,13 @@ def get_ltc_tx_info(tx_hash, wait=True):
             url = 'https://api.blockcypher.com/v1/ltc/main/txs/'+tx_hash+'?limit=800'
             headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
             r = requests.get(url, headers=headers)
-            resp = r.json()
+            return r.json()
         except Exception as e:
             logger.warning(e)
             print("err in get_ltc_tx_info")
+        if exit_script:
+            logger.warning("Exiting script to avoid API rate limits...")
+            sys.exit()
         if wait:
             exit_loop = api_sleep_or_exit(resp)
         else:

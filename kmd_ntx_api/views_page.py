@@ -7,32 +7,11 @@ from django.shortcuts import render
 from kmd_ntx_api.pages import *
 from kmd_ntx_api.endpoints import *
 from kmd_ntx_api.lib_stats import *
-from kmd_ntx_api.api_tables import *
+from kmd_ntx_api.api_table import *
 from kmd_ntx_api.lib_testnet import *
 
 
 ## DASHBOARD        
-
-def btc_ntx(request):
-    season = get_season()
-    btc_ntx = get_notarised_btc_data(season).filter(
-                            season=season).order_by('btc_block_time').values()[:100]
-    for item in btc_ntx:
-        # TODO: these fields are not actually populated, 
-        # need to add to cron scripts
-        lag = item["btc_block_time"]-item["kmd_block_time"]
-        item.update({"lag":lag})
-
-    context = {
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link(),
-        "explorers":get_explorers(),
-        "btc_ntx":btc_ntx,
-        "season":season.replace("_"," ")
-    }
-
-    return render(request, 'btc_ntx.html', context)
-
 
 def chains_last_ntx(request):
     season = get_season()
@@ -43,7 +22,7 @@ def chains_last_ntx(request):
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
-        "explorers":get_explorers(),
+        "explorers":get_explorers(request),
         "season_chain_ntx_data":season_chain_ntx_data
     }
 
@@ -57,30 +36,33 @@ def chain_sync(request):
 
     context.update({
         "sidebar_links":get_sidebar_links(season),
-        "explorers":get_explorers(),
+        "explorers":get_explorers(request),
         "eco_data_link":get_eco_data_link()
         })
     return render(request, 'chain_sync.html', context)
 
-
 def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY PROFILE
     season = get_season()
+    server = get_chain_server(chain)
 
     context = {
-        "sidebar_links":get_sidebar_links(season)
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
     }
     
     if chain:
-        balance_data = get_balances_data(season, None, chain, None).values()
+        url = f"{THIS_SERVER}/api/table/balances/?season={season}&chain={chain}"
+        chain_balances = requests.get(url).json()['results']
 
         max_tick = 0
-        for item in balance_data:
-            if item['balance'] > max_tick:
+        for item in chain_balances:
+            if float(item['balance']) > max_tick:
                 max_tick = float(item['balance'])
         if max_tick > 0:
             10**(int(round(np.log10(max_tick))))
         else:
             max_tick = 10
+
         coin_notariser_ranks = get_coin_notariser_ranks(season)
         top_region_notarisers = get_top_region_notarisers(coin_notariser_ranks)
         top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
@@ -88,8 +70,11 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
         season_chain_ntx_data = get_season_chain_ntx_data(season)
 
         context.update({
+            "season":season,
+            "server":server,
             "chain":chain,
-            "explorers":get_explorers(),
+            "chain_balances":chain_balances,
+            "explorers":get_explorers(request),
             "eco_data_link":get_eco_data_link(),
             "max_tick": max_tick,
             "coin_social": get_coin_social(chain),
@@ -101,9 +86,10 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
     else:
         context.update({ 
             "coin_social": get_coin_social(),
-            "coin_info":get_coin_info()
+            "server_coins": get_dpow_server_coins_dict()
         })
         return render(request, 'coin_profile_index.html', context)
+
 
 def dash_view(request, dash_name=None):
     # Table Views
@@ -183,7 +169,7 @@ def dash_view(request, dash_name=None):
             "show_ticker":True
         })
 
-    server_chains = get_server_chains(season)
+    server_chains = get_dpow_server_coins_dict(season)
     context.update({
         "gets":gets,
         "sidebar_links":get_sidebar_links(season),
@@ -197,12 +183,13 @@ def dash_view(request, dash_name=None):
     })
     return render(request, html, context)
     
+
 def faucet(request):
     season = get_season()
     notary_list = get_notary_list(season)
     context = {
         "sidebar_links":get_sidebar_links(season),
-        "explorers":get_explorers(),
+        "explorers":get_explorers(request),
         "eco_data_link":get_eco_data_link()
         }
     if request.method == 'POST':
@@ -228,6 +215,7 @@ def faucet(request):
 
     return render(request, 'faucet.html', context)
 
+
 def funds_sent(request):
     season = get_season()
     notary_list = get_notary_list(season)
@@ -236,12 +224,13 @@ def funds_sent(request):
 
     context = {
         "sidebar_links":get_sidebar_links(season),
-        "explorers":get_explorers(),
+        "explorers":get_explorers(request),
         "eco_data_link":get_eco_data_link(),
         "funding_data":funding_data,
         "funding_totals":funding_totals,
     }  
     return render(request, 'funding_sent.html', context)
+
 
 def funding(request):
     # add extra views for per chain or per notary
@@ -325,13 +314,14 @@ def funding(request):
         "notaries_list":notary_list,
         "last_balances_update":last_balances_update,
         "sidebar_links":get_sidebar_links(season),
-        "explorers":get_explorers(),
+        "explorers":get_explorers(request),
         "low_nn_balances":low_nn_balances['low_balances'],
         "notary_funding":get_notary_funding(),
         "bot_balance_deltas":get_bot_balance_deltas(),
         "eco_data_link":get_eco_data_link()
     }
     return render(request, 'funding.html', context)
+
 
 def mining_24hrs(request):
     season = get_season()
@@ -342,36 +332,41 @@ def mining_24hrs(request):
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "mined_24hrs":mined_24hrs,
-        "explorers":get_explorers(),
+        "explorers":get_explorers(request),
         "season":season.replace("_"," ")
     }
     return render(request, 'mining_24hrs.html', context)
 
+
 def mining_overview(request):
     season = get_season()
-
+    mined_season = requests.get(f"{THIS_SERVER}/api/table/mined_count_season/?season={season}").json()['results']
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
-        "explorers":get_explorers(),
-        "mined_season":get_mined_count_season_data_table(request),
+        "explorers":get_explorers(request),
+        "mined_season":mined_season,
         "season":season.replace("_"," ")
     }
     return render(request, 'mining_overview.html', context)
 
 
-def ntx_24hrs(request):
+def notarised_24hrs(request):
     season = get_season()
-    ntx_24hrs = get_notarised_data_24hr().order_by('-block_time').values()[:200]
+    notarised_24hrs = get_notarised_data_24hr()
+    print(f"notarised_24hrs.count(): {notarised_24hrs.count()}")
+    notarised_24hrs = notarised_24hrs.order_by('-block_time').values()[:200]
+    
 
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
-        "ntx_24hrs":ntx_24hrs,
-        "explorers":get_explorers(),
+        "notarised_24hrs":notarised_24hrs,
+        "explorers":get_explorers(request),
         "season":season.replace("_"," ")
     }
-    return render(request, 'ntx_24hrs.html', context)
+    return render(request, 'notarised_24hrs.html', context)
+
 
 def ntx_scoreboard(request):
     if not "season" in request.GET:
@@ -390,6 +385,7 @@ def ntx_scoreboard(request):
     }
     return render(request, 'ntx_scoreboard.html', context)
 
+
 def ntx_scoreboard_24hrs(request):
     if not "season" in request.GET:
         season = "Season_4"
@@ -404,7 +400,7 @@ def ntx_scoreboard_24hrs(request):
     return render(request, 'ntx_scoreboard_24hrs.html', context)
 
 
-def notary_epoch_scoring_table(request):
+def notary_epoch_scores_view(request):
     if not "season" in request.GET:
         season = "Season_4"
     else:
@@ -416,7 +412,7 @@ def notary_epoch_scoring_table(request):
     else:
         notary = request.GET["notary"]
 
-    scoring_table, total = get_notary_epoch_scoring_table(notary, season)
+    scoring_table, total = get_notary_epoch_scores_table(notary, season)
     
 
     context = {
@@ -428,7 +424,8 @@ def notary_epoch_scoring_table(request):
         "total":total,
         "nn_social":get_nn_social()
     }
-    return render(request, 'notary_epoch_scoring_table.html', context)
+    return render(request, 'notary_epoch_scores_view.html', context)
+
 
 def notarised_tenure_view(request):
     season = get_season()
@@ -441,16 +438,19 @@ def notarised_tenure_view(request):
     }
     return render(request, 'notarised_tenure.html', context)
 
+
 def scoring_epochs_view(request):
     season = get_season()
     notary_list = get_notary_list(season)
+    epochs = requests.get(f"{THIS_SERVER}/api/table/scoring_epochs/?season={season}").json()['results']
     context = {
         "sidebar_links":get_sidebar_links(season),
-        "epochs":get_epoch_scoring_table(request),
+        "epochs":epochs,
         "eco_data_link":get_eco_data_link()
     }
     return render(request, 'scoring_epochs.html', context)
-        
+  
+
 def testnet_ntx_scoreboard(request):
     season = "Season_5_Testnet"
     notary_list = get_notary_list(season)
@@ -474,6 +474,7 @@ def testnet_ntx_scoreboard(request):
         "testnet_ntx_counts":testnet_ntx_counts
     }
     return render(request, 'testnet_scoreboard.html', context)
+
 
 def sitemap(request):
 

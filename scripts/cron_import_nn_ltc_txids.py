@@ -2,7 +2,7 @@
 import json
 import time
 import requests
-from lib_const import NOTARY_LTC_ADDRESSES, OTHER_SERVER
+from lib_const import NOTARY_LTC_ADDRESSES, OTHER_SERVER, THIS_SERVER
 from lib_notary import get_new_notary_txids
 from models import ltc_tx_row, get_chain_epoch_score_at, get_chain_epoch_at
 from lib_const import *
@@ -19,7 +19,7 @@ for season in seasons:
         for notary_address in NOTARY_LTC_ADDRESSES[season]:
             i += 1
             logger.info(f">>> Categorising {notary_address} for {season} {i}/{num_addr}")
-            txid_list = get_new_notary_txids(notary_address, "LTC")
+            txid_list = get_new_notary_txids(notary_address, "LTC", season)
             logger.info(f"Processing ETA: {0.02*len(txid_list)} sec")
 
             j = 0
@@ -27,7 +27,7 @@ for season in seasons:
             for txid in txid_list:
                 j += 1
                 logger.info(f">>> Categorising {txid} for {j}/{num_txid}")
-                txid_url = f"{OTHER_SERVER}/api/info/nn_ltc_txid?txid={txid}"
+                txid_url = f"{OTHER_SERVER}/api/info/notary_ltc_txid?txid={txid}"
                 time.sleep(0.02)
                 r = requests.get(txid_url)
                 try:

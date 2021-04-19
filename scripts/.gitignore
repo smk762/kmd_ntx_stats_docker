@@ -9,4 +9,5 @@
 *missing
 *notarised_table_validation.json
 deprecated.py
-table_ops
+table_ops/
+old/

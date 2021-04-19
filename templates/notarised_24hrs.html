@@ -7,7 +7,7 @@
 				<h4>{{ season }} Last 200 Notarised</h4>
 			</div>
 			<div class="card-body kmd_ui_dark1_bg m-auto">
-				<table id="ntx_24hr_tbl" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+				<table id="ntx_24hr_tbl" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%; display: none;">
 					<thead>
 						<tr>
 							<th data-data="chain">CHAIN</th>
@@ -19,7 +19,7 @@
 						</tr>
 					</thead>
 					<tbody>
-					{% for row in ntx_24hrs %}
+					{% for row in notarised_24hrs %}
 						<tr>
 							<th data-data="chain">{{ row.chain }}</th>
 							<th style="font-size: 0.9em;" data-data="block_height">{{ row.block_height }}</th>
@@ -39,6 +39,7 @@
     {{ explorers|json_script:"explorers-data" }}
 	<script type="text/javascript">
 	    $(document).ready(function() {
+	    $('#ntx_24hr_tbl').css({'display':'unset'});
 	    var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	        $('#ntx_24hr_tbl').DataTable({
         		order: [[ 5, 'desc' ]],

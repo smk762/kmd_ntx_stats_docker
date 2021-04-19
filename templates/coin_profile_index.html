@@ -11,16 +11,16 @@
 			</h4>
 		</div>
 	</div>
-	{% for server, info in coin_info.server_info.items %}	
+	{% for server, coins in server_coins.items %}	
 	<div class="card text-center">	
 		<div class="card-header kmd_ui_dark1_bg">
 			<a id="{{server}}" class="section-anchor">
-				<h4 class="text-uppercase kmd_teal">{{ info.name }}</h4>
+				<h4 class="text-uppercase kmd_teal">{{ server }}</h4>
 			</a>
 		</div>		
 		<div class="card-body kmd_ui_dark1_bg">
-			<div class="row m-1 d-flex justify-content-between">	
-            	{% for coin in info.coins %}
+			<div class="row m-1 d-flex justify-content-between">
+            	{% for coin in coins %}
             	<div class="card kmd_ui_dark3_bg kmd_ui_light3 col-2 px-0 mx-1">
             		<a href="//{{ request.get_host }}/coin_profile/{{ coin }}">
 

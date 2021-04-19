@@ -42,7 +42,7 @@ def get_chain_ntx_date_aggregates(day, season):
         return ()
 
 def get_mined_date_aggregates(day):
-    sql = "SELECT FROM mined WHERE \
+    sql = "SELECT name, COUNT(*), SUM(value) FROM mined WHERE \
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY name;"
     CURSOR.execute(sql)
@@ -579,14 +579,6 @@ def get_replenish_addresses():
         replenish_addr.append(addr[0])
     return replenish_addr
 
-
-def get_existing_notarised_btc():
-    existing_txids = []
-    CURSOR.execute("SELECT DISTINCT btc_txid FROM notarised_btc;")
-    txids_results = CURSOR.fetchall()
-    for result in txids_results:
-        existing_txids.append(result[0])
-    return existing_txids
 
 #### LTC
 

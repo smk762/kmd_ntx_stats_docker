@@ -4,20 +4,22 @@ import json
 import requests
 from lib_const import *
 
-r = requests.get(f"{THIS_SERVER}/api/info/coins/?dpow_active=1")
-coins_data = r.json()
+url = f"{THIS_SERVER}/api/info/dpow_server_coins"
+dpow_main_chains = requests.get(f"{url}/?season={season}&server=Main").json()['results']
+dpow_3p_chains = requests.get(f"{url}/?season={season}&server=Third_Party").json()['results']
 
-coins_list = list(coins_data['results'].keys())
 
 template = {}
-for chain in coins_list:
+for chain in dpow_main_chains:
+    coin_info = requests.get(f"{THIS_SERVER}/api/info/coins/?chain={chain}").json()
     template.update({
         chain: {
                 "discord": "",
-                "icon": "",
+                "icon": coin_info["coins_info"]["icon"],
                 "github": "",
-                "explorer": "",
+                "explorer": coin_info[explorers],
                 "telegram": "",
+                "keybase": "",
                 "twitter": "",
                 "website": "",
                 "youtube": ""

@@ -8,7 +8,7 @@ from rest_framework import permissions, viewsets
 from kmd_ntx_api.models import *
 from kmd_ntx_api.lib_query import *
 from kmd_ntx_api.serializers import *
-from kmd_ntx_api.filters import minedFilter, ntxFilter, ntxTenureFilter
+from kmd_ntx_api.filters import minedFilter, notarisedFilter, notarisedTenureFilter
 
 ## Source data endpoints
 
@@ -69,8 +69,20 @@ class coinsViewSet(viewsets.ModelViewSet):
     ordering = ['chain']
 
 
+class coinSocialViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing notarisations table data
+    """
+    queryset = coin_social.objects.all()
+    serializer_class = coinSocialSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['chain']
+    ordering_fields = ['chain']
+    ordering = ['chain']
 
-class lastNtxViewSet(viewsets.ModelViewSet):
+
+class lastNotarisedViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing notarisations table data
     """
@@ -83,7 +95,7 @@ class lastNtxViewSet(viewsets.ModelViewSet):
     ordering = ['season', 'notary', 'chain']
 
 
-class MinedViewSet(viewsets.ModelViewSet):
+class minedViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing mining table data
     """
@@ -96,7 +108,7 @@ class MinedViewSet(viewsets.ModelViewSet):
     ordering = ['-block_height']
 
 
-class MinedCountDayViewSet(viewsets.ModelViewSet):
+class minedCountDailyViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing mining table data
     """
@@ -109,7 +121,7 @@ class MinedCountDayViewSet(viewsets.ModelViewSet):
     ordering = ['-mined_date','notary']
 
 
-class MinedCountSeasonViewSet(viewsets.ModelViewSet):
+class minedCountSeasonViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing mining table data
     """
@@ -117,12 +129,38 @@ class MinedCountSeasonViewSet(viewsets.ModelViewSet):
     serializer_class = minedCountSeasonSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['notary', 'season']
+    filterset_fields = ['name', 'season']
     ordering_fields = ['block_height']
-    ordering = ['notary']
+    ordering = ['name']
 
 
-class nn_socialViewSet(viewsets.ModelViewSet):
+class nnBtcTxViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing Node Operator social links
+    """
+    queryset = nn_btc_tx.objects.all()
+    serializer_class = nnBtcTxSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['notary', 'season']
+    ordering_fields = ['season', 'notary']
+    ordering = ['-season', 'notary']
+
+
+class nnLtcTxViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing Node Operator social links
+    """
+    queryset = nn_ltc_tx.objects.all()
+    serializer_class = nnLtcTxSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['notary', 'season']
+    ordering_fields = ['season', 'notary']
+    ordering = ['-season', 'notary']
+
+
+class nnSocialViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing Node Operator social links
     """
@@ -135,7 +173,7 @@ class nn_socialViewSet(viewsets.ModelViewSet):
     ordering = ['-season', 'notary']
 
 
-class ntxViewSet(viewsets.ModelViewSet):
+class notarisedViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing notarisations table data
     """
@@ -143,38 +181,12 @@ class ntxViewSet(viewsets.ModelViewSet):
     serializer_class = notarisedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = ntxFilter
+    filterset_class = notarisedFilter
     ordering_fields = ['block_time', 'chain']
     ordering = ['-block_time', 'chain']
 
 
-class ntxCountDateViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint showing notarisations table data
-    """
-    queryset = get_notarised_count_daily_data()
-    serializer_class = notarisedCountDailySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['notarised_date', 'notary']
-    ordering_fields = ['notarised_date', 'notary']
-    ordering = ['-notarised_date', 'notary']
-
-
-class ntxCountSeasonViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint showing notarisations table data
-    """
-    queryset = notarised_count_season.objects.all()
-    serializer_class = notarisedCountSeasonSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['season', 'notary']
-    ordering_fields = ['season', 'notary']
-    ordering = ['-season', 'notary']
-
-
-class ntxChainDateViewSet(viewsets.ModelViewSet):
+class notarisedChainDailyViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing notarisations table data
     """
@@ -187,7 +199,7 @@ class ntxChainDateViewSet(viewsets.ModelViewSet):
     ordering = ['-notarised_date', 'chain']
 
 
-class ntxChainSeasonViewSet(viewsets.ModelViewSet):
+class notarisedChainSeasonViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing notarisations table data
     """
@@ -200,15 +212,52 @@ class ntxChainSeasonViewSet(viewsets.ModelViewSet):
     ordering = ['-block_height']
 
 
-class ntxTenureViewSet(viewsets.ModelViewSet):
+class notarisedCountDailyViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing notarisations table data
+    """
+    queryset = get_notarised_count_daily_data()
+    serializer_class = notarisedCountDailySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['notarised_date', 'notary']
+    ordering_fields = ['notarised_date', 'notary']
+    ordering = ['-notarised_date', 'notary']
+
+
+class notarisedCountSeasonViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint showing notarisations table data
+    """
+    queryset = notarised_count_season.objects.all()
+    serializer_class = notarisedCountSeasonSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['season', 'notary']
+    ordering_fields = ['season', 'notary']
+    ordering = ['-season', 'notary']
+
+
+class notarisedTenureViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing chain notarisation tenure
     """
     queryset = notarised_tenure.objects.all()
-    serializer_class = ntxTenureSerializer
+    serializer_class = notarisedTenureSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['chain', 'season']
     ordering_fields = ['chain', 'season']
     ordering = ['-season', 'chain']
 
+
+class scoringEpochsViewSet(viewsets.ModelViewSet):
+    """
+    """
+    queryset = scoring_epochs.objects.all()
+    serializer_class = scoringEpochsSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['season','server']
+    ordering_fields = ['season','server', 'epoch']
+    ordering = ['-season', 'epoch', 'server']

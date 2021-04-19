@@ -57,10 +57,10 @@ RETIRED_SMARTCHAINS = ["HUSH3"]
 COINS_INFO = requests.get(f'{THIS_SERVER}/api/info/coins/').json()['results']
 ELECTRUMS = requests.get(f'{THIS_SERVER}/api/info/electrums/').json()['results']
 
-SEASON_SERVER_DPOW_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins').json()
+SEASON = 'Season_4'
 
-ANTARA_COINS = SEASON_SERVER_DPOW_COINS["Main"]
-THIRD_PARTY_COINS = SEASON_SERVER_DPOW_COINS["Third_Party"]
+ANTARA_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins?season={SEASON}&server=Main').json()["results"]
+THIRD_PARTY_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins?season={SEASON}&server=Third_Party').json()["results"]
 
 ALL_COINS = ANTARA_COINS + THIRD_PARTY_COINS + ['BTC', 'KMD', 'LTC']
 ALL_ANTARA_COINS = ANTARA_COINS + RETIRED_SMARTCHAINS # add retired smartchains here
@@ -146,7 +146,7 @@ ALL_SEASON_NOTARY_BTC_ADDRESSES = []
 for season in SEASONS_INFO:
     NN_BTC_ADDRESSES_DICT.update({season:{}})
     try:
-        addresses = requests.get(f"{THIS_SERVER}/api/source/addresses/?chain=BTC&season={season}").json()
+        addresses = requests.get(f"{THIS_SERVER}/api/table/addresses/?chain=BTC&season={season}").json()
         for item in addresses['results']:
             ALL_SEASON_NOTARY_BTC_ADDRESSES.append(item["address"])
             ALL_SEASON_NN_BTC_ADDRESSES_DICT.update({item["address"]:item["notary"]})
@@ -158,7 +158,6 @@ for season in SEASONS_INFO:
 
 ALL_SEASON_NOTARY_BTC_ADDRESSES = list(set(ALL_SEASON_NOTARY_BTC_ADDRESSES))
 
-
 NN_LTC_ADDRESSES_DICT = {}
 NOTARY_LTC_ADDRESSES = {}
 ALL_SEASON_NN_LTC_ADDRESSES_DICT = {}
@@ -167,7 +166,7 @@ ALL_SEASON_NOTARY_LTC_ADDRESSES = []
 for season in SEASONS_INFO:
     NN_LTC_ADDRESSES_DICT.update({season:{}})
     try:
-        addresses = requests.get(f"{THIS_SERVER}/api/source/addresses/?chain=LTC&season={season}").json()
+        addresses = requests.get(f"{THIS_SERVER}/api/table/addresses/?chain=LTC&season={season}").json()
         for item in addresses['results']:
             ALL_SEASON_NOTARY_LTC_ADDRESSES.append(item["address"])
             ALL_SEASON_NN_LTC_ADDRESSES_DICT.update({item["address"]:item["notary"]})

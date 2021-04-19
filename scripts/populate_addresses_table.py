@@ -10,47 +10,42 @@ or coins with new parmas are added.
 TODO: auto grab from repo?
 '''
 
-def populate_addresses(season):
-    season_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins?season={season}').json()
+def populate_addresses(season, server):
+    url = f'{THIS_SERVER}/api/info/dpow_server_coins?season={season}&server={server}'
+    logger.info(url)
+    coins = requests.get(url).json()['results']
 
-    if len(season_coins) > 0:
-        
-        for pubkey_season in NOTARY_PUBKEYS:
+    if len(coins) > 0:
+        if server == 'Main':
+            pubkeys = NOTARY_PUBKEYS[season]
+        elif server == 'Third_Party':
+            pubkeys = NOTARY_PUBKEYS[f"{season}_Third_Party"]
 
-            if pubkey_season.find(season) != -1:
+        coins += ["BTC", "KMD", "LTC"]
+        coins.sort()
 
-                if pubkey_season.find("Third_Party") != -1:
-                    coins = season_coins["Third_Party"][:]
-                    server = "Third_Party"
-                else:
-                    coins = season_coins["Main"][:]
-                    server = "Main"
+        i = 0
 
-                coins += ["BTC", "KMD", "LTC"]
-                coins.sort()
+        for notary in pubkeys:
+            pubkey = pubkeys[notary]
 
-                i = 0
+            for coin in coins:
+                row = addresses_row()
+                row.chain = coin
+                row.season = season
+                row.server = server
+                row.notary_id = i
+                row.notary = notary
+                row.pubkey = pubkey
+                if coin == "GLEEC":
+                    if server == "Third_Party":
+                        coin = "GLEEC_3P"
+                    else:
+                        coin = "GLEEC_AC"
+                row.address = get_addr_from_pubkey(coin, pubkey)
+                row.update()
 
-                for notary in NOTARY_PUBKEYS[pubkey_season]:
-                    pubkey = NOTARY_PUBKEYS[pubkey_season][notary]
-
-                    for coin in coins:
-                        row = addresses_row()
-                        row.chain = coin
-                        row.season = season
-                        row.server = server
-                        row.notary_id = i
-                        row.notary = notary
-                        row.pubkey = pubkey
-                        if coin == "GLEEC":
-                            if server == "Third_Party":
-                                coin = "GLEEC_3P"
-                            else:
-                                coin = "GLEEC_AC"
-                        row.address = get_addr_from_pubkey(coin, pubkey)
-                        row.update()
-
-                i += 1
+            i += 1
 
 if __name__ == "__main__":
 
@@ -66,4 +61,5 @@ if __name__ == "__main__":
         if season in EXCLUDED_SEASONS:
             logger.warning(f"Skipping season: {season}")
         else:
-            populate_addresses(season)
+            for server in ["Main", "Third_Party"]:
+                populate_addresses(season, server)

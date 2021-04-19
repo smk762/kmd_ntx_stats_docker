@@ -3,6 +3,7 @@ import json
 import time
 import requests
 from lib_const import *
+from lib_table_select import get_notarised_chains
 from models import coins_row
 
 
@@ -225,74 +226,79 @@ def parse_electrum_explorer(coins_data):
     return coins_data
 
 
+# TODO: Handle GLEEC
 def get_dpow_tenure(coins_data):
+
     now = int(time.time())
-    # TODO: Handle GLEEC
-    notarised_tenure = requests.get(f'{THIS_SERVER}/api/info/notarised_tenure/').json()["results"][0]
+    notarised_chains = get_notarised_chains()
 
-    for season in notarised_tenure:
-        for server in notarised_tenure[season]:
-            for coin in notarised_tenure[season][server]:
-                logger.info(f"[get_dpow_tenure] adding dpow_tenure data to {coin} {season} {server}")
-                if season in SEASONS_INFO:
+    for coin in notarised_chains:
+        url = f'{THIS_SERVER}/api/table/notarised_tenure/?chain={coin}'
+        logger.info(url)
+        notarised_tenure = requests.get(url).json()["results"]
+        if "season" in notarised_tenure:
+            season = notarised_tenure["season"]
+            server = notarised_tenure["server"]
+            logger.info(f"[get_dpow_tenure] adding dpow_tenure data to {coin} {season} {server}")
 
-                    season_start_time = SEASONS_INFO[season]["start_time"]
-                    season_end_time = SEASONS_INFO[season]["end_time"]
+            if season in SEASONS_INFO:
 
+                season_start_time = SEASONS_INFO[season]["start_time"]
+                season_end_time = SEASONS_INFO[season]["end_time"]
 
+                if coin == "GLEEC" and server == "Third_Party":
 
-                    if coin == "GLEEC" and server == "Third_Party":
+                    if "GLEEC-OLD" not in coins_data:
+                        coins_data.update({"GLEEC-OLD":{}})
 
-                            if "GLEEC-OLD" not in coins_data:
-                                coins_data.update({"GLEEC-OLD":{}})
+                    if "dpow_tenure" not in coins_data["GLEEC-OLD"]:
+                        coins_data["GLEEC-OLD"].update({"dpow_tenure":{}})
 
-                            if "dpow_tenure" not in coins_data["GLEEC-OLD"]:
-                                coins_data["GLEEC-OLD"].update({"dpow_tenure":{}})
+                    if season not in coins_data["GLEEC-OLD"]["dpow_tenure"]:
+                        coins_data["GLEEC-OLD"]["dpow_tenure"].update({season:{}})
 
-                            if season not in coins_data["GLEEC-OLD"]["dpow_tenure"]:
-                                coins_data["GLEEC-OLD"]["dpow_tenure"].update({season:{}})
+                    if server not in coins_data["GLEEC-OLD"]["dpow_tenure"][season]:
+                        coins_data["GLEEC-OLD"]["dpow_tenure"][season].update({server:{}})
 
-                            if server not in coins_data["GLEEC-OLD"]["dpow_tenure"][season]:
-                                coins_data["GLEEC-OLD"]["dpow_tenure"][season].update({server:{}})
+                    coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"start_time":season_start_time})
+                    coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"end_time":season_end_time})
 
-                            coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"start_time":season_start_time})
-                            coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"end_time":season_end_time})
-                    else:
-                        if coin not in coins_data:
-                            coins_data.update({coin:{}})
+                else:
+                    if coin not in coins_data:
+                        coins_data.update({coin:{}})
 
-                        if "dpow_tenure" not in coins_data[coin]:
-                            coins_data[coin].update({"dpow_tenure":{}})
+                    if "dpow_tenure" not in coins_data[coin]:
+                        coins_data[coin].update({"dpow_tenure":{}})
 
-                        if season not in coins_data[coin]["dpow_tenure"]:
-                            coins_data[coin]["dpow_tenure"].update({season:{}})
+                    if season not in coins_data[coin]["dpow_tenure"]:
+                        coins_data[coin]["dpow_tenure"].update({season:{}})
 
-                        if server not in coins_data[coin]["dpow_tenure"][season]:
-                            coins_data[coin]["dpow_tenure"][season].update({server:{}})
+                    if server not in coins_data[coin]["dpow_tenure"][season]:
+                        coins_data[coin]["dpow_tenure"][season].update({server:{}})
 
-                        coins_data[coin]["dpow_tenure"][season][server].update({"start_time":season_start_time})
-                        coins_data[coin]["dpow_tenure"][season][server].update({"end_time":season_end_time})
+                    coins_data[coin]["dpow_tenure"][season][server].update({"start_time":season_start_time})
+                    coins_data[coin]["dpow_tenure"][season][server].update({"end_time":season_end_time})
 
-                    if season in PARTIAL_SEASON_DPOW_CHAINS:
-                        if server in PARTIAL_SEASON_DPOW_CHAINS[season]:
-                            if coin in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
+                if season in PARTIAL_SEASON_DPOW_CHAINS:
+                    if server in PARTIAL_SEASON_DPOW_CHAINS[season]:
+                        if coin in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
 
-                                # TODO: Calc first / last block based on timestamp
-                                if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]:
-                                    start_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]["start_time"]
+                            # TODO: Calc first / last block based on timestamp
+                            if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]:
+                                start_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]["start_time"]
 
-                                    if coin == "GLEEC" and server == "Third_Party":
-                                        coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"start_time":start_time})
-                                    else:
-                                        coins_data[coin]["dpow_tenure"][season][server].update({"start_time":start_time})
+                                if coin == "GLEEC" and server == "Third_Party":
+                                    coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"start_time":start_time})
+                                else:
+                                    coins_data[coin]["dpow_tenure"][season][server].update({"start_time":start_time})
 
-                                if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]:
-                                    end_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]["end_time"]
+                            if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]:
+                                end_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]["end_time"]
 
-                                    if coin == "GLEEC" and server == "Third_Party":
-                                        coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"end_time":end_time})
-                                    else:
-                                        coins_data[coin]["dpow_tenure"][season][server].update({"end_time":end_time})
+                                if coin == "GLEEC" and server == "Third_Party":
+                                    coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"end_time":end_time})
+                                else:
+                                    coins_data[coin]["dpow_tenure"][season][server].update({"end_time":end_time})
     for coin in coins_data:
         logger.info(f"[get_dpow_tenure] setting dpow_active: {coin}")
 

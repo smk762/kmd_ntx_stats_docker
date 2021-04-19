@@ -397,8 +397,6 @@ NOTARY_PUBKEYS = {
         "decker_AR":"02a85540db8d41c7e60bf0d33d1364b4151cad883dd032878ea4c037f67b769635"
     },
 
-
-
     "Season_4": {
         "alien_AR": "03911a60395801082194b6834244fa78a3c30ff3e888667498e157b4aa80b0a65f",
         "alien_EU": "03bb749e337b9074465fa28e757b5aa92cb1f0fea1a39589bca91a602834d443cd",
@@ -559,13 +557,18 @@ NOTARY_PUBKEYS = {
         "dathbezumniy0": "02be7fd8f4ad2530375951c0dc9fec73c7588220d0fbfac45ea17eb360aada72bc",
         "dathbezumniy1": "0332116904ade54b600629823adf62784fd251c71fbc1f019255ea8e23d7ef8eaf",
         "ocean": "03ca223f9583e770a9641892e8983d7cfa71906818c9717a073079600b5c784882",
-        "hsukrd": "03ca35a0c89ba28d3c04f0e73eccf64b4ffe5d477885ff6d532d46cfe5c1c8960a",
         "block9": "033c51602bd33e29703d370fbcbdf174f80f98ddfbe9423939b5ece4145f871f58",
         "jorian1": "0220caf63bff86f2ad9952c95030f525be3e3d4ef467bfc6da45f1bcb77c6a5a1e",
-        "hsukrd": "03ca35a0c89ba28d3c04f0e73eccf64b4ffe5d477885ff6d532d46cfe5c1c8960a",
+        "drkush": "03ca35a0c89ba28d3c04f0e73eccf64b4ffe5d477885ff6d532d46cfe5c1c8960a",
         "pangz": "027d5aaab118e81850145d7a7d1f8944c09a50b1cf837e49e53e6c94d74a22aa20",
         "kulim": "020c3d33ddac956a0ce5ec0d307351f748db81845efcd863f30168ce85af93b511",
-        "fediakash": "037957f955dd0b8ef802320137d41599c89f9e12e7b99997716d4ec9fcd39f4770"
+        "fediakash": "037957f955dd0b8ef802320137d41599c89f9e12e7b99997716d4ec9fcd39f4770",
+        "hashira": "029ed47a1265dcc54dea962bb4e03457adfb9d8ebdfc8f79973a67dcbb5d2a3235",
+        "daria": "02443ecb4b78fdbbc372c278d092bf03d535ddb1eb2310b56a56a58052c8a3109d",
+        "hastrup": "032cca7f99965a0a74748c6b02851234b87dea8abc9684cb7a0f2a94b2556a223d",
+        "mylo": "03ad726ba996a69d783258eca293d19dd818bf1f8dd66e8cab1965c7fe48a247a9",
+        "byozgunn": "0345474b6bdd307194cef7b840fe8d1bb4b7761513c63bb06679ea808886fb6789",
+        "hastrup": "032cca7f99965a0a74748c6b02851234b87dea8abc9684cb7a0f2a94b2556a223d"
         },
     "Season_5": {}
 }

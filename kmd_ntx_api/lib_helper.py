@@ -8,6 +8,52 @@ from .lib_const import *
 
 logger = logging.getLogger("mylogger")
 
+def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=None):
+    if not filter_kwargs:
+        filter_kwargs = {}
+
+    for field in serializer.Meta.fields:
+        # handle both standard 'WSGIRequest' object and DRF request object
+        if hasattr(request, 'query_params'):
+            val = request.query_params.get(field, None)
+        else:
+            val = request.GET.get(field, None)
+        if val is not None:
+            filter_kwargs.update({field:val}) 
+
+    if 'from_block' in request.GET:
+        filter_kwargs.update({'block_height__gte':request.GET['from_block']}) 
+
+    if 'to_block' in request.GET:
+        filter_kwargs.update({'block_height__lte':request.GET['to_block']})  
+
+    if 'from_timestamp' in request.GET:
+        filter_kwargs.update({'block_time__gte':request.GET['from_timestamp']}) 
+
+    if 'to_timestamp' in request.GET:
+        filter_kwargs.update({'block_time__lte':request.GET['to_timestamp']})
+
+    if table in ['mined_count_daily']:
+
+        if 'from_date' in request.GET:
+            filter_kwargs.update({'mined_date__gte':request.GET['from_date']})  
+
+        if 'to_date' in request.GET:
+            filter_kwargs.update({'mined_date__lte':request.GET['to_date']})   
+
+    if table in ['daily_notarised_chain', 'daily_notarised_count']:
+
+        if 'from_date' in request.GET:
+            filter_kwargs.update({'notarised_date__gte':request.GET['from_date']}) 
+
+        if 'to_date' in request.GET:
+            filter_kwargs.update({'notarised_date__lte':request.GET['to_date']})  
+
+    if len(filter_kwargs) > 0:
+        queryset = queryset.filter(**filter_kwargs)
+    return queryset
+
+
 def get_season(time_stamp=None):
     if not time_stamp:
         time_stamp = int(time.time())
@@ -140,6 +186,27 @@ def get_eco_data_link():
           +ad['data']['anchorText']+"</a> "+ad['data']['string2']
     return link
 
+def get_dpow_server_coins_dict(season=None):
+    if not season:
+        season = SEASON
+    url = f"{THIS_SERVER}/api/info/dpow_server_coins"
+    dpow_main_chains = requests.get(f"{url}/?season={season}&server=Main").json()['results']
+    dpow_3p_chains = requests.get(f"{url}/?season={season}&server=Third_Party").json()['results']
+
+    chains_dict = {
+        "Main":dpow_main_chains,
+        "Third_Party":dpow_3p_chains
+    }
+    
+    return chains_dict
+
+def get_chain_server(chain):
+    coins_dict = get_dpow_server_coins_dict()
+    for server in coins_dict:
+        if chain in coins_dict[server]:
+            return server
+    return "Unofficial"
+
 
 def get_mainnet_chains(coins_dict):
     if "Main" in coins_dict:
@@ -153,9 +220,14 @@ def get_third_party_chains(coins_dict):
     return []
 
 
-
 def get_notary_region(notary):
     return notary.split("_")[-1]
+
+def get_time_since(timestamp):
+    now = int(time.time())
+    sec_since = now - int(timestamp)
+    dms_since = day_hr_min_sec(sec_since)
+    return sec_since, dms_since
 
 
 def region_sort(notary_list):
