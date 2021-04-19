@@ -192,6 +192,23 @@ class tx_row():
         self.num_inputs = num_inputs
         self.num_outputs = num_outputs
 
+
+    def validated(self):
+
+        for i in [
+            self.txid, self.block_hash, self.block_height,
+            self.block_time, self.block_datetime, self.address,
+            self.season, self.block_hash, self.txid, self.block_hash,
+            self.input_index, self.input_sats, self.output_index, 
+            self.output_sats
+            ]:
+
+            if i == '':
+                return False
+
+        return True
+
+    def update(self):
         if self.category == "SPAM":
             self.input_index = 0
             self.input_sats = 0
@@ -206,21 +223,6 @@ class tx_row():
 
         if self.address == BTC_NTX_ADDR:
             self.notary = "BTC_NTX_ADDR"
-
-    def validated(self):
-
-        for i in [
-            self.txid, self.block_hash, self.block_height,
-            self.block_time, self.block_datetime, self.address,
-            self.season, self.block_hash, self.txid, self.block_hash
-            ]:
-
-            if i == '':
-                return False
-
-        return True
-
-    def update(self):
         row_data = (
             self.txid, self.block_hash, self.block_height,
             self.block_time, self.block_datetime, self.address,

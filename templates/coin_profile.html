@@ -138,6 +138,60 @@
 			</div>
 		</div>
 	</div>
+	<div class="row">
+		<div class="card kmd_ui_dark1_bg m-auto col-10">
+			<div class="card-body kmd_ui_dark1_bg">
+				<table id="coins_info_tbl" class="table table-striped table-bordered kmd_ui_light4 col-12 m-auto" style="width:99%">
+					<tbody>
+						<tr>
+							<td data-data="">CLI</td>
+							<td style="font-size: 0.9em; text-align: left;" data-data=""><span class='badge kmd_ui_dark3_bg p-2'>{{ coins_data.coins_info.cli }}</span></td>
+						</tr>
+						<tr>
+							<td data-data="">Config</td>
+							<td style="font-size: 0.9em; text-align: left;" data-data=""><span class='badge kmd_ui_dark3_bg p-2'>{{ coins_data.coins_info.conf_path }}</span></td>
+						</tr>
+						<tr>
+							<td data-data="">Launch</td>
+							<td style="font-size: 0.8em; text-align: left;" data-data=""><span class='badge kmd_ui_dark3_bg p-2'>{{ coins_data.coins_info.launch_params }}</span></td>
+						</tr>
+						{% if coins_data.explorers|length > 0 %}
+						<tr>
+							<td data-data="">Explorers</td>
+							<td style="font-size: 0.9em; text-align: left;" data-data="">
+								{% for x in coins_data.explorers %}
+									<span class='badge kmd_ui_dark3_bg p-2'>
+										<a href="{{ x }}">{{ x }}</a>
+									</span>
+								{% endfor %}
+							</td>
+						</tr>
+						{% endif %}
+						{% if coins_data.electrums|length > 0 %}
+						<tr>
+							<td data-data="">Electrums</td>
+							<td style="font-size: 0.9em; text-align: left;" data-data="">
+								{% for x in coins_data.electrums %}
+									<span class='badge kmd_ui_dark3_bg p-2'>{{ x }}</span>
+								{% endfor %}
+							</td>
+						</tr>
+						{% endif %}
+						{% if coins_data.electrums_ssl|length > 0 %}
+						<tr>
+							<td data-data="">Electrums (SSL)</td>
+							<td style="font-size: 0.9em; text-align: left;" data-data="">
+								{% for x in coins_data.electrums_ssl %}
+									<span class='badge kmd_ui_dark3_bg p-2'>{{ x }}</span>
+								{% endfor %}
+							</td>
+						</tr>
+						{% endif %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 	<!--
 	<div class="row">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
@@ -185,7 +239,7 @@
 					{{ chain }} ADDRESSES & BALANCES
 				</div>
 				<div class="card-body kmd_ui_dark1_bg">
-					<table id="table_id" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+					<table id="balances_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
 						<thead>
 							<tr>
 								<th data-data="notary">NOTARY</th>
@@ -221,7 +275,7 @@
   	<script>
 	    $(document).ready(function() {
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
-	        $('#table_id').DataTable({
+	        $('#balances_table').DataTable({
 	           "pageLength": 64,
         		order: [[ 5, 'asc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
         		"columnDefs": [
