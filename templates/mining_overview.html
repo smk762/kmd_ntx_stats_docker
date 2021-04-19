@@ -10,7 +10,7 @@
 				<table style="visibility: hidden;" id="mined_overview_tbl" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
 					<thead>
 						<tr>
-							<th data-data="notary">NOTARY</th>
+							<th data-data="name">NAME</th>
 							<th data-data="address">ADDRESS</th>
 							<th data-data="blocks_mined">BLOCKS MINED</th>
 							<th data-data="sum_value_mined">SUM MINED</th>
@@ -23,7 +23,7 @@
 					<tbody>
 					{% for row in mined_season %}
 						<tr>
-							<td data-data="notary">{{ row.notary }}</td>
+							<td data-data="name">{{ row.name }}</td>
 							<td style="font-size: 0.9em" data-data="address">{{ row.address }}</td>
 							<td style="font-size: 0.9em" data-data="blocks_mined">{{ row.blocks_mined }}</td>
 							<td style="font-size: 0.9em" data-data="sum_value_mined">{{ row.sum_value_mined }}</td>
@@ -49,10 +49,10 @@
         		order: [[ 5, 'desc' ], [ 0, 'asc' ]],
         		"columnDefs": [
         			{
-			            "data": 'notary',
+			            "data": 'name',
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            	$(nTd).html("<a href='https://komodod.com/a/"+oData.address+"'>"+oData.notary+"</a>");
+				            	$(nTd).html("<a href='https://komodod.com/a/"+oData.address+"'>"+oData.name+"</a>");
 				        }
 			        },
 		            {

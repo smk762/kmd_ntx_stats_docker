@@ -15,32 +15,87 @@
               <i class="cil-transfer"></i>  <span style="padding-left: 12px;">API</span>
           </a>
           <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
-            <li class="c-sidebar-nav-title">Wallets</li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'addresses_filter-list' %}"> Addresses</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'balances_filter-list' %}"> Balances</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notary_rewards_filter-list' %}"> Notary Rewards</a></li>
+            <li class="c-sidebar-nav-title">Info v2</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/balances"> Balances</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/base_58"> Base 58 Params</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/chain_sync"> Chain SYNC</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/coins"> Coins</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/mined_count_daily"> Daily Mined</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/notarised_chain_daily"> Daily NTX (chain)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/notarised_count_daily"> Daily NTX (notary)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/daemon_cli"> Deamon CLI</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/dpow_server_coins"> dPoW Server Coins</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/electrums"> Electrums</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/electrums_ssl"> Electrums SSL</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/explorers"> Explorers</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/launch_params"> Launch Params</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/btc_txid_list"> Notary BTC Tx List</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/notary_btc_txid"> Notary BTC Tx Info</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/notary_btc_transactions"> BTC Transactions</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/ltc_txid_list"> Notary LTC Tx List</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/notary_ltc_txid"> Notary LTC Tx Info</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/notary_ltc_transactions"> LTC Transactions</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/notarisation_txid_list"> Notarised Tx List</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/notarised_txid"> Notarised Tx Info</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/notary_nodes"> Notary Nodes</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/nn_social"> Notary Social</a></li>
 
-            <li class="c-sidebar-nav-title">Mining</li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'mined_count_date_filter-list' %}"> Daily Mining</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'mined_count_season_filter-list' %}"> Season Mining</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'MinedViewSet-list' %}"> All Mining</a></li>
+            <li class="c-sidebar-nav-title">Wallet v2</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/wallet/chain_addresses"> Chain Addresses</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/wallet/chain_balances"> Chain Addresses</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/wallet/notary_addresses"> Notary Addresses</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/wallet/notary_balances"> Notary Addresses</a></li>
 
-            <li class="c-sidebar-nav-title">Notarisations</li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notarised_count_date_filter-list' %}"> Daily Notarisations</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notarised_count_season_filter-list' %}"> Season Notarisations</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'ntxViewSet-list' %}"> All Notarisations</a></li>
-            
-            <li class="c-sidebar-nav-title">Info</li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'coins_filter-list' %}"> Coins</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'notary_nodes_filter-list' %}"> Notaries</a></li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'epoch_scoring_table' %}"> Scoring Epochs</a></li>
+            <li class="c-sidebar-nav-title">Table v2</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/addresses"> Addresses</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/balances"> Balances</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/last_mined"> Last Mined</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/last_notarised"> Last Notarised</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/mined_24hrs"> Mined (24hrs)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/mined_count_season"> Mined (season)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/notarised"> Notarised</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/notarised_24hrs"> Notarised (24hrs)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/notarised_tenure"> Notarised Tenure</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/notary_profile_summary"> Notary Summary</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/notary_epoch_scores"> Notary Epoch Scores</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/scoring_epochs"> Scoring Epochs</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/notarised_chain_season"> Season NTX (chain)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/notarised_count_season"> Season NTX (notary)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/table/split_stats"> Split Stats</a></li>
 
-            <li class="c-sidebar-nav-title">Testnet</li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'api_testnet_totals' %}"> Stats</a></li>
+            <li class="c-sidebar-nav-title">Source v2 (paginated)</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/addresses"> Addresses</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/balances"> Balances</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/coins"> Coins</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/last_notarised"> Last Notarised</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/mined"> Mined</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/mined_count_daily"> Mined Count (by date)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/mined_count_season"> Mined Count (season)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/nn_btc_tx"> Notary BTC Tx</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/nn_ltc_tx"> Notary LTC Tx</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/nn_social"> Notary Social</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/notarised"> Notarisations</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/notarised_chain_daily"> Daily NTX (chain)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/notarised_count_daily"> Daily NTX (notary)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/notarised_chain_season"> Season NTX (chain)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/notarised_count_season"> Season NTX (notary)</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/notarised_tenure"> Notarised Tenure</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/source/scoring_epochs"> Scoring Epochs</a></li>
 
-            <li class="c-sidebar-nav-title">Uncategorised</li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{% url 'api_testnet_totals' %}"> Explorers</a></li>
-            
+            <li class="c-sidebar-nav-title">Tools v2</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/tools/addr_from_base58"> Address From Base 58</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/tools/address_from_pubkey"> Address From Pubkey</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/tools/decode_opreturn"> Decode OP_RETURN</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/tools/kmd_rewards"> KMD Rewards</a></li>
+
+            <li class="c-sidebar-nav-title">Other</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/sidebar_links"> Sidebar Links</a></li>
+
+            <li class="c-sidebar-nav-title">Deprecate in S5</li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/info/split_summary_api"> BTC Split Summary API</a></li>
+            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="//{{ request.get_host }}/api/testnet/totals"> Testnet Stats</a></li>
+
+
           </ul>
         </li>
         <li class="c-sidebar-nav-dropdown">
@@ -116,15 +171,13 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/btc_ntx"> BTC Notarisations
-                    </a>
                     <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard"> {{ season }} Scoreboard
                     </a>
                     <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard_24hrs"> 24hr Scoreboard
                     </a>
                     <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/chains_last_ntx"> Last Chain Notarisation
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_24hrs"> Last 200 Notarisations
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_24hrs"> Last 200 Notarisations
                     </a>
                     <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_tenure"> Chain dPoW Tenure
                     </a>
@@ -157,6 +210,34 @@
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
                     <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/faucet"> RICK / MORTY Faucet
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="c-sidebar-nav-dropdown">
+            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                <i class="cil-cog"></i>   
+                <span style="padding-left: 12px;">TOOLS </span>
+            </a>
+            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/pubkey_addresses"> Address from Pubkey
+                    </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/decode_opret"> Decode OP_RETURN
+                    </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/daemon_clis"> Daemon CLIs
+                    </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/launch_params"> Launch Params
+                    </a>
+                </li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/kmd_rewards"> KMD Rewards
                     </a>
                 </li>
             </ul>

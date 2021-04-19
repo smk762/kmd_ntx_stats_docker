@@ -16,12 +16,6 @@ from models import tx_row, last_notarised_row, notarised_row, get_chain_epoch_sc
 from lib_const import *
 from known_txids import *
 
-logger = logging.getLogger()
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
 
 def get_linked_addresses(addr=None, notary=None):
     linked_addresses = {}
@@ -129,6 +123,7 @@ def detect_replenish(vins, vouts):
         replenish_vout = True
 
     if replenish_vin and replenish_vout:
+        '''
         for addr in vin_non_notary_addresses:
 
             if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
@@ -136,6 +131,7 @@ def detect_replenish(vins, vouts):
         for addr in vout_non_notary_addresses:
             if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
                 update_nn_btc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
+        '''
         return True
     return False
 
@@ -165,12 +161,14 @@ def detect_consolidate(vins, vouts):
 
         if len(list(set(vout_notaries))) == 1 and is_notary_address(vouts[0]["addresses"][0]):
             if notary == vout_notaries[0]:
+                '''
                 for addr in vin_non_notary_addresses:
                     if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
                         update_nn_btc_tx_notary_from_addr(f"{notary} (linked)", addr)
                 for addr in vout_non_notary_addresses:
                     if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
                         update_nn_btc_tx_notary_from_addr(f"{notary} (linked)", addr)
+                '''
                 return True
 
     return False
@@ -209,7 +207,7 @@ def detect_intra_notary(vins, vouts):
 
     return True
 
-def detect_spam(btc_row, addresses):
+def detect_spam(btc_row, addresses, vouts):
     if '1See1xxxx1memo1xxxxxxxxxxxxxBuhPF' in addresses:        
         btc_row.input_sats = 0
         btc_row.output_sats = 0
@@ -288,8 +286,10 @@ def scan_btc_transactions(season):
             j += 1
             # Get tx data from Blockcypher API
             logger.info(f">>> Processing txid {j}/{num_txids}")
-            tx_info = get_btc_tx_info(txid)
-            if 'fees' in tx_info:
+            tx_info = get_btc_tx_info(txid, True, True)
+            if 'error' in tx_info:
+                pass
+            elif 'fees' in tx_info:
                 btc_row = tx_row()
                 btc_row.txid = txid
                 btc_row.address = notary_address
@@ -311,10 +311,10 @@ def scan_btc_transactions(season):
 
                 vouts = tx_info["outputs"]
                 vins = tx_info["inputs"]
-                update_notary_linked_vins(vins)
+                # update_notary_linked_vins(vins)
 
                 # single row for memo.sv spam
-                if detect_spam(btc_row, addresses):
+                if detect_spam(btc_row, addresses, vouts):
                     logger.info("SPAM detected")
 
                 elif detect_cipi_faucet(btc_row, addresses, vins):
@@ -387,6 +387,7 @@ def scan_btc_transactions(season):
                                 last_btc_ntx_ht = 0
                             if last_btc_ntx_ht < btc_row.block_height:
                                 last_ntx_row.season = season
+                                last_ntx_row.server = btc_row.server
                                 last_ntx_row.chain = "BTC"
                                 last_ntx_row.txid = btc_row.txid
                                 last_ntx_row.block_height = btc_row.block_height
@@ -427,9 +428,9 @@ def scan_btc_transactions(season):
                                 ntx_row.btc_validated = "true"
                                 ntx_row.update()
 
-            logger.info(f"TXID: {txid} ({btc_row.category})")
-        else:
-            logger.warning(f"Fees not in txinfo for {txid}! Likely unconfirmed...")
+                logger.info(f"TXID: {txid} ({btc_row.category})")
+            else:
+                logger.warning(f"Fees not in txinfo for {txid}! Likely unconfirmed...")
         season_btc_addresses.remove(notary_address)
 
 if __name__ == "__main__":
@@ -440,6 +441,4 @@ if __name__ == "__main__":
         if season not in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]: 
             scan_btc_transactions(season)
 
-            CURSOR.close()
-            CONN.close()
 

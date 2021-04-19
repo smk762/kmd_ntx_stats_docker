@@ -1,129 +1,156 @@
 PAGES = {
-	"index": {
+	"tools/decode_opret/": {
+		"category": "tools",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": False
+	},
+	"tools/deamon_clis/": {
+		"category": "tools",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": False
+	},
+	"tools/launch_params/": {
+		"category": "tools",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": False
+	},
+	"tools/pubkey_addresses/": {
+		"category": "tools",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": False
+	},
+	"chains_last_ntx/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"btc_ntx": {
+	"chain_sync/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"chains_last_ntx": {
+	"coin_profile/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"chain_sync": {
-		"category": "wallets",
-		"filters": [],
-		"example": "",
-		"description": "",
-		"sidebar": False,
-		"review": True
-	},
-	"coin_profile": {
+	"dash/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"dash": {
+	"faucet/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"faucet": {
+	"mining_24hrs/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"mining_24hrs": {
+	"mining_overview/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"mining_overview": {
+	"notarised_24hrs/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"notary_profile": {
+	"ntx_scoreboard/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"ntx_24hrs": {
+	"ntx_scoreboard_24hrs/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"ntx_scoreboard": {
+	"notarised_tenure/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"ntx_scoreboard_24hrs": {
+	"notary_profile/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"notarised_tenure": {
+	"sitemap/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"sitemap": {
+	"scoring_epochs/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"scoring_epochs": {
+	"testnet_ntx_scoreboard/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"testnet_ntx_scoreboard": {
+	"notary_epoch_scores_view/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
 	},
-	"notary_epoch_scoring_table": {
+	"review/funding/": {
 		"category": "wallets",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": False
-	}	
+	},
+	"review/funds_sent/": {
+		"category": "wallets",
+		"filters": [],
+		"example": "",
+		"description": "",
+		"sidebar": False
+	}
 }

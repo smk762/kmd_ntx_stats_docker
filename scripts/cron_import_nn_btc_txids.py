@@ -20,7 +20,7 @@ for season in seasons:
             notary_address = random.choice(addresses)
             i += 1
             logger.info(f">>> Categorising {notary_address} for {season} {i}/{num_addr}")
-            txid_list = get_new_notary_txids(notary_address, "BTC")
+            txid_list = get_new_notary_txids(notary_address, "BTC", season)
             logger.info(f"Processing ETA: {0.02*len(txid_list)} sec")
 
             j = 0
@@ -28,7 +28,7 @@ for season in seasons:
             for txid in txid_list:
                 j += 1
                 logger.info(f">>> Categorising {txid} for {j}/{num_txid}")
-                txid_url = f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={txid}"
+                txid_url = f"{OTHER_SERVER}/api/info/notary_btc_txid?txid={txid}"
                 time.sleep(0.02)
                 r = requests.get(txid_url)
                 try:

@@ -1,19 +1,71 @@
 #!/usr/bin/env python3
 import json
+import time
 import requests
 from lib_const import *
+from lib_table_select import get_notarised_chains
 from models import coins_row
 
 
 '''
-This script scans the coins and dpow repositories and updates contexual info about the chains in the "coins" table.
+This script scans the komodo, coins and dpow repositories and updates contexual info about the chains in the "coins" table.
 It should be run as a cronjob every 12-24 hours
 '''
 
-def parse_dpow_coins():
-    dpow = {}
-    dpow_main = []
-    dpow_3p = []
+
+# Gets coins info from coins repo
+def parse_coins_repo():
+    r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/coins")
+    coins_repo = r.json()
+
+    coins_data = {}
+    for item in coins_repo:
+        coin = item['coin']
+
+        if coin == "SFUSD":
+            coin = "PBC"
+
+        if coin in TRANSLATE_COINS:
+            logger.warning(f"[parse_coins_repo] Translating {coin} to {TRANSLATE_COINS[coin]}")
+            coin = TRANSLATE_COINS[coin]
+
+        coins_data.update({coin:{"coins_info":item}})
+        if 'asset' in item:
+            coins_data[coin]["coins_info"].update({
+                "pubtype": 60,
+                "p2shtype": 85,
+                "wiftype": 188,
+                "txfee": 1000
+                })
+
+    for coin in coins_data:
+        logger.info(f"[parse_coins_repo] Getting info for {coin}")
+        coins_data[coin].update({
+            "electrums":[],
+            "electrums_ssl":[],
+            "dpow":{},
+            "dpow_active":0
+        })
+
+        if "mm2" not in coins_data[coin]["coins_info"]:
+            coins_data[coin]["coins_info"].update({
+                "mm2": 0
+            })
+            coins_data[coin].update({
+                "mm2_compatible": 0
+            })
+
+        elif coins_data[coin]["coins_info"]["mm2"] == 1:
+            coins_data[coin].update({
+                "mm2_compatible": 1
+            })
+
+
+    return coins_data
+
+
+# Gets dpow info from dpow repo
+def parse_dpow_coins(coins_data):
     r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/README.md")
     dpow_readme = r.text
     lines = dpow_readme.splitlines()
@@ -25,10 +77,6 @@ def parse_dpow_coins():
         if len(info) > 4 and info[0].lower() not in ['coin', '--------', 'game']:
             coin = info[0]
 
-            if coin in TRANSLATE_COINS:
-                coin = TRANSLATE_COINS[coin]
-
-            logger.info("Adding "+coin+" to dpow")
             try:
                 src = info[1].split("(")[1].replace(")","")
             except:
@@ -36,43 +84,42 @@ def parse_dpow_coins():
 
             version = info[2]
             server = info[4].lower()
+            if server == "dpow-3p":
+                server = "Third_Party"
+            elif server == "dpow-mainnet":
+                server = "Main"
 
-            if server == "dpow-mainnet":
-                dpow_main.append(coin)
-            elif server == "dpow-3p":
-                dpow_3p.append(coin)
+            if coin == "GleecBTC" and server == "Third_Party":
+                logger.warning(f"[parse_dpow_coins] Translating GleecBTC to GLEEC-OLD")
+                coin = "GLEEC-OLD"
+            elif coin in TRANSLATE_COINS:
+                logger.warning(f"[parse_dpow_coins] Translating {coin} to {TRANSLATE_COINS[coin]}")
+                coin = TRANSLATE_COINS[coin]
 
-            dpow.update({
-                coin:{
+            logger.info(f"[parse_dpow_coins] Adding {coin} to dpow")
+
+            if coin not in coins_data:
+                coins_data.update({coin:{}})
+
+            coins_data[coin].update({
+                "dpow":{
                     "src":src,
                     "version":version,
                     "server":server            
                 }
             })
-    return dpow, dpow_main, dpow_3p
-
-def remove_from_dpow(dpow):
-    before_coins = ANTARA_COINS + THIRD_PARTY_COINS + OTHER_COINS + ['BTC', 'KMD']
-    now_coins = list(dpow.keys())
-    for coin in before_coins:
-
-        if coin in TRANSLATE_COINS:
-            coin = TRANSLATE_COINS[coin]
-
-        if coin not in now_coins:
-            logger.warning("Removing "+coin+" from dpow")
-            coin_data = coins_row()
-            coin_data.coin = coin
-            coin_data.delete()
+    return coins_data
 
 
-def parse_assetchains(dpow):
+# Gets launch params from komodo repo
+def parse_assetchains(coins_data):
     r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/komodo/dev/src/assetchains.json")
     ac_json = r.json()
     for item in ac_json:
         coin = item['ac_name']
 
         if coin in TRANSLATE_COINS:
+            logger.warning(f"[parse_assetchains] Translating {coin} to {TRANSLATE_COINS[coin]}")
             coin = TRANSLATE_COINS[coin]
 
         params = "~/komodo/src/komodod"
@@ -82,110 +129,46 @@ def parse_assetchains(dpow):
                     params += " -"+k+"="+ip
             else:
                 params += " -"+k+"="+str(v)
-        if coin in dpow:
-            dpow[coin].update({"launch_params":params})
-            dpow[coin].update({"cli":'~/komodo/src/komodo-cli -ac_name='+coin})
-            dpow[coin].update({"conf_path":'~/.komodo/'+coin+'/'+coin+'.conf'})
-        else:
-            logger.info(coin+" not in dpow list")
 
-    for coin in OTHER_LAUNCH_PARAMS:
-        if coin in dpow:
-            dpow[coin].update({"launch_params":OTHER_LAUNCH_PARAMS[coin]})
+        if coin not in coins_data:
+            coins_data.update({coin:{}})
+        if "coins_info" not in coins_data[coin]:
+            coins_data[coin].update({"coins_info":{}})
 
-    for coin in OTHER_CONF_FILE:
-        if coin in dpow:
-            dpow[coin].update({"conf_path":OTHER_CONF_FILE[coin]})
+        coins_data[coin]["coins_info"].update({"cli":'~/komodo/src/komodo-cli -ac_name='+coin})
+        coins_data[coin]["coins_info"].update({"conf_path":'~/.komodo/'+coin+'/'+coin+'.conf'})
+        coins_data[coin]["coins_info"].update({"launch_params":params})
 
     for coin in OTHER_CLI:
-        if coin in dpow:
-            dpow[coin].update({"cli":OTHER_CLI[coin]})
+        if coin not in coins_data:
+            coins_data.update({coin:{}})
+        if "coins_info" not in coins_data[coin]:
+            coins_data[coin].update({"coins_info":{}})
+        coins_data[coin]["coins_info"].update({"cli":OTHER_CLI[coin]})
 
-    return dpow
+    for coin in OTHER_CONF_FILE:
+        if coin not in coins_data:
+            coins_data.update({coin:{}})
+        if "coins_info" not in coins_data[coin]:
+            coins_data[coin].update({"coins_info":{}})
+        coins_data[coin]["coins_info"].update({"conf_path":OTHER_CONF_FILE[coin]})
 
+    for coin in OTHER_LAUNCH_PARAMS:
+        if coin not in coins_data:
+            coins_data.update({coin:{}})
+        if "coins_info" not in coins_data[coin]:
+            coins_data[coin].update({"coins_info":{}})
+        coins_data[coin]["coins_info"].update({"launch_params":OTHER_LAUNCH_PARAMS[coin]})
 
-def parse_coins_repo(dpow):
-    r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/coins")
-    coins_repo = r.json()
-
-    coins_info = {}
-    for item in coins_repo:
-        coin = item['coin']
-
-        if coin == "SFUSD":
-            coin = "PBC"
-
-        if coin in TRANSLATE_COINS:
-            coin = TRANSLATE_COINS[coin]
-
-        coins_info.update({coin:{"coins_info":item}})
-
-    for coin in dpow:
-        if coin not in coins_info:
-            coins_info.update({coin:{"coins_info":{}}})
-
-    for server in PARTIAL_SEASON_DPOW_CHAINS["Season_4"]:
-        for coin in PARTIAL_SEASON_DPOW_CHAINS["Season_4"][server]:
-            if coin not in coins_info:
-                coins_info.update({coin:{"coins_info":{}}})
-
-    for coin in coins_info:
-        logger.info(f"Getting info for {coin} from coins repo")
-        coins_info[coin].update({
-            "electrums":[],
-            "electrums_ssl":[],
-            "dpow":{},
-            "dpow_active":0
-        })
-
-        if "mm2" not in coins_info[coin]["coins_info"]:
-            coins_info[coin]["coins_info"].update({
-                "mm2": 0
-            })
-            coins_info[coin].update({
-                "mm2_compatible": 0
-            })
-
-        elif coins_info[coin]["coins_info"]["mm2"] == 1:
-            coins_info[coin].update({
-                "mm2_compatible": 1
-            })
-
-        if coin in dpow:
-            coins_info[coin].update({
-                "dpow":dpow[coin],
-                "dpow_active":1,
-            })
-
-    return coins_info
+    return coins_data
 
 
-# This is to cover coins with explorer/electrum but not in "coins" file
-def parse_electrum_explorer(dpow, coins_info):
-    no_electrums = []
-    no_explorers = []
-    for coin in coins_info:
-        logger.info(f"Adding electrum/explorer info for {coin}")
-        if 'dpow' not in coins_info[coin]:
-            coins_info[coin].update({
-                "dpow":{}
-            })
-
-        if 'dpow_active' not in coins_info[coin]:
-            coins_info[coin].update({
-                "dpow_active":0
-            })
-
-        if 'electrums' not in coins_info[coin]:
-            coins_info[coin].update({
-                "electrums":[],
-                "electrums_ssl":[]
-            })
-
-        if 'explorers' not in coins_info[coin]:
-            coins_info[coin].update({
-                "explorers":[]
-            })
+# Gets Electrum / Explorer info from coins repo
+def parse_electrum_explorer(coins_data):
+    coins = list(coins_data.keys())
+    coins.sort()
+    for coin in coins:
+        logger.info(f"[parse_electrum_explorer] Adding info for {coin}")
 
         try:
             if coin == "PBC":
@@ -194,100 +177,224 @@ def parse_electrum_explorer(dpow, coins_info):
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+coin)
             electrums = r.json()
 
+            if "electrums" not in coins_data[coin]:
+                coins_data[coin].update({"electrums":[]})
+            if "electrums_ssl" not in coins_data[coin]:
+
+                coins_data[coin].update({"electrums_ssl":[]})
+
             for electrum in electrums:
+
                 if "protocol" in electrum:
+
                     if electrum['protocol'] == "SSL":
-                        coins_info[coin]['electrums_ssl'].append(electrum['url'])
+                        coins_data[coin]['electrums_ssl'].append(electrum['url'])
+
                     else:
-                        coins_info[coin]['electrums'].append(electrum['url'])
+                        coins_data[coin]['electrums'].append(electrum['url'])
                 else:
-                    coins_info[coin]['electrums'].append(electrum['url'])
+                    coins_data[coin]['electrums'].append(electrum['url'])
 
         except Exception as e:
             if r.text != "404: Not Found":
-                logger.error("GET "+coin+" ELECTRUM ERROR: "+str(e)+" [RESPONSE]: "+r.text)
+                logger.error(f"Exception in [parse_electrum_explorer]: {e} {r.text}")
 
         try:
             r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/"+coin)
             explorers = r.json()
+
+            if "explorers" not in coins_data[coin]:
+                coins_data[coin].update({"explorers":[]})
+
             for explorer in explorers:
-                coins_info[coin]['explorers'].append(explorer)
+                coins_data[coin]['explorers'].append(explorer)
+
         except Exception as e:
             if r.text != "404: Not Found":
-                logger.error("GET "+coin+" EXPLORER ERROR: "+str(e)+" [RESPONSE]: "+r.text)
+                logger.error(f"Exception in [parse_electrum_explorer]: {e} {r.text}")
+
+        try:
+            url = f"https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{coin.lower()}.png"
+            r = requests.get(url)
+            if r.text != "404: Not Found":
+                coins_data[coin]["coins_info"].update({"icon":url})
+        except Exception as e:
+            if r.text != "404: Not Found":
+                logger.error(f"Exception in [parse_electrum_explorer]: {e} {r.text}")
 
 
-        if len(coins_info[coin]['electrums']) == 0:
-            no_electrums.append(coin)
-        if len(coins_info[coin]['explorers']) == 0:
-            no_explorers.append(coin)
-    logger.warning("no_electrums: "+str(no_electrums))
-    logger.warning("no_explorers: "+str(no_explorers))
-    return coins_info
-
-def get_dpow_tenure():
-    tenure = requests.get(f'{THIS_SERVER}/api/info/notarised_tenure/').json()["results"][0]
-
-    tenured_coins = list(tenure.keys()) + list(PARTIAL_SEASON_DPOW_CHAINS["Season_4"].keys())
-
-    for chain in tenured_coins:
-        if chain in tenure:
-            for season in tenure[chain]:
-                if season == "Season_4" and chain in DPOW_EXCLUDED_CHAINS["Season_4"] \
-                or season == "season_undefined":
-                    pass
-                elif season in  SEASONS_INFO:
-                    season_start_block = SEASONS_INFO[season]["start_block"]
-                    season_start_time = SEASONS_INFO[season]["start_time"]
-                    season_end_block = SEASONS_INFO[season]["end_block"]
-                    season_end_time = SEASONS_INFO[season]["end_time"]
-
-                    tenure[chain][season].update({"first_ntx_block":season_start_block})
-                    tenure[chain][season].update({"last_ntx_block":season_end_block})
-                    tenure[chain][season].update({"first_ntx_block_time":season_start_time})
-                    tenure[chain][season].update({"last_ntx_block_time":season_end_time})
-
-                    if season in PARTIAL_SEASON_DPOW_CHAINS:
-                        if server in PARTIAL_SEASON_DPOW_CHAINS:
-
-                            if chain in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
-                                # TODO: Calc first / last block based on timestamp
-                                if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
-                                    season_start_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"]
-                                    tenure[chain][season].update({"first_ntx_block_time":season_start_time})
-                                    tenure[chain][season].update({"first_ntx_block":0})
-
-                                if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
-                                    season_end_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]
-                                    tenure[chain][season].update({"last_ntx_block_time":season_end_time})
-                                    tenure[chain][season].update({"last_ntx_block":0})
-    return tenure
-
-dpow_tenure = get_dpow_tenure()
-
- 
-dpow, dpow_main, dpow_3p = parse_dpow_coins()
-remove_from_dpow(dpow)
-dpow = parse_assetchains(dpow)
-coins_info = parse_coins_repo(dpow)
-coins_info = parse_electrum_explorer(dpow, coins_info)
+    return coins_data
 
 
-for coin in coins_info:
+# TODO: Handle GLEEC
+def get_dpow_tenure(coins_data):
 
-    coin_data = coins_row()
-    coin_data.chain = coin
-    coin_data.coins_info = json.dumps(coins_info[coin]["coins_info"])
-    coin_data.electrums = json.dumps(coins_info[coin]['electrums'])
-    coin_data.electrums_ssl = json.dumps(coins_info[coin]['electrums_ssl'])
-    coin_data.explorers = json.dumps(coins_info[coin]['explorers'])
-    coin_data.dpow = json.dumps(coins_info[coin]['dpow'])
-    if coin in dpow_tenure:
-        coin_data.dpow_tenure = json.dumps(dpow_tenure[coin])
-    else:
-        coin_data.dpow_tenure = json.dumps({})
-    coin_data.dpow_active = coins_info[coin]['dpow_active']
-    coin_data.mm2_compatible = coins_info[coin]['mm2_compatible']
-    coin_data.update()
+    now = int(time.time())
+    notarised_chains = get_notarised_chains()
 
-logging.info("Coins table update complete!")
+    for coin in notarised_chains:
+        url = f'{THIS_SERVER}/api/table/notarised_tenure/?chain={coin}'
+        logger.info(url)
+        notarised_tenure = requests.get(url).json()["results"]
+        if "season" in notarised_tenure:
+            season = notarised_tenure["season"]
+            server = notarised_tenure["server"]
+            logger.info(f"[get_dpow_tenure] adding dpow_tenure data to {coin} {season} {server}")
+
+            if season in SEASONS_INFO:
+
+                season_start_time = SEASONS_INFO[season]["start_time"]
+                season_end_time = SEASONS_INFO[season]["end_time"]
+
+                if coin == "GLEEC" and server == "Third_Party":
+
+                    if "GLEEC-OLD" not in coins_data:
+                        coins_data.update({"GLEEC-OLD":{}})
+
+                    if "dpow_tenure" not in coins_data["GLEEC-OLD"]:
+                        coins_data["GLEEC-OLD"].update({"dpow_tenure":{}})
+
+                    if season not in coins_data["GLEEC-OLD"]["dpow_tenure"]:
+                        coins_data["GLEEC-OLD"]["dpow_tenure"].update({season:{}})
+
+                    if server not in coins_data["GLEEC-OLD"]["dpow_tenure"][season]:
+                        coins_data["GLEEC-OLD"]["dpow_tenure"][season].update({server:{}})
+
+                    coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"start_time":season_start_time})
+                    coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"end_time":season_end_time})
+
+                else:
+                    if coin not in coins_data:
+                        coins_data.update({coin:{}})
+
+                    if "dpow_tenure" not in coins_data[coin]:
+                        coins_data[coin].update({"dpow_tenure":{}})
+
+                    if season not in coins_data[coin]["dpow_tenure"]:
+                        coins_data[coin]["dpow_tenure"].update({season:{}})
+
+                    if server not in coins_data[coin]["dpow_tenure"][season]:
+                        coins_data[coin]["dpow_tenure"][season].update({server:{}})
+
+                    coins_data[coin]["dpow_tenure"][season][server].update({"start_time":season_start_time})
+                    coins_data[coin]["dpow_tenure"][season][server].update({"end_time":season_end_time})
+
+                if season in PARTIAL_SEASON_DPOW_CHAINS:
+                    if server in PARTIAL_SEASON_DPOW_CHAINS[season]:
+                        if coin in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
+
+                            # TODO: Calc first / last block based on timestamp
+                            if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]:
+                                start_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]["start_time"]
+
+                                if coin == "GLEEC" and server == "Third_Party":
+                                    coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"start_time":start_time})
+                                else:
+                                    coins_data[coin]["dpow_tenure"][season][server].update({"start_time":start_time})
+
+                            if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]:
+                                end_time = PARTIAL_SEASON_DPOW_CHAINS[season][server][coin]["end_time"]
+
+                                if coin == "GLEEC" and server == "Third_Party":
+                                    coins_data["GLEEC-OLD"]["dpow_tenure"][season][server].update({"end_time":end_time})
+                                else:
+                                    coins_data[coin]["dpow_tenure"][season][server].update({"end_time":end_time})
+    for coin in coins_data:
+        logger.info(f"[get_dpow_tenure] setting dpow_active: {coin}")
+
+        if "dpow_tenure" not in coins_data[coin]:
+            coins_data[coin].update({"dpow_tenure":{}})
+
+        for season in coins_data[coin]["dpow_tenure"]:
+            for server in coins_data[coin]["dpow_tenure"][season]:
+                if "start_time" in coins_data[coin]["dpow_tenure"][season][server] and "end_time" in coins_data[coin]["dpow_tenure"][season][server]:
+                    logger.info(f'{coin}: {coins_data[coin]["dpow_tenure"][season][server]["start_time"]} <= {now} >= {coins_data[coin]["dpow_tenure"][season][server]["end_time"]}')
+                    logger.info(f'{coin}: {now >= coins_data[coin]["dpow_tenure"][season][server]["start_time"]} and {now <= coins_data[coin]["dpow_tenure"][season][server]["end_time"]}')
+                    if now >= coins_data[coin]["dpow_tenure"][season][server]["start_time"] and now <= coins_data[coin]["dpow_tenure"][season][server]["end_time"]:
+                        coins_data[coin].update({"dpow_active":1})
+
+    return coins_data
+
+
+def remove_old_coins(coins_data):
+    current_coins = requests.get(f"{THIS_SERVER}/api/info/coins/").json()["results"]
+    for coin in current_coins:
+        if coin not in coins_data:
+            logger.info(f"[remove_old_coins] Removing {coin}")
+            coin_data = coins_row()
+            coin_data.chain = coin
+            coin_data.delete()
+
+
+def update_coins(coins_data):
+    for coin in coins_data:
+        logger.info(f"[update_coins] Updating {coin}")
+        coin_data = coins_row()
+        coin_data.chain = coin
+
+        if "coins_info" in coins_data[coin]:
+            coin_data.coins_info = json.dumps(coins_data[coin]['coins_info'])
+        else:
+            logger.warning(f"'coins_info' not set for {coin}, setting to default")
+            coin_data.coins_info = json.dumps({})
+            
+        if "electrums" in coins_data[coin]:
+            coin_data.electrums = json.dumps(coins_data[coin]['electrums'])
+        else:
+            logger.warning(f"'electrums' not set for {coin}, setting to default")
+            coin_data.electrums = json.dumps([])
+            
+        if "electrums_ssl" in coins_data[coin]:
+            coin_data.electrums_ssl = json.dumps(coins_data[coin]['electrums_ssl'])
+        else:
+            logger.warning(f"'electrums_ssl' not set for {coin}, setting to default")
+            coin_data.electrums_ssl = json.dumps([])
+            
+        if "explorers" in coins_data[coin]:
+            coin_data.explorers = json.dumps(coins_data[coin]['explorers'])
+        else:
+            logger.warning(f"'explorers' not set for {coin}, setting to default")
+            coin_data.explorers = json.dumps([])
+
+        if "dpow" in coins_data[coin]:
+            coin_data.dpow = json.dumps(coins_data[coin]['dpow'])
+        else:
+            logger.warning(f"'dpow' not set for {coin}, setting to default")
+            coin_data.dpow = json.dumps({})
+
+        if "dpow_tenure" in coins_data[coin]:
+            coin_data.dpow_tenure = json.dumps(coins_data[coin]['dpow_tenure'])
+        else:
+            logger.warning(f"'dpow_tenure' not set for {coin}, setting to default")
+            coin_data.dpow_tenure = json.dumps({})
+
+        if "dpow_active" in coins_data[coin]:
+            coin_data.dpow_active = coins_data[coin]['dpow_active']
+        else:
+            logger.warning(f"'dpow_active' not set for {coin}, setting to default")
+            coin_data.dpow_active = 0
+
+        if "mm2_compatible" in coins_data[coin]:
+            coin_data.mm2_compatible = coins_data[coin]['mm2_compatible']
+        else:
+            logger.warning(f"'mm2_compatible' not set for {coin}, setting to default")
+            coin_data.mm2_compatible = 0
+
+        coin_data.update()
+
+
+if __name__ == "__main__":
+
+    logger.info(f"Preparing to populate [coins] table...")
+
+    # Gets data from coins repo, komodo repo and dpow repo...
+    coins_data = parse_coins_repo()
+    coins_data = parse_dpow_coins(coins_data)
+    coins_data = parse_assetchains(coins_data)
+    coins_data = parse_electrum_explorer(coins_data)
+    coins_data = get_dpow_tenure(coins_data)
+
+    remove_old_coins(coins_data)
+    update_coins(coins_data)
+
+    logging.info("[coins] table update complete!")

@@ -8,20 +8,132 @@ def get_active_dpow_coins():
     chains_list.sort()
     return chains_list
 
+def get_nn_social(notary_name=None, season=None):
+    season = get_season()
+    nn_social_info = {}
+    nn_social_data = get_nn_social_data(season, notary_name).values()
+    for item in nn_social_data:
+        nn_social_info.update(items_row_to_dict(item,'notary'))
+    for notary in nn_social_info:
+        for item in nn_social_info[notary]:
+            if item in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase']:   
+                if nn_social_info[notary][item].endswith('/'):
+                   nn_social_info[notary][item] = nn_social_info[notary][item][:-1]
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("t.me/", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("twitter.com/", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("github.com/", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("www.youtube.com/", "")
+                nn_social_info[notary][item] = nn_social_info[notary][item].replace("keybase.io/", "")
+
+    return nn_social_info
+    
+# TODO: Deprecated? use notarised table values
+def get_ntx_score(btc_ntx, main_ntx, third_party_ntx, season=None):
+    if not season:
+        season = "Season_4"
+    coins_dict = get_dpow_server_coins_dict(season)
+    third_party = get_third_party_chains(coins_dict)
+    main_chains = get_mainnet_chains(coins_dict)
+    try:
+        if 'BTC' in main_chains:
+            main_chains.remove('BTC')
+        if 'KMD' in main_chains:
+            main_chains.remove('KMD')
+        return btc_ntx*0.0325 + main_ntx*0.8698/len(main_chains) + third_party_ntx*0.0977/len(third_party)
+    except:
+        return 0
+
+def get_nn_ntx_summary(notary):
+    season = get_season()
+    now = int(time.time())
+    day_ago = now - 24*60*60
+    week_ago = now - 24*60*60*7
+
+    today = datetime.date.today()
+    delta = datetime.timedelta(days=1)
+    week_ago = today-delta*7
+
+    ntx_summary = {
+        "today":{
+            "btc_ntx":0,
+            "main_ntx":0,
+            "third_party_ntx":0,
+            "most_ntx":str(0)+" ("+str('-')+")"
+        },
+        "season":{
+            "btc_ntx":0,
+            "main_ntx":0,
+            "third_party_ntx":0,
+            "most_ntx":str(0)+" ("+str('-')+")"
+        },
+        "time_since_last_btc_ntx":-1,
+        "time_since_last_ntx":-1,
+        "last_ntx_chain":'-'
+    }
+
+    # 24hr ntx 
+    ntx_24hr = get_notarised_data_24hr().values()
+
+    notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary)
+    ntx_summary.update({"today":notary_ntx_24hr_summary})
+
+
+    # season ntx stats
+    ntx_season = get_notarised_count_season_data(season, notary).values()
+
+    if len(ntx_season) > 0:
+        chains_ntx_season = ntx_season[0]['chain_ntx_counts']
+        season_max_chain = max(chains_ntx_season, key=chains_ntx_season.get) 
+        season_max_ntx = chains_ntx_season[season_max_chain]
+
+        ntx_summary['season'].update({
+            "btc_ntx":ntx_season[0]['btc_count'],
+            "main_ntx":ntx_season[0]['antara_count'],
+            "third_party_ntx":ntx_season[0]['third_party_count'],
+            "most_ntx":season_max_chain+" ("+str(season_max_ntx)+")",
+            "score":ntx_season[0]["season_score"]
+        })
+
+    #last ntx data
+    ntx_last = get_last_notarised_data(season, None, notary).values()
+    last_chain_ntx_times = {}
+    for item in ntx_last:
+        last_chain_ntx_times.update({item['chain']:item['block_time']})
+
+    if len(last_chain_ntx_times) > 0:
+        max_last_ntx_chain = max(last_chain_ntx_times, key=last_chain_ntx_times.get) 
+        max_last_ntx_time = last_chain_ntx_times[max_last_ntx_chain]
+        time_since_last_ntx = get_time_since(max_last_ntx_time)[1]
+        ntx_summary.update({
+            "time_since_last_ntx":time_since_last_ntx,
+            "last_ntx_chain":max_last_ntx_chain,
+        })
+
+    if "BTC" in last_chain_ntx_times:
+        max_btc_ntx_time = last_chain_ntx_times["BTC"]
+        time_since_last_btc_ntx = get_time_since(max_btc_ntx_time)[1]
+        ntx_summary.update({
+            "time_since_last_btc_ntx":time_since_last_btc_ntx,
+        })
+
+    return ntx_summary
+
 def btc_ntx_all(request):
     season = get_season()
-    btc_ntx = get_notarised_data(season, "BTC").values()
+    btc_ntx = get_notarised_data(season, None, None, "BTC").values()
 
     context = {
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
-        "explorers":get_dpow_explorers(),
+        "explorers":get_explorers(request),
         "btc_ntx":btc_ntx,
         "season":season.replace("_"," ")
     }
 
     return render(request, 'btc_ntx_all.html', context)
-    
+
 # TODO: Unassigned - is this a duplicate?
 def get_btc_split_stats(address):
     resp = {}
@@ -227,7 +339,7 @@ def get_balances_dict(filter_kwargs):
 def get_mined_data(request):
     resp = {}
     data = mined.objects.all()
-    data = apply_filters_api(request, MinedSerializer, data)
+    data = apply_filters_api(request, minedSerializer, data)
     if len(data) == len(mined.objects.all()):
         yesterday = int(time.time() -60*60*24)
         data = mined.objects.filter(block_time__gte=yesterday) \
@@ -259,10 +371,10 @@ def get_mined_data(request):
 # Response too large
 class mined_filter(viewsets.ViewSet):
     """
-    API endpoint showing notary node mined blocks. 
+    API endpoint showing notary mined blocks. 
     Use filters or be patient, this is a big dataset.
     """
-    serializer_class = MinedSerializer
+    serializer_class = minedSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
 
@@ -403,13 +515,297 @@ def update_mined_tbl(conn, cursor, row_data):
         conn.rollback()
         return 0
 
+def get_notarised_tenure_data_api(request):
+    resp = {}
+    data = notarised_tenure.objects.all()
+    data = apply_filters_api(request, notarisedTenureSerializer, data)
+    data = data.order_by('chain', 'season').values()
+    for item in data:
+
+        if item["season"] not in resp: 
+            resp.update({item["season"]:{}})
+
+        if item["server"] not in resp[item["season"]]: 
+            resp[item["season"]].update({item["server"]:{}})
+
+        if item["chain"] not in resp[item["season"]][item["server"]]:
+            resp[item["season"]][item["server"]].update({
+                item["chain"]: {
+                    "first_ntx_block":item["first_ntx_block"],
+                    "first_ntx_block_time":item["first_ntx_block_time"],
+                    "last_ntx_block":item["last_ntx_block"], 
+                    "last_ntx_block_time":item["last_ntx_block_time"],
+                    "official_start_block_time":item["official_start_block_time"],
+                    "official_end_block_time":item["official_end_block_time"],
+                    "scored_ntx_count":item["scored_ntx_count"],
+                    "unscored_ntx_count":item["unscored_ntx_count"]
+                }
+            })
+
+    return resp
+
+def get_notarised_count_season_data_api(request):
+    resp = {}
+    data = notarised_count_season.objects.all()
+    data = apply_filters_api(request, notarisedCountSeasonSerializer, data)
+    # default filter if none set.
+    if len(data) == notarised_count_season.objects.count() or len(data) == 0:
+        season = get_season()
+        data = notarised_count_season.objects.filter(season=season)
+
+    data = data.order_by('season', 'notary').values()
+
+    for item in data:
+        season = item['season']
+        notary = item['notary']
+        btc_count = item['btc_count']
+        antara_count = item['antara_count']
+        third_party_count = item['third_party_count']
+        other_count = item['other_count']
+        total_ntx_count = item['total_ntx_count']
+        chain_ntx_counts = item['chain_ntx_counts']
+        chain_ntx_pct = item['chain_ntx_pct']
+        time_stamp = item['time_stamp']
+
+        if season not in resp:
+            resp.update({season:{}})
+
+        resp[season].update({
+            notary:{
+                "btc_count":btc_count,
+                "antara_count":antara_count,
+                "third_party_count":third_party_count,
+                "other_count":other_count,
+                "total_ntx_count":total_ntx_count,
+                "time_stamp":time_stamp,
+                "chains":{}
+            }
+        })
+        for chain in chain_ntx_counts:
+            resp[season][notary]["chains"].update({
+                chain:{
+                    "count":chain_ntx_counts[chain]
+                }
+            })
+        for chain in chain_ntx_pct:
+            if chain not in resp[season][notary]["chains"]:
+                resp[season][notary]["chains"].update({chain:{}})
+            resp[season][notary]["chains"][chain].update({
+                "percentage":chain_ntx_pct[chain]
+            }),
+
+
+    return resp
+
+class notarised_count_season_filter(viewsets.ViewSet):
+    """
+    API endpoint showing notary mined blocks
+    """
+    serializer_class = notarisedCountSeasonSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        filters = self.serializer_class.Meta.fields
+        resp = get_notarised_count_season_data_api(request)
+        api_resp = wrap_api(resp, filters)
+        return Response(api_resp)
+
+def get_notarised_chain_season_data_api(request):
+    resp = {}
+    data = notarised_chain_season.objects.all()
+    data = apply_filters_api(request, notarisedChainSeasonSerializer, data) \
+            .order_by('-season', 'chain') \
+            .values()
+
+    for item in data:
+        season = item['season']
+        chain = item['chain']
+        ntx_lag = item['ntx_lag']
+        ntx_count = item['ntx_count']
+        block_height = item['block_height']
+        kmd_ntx_txid = item['kmd_ntx_txid']
+        kmd_ntx_blockhash = item['kmd_ntx_blockhash']
+        kmd_ntx_blocktime = item['kmd_ntx_blocktime']
+        opret = item['opret']
+        ac_ntx_blockhash = item['ac_ntx_blockhash']
+        ac_ntx_height = item['ac_ntx_height']
+        ac_block_height = item['ac_block_height']
+
+        if season not in resp:
+            resp.update({season:{}})
+
+        resp[season].update({
+            chain:{
+                "ntx_count":ntx_count,
+                "kmd_ntx_height":block_height,
+                "kmd_ntx_blockhash":kmd_ntx_blockhash,
+                "kmd_ntx_txid":kmd_ntx_txid,
+                "kmd_ntx_blocktime":kmd_ntx_blocktime,
+                "ac_ntx_blockhash":ac_ntx_blockhash,
+                "ac_ntx_height":ac_ntx_height,
+                "ac_block_height":ac_block_height,
+                "opret":opret,
+                "ntx_lag":ntx_lag
+            }
+        })
+
+
+    return resp
+
+
+# TODO: add to lib_api_filtered
+class last_ntx_filter(viewsets.ViewSet):
+    """
+    API endpoint showing notary rewards pending
+    """
+    serializer_class = lastNotarisedSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        last_ntx_data = get_last_notarised_data().values()
+        return Response(last_ntx_data)
+
+
+
+class notarised_chain_season_filter(viewsets.ViewSet):
+    """
+    API endpoint showing notary mined blocks
+    """
+    serializer_class = notarisedChainSeasonSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        filters = self.serializer_class.Meta.fields
+        resp = get_notarised_chain_season_data_api(request)
+        api_resp = wrap_api(resp, filters)
+        return Response(api_resp)
+
+class notarised_tenure_filter(viewsets.ViewSet):
+    """
+    Returns chain notarisation tenure, nested by Season > Chain \n
+    Default filter returns current NN Season \n
+
+    """
+    serializer_class = notarisedTenureSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        filters = self.serializer_class.Meta.fields
+        resp = get_notarised_tenure_data_api(request)
+        api_resp = wrap_api(resp, filters)
+        return Response(api_resp)
+
+class mined_count_season_filter(viewsets.ViewSet):
+    """
+    API endpoint showing mined blocks by notary/address (minimum 10 blocks mined)
+    """
+    serializer_class = minedCountSeasonSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        """
+        """
+        filters = self.serializer_class.Meta.fields
+        resp = get_mined_count_season_data_api(request)
+        api_resp = wrap_api(resp, filters)
+        return Response(api_resp)
+
+def get_mined_count_season_data_api(request):
+    resp = {}
+    data = mined_count_season.objects.all()
+    data = apply_filters_api(request, minedCountSeasonSerializer, data)
+    if len(data) == len(mined_count_season.objects.all()):
+        season = get_season()
+        data = mined_count_season.objects.filter(season=season)
+    data = data.order_by('season', 'name').values()
+
+    for item in data:
+        blocks_mined = item['blocks_mined']
+        if blocks_mined > 10:
+            notary = item['name']
+            sum_value_mined = item['sum_value_mined']
+            max_value_mined = item['max_value_mined']
+            last_mined_block = item['last_mined_block']
+            last_mined_blocktime = item['last_mined_blocktime']
+            time_stamp = item['time_stamp']
+            season = item['season']
+
+            if season not in resp:
+                resp.update({season:{}})
+
+            resp[season].update({
+                notary:{
+                    "blocks_mined":blocks_mined,
+                    "sum_value_mined":sum_value_mined,
+                    "max_value_mined":max_value_mined,
+                    "last_mined_block":last_mined_block,
+                    "last_mined_blocktime":last_mined_blocktime,
+                    "time_stamp":time_stamp
+                }
+            })
+
+    return resp
+
+class addresses_filter(viewsets.ViewSet):
+    """
+    Returns Source Notary Node addresses data \n
+    Default filter returns current NN Season \n
+
+    """
+    serializer_class = addressesSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+
+    def create(self, validated_data):
+        return Task(id=None, **validated_data)
+
+    def get(self, request, format=None):
+        filters = self.serializer_class.Meta.fields
+        if 'chain' not in request.GET and 'notary' not in request.GET and 'season' not in request.GET:
+            return JsonResponse({
+                "error":"You need to specify at least one of the following filter parameters: ['chain', 'notary', 'season']",
+                "filters":filters,
+                })
+        resp = get_addresses_data_api(request)
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":resp
+            })
+
 def update_season_mined_count_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO  mined_count_season \
-            (notary, address, season, blocks_mined, sum_value_mined, \
+            (name, address, season, blocks_mined, sum_value_mined, \
             max_value_mined, last_mined_blocktime, last_mined_block, \
             time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_season_mined DO UPDATE SET \
+            ON CONFLICT ON CONSTRAINT unique_name_season_mined DO UPDATE SET \
             address="+str(row_data[1])+", blocks_mined="+str(row_data[2])+", sum_value_mined="+str(row_data[3])+", \
             max_value_mined="+str(row_data[4])+", last_mined_blocktime="+str(row_data[5])+", \
             last_mined_block="+str(row_data[6])+", time_stamp='"+str(row_data[7])+"';"
@@ -458,7 +854,7 @@ def update_season_notarised_count_tbl(conn, cursor, row_data):
     cursor.execute(sql, row_data)
     conn.commit()
 
-def update_daily_mined_count_tbl(conn, cursor, row_data):
+def update_mined_count_daily_tbl(conn, cursor, row_data):
     try:
         sql = "INSERT INTO mined_count_daily \
             (notary, blocks_mined, sum_value_mined, \
@@ -480,7 +876,7 @@ def update_daily_notarised_chain_tbl(conn, cursor, row_data):
     sql = "INSERT INTO notarised_chain_daily \
          (chain, ntx_count, notarised_date) \
           VALUES (%s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_notarised_chain_date DO UPDATE \
+          ON CONFLICT ON CONSTRAINT unique_notarised_chain_daily DO UPDATE \
           SET ntx_count="+str(row_data[1])+";"
     cursor.execute(sql, row_data)
     conn.commit()

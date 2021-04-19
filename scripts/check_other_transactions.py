@@ -40,21 +40,15 @@ class LogstashFormatter(Formatter):
 
         return "<i>{datetime}</i><pre>\n{message}</pre>".format(message=record.msg, datetime=t)
 
-logger = logging.getLogger()
-logger.setLevel(logging.WARNING)
+season = "Season_4"
 
-handler = RequestsHandler()
-formatter = LogstashFormatter()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
-r = requests.get(f"{THIS_SERVER}/api/info/notary_nodes/")
+r = requests.get(f"{THIS_SERVER}/api/info/notary_nodes/?season={season}")
 notaries = r.json()["results"][0]
 
 notaries_with_others = {}
 for notary in notaries:
-    r = requests.get(f"{THIS_SERVER}/api/info/notary_btc_txids?notary={notary}")
-    results = r.json()["results"]["Season_4"]
+    r = requests.get(f"{THIS_SERVER}/api/info/notary_btc_txids?season={season}&notary={notary}")
+    results = r.json()["results"]
     print(f"Checking {notary}")
     if "Other" in results:
         txids = results["Other"]["txids"].keys()

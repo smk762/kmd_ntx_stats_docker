@@ -45,7 +45,7 @@ def run_updates():
 def thread_chain_ntx_daily_aggregate(season, day):
 
     chains_aggr_resp = get_chain_ntx_date_aggregates(day, season)
-    logger.info(f"[chains_aggr_resp]: {chains_aggr_resp}")
+    logger.info(f"[get_chain_ntx_date_aggregates]: {chains_aggr_resp}")
     for item in chains_aggr_resp:
         try:
             row = notarised_chain_daily_row()
@@ -75,7 +75,6 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
         if row_data is not None: # ignore TXIDs that are not notarisations
             chain = row_data[0]
 
-            #if chain != 'KMD': # KMD -> BTC notarisations are requested via BTC blockchain APIs
             ntx_row = notarised_row()
             ntx_row.chain = chain
             ntx_row.block_height = row_data[1]
@@ -102,6 +101,7 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
             ntx_row.btc_validated = "N/A"
             ntx_row.update()
 
+
             runtime = int(time.time()-start)
             try:
                 pct = round(i/num_unrecorded_KMD_txids*100,3)
@@ -110,6 +110,7 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
                          " records added to db ["+str(runtime)+"/"+str(est_end)+" sec]")
             except:
                 pass
+
 
     logger.info("Notarised blocks updated!")
 
@@ -290,11 +291,12 @@ def get_notary_season_count_pct(season):
             if chain not in notary_season_counts[notary]:
                 notary_season_counts[notary].update({chain:1})
             else:
-                val = notary_season_counts[notary][chain] + 1
-                notary_season_counts[notary].update({chain:val})
+                notary_season_counts[notary][chain] += 1
 
 
+    notary_season_pct = {}
     for notary in notary_season_counts:
+
         chain_ntx_counts = notary_season_counts[notary]
         btc_count = 0
         antara_count = 0
@@ -302,7 +304,8 @@ def get_notary_season_count_pct(season):
         other_count = 0
         total_ntx_count = 0
 
-        notary_season_pct = {}
+        if notary not in notary_season_pct:
+            notary_season_pct.update({notary:{}})
         for chain in chain_ntx_counts:
             if chain == "KMD":
                 btc_count += chain_ntx_counts[chain]
@@ -317,8 +320,8 @@ def get_notary_season_count_pct(season):
                 other_count += chain_ntx_counts[chain]
 
             pct = round(chain_ntx_counts[chain]/total_chain_season_ntx[chain]*100,3)
-            notary_season_pct.update({chain:pct})
-
+            notary_season_pct[notary].update({chain:pct})
+ 
     return chain_ntx_counts, notary_season_pct
 
 
@@ -329,8 +332,7 @@ def update_season_notarised_counts(season):
 
 
     results = get_chain_ntx_season_aggregates(season)
-    logger.info(f"get_chain_ntx_season_aggregates(season): {results}")
-    
+
     for item in results:
         chain = item[0]
         block_height = item[1]
@@ -369,6 +371,7 @@ def update_season_notarised_counts(season):
                 row.ac_block_height = ac_block_height
                 row.ntx_lag = ntx_lag
                 row.season = season
+                row.server = server
                 row.update()
         except Exception as e:
             logger.error(f"Exception in [update_season_notarised_counts] : {e}")
@@ -401,7 +404,7 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
         sql += " AND ".join(where)
     sql += ";"
 
-    logger.info(f"Processing for ntx summary {where}")
+    logger.info(f"[get_notarisation_data] {where}")
     ntx_summary = {}
     chain_totals = {}
     
@@ -509,11 +512,12 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
         return ntx_summary, chain_totals
 
 
-def update_latest_ntx(season):
+def update_latest_ntx(season, server):
 
     sql = "SELECT chain, MAX(block_time) \
            FROM notarised WHERE \
            season = '"+str(season)+"' \
+           AND server = '"+str(server)+"' \
            GROUP BY chain;"
 
     try:
@@ -524,7 +528,7 @@ def update_latest_ntx(season):
             chain = item[0]
             block_time = item[1]
             sql = "SELECT block_height, txid, notaries \
-                   FROM notarised WHERE season='"+season+"' AND \
+                   FROM notarised WHERE season='"+season+"' AND server='"+server+"' AND \
                    chain='"+str(chain)+"' AND block_time="+str(block_time)+";"
 
             try:
@@ -543,6 +547,7 @@ def update_latest_ntx(season):
                         row.block_height = block_height
                         row.block_time = block_time
                         row.season = season
+                        row.server = server
                         row.update()
 
             except Exception as e:
@@ -587,7 +592,6 @@ def scan_rpc_for_ntx(season):
             
     ntx_summary, chain_totals = get_notarisation_data(season)
     chain_ntx_counts, notary_season_pct = get_notary_season_count_pct(season)
-
     for notary in ntx_summary:
 
         for summary_season in ntx_summary[notary]["seasons"]:
@@ -627,11 +631,69 @@ def scan_rpc_for_ntx(season):
 
                 season_ntx_count_row.season_score = ntx_summary[notary]["seasons"][summary_season]["season_score"]
                 season_ntx_count_row.chain_ntx_counts = json.dumps(ntx_summary[notary])
-                season_ntx_count_row.chain_ntx_pct = json.dumps(notary_season_pct)
+                season_ntx_count_row.chain_ntx_pct = json.dumps(notary_season_pct[notary])
                 season_ntx_count_row.time_stamp = time.time()
                 season_ntx_count_row.update()
 
+
+def rescan_notaries(season):
+    sql = f"SELECT chain, block_height, block_time, block_datetime, block_hash, \
+            notaries, notary_addresses, ac_ntx_blockhash, \
+            ac_ntx_height, txid, opret, season,\
+            server, epoch, score_value, scored, btc_validated \
+            FROM notarised"
+    where = []
+    if season:
+        where.append(f"season = '{season}'")
+
+    if len(where) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(where)
+    sql += ";"
+
+    try:
+        CURSOR.execute(sql)
+        results = CURSOR.fetchall()
+        for item in results:
+            notaries = item[5][:]
+            for notary in notaries:
+                if len(notary) > 20:
+                    # e.g. record input as address before pubkey added
+                    try:
+                        notaries.remove(notary)
+                        notaries.append(KNOWN_ADDRESSES[notary])
+                        logger.warning(f"!!!! {item[9]} Invalid notary {notary} set to {KNOWN_ADDRESSES[notary]}")
+                    except:
+                        logger.warning(f"!!!! {item[9]} Invalid notary {notary}")
+            if notaries != item[5]:
+                row = notarised_row()
+                row.chain = item[0]
+                row.block_height = item[1]
+                row.block_time = item[2]
+                row.block_datetime = item[3]
+                row.block_hash = item[4]
+                row.notaries = notaries
+                row.notary_addresses = item[6]
+                row.ac_ntx_blockhash = item[7]
+                row.ac_ntx_height = item[8]
+                row.txid = item[9]
+                row.opret = item[10]
+                row.season = item[11]
+                row.server = item[12]
+                row.epoch = item[13]
+                row.score_value = item[14]
+                row.scored = item[15]
+                row.btc_validated = item[16]
+                row.update()
+
+    except Exception as e:
+        logger.error(f"Exception in [rescan_notaries]: {e}")
+
 if __name__ == "__main__":
+
+    # Uncomment if record contains address rather than notary in [notaries] list (e.g. saved before pubkeys updated)
+    rescan_notaries("Season_5_Testnet")
+
     tip = int(RPC["KMD"].getblockcount())
 
     seasons = get_notarised_seasons()
@@ -648,7 +710,9 @@ if __name__ == "__main__":
             update_daily_notarised_chains(season)
 
             update_season_notarised_counts(season)
-            update_latest_ntx(season)
+            season_servers = get_notarised_servers(season)
+            for server in season_servers:
+                update_latest_ntx(season, server)
 
 
 

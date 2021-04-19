@@ -16,7 +16,7 @@ class minedFilter(FilterSet):
                   'block_height', 'block_time', 'block_datetime', 
                   'value', 'address', 'name', 'txid', 'season']
 
-class ntxFilter(FilterSet):
+class notarisedFilter(FilterSet):
     min_block = NumberFilter(field_name="block_height", lookup_expr='gte')
     max_block = NumberFilter(field_name="block_height", lookup_expr='lte')
     min_ac_block = NumberFilter(field_name="ac_ntx_height", lookup_expr='gte')
@@ -33,7 +33,7 @@ class ntxFilter(FilterSet):
                   'ac_ntx_height', 'opret', 'season', 'server', 'epoch',
                   'scored', 'btc_validated']
 
-class ntxTenureFilter(FilterSet):
+class notarisedTenureFilter(FilterSet):
     gte_official_start = NumberFilter(field_name="official_start_block_time", lookup_expr='gte')
     lte_official_start = NumberFilter(field_name="official_start_block_time", lookup_expr='lte')
     gte_official_end = NumberFilter(field_name="official_end_block_time", lookup_expr='gte')

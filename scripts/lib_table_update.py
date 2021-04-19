@@ -4,25 +4,70 @@ import json
 from psycopg2.extras import execute_values
 from lib_const import *
 
+#### ADRESSES TABLE
 
-def update_addresses_tbl(row_data):
+def update_addresses_row(row_data):
     try:
-        sql = "INSERT INTO addresses \
-              (season, node, notary, notary_id, chain, pubkey, address) \
-               VALUES (%s, %s, %s, %s, %s, %s, %s) \
-               ON CONFLICT ON CONSTRAINT unique_season_chain_address DO UPDATE SET \
-               node='"+str(row_data[1])+"', notary='"+str(row_data[2])+"', \
-               pubkey='"+str(row_data[5])+"', address='"+str(row_data[6])+"';"
+        sql = f"INSERT INTO addresses \
+                    (season, server, notary, notary_id, \
+                    address, pubkey, chain) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s) \
+                ON CONFLICT ON CONSTRAINT unique_season_chain_address \
+                DO UPDATE SET \
+                    server='{row_data[1]}', notary='{row_data[2]}', \
+                    notary_id='{row_data[3]}', address='{row_data[4]}', \
+                    pubkey='{row_data[5]}', chain='{row_data[6]}';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
-        return 1
     except Exception as e:
-        logger.debug(e)
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
+        logger.error(f"Exception in [update_addresses_row]: {e}")
+        logger.error(f"[update_addresses_row] sql: {sql}")
+        logger.error(f"[update_addresses_row] row_data: {row_data}")
         CONN.rollback()
-        return 0
+
+
+def delete_addresses_row(season, chain, address):
+    CURSOR.execute(f"DELETE FROM addresses WHERE \
+        season = '{season}', \
+        chain = '{chain}', \
+        address = '{address}' \
+        ;")
+    CONN.commit()
+
+
+#### BALANCES TABLE
+
+def update_balances_row(row_data):
+    try:
+        sql = f"INSERT INTO balances \
+                (season, server, notary, \
+                address, chain, balance, update_time) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_address_season_balance DO UPDATE SET \
+                balance={row_data[5]}, \
+                server='{row_data[2]}', \
+                update_time={row_data[6]};"
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
+    except Exception as e:
+        logger.error(f"Exception in [update_balances_row]: {e}")
+        logger.error(f"[update_balances_row] sql: {sql}")
+        logger.error(f"[update_balances_row] row_data: {row_data}")
+        CONN.rollback()
+
+
+def delete_balances_row(chain, address, season):
+    try:
+        sql = f"DELETE FROM balances WHERE chain='{chain}' and address='{address}' and season={season};"
+        CURSOR.execute(sql)
+        CONN.commit()
+    except Exception as e:
+        logger.error(f"Exception in [delete_balances_row]: {e}")
+        CONN.rollback()
+
+
+
+
 
 
 def update_rewards_row(row_data):
@@ -46,23 +91,6 @@ def update_rewards_row(row_data):
         CONN.rollback()
         return 0
 
-def update_notarised_btc_tbl(row_data):
-    sql = "INSERT INTO notarised_btc (btc_txid, btc_block_hash, btc_block_ht, \
-                                      btc_block_time, \
-                                      addresses, notaries, kmd_txid, \
-                                      kmd_block_hash, kmd_block_ht, \
-                                      kmd_block_time, \
-                                      opret, season) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-    try:
-        CURSOR.execute(sql, row_data)
-        CONN.commit()
-        logger.debug(row_data)
-    except Exception as e:
-        if str(e).find('duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        CONN.rollback()
 
 def update_ntx_row(row_data):
     sql = f"INSERT INTO notarised (chain, block_height, \
@@ -213,6 +241,8 @@ def update_season_server_addresses_notarised_tbl(txid, season, server, addresses
         logger.debug(e)
         CONN.rollback()
 
+
+
 def delete_txid_from_notarised_tbl(txid):
     CURSOR.execute(f"DELETE FROM notarised WHERE txid = '{txid}';")
     CONN.commit()
@@ -265,11 +295,11 @@ def update_mined_row(row_data):
 
 def update_season_mined_count_row(row_data):
     try:
-        sql = f"INSERT INTO  mined_count_season \
-            (notary, season, address, blocks_mined, sum_value_mined, \
+        sql = f"INSERT INTO mined_count_season \
+            (name, season, address, blocks_mined, sum_value_mined, \
             max_value_mined, last_mined_blocktime, last_mined_block, \
             time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_season_mined DO UPDATE SET \
+            ON CONFLICT ON CONSTRAINT unique_name_season_mined DO UPDATE SET \
             address='{row_data[2]}', blocks_mined={row_data[3]}, sum_value_mined={row_data[4]}, \
             max_value_mined={row_data[5]}, last_mined_blocktime={row_data[6]}, \
             last_mined_block={row_data[7]}, time_stamp={row_data[8]};"
@@ -287,9 +317,9 @@ def update_season_notarised_chain_row(row_data):
     sql = "INSERT INTO notarised_chain_season \
          (chain, ntx_count, block_height, kmd_ntx_blockhash,\
           kmd_ntx_txid, kmd_ntx_blocktime, opret, ac_ntx_blockhash, \
-          ac_ntx_height, ac_block_height, ntx_lag, season) \
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_notarised_chain_season DO UPDATE \
+          ac_ntx_height, ac_block_height, ntx_lag, season, server) \
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+          ON CONFLICT ON CONSTRAINT unique_notarised_chain_season_server DO UPDATE \
           SET ntx_count="+str(row_data[1])+", block_height="+str(row_data[2])+", \
           kmd_ntx_blockhash='"+str(row_data[3])+"', kmd_ntx_txid='"+str(row_data[4])+"', \
           kmd_ntx_blocktime="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
@@ -338,7 +368,7 @@ def update_daily_notarised_chain_row(row_data):
     sql = "INSERT INTO notarised_chain_daily \
          (chain, ntx_count, notarised_date) \
           VALUES (%s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_notarised_chain_date DO UPDATE \
+          ON CONFLICT ON CONSTRAINT unique_notarised_chain_daily DO UPDATE \
           SET ntx_count="+str(row_data[1])+";"
     CURSOR.execute(sql, row_data)
     CONN.commit()
@@ -438,14 +468,15 @@ def update_coin_social_row(row_data):
 
 def update_last_ntx_row(row_data):
     try:
-        sql = "INSERT INTO  last_notarised \
+        sql = "INSERT INTO last_notarised \
             (notary, chain, txid, block_height, \
-            block_time, season) VALUES (%s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_chain DO UPDATE SET \
+            block_time, season, server) VALUES (%s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_chain_season_server DO UPDATE SET \
             txid='"+str(row_data[2])+"', \
             block_height='"+str(row_data[3])+"', \
             block_time='"+str(row_data[4])+"', \
-            season='"+str(row_data[5])+"';"
+            season='"+str(row_data[5])+"', \
+            server='"+str(row_data[6])+"';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
         
@@ -453,26 +484,6 @@ def update_last_ntx_row(row_data):
     except Exception as e:
         logger.debug(e)
         if str(e).find('Duplicate') == -1:
-            logger.debug(row_data)
-        CONN.rollback()
-        return 0
-
-def update_last_btc_ntx_tbl(row_data):
-    try:
-        sql = "INSERT INTO  last_btc_notarised \
-            (notary, txid, block_height, \
-            block_time, season) VALUES (%s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_btc_ntx DO UPDATE SET \
-            txid='"+str(row_data[1])+"', \
-            block_height='"+str(row_data[2])+"', \
-            block_time='"+str(row_data[3])+"', \
-            season='"+str(row_data[4])+"';"
-        CURSOR.execute(sql, row_data)
-        CONN.commit()
-        return 1
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
             logger.debug(row_data)
         CONN.rollback()
         return 0
@@ -634,33 +645,6 @@ def delete_nn_btc_tx_row(txid, notary):
         logger.debug(e)
         CONN.rollback()
 
-#### BALANCES TABLE
-
-def update_balances_row(row_data):
-    try:
-        sql = "INSERT INTO balances \
-            (notary, chain, balance, address, season, node, update_time) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_address_season_balance DO UPDATE SET \
-            balance="+str(row_data[2])+", \
-            node='"+str(row_data[5])+"', \
-            update_time="+str(row_data[6])+";"
-        CURSOR.execute(sql, row_data)
-        CONN.commit()
-    except Exception as e:
-        if str(e).find('Duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        CONN.rollback()
-
-def delete_balances_row(chain, address, season):
-    try:
-        sql = f"DELETE FROM balances WHERE chain='{chain}' and address='{address}' and season={season};"
-        CURSOR.execute(sql)
-        CONN.commit()
-    except Exception as e:
-        logger.debug(e)
-        CONN.rollback()
 
 #### LTC
 
