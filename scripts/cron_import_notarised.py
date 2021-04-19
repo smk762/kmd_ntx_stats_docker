@@ -26,7 +26,7 @@ for season in seasons:
             existing_notarised_txids = get_existing_notarised_txids(chain, season)
             logger.info(f"existing_notarised_txids: {len(existing_notarised_txids)}")
 
-            import_txids_url = f"{OTHER_SERVER}/api/info/notarisation_txid_list?season={season}&server={server}&chain={chain}"
+            import_txids_url = f"{OTHER_SERVER}/api/info/notarised_txid_list?season={season}&server={server}&chain={chain}"
             import_txids = requests.get(import_txids_url).json()["results"]
             logger.info(f"import_txids: {len(import_txids)}")
 
@@ -41,7 +41,7 @@ for season in seasons:
             for txid in new_txids:
                 j += 1
                 logger.info(f">>> Importing {txid} {j}/{len(new_txids)}")
-                txid_url = f"{OTHER_SERVER}/api/info/notarisation_txid?txid={txid}"
+                txid_url = f"{OTHER_SERVER}/api/info/notarised_txid?txid={txid}"
                 time.sleep(0.02)
                 r = requests.get(txid_url)
                 try:
