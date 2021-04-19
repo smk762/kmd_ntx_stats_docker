@@ -161,11 +161,19 @@
 						</tr>
 						<tr>
 							<td data-data="">Launch</td>
+							{% if coins_data.coins_info.launch_params|length > 80 %}
 							<td style="font-size: 0.8em; text-align: left;" data-data="">
 								<div class='kmd_ui_dark3_bg p-2'>
 									{{ coins_data.coins_info.launch_params }}
 								</div>
 							</td>
+							{% else %}
+							<td style="font-size: 0.8em; text-align: left;" data-data="">
+								<span class=' badge kmd_ui_dark3_bg p-2'>
+									{{ coins_data.coins_info.launch_params }}
+								</span>
+							</td>
+							{% endif %}
 						</tr>
 						{% if coins_data.explorers|length > 0 %}
 						<tr>
