@@ -417,7 +417,7 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None):
         if chain_ntx_count > max_ntx_count:
             max_chain = chain
             max_ntx_count = chain_ntx_count
-        if chain == "BTC":
+        if chain == "KMD":
             btc_ntx_count += chain_ntx_count
         elif chain in main_chains:
             main_ntx_count += chain_ntx_count
