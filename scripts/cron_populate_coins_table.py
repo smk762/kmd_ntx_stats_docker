@@ -207,7 +207,7 @@ def parse_electrum_explorer(coins_data):
                 coins_data[coin].update({"explorers":[]})
 
             for explorer in explorers:
-                coins_data[coin]['explorers'].append(explorer)
+                coins_data[coin]['explorers'].append(explorer.replace("/tx/", "/").replace("/tx.dws?", "/"))
 
         except Exception as e:
             if r.text != "404: Not Found":

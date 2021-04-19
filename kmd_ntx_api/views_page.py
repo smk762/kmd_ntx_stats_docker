@@ -54,6 +54,11 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
         url = f"{THIS_SERVER}/api/table/balances/?season={season}&chain={chain}"
         chain_balances = requests.get(url).json()['results']
 
+        url = f"{THIS_SERVER}/api/info/coins/?&chain={chain}"
+        coins_data = requests.get(url).json()['results']
+        if chain in coins_data:
+            coins_data = coins_data[chain]
+
         max_tick = 0
         for item in chain_balances:
             if float(item['balance']) > max_tick:
@@ -73,6 +78,7 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
             "season":season,
             "server":server,
             "chain":chain,
+            "coins_data":coins_data,
             "chain_balances":chain_balances,
             "explorers":get_explorers(request),
             "eco_data_link":get_eco_data_link(),
