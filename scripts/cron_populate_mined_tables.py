@@ -40,6 +40,7 @@ def clear_known_address(address):
     row.delete_address()
 
 def update_miner(block):
+    logger.info(f"[update_miner] Getting info for block [{block}]")
     blockinfo = RPC["KMD"].getblock(str(block), 2)
     for tx in blockinfo['tx']:
         if len(tx['vin']) > 0:

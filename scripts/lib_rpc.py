@@ -40,7 +40,7 @@ def def_credentials(chain):
             print("check " + coin_config_file)
             exit(1)
     try:
-        return (Proxy("http://%s:%s@127.0.0.1:%d" % (rpcuser, rpcpassword, int(rpcport))))
+        return (Proxy("http://%s:%s@127.0.0.1:%d" % (rpcuser, rpcpassword, int(rpcport)), timeout=90))
     except:
         print("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in "+coin_config_file)
 
