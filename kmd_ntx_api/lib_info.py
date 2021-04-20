@@ -198,41 +198,35 @@ def get_nn_info(season=None):
 
 def get_nn_mining_summary(notary, season=None):
     if not season:
-        season = "Season_4"
-    
-    now = int(time.time())
-    day_ago = now - 24*60*60
-    week_ago = now - 24*60*60*7
+        season = SEASON
 
-    mining_summary = {
-        "mined_last_24hrs": 0,
-        "season_value_mined": 0,
-        "season_blocks_mined": 0,
-        "season_largest_block": 0,
-        "largest_block_height": 0,
-        "last_mined_datetime": -1,
-        "time_since_mined": -1,
-    }
+    url = f"{THIS_SERVER}/api/table/mined_count_season/?season={season}&name={notary}"
+    mining_summary = requests.get(url).json()['results'][0]
+    if len(mining_summary) > 0:
+        mining_summary.update({
+            "time_since_mined":get_time_since(mining_summary["last_mined_blocktime"])[1]
+        })
+    else:
+        mining_summary = {
+          "blocks_mined": 0,
+          "sum_value_mined": 0,
+          "max_value_mined": 0,
+          "last_mined_block": "N/A",
+          "last_mined_blocktime": "N/A",
+          "time_since_mined": "N/A"
+        }
 
-    mined_this_season = get_notary_season_aggr(season, notary)
     mined_last_24hrs = get_notary_mined_last_24hrs(notary)
 
     if len(mined_last_24hrs) > 0:
-        mining_summary.update({
-            "mined_last_24hrs": float(mined_last_24hrs[0]['mined_24hrs'])
-        })
+        mined_sum_24hr = float(mined_last_24hrs[0]['mined_24hrs'])
+    else:
+        mined_sum_24hr = 0
 
+    mining_summary.update({
+        "mined_last_24hrs": mined_sum_24hr
+    })
     
-    if len(mined_last_24hrs) > 0:
-        time_since_mined = get_time_since(mined_this_season[0]['last_mined_time'])[1]
-        mining_summary.update({
-            "season_value_mined": float(mined_this_season[0]['season_value_mined']),
-            "season_blocks_mined": int(mined_this_season[0]['season_blocks_mined']),
-            "season_largest_block": float(mined_this_season[0]['season_largest_block']),
-            "last_mined_datetime": mined_this_season[0]['last_mined_datetime'],
-            "time_since_mined": time_since_mined,
-            "largest_block_height": int(mined_this_season[0]['last_mined_block']),
-        })
     return mining_summary
 
 
@@ -319,9 +313,8 @@ def get_notary_addresses_data(notary, season=None):
     return data.order_by('chain').values('chain','address')
 
 
-def get_notary_season_aggr(season, notary):
-    now = int(time.time())
-    return get_mined_data(season, notary).values('name').annotate(
+def get_notary_season_aggr(season, name):
+    return get_mined_data(season, name).values('name').annotate(
                 season_value_mined=Sum('value'),\
                 season_blocks_mined=Count('value'),
                 season_largest_block=Max('value'),
