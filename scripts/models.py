@@ -823,9 +823,10 @@ class scoring_epoch_row():
 
 class notarised_row():
     def __init__(self, chain='', block_height='', 
-                block_time='', block_datetime='', block_hash='', 
-                notaries=list, notary_addresses=list, ac_ntx_blockhash='', ac_ntx_height='', 
-                txid='', opret='', season='', server='', scored=True, score_value=0, btc_validated='', epoch=''):
+                 block_time='', block_datetime='', block_hash='', 
+                 notaries=list, notary_addresses=list, ac_ntx_blockhash='',
+                 ac_ntx_height='', txid='', opret='', season='', server='',
+                 scored=True, score_value=0, btc_validated='', epoch=''):
         self.chain = chain
         self.block_height = block_height
         self.block_time = block_time
