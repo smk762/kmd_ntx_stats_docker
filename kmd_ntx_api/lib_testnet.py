@@ -19,34 +19,42 @@ def get_api_testnet(request):
         if chain not in ntx_dict:
             ntx_dict.update({chain:[]})
             ntx_dict_24hr.update({chain:[]})
+
         # RICK/MORTY heights from gcharang
         # https://discord.com/channels/412898016371015680/455755767132454913/823823358768185344
+
         if chain in ["RICK", "MORTY"] and item["block_height"] >= 2316959:
             ntx_dict[chain].append(item)
-        elif chain in ["LTC"] and item["block_height"] >= 2022000:
+
+        #elif chain in ["LTC"] and item["block_height"] >= 2022000:
+        elif chain in ["KMD"] and item["block_height"] >= 2022000:
             ntx_dict[chain].append(item)
 
 
     for item in ntx_data_24hr:
         chain = item['chain']
+
         if chain in ["RICK", "MORTY"] and item["block_height"] >= 2316959:
             ntx_dict_24hr[chain].append(item)
-        elif chain in ["LTC"] and item["block_height"] >= 2022000:
+
+        #elif chain in ["LTC", "KMD"] and item["block_height"] >= 2022000:
+        elif chain in ["KMD"] and item["block_height"] >= 2022000:
             ntx_dict_24hr[chain].append(item)
 
     testnet_chains = list(ntx_dict.keys())
-
     testnet_stats_dict = get_testnet_stats_dict(season, testnet_chains)
-
     last_notarisations = get_last_nn_chain_ntx(season)
+
 
     for chain in testnet_chains:
 
         # Get last notarised times
         for notary in testnet_stats_dict:
+
             try:
                 last_chain_ntx = last_notarisations[notary][chain]["time_since"]
                 testnet_stats_dict[notary].update({f"Last_{chain}":last_chain_ntx})
+
             except Exception as e:
                 logger.error(f"[get_api_testnet] Exception: {e} | notary: {notary} | chain: {chain}")
                 testnet_stats_dict[notary].update({f"Last_{chain}":"> 24hrs"})
