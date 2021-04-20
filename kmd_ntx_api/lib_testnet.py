@@ -53,12 +53,19 @@ def get_api_testnet(request):
 
             try:
                 last_chain_ntx = last_notarisations[notary][chain]["time_since"]
-                testnet_stats_dict[notary].update({f"Last_{chain}":last_chain_ntx})
+                last_chain_ntx_time = last_notarisations[notary][chain]["block_time"]
+                testnet_stats_dict[notary].update({
+                    f"Last_{chain}":last_chain_ntx,
+                    f"Last_{chain}_time":last_chain_ntx_time
+                })
 
             except Exception as e:
                 logger.error(f"[get_api_testnet] Exception: {e} | notary: {notary} | chain: {chain}")
                 logger.warning(f"[get_api_testnet] Setting last_ntx for {notary} | chain: {chain} to > 24hrs")
-                testnet_stats_dict[notary].update({f"Last_{chain}":"> 24hrs"})
+                testnet_stats_dict[notary].update({
+                    f"Last_{chain}":"> 24hrs",
+                    f"Last_{chain}_time":0
+                })
 
         # Get notarisation counts
         for item in ntx_dict[chain]:

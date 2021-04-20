@@ -9,7 +9,7 @@
 				<h6>Average: {{ average_score|floatformat:-2 }}</h6>
 			</div>
 			<div class="card-body kmd_ui_dark1_bg">
-				<table id="Testnet_notarisations" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+				<table id="Testnet_notarisations" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%; display:none;">
 					<thead>
 						<tr>
 							<th>RANK</th>
@@ -21,6 +21,9 @@
 							<th>LAST RICK</th>
 							<th>LAST MORTY</th>
 							<th>LAST LTC</th>
+							<th style="visibility: hidden;">LAST RICK TIME</th>
+							<th style="visibility: hidden;">LAST MORTY TIME</th>
+							<th style="visibility: hidden;">LAST LTC TIME</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -39,6 +42,9 @@
 							<td data-data="last_rick" style="font-size: 0.9em">{{ notary_data.Last_RICK }}</th>
 							<td data-data="last_morty" style="font-size: 0.9em">{{ notary_data.Last_MORTY }}</th>
 							<td data-data="last_ltc" style="font-size: 0.9em">{{ notary_data.Last_KMD }}</th>
+							<td data-data="last_rick_time" style="visibility: hidden;">{{ notary_data.Last_RICK_time }}</th>
+							<td data-data="last_morty_time" style="visibility: hidden;">{{ notary_data.Last_MORTY_time }}</th>
+							<td data-data="last_ltc_time" style="visibility: hidden;">{{ notary_data.Last_KMD_time }}</th>
 						</tr>
 						{% endfor %}
 					</tbody>
@@ -53,7 +59,7 @@
 				<h6>24hr Average: {{average_score_24hr|floatformat:-2}}</h6>
 			</div>
 			<div class="card-body kmd_ui_dark1_bg">
-				<table id="Testnet_notarisations_24hr" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+				<table id="Testnet_notarisations_24hr" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%; display:none;">
 					<thead>
 						<tr>
 							<th style="font-size: 0.9em">24hr RANK</th>
@@ -65,6 +71,9 @@
 							<th style="font-size: 0.9em">LAST RICK</th>
 							<th style="font-size: 0.9em">LAST MORTY</th>
 							<th style="font-size: 0.9em">LAST LTC</th>
+							<th style="visibility: hidden;">LAST RICK TIME</th>
+							<th style="visibility: hidden;">LAST MORTY TIME</th>
+							<th style="visibility: hidden;">LAST LTC TIME</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -83,6 +92,9 @@
 							<td data-data="last_rick" style="font-size: 0.9em">{{ notary_data.Last_RICK }}</th>
 							<td data-data="last_morty" style="font-size: 0.9em">{{ notary_data.Last_MORTY }}</th>
 							<td data-data="last_ltc" style="font-size: 0.9em">{{ notary_data.Last_KMD }}</th>
+							<td data-data="last_rick_time" style="visibility: hidden;">{{ notary_data.Last_RICK_time }}</th>
+							<td data-data="last_morty_time" style="visibility: hidden;">{{ notary_data.Last_MORTY_time }}</th>
+							<td data-data="last_ltc_time" style="visibility: hidden;">{{ notary_data.Last_KMD_time }}</th>
 						</tr>
 						{% endfor %}
 					</tbody>
@@ -109,10 +121,17 @@
 			        { "data": "last_rick" },
 			        { "data": "last_morty" },
 			        { "data": "last_ltc" }
-			    ]
+			    ],			    
+		        "columnDefs": [
+		            {
+		                "targets": [ 9,10,11 ],
+		                "visible": false
+		            },
+ 					{ "orderData":[ 9 ],   "targets": [ 6 ] },
+ 					{ "orderData":[ 10 ],   "targets": [ 7 ] },
+ 					{ "orderData":[ 11 ],   "targets": [ 8 ] },
+		        ]
 	        });
-	    });
-	    $(document).ready(function() {
 	        Testnet_table = $('#Testnet_notarisations_24hr').DataTable({    
 	        	"paging": false,
         		order: [[ 0, 'asc' ]],
@@ -126,8 +145,19 @@
 			        { "data": "last_rick" },
 			        { "data": "last_morty" },
 			        { "data": "last_ltc" }
-			    ]
+			    ],			    
+		        "columnDefs": [
+		            {
+		                "targets": [ 9,10,11 ],
+		                "visible": false
+		            },
+ 					{ "orderData":[ 9 ],   "targets": [ 6 ] },
+ 					{ "orderData":[ 10 ],   "targets": [ 7 ] },
+ 					{ "orderData":[ 11 ],   "targets": [ 8 ] },
+		        ]
 	        });
+	        $('#Testnet_notarisations').css({'display':'unset'})
+	        $('#Testnet_notarisations_24hr').css({'display':'unset'})
 	    });
   </script> 
 
