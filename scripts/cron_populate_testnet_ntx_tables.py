@@ -692,7 +692,7 @@ def rescan_notaries(season):
 if __name__ == "__main__":
 
     # Uncomment if record contains address rather than notary in [notaries] list (e.g. saved before pubkeys updated)
-    rescan_notaries("Season_4")
+    rescan_notaries("Season_5_Testnet")
 
     tip = int(RPC["KMD"].getblockcount())
 
@@ -700,7 +700,7 @@ if __name__ == "__main__":
     logger.info(f"Preparing to populate NTX tables...")
 
     for season in seasons:
-        if season in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]:
+        if season in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_4"]:
             logger.warning(f"Skipping season: {season}")
         else:
             scan_rpc_for_ntx(season)
