@@ -116,8 +116,8 @@ def get_last_mined_table(request):
         season = item['season']
         name = item['name']
         address = item['address']
-        last_mined_block = item['block_time__max']
-        last_mined_blocktime = item['block_height__max']
+        last_mined_block = item['block_height__max']
+        last_mined_blocktime = item['block_time__max']
         if name != address:
             resp.append({
                     "name":name,
