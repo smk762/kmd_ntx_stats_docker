@@ -240,9 +240,9 @@ class nn_btc_tx(models.Model):
     category = models.CharField(max_length=32)
 
     input_index = models.IntegerField(default=-1)
-    input_sats = models.IntegerField(default=-1)
+    input_sats = models.BigIntegerField(default=-1)
     output_index = models.IntegerField(default=-1)
-    output_sats = models.IntegerField(default=-1)
+    output_sats = models.BigIntegerField(default=-1)
     num_inputs = models.PositiveIntegerField(default=0)
     num_outputs = models.PositiveIntegerField(default=0)
     fees = models.PositiveIntegerField(default=0)
