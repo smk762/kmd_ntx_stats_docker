@@ -270,30 +270,12 @@ def get_mined_count_season_table(request):
     data = get_mined_count_season_data(season, name, address)
     data = data.order_by('season', 'name').values()
 
-    resp = []
-    # name num sum max last
-    for item in data:
-        blocks_mined = item['blocks_mined']
-        if blocks_mined > 10:
-            name = item['name']
-            address = item['address']
-            sum_value_mined = item['sum_value_mined']
-            max_value_mined = item['max_value_mined']
-            last_mined_block = item['last_mined_block']
-            last_mined_blocktime = item['last_mined_blocktime']
-            time_stamp = item['time_stamp']
-            season = item['season']
+    serializer = minedCountSeasonSerializer(data, many=True)
 
-            resp.append({
-                    "name":name,
-                    "address":address,
-                    "blocks_mined":blocks_mined,
-                    "sum_value_mined":sum_value_mined,
-                    "max_value_mined":max_value_mined,
-                    "last_mined_block":last_mined_block,
-                    "last_mined_blocktime":last_mined_blocktime,
-                    "season":season
-            })
+    resp = []
+    for item in serializer.data:
+        if item['blocks_mined'] > 5:
+            resp.append(item)
 
     return resp
 

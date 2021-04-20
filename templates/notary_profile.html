@@ -161,7 +161,7 @@
 								</span>
 							    <span class="badge kmd_ui_dark1_bg p-1">
 							    	<a href="//{{ request.get_host }}/mining_overview">
-							    		{{ mining_summary.season_value_mined|floatformat:-3 }} KMD<br />Season
+							    		{{ mining_summary.sum_value_mined|floatformat:-3 }} KMD<br />Season
 							    	</a>
 								</span>
 							</div>
@@ -171,7 +171,7 @@
 							    Blocks Mined this Season
 							    <span class="badge kmd_ui_dark1_bg p-1">
 							    	<a href="//{{ request.get_host }}/mining_overview">
-							    		{{ mining_summary.season_blocks_mined }}
+							    		{{ mining_summary.blocks_mined }}
 							    	</a>
 								</span>
 							</div>
@@ -181,7 +181,7 @@
 							    Largest Block Mined
 							    <span class="badge kmd_ui_dark1_bg p-1">
 							    	<a href="//{{ request.get_host }}/mining_overview">
-							    		{{ mining_summary.season_largest_block|floatformat:-3 }} KMD
+							    		{{ mining_summary.max_value_mined|floatformat:-3 }} KMD
 							    	</a>
 								</span>
 							</div>
@@ -283,7 +283,7 @@
 						</thead>
 						<tbody>
 							{% for item in notary_balances %}
-							
+
 							<tr>
 								<td data-data="chain">{{ item.chain }}</td>
 								<td data-data="address">{{ item.address }}</td>
