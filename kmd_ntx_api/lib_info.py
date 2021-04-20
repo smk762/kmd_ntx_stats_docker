@@ -289,7 +289,8 @@ def get_testnet_addresses(season):
     for item in addresses_data:
         if item["notary"] not in addresses_dict: 
             addresses_dict.update({item["notary"]:item['address']})
-
+        addresses_dict.update({"jorian":"RJNieyvnmjGGFHHEQKZeQv4SyaEhvfpRvA"})
+        addresses_dict.update({"hsukrd":"RA93ZHcbw94XqyaYoSF88SfBRUGgA8vVJR"})
     return addresses_dict
 
 
@@ -604,7 +605,7 @@ def get_split_stats():
 
 
 def get_testnet_stats_dict(season, testnet_chains):
-    notaries = get_notary_list(season)
+    notaries = get_notary_list(season)+["jorian","hsukrd"]
     testnet_stats_dict = create_dict(notaries)
 
     addresses_dict = get_testnet_addresses(season)
