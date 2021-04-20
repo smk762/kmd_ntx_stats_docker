@@ -18,8 +18,9 @@
 					
 				</form>
 				{% if opret_rows %}
+				<div class="col-8 m-auto"><i style="font-size: 0.8em;">Data for OP_RETURN {{ OP_RETURN }}</i></div>
 				<table id="opret_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
-					<thead>
+					<thead style="display:none">
 						<tr>
 							<th data-data="key">Key</th>
 							<th data-data="value">Value</th>
@@ -27,10 +28,12 @@
 					</thead>
 					<tbody>
 						{% for item in opret_rows %}
+							{% if item.key != 'OP_RETURN' %}
 							<tr>
 								<td data-data="key">{{ item.key }}</td>
 								<td data-data="value">{{ item.value }}</td>
 							</tr>
+							{% endif %}
 						{% endfor %}
 					</tbody>
 				</table>
@@ -46,13 +49,17 @@
 	{% if opret_rows %}
   	<script>
 	    $(document).ready(function() {
-	        $('#opret_table').DataTable({  "pageLength": 50,
+	        $('#opret_table').DataTable({ 
+	        	sDom: 'lrtip',
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "key" },
 			        { "data": "value" }
 			    ]
 	        });
+	        $('#opret_table_length').css({'display':'none'});
+	        $('#opret_table_paginate').css({'display':'none'});
+	        $('#opret_table_info').css({'display':'none'});
 	    });
     </script> 
     {% endif %}
