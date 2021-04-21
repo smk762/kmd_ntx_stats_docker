@@ -568,7 +568,9 @@ NOTARY_PUBKEYS = {
         "hastrup": "032cca7f99965a0a74748c6b02851234b87dea8abc9684cb7a0f2a94b2556a223d",
         "mylo": "03ad726ba996a69d783258eca293d19dd818bf1f8dd66e8cab1965c7fe48a247a9",
         "byozgunn": "0345474b6bdd307194cef7b840fe8d1bb4b7761513c63bb06679ea808886fb6789",
-        "hastrup": "032cca7f99965a0a74748c6b02851234b87dea8abc9684cb7a0f2a94b2556a223d"
+        "hastrup": "032cca7f99965a0a74748c6b02851234b87dea8abc9684cb7a0f2a94b2556a223d",
+        "Hyperstaking": "0228876c1352e0da73d4b66dbcab5ee03e3ef12914ca28453117810e733b3e4d3a",
+        "marmarachain": "025217660ad707988ab49847ab4a0a1d1c0fcbd300be9f062f587078695fd43282"
         },
     "Season_5": {}
 }
