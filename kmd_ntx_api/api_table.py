@@ -223,6 +223,22 @@ def split_stats_table(request):
     })
 
 
+def vote2021_table(request):
+    resp = get_vote2021_table(request)
+    filters = ["candidate", "block", "txid", "max_block",
+               "max_blocktime", "max_locktime", "mined_by"]
+    if "error" in resp:
+        return JsonResponse({
+            "error":resp["error"],
+            "filters":filters
+        })
+    return JsonResponse({
+        "count":len(resp),
+        "filters":filters,
+        "results":resp
+    })
+
+
 
 # UPDATE PENDING
 def notary_epoch_scores_table(request):

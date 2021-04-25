@@ -13,7 +13,9 @@ cursor = conn.cursor()
 #table = 'coins'
 #table = "scoring_epochs"
 #table = 'nn_ltc_tx'
-table = 'addresses'
+#table = 'addresses'
+table = 'last_notarised'
+
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
 
@@ -27,14 +29,15 @@ print(cursor.fetchall())
 #cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_4';")
 #cursor.execute("DELETE FROM nn_ltc_tx WHERE category = 'Other';")
 cursor.execute("DELETE FROM "+table+";")
+#cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_5_Testnet';")
 
 conn.commit()
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
 
-cursor.execute("SELECT DISTINCT category FROM nn_btc_tx;")
-print(cursor.fetchall())
+#cursor.execute("SELECT DISTINCT category FROM nn_btc_tx;")
+#print(cursor.fetchall())
 
 cursor.close()
 

@@ -48,4 +48,8 @@ api_tool_urls = [
           api_tools.get_kmd_rewards,
           name='get_kmd_rewards'),
 
+    path('api/tools/notary_utxos/',
+          api_tools.get_notary_utxo_count,
+          name='get_notary_utxo_count'),
+
 ]

@@ -14,15 +14,18 @@ def populate_addresses(season, server):
     url = f'{THIS_SERVER}/api/info/dpow_server_coins?season={season}&server={server}'
     logger.info(url)
     coins = requests.get(url).json()['results']
+    coins += ["BTC", "KMD", "LTC"]
+    coins.sort()
 
     if len(coins) > 0:
         if server == 'Main':
             pubkeys = NOTARY_PUBKEYS[season]
         elif server == 'Third_Party':
-            pubkeys = NOTARY_PUBKEYS[f"{season}_Third_Party"]
+            if f"{season}_Third_Party" in NOTARY_PUBKEYS:
+                pubkeys = NOTARY_PUBKEYS[f"{season}_Third_Party"]
+            else:
+                pubkeys = []
 
-        coins += ["BTC", "KMD", "LTC"]
-        coins.sort()
 
         i = 0
 
@@ -58,8 +61,8 @@ if __name__ == "__main__":
     '''
 
     for season in SEASONS_INFO:
-        if season in EXCLUDED_SEASONS:
-            logger.warning(f"Skipping season: {season}")
-        else:
-            for server in ["Main", "Third_Party"]:
-                populate_addresses(season, server)
+        #if season in EXCLUDED_SEASONS:
+        #    logger.warning(f"Skipping season: {season}")
+        #else:
+        for server in ["Main", "Third_Party"]:
+            populate_addresses(season, server)
