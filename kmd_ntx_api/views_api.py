@@ -47,7 +47,7 @@ def nn_mined_4hrs_api(request):
         block_time__gt=str(int(time.time()-4*60*60))
         ).values()
     serializer = minedSerializer(mined_4hrs, many=True)
-    season = get_season()
+    season = SEASON
     notary_list = get_notary_list(season)
     mined_counts_4hr = {}
     for nn in notary_list:

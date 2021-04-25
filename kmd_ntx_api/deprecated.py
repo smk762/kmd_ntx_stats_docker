@@ -10,7 +10,7 @@ def get_active_dpow_coins():
 
 # TODO: Delegate this to crons and table
 def get_chain_sync_data(request):
-    season = get_season()
+    season = SEASON
     coins_data = get_coins_data(1).values('chain', 'dpow')
     context = {}
     r = requests.get('http://138.201.207.24/show_sync_node_data')
@@ -53,7 +53,7 @@ def get_chain_sync_data(request):
         messages.error(request, 'Sync Node API not Responding!')
     return context
 def get_nn_social(notary_name=None, season=None):
-    season = get_season()
+    season = SEASON
     nn_social_info = {}
     nn_social_data = get_nn_social_data(season, notary_name).values()
     for item in nn_social_data:
@@ -90,7 +90,7 @@ def get_ntx_score(btc_ntx, main_ntx, third_party_ntx, season=None):
         return 0
 
 def get_nn_ntx_summary(notary):
-    season = get_season()
+    season = SEASON
     now = int(time.time())
     day_ago = now - 24*60*60
     week_ago = now - 24*60*60*7
@@ -165,7 +165,7 @@ def get_nn_ntx_summary(notary):
     return ntx_summary
 
 def btc_ntx_all(request):
-    season = get_season()
+    season = SEASON
     btc_ntx = get_notarised_data(season, None, None, "BTC").values()
 
     context = {
@@ -270,7 +270,7 @@ def get_nn_health():
         if len(sync_no_exp) > 0:
             sync_tooltip += "<h5 class='kmd_secondary_red'>"+str(sync_no_exp)+" have no explorer </h5>\n"
 
-        season = get_season()
+        season = SEASON
         notary_list = get_notary_list(season)
 
         timenow = int(time.time())
@@ -304,7 +304,7 @@ def get_nn_health():
             if item['name'] in notary_list:
                 mining_nodes.append(item['name'])
 
-        season = get_season()
+        season = SEASON
         filter_kwargs = {'season':season}
         balances_dict = get_balances_dict(filter_kwargs) 
 
@@ -594,7 +594,7 @@ def get_notarised_count_season_data_api(request):
     data = apply_filters_api(request, notarisedCountSeasonSerializer, data)
     # default filter if none set.
     if len(data) == notarised_count_season.objects.count() or len(data) == 0:
-        season = get_season()
+        season = SEASON
         data = notarised_count_season.objects.filter(season=season)
 
     data = data.order_by('season', 'notary').values()
@@ -785,7 +785,7 @@ def get_mined_count_season_data_api(request):
     data = mined_count_season.objects.all()
     data = apply_filters_api(request, minedCountSeasonSerializer, data)
     if len(data) == len(mined_count_season.objects.all()):
-        season = get_season()
+        season = SEASON
         data = mined_count_season.objects.filter(season=season)
     data = data.order_by('season', 'name').values()
 

@@ -562,9 +562,9 @@ def scan_rpc_for_ntx(season):
     end_block = SEASONS_INFO[season]["end_block"]
 
     if SKIP_UNTIL_YESTERDAY:
-        start_block = tip - 24*60*2
+        start_block = TIP - 24*60*2
         logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
-        unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season)
+        unrecorded_KMD_txids = get_unrecorded_KMD_txids(TIP, season)
         unrecorded_KMD_txids.sort()
         update_KMD_notarisations(unrecorded_KMD_txids)
 
@@ -584,7 +584,7 @@ def scan_rpc_for_ntx(season):
             window = random.choice(windows)
 
             logger.info(f"Processing notarisations for blocks {window[0]} - {window[1]}")
-            unrecorded_KMD_txids = get_unrecorded_KMD_txids(tip, season, window[0], window[1])
+            unrecorded_KMD_txids = get_unrecorded_KMD_txids(TIP, season, window[0], window[1])
             unrecorded_KMD_txids.sort()
             update_KMD_notarisations(unrecorded_KMD_txids)
 
@@ -692,9 +692,9 @@ def rescan_notaries(season):
 if __name__ == "__main__":
 
     # Uncomment if record contains address rather than notary in [notaries] list (e.g. saved before pubkeys updated)
-    rescan_notaries("Season_4")
+    # rescan_notaries(SEASON)
 
-    tip = int(RPC["KMD"].getblockcount())
+    TIP = int(RPC["KMD"].getblockcount())
 
     seasons = get_notarised_seasons()
     logger.info(f"Preparing to populate NTX tables...")

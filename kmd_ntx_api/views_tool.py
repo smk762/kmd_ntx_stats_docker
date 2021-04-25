@@ -8,6 +8,7 @@ from kmd_ntx_api.api_tools import *
 
 def decode_opret_view(request):
     context = {
+        "page_title":"Decode OP_RETURN Tool",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()
     }
@@ -41,6 +42,7 @@ def decode_opret_view(request):
 
 def kmd_rewards_view(request):
     context = {
+        "page_title":"KMD Rewards Tool",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()
     }
@@ -72,6 +74,7 @@ def kmd_rewards_view(request):
 
 def launch_params_view(request):
     context = {
+        "page_title":"Launch Parameters",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()
     }
@@ -92,6 +95,7 @@ def launch_params_view(request):
 
 def daemon_cli_view(request):
     context = {
+        "page_title":"Daemon CLIs",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()
     }
@@ -112,6 +116,7 @@ def daemon_cli_view(request):
 
 def pubkey_addresses_view(request):
     context = {
+        "page_title":"Pubkey Addresses View",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()
     }

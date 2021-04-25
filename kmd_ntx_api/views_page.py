@@ -14,12 +14,13 @@ from kmd_ntx_api.lib_testnet import *
 ## DASHBOARD        
 
 def chains_last_ntx(request):
-    season = get_season()
+    season = SEASON
     notary_list = get_notary_list(season)
 
     season_chain_ntx_data = get_season_chain_ntx_data(season)
 
     context = {
+        "page_title":"dPoW Last Chain Notarisations",
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "explorers":get_explorers(request),
@@ -31,10 +32,11 @@ def chains_last_ntx(request):
 
 # TODO: Awaiting delegation to crons / db table
 def chain_sync(request):
-    season = get_season()
+    season = SEASON
     context = get_chain_sync_data(request)
 
     context.update({
+        "page_title":"Chain Sync",
         "sidebar_links":get_sidebar_links(season),
         "explorers":get_explorers(request),
         "eco_data_link":get_eco_data_link()
@@ -42,10 +44,11 @@ def chain_sync(request):
     return render(request, 'chain_sync.html', context)
 
 def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY PROFILE
-    season = get_season()
+    season = SEASON
     server = get_chain_server(chain)
 
     context = {
+        "page_title":"Coin Profile Index",
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link()
     }
@@ -75,6 +78,7 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
         season_chain_ntx_data = get_season_chain_ntx_data(season)
 
         context.update({
+            "page_title": f"{chain} Profile",
             "season":season,
             "server":server,
             "chain":chain,
@@ -99,7 +103,9 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
 
 def dash_view(request, dash_name=None):
     # Table Views
-    context = {}
+    context = {
+        "page_title":"Index"
+        }
     gets = ''
     html = 'dash_index.html'
 
@@ -107,7 +113,7 @@ def dash_view(request, dash_name=None):
         season = request.GET["season"]
         
     else:
-        season = "Season_4"
+        season = SEASON
 
     notary_list = get_notary_list(season)
     coins_list = get_dpow_coins_list(season)
@@ -191,9 +197,10 @@ def dash_view(request, dash_name=None):
     
 
 def faucet(request):
-    season = get_season()
+    season = SEASON
     notary_list = get_notary_list(season)
     context = {
+        "page_title":"Rick / Morty Faucet",
         "sidebar_links":get_sidebar_links(season),
         "explorers":get_explorers(request),
         "eco_data_link":get_eco_data_link()
@@ -223,12 +230,13 @@ def faucet(request):
 
 
 def funds_sent(request):
-    season = get_season()
+    season = SEASON
     notary_list = get_notary_list(season)
     funding_data = get_funding_transactions_data(season).values()
     funding_totals = get_funding_totals(funding_data)
 
     context = {
+        "page_title":"Funding Sent",
         "sidebar_links":get_sidebar_links(season),
         "explorers":get_explorers(request),
         "eco_data_link":get_eco_data_link(),
@@ -255,7 +263,7 @@ def funding(request):
     low_nn_balances['low_balance_chains'].sort()
     low_nn_balances['low_balance_notaries'].sort()
 
-    season = get_season()
+    season = SEASON
     notary_list = get_notary_list(season)
 
     chain_list = get_dpow_coins_list(season)
@@ -301,6 +309,7 @@ def funding(request):
     addresses_funded_pct = round((num_addresses-num_low_balance_addresses)/num_addresses*100,2)
 
     context = {
+        "page_title":"Funding Info",
         "chains_funded_pct":chains_funded_pct,
         "notaries_funded_pct":notaries_funded_pct,
         "addresses_funded_pct":addresses_funded_pct,
@@ -330,11 +339,12 @@ def funding(request):
 
 
 def mining_24hrs(request):
-    season = get_season()
+    season = SEASON
     notary_list = get_notary_list(season)
     mined_24hrs = get_mined_data_24hr().values()
 
     context = {
+        "page_title":"KMD Mining Last 24hrs",
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "mined_24hrs":mined_24hrs,
@@ -345,9 +355,10 @@ def mining_24hrs(request):
 
 
 def mining_overview(request):
-    season = get_season()
+    season = SEASON
     mined_season = requests.get(f"{THIS_SERVER}/api/table/mined_count_season/?season={season}").json()['results']
     context = {
+        "page_title":f"{season.replace('_',' ')} Mining Overview",
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "explorers":get_explorers(request),
@@ -358,13 +369,14 @@ def mining_overview(request):
 
 
 def notarised_24hrs(request):
-    season = get_season()
+    season = SEASON
     notarised_24hrs = get_notarised_data_24hr()
     print(f"notarised_24hrs.count(): {notarised_24hrs.count()}")
     notarised_24hrs = notarised_24hrs.order_by('-block_time').values()[:200]
     
 
     context = {
+        "page_title":"dPoW Notarisations (last 200)",
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "notarised_24hrs":notarised_24hrs,
@@ -376,13 +388,14 @@ def notarised_24hrs(request):
 
 def ntx_scoreboard(request):
     if not "season" in request.GET:
-        season = "Season_4"
+        season = SEASON
     else:
         season = request.GET["season"]
 
     notarisation_scores = get_notarisation_scores(season)
 
     context = {
+        "page_title":f"{season.replace('_',' ')} Notarisation Scoreboard",
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "notarisation_scores":notarisation_scores,
@@ -394,10 +407,11 @@ def ntx_scoreboard(request):
 
 def ntx_scoreboard_24hrs(request):
     if not "season" in request.GET:
-        season = "Season_4"
+        season = SEASON
     else:
         season = request.GET["season"]
     context = {
+        "page_title":f"{season.replace('_',' ')} Last 24hrs Notarisation Scoreboard",
         "daily_stats_sorted":get_daily_stats_sorted(),
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
@@ -408,7 +422,7 @@ def ntx_scoreboard_24hrs(request):
 
 def notary_epoch_scores_view(request):
     if not "season" in request.GET:
-        season = "Season_4"
+        season = SEASON
     else:
         season = request.GET["season"]
 
@@ -422,6 +436,7 @@ def notary_epoch_scores_view(request):
     
 
     context = {
+        "page_title":f"{season.replace('_',' ')} dPoW Notarisation Epoch Scores",
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "notary":notary,
@@ -434,10 +449,11 @@ def notary_epoch_scores_view(request):
 
 
 def notarised_tenure_view(request):
-    season = get_season()
+    season = SEASON
     notary_list = get_notary_list(season)
     tenure_data = get_notarised_tenure_data().values()
     context = {
+        "page_title":f"{season.replace('_',' ')} Chain Notarisation Tenure",
         "sidebar_links":get_sidebar_links(season),
         "tenure_data":tenure_data,
         "eco_data_link":get_eco_data_link()
@@ -446,10 +462,11 @@ def notarised_tenure_view(request):
 
 
 def scoring_epochs_view(request):
-    season = get_season()
+    season = SEASON
     notary_list = get_notary_list(season)
     epochs = requests.get(f"{THIS_SERVER}/api/table/scoring_epochs/?season={season}").json()['results']
     context = {
+        "page_title":f"{season.replace('_',' ')} dPoW Scoring Epochs",
         "sidebar_links":get_sidebar_links(season),
         "epochs":epochs,
         "eco_data_link":get_eco_data_link()
@@ -473,6 +490,7 @@ def testnet_ntx_scoreboard(request):
     average_score_24hr = combined_total_24hr/num_notaries
 
     context = {
+        "page_title":f"Season 5 Testnet Scoreboard",
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "average_score":average_score,
@@ -485,6 +503,7 @@ def testnet_ntx_scoreboard(request):
 def sitemap(request):
 
     context = {
+        "page_title":f"Sitemap",
         "endpoints":ENDPOINTS,
         "pages":PAGES
     }

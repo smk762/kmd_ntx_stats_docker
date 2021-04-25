@@ -1,7 +1,6 @@
 import time
 from lib_table_select import get_epochs
 from lib_table_update import *
-from lib_const import *
 
 
 def get_season_from_block(block):
@@ -526,6 +525,10 @@ class last_notarised_row():
         self.server = server
 
     def validated(self):
+        for i in [self.notary, self.chain, self.txid, self.block_height, \
+            self.block_time, self.season, self.server]:
+            if i == "":
+                return False
         return True
 
     def update(self):
@@ -620,17 +623,25 @@ class season_mined_count_row():
                 return False
         if self.season.find("Testnet") != -1:
             return False
+        # Overcome where old season address mines within this season.
+        if self.name in NOTARY_PUBKEYS[self.season]:
+            if self.address != NOTARY_ADDRESSES_DICT[self.season][self.name]["KMD"]:
+                return False
+
         return True
 
     def update(self):
+
+
         row_data = (
             self.name, self.season, self.address, self.blocks_mined, 
             self.sum_value_mined, self.max_value_mined,
             self.last_mined_blocktime, self.last_mined_block, self.time_stamp
-        )
+        ) 
         if self.validated():
             update_season_mined_count_row(row_data)
             logger.info(f"[mined_count_season] updated: {self.name} {self.season} {self.last_mined_block} {self.sum_value_mined}")
+            logger.info(f"[mined_count_season] updated: {row_data}")
         else:
             logger.warning(f"[mined_count_season] Row data invalid!")
             logger.warning(f"{row_data}")
@@ -1016,3 +1027,57 @@ class ntx_tenure_row():
 
             CURSOR.execute(sql)
             CONN.commit()
+
+
+class vote2021_row():
+    def __init__(self, txid='', block_hash='', block_time=0, \
+            lock_time=0, block_height=0, votes=0, candidate='', 
+            candidate_address='', mined_by='', difficulty='', notes=''):
+        self.txid = txid
+        self.block_hash = block_hash
+        self.block_time = block_time
+        self.lock_time = lock_time
+        self.block_height = block_height
+        self.votes = votes
+        self.candidate = candidate
+        self.candidate_address = candidate_address
+        self.mined_by = mined_by
+        self.difficulty = difficulty
+        self.notes = notes
+
+    def validated(self):
+        for i in [self.block_time, self.lock_time, self.block_time,
+                  self.votes]:
+            if i in [0, None]:
+                return False
+
+        for i in [self.txid, self.block_hash, self.candidate,
+                  self.candidate_address]:
+            if i in ['', None]:
+                return False
+
+        if self.candidate_address not in VOTE2021_ADDRESSES_DICT:
+            return False
+
+        return True
+
+    def update(self):
+        logger.info(f"Updating votes for {self.candidate}")
+        if self.lock_time == 0:
+            self.lock_time = self.block_time
+        row_data = (
+            self.txid, self.block_hash, self.block_time, \
+            self.lock_time, self.block_height, self.votes, \
+            self.candidate, self.candidate_address, self.mined_by,
+            self.difficulty, self.notes
+        )
+        if self.validated():
+            logger.info(f"Updating [vote2021_row] {self.txid} | {self.block_height} | {self.candidate} | {self.votes}")
+            update_vote2021_row(row_data)
+        else:
+            logger.warning(f"[vote2021_row] Row data invalid!")
+            logger.warning(f"{row_data}")
+
+    def delete_txid(self):
+        CURSOR.execute(f"DELETE FROM [vote2021_row] WHERE txid = '{self.txid}';")
+        CONN.commit()

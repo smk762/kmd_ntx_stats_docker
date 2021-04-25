@@ -582,3 +582,43 @@ def get_notary_epoch_scores_table(notary=None, season=None):
                     rows.append(row)
 
     return rows, total
+
+
+def get_vote2021_table(request):
+    candidate = None
+    block = None
+    txid = None
+    mined_by = None
+    max_block = None
+    max_blocktime = None
+    max_locktime = None
+
+    if "candidate" in request.GET:
+        candidate = request.GET["candidate"]
+    if "block" in request.GET:
+        block = request.GET["block"]
+    if "txid" in request.GET:
+        txid = request.GET["txid"]
+    if "mined_by" in request.GET:
+        mined_by = request.GET["mined_by"]
+    if "max_block" in request.GET:
+        max_block = request.GET["max_block"]
+    if "max_blocktime" in request.GET:
+        max_blocktime = request.GET["max_blocktime"]
+    if "max_locktime" in request.GET:
+        max_locktime = request.GET["max_locktime"]
+
+    data = get_vote2021_data(candidate, block, txid, max_block, max_blocktime, max_locktime, mined_by)
+
+    if "order_by" in request.GET:
+        order_by = request.GET["order_by"]
+        data = data.values().order_by(f'-{order_by}')
+    else:
+        data = data.values().order_by(f'-block_time')
+
+    serializer = vote2021Serializer(data, many=True)
+    resp = {}
+    for item in serializer.data:
+        item.update({"lag":item["block_time"]-item["lock_time"]})
+
+    return serializer.data
