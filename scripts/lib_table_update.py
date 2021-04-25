@@ -471,7 +471,7 @@ def update_last_ntx_row(row_data):
         sql = "INSERT INTO last_notarised \
             (notary, chain, txid, block_height, \
             block_time, season, server) VALUES (%s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_chain_season_server DO UPDATE SET \
+            ON CONFLICT ON CONSTRAINT unique_notary_season_server_chain DO UPDATE SET \
             txid='"+str(row_data[2])+"', \
             block_height='"+str(row_data[3])+"', \
             block_time='"+str(row_data[4])+"', \
@@ -744,4 +744,32 @@ def update_chain_notarised_epoch_window(chain, season, server, epoch, epoch_star
         CONN.commit()
     except Exception as e:
         logger.debug(e)
+        CONN.rollback()
+
+def update_vote2021_row(row_data):
+    sql = f"INSERT INTO vote2021 \
+                (txid, block_hash, block_time, \
+                lock_time, block_height, votes, \
+                candidate, candidate_address, \
+                mined_by, difficulty, notes) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+        ON CONFLICT ON CONSTRAINT unique_vote_txid_candidate DO UPDATE SET \
+            txid='{row_data[0]}', \
+            block_hash='{row_data[1]}', \
+            block_time={row_data[2]}, \
+            lock_time={row_data[3]}, \
+            block_height={row_data[4]}, \
+            votes={row_data[5]}, \
+            candidate='{row_data[6]}', \
+            candidate_address='{row_data[7]}', \
+            mined_by='{row_data[8]}', \
+            difficulty='{row_data[9]}', \
+            notes='{row_data[10]}';"
+    try:
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
+    except Exception as e:
+        logger.debug(e)
+        if str(e).find('duplicate') == -1:
+            logger.debug(row_data)
         CONN.rollback()

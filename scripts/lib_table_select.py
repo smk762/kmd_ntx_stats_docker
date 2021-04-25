@@ -227,7 +227,6 @@ def get_tenure_chains(season=None, server=None):
     resp.sort()
     return resp
 
-
 def get_min_from_table(table, col):
     sql = "SELECT MIN("+col+") FROM "+table
     CURSOR.execute(sql)
@@ -438,7 +437,6 @@ def get_all_coins():
 
     return coins
 
-# TODO: add WHERE conditions list
 def get_notarised_servers(season=None):
 
     sql = "SELECT DISTINCT server FROM notarised"
@@ -510,7 +508,7 @@ def get_notary_last_ntx(chain=None):
         notary_last_ntx[notary].update({chain:block_height})
     return notary_last_ntx
 
-def get_existing_notarised_txids(chain=None, season=None):
+def get_existing_notarised_txids(chain=None, season=None, server=None):
 
     logger.info("Getting existing TXIDs from [notarised]...")
     sql = f"SELECT DISTINCT txid from notarised"
@@ -520,6 +518,8 @@ def get_existing_notarised_txids(chain=None, season=None):
         conditions.append(f"chain = '{chain}'")
     if season:
         conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
     if len(conditions) > 0:
         sql += " WHERE "
         sql += " AND ".join(conditions)    
@@ -557,7 +557,6 @@ def get_existing_nn_btc_txids(address=None, category=None, season=None, notary=N
     for txid in existing_txids:
         recorded_txids.append(txid[0])
     return recorded_txids
-
 
 def get_non_notary_btc_txids():
     non_notary_txids = []

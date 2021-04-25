@@ -295,3 +295,33 @@ def get_scoring_epochs_data(season=None, server=None, chain=None, epoch=None, ti
     return data
 
 
+
+def get_vote2021_data(candidate=None, block=None, txid=None,
+                      max_block=None, max_blocktime=None,
+                      max_locktime=None, mined_by=None):
+    data = vote2021.objects.all()
+
+    if candidate:
+        data = data.filter(candidate=candidate)
+
+    if block:
+        data = data.filter(block=block)
+
+    if txid:
+        data = data.filter(txid=txid)
+
+    if mined_by:
+        data = data.filter(mined_by=mined_by)
+
+    if max_block:
+        data = data.filter(block_height__lte=max_block)
+
+    if max_blocktime:
+        data = data.filter(block_time__lte=max_blocktime)
+
+    if max_locktime:
+        data = data.filter(lock_time__lte=max_locktime)
+
+    return data
+
+

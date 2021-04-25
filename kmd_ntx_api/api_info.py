@@ -339,3 +339,17 @@ def notary_nodes_info(request):
         "filters":filters,
         "results":resp
     })
+
+def vote2021_info(request):
+    resp = get_vote2021_info(request)
+    filters = ["candidate", "block", "txid", "max_block",
+               "max_blocktime", "max_locktime"]
+    if "error" in resp:
+        return JsonResponse({
+            "error":resp["error"],
+            "filters":filters
+        })
+    return JsonResponse({
+        "filters":filters,
+        "results":resp
+    })

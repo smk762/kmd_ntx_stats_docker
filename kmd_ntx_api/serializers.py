@@ -157,6 +157,14 @@ class scoringEpochsSerializer(serializers.HyperlinkedModelSerializer):
                   'epoch_end', 'start_event', 'end_event',
                   'epoch_chains', 'score_per_ntx']
 
+class vote2021Serializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = vote2021
+        fields = ["txid", "block_hash", "block_time", "lock_time",
+                  "block_height", "votes", "candidate",
+                  "candidate_address", "mined_by", "difficulty",
+                  "notes"]
+
 
 # Non-Model serializers
 class addrFromBase58Serializer(serializers.Serializer):

@@ -8,6 +8,7 @@ from lib_db import CONN, CURSOR
 from base_58 import COIN_PARAMS, get_addr_from_pubkey
 from lib_rpc import def_credentials
 from notary_pubkeys import NOTARY_PUBKEYS
+from s5_candidates import VOTE2021_ADDRESSES_DICT
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -25,6 +26,8 @@ OTHER_SERVER = os.getenv("OTHER_SERVER") # set to IP or domain to allow for exte
 THIS_SERVER = os.getenv("THIS_SERVER") # IP / domain of the local server
 API_PAGE_BREAK = int(os.getenv("API_PAGE_BREAK")) # How many pages back to go with verbose API responses
 
+SEASON = "Season_4"
+
 # Notarisation Addresses
 NTX_ADDR = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 BTC_NTX_ADDR = '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg'
@@ -33,6 +36,7 @@ LTC_NTX_ADDR = 'LhGojDga6V1fGzQfNGcYFAfKnDvsWeuAsP'
 # KMD RPC Proxy
 RPC = {}
 RPC["KMD"] = def_credentials("KMD")
+RPC["VOTE2021"] = def_credentials("VOTE2021")
 noMoM = ['CHIPS', 'GAME', 'EMC2', 'AYA', 'GLEEC']
 
 # KMD REWARDS CONSTANTS

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import time
+from datetime import datetime as dt
+
 from django.shortcuts import render
 
 from kmd_ntx_api.lib_info import *
@@ -10,9 +12,10 @@ from kmd_ntx_api.lib_graph import *
 def notary_profile_view(request, notary=None, season=None):
     # Populate sidebar
     if not season:
-        season="Season_4"
+        season = SEASON
     
     context = {
+        "page_title":"Notary Profile Index",
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link()
     }
@@ -52,6 +55,7 @@ def notary_profile_view(request, notary=None, season=None):
                     last_ntx_chain = item["chain"]
 
         context.update({
+            "page_title":f"{notary} Notary Profile",
             "notary_name": notary,
             "nn_social": get_nn_social(notary), # Social Media Links
             "season_btc_count": notarised_count_season_data['btc_count'],
@@ -82,3 +86,70 @@ def notary_profile_view(request, notary=None, season=None):
         })
 
         return render(request, 'notary_profile_index.html', context)
+
+def vote2021_view(request):
+    # Populate sidebar
+    season = None
+    if "season" in request.GET:
+        params = f'?season={request.GET["season"]}'
+    else:
+        season = SEASON
+    
+    context = {
+        "page_title":"Notary VOTE 2021",
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+
+
+    params = f'?max_locktime=1619179199'
+    url = f"{THIS_SERVER}/api/info/vote2021_stats"
+    vote2021_table = requests.get(f"{url}/{params}").json()
+    if 'results' in vote2021_table:
+        vote2021_table = vote2021_table["results"]
+
+    context.update({
+        "params": params,
+        "vote2021_table": vote2021_table
+    })
+
+    return render(request, 'vote2021.html', context)
+
+def vote2021_detail_view(request):
+    # Populate sidebar
+    season = None
+    if "season" in request.GET:
+        params = f'?season={request.GET["season"]}'
+    else:
+        season = SEASON
+    
+    context = {
+        "page_title":"Notary VOTE 2021",
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+
+    candidate = None
+    if "candidate" in request.GET:
+        params = f'?candidate={request.GET["candidate"]}'
+    else:
+        return vote2021_view(request)
+
+    params += f'&max_locktime=1619179199'
+    url = f"{THIS_SERVER}/api/table/vote2021"
+    vote2021_detail_table = requests.get(f"{url}/{params}").json()
+    if 'results' in vote2021_detail_table:
+        vote2021_detail_table = vote2021_detail_table["results"]
+
+    for item in vote2021_detail_table:
+        date_time = dt.fromtimestamp(item["lock_time"])
+
+        item.update({"lock_time_human":date_time.strftime("%m/%d/%Y, %H:%M:%S")})
+
+    context.update({
+        "candidate": request.GET["candidate"],
+        "params": params,
+        "vote2021_detail_table": vote2021_detail_table
+    })
+
+    return render(request, 'vote2021_detail.html', context)

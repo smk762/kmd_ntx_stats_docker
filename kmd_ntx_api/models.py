@@ -154,8 +154,8 @@ class last_notarised(models.Model):
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=['notary','chain','season','server'],
-                name='unique_notary_chain_season_server'
+                fields=['notary','season', 'server', 'chain'],
+                name='unique_notary_season_server_chain'
             )
         ]
 
@@ -486,6 +486,26 @@ class scoring_epochs(models.Model):
                 fields=['season', 'server', 'epoch'],
                 name='unique_scoring_epoch'
             )
+        ]
+
+class vote2021(models.Model):
+    txid = models.CharField(max_length=64)
+    block_hash = models.CharField(max_length=64)
+    block_time = models.PositiveIntegerField()
+    mined_by = models.CharField(max_length=42, default="")
+    lock_time = models.PositiveIntegerField()
+    block_height = models.PositiveIntegerField()
+    votes = models.DecimalField(max_digits=18, decimal_places=8)
+    difficulty = models.DecimalField(max_digits=18, decimal_places=8, default=0)
+    candidate = models.CharField(max_length=64)
+    candidate_address = models.CharField(max_length=42)
+    notes = models.CharField(max_length=512)
+
+    class Meta:
+        db_table = 'vote2021'
+        constraints = [
+            models.UniqueConstraint(fields=['txid', 'candidate'],
+                                 name='unique_vote_txid_candidate')
         ]
 
 

@@ -7,6 +7,7 @@ from rest_framework import permissions, viewsets, authentication
 from kmd_ntx_api.serializers import addrFromBase58Serializer
 from kmd_ntx_api.lib_info import get_all_coins
 from kmd_ntx_api.lib_base58 import *
+from kmd_ntx_api.lib_electrum import *
 
 
 def addr_from_base58_tool(request):
@@ -28,15 +29,6 @@ def addr_from_base58_tool(request):
 def address_from_pubkey_tool(request):
     resp = get_address_from_pubkey(request)
     return JsonResponse(resp)
-
-
-def decode_op_return_tool(request):
-    if 'OP_RETURN' in request.GET:
-        coins_list = get_all_coins() 
-        decoded = decode_opret(request.GET['OP_RETURN'], coins_list)
-    else:
-        decoded = {"error":"You need to include an OP_RETURN, e.g. '?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400'"}
-    return JsonResponse(decoded)
 
 
 def get_address_from_pubkey(request):
@@ -65,12 +57,53 @@ def get_address_from_pubkey(request):
         }
 
 
-def validate_opret(OP_RETURN):
-    coins_list = get_all_coins() 
-    decoded = decode_opret(OP_RETURN, coins_list)
-    if "error" in decoded:
-        return False
-    return True
+def get_notary_utxo_count(request):
+    chain = None
+    season = None
+    server = None
+    notary = None
+
+    if "chain" in request.GET:
+        chain = request.GET["chain"]
+    if "season" in request.GET:
+        season = request.GET["season"]
+    if "server" in request.GET:
+        server = request.GET["server"]
+    if "notary" in request.GET:
+        notary = request.GET["notary"]
+
+    filters = ["notary", "chain", "season", "server"]
+    if not chain or not notary or not server or not season:
+        return JsonResponse({
+            "filters":filters,
+            "error": f"You need to specify all filter params: {filters}"
+        })
+    endpoint = f"{THIS_SERVER}/api/table/addresses"
+    params = f"?season={season}&server={server}&chain={chain}&notary={notary}"
+    addr_info = requests.get(f"{endpoint}/{params}").json()["results"]
+    if len(addr_info) == 1:
+        pubkey = addr_info[0]["pubkey"]
+        resp = get_utxo_count(chain, pubkey)
+        min_height = 999999999
+        for item in resp["utxos"]:
+            if item["height"] < min_height:
+                min_height = item["height"]
+        api_resp = {
+            "dpow_utxo_count":resp["dpow_utxo_count"],
+            "oldest_utxo_height":min_height,
+            "utxos":resp["utxos"]
+        }
+        return JsonResponse({
+            "count":len(resp),
+            "filters":filters,
+            "results":api_resp
+        })
+    else:
+        return JsonResponse({
+            "filters":filters,
+            "error": f"Unable to get pubkey for {server} {chain} {notary}"
+        })
+
 
 
 def get_kmd_rewards(request):
@@ -138,4 +171,21 @@ def get_kmd_rewards(request):
             "total_rewards":total_rewards
         })
         return JsonResponse(rewards_info)
+
+
+def decode_op_return_tool(request):
+    if 'OP_RETURN' in request.GET:
+        coins_list = get_all_coins() 
+        decoded = decode_opret(request.GET['OP_RETURN'], coins_list)
+    else:
+        decoded = {"error":"You need to include an OP_RETURN, e.g. '?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400'"}
+    return JsonResponse(decoded)
+
+
+def validate_opret(OP_RETURN):
+    coins_list = get_all_coins() 
+    decoded = decode_opret(OP_RETURN, coins_list)
+    if "error" in decoded:
+        return False
+    return True
 

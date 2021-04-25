@@ -59,8 +59,12 @@ api_table_urls = [
     path('api/table/scoring_epochs/',
           api_table.scoring_epochs_table,
           name='scoring_epochs_table'),
-
+    
     path('api/table/split_stats/',
           api_table.split_stats_table,
           name='split_stats_table'),
+
+    path('api/table/vote2021/',
+          api_table.vote2021_table,
+          name='vote2021_table'),
 ]

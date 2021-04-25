@@ -89,6 +89,15 @@ frontend_page_urls = [
           name='notary_epoch_scores_view'),
     
 
+    path('vote2021/',
+          views_notary.vote2021_view,
+          name='vote2021_view'),
+
+    path('candidate_vote2021_detail/',
+          views_notary.vote2021_detail_view,
+          name='vote2021_detail_view'),
+    
+
     # REVIEW? DEPRECATED?
     path('review/funding/',
           views_page.funding,

@@ -6,7 +6,7 @@ from kmd_ntx_api.pages import PAGES
 
 def get_epochs_dict(season=None):
     if not season:
-        season = get_season()
+        season = SEASON
 
     epoch_data = get_scoring_epochs_data(season).values()
     epochs = {}
@@ -37,8 +37,6 @@ def get_epochs_dict(season=None):
             }})
 
     return epochs
-
-
 
 
 def get_epoch_id(season, server, block_time):
@@ -187,7 +185,7 @@ def get_nn_info(season=None):
         season = "Season_4"
     # widget using this has been deprecated, but leaving code here for reference
     # to use in potential replacement functions.
-    #season = get_season()
+    #season = SEASON
     notary_list = get_notary_list(season)
     regions_info = get_regions_info(notary_list)
     nn_info = {
@@ -201,8 +199,9 @@ def get_nn_mining_summary(notary, season=None):
         season = SEASON
 
     url = f"{THIS_SERVER}/api/table/mined_count_season/?season={season}&name={notary}"
-    mining_summary = requests.get(url).json()['results'][0]
+    mining_summary = requests.get(url).json()['results']
     if len(mining_summary) > 0:
+        mining_summary = mining_summary[0]
         mining_summary.update({
             "time_since_mined":get_time_since(mining_summary["last_mined_blocktime"])[1]
         })
@@ -346,7 +345,7 @@ def get_nn_season_ntx_counts(season):
 
 
 def get_nn_social(notary_name=None, season=None):
-    season = get_season()
+    season = SEASON
     nn_social_info = {}
     nn_social_data = get_nn_social_data(season, notary_name).values()
     for item in nn_social_data:
@@ -1433,3 +1432,53 @@ def get_coin_social(chain=None):
                 coin_social_info[chain][item] = coin_social_info[chain][item].replace("github.com/", "")
                 coin_social_info[chain][item] = coin_social_info[chain][item].replace("www.youtube.com/", "")
     return coin_social_info
+
+def get_vote2021_info(request):
+    candidate = None
+    block = None
+    txid = None
+    max_block = None
+    max_blocktime = None
+    max_locktime = None
+
+    if "candidate" in request.GET:
+        candidate = request.GET["candidate"]
+    if "block" in request.GET:
+        block = request.GET["block"]
+    if "txid" in request.GET:
+        txid = request.GET["txid"]
+    if "max_block" in request.GET:
+        max_block = request.GET["max_block"]
+    if "max_blocktime" in request.GET:
+        max_blocktime = request.GET["max_blocktime"]
+    if "max_locktime" in request.GET:
+        max_locktime = request.GET["max_locktime"]
+
+    if not max_block and not max_blocktime and not max_locktime:
+        return {
+            "error":"You need to specify one of the following filter parameters: ['max_block', 'max_blocktime', 'max_locktime']"
+        }
+
+    data = get_vote2021_data(candidate, block, txid, max_block, max_blocktime, max_locktime)
+    data = data.values('candidate').annotate(num_votes=Count('votes'), sum_votes=Sum('votes'))
+
+    resp = {}
+    region_scores = {}
+    for item in data:
+        region = item["candidate"].split("_")[1]
+        if region not in resp:
+            resp.update({region:[]})
+            region_scores.update({region:[]})
+        resp[region].append(item)
+        region_scores[region].append(item["sum_votes"])
+
+
+    for region in resp:
+        region_scores[region].sort()
+        region_scores[region].reverse()
+        for item in resp[region]:
+            rank = region_scores[region].index(item["sum_votes"]) + 1
+            item.update({"region_rank":rank})
+    for region in resp:
+        resp[region] = sorted(resp[region], key = lambda item: item['region_rank'])
+    return resp

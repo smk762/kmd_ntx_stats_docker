@@ -100,5 +100,9 @@ api_info_urls = [
           api_info.notary_ltc_transactions,
           name='notary_ltc_transactions'),
 
+    path('api/info/vote2021_stats/',
+          api_info.vote2021_info,
+          name='vote2021_info'),
+
 
 ]
