@@ -83,21 +83,30 @@ def get_notary_utxo_count(request):
     addr_info = requests.get(f"{endpoint}/{params}").json()["results"]
     if len(addr_info) == 1:
         pubkey = addr_info[0]["pubkey"]
-        resp = get_utxo_count(chain, pubkey)
+        resp = get_utxo_count(chain, pubkey, server)
         min_height = 999999999
-        for item in resp["utxos"]:
-            if item["height"] < min_height:
-                min_height = item["height"]
-        api_resp = {
-            "dpow_utxo_count":resp["dpow_utxo_count"],
-            "oldest_utxo_height":min_height,
-            "utxos":resp["utxos"]
-        }
-        return JsonResponse({
-            "count":len(resp),
-            "filters":filters,
-            "results":api_resp
-        })
+        if "utxos" in resp:
+            for item in resp["utxos"]:
+                if item["height"] < min_height and item["height"] != 0:
+                    min_height = item["height"]
+            if min_height == 999999999:
+                min_height = 0
+            api_resp = {
+                "block_tip":resp["block_tip"],
+                "oldest_utxo_height":min_height,
+                "dpow_utxo_count":resp["dpow_utxo_count"],
+                "utxos":resp["utxos"]
+            }
+            return JsonResponse({
+                "count":len(resp),
+                "filters":filters,
+                "results":api_resp
+            })
+        else: 
+            return JsonResponse({
+                "filters":filters,
+                "error": f"Bad electrum response! {resp}"
+            })
     else:
         return JsonResponse({
             "filters":filters,

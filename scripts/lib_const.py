@@ -283,10 +283,11 @@ OTHER_LAUNCH_PARAMS = {
     "GLEEC":"~/komodo/src/komodod -ac_name=GLEEC -ac_supply=210000000 -ac_public=1 -ac_staked=100 -addnode=95.217.161.126",
     "VOTE2021":"~/komodo/src/komodod  -ac_name=VOTE2021 -ac_public=1 -ac_supply=129848152 -addnode=77.74.197.115",
     "GLEEC-OLD":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",
-    "MCL":"~/komodo/src/komodod -ac_name=MCL -ac_supply=2000000 -ac_cc=2 -addnode=37.148.210.158 -addnode=37.148.212.36 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000"
+    "MCL":"~/Marmara-v.1.0/src/komodod -ac_name=MCL -pubkey=$pubkey -ac_supply=2000000 -ac_cc=2 -addnode=37.148.210.158 -addnode=37.148.212.36 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000 -daemon"
 }
 OTHER_CONF_FILE = {
     "BTC":"~/.bitcoin/bitcoin.conf",
+    "BTC":"~/.litecoin/litecoin.conf",
     "KMD":"~/.komodo/komodo.conf",   
     "MCL":"~/.komodo/MCL/MCL.conf", 
     "VOTE2021":"~/.komodo/VOTE2021/VOTE2021.conf",
@@ -299,6 +300,7 @@ OTHER_CONF_FILE = {
 }
 OTHER_CLI = {
     "BTC":"~/bitcoin/src/bitcoin-cli",
+    "LTC":"~/litecoin/src/litecoin-cli",
     "KMD":"~/komodo/src/komodo-cli",
     "MCL":"~/komodo/src/komodo-cli -ac_name=MCL",
     "GLEEC":"~/komodo/src/komodo-cli -ac_name=GLEEC",
@@ -310,69 +312,28 @@ OTHER_CLI = {
     "GLEEC-OLD":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
 }
 
-
-PARTIAL_SEASON_DPOW_CHAINS = {
-    "Season_4": {
-        "Main": {
-            "RFOX": {
-                "end_time": 1613769736,
-                "end_time_comment": "Fri Feb 19 22:22:16 2021 +0100 commit 1c3d3cd06fd2cacc4112c5165d20e9e9fa4dadf0"
-            },
-            "PGT": {
-                "end_time": 1616250930,
-                "end_time_comment": "Sat Mar 20 15:35:30 2021 +0100 commit b70d11a3f356ab2aa7925ba6307a5397ab9623a0"
-            },
-            "STBL": {
-                "end_time": 1616250930,
-                "end_time_comment": "Sat Mar 20 15:35:30 2021 +0100 commit b70d11a3f356ab2aa7925ba6307a5397ab9623a0"
-            },
-            "GLEEC": {
-                "start_time": 1617181776,
-                "start_time_comment": "Tue Mar 30 17:09:36 2021 +0800 commit 677700939d5711286f69e1c9bb438ad05782230f +24hrs"
-            },
-            "VOTE2021": {
-                "start_time": 1617181776,
-                "start_time_comment": "Tue Mar 30 17:09:36 2021 +0800 commit 677700939d5711286f69e1c9bb438ad05782230f +24hrs"
-            }
-        },
-        "Third_Party": {
-            "PBC": {
-                "start_time": 1606390840,
-                "start_time_comment": "Wed Nov 25 12:40:40 2020 +0100 commit 774d6aaba0f1ad78f8cf4f6a6591ecd344ff1a60 +24hrs"
-            },
-            "HUSH3": {
-                "start_time": 1593331689,
-                "start_time_comment": "Sat Jun 27 10:08:09 2020 +0200 commit 09bbc0055be462ad53dbe2c0af2d7202a9c362eb +24hrs",
-                "end_time": 1603623834,
-                "end_time_comment": "Sun Oct 25 12:03:54 2020 +0100 commit 3efe36aa528495223633a560c7d457a31b3a94c3"
-            },
-            "GLEEC": {
-                "start_time": 1603710234,
-                "start_time_comment": "Sun Oct 25 12:03:54 2020 +0100 commit 3efe36aa528495223633a560c7d457a31b3a94c3 +24hrs"
-            },
-            "MCL": {
-                "start_time": 1593331689,
-                "start_time_comment": "Sat Jun 27 10:08:09 2020 +0200 commit 09bbc0055be462ad53dbe2c0af2d7202a9c362eb +24hrs"
-            }
-        }
-    },
+PARTIAL_SEASON_DPOW_CHAINS = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/master/doc/scoring_epochs.json").json()
+PARTIAL_SEASON_DPOW_CHAINS.update({
     "Season_5_Testnet": {
-        "Main": {
-            "LTC": {
-                "start_time":1616508400,
-                "start_time_comment": "LTC Block 2022000"
-            },
-            "RICK": {
-                "start_time":1616442129,
-                "start_time_comment": "KMD Block 2316959"
-            },
-            "MORTY": {
-                "start_time":1616442129,
-                "start_time_comment": "KMD Block 2316959"
+        "Servers": {
+            "Main": {
+                "LTC": {
+                    "start_time":1616508400,
+                    "start_time_comment": "LTC Block 2022000"
+                },
+                "RICK": {
+                    "start_time":1616442129,
+                    "start_time_comment": "KMD Block 2316959"
+                },
+                "MORTY": {
+                    "start_time":1616442129,
+                    "start_time_comment": "KMD Block 2316959"
+                }
             }
         }
     }
-}
+})
+
 
 DPOW_EXCLUDED_CHAINS = {
     "Season_1": [],
@@ -477,15 +438,15 @@ for season in SEASONS_INFO:
         })
 
     else:
-        for server in PARTIAL_SEASON_DPOW_CHAINS[season]:
+        for server in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"]:
             epoch_event_times = [season_start, season_end]
 
-            for chain in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
+            for chain in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server]:
 
-                if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
-                    epoch_event_times.append(PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"])
-                if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
-                    epoch_event_times.append(PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"])
+                if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server][chain]:
+                    epoch_event_times.append(PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server][chain]["start_time"])
+                if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server][chain]:
+                    epoch_event_times.append(PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server][chain]["end_time"])
 
             epoch_event_times = list(set(epoch_event_times))
             epoch_event_times.sort()
@@ -505,25 +466,29 @@ for season in SEASONS_INFO:
                 if epoch_end_time == season_end:
                     epoch_end_events.append("Season end")
 
-                for chain in PARTIAL_SEASON_DPOW_CHAINS[season][server]:
-                    if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+                for chain in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server]:
+                    if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server][chain]:
 
-                        if epoch_start_time == PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"]:
+                        if epoch_start_time == PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server][chain]["start_time"]:
                             epoch_start_events.append(f"{chain} start")
 
-                        elif epoch_end_time == PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["start_time"]:
+                        elif epoch_end_time == PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server][chain]["start_time"]:
                             epoch_end_events.append(f"{chain} start")
 
-                    if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]:
+                    if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server][chain]:
 
-                        if epoch_start_time == PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]:
+                        if epoch_start_time == PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server][chain]["end_time"]:
                             epoch_start_events.append(f"{chain} end")
 
-                        elif epoch_end_time == PARTIAL_SEASON_DPOW_CHAINS[season][server][chain]["end_time"]:
+                        elif epoch_end_time == PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][server][chain]["end_time"]:
                             epoch_end_events.append(f"{chain} end")
 
+                if server == "dPoW-Mainnet":
+                    score_server = "Main"
+                elif server == "dPoW-3P":
+                    score_server = "Third_Party"
 
-                SCORING_EPOCHS[season][server].update({
+                SCORING_EPOCHS[season][score_server].update({
                     f"Epoch_{epoch}": {
                         "start":epoch_start_time,
                         "end":epoch_end_time-1,

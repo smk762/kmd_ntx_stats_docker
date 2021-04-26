@@ -419,18 +419,18 @@ def get_dpow_scoring_window(season, chain, server):
         official_end = SEASONS_INFO[season]["end_time"]
 
     if season in PARTIAL_SEASON_DPOW_CHAINS:
-        for partial_season_server in PARTIAL_SEASON_DPOW_CHAINS[season]:
+        for partial_season_server in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"]:
 
-            if chain in PARTIAL_SEASON_DPOW_CHAINS[season][partial_season_server]:
+            if chain in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][partial_season_server]:
 
                 # Overcomes Duel Wielding GLEEC issue.
                 if partial_season_server == server:
 
-                    if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season][partial_season_server][chain]:
-                        official_start = PARTIAL_SEASON_DPOW_CHAINS[season][partial_season_server][chain]["start_time"]
+                    if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][partial_season_server][chain]:
+                        official_start = PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][partial_season_server][chain]["start_time"]
 
-                    if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season][partial_season_server][chain]:
-                        official_end = PARTIAL_SEASON_DPOW_CHAINS[season][partial_season_server][chain]["end_time"]
+                    if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][partial_season_server][chain]:
+                        official_end = PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][partial_season_server][chain]["end_time"]
 
     scored_list, unscored_list = get_ntx_scored(season, chain, official_start, official_end, server)
 
