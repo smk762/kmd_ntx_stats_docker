@@ -6,36 +6,72 @@ import time
 import hashlib
 import codecs
 import random
-from kmd_ntx_api.lib_base58 import *
 from kmd_ntx_api.lib_const import *
+from kmd_ntx_api.lib_base58 import *
+import kmd_ntx_api.lib_dexstats as dexstats
 
-def get_utxo_count(chain, pubkey):
+def get_utxo_count(chain, pubkey, server):
     try:
         endpoint = f"{THIS_SERVER}/api/info/electrums"
         electrums_info = requests.get(f"{endpoint}").json()["results"]
 
-        if chain in electrums_info:
-            electrum = random.choice(electrums_info[chain]).split(":")
-            url = electrum[0]
-            port = electrum[1]
-            logger.info(f"{chain} {url}:{port} {pubkey}")
-            p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
-            logger.info(f"{chain} {url}:{port} {p2pk_scripthash}")
-            p2pk_resp = get_from_electrum(url, port, 'blockchain.scripthash.listunspent', p2pk_scripthash)
-            logger.info(f"{chain} {url}:{port} {p2pk_resp}")
-            logger.info(f"p2pk_resp: {p2pk_resp}")
-            num_unspent = 0
-            for item in p2pk_resp['result']:
-                if item['value'] == 10000:
-                    num_unspent +=1
-            return {
-                "dpow_utxo_count":num_unspent,
-                "utxos":p2pk_resp['result'],
-            }
+        block_tip = dexstats.get_blocktip(chain)
 
+        if chain in ["PIRATE", "NINJA", "MESH", "AXO"]:
+            address = calc_addr_from_pubkey("KMD", pubkey)
+            resp = dexstats.get_utxos(chain, address)
+            utxos = []
+            num_unspent = 0
+            for item in resp:
+                if item['satoshis'] == 10000:
+                    num_unspent +=1
+
+                if item['satoshis'] != 0:
+                    utxos.append(item)
+
+            return {
+                "block_tip":block_tip,
+                "dpow_utxo_count":num_unspent,
+                "utxos":utxos,
+            }
         else:
-            return {"error":f"{chain} not in electrums"}
-            logger.info(f"{chain} not in electrums")
+            if chain == "GLEEC" and server == "Third_Party":
+                chain = "GLEEC-OLD"
+            if chain in electrums_info:
+                electrum = random.choice(electrums_info[chain]).split(":")
+                url = electrum[0]
+                port = electrum[1]
+                logger.info(f"{chain} {url}:{port} {pubkey}")
+                p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
+                p2pk_resp = get_from_electrum(url, port, 'blockchain.scripthash.listunspent', p2pk_scripthash)
+                p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
+                p2pkh_resp = get_from_electrum(url, port, 'blockchain.scripthash.listunspent', p2pkh_scripthash)
+                resp = p2pk_resp['result'] + p2pkh_resp['result']
+                utxos = []
+                num_unspent = 0
+                for item in p2pkh_resp['result']:
+                    if item['value'] != 0:
+                        utxos.append(item)
+
+                for item in p2pk_resp['result']:
+                    if item['value'] != 0:
+                        utxos.append(item)
+
+                    if chain in ["AYA", "EMC2"]:
+                        if item['value'] == 100000:
+                            num_unspent +=1
+                    else:
+                        if item['value'] == 10000:
+                            num_unspent +=1
+                return {
+                    "block_tip":block_tip,
+                    "dpow_utxo_count":num_unspent,
+                    "utxos":utxos,
+                }
+
+            else:
+                return {"error":f"{chain} not in electrums"}
+                logger.info(f"{chain} not in electrums")
     except Exception as e:
         return {
             "error":f"{e}",
@@ -48,8 +84,8 @@ def get_from_electrum(url, port, method, params=[]):
     socket.setdefaulttimeout(20)
     s = socket.create_connection((url, port))
     s.send(json.dumps({"id": 0, "method": method, "params": params}).encode() + b'\n')
-    time.sleep(0.05)
-    return json.loads(s.recv(99999)[:-1].decode())
+    time.sleep(0.1)
+    return json.loads(s.recv(999999)[:-1].decode())
 
 def get_p2pk_scripthash_from_pubkey(pubkey):
     scriptpubkey = '21' +pubkey+ 'ac'

@@ -100,13 +100,13 @@ def import_ntx(season, server, chain):
 
 
 def import_last_ntx(season, server, notary):
-    import_last_ntx_url = f"{OTHER_SERVER}/api/table/last_notarised?season={season}&server={server}&notary={notary}"
+    import_last_ntx_url = f"{OTHER_SERVER}/api/table/last_notarised/?season={season}&server={server}&notary={notary}"
     import_last_ntx = requests.get(import_last_ntx_url).json()["results"]
     for import_item in import_last_ntx:
         chain = import_item["chain"]
         logger.info(f">>> [import_last_ntx] checking {season} {server} {notary} {chain}")
         
-        local_last_ntx_url = f"{THIS_SERVER}/api/table/last_notarised?season={season}&server={server}&notary={notary}&chain={chain}"
+        local_last_ntx_url = f"{THIS_SERVER}/api/table/last_notarised/?season={season}&server={server}&notary={notary}&chain={chain}"
         local_last_ntx = requests.get(local_last_ntx_url).json()["results"]
 
         logger.info(f">>> [import_last_ntx] {server} {server} {notary} {chain} local records: {len(local_last_ntx)}")

@@ -10,6 +10,11 @@ services:
       - "7770:7770"
       - "7771:7771"
     network_mode: "host"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
   db:
     image: postgres
     volumes:
@@ -22,6 +27,11 @@ services:
       - kmd
     ports:
       - "7654:5432"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8762
@@ -32,6 +42,11 @@ services:
       - "8762:8762"
     depends_on:
       - db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
 
 # to run migrations, use "docker-compose run web python3 manage.py migrate"
 # to run migrations, use "docker-compose run web python3 makemigrations"
