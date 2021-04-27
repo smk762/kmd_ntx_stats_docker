@@ -4,7 +4,7 @@ import table_lib
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-sql = "UPDATE notarised SET server = 'Main' WHERE season = 'Season_5_Testnet';"
+sql = "UPDATE notarised SET chain = 'GLEEC-OLD' WHERE chain = 'GLEEC' and server = 'Third_Party';"
 cursor.execute(sql)
 conn.commit()
 

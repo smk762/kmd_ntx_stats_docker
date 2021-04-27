@@ -28,7 +28,7 @@ for season in seasons:
             for txid in txid_list:
                 j += 1
                 logger.info(f">>> Categorising {txid} for {j}/{num_txid}")
-                txid_url = f"{OTHER_SERVER}/api/info/notary_btc_txid?txid={txid}"
+                txid_url = f"{OTHER_SERVER}/api/info/notary_btc_txid/?txid={txid}"
                 time.sleep(0.02)
                 r = requests.get(txid_url)
                 try:
@@ -52,7 +52,7 @@ for season in seasons:
                         txid_data.fees = row["fees"]
                         txid_data.num_inputs = row["num_inputs"]
                         txid_data.num_outputs = row["num_outputs"]
-                        txid_data.insert()
+                        txid_data.update()
                 except Exception as e:
                     logger.error(e)
                     logger.error(f"Something wrong with API? {txid_url}")

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from lib_const import *
 from lib_notary import *
+from lib_helper import *
 import unittest
 
 '''

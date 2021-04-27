@@ -3,6 +3,7 @@ import json
 import time
 import random
 import requests
+from lib_helper import *
 from lib_notary import *
 from models import notarised_row, get_chain_epoch_score_at, get_chain_epoch_at, last_notarised_row
 from lib_const import *
@@ -51,7 +52,7 @@ def import_ntx(season, server, chain):
                 if len(txid_info["notary_addresses"]) == 0:
 
                     if ntx_row.chain == "BTC":
-                        url = f"{THIS_SERVER}/api/info/notary_btc_txid?txid={txid}"
+                        url = f"{THIS_SERVER}/api/info/notary_btc_txid/?txid={txid}"
                         local_info = requests.get(url).json()["results"]
                         local_addresses = []
                         for item in local_info:
@@ -61,7 +62,7 @@ def import_ntx(season, server, chain):
                         ntx_row.season, ntx_row.server = get_season_from_addresses(ntx_row.notary_addresses, ntx_row.block_time, "BTC", "BTC", txid, ntx_row.notaries)
 
                     elif ntx_row.chain == "LTC":
-                        url = f"{THIS_SERVER}/api/info/notary_ltc_txid?txid={txid}"
+                        url = f"{THIS_SERVER}/api/info/notary_ltc_txid/?txid={txid}"
                         local_info = requests.get(url).json()["results"]
                         local_addresses = []
                         for item in local_info:
@@ -75,18 +76,20 @@ def import_ntx(season, server, chain):
                         ntx_row.notary_addresses = row_data[6]
                         ntx_row.season = row_data[11]
                         ntx_row.server = row_data[12]                
-                        ntx_row.season, ntx_row.server = get_season_from_addresses(ntx_row.notary_addresses, ntx_row.block_time)
+                        ntx_row.season, ntx_row.server = get_season_from_addresses(ntx_row.notary_addresses, ntx_row.block_time, "KMD", ntx_row.chain, txid, ntx_row.notaries)
                         
                 else:
                     ntx_row.notary_addresses = txid_info["notary_addresses"]
                     ntx_row.season = txid_info["season"]
                     ntx_row.server = txid_info["server"]
 
-                if ntx_row.chain == "GLEEC":
-                    ntx_row.server = get_gleec_ntx_server(ntx_row.txid)
 
                 ntx_row.score_value = get_chain_epoch_score_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
                 ntx_row.epoch = get_chain_epoch_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
+                if ntx_row.chain == "GLEEC":
+                    ntx_row.server = get_gleec_ntx_server(ntx_row.txid)
+                    if ntx_row.server == "Third_Party":
+                        ntx_row.chain == "GLEEC-OLD"
                 if ntx_row.score_value > 0:
                     ntx_row.scored = True
                 else:
@@ -104,20 +107,15 @@ def import_last_ntx(season, server, notary):
     import_last_ntx = requests.get(import_last_ntx_url).json()["results"]
     for import_item in import_last_ntx:
         chain = import_item["chain"]
-        logger.info(f">>> [import_last_ntx] checking {season} {server} {notary} {chain}")
-        
+        chain = handle_dual_server_chains(chain, server)
         local_last_ntx_url = f"{THIS_SERVER}/api/table/last_notarised/?season={season}&server={server}&notary={notary}&chain={chain}"
         local_last_ntx = requests.get(local_last_ntx_url).json()["results"]
 
-        logger.info(f">>> [import_last_ntx] {server} {server} {notary} {chain} local records: {len(local_last_ntx)}")
         if len(local_last_ntx) > 0:
             for local_item in local_last_ntx:
                 local_height = local_item["block_height"]
-                logger.info(f">>> [import_last_ntx] {season} {server} {notary} {chain} local block height: {local_height}")
         else:
-            logger.info(f">>> [import_last_ntx] no local info for {season} {server} {notary} {chain}")
             local_height = 0
-
 
         import_height = import_item["block_height"]        
         if import_height > local_height:
@@ -131,8 +129,6 @@ def import_last_ntx(season, server, notary):
             row.season = import_item["season"]
             row.server = import_item["server"]
             row.update()
-        else:
-            logger.info(f">>> [import_last_ntx] not updating {season} {server} {chain} {notary}, local block is fresher")
 
 
 
@@ -142,7 +138,7 @@ if __name__ == "__main__":
     seasons = get_notarised_seasons()
 
     for season in seasons:
-        if season not in ["Season_1", "Season_2", "Season_3", "Unofficial"]: 
+        if season not in EXCLUDED_SEASONS: 
             season_notaries = list(NOTARY_PUBKEYS[season].keys())
             season_notaries.sort()
             servers = get_notarised_servers(season)

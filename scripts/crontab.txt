@@ -1,13 +1,15 @@
-50 */1 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_api_populate_nn_btc_txids.py
-50 */1 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_api_populate_nn_ltc_txids.py
-*/5 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_import_nn_btc_txids.py
+55 */6 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_api_populate_nn_btc_txids.py
+*/15 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_api_populate_nn_ltc_txids.py
+5 */6 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_import_nn_btc_txids.py
 */5 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_import_nn_ltc_txids.py
-*/9 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_import_notarised.py
-29 */1 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_balances_table.py
-0 */1 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_coin_social.py
-11 */1 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_coins_table.py
-21 */1 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_epochs.py
-0 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_funding_table.py
-*/4 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_mined_tables.py
-0 */1 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_nn_social.py
-*/12 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_ntx_tables.py
+*/5 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_import_notarised.py
+22 6 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_addresses_table.py
+24 */1 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_balances_table.py
+32 */1 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_coins_table.py
+12 4 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_epochs.py
+12 8 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_funding_table.py
+*/5 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_mined_tables.py
+*/5 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_ntx_tables.py
+12 2 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_social_coins.py
+12 4 * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_populate_social_notaries.py
+

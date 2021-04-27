@@ -343,6 +343,8 @@ class notarised(models.Model):
 
 class notarised_chain_daily(models.Model):
     notarised_date = models.DateField()
+    season = models.CharField(max_length=24)
+    server = models.CharField(max_length=24)
     chain = models.CharField(max_length=64)
     ntx_count = models.PositiveIntegerField(default=0)
 
@@ -353,7 +355,7 @@ class notarised_chain_daily(models.Model):
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=['chain', 'notarised_date'],
+                fields=['chain', 'notarised_date', 'season', 'server'],
                 name='unique_notarised_chain_daily'
             )
         ]

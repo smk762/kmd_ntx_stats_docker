@@ -7,7 +7,8 @@ from decimal import *
 from datetime import datetime as dt
 import datetime
 import dateutil.parser as dp
-from lib_notary import get_new_nn_btc_txids, get_notary_from_btc_address, get_notary_last_ntx, get_season_from_addresses, get_dpow_score_value
+from lib_helper import *
+from lib_notary import *
 from lib_table_update import update_nn_btc_tx_notary_from_addr
 from lib_table_select import get_existing_nn_btc_txids, get_existing_notarised_txids, get_notarised_seasons
 from lib_api import get_btc_tx_info

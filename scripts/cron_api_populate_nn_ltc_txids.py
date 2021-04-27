@@ -8,7 +8,8 @@ from datetime import datetime as dt
 import datetime
 import dateutil.parser as dp
 
-from lib_notary import get_new_nn_ltc_txids, get_notary_from_ltc_address, get_notary_last_ntx, get_season_from_addresses, get_dpow_score_value
+from lib_helper import *
+from lib_notary import *
 from lib_table_update import update_nn_ltc_tx_notary_from_addr
 from lib_table_select import get_existing_nn_ltc_txids, get_existing_notarised_txids
 from lib_api import get_ltc_tx_info
@@ -347,7 +348,7 @@ def scan_ltc_transactions(season):
                         notary_addresses = []
                         for vin in vins:
                             last_ntx_row = last_notarised_row()
-                            last_ntx_row.notary = get_notary_from_ltc_address(vin["addresses"][0], season)
+                            last_ntx_row.notary = get_notary_from_ltc_address(vin["addresses"][0], ltc_row.season)
                             notary_list.append(last_ntx_row.notary)
                             notary_addresses.append(vin["addresses"][0])
                             if last_ntx_row.notary in notary_last_ntx:
@@ -355,13 +356,14 @@ def scan_ltc_transactions(season):
                             else:
                                 last_ltc_ntx_ht = 0
                             if last_ltc_ntx_ht < ltc_row.block_height:
-                                last_ntx_row.season = season
-                                last_ntx_row.server = ltc_row.server
+                                last_ntx_row.season = ltc_row.season
+                                last_ntx_row.server = "LTC"
                                 last_ntx_row.chain = "LTC"
                                 last_ntx_row.txid = ltc_row.txid
                                 last_ntx_row.block_height = ltc_row.block_height
                                 last_ntx_row.block_time = ltc_row.block_time
                                 last_ntx_row.update()
+
                         for vout in vouts:
                             if 'data_hex' in vout:
                                 opret = vout['data_hex']
@@ -387,13 +389,10 @@ def scan_ltc_transactions(season):
                                 ntx_row.txid = ltc_row.txid
                                 ntx_row.opret = opret
                                 ntx_row.season = ltc_row.season
-                                ntx_row.server = ltc_row.server
-                                ntx_row.score_value = get_chain_epoch_score_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
-                                ntx_row.epoch = get_chain_epoch_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
-                                if ntx_row.score_value > 0:
-                                    ntx_row.scored = True
-                                else:
-                                    ntx_row.scored = False
+                                ntx_row.server = "LTC"
+                                ntx_row.score_value = 0
+                                ntx_row.epoch = "LTC"
+                                ntx_row.scored = False
                                 ntx_row.btc_validated = "N/A"
                                 ntx_row.update()
 
@@ -405,8 +404,9 @@ def scan_ltc_transactions(season):
 
 if __name__ == "__main__":
     
-    season = "Season_5_Testnet"
-    scan_ltc_transactions(season)
+    seasons = [SEASON]
+    for season in seasons:
+        scan_ltc_transactions(season)
 
     CURSOR.close()
     CONN.close()

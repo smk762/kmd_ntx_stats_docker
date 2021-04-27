@@ -41,10 +41,10 @@ def populate_addresses(season, server):
                 row.notary = notary
                 row.pubkey = pubkey
                 if coin == "GLEEC":
-                    if server == "Third_Party":
-                        coin = "GLEEC_3P"
+                    if row.server == "Third_Party":
+                        coin = "GLEEC-OLD"
                     else:
-                        coin = "GLEEC_AC"
+                        coin = "GLEEC"
                 row.address = get_addr_from_pubkey(coin, pubkey)
                 row.update()
 
