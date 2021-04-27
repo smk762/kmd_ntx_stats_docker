@@ -45,6 +45,8 @@ def notary_profile_view(request, notary=None, season=None):
 
         season_score = 0
         last_ntx_time = 0
+        last_btc_ntx_time = 0
+        last_ntx_chain = ""
         for item in notary_profile_summary_table['ntx_summary_data']:
             season_score += item["chain_score"]
             if "last_block_time" in item:

@@ -27,7 +27,7 @@ for season in seasons:
             for txid in txid_list:
                 j += 1
                 logger.info(f">>> Categorising {txid} for {j}/{num_txid}")
-                txid_url = f"{OTHER_SERVER}/api/info/notary_ltc_txid?txid={txid}"
+                txid_url = f"{OTHER_SERVER}/api/info/notary_ltc_txid/?txid={txid}"
                 time.sleep(0.02)
                 r = requests.get(txid_url)
                 try:

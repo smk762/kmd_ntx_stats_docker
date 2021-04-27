@@ -7,6 +7,7 @@ import hashlib
 import codecs
 from base_58 import *
 from lib_const import *
+from lib_helper import *
 
 
 def lil_endian(hex_str):

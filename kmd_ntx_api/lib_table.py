@@ -565,12 +565,15 @@ def get_notary_epoch_scores_table(notary=None, season=None):
                     score_per_ntx = chain_ntx["servers"][server]["epochs"][epoch]["score_per_ntx"]
                     epoch_chain_ntx_count = chain_stats["chain_ntx_count"]
                     epoch_chain_score = chain_stats["chain_score"]
-
+                    if epoch.find("_") > -1:
+                        epoch_id = epoch.split("_")[1]
+                    else:
+                        epoch_id = epoch
                     row = {
                         "notary":notary,
                         "season":season.replace("_", " "),
                         "server":server,
-                        "epoch":epoch.split("_")[1],
+                        "epoch":epoch_id,
                         "chain":chain,
                         "score_per_ntx":score_per_ntx,
                         "epoch_chain_ntx_count":epoch_chain_ntx_count,

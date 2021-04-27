@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import requests
 from lib_const import *
+from lib_helper import *
 from lib_notary import get_notary_from_address, get_season
 from models import funding_row
 

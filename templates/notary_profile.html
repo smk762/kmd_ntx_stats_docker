@@ -14,17 +14,17 @@
 						    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem;">
 							    Notarised Last 24hrs
 							    <span class="badge kmd_ui_dark1_bg p-1">
-							    	<a href="//{{ request.get_host }}/ntx_24hrs">
+							    	<a href="//{{ request.get_host }}/notarised_24hrs">
 							    		{{ 24hr_btc_count }}<br /> BTC
 							    	</a>
 							    </span>
 							    <span class="badge kmd_ui_dark1_bg p-1">
-							    	<a href="//{{ request.get_host }}/ntx_24hrs">
+							    	<a href="//{{ request.get_host }}/notarised_24hrs">
 							    		{{ 24hr_main_count }}<br /> Main
 							    	</a>
 							    </span>
 							    <span class="badge kmd_ui_dark1_bg p-1">
-							    	<a href="//{{ request.get_host }}/ntx_24hrs">
+							    	<a href="//{{ request.get_host }}/notarised_24hrs">
 							    		{{ 24hr_third_party_count }}<br /> 3rd Party
 							    	</a>
 							    </span>
@@ -333,11 +333,7 @@
 			            "data": 'chain',
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	if (oData.chain == "KMD") {
-			            		$(nTd).html("<a href='//{{ request.get_host }}/coin_profile/BTC'>BTC</a>");
-			            	} else {
 			            		$(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");	
-			            	}
 				            
 				        }
         			},
@@ -345,7 +341,11 @@
 			            "data": 'block',
 			            "targets": 5,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='http://kmd.explorer.dexstats.info/tx/"+oData.block+"'>"+oData.block+"</a>");
+			            	if (oData.chain == "BTC") {
+					            $(nTd).html("<a href='https://www.blockchain.com/btc/block/"+oData.block+"'>"+oData.block+"</a>");
+   			            	} else {
+					            $(nTd).html("<a href='http://komodod.com/b/"+oData.block+"'>"+oData.block+"</a>");
+			            	}
 				        }
 			        }
         		]

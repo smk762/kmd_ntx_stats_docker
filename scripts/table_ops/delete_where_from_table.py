@@ -4,7 +4,7 @@ import table_lib
 conn = table_lib.connect_db()
 cursor = conn.cursor()
 
-#table = 'balances'
+table = 'balances'
 #table = 'nn_social'
 #table = 'mined'
 #table = 'mined_count_season'
@@ -14,7 +14,7 @@ cursor = conn.cursor()
 #table = "scoring_epochs"
 #table = 'nn_ltc_tx'
 #table = 'addresses'
-table = 'last_notarised'
+#table = 'last_notarised'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
@@ -28,8 +28,9 @@ print(cursor.fetchall())
 #cursor.execute("DELETE FROM "+table+" WHERE chain='LTC' AND season = 'Season_4';")
 #cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_4';")
 #cursor.execute("DELETE FROM nn_ltc_tx WHERE category = 'Other';")
-cursor.execute("DELETE FROM "+table+";")
+#cursor.execute("DELETE FROM "+table+";")
 #cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_5_Testnet';")
+cursor.execute("DELETE FROM "+table+" WHERE chain = 'GLEEC' and server = 'Third_Party';")
 
 conn.commit()
 

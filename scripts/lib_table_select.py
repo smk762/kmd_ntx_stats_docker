@@ -4,22 +4,24 @@ import time
 from lib_const import *
 
 def get_latest_chain_ntx_info(chain, height):
-    sql = "SELECT ac_ntx_blockhash, ac_ntx_height, opret, block_hash, txid \
-           FROM notarised WHERE chain = '"+chain+"' AND block_height = "+str(height)+";"
+    sql = f"SELECT ac_ntx_blockhash, ac_ntx_height, opret, block_hash, txid \
+           FROM notarised WHERE chain = '{chain}' AND block_height = {height};"
     CURSOR.execute(sql)
     chains_resp = CURSOR.fetchone()
     return chains_resp
 
 def get_validated_ntx_info(opret):
-    sql = "SELECT txid, block_time, btc_validated FROM notarised \
-          WHERE btc_validated != 'true' AND opret LIKE '%' || '"+opret[11:33]+"' || '%';"
+    sql = f"SELECT txid, block_time, btc_validated FROM notarised \
+          WHERE btc_validated != 'true' AND opret LIKE '%' || '{opret[11:33]}' || '%';"
     CURSOR.execute(sql)
     return CURSOR.fetchone()
 
 def get_chain_ntx_season_aggregates(season):
-    sql = "SELECT chain, MAX(block_height), MAX(block_time), COALESCE(COUNT(*), 0) \
+    sql = f"SELECT chain, MAX(block_height), \
+                          MAX(block_time), \
+                          COALESCE(COUNT(*), 0) \
            FROM notarised WHERE \
-           season = '"+str(season)+"' \
+           season = '{season}' \
            GROUP BY chain;"
     CURSOR.execute(sql)
     try:
@@ -29,9 +31,12 @@ def get_chain_ntx_season_aggregates(season):
         return ()
 
 def get_chain_ntx_date_aggregates(day, season):
-    sql = "SELECT chain, COALESCE(MAX(block_height), 0), COALESCE(MAX(block_time), 0), COALESCE(COUNT(*), 0) \
-           FROM notarised WHERE season='"+season+"' AND \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
+    sql = f"SELECT chain, COALESCE(MAX(block_height), 0), \
+                          COALESCE(MAX(block_time), 0), \
+                          COALESCE(COUNT(*), 0) \
+           FROM notarised \
+           WHERE season='{season}' \
+           AND DATE_TRUNC('day', block_datetime) = '{day}' \
            GROUP BY chain;"
     CURSOR.execute(sql)
     try:
@@ -134,9 +139,10 @@ def get_ntx_for_season(season):
         return ()
 
 def get_ntx_for_day(day, season):
-    sql = "SELECT chain, notaries \
-           FROM notarised WHERE season='"+season+"' AND \
-           DATE_TRUNC('day', block_datetime) = '"+str(day)+"';"
+    sql = f"SELECT chain, notaries \
+           FROM notarised \
+           WHERE season='{season}' \
+           AND DATE_TRUNC('day', block_datetime) = '{day}';"
     CURSOR.execute(sql)
     try:
         results = CURSOR.fetchall()
@@ -200,7 +206,6 @@ def select_from_table(table, cols, conditions=None):
     if conditions:
         sql = sql+" WHERE "+conditions
     sql = sql+";"
-    logger.info(sql)
     CURSOR.execute(sql)
     results = CURSOR.fetchall()
     if len(results) > 0:
@@ -330,7 +335,7 @@ def get_ntx_scored(season, chain, lowest_block_time, highest_block_time, server)
 
     return scored_list, unscored_list
 
-# TODO: add WHERE conditions list
+
 def get_notarised_chains(season=None, server=None, epoch=None):
 
     sql = "SELECT DISTINCT chain FROM notarised"
@@ -361,7 +366,7 @@ def get_notarised_chains(season=None, server=None, epoch=None):
 
     return chains
 
-# TODO: add WHERE conditions list
+
 def get_notarised_epochs(season=None, server=None):
 
     sql = "SELECT DISTINCT epoch FROM notarised"
@@ -391,7 +396,7 @@ def get_notarised_epochs(season=None, server=None):
 
     return epochs
 
-# TODO: add WHERE conditions list
+
 def get_notarised_seasons(chain=None):
 
     sql = "SELECT DISTINCT season FROM notarised"
@@ -422,21 +427,6 @@ def get_notarised_seasons(chain=None):
 
     return seasons
 
-def get_all_coins():
-    coins = []
-    CURSOR.execute("SELECT DISTINCT chain FROM coins;")
-    try:
-        results = CURSOR.fetchall()
-        for result in results:
-            coins.append(result[0])
-        coins.sort()
-        coins.reverse()
-        
-    except Exception as e:
-        logger.warning(f"No [get_all_coins] results? {e}")
-
-    return coins
-
 def get_notarised_servers(season=None):
 
     sql = "SELECT DISTINCT server FROM notarised"
@@ -463,6 +453,23 @@ def get_notarised_servers(season=None):
         logger.warning(f"No [get_notarised_servers] results for {season} | {sql}? {e}")
 
     return servers
+
+
+def get_all_coins():
+    coins = []
+    CURSOR.execute("SELECT DISTINCT chain FROM coins;")
+    try:
+        results = CURSOR.fetchall()
+        for result in results:
+            coins.append(result[0])
+        coins.sort()
+        coins.reverse()
+        
+    except Exception as e:
+        logger.warning(f"No [get_all_coins] results? {e}")
+
+    return coins
+
 
 def get_notarised_chain_rows(chain):
     rows = []
@@ -605,3 +612,20 @@ def get_existing_nn_ltc_txids(address=None, category=None, season=None, notary=N
     for txid in existing_txids:
         recorded_txids.append(txid[0])
     return recorded_txids
+
+
+def get_distinct_col_vals_from_table(table, column, conditions=None):
+    logger.info(f"Getting DISTINCT [{column}] values from [{table}] {conditions}...")
+    sql = f"SELECT DISTINCT {column} from {table}"
+    if conditions:
+        sql += f" {conditions}"
+    sql += ";"
+
+    CURSOR.execute(sql)
+    results = CURSOR.fetchall()
+
+    distinct_values = []
+    for item in results:
+        distinct_values.append(item[0])
+    distinct_values.sort()
+    return distinct_values

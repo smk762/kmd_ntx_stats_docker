@@ -106,7 +106,8 @@ def parse_dpow_coins(coins_data):
                     "src":src,
                     "version":version,
                     "server":server            
-                }
+                },
+                "dpow_active":1
             })
     return coins_data
 
@@ -340,18 +341,10 @@ def get_dpow_tenure(coins_data):
                                         coins_data[coin]["dpow_tenure"][season][server].update({"end_time":end_time})
                             
     for coin in coins_data:
-        logger.info(f"[get_dpow_tenure] setting dpow_active: {coin}")
+        logger.info(f"[get_dpow_tenure] setting dpow tenure: {coin}")
 
         if "dpow_tenure" not in coins_data[coin]:
             coins_data[coin].update({"dpow_tenure":{}})
-
-        for season in coins_data[coin]["dpow_tenure"]:
-            for server in coins_data[coin]["dpow_tenure"][season]:
-                if "start_time" in coins_data[coin]["dpow_tenure"][season][server] and "end_time" in coins_data[coin]["dpow_tenure"][season][server]:
-                    logger.info(f'{coin}: {coins_data[coin]["dpow_tenure"][season][server]["start_time"]} <= {now} >= {coins_data[coin]["dpow_tenure"][season][server]["end_time"]}')
-                    logger.info(f'{coin}: {now >= coins_data[coin]["dpow_tenure"][season][server]["start_time"]} and {now <= coins_data[coin]["dpow_tenure"][season][server]["end_time"]}')
-                    if now >= coins_data[coin]["dpow_tenure"][season][server]["start_time"] and now <= coins_data[coin]["dpow_tenure"][season][server]["end_time"]:
-                        coins_data[coin].update({"dpow_active":1})
 
     return coins_data
 

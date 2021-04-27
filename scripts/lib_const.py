@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import logging
 import logging.handlers
@@ -37,7 +38,7 @@ LTC_NTX_ADDR = 'LhGojDga6V1fGzQfNGcYFAfKnDvsWeuAsP'
 RPC = {}
 RPC["KMD"] = def_credentials("KMD")
 RPC["VOTE2021"] = def_credentials("VOTE2021")
-noMoM = ['CHIPS', 'GAME', 'EMC2', 'AYA', 'GLEEC']
+noMoM = ['CHIPS', 'GAME', 'EMC2', 'AYA', 'GLEEC-OLD']
 
 # KMD REWARDS CONSTANTS
 KOMODO_ENDOFERA = 7777777
@@ -50,7 +51,7 @@ ONE_YEAR = 365 * 24 * 60
 DEVISOR = 10512000
 
 # Some coins are named differently between dpow and coins repo...
-TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GleecBTC':'GLEEC', "SFUSD":"PBC"  }
+TRANSLATE_COINS = { 'COQUI':'COQUICASH','OURC':'OUR','WLC':'WLC21','GleecBTC':'GLEEC-OLD', "SFUSD":"PBC"  }
 
 # Coins categorised
 OTHER_COINS = []
@@ -313,6 +314,10 @@ OTHER_CLI = {
 }
 
 PARTIAL_SEASON_DPOW_CHAINS = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/master/doc/scoring_epochs.json").json()
+PARTIAL_SEASON_DPOW_CHAINS["Season_4"]["Servers"]["dPoW-3P"].update({
+    "GLEEC-OLD": PARTIAL_SEASON_DPOW_CHAINS["Season_4"]["Servers"]["dPoW-3P"]["GLEEC"]
+})
+del PARTIAL_SEASON_DPOW_CHAINS["Season_4"]["Servers"]["dPoW-3P"]["GLEEC"]
 PARTIAL_SEASON_DPOW_CHAINS.update({
     "Season_5_Testnet": {
         "Servers": {
@@ -333,7 +338,6 @@ PARTIAL_SEASON_DPOW_CHAINS.update({
         }
     }
 })
-
 
 DPOW_EXCLUDED_CHAINS = {
     "Season_1": [],
@@ -367,8 +371,7 @@ DPOW_EXCLUDED_CHAINS = {
         "GAME",
         "TXSCLI",
         "HUF",
-        "K64", 
-        "LTC"
+        "K64"
     ],
     "Season_5": [],
     "Season_5_Testnet": [
@@ -380,7 +383,7 @@ DPOW_EXCLUDED_CHAINS = {
 EXCLUDE_DECODE_OPRET_COINS = ['D']
 
 EXCLUDED_SERVERS = ["Unofficial"]
-EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial"]
+EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]
 
 SCORING_EPOCHS = {
 
@@ -394,7 +397,7 @@ for season in SEASONS_INFO:
         "Main":{},
         "Third_Party":{},
         "KMD": {
-            f"Epoch_KMD": {
+            f"KMD": {
                 "start":season_start,
                 "end":season_end-1,
                 "start_event":"Season start",
@@ -402,7 +405,7 @@ for season in SEASONS_INFO:
             }
         },
         "BTC": {
-            f"Epoch_BTC": {
+            f"BTC": {
                 "start":season_start,
                 "end":season_end-1,
                 "start_event":"Season start",
@@ -410,7 +413,7 @@ for season in SEASONS_INFO:
             }
         },
         "LTC": {
-            f"Epoch_LTC": {
+            f"LTC": {
                 "start":season_start,
                 "end":season_end-1,
                 "start_event":"Season start",
@@ -421,7 +424,7 @@ for season in SEASONS_INFO:
 
     if season not in PARTIAL_SEASON_DPOW_CHAINS:
         SCORING_EPOCHS[season]["Main"].update({
-            f"Epoch_1": {
+            f"Epoch_0": {
                 "start":season_start,
                 "end":season_end-1,
                 "start_event":"Season start",
@@ -429,7 +432,7 @@ for season in SEASONS_INFO:
             }
         })
         SCORING_EPOCHS[season]["Third_Party"].update({
-            f"Epoch_1": {
+            f"Epoch_0": {
                 "start":season_start,
                 "end":season_end-1,
                 "start_event":"Season start",
@@ -453,7 +456,6 @@ for season in SEASONS_INFO:
             num_epochs = len(epoch_event_times)
 
             for epoch in range(0,num_epochs-1):
-
 
                 epoch_start_time = epoch_event_times[epoch]
                 epoch_end_time = epoch_event_times[epoch+1]

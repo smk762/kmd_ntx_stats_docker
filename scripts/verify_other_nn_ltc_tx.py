@@ -11,14 +11,15 @@ from telegram import ParseMode
 import requests
 from datetime import datetime as dt
 
-from lib_const import *
 from dotenv import load_dotenv
 from logging import Handler, Formatter
+from lib_const import *
 
 load_dotenv()
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+THIS_SERVER = os.getenv("THIS_SERVER") # IP / domain of the local server
 
 class RequestsHandler(Handler):
     def emit(self, record):
@@ -40,16 +41,24 @@ class LogstashFormatter(Formatter):
 
         return "<i>{datetime}</i><pre>\n{message}</pre>".format(message=record.msg, datetime=t)
 
-season = "Season_4"
+logger = logging.getLogger()
+logger.setLevel(logging.WARNING)
+handler = RequestsHandler()
+formatter = LogstashFormatter()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+season = SEASON
 
 r = requests.get(f"{THIS_SERVER}/api/info/notary_nodes/?season={season}")
-notaries = r.json()["results"][0]
+notaries = r.json()["results"]
 
 notaries_with_others = {}
 for notary in notaries:
-    r = requests.get(f"{THIS_SERVER}/api/info/notary_btc_txids?season={season}&notary={notary}")
-    results = r.json()["results"]
     print(f"Checking {notary}")
+    params = f"?season={season}&notary={notary}&category=Other"
+    r = requests.get(f"{THIS_SERVER}/api/info/notary_ltc_transactions/{params}")
+    results = r.json()["results"]
     if "Other" in results:
         txids = results["Other"]["txids"].keys()
         notaries_with_others.update({
@@ -60,9 +69,9 @@ for notary in notaries:
             })
         print(f"{notary} has {len(txids)} unrecognised transactions")
         for txid in txids:
-            notaries_with_others[notary]['txids'].append(f"https://www.blockchain.com/btc/tx/{txid}")
+            notaries_with_others[notary]['txids'].append(f"https://www.blockchain.com/ltc/tx/{txid}")
 
-msg = f"### Uncategorised Transactions ###\n"
+msg = f"### Uncategorised LTC Transactions ###\n"
 for notary in notaries_with_others:
     print(f"{notary}")
     msg += f"### {notary} ###\n"
@@ -71,12 +80,12 @@ for notary in notaries_with_others:
         print(txid)
         msg += f"{txid}\n"
 
-        if len(msg) > 3200:
+        if len(msg) > 2000:
             print(msg)
             logger.warning(msg)
             msg = ''
 
-if msg == f"### Uncategorised Transactions ###\n":
+if msg == f"### Uncategorised LTC Transactions ###\n":
     pass
 elif msg != '':
     print(msg)

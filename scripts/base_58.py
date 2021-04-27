@@ -65,8 +65,8 @@ class GLEEC_3P_CoinParams(CoreMainParams):
 COIN_PARAMS = {
     "KMD": KMD_CoinParams,
     "MCL": KMD_CoinParams,
-    "GLEEC_AC": KMD_CoinParams,
-    "GLEEC_3P": GLEEC_3P_CoinParams,
+    "GLEEC": KMD_CoinParams,
+    "GLEEC-OLD": GLEEC_3P_CoinParams,
     "PBC": PBC_CoinParams,
     "CHIPS": KMD_CoinParams,
     "VRSC": KMD_CoinParams,
