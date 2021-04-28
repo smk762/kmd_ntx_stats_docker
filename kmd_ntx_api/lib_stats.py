@@ -74,7 +74,7 @@ def get_top_coin_notarisers(top_region_notarisers, chain):
 
 def get_daily_stats_sorted(season=None):
     if not season:
-        season = "Season_4"
+        season = SEASON
 
     notary_list = get_notary_list(season)
     
@@ -187,7 +187,7 @@ def get_notarisation_scores(season):
     notarisation_scores = {}
     # set coins lists
     if not season:
-        season = "Season_4"
+        season = SEASON
     coin_notariser_ranks = get_coin_notariser_ranks(season)
     coins_dict = get_dpow_server_coins_dict(season)
     server_chains = get_dpow_server_coins_dict(season)

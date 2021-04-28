@@ -787,10 +787,10 @@ class notarised_row():
     def validated(self):
         if len(self.chain) > 12:
             return False
-
-        if self.epoch.find("Epoch") == -1 and self.epoch != "Unofficial":
-            logger.warning(f"!!!! Invalid epoch {self.epoch}")
-            return False
+        if self.epoch not in ["KMD", "LTC", "BTC"]:
+            if self.epoch.find("Epoch") == -1 and self.epoch != "Unofficial":
+                logger.warning(f"!!!! Invalid epoch {self.epoch}")
+                return False
 
         if self.server in ["Main", "Third_Party", "KMD", "LTC", "BTC"]:
             for notary in self.notaries[:]:
@@ -823,7 +823,6 @@ class notarised_row():
                     self.score_value = 0.0325
                 else:
                     self.score_value = 0
-                    self.epoch = "Unofficial"
             elif self.chain in ["LTC", "BTC"]:
                 self.score_value = 0
         else:

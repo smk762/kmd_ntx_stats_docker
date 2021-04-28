@@ -16,7 +16,7 @@ from lib_table_update import *
 from lib_table_select import *
 from lib_api import *
 from lib_helper import *
-from models import notarised_row, notarised_count_season_row, notarised_chain_season_row, notarised_count_daily_row, notarised_chain_daily_row, last_notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
+from models import notarised_row, notarised_count_season_row, notarised_chain_season_row, notarised_count_daily_row, notarised_chain_daily_row, get_chain_epoch_score_at, get_chain_epoch_at
 
 
 '''
@@ -347,7 +347,6 @@ def update_season_notarised_counts(season):
         conditions = "block_height="+str(block_height)+" AND chain='"+chain+"'"
         try:
             last_ntx_result = select_from_table('notarised', cols, conditions)[0]
-            logger.info(f"last_ntx_result: {last_ntx_result}")
             kmd_ntx_blockhash = last_ntx_result[0]
             kmd_ntx_txid = last_ntx_result[1]
             kmd_ntx_blocktime = last_ntx_result[2]
@@ -425,9 +424,10 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
             epoch = item[4]
             score_value = round(float(item[5]), 8)
 
+            if chain in ["BTC", "LTC", "KMD"]:
+                server = chain
+                epoch = chain
             if "Unofficial" not in [season, server, epoch]:
-                if chain in ["BTC", "LTC", "KMD"]:
-                    server = chain
 
                 if server not in chain_totals:
                     chain_totals.update({
@@ -516,131 +516,6 @@ def get_notarisation_data(season, min_time=None, max_time=None, notary_name=None
         logger.error(f"Error in [get_notarisation_data]: {e}")
         return ntx_summary, chain_totals
 
-
-def update_latest_ntx(season, server):
-
-    sql = "SELECT chain, MAX(block_time) \
-           FROM notarised WHERE \
-           season = '"+str(season)+"' \
-           AND server = '"+str(server)+"' \
-           GROUP BY chain;"
-
-    try:
-        CURSOR.execute(sql)
-        resp = CURSOR.fetchall()
-
-        for item in resp:
-            chain = item[0]
-            block_time = item[1]
-            sql = "SELECT block_height, txid, notaries \
-                   FROM notarised WHERE season='"+season+"' AND server='"+server+"' AND \
-                   chain='"+str(chain)+"' AND block_time="+str(block_time)+";"
-
-            try:
-
-                CURSOR.execute(sql)
-                rows = CURSOR.fetchall()
-                for x in rows:
-                    block_height = x[0]
-                    txid = x[1]
-                    notaries = x[2]
-                    for notary in notaries:
-                        row = last_notarised_row()
-                        row.notary = notary
-                        row.chain = chain
-                        row.txid = txid
-                        row.block_height = block_height
-                        row.block_time = block_time
-                        row.season = season
-                        row.server = server
-                        row.update()
-
-            except Exception as e:
-                logger.error(f"Exception in [update_latest_ntx]: {e}")
-
-    except Exception as e:
-        logger.error(f"Exception in [update_latest_ntx]: {e}")
-
-
-def update_latest_btc_ntx(season, notary):
-
-    sql = f"SELECT notary, MAX(block_time) \
-           FROM nn_btc_tx \
-           WHERE season = '{season}' \
-           AND category = 'NTX' \
-           GROUP BY notary;"
-
-    try:
-        CURSOR.execute(sql)
-        resp = CURSOR.fetchall()
-
-        for item in resp:
-            if item[0] == notary:
-                block_time = item[1]
-                sql = f"SELECT block_height, txid \
-                       FROM notarised WHERE season='{season}' AND \
-                       chain='BTC' AND block_time={block_time};"
-
-                try:
-                    CURSOR.execute(sql)
-                    resp = CURSOR.fetchone()
-                    block_height = resp[0]
-                    txid = resp[1]
-                    row = last_notarised_row()
-                    row.notary = notary
-                    row.chain = "BTC"
-                    row.txid = txid
-                    row.block_height = block_height
-                    row.block_time = block_time
-                    row.season = season
-                    row.server = "BTC"
-                    row.update()
-
-                except Exception as e:
-                    logger.error(f"Exception in [update_latest_ntx] BTC fetchone: {e}")
-
-    except Exception as e:
-        logger.error(f"Exception in [update_latest_ntx] BTC group_by: {e}")
-
-def update_latest_ltc_ntx(season, notary):
-
-    sql = f"SELECT notary, MAX(block_time) \
-           FROM nn_ltc_tx \
-           WHERE season = '{season}' \
-           AND category = 'NTX' \
-           GROUP BY notary;"
-
-    try:
-        CURSOR.execute(sql)
-        resp = CURSOR.fetchall()
-
-        for item in resp:
-            if item[0] == notary:
-                block_time = item[1]
-                sql = f"SELECT block_height, txid \
-                       FROM notarised WHERE season='{season}' AND \
-                       chain='LTC' AND block_time={block_time};"
-
-                try:
-                    CURSOR.execute(sql)
-                    resp = CURSOR.fetchone()
-                    block_height = resp[0]
-                    txid = resp[1]
-                    row = last_notarised_row()
-                    row.notary = notary
-                    row.chain = "LTC"
-                    row.txid = txid
-                    row.block_height = block_height
-                    row.block_time = block_time
-                    row.season = season
-                    row.server = "LTC"
-                    row.update()
-
-                except Exception as e:
-                    logger.error(f"Exception in [update_latest_ntx] LTC fetchone: {e}")
-
-    except Exception as e:
-        logger.error(f"Exception in [update_latest_ntx] LTC group_by: {e}")
 
 def scan_rpc_for_ntx(season):
     start_block = SEASONS_INFO[season]["start_block"]
@@ -816,22 +691,28 @@ if __name__ == "__main__":
             logger.warning(f"Skipping season: {season}")
         else:
             # Comment this out unless needed for cleanup
-            for chain in ["KMD", "BTC", "LTC"]:
-                rescan_chain(season, chain)
+            # for chain in ["KMD", "BTC", "LTC"]:
+            #    rescan_chain(season, chain)
 
+            start = time.time()
             scan_rpc_for_ntx(season)
+            end = time.time()
+            logger.info(f">>> {end-start} sec to complete [scan_rpc_for_ntx({season})]")
+            start = end
 
             # TODO: add season / server / epoch to the aggregate tables
             update_daily_notarised_counts(season)
+            end = time.time()
+            logger.info(f">>> {end-start} sec to complete [update_daily_notarised_counts({season})]")
+            start = end
             update_daily_notarised_chains(season)
+            end = time.time()
+            logger.info(f">>> {end-start} sec to complete [update_daily_notarised_chains({season})]")
+            start = end
 
             update_season_notarised_counts(season)
-            season_servers = get_notarised_servers(season)
-            for server in season_servers:
-                update_latest_ntx(season, server)
+            end = time.time()
+            logger.info(f">>> {end-start} sec to complete [update_season_notarised_counts({season})]")
 
-            for notary in NOTARY_PUBKEYS[season]:
-                update_latest_ltc_ntx(season, notary)
-                update_latest_btc_ntx(season, notary)
 
 
