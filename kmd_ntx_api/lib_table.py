@@ -528,7 +528,7 @@ def get_notary_epoch_scores_table(notary=None, season=None):
         notary = random.choice(notary_list)
 
     if not season:
-        season = "Season_4"
+        season = SEASON
 
     notary_epoch_scores = get_notarised_count_season_data(season, notary).values()
 

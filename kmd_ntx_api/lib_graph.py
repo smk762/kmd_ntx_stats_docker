@@ -204,11 +204,16 @@ def get_daily_ntx_graph_data(request):
 # TODO: Deprecate later (used in notary_profile_view)
 def get_notary_balances_graph(notary, season=None):
     if not season:
-        season = "Season_4"
+        season = SEASON
 
     notary_balances = get_notary_balances(notary, season)
     main_chains, third_chains = get_dpow_server_coins_dict_lists(season)
 
+    if "HUSH3" in third_chains:
+        third_chains.remove("HUSH3")
+
+    main_chains += ["KMD", "BTC", "LTC"]
+    main_chains.sort()
     balances_graph_dict = {}
     notary_balances_list = []
     for item in notary_balances:
@@ -235,7 +240,7 @@ def get_notary_balances_graph(notary, season=None):
     for label in labels:
         border_color.append(BLACK)
 
-        if label in ['KMD', 'KMD_3P', 'BTC']:
+        if label in ['KMD', 'KMD_3P', 'BTC', 'LTC']:
             bg_color.append(LT_ORANGE)
 
         elif label in third_chains:

@@ -182,7 +182,7 @@ def get_funding_totals(funding_data):
 
 def get_nn_info(season=None):
     if not season:
-        season = "Season_4"
+        season = SEASON
     # widget using this has been deprecated, but leaving code here for reference
     # to use in potential replacement functions.
     #season = SEASON
@@ -368,7 +368,7 @@ def get_nn_social(notary_name=None, season=None):
 
 def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None):
     if not season:
-        season = "Season_4"
+        season = SEASON
 
     notary_ntx_24hr = {
             "btc_ntx":0,
@@ -633,7 +633,7 @@ def get_testnet_stats_dict(season, testnet_chains):
 
 def get_sidebar_links(season=None):
     if not season:
-        season = "Season_4"
+        season = SEASON
     notary_list = get_notary_list(season)
     region_notaries = get_regions_info(notary_list)
     coins_dict = get_dpow_server_coins_dict(season)

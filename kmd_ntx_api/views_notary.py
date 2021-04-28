@@ -148,8 +148,9 @@ def vote2021_detail_view(request):
 
         item.update({"lock_time_human":date_time.strftime("%m/%d/%Y, %H:%M:%S")})
 
+    candidate = request.GET["candidate"].replace(".", "-")
     context.update({
-        "candidate": request.GET["candidate"],
+        "candidate": candidate,
         "params": params,
         "vote2021_detail_table": vote2021_detail_table
     })

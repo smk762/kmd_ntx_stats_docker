@@ -286,7 +286,7 @@ def prepare_coins_graph_data(graph_data, coins_dict):
     labels.sort()
         
     if not season:
-        season = "Season_4"
+        season = SEASON
     main_chains = get_mainnet_chains(coins_dict)
     third_chains = get_third_party_chains(coins_dict)
 
