@@ -243,7 +243,7 @@ def vote2021_table(request):
 # UPDATE PENDING
 def notary_epoch_scores_table(request):
     if not "season" in request.GET:
-        season = "Season_4"
+        season = SEASON
     else:
         season = request.GET["season"]
 
@@ -253,7 +253,11 @@ def notary_epoch_scores_table(request):
     else:
         notary = request.GET["notary"]
 
-    resp = get_notary_epoch_scores_table(notary, season)[0]
+    chain = None
+    if 'chain' in request.GET:
+        chain = request.GET["chain"]
+
+    resp = get_notary_epoch_scores_table(notary, season, chain)[0]
     return JsonResponse(resp, safe=False)
     
 

@@ -72,24 +72,24 @@ def get_top_coin_notarisers(top_region_notarisers, chain):
     return top_coin_notarisers
 
 
-def get_daily_stats_sorted(season=None):
+def get_daily_stats_sorted(season=None, coins_dict=None):
     if not season:
-        season = "Season_4"
+        season = SEASON
+    if not coins_dict:
+        coins_dict = get_dpow_server_coins_dict(season)
 
     notary_list = get_notary_list(season)
-    
+    ntx_24hr = get_notarised_data_24hr().values()    
     mined_last_24hrs = get_mined_data_24hr().values('name').annotate(mined_24hrs=Sum('value'), blocks_24hrs=Count('value'))
 
     nn_mined_last_24hrs = {}
     for item in mined_last_24hrs:
         nn_mined_last_24hrs.update({item['name']:item['blocks_24hrs']})
 
-    ntx_24hr = get_notarised_data_24hr().values()
-
     daily_stats = {}
     for notary_name in notary_list:
         region = get_notary_region(notary_name)
-        notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary_name)
+        notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary_name, season, coins_dict)
 
         if region not in daily_stats:
             daily_stats.update({region:[]})
@@ -126,10 +126,13 @@ def get_daily_stats_sorted(season=None):
 
 
 # returns region > notary > chain > season ntx count
-def get_coin_notariser_ranks(season):
+def get_coin_notariser_ranks(season, coins_list=None):
     # season ntx stats
+    if not coins_list:
+        coins_list = get_dpow_coins_list(season)
+
     ntx_season = get_notarised_count_season_data(season)
-    season_chains = get_dpow_coins_list(season)
+    notary_list = get_notary_list(season)
     ntx_season = ntx_season.values()
 
     if season == "Season_5_Testnet":
@@ -137,7 +140,7 @@ def get_coin_notariser_ranks(season):
             "TESTNET":{}
         }
         notary_list = get_notary_list(season)
-        dpow_coins = ["RICK", "MORTY", "LTC"]
+        coins_list = ["RICK", "MORTY", "LTC"]
 
         for notary in notary_list:
             region_notary_ranks["TESTNET"].update({notary:{}})
@@ -147,7 +150,7 @@ def get_coin_notariser_ranks(season):
 
             if notary in notary_list:
                 for coin in item['chain_ntx_counts']:
-                    if coin in dpow_coins:
+                    if coin in coins_list:
                         region_notary_ranks[region][notary].update({
                             coin:item['chain_ntx_counts'][coin]
                         })
@@ -159,8 +162,6 @@ def get_coin_notariser_ranks(season):
             "SH":{},
             "DEV":{}
         }
-        notary_list = get_notary_list(season)
-        dpow_coins = get_dpow_coins_list(season)
         for notary in notary_list:
             region = get_notary_region(notary)
             if region in ["AR","EU","NA","SH", "DEV"]:
@@ -174,7 +175,7 @@ def get_coin_notariser_ranks(season):
             notary = item['notary']
             if notary in notary_list:
                 for coin in item['chain_ntx_counts']:
-                    if coin in dpow_coins:
+                    if coin in coins_list:
                         region = get_notary_region(notary)
                         if region in ["AR","EU","NA","SH", "DEV"]:
                             region_notary_ranks[region][notary].update({
@@ -183,16 +184,22 @@ def get_coin_notariser_ranks(season):
     return region_notary_ranks
 
 
-def get_notarisation_scores(season):
+def get_notarisation_scores(season, coins_list=None):
+
+    mined_season = get_mined_season(season)
+    scores = get_notarised_count_season_data(season).values()
+
     notarisation_scores = {}
     # set coins lists
     if not season:
-        season = "Season_4"
-    coin_notariser_ranks = get_coin_notariser_ranks(season)
-    coins_dict = get_dpow_server_coins_dict(season)
-    server_chains = get_dpow_server_coins_dict(season)
-    main_chains = get_mainnet_chains(coins_dict)
-    third_chains = get_third_party_chains(coins_dict)
+        season = SEASON
+    if not coins_list:
+        coins_dict = get_dpow_server_coins_dict(season)
+        coins_list = []
+        for server in coins_dict: 
+            coins_list += coins_dict[server]
+
+    coin_notariser_ranks = get_coin_notariser_ranks(season, coins_list)
 
     # init scores dict
     for region in coin_notariser_ranks:
@@ -206,9 +213,8 @@ def get_notarisation_scores(season):
                     "mining":0
                 }
             })
-    # populate mining data
-    mined_season = get_mined_season(season)
 
+    # populate mining data
     for item in mined_season:
         notary = item["name"]
         region = get_notary_region(notary)
@@ -218,8 +224,6 @@ def get_notarisation_scores(season):
                 notarisation_scores[region][notary].update({
                     "mining": blocks_mined
                 })
-
-    scores = get_notarised_count_season_data(season).values()
 
     # update chain / server counts
     for item in scores:
@@ -247,7 +251,6 @@ def get_notarisation_scores(season):
             logger.error(f"[get_notarisation_scores] Exception: {e}")
             pass
 
-
     # calc scores
     for region in notarisation_scores:
         for notary in notarisation_scores[region]:
@@ -260,7 +263,6 @@ def get_notarisation_scores(season):
             notarisation_scores[region][notary].update({
                 "rank": rank
             })
-
 
     return notarisation_scores
 

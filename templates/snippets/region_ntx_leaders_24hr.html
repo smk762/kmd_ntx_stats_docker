@@ -9,7 +9,7 @@
 						{% for region, region_data in daily_stats_sorted.items %}
 							{% for item in region_data %}
 								{% if item.rank == 1 %}
-							    <div class="		badge kmd_ui_dark4_bg m-2" style="width:16%; background-color: #26456B !important;">
+							    <div class="badge kmd_ui_dark4_bg m-2" style="width:16%; background-color: #26456B !important;">
 							    	<div class="col-12">
 										{% for nn, site_links in nn_social.items %}
 											{% if item.notary == nn %}
@@ -22,7 +22,7 @@
 										{% endfor %}
 							    	</div>
 							    	<div class="col-12">
-							    		<a class="badge kmd_ui_dark1_bg" style="font-size: 1.1em" href="http://{{ request.get_host }}/notary_profile/{{ notary }}"> {{ item.notary }} <br /><span style="font-size: 1.3em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
+							    		<a class="badge kmd_ui_dark1_bg" style="font-size: 1.1em" href="http://{{ request.get_host }}/notary_profile/{{ item.notary }}"> {{ item.notary }} <br /><span style="font-size: 1.3em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
 							    	</div>
 							    	{% if region == 'AR' %}
 									<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2 mt-0">

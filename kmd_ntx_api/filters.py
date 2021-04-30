@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-from django_filters.rest_framework import FilterSet, NumberFilter
+from django_filters.rest_framework import FilterSet, NumberFilter, CharFilter
 from kmd_ntx_api.models import *
+
 
 ## Custom Filter Sets
 
@@ -23,6 +24,7 @@ class notarisedFilter(FilterSet):
     max_ac_block = NumberFilter(field_name="ac_ntx_height", lookup_expr='lte')
     min_blocktime = NumberFilter(field_name="block_time", lookup_expr='gte')
     max_blocktime = NumberFilter(field_name="block_time", lookup_expr='lte')
+    notary = CharFilter(field_name="notaries", lookup_expr='contains')
 
     class Meta:
         model = notarised

@@ -77,11 +77,11 @@ def update_mined_blocks(season):
     recorded_blocks = []
     for block in existing_blocks:
         recorded_blocks.append(block[0])
-    logger.info(f"{len(recorded_blocks)} in mined table in db")
+    logger.info(f"[update_mined_blocks] {len(recorded_blocks)} in mined table in db")
 
     all_blocks = [*range(start_block,tip,1)]    
     unrecorded_blocks = set(all_blocks) - set(recorded_blocks)
-    logger.info(f"{len(unrecorded_blocks)} not in mined table in db")
+    logger.info(f"[update_mined_blocks] {len(unrecorded_blocks)} not in mined table in db")
 
     if not RESCAN_SEASON:
         rescan_blocks = [*range(tip-100,tip,1)]
@@ -89,7 +89,7 @@ def update_mined_blocks(season):
         rescan_blocks = [*range(start_block,tip,1)]
 
     rescan_blocks = list(set(list(unrecorded_blocks) + rescan_blocks))
-    logger.info(f"{len(rescan_blocks)} blocks to scan")
+    logger.info(f"[update_mined_blocks] {len(rescan_blocks)} blocks to scan")
 
     time.sleep(4)
     for block in rescan_blocks:
@@ -108,14 +108,16 @@ def process_aggregates(season):
         start = end - datetime.timedelta(days=20)
 
     delta = datetime.timedelta(days=1)
-    logger.info("Aggregating daily mined counts from "+str(start)+" to "+str(end))
+    logger.info(f"[process_aggregates] Aggregating daily mined counts from {start} to {end}")
     day = start
 
     time_stamp = int(time.time())
     while day <= end:
-        logger.info(f"Aggregating daily mined counts for {day}")
+        logger.info(f"[process_aggregates] Aggregating daily mined counts for {day}")
         results = get_mined_date_aggregates(day)
-        logger.info(f"get_mined_date_aggregates results for {day}: {len(results)}")
+
+        season_notaries = list(NOTARY_PUBKEYS[season].keys())
+
         for item in results:
             if len(item) > 0:
                 row = daily_mined_count_row()
@@ -125,10 +127,24 @@ def process_aggregates(season):
                 row.sum_value_mined = float(item[2])
                 row.mined_date = day
                 row.time_stamp = time_stamp
-                logger.info(f"{day} {row.notary} {row.blocks_mined} {row.sum_value_mined}")
+                logger.info(f"[process_aggregates] {day} {row.notary} {row.blocks_mined} {row.sum_value_mined}")
                 row.update()
+                if row.notary in season_notaries:
+                    season_notaries.remove(row.notary)
+
+        # Handle where notary has not mined on this day
+        for remaining_notary in season_notaries:
+            row = daily_mined_count_row()
+            row.notary = remaining_notary
+            row.blocks_mined = 0
+            row.sum_value_mined = 0
+            row.mined_date = day
+            row.time_stamp = time_stamp
+            logger.info(f"[process_aggregates] {day} {row.notary} {row.blocks_mined} {row.sum_value_mined}")
+            row.update()
+
         day += delta
-    logger.info("Finished!")
+    logger.info("[process_aggregates] Finished!")
 
 
 def update_season_mined_counts(season):

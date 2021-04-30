@@ -3,12 +3,14 @@
 import time
 import random
 import numpy as np
+from datetime import datetime as dt
 from django.shortcuts import render
 from kmd_ntx_api.pages import *
 from kmd_ntx_api.endpoints import *
 from kmd_ntx_api.lib_stats import *
 from kmd_ntx_api.api_table import *
 from kmd_ntx_api.lib_testnet import *
+from kmd_ntx_api.api_status import *
 
 
 ## DASHBOARD        
@@ -42,6 +44,7 @@ def chain_sync(request):
         "eco_data_link":get_eco_data_link()
         })
     return render(request, 'chain_sync.html', context)
+
 
 def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY PROFILE
     season = SEASON
@@ -116,7 +119,11 @@ def dash_view(request, dash_name=None):
         season = SEASON
 
     notary_list = get_notary_list(season)
-    coins_list = get_dpow_coins_list(season)
+    coins_dict = get_dpow_server_coins_dict(season)
+    coins_list = []
+    for server in coins_dict: 
+        coins_list += coins_dict[server]
+
     if dash_name:
         if dash_name.find('table') != -1:
             if dash_name == 'balances_table':
@@ -158,7 +165,6 @@ def dash_view(request, dash_name=None):
             if dash_name == 'season_mining_graph':
                 html = 'graphs/daily_ntx_graph.html'
     else:
-        coin_notariser_ranks = get_coin_notariser_ranks(season)
         ntx_24hr = get_notarised_data().filter(
             block_time__gt=str(int(time.time()-24*60*60))
             ).count()
@@ -167,11 +173,14 @@ def dash_view(request, dash_name=None):
         except:
             # no records returned
             mined_24hr = 0
+
         biggest_block = get_mined_data(season).order_by('-value').first()
-        
-        notarisation_scores = get_notarisation_scores(season)
-        
+        daily_stats_sorted = get_daily_stats_sorted(season, coins_dict)
+        notarisation_scores = get_notarisation_scores(season, coins_list)
+        nn_social = get_nn_social()
         region_score_stats = get_region_score_stats(notarisation_scores)
+        sidebar_links = get_sidebar_links(season)
+
         context.update({
             "ntx_24hr":ntx_24hr,
             "mined_24hr":mined_24hr,
@@ -181,17 +190,15 @@ def dash_view(request, dash_name=None):
             "show_ticker":True
         })
 
-    server_chains = get_dpow_server_coins_dict(season)
     context.update({
         "gets":gets,
-        "sidebar_links":get_sidebar_links(season),
+        "sidebar_links":sidebar_links,
         "eco_data_link":get_eco_data_link(),
-        "server_chains":server_chains,
+        "server_chains":coins_dict,
         "coins_list":coins_list,
         "notaries_list":notary_list,
-        "daily_stats_sorted":get_daily_stats_sorted(notary_list),
-        "nn_social":get_nn_social(),
-
+        "daily_stats_sorted":daily_stats_sorted,
+        "nn_social":nn_social
     })
     return render(request, html, context)
     
@@ -199,11 +206,59 @@ def dash_view(request, dash_name=None):
 def faucet(request):
     season = SEASON
     notary_list = get_notary_list(season)
+    faucet_supply = {
+        "RICK":0,
+        "MORTY":0
+    }
+    faucet_supply_resp = requests.get(f"https://faucet.komodo.live/rm_faucet_balances").json()
+
+    for node in faucet_supply_resp:
+        print(faucet_supply_resp[node])
+        faucet_supply["RICK"] += faucet_supply_resp[node]["RICK"]
+        faucet_supply["MORTY"] += faucet_supply_resp[node]["MORTY"]
+
+    pending_tx_resp = requests.get(f"https://faucet.komodo.live/show_pending_tx").json()
+    pending_tx_list = []
+    tx_rows = []
+    pending_index = []
+    if "Result" in pending_tx_resp:
+        if "Message" in pending_tx_resp["Result"]:
+            pending_tx_list = pending_tx_resp["Result"]["Message"]
+    for item in pending_tx_list:
+        tx_rows.append({
+            "index":item[0],    
+            "coin":item[1], 
+            "address":item[2], 
+            "time_sent":"n/a",   
+            "amount":"n/a",  
+            "txid":"n/a",
+            "status":item[6]
+        })
+        pending_index.append(item[0])
+    sent_tx_resp = requests.get(f"https://faucet.komodo.live/show_faucet_db").json()
+    sent_tx_list = []
+    if "Result" in sent_tx_resp:
+        if "Message" in sent_tx_resp["Result"]:
+            sent_tx_list = sent_tx_resp["Result"]["Message"]
+    for item in sent_tx_list:
+        if item[0] not in pending_index:
+            tx_rows.append({
+                "index":item[0],    
+                "coin":item[1], 
+                "address":item[2], 
+                "time_sent":dt.fromtimestamp(item[3]), 
+                "amount":item[4],  
+                "txid":item[5],  
+                "status":item[6]
+            })
+
     context = {
         "page_title":"Rick / Morty Faucet",
         "sidebar_links":get_sidebar_links(season),
         "explorers":get_explorers(request),
-        "eco_data_link":get_eco_data_link()
+        "eco_data_link":get_eco_data_link(),
+        "faucet_supply":faucet_supply,
+        "tx_rows": tx_rows
         }
     if request.method == 'POST':
         if 'coin' in request.POST:
@@ -412,7 +467,7 @@ def ntx_scoreboard_24hrs(request):
         season = request.GET["season"]
     context = {
         "page_title":f"{season.replace('_',' ')} Last 24hrs Notarisation Scoreboard",
-        "daily_stats_sorted":get_daily_stats_sorted(),
+        "daily_stats_sorted":get_daily_stats_sorted(season),
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link(),
         "nn_social":get_nn_social()
@@ -432,7 +487,11 @@ def notary_epoch_scores_view(request):
     else:
         notary = request.GET["notary"]
 
-    scoring_table, total = get_notary_epoch_scores_table(notary, season)
+    chain = None
+    if 'chain' in request.GET:
+        chain = request.GET["chain"]
+
+    scoring_table, total = get_notary_epoch_scores_table(notary, season, chain)
     
 
     context = {

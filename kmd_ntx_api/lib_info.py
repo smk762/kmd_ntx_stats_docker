@@ -182,7 +182,7 @@ def get_funding_totals(funding_data):
 
 def get_nn_info(season=None):
     if not season:
-        season = "Season_4"
+        season = SEASON
     # widget using this has been deprecated, but leaving code here for reference
     # to use in potential replacement functions.
     #season = SEASON
@@ -345,7 +345,8 @@ def get_nn_season_ntx_counts(season):
 
 
 def get_nn_social(notary_name=None, season=None):
-    season = SEASON
+    if not season:
+        season = SEASON
     nn_social_info = {}
     nn_social_data = get_nn_social_data(season, notary_name).values()
     for item in nn_social_data:
@@ -366,9 +367,11 @@ def get_nn_social(notary_name=None, season=None):
     return nn_social_info
 
 
-def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None):
+def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
     if not season:
-        season = "Season_4"
+        season = SEASON
+    if not coins_dict:
+        coins_dict = get_dpow_server_coins_dict(season)
 
     notary_ntx_24hr = {
             "btc_ntx":0,
@@ -378,7 +381,6 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None):
             "score":0
         }
 
-    coins_dict = get_dpow_server_coins_dict(season)
     main_chains = get_mainnet_chains(coins_dict)
     third_party_chains = get_third_party_chains(coins_dict)   
 
@@ -633,14 +635,14 @@ def get_testnet_stats_dict(season, testnet_chains):
 
 def get_sidebar_links(season=None):
     if not season:
-        season = "Season_4"
+        season = SEASON
     notary_list = get_notary_list(season)
     region_notaries = get_regions_info(notary_list)
     coins_dict = get_dpow_server_coins_dict(season)
-    server_chains = get_dpow_server_coins_dict(season)
+    coins_dict = get_dpow_server_coins_dict(season)
     sidebar_links = {
         "server":os.getenv("SERVER"),
-        "chains_menu":server_chains,
+        "chains_menu":coins_dict,
         "notaries_menu":region_notaries,
     }
     return sidebar_links
@@ -1158,6 +1160,7 @@ def get_split_stats_table(request):
 
 
 def get_notary_btc_transactions(request):
+    logger.info(request.GET)
     season = None
     notary = None
     category = None
@@ -1470,14 +1473,21 @@ def get_vote2021_info(request):
             resp.update({region:[]})
             region_scores.update({region:[]})
         resp[region].append(item)
-        region_scores[region].append(item["sum_votes"])
+        if item["candidate"] in DISQUALIFIED:
+            region_scores[region].append(-1)
+        else:
+            region_scores[region].append(item["sum_votes"])
 
 
     for region in resp:
         region_scores[region].sort()
         region_scores[region].reverse()
         for item in resp[region]:
-            rank = region_scores[region].index(item["sum_votes"]) + 1
+            if item["candidate"] in DISQUALIFIED:
+                rank = region_scores[region].index(-1) + 1
+                item.update({"sum_votes":"DISQUALIFIED"})
+            else:
+                rank = region_scores[region].index(item["sum_votes"]) + 1
             item.update({"region_rank":rank})
     for region in resp:
         resp[region] = sorted(resp[region], key = lambda item: item['region_rank'])

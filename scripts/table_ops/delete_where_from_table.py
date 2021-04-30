@@ -14,7 +14,9 @@ cursor = conn.cursor()
 #table = "scoring_epochs"
 #table = 'nn_ltc_tx'
 #table = 'addresses'
-table = 'last_notarised'
+#table = 'last_notarised'
+table = 'notarised_count_season'
+
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())
@@ -30,6 +32,7 @@ print(cursor.fetchall())
 #cursor.execute("DELETE FROM nn_ltc_tx WHERE category = 'Other';")
 cursor.execute("DELETE FROM "+table+";")
 #cursor.execute("DELETE FROM "+table+" WHERE season = 'Season_5_Testnet';")
+#cursor.execute("DELETE FROM "+table+" WHERE chain = 'GLEEC' and server = 'Third_Party';")
 
 conn.commit()
 

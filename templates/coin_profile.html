@@ -302,7 +302,7 @@
         			{
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='"+explorers[oData.chain]+'address/'+oData.address+"'>"+oData.address+"</a>");
+				            $(nTd).html("<a href='"+explorers['{{ chain }}']+'address/'+oData.address+"'>"+oData.address+"</a>");
 				        }
 			        },
         			{

@@ -111,6 +111,7 @@ def update_ntx_row(row_data):
             logger.debug(row_data)
         CONN.rollback()
 
+
 def update_ntx_records(records):
     try:
         execute_values(CURSOR, "INSERT INTO notarised (chain, block_height, \
@@ -365,11 +366,11 @@ def update_daily_mined_count_row(row_data):
         return 0
 
 def update_daily_notarised_chain_row(row_data):
-    sql = "INSERT INTO notarised_chain_daily \
-         (chain, ntx_count, notarised_date) \
-          VALUES (%s, %s, %s) \
+    sql = f"INSERT INTO notarised_chain_daily \
+          (season, server, chain, ntx_count, notarised_date) \
+          VALUES (%s, %s, %s, %s, %s) \
           ON CONFLICT ON CONSTRAINT unique_notarised_chain_daily DO UPDATE \
-          SET ntx_count="+str(row_data[1])+";"
+          SET ntx_count={row_data[3]};"
     CURSOR.execute(sql, row_data)
     CONN.commit()
 
@@ -721,7 +722,7 @@ def update_notarised_epoch(actual_epoch, season=None, server=None, chain=None, t
         logger.debug(e)
         CONN.rollback()
 
-def update_chain_notarised_epoch_window(chain, season, server, epoch, epoch_start, epoch_end, score_per_ntx, scored):
+def update_notarised_epoch_scores(chain, season, server, epoch, epoch_start, epoch_end, score_per_ntx, scored):
     sql = f"UPDATE notarised SET epoch='{epoch}', score_value={score_per_ntx}, scored={scored}"
     conditions = []
     if chain:

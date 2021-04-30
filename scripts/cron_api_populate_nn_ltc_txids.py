@@ -8,12 +8,13 @@ from datetime import datetime as dt
 import datetime
 import dateutil.parser as dp
 
-from lib_notary import get_new_nn_ltc_txids, get_notary_from_ltc_address, get_notary_last_ntx, get_season_from_addresses, get_dpow_score_value
+from lib_helper import *
+from lib_notary import *
 from lib_table_update import update_nn_ltc_tx_notary_from_addr
 from lib_table_select import get_existing_nn_ltc_txids, get_existing_notarised_txids
 from lib_api import get_ltc_tx_info
 
-from models import ltc_tx_row, last_notarised_row, notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
+from models import ltc_tx_row, notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
 
 from lib_const import *
 from known_txids import *
@@ -120,11 +121,13 @@ def detect_replenish(vins, vouts):
     if replenish_vin and replenish_vout:
         for addr in vin_non_notary_addresses:
             if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
-                update_nn_ltc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
+                pass
+                #update_nn_ltc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
         for addr in vout_non_notary_addresses:
 
             if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
-                update_nn_ltc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
+                pass
+                #update_nn_ltc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
         return True
     return False
 
@@ -250,6 +253,8 @@ def scan_ltc_transactions(season):
     while len(season_ltc_addresses) > 0:
         if LTC_NTX_ADDR in season_ltc_addresses:
             notary_address = LTC_NTX_ADDR
+        elif "LcnrQXJs8kH55iCoqSZ3M3MA5QT4kPu117" in season_ltc_addresses:
+            notary_address = "LcnrQXJs8kH55iCoqSZ3M3MA5QT4kPu117"
         else:
             notary_address = random.choice(season_ltc_addresses)
         i += 1
@@ -264,8 +269,8 @@ def scan_ltc_transactions(season):
         existing_txids = list(set(existing_nn_ltc_txids)&set(existing_notarised_txids))
         txids = get_new_nn_ltc_txids(existing_txids, notary_address)
 
-        logger.info(f"{len(existing_txids)} EXIST IN DB FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
-        logger.info(f"{len(txids)} NEW TXIDs TO PROCESS FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
+        logger.info(f"[scan_ltc_transactions] {len(existing_txids)} EXIST IN DB FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
+        logger.info(f"[scan_ltc_transactions] {len(txids)} NEW TXIDs TO PROCESS FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
 
         num_txids = len(txids)
 
@@ -273,7 +278,7 @@ def scan_ltc_transactions(season):
         for txid in txids:
             j += 1
             # Get tx data from Blockcypher API
-            logger.info(f">>> Processing txid {j}/{num_txids}")
+            logger.info(f"[scan_ltc_transactions] >>> Processing txid {j}/{num_txids}")
             tx_info = get_ltc_tx_info(txid, True, True)
             if 'error' in tx_info:
                 pass
@@ -304,7 +309,7 @@ def scan_ltc_transactions(season):
 
                 # Detect Split (single row only)
                 if detect_split(ltc_row, addresses):
-                    logger.info("SPLIT detected")
+                    logger.info("[scan_ltc_transactions] SPLIT detected")
 
                 else:                    
                     if detect_ntx(vins, vouts, addresses):
@@ -318,6 +323,8 @@ def scan_ltc_transactions(season):
                     else:
                         ltc_row.category = "Other"
 
+                    notary_list = []
+                    notary_addresses = []
                     input_index = 0
                     for vin in vins:
                         ltc_row.output_sats = -1
@@ -328,6 +335,8 @@ def scan_ltc_transactions(season):
                         ltc_row.notary = get_notary_from_ltc_address(ltc_row.address, ltc_row.season)
                         ltc_row.update()
                         input_index += 1
+                        notary_list.append(ltc_row.notary)
+                        notary_addresses.append(ltc_row.address)
 
                     output_index = 0
                     for vout in vouts:
@@ -341,27 +350,8 @@ def scan_ltc_transactions(season):
                             ltc_row.update()
                             output_index += 1
 
-                    # update notary_last_ntx
                     if ltc_row.category == "NTX":
-                        notary_list = []
-                        notary_addresses = []
-                        for vin in vins:
-                            last_ntx_row = last_notarised_row()
-                            last_ntx_row.notary = get_notary_from_ltc_address(vin["addresses"][0], season)
-                            notary_list.append(last_ntx_row.notary)
-                            notary_addresses.append(vin["addresses"][0])
-                            if last_ntx_row.notary in notary_last_ntx:
-                                last_ltc_ntx_ht = notary_last_ntx[last_ntx_row.notary]["LTC"]
-                            else:
-                                last_ltc_ntx_ht = 0
-                            if last_ltc_ntx_ht < ltc_row.block_height:
-                                last_ntx_row.season = season
-                                last_ntx_row.server = ltc_row.server
-                                last_ntx_row.chain = "LTC"
-                                last_ntx_row.txid = ltc_row.txid
-                                last_ntx_row.block_height = ltc_row.block_height
-                                last_ntx_row.block_time = ltc_row.block_time
-                                last_ntx_row.update()
+
                         for vout in vouts:
                             if 'data_hex' in vout:
                                 opret = vout['data_hex']
@@ -387,17 +377,14 @@ def scan_ltc_transactions(season):
                                 ntx_row.txid = ltc_row.txid
                                 ntx_row.opret = opret
                                 ntx_row.season = ltc_row.season
-                                ntx_row.server = ltc_row.server
-                                ntx_row.score_value = get_chain_epoch_score_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
-                                ntx_row.epoch = get_chain_epoch_at(ntx_row.season, ntx_row.server, ntx_row.chain, int(ntx_row.block_time))
-                                if ntx_row.score_value > 0:
-                                    ntx_row.scored = True
-                                else:
-                                    ntx_row.scored = False
+                                ntx_row.server = "LTC"
+                                ntx_row.score_value = 0
+                                ntx_row.epoch = "LTC"
+                                ntx_row.scored = False
                                 ntx_row.btc_validated = "N/A"
                                 ntx_row.update()
 
-                logger.info(f"TXID: {txid} ({ltc_row.category})")
+                logger.info(f"[scan_ltc_transactions] TXID: {txid} ({ltc_row.category})")
             else:
                 logger.warning(f"Fees not in txinfo for {txid}! Likely unconfirmed...")
                 logger.warning(tx_info)
@@ -405,8 +392,9 @@ def scan_ltc_transactions(season):
 
 if __name__ == "__main__":
     
-    season = "Season_5_Testnet"
-    scan_ltc_transactions(season)
+    seasons = [SEASON]
+    for season in seasons:
+        scan_ltc_transactions(season)
 
     CURSOR.close()
     CONN.close()

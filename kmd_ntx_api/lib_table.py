@@ -156,6 +156,7 @@ def get_last_notarised_table(request):
     serializer = lastNotarisedSerializer(data, many=True)
     return serializer.data
 
+# TODO: Handle where chain not notarised
 def get_notary_profile_summary_table(request):
     season = None
     server = None
@@ -175,29 +176,37 @@ def get_notary_profile_summary_table(request):
         return {
             "error":"You need to specify at least both of the following filter parameters: ['notary', 'season']"
         }
+    season_main_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Main').json()["results"]
+    season_3P_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Third_Party').json()["results"]
+
     resp = {}
     ntx_season_data = get_notarised_count_season_table(request)
     for item in ntx_season_data:
         chain_ntx_counts = item['chain_ntx_counts']
         for server in chain_ntx_counts:
-            for epoch in chain_ntx_counts[server]["epochs"]:
-                for chain in chain_ntx_counts[server]["epochs"][epoch]["chains"]:
-                    if chain not in resp:
-                        resp.update({
-                            chain:{
-                                "season":season,
-                                "server":server,
-                                "chain":chain,
-                                "chain_score":0,
-                                "chain_ntx_count":0
-                            }
-                        })
-                    resp[chain]['chain_score'] += chain_ntx_counts[server]["epochs"][epoch]["chains"][chain]["chain_score"]
-                    resp[chain]['chain_ntx_count'] += chain_ntx_counts[server]["epochs"][epoch]["chains"][chain]["chain_ntx_count"]
+            for chain in chain_ntx_counts[server]["chains"]:
+                if chain not in resp:
+                    resp.update({
+                        chain:{
+                            "season":season,
+                            "server":server,
+                            "chain":chain,
+                            "chain_score":chain_ntx_counts[server]["chains"][chain]["chain_score"],
+                            "chain_ntx_count":chain_ntx_counts[server]["chains"][chain]["chain_ntx_count"]
+                        }
+                    })
 
         chain_ntx_pct = item['chain_ntx_pct']
         for chain in chain_ntx_pct:
             if chain not in resp:
+                if chain in season_main_coins:
+                    server = "Main"
+                elif chain in season_3P_coins:
+                    server = "Third_Party"
+                elif chain in ["KMD", "BTC", "LTC"]:
+                    server = chain
+                else:
+                    logger.warning(f"Can't assign {chain} NTX % for {notary}")
                 resp.update({
                     chain: {
                         "season":season,
@@ -442,7 +451,7 @@ def get_notarised_table(request):
             "error":"You need to specify all of the following filter parameters: ['season', 'server', 'chain', 'notary']"
         }
     print(chain)
-    data = get_notarised_data(season, server, epoch, chain, notary, address)
+    data = get_notarised_data(season, server, epoch, chain, notary, address).order_by('-block_time')
     data = data.values()
 
     serializer = notarisedSerializer(data, many=True)
@@ -500,35 +509,40 @@ def get_scoring_epochs_table(request):
     resp = []
     
     for item in data:
-
-        resp.append({
-                "season":item['season'],
-                "server":item['server'],
-                "epoch":item['epoch'].split("_")[1],
-                "epoch_start":dt.fromtimestamp(item['epoch_start']),
-                "epoch_end":dt.fromtimestamp(item['epoch_end']),
-                "epoch_start_timestamp":item['epoch_start'],
-                "epoch_end_timestamp":item['epoch_end'],
-                "duration":item['epoch_end']-item['epoch_start'],
-                "start_event":item['start_event'],
-                "end_event":item['end_event'],
-                "epoch_chains":item['epoch_chains'],
-                "num_epoch_chains":len(item['epoch_chains']),
-                "score_per_ntx":item['score_per_ntx']
-        })
+        if item['epoch'].find("_") > -1:
+            epoch_id = item['epoch'].split("_")[1]
+        else:
+            epoch_id = epoch
+            
+        if epoch_id not in ["Unofficial", None]:
+            resp.append({
+                    "season":item['season'],
+                    "server":item['server'],
+                    "epoch":epoch_id,
+                    "epoch_start":dt.fromtimestamp(item['epoch_start']),
+                    "epoch_end":dt.fromtimestamp(item['epoch_end']),
+                    "epoch_start_timestamp":item['epoch_start'],
+                    "epoch_end_timestamp":item['epoch_end'],
+                    "duration":item['epoch_end']-item['epoch_start'],
+                    "start_event":item['start_event'],
+                    "end_event":item['end_event'],
+                    "epoch_chains":item['epoch_chains'],
+                    "num_epoch_chains":len(item['epoch_chains']),
+                    "score_per_ntx":item['score_per_ntx']
+            })
     return resp
 
 
 
 # UPDATE PENDING
-def get_notary_epoch_scores_table(notary=None, season=None):
+def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None):
 
     if not notary:
         notary_list = get_notary_list(season)
         notary = random.choice(notary_list)
 
     if not season:
-        season = "Season_4"
+        season = SEASON
 
     notary_epoch_scores = get_notarised_count_season_data(season, notary).values()
 
@@ -551,35 +565,40 @@ def get_notary_epoch_scores_table(notary=None, season=None):
         for server in chain_ntx["servers"]:
 
             for epoch in chain_ntx["servers"][server]["epochs"]:
-                if server == "BTC":
-                    server_epoch_chains = ["BTC"]
-                elif server == "KMD":
-                    server_epoch_chains = ["KMD"]
-                elif server == "LTC":
-                    server_epoch_chains = ["LTC"]
-                else:
-                    server_epoch_chains = epoch_chains_dict[season][server][epoch]
+                if epoch != "Unofficial":
+                    if server == "BTC":
+                        server_epoch_chains = ["BTC"]
+                    elif server == "KMD":
+                        server_epoch_chains = ["KMD"]
+                    elif server == "LTC":
+                        server_epoch_chains = ["LTC"]
+                    else:
+                        server_epoch_chains = epoch_chains_dict[season][server][epoch]
 
-                for chain in chain_ntx["servers"][server]["epochs"][epoch]["chains"]:
-                    chain_stats = chain_ntx["servers"][server]["epochs"][epoch]["chains"][chain]
-                    score_per_ntx = chain_ntx["servers"][server]["epochs"][epoch]["score_per_ntx"]
-                    epoch_chain_ntx_count = chain_stats["chain_ntx_count"]
-                    epoch_chain_score = chain_stats["chain_score"]
+                    for chain in chain_ntx["servers"][server]["epochs"][epoch]["chains"]:
+                        if not selected_chain or chain == selected_chain:
+                            chain_stats = chain_ntx["servers"][server]["epochs"][epoch]["chains"][chain]
+                            score_per_ntx = chain_ntx["servers"][server]["epochs"][epoch]["score_per_ntx"]
+                            epoch_chain_ntx_count = chain_stats["epoch_chain_ntx_count"]
+                            epoch_chain_score = chain_stats["epoch_chain_score"]
+                            if epoch.find("_") > -1:
+                                epoch_id = epoch.split("_")[1]
+                            else:
+                                epoch_id = epoch
+                            row = {
+                                "notary":notary,
+                                "season":season.replace("_", " "),
+                                "server":server,
+                                "epoch":epoch_id,
+                                "chain":chain,
+                                "score_per_ntx":score_per_ntx,
+                                "epoch_chain_ntx_count":epoch_chain_ntx_count,
+                                "epoch_chain_score":epoch_chain_score
+                            }
 
-                    row = {
-                        "notary":notary,
-                        "season":season.replace("_", " "),
-                        "server":server,
-                        "epoch":epoch.split("_")[1],
-                        "chain":chain,
-                        "score_per_ntx":score_per_ntx,
-                        "epoch_chain_ntx_count":epoch_chain_ntx_count,
-                        "epoch_chain_score":epoch_chain_score
-                    }
-
-                    server_epoch_chains.remove(chain)
-                    total += chain_stats["chain_score"]
-                    rows.append(row)
+                            server_epoch_chains.remove(chain)
+                            total += chain_stats["epoch_chain_score"]
+                            rows.append(row)
 
     return rows, total
 
@@ -619,6 +638,8 @@ def get_vote2021_table(request):
     serializer = vote2021Serializer(data, many=True)
     resp = {}
     for item in serializer.data:
+        if item["candidate"] in DISQUALIFIED:
+            item.update({"votes":-1})    
         item.update({"lag":item["block_time"]-item["lock_time"]})
 
     return serializer.data
