@@ -55,7 +55,7 @@
   	<script>
 	    $(document).ready(function() {
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
-	        AR_table = $('#epoch_scoring_table').DataTable({
+	        $('#epoch_scoring_table').DataTable({
 	        	"paging": false,
         		order: [[ 0, 'asc' ],[ 1, 'asc' ],[ 2, 'asc' ]],
 	        	"columns": [
@@ -64,9 +64,18 @@
 			        { "data": "chain" },
 			        { "data": "epoch_chain_ntx_count" },
 			        { "data": "score_per_ntx" },
-			        { "data": "epoch_chain_score" }
+			        { "data": "epoch_chain_score" },
+			        { "data": "detail" }
 			    ],
         		"columnDefs": [
+        			{
+			            "data": 'chain',
+			            "targets": 2,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            		$(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a>");	
+				            
+				        }
+        			},
         			{
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {

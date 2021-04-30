@@ -4,6 +4,9 @@ from lib_table_select import *
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
 
+def safe_div(x,y):
+    if y==0: return 0
+    return x/y
 
 def handle_dual_server_chains(chain, server):
     if chain == "GLEEC" and server == "Third_Party":
@@ -161,8 +164,8 @@ def get_chain_server(chain, season):
     if chain in ["KMD", "LTC", "BTC"]:
         return chain
     else:
-        main_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins?season={season}&server=Main').json()["results"]
-        third_party_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins?season={SEASON}&server=Third_Party').json()["results"]
+        main_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={season}&server=Main').json()["results"]
+        third_party_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Third_Party').json()["results"]
     if chain in main_coins:
         return "Main"
     elif chain in third_party_coins:
@@ -205,7 +208,7 @@ def ts_col_to_season_col(ts_col, season_col, table):
 
 
 def get_nn_btc_tx_parts(txid):
-    r = requests.get(f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={txid}")
+    r = requests.get(f"{OTHER_SERVER}/api/info/nn_btc_txid/?txid={txid}")
     tx_parts_list = r.json()["results"][0]
     
     tx_vins = []
@@ -219,7 +222,7 @@ def get_nn_btc_tx_parts(txid):
 
 
 def get_nn_btc_tx_parts_local(txid):
-    r = requests.get(f"{THIS_SERVER}/api/info/nn_btc_txid?txid={txid}")
+    r = requests.get(f"{THIS_SERVER}/api/info/nn_btc_txid/?txid={txid}")
     tx_parts_list = r.json()["results"][0]
     
     tx_vins = []
@@ -243,14 +246,16 @@ def get_notary_from_ltc_address(address, season=None, notary=None):
     if address == LTC_NTX_ADDR:
         return "LTC_NTX_ADDR"
 
-    if address in NN_LTC_ADDRESSES_DICT[season]:
-        return NN_LTC_ADDRESSES_DICT[season][address]
+    if season in NN_LTC_ADDRESSES_DICT:
+        if address in NN_LTC_ADDRESSES_DICT[season]:
+            return NN_LTC_ADDRESSES_DICT[season][address]
 
     seasons = list(SEASONS_INFO.keys())[::-1]
 
     for s in seasons:
-        if address in NN_LTC_ADDRESSES_DICT[s]:
-            return NN_LTC_ADDRESSES_DICT[s][address]
+        if s in NN_LTC_ADDRESSES_DICT:
+            if address in NN_LTC_ADDRESSES_DICT[s]:
+                return NN_LTC_ADDRESSES_DICT[s][address]
     if notary:
         return notary
     else:
@@ -260,15 +265,16 @@ def get_notary_from_ltc_address(address, season=None, notary=None):
 def get_notary_from_btc_address(address, season=None, notary=None):
     if address == BTC_NTX_ADDR:
         return "BTC_NTX_ADDR"
-
-    if address in NN_BTC_ADDRESSES_DICT[season]:
-        return NN_BTC_ADDRESSES_DICT[season][address]
+    if season in NN_BTC_ADDRESSES_DICT:
+        if address in NN_BTC_ADDRESSES_DICT[season]:
+            return NN_BTC_ADDRESSES_DICT[season][address]
 
     seasons = list(SEASONS_INFO.keys())[::-1]
 
     for s in seasons:
-        if address in NN_BTC_ADDRESSES_DICT[s]:
-            return NN_BTC_ADDRESSES_DICT[s][address]
+        if s in NN_BTC_ADDRESSES_DICT:
+            if address in NN_BTC_ADDRESSES_DICT[s]:
+                return NN_BTC_ADDRESSES_DICT[s][address]
     if notary:
         return notary
     else:

@@ -64,8 +64,8 @@ ELECTRUMS = requests.get(f'{THIS_SERVER}/api/info/electrums/').json()['results']
 
 SEASON = 'Season_4'
 
-ANTARA_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins?season={SEASON}&server=Main').json()["results"]
-THIRD_PARTY_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins?season={SEASON}&server=Third_Party').json()["results"]
+ANTARA_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Main').json()["results"]
+THIRD_PARTY_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Third_Party').json()["results"]
 
 ALL_COINS = ANTARA_COINS + THIRD_PARTY_COINS + ['BTC', 'KMD', 'LTC']
 ALL_ANTARA_COINS = ANTARA_COINS + RETIRED_SMARTCHAINS # add retired smartchains here

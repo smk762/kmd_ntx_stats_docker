@@ -26,7 +26,7 @@ def update_latest_ntx(season, server, notary, chain):
     try:
         CURSOR.execute(sql)
         resp = CURSOR.fetchone()
-
+        print(f"[update_latest_ntx] {season} {server} {notary} {chain} Max block_time resp: {resp}")
         block_time = resp[0]
         if block_time:
             sql = "SELECT block_height, txid \
@@ -50,10 +50,22 @@ def update_latest_ntx(season, server, notary, chain):
                 row.update()
 
             except Exception as e:
-                logger.error(f"Exception in [update_latest_ntx]: {e}")
+                logger.error(f"Exception in [update_latest_ntx] where block_time: {e}")
+        else:
+            row = last_notarised_row()
+            row.notary = notary
+            row.chain = chain
+            row.txid = "N/A"
+            row.block_height = 0
+            row.block_time = 0
+            row.season = season
+            row.server = server
+            row.update()
+
+
 
     except Exception as e:
-        logger.error(f"Exception in [update_latest_ntx]: {e}")
+        logger.error(f"Exception in [update_latest_ntx] max block_time: {e}")
 
 
 if __name__ == "__main__":

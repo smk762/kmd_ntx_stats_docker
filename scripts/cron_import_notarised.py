@@ -3,10 +3,10 @@ import json
 import time
 import random
 import requests
+from lib_const import *
 from lib_helper import *
 from lib_notary import *
-from models import notarised_row, get_chain_epoch_score_at, get_chain_epoch_at, last_notarised_row
-from lib_const import *
+from models import notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
 from lib_api import get_btc_tx_info
 from lib_table_select import get_existing_notarised_txids, get_notarised_chains, get_notarised_seasons
 
@@ -15,7 +15,7 @@ def import_ntx(season, server, chain):
     existing_notarised_txids = get_existing_notarised_txids(chain, season, server)
     logger.info(f"existing_notarised_txids: {len(existing_notarised_txids)}")
 
-    import_txids_url = f"{OTHER_SERVER}/api/info/notarisation_txid_list?season={season}&server={server}&chain={chain}"
+    import_txids_url = f"{OTHER_SERVER}/api/info/notarisation_txid_list/?season={season}&server={server}&chain={chain}"
     import_txids = requests.get(import_txids_url).json()["results"]
     logger.info(f"import_txids: {len(import_txids)}")
 
@@ -29,7 +29,7 @@ def import_ntx(season, server, chain):
     for txid in new_txids:
         j += 1
         logger.info(f">>> Importing {txid} {j}/{len(new_txids)}")
-        txid_url = f"{OTHER_SERVER}/api/info/notarised_txid?txid={txid}"
+        txid_url = f"{OTHER_SERVER}/api/info/notarised_txid/?txid={txid}"
         time.sleep(0.02)
         r = requests.get(txid_url)
         try:
@@ -102,37 +102,6 @@ def import_ntx(season, server, chain):
             logger.error(f"Something wrong with API? {txid_url}")
 
 
-def import_last_ntx(season, server, notary):
-    import_last_ntx_url = f"{OTHER_SERVER}/api/table/last_notarised/?season={season}&server={server}&notary={notary}"
-    import_last_ntx = requests.get(import_last_ntx_url).json()["results"]
-    for import_item in import_last_ntx:
-        chain = import_item["chain"]
-        chain = handle_dual_server_chains(chain, server)
-        local_last_ntx_url = f"{THIS_SERVER}/api/table/last_notarised/?season={season}&server={server}&notary={notary}&chain={chain}"
-        local_last_ntx = requests.get(local_last_ntx_url).json()["results"]
-
-        if len(local_last_ntx) > 0:
-            for local_item in local_last_ntx:
-                local_height = local_item["block_height"]
-        else:
-            local_height = 0
-
-        import_height = import_item["block_height"]        
-        if import_height > local_height:
-            logger.info(f">>> [import_last_ntx] updating {season} {server} {chain} {notary}")
-            row = last_notarised_row()
-            row.notary = notary
-            row.chain = import_item["chain"]
-            row.txid = import_item["txid"]
-            row.block_height = import_item["block_height"]
-            row.block_time = import_item["block_time"]
-            row.season = import_item["season"]
-            row.server = import_item["server"]
-            row.update()
-
-
-
-
 if __name__ == "__main__":
 
     seasons = get_notarised_seasons()
@@ -143,9 +112,6 @@ if __name__ == "__main__":
             season_notaries.sort()
             servers = get_notarised_servers(season)
             for server in servers:
-                for notary in season_notaries:
-                    import_last_ntx(season, server, notary)
-
                 chains = get_notarised_chains(season, server)
                 i = 0
                 while len(chains) > 0:

@@ -116,7 +116,7 @@ def daemon_cli_view(request):
 
 def pubkey_addresses_view(request):
     context = {
-        "page_title":"Pubkey Addresses View",
+        "page_title":"Pubkey Addresses",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()
     }

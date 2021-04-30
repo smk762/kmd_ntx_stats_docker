@@ -427,6 +427,7 @@ def get_notarised_seasons(chain=None):
 
     return seasons
 
+
 def get_notarised_servers(season=None):
 
     sql = "SELECT DISTINCT server FROM notarised"
@@ -629,3 +630,27 @@ def get_distinct_col_vals_from_table(table, column, conditions=None):
         distinct_values.append(item[0])
     distinct_values.sort()
     return distinct_values
+
+
+def get_season_ntx_sum_count(season, server, epoch, chain):
+    if postseason:
+        if 'post_season_end_time' in SEASONS_INFO[season]:
+            end_time = SEASONS_INFO[season]['post_season_end_time']
+        else:
+            end_time = SEASONS_INFO[season]['end_time']
+    else:
+        end_time = SEASONS_INFO[season]['end_time']
+
+    sql = "SELECT server, epoch, chain, COUNT(*), SUM(score_value) \
+            FROM notarised WHERE block_time >= "+str(SEASONS_INFO[season]['start_time'])+" \
+           AND block_time <= "+str(end_time)+" \
+           AND season = '"+str(season)+"' \
+           GROUP BY server, epoch, chain;"
+
+
+    CURSOR.execute(sql)
+    results = CURSOR.fetchall()
+    if len(results) > 0:
+        return results
+    else:
+        return ()

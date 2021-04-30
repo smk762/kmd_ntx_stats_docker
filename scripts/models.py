@@ -167,6 +167,10 @@ class tx_row():
 
         if self.address == BTC_NTX_ADDR:
             self.notary = "BTC_NTX_ADDR"
+            
+        if self.notary.find("linked") != -1:
+            self.notary = get_name_from_address(self.address)
+
         row_data = (
             self.txid, self.block_hash, self.block_height,
             self.block_time, self.block_datetime, self.address,
@@ -184,7 +188,7 @@ class tx_row():
             update_nn_btc_tx_row(row_data)
         else:
             logger.warning(f"[btc_tx] Row data invalid!")
-            logger.warning(f"{OTHER_SERVER}/api/info/nn_btc_txid?txid={self.txid}")
+            logger.warning(f"{OTHER_SERVER}/api/info/nn_btc_txid/?txid={self.txid}")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -477,7 +481,8 @@ class last_notarised_row():
             logger.warning(f"{row_data}")
 
     def delete(self):
-        CURSOR.execute(f"DELETE FROM last_notarised WHERE notary = '{self.notary}' and chain = '{self.chain}';")
+        logger.warning(f"[last_notarised_row] DELETING {self.season} {self.server} {self.notary} {self.chain}")
+        CURSOR.execute(f"DELETE FROM last_notarised WHERE notary = '{self.notary}' and season = '{self.season}' and server = '{self.server}' and chain = '{self.chain}';")
         CONN.commit()
 
 
@@ -640,20 +645,6 @@ class ltc_tx_row():
         self.num_inputs = num_inputs
         self.num_outputs = num_outputs
 
-        if self.category == "SPAM":
-            self.input_index = 0
-            self.input_sats = 0
-            self.output_index = 0
-            self.output_sats = 0
-
-        if self.category == "Split":
-            self.input_index = -99
-            self.input_sats = -99
-            self.output_index = -99
-            self.output_sats = -99
-
-        if self.address == LTC_NTX_ADDR:
-            self.notary = "LTC_NTX_ADDR"
 
     def validated(self):
 
@@ -669,6 +660,24 @@ class ltc_tx_row():
         return True
 
     def update(self):
+        if self.category == "SPAM":
+            self.input_index = 0
+            self.input_sats = 0
+            self.output_index = 0
+            self.output_sats = 0
+
+        if self.category == "Split":
+            self.input_index = -99
+            self.input_sats = -99
+            self.output_index = -99
+            self.output_sats = -99
+
+        if self.address == LTC_NTX_ADDR:
+            self.notary = "LTC_NTX_ADDR"
+
+        if self.notary.find("linked") != -1:
+            self.notary = get_name_from_address(self.address)
+
         row_data = (
             self.txid, self.block_hash, self.block_height,
             self.block_time, self.block_datetime, self.address,
@@ -686,7 +695,7 @@ class ltc_tx_row():
             update_nn_ltc_tx_row(row_data)
         else:
             logger.warning(f"[ltc_tx_row] Row data invalid!")
-            logger.warning(f"{OTHER_SERVER}/api/info/nn_ltc_txid?txid={self.txid}")
+            logger.warning(f"{OTHER_SERVER}/api/info/nn_ltc_txid/?txid={self.txid}")
             logger.warning(f"{row_data}")
 
 

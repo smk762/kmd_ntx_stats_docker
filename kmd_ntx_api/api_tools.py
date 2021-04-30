@@ -114,7 +114,6 @@ def get_notary_utxo_count(request):
         })
 
 
-
 def get_kmd_rewards(request):
     address = None
     if "address" in request.GET:
