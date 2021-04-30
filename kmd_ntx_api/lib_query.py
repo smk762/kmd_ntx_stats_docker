@@ -6,14 +6,12 @@ import datetime
 import random
 from datetime import datetime as dt
 from .models import *
-from .lib_const import *
 from .lib_helper import *
 
 from dotenv import load_dotenv
 from django.db.models import Count, Min, Max, Sum
 from kmd_ntx_api.serializers import *
 
-logger = logging.getLogger("mylogger")
 
 load_dotenv()
 
@@ -21,6 +19,7 @@ load_dotenv()
 def get_addresses_data(season=None, server=None, chain=None, notary=None, address=None):
     data = addresses.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
 
     if server:
@@ -41,6 +40,7 @@ def get_addresses_data(season=None, server=None, chain=None, notary=None, addres
 def get_balances_data(season=None, server=None, chain=None, notary=None, address=None):
     data = balances.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
 
     if server:
@@ -86,6 +86,7 @@ def get_coin_social_data(chain=None):
 def get_funding_transactions_data(season=None, notary=None, category=None, chain=None):
     data = funding_transactions.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
@@ -99,6 +100,7 @@ def get_funding_transactions_data(season=None, notary=None, category=None, chain
 def get_last_notarised_data(season=None, server=None, notary=None, chain=None):
     data = last_notarised.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
     if server:
         data = data.filter(server=server)
@@ -114,6 +116,7 @@ def get_mined_count_daily_data(season=None, notary=None, mined_date=None):
     if mined_date:
         data = data.filter(mined_date=mined_date)
     if season:
+        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
@@ -123,6 +126,7 @@ def get_mined_count_daily_data(season=None, notary=None, mined_date=None):
 def get_mined_count_season_data(season=None, name=None, address=None):
     data = mined_count_season.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
     if name:
         data = data.filter(name=name)
@@ -134,6 +138,7 @@ def get_mined_count_season_data(season=None, name=None, address=None):
 def get_mined_data(season=None, name=None, address=None):
     data = mined.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
     if name:
         data = data.filter(name=name)
@@ -148,6 +153,7 @@ def get_nn_btc_tx_data(season=None, notary=None, category=None, address=None, tx
     else:
         data = nn_btc_tx.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
@@ -155,6 +161,7 @@ def get_nn_btc_tx_data(season=None, notary=None, category=None, address=None, tx
         data = data.filter(category=category)
     if address:
         data = data.filter(address=address)
+    logger.info(data.count())
     return data
 
 
@@ -164,6 +171,7 @@ def get_nn_ltc_tx_data(season=None, notary=None, category=None, address=None, tx
     else:
         data = nn_ltc_tx.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
@@ -176,7 +184,8 @@ def get_nn_ltc_tx_data(season=None, notary=None, category=None, address=None, tx
 
 def get_nn_social_data(season=None, notary=None):
     data = nn_social.objects.all()
-    if season:
+    if season:  
+        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
@@ -189,6 +198,7 @@ def get_notarised_data(season=None, server=None, epoch=None, chain=None, notary=
     else:
         data = notarised.objects.exclude(season="Season_1").exclude(season="Season_2").exclude(season="Season_3")
     if season:
+        season = season.title()
         data = data.filter(season=season)
     if server:
         data = data.filter(server=server)
@@ -207,6 +217,7 @@ def get_notarised_data(season=None, server=None, epoch=None, chain=None, notary=
 def get_notarised_btc_data(season=None):
     data = notarised_btc.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
     return data
 
@@ -223,6 +234,7 @@ def get_notarised_chain_daily_data(notarised_date=None, chain=None):
 def get_notarised_chain_season_data(season=None, server=None, chain=None):
     data = notarised_chain_season.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
     if server:
         data = data.filter(server=server)
@@ -243,6 +255,7 @@ def get_notarised_count_daily_data(notarised_date=None, notary=None):
 def get_notarised_count_season_data(season=None, notary=None):
     data = notarised_count_season.objects.all()
     if season:
+        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
@@ -253,6 +266,7 @@ def get_notarised_tenure_data(season=None, server=None, chain=None):
     data = notarised_tenure.objects.all()
 
     if season:
+        season = season.title()
         data = data.filter(season=season)
 
     if server:
@@ -277,6 +291,7 @@ def get_scoring_epochs_data(season=None, server=None, chain=None, epoch=None, ti
     data = scoring_epochs.objects.all()
 
     if season:
+        season = season.title()
         data = data.filter(season=season)
 
     if server:

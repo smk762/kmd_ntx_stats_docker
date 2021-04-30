@@ -189,19 +189,6 @@ def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None, stop_b
 # MINED OPS
 
 
-def get_daily_mined_counts(day):
-    result = 0
-    results = get_mined_date_aggregates(day)
-    time_stamp = int(time.time())
-    for item in results:
-        row = daily_mined_count_row()
-        row.notary = item[0]
-        if row.notary in ALL_SEASON_NOTARIES:
-            row.blocks_mined = int(item[1])
-            row.sum_value_mined = float(item[2])
-            row.mined_date = str(day)
-            row.update()
-    return result
 
 
 
@@ -270,12 +257,12 @@ def get_new_notary_txids(notary_address, chain, season):
     existing_txids = []
     if chain == "BTC":
         existing_txids = get_existing_nn_btc_txids(None, None, season, NN_BTC_ADDRESSES_DICT[season][notary_address])
-        url = f"{OTHER_SERVER}/api/info/btc_txid_list?notary={NN_BTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
+        url = f"{OTHER_SERVER}/api/info/btc_txid_list/?notary={NN_BTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
         logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_BTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
            
     elif chain == "LTC":
         existing_txids = get_existing_nn_ltc_txids(None, None, season, NN_LTC_ADDRESSES_DICT[season][notary_address])
-        url = f"{OTHER_SERVER}/api/info/ltc_txid_list?notary={NN_LTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
+        url = f"{OTHER_SERVER}/api/info/ltc_txid_list/?notary={NN_LTC_ADDRESSES_DICT[season][notary_address]}&season={season}"
         logger.info(f"{len(existing_txids)} existing txids in local DB detected for {NN_LTC_ADDRESSES_DICT[season][notary_address]} {notary_address} {season}")
      
     logger.info(url)
@@ -573,3 +560,23 @@ def validate_ltc_ntx_vins(vins):
             return False
 
     return True
+
+
+'''
+# DEPRECATE LATER (unused?)
+
+def get_daily_mined_counts(day):
+    result = 0
+    results = get_mined_date_aggregates(day)
+    time_stamp = int(time.time())
+    for item in results:
+        row = daily_mined_count_row()
+        row.notary = item[0]
+        if row.notary in ALL_SEASON_NOTARIES:
+            row.blocks_mined = int(item[1])
+            row.sum_value_mined = float(item[2])
+            row.mined_date = str(day)
+            row.update()
+    return result
+    
+'''

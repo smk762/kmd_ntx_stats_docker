@@ -45,8 +45,8 @@ def thread_electrum(season, server, notary, coin, pubkey, address):
 def get_balances(season):
 
     logger.warning(f"Processing season: {season}")
-    season_main_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins?season={season}&server=Main').json()['results']
-    season_3p_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins?season={season}&server=Third_Party').json()['results']
+    season_main_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={season}&server=Main').json()['results']
+    season_3p_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={season}&server=Third_Party').json()['results']
     logger.warning(f"season_main_coins: {season_main_coins}")
     logger.warning(f"season_3p_coins: {season_3p_coins}")
 
@@ -56,7 +56,7 @@ def get_balances(season):
         for pubkey_season in NOTARY_PUBKEYS:
 
             if pubkey_season.find(season) != -1:
-                address_data = requests.get(f'{THIS_SERVER}/api/wallet/notary_addresses?season={season}').json()
+                address_data = requests.get(f'{THIS_SERVER}/api/wallet/notary_addresses/?season={season}').json()
 
                 if pubkey_season.find("Third_Party") != -1:
                     coins = season_3p_coins

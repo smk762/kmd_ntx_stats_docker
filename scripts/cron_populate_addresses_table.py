@@ -11,7 +11,7 @@ TODO: auto grab from repo?
 '''
 
 def populate_addresses(season, server):
-    url = f'{THIS_SERVER}/api/info/dpow_server_coins?season={season}&server={server}'
+    url = f'{THIS_SERVER}/api/info/dpow_server_coins/?season={season}&server={server}'
     logger.info(url)
     coins = requests.get(url).json()['results']
     coins += ["BTC", "KMD", "LTC"]
