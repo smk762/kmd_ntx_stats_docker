@@ -10,19 +10,45 @@ def get_latest_chain_ntx_info(chain, height):
     chains_resp = CURSOR.fetchone()
     return chains_resp
 
-def get_validated_ntx_info(opret):
-    sql = f"SELECT txid, block_time, btc_validated FROM notarised \
-          WHERE btc_validated != 'true' AND opret LIKE '%' || '{opret[11:33]}' || '%';"
-    CURSOR.execute(sql)
-    return CURSOR.fetchone()
-
 def get_chain_ntx_season_aggregates(season):
     sql = f"SELECT chain, MAX(block_height), \
                           MAX(block_time), \
                           COALESCE(COUNT(*), 0) \
-           FROM notarised WHERE \
-           season = '{season}' \
+           FROM notarised \
+           WHERE season = '{season}' \
+           AND epoch != 'Unofficial' \
            GROUP BY chain;"
+    CURSOR.execute(sql)
+    try:
+        results = CURSOR.fetchall()
+        return results
+    except:
+        return ()
+
+
+def get_official_ntx_results(season, group_by, server=None, epoch=None, chain=None, notary=None):
+    group_by = ", ".join(group_by)
+    sql = f"SELECT {group_by}, \
+            COALESCE(COUNT(*), 0), \
+            COALESCE(SUM(score_value), 0) \
+            FROM notarised "
+
+    conditions = []
+    if season:
+        conditions.append(f"season = '{season}'")
+    if server:
+        conditions.append(f"server = '{server}'")
+    if epoch:
+        conditions.append(f"epoch = '{epoch}'")
+    if chain:
+        conditions.append(f"chain = '{chain}'")
+    if notary:
+        conditions.append(f"'{notary}' = ANY (notaries)")
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
+
+    sql += f" GROUP BY {group_by};"
     CURSOR.execute(sql)
     try:
         results = CURSOR.fetchall()
@@ -264,8 +290,8 @@ def get_table_names():
     return tables_list
 
 
-def get_season_mined_counts(season, postseason=False):
-    if postseason:
+def get_season_mined_counts(season):
+    if POSTSEASON:
         if 'post_season_end_time' in SEASONS_INFO[season]:
             end_time = SEASONS_INFO[season]['post_season_end_time']
         else:
@@ -283,6 +309,15 @@ def get_season_mined_counts(season, postseason=False):
         return results
     else:
         return ()
+
+def get_max_value_mined_txid(max_value):
+    sql = f"SELECT txid FROM mined WHERE value = {max_value};"
+    CURSOR.execute(sql)
+    results = CURSOR.fetchone()
+    if len(results) > 0:
+        return results[0]
+    else:
+        return ''
 
 def season_server_chain_has_ntx(season, chain, server):
     CURSOR.execute("SELECT COUNT(txid) \
@@ -405,6 +440,10 @@ def get_notarised_seasons(chain=None):
 
     if chain:
         conditions.append(f"chain = '{chain}'")
+    else:
+        resp = list(SEASONS_INFO.keys())
+        resp.reverse()
+        return resp
 
     if len(conditions) > 0:
         sql += " WHERE "
@@ -471,32 +510,6 @@ def get_all_coins():
 
     return coins
 
-
-def get_notarised_chain_rows(chain):
-    rows = []
-    CURSOR.execute(f"SELECT chain, block_height, \
-            block_time, block_datetime, block_hash, \
-            notaries, notary_addresses, ac_ntx_blockhash, \
-            ac_ntx_height, txid, opret, season, \
-            server, scored, score_value, btc_validated FROM notarised WHERE chain='{chain}';")
-    servers_results = CURSOR.fetchall()
-    for result in servers_results:
-        rows.append(result)
-    rows.sort()
-    return rows
-
-def get_notarised_season_rows(chain):
-    rows = []
-    CURSOR.execute(f"SELECT chain, block_height, \
-            block_time, block_datetime, block_hash, \
-            notaries, notary_addresses, ac_ntx_blockhash, \
-            ac_ntx_height, txid, opret, season, \
-            server, scored, score_value, btc_validated FROM notarised WHERE season='{season}';")
-    servers_results = CURSOR.fetchall()
-    for result in servers_results:
-        rows.append(result)
-    rows.sort()
-    return rows
 
 def get_notary_last_ntx(chain=None):
     # Get chain and time of last ntx
@@ -633,7 +646,7 @@ def get_distinct_col_vals_from_table(table, column, conditions=None):
 
 
 def get_season_ntx_sum_count(season, server, epoch, chain):
-    if postseason:
+    if POSTSEASON:
         if 'post_season_end_time' in SEASONS_INFO[season]:
             end_time = SEASONS_INFO[season]['post_season_end_time']
         else:

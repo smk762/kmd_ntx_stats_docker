@@ -12,8 +12,9 @@
 						<tr>
 							<th data-data="block_height">BLOCK HEIGHT</th>
 							<th data-data="name">MINED BY</th>
-							<th data-data="address">ADDRESS</th>
+							<th data-data="address" style="display: none">ADDRESS</th>
 							<th data-data="value">VALUE</th>
+							<th data-data="txid" style="display: none">TXID</th>
 							<th data-data="block_time">LAST MINED</th>
 						</tr>
 					</thead>
@@ -22,8 +23,9 @@
 						<tr>
 							<td data-data="block_height">{{ row.block_height }}</td>
 							<td data-data="name">{{ row.name }}</td>
-							<td data-data="address">{{ row.address }}</td>
+							<td data-data="address" style="display: none">{{ row.address }}</td>
 							<td data-data="value">{{ row.value }}</td>
+							<td data-data="txid" style="display: none">{{ row.txid }}</td>
 							<td data-data="block_time">{{ row.block_time }}</td>
 						</tr>
 					{% endfor %}
@@ -61,8 +63,20 @@
 		                "visible": false
 			        },
         			{
-			            "data": 'block_time',
+			            "data": 'value',
+			            "targets": 3,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.value+"</a>");
+				        }
+			        },
+        			{
+			            "data": 'txid',
 			            "targets": 4,
+		                "visible": false
+			        },
+        			{
+			            "data": 'block_time',
+			            "targets": 5,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	var time_now = Date.now()/1000;
 			            	totalSeconds = time_now-oData.block_time

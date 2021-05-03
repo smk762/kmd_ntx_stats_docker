@@ -6,12 +6,30 @@ def lil_endian(hex_str):
 
 def safe_div(x,y):
     if y==0: return 0
-    return x/y
+    return float(x/y)
 
 def handle_dual_server_chains(chain, server):
     if chain == "GLEEC" and server == "Third_Party":
         return "GLEEC-OLD"
     return chain
+
+def validate_epoch_chains(epoch_chains, season):
+    for chain in epoch_chains:
+        if season in DPOW_EXCLUDED_CHAINS:
+            if chain in DPOW_EXCLUDED_CHAINS[season]:
+                logger.warning(f"{chain} in DPOW_EXCLUDED_CHAINS[{season}]")
+                return False
+    return True
+
+def validate_season_server_epoch(season, server, epoch, notary_addresses, block_time, chain, txid, notaries):
+    if season in DPOW_EXCLUDED_CHAINS:
+        if chain in DPOW_EXCLUDED_CHAINS[season]:
+            season = "Unofficial"
+            server = "Unofficial"
+            epoch = "Unofficial"
+    season, server = get_season_from_addresses(notary_addresses, block_time, "KMD", chain, txid, notaries)
+    epoch = get_chain_epoch_at(season, server, chain, block_time)
+    return season, server, epoch
 
 def handle_translate_chains(chain):
     if chain in TRANSLATE_COINS:
@@ -34,6 +52,13 @@ def get_season_from_block(block):
                 return season
     return None
 
+def has_season_started(season):
+    now = time.time()
+    if season in SEASONS_INFO:
+        if SEASONS_INFO[season]["start_time"] < now:
+            return True
+    return False
+
 
 def get_chain_epoch_at(season, server, chain, timestamp):
     if season in DPOW_EXCLUDED_CHAINS: 
@@ -54,6 +79,8 @@ def get_chain_epoch_at(season, server, chain, timestamp):
 def get_chain_epoch_score_at(season, server, chain, timestamp):
     if season in DPOW_EXCLUDED_CHAINS: 
         if chain not in DPOW_EXCLUDED_CHAINS[season]:
+            if chain in ["BTC", "LTC"]:
+                return 0
             if chain in ["KMD"]:
                 if int(timestamp) >= SEASONS_INFO[season]["start_time"] and int(timestamp) <= SEASONS_INFO[season]["end_time"]:
                     return 0.0325

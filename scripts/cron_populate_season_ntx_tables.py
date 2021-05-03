@@ -18,23 +18,353 @@ from lib_api import *
 from lib_helper import *
 from models import *
 
+# Get total categorised count for all official chain notarisations
+def get_official_ntx(season):
+    official_ntx_results = get_official_ntx_results(season)
+    official_ntx = {}
+    for item in chain_season_ntx_result:
+        chain = item[0]
+        epoch = item[1]
+        notaries = item[2]
+        server = item[3]
+        count = item[4]
+        score_value = item[5]
+        official_ntx.update({
+            "chain":chain,
+            "epoch":epoch,
+            "notaries":notary,
+            "server":server,
+            "count":count,
+            "score_value":score_value
+        })
+    return official_ntx
+
+def get_official_ntx_dict(season):
+    official_ntx = get_official_ntx(season)
+    official_ntx_dict = {
+        "season_ntx_count":0,
+        "season_ntx_score":0,
+        "servers": {},
+        "notaries": {},
+        "chains": {}
+    }
+    for item in official_ntx:
+        server = item["server"]
+        epoch = item["epoch"]
+        chain = item["chain"]
+        count = item["count"]
+        score_value = item["score_value"]
+        notaries = item["notaries"]
+
+        for notary in notaries:
+
+            # Season stats
+            official_ntx_dict["season_ntx_count"] += count
+            official_ntx_dict["season_ntx_score"] += score_value*count
+
+            # Season chain stats
+            if chain not in official_ntx_dict["chains"]:
+                official_ntx_dict["chains"].update({
+                    chain:{
+                        "chain_ntx_count":0,
+                        "chain_ntx_score":0
+                    }
+                })
+            official_ntx_dict["chains"][chain]["chain_ntx_count"] += count
+            official_ntx_dict["chains"][chain]["chain_ntx_score"] += score_value*count
+
+            # Season notary stats
+            if notary not in official_ntx_dict["notaries"]:
+                official_ntx_dict["notaries"].update({
+                    notary:{
+                        "notary_ntx_count":0,
+                        "notary_ntx_score":0
+                    }
+                })
+            official_ntx_dict["notaries"][notary]["notary_ntx_count"] += count
+            official_ntx_dict["notaries"][notary]["notary_ntx_score"] += score_value*count
+            
+            # Season server stats
+            if server not in official_ntx_dict["servers"]:
+                official_ntx_dict["servers"].update({
+                    server:{
+                        "server_ntx_count":0,
+                        "server_ntx_score":0,
+                        "epochs":{},
+                        "chains":{},
+                        "notaries":{}
+                    }
+                })
+            official_ntx_dict["servers"][server]["server_ntx_count"] += count
+            official_ntx_dict["servers"][server]["server_ntx_score"] += score_value*count
+
+            # Season server notary stats
+            if notary not in official_ntx_dict["servers"][server]["notaries"]:
+                official_ntx_dict["servers"][server]["notaries"].update({
+                    notary : {
+                        "notary_ntx_count":0,
+                        "notary_ntx_score":0
+                    }
+                })
+            official_ntx_dict["servers"][server]["notaries"][notary]["notary_ntx_count"] += count
+            official_ntx_dict["servers"][server]["notaries"][notary]["notary_ntx_score"] += score_value*count
+
+            # Season server chain stats
+            if chain not in official_ntx_dict["servers"][server]["chains"]:
+                official_ntx_dict["servers"][server]["chains"].update({
+                    chain : {
+                        "chain_ntx_count":0,
+                        "chain_ntx_score":0
+                    }
+                })
+            official_ntx_dict["servers"][server]["chains"][chain]["chain_ntx_count"] += count
+            official_ntx_dict["servers"][server]["chains"][chain]["chain_ntx_score"] += score_value*count
+            
+            # Season server epoch stats
+            if epoch not in official_ntx_dict["servers"][server]["epochs"]:
+                official_ntx_dict["servers"][server]["epochs"].update({
+                    epoch: {
+                        "epoch_ntx_count":0,
+                        "epoch_ntx_score":0,
+                        "notaries":{},
+                        "chains":{}
+                    }
+                })
+            official_ntx_dict["servers"][server]["epochs"][epoch]["epoch_ntx_count"] += count
+            official_ntx_dict["servers"][server]["epochs"][epoch]["epoch_ntx_score"] += score_value*count
+
+            # Season server epoch notary stats
+            if notary not in official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"]:
+                official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"].update({
+                    notary: {
+                        "notary_ntx_count":0,
+                        "notary_ntx_score":0
+                    }
+                })
+            official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["notary_ntx_count"] += count
+            official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["notary_ntx_score"] += score_value*count
+
+            # Season server epoch chain stats
+            if chain not in official_ntx_dict["servers"][server]["epochs"][epoch]["chains"]:
+                official_ntx_dict["servers"][server]["epochs"][epoch]["chains"].update({
+                    chain: {
+                        "chain_ntx_count":0,
+                        "chain_ntx_score":0
+                    }
+                })
+            official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["chain_ntx_count"] += count
+            official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["chain_ntx_score"] += score_value*count
+            
+            # Season server epoch chain notary stats
+            if notary not in official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["notaries"]:
+                official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["notaries"].update({
+                    notary: {
+                        "notary_ntx_count":0,
+                        "notary_ntx_score":0
+                    }
+                })
+            official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["notaries"][notary]["notary_ntx_count"] += count
+            official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["notaries"][notary]["notary_ntx_score"] += score_value*count
+
+            # Season server epoch notary chain stats
+            if chain not in official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["chains"]:
+                official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["notaries"].update({
+                    chain: {
+                        "chain_ntx_count":0,
+                        "chain_ntx_score":0
+                    }
+                })
+            official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["chains"][chain]["chain_ntx_count"] += count
+            official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["chains"][chain]["chain_ntx_score"] += score_value*count
+
+    return official_ntx_dict
+
+def update_official_ntx_pct(official_ntx_dict):
+    season_ntx_count = official_ntx_dict["season_ntx_count"]
+    season_ntx_score = official_ntx_dict["season_ntx_score"]
+
+    # Season chain pct
+    for chain in official_ntx_dict["chains"]:
+        chain_ntx_count = official_ntx_dict["chains"][chain]["chain_ntx_count"]
+        chain_ntx_score = official_ntx_dict["chains"][chain]["chain_ntx_score"]
+        official_ntx_dict["chains"][chain].update({
+            "season_ntx_count_pct":chain_ntx_count/season_ntx_count,
+            "season_ntx_score_pct":chain_ntx_score/season_ntx_score
+        })
+
+    # Season notary pct
+    for notary in official_ntx_dict["notaries"]:
+        notary_ntx_count = official_ntx_dict["notaries"][notary]["notary_ntx_count"]
+        notary_ntx_score = official_ntx_dict["notaries"][notary]["notary_ntx_score"]
+        official_ntx_dict["notaries"][notary].update({
+            "season_ntx_count_pct":notary_ntx_count/season_ntx_count,
+            "season_ntx_score_pct":notary_ntx_score/season_ntx_score
+        })
+
+    # Season notary pct
+    for server in official_ntx_dict["servers"]:
+        server_ntx_count = official_ntx_dict["servers"][server]["server_ntx_count"]
+        server_ntx_score = official_ntx_dict["servers"][server]["server_ntx_score"]
+        official_ntx_dict["servers"][server].update({
+            "server_ntx_count_pct":server_ntx_count/season_ntx_count,
+            "server_ntx_score_pct":server_ntx_score/season_ntx_score
+        })
+
+        # Season server notary stats
+        for notary in official_ntx_dict["servers"][server]["notaries"]:
+            notary_ntx_count = official_ntx_dict["servers"][server]["notaries"][notary]["notary_ntx_count"]
+            notary_ntx_score = official_ntx_dict["servers"][server]["notaries"][notary]["notary_ntx_score"]
+            official_ntx_dict["servers"][server]["notaries"][notary].update({
+                "season_ntx_count_pct":notary_ntx_count/season_ntx_count,
+                "season_ntx_score_pct":notary_ntx_score/season_ntx_score,
+                "server_ntx_count_pct":notary_ntx_count/server_ntx_count,
+                "server_ntx_score_pct":notary_ntx_score/server_ntx_score
+            })
+
+        # Season server chain stats
+        for chain in official_ntx_dict["servers"][server]["chains"]:
+            chain_ntx_count = official_ntx_dict["servers"][server]["chains"][chain]["chain_ntx_count"]
+            chain_ntx_score = official_ntx_dict["servers"][server]["chains"][chain]["chain_ntx_score"]
+            official_ntx_dict["servers"][server]["chains"][chain].update({
+                "season_ntx_count_pct":chain_ntx_count/season_ntx_count,
+                "season_ntx_score_pct":chain_ntx_score/season_ntx_score,
+                "server_ntx_count_pct":chain_ntx_count/server_ntx_count,
+                "server_ntx_score_pct":chain_ntx_score/server_ntx_score
+            })
+
+        # Season server epoch stats
+        for epoch in official_ntx_dict["servers"][server]["epochs"]:
+            epoch_ntx_count = official_ntx_dict["servers"][server]["epochs"][epoch]["epoch_ntx_count"]
+            epoch_ntx_score = official_ntx_dict["servers"][server]["epochs"][epoch]["epoch_ntx_score"]
+            official_ntx_dict["servers"][server]["epochs"][epoch].update({
+                "season_ntx_count_pct":epoch_ntx_count/season_ntx_count,
+                "season_ntx_score_pct":epoch_ntx_score/season_ntx_score,
+                "server_ntx_count_pct":epoch_ntx_count/server_ntx_count,
+                "server_ntx_score_pct":epoch_ntx_score/server_ntx_score
+            })
+
+            # Season server epoch notary stats
+            for notary in official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"]:
+                official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"].update({
+                    notary: {
+                        "notary_ntx_count":0,
+                        "notary_ntx_score":0
+                    }
+                })
+                notary_ntx_count = official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["notary_ntx_count"]
+                notary_ntx_score = official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["notary_ntx_score"]
+                official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary].update({
+                    "season_ntx_count_pct":notary_ntx_count/season_ntx_count,
+                    "season_ntx_score_pct":notary_ntx_score/season_ntx_score,
+                    "server_ntx_count_pct":notary_ntx_count/server_ntx_count,
+                    "server_ntx_score_pct":notary_ntx_score/server_ntx_score,
+                    "epoch_ntx_count_pct":notary_ntx_count/epoch_ntx_count,
+                    "epoch_ntx_score_pct":notary_ntx_score/epoch_ntx_score
+                })
+
+            # Season server epoch chain stats
+            for chain in official_ntx_dict["servers"][server]["epochs"][epoch]["chains"]:
+                chain_ntx_count = official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["chain_ntx_count"]
+                chain_ntx_score = official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["chain_ntx_score"]
+                official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain].update({
+                    "season_ntx_count_pct":chain_ntx_count/season_ntx_count,
+                    "season_ntx_score_pct":chain_ntx_score/season_ntx_score,
+                    "server_ntx_count_pct":chain_ntx_count/server_ntx_count,
+                    "server_ntx_score_pct":chain_ntx_score/server_ntx_score,
+                    "epoch_ntx_count_pct":chain_ntx_count/epoch_ntx_count,
+                    "epoch_ntx_score_pct":chain_ntx_score/epoch_ntx_score
+                })
+            
+            # Season server epoch chain notary stats
+            if notary not in official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["notaries"]:
+                notary_ntx_count = official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["notaries"][notary]["notary_ntx_count"]
+                notary_ntx_score = official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["notaries"][notary]["notary_ntx_score"]
+                official_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["notaries"][notary].update({
+                    "season_ntx_count_pct":notary_ntx_count/season_ntx_count,
+                    "season_ntx_score_pct":notary_ntx_score/season_ntx_score,
+                    "server_ntx_count_pct":notary_ntx_count/server_ntx_count,
+                    "server_ntx_score_pct":notary_ntx_score/server_ntx_score,
+                    "epoch_ntx_count_pct":notary_ntx_count/epoch_ntx_count,
+                    "epoch_ntx_score_pct":notary_ntx_score/epoch_ntx_score
+                })
+
+            # Season server epoch notary chain stats
+            if chain not in official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["chains"]:
+                chain_ntx_count = official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["chains"][chain]["chain_ntx_count"]
+                chain_ntx_score = official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["chains"][chain]["chain_ntx_score"]
+                official_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["chains"][chain].update({
+                    "season_ntx_count_pct":chain_ntx_count/season_ntx_count,
+                    "season_ntx_score_pct":chain_ntx_score/season_ntx_score,
+                    "server_ntx_count_pct":chain_ntx_count/server_ntx_count,
+                    "server_ntx_score_pct":chain_ntx_score/server_ntx_score,
+                    "epoch_ntx_count_pct":chain_ntx_count/epoch_ntx_count,
+                    "epoch_ntx_score_pct":chain_ntx_score/epoch_ntx_score
+                })
+
+    return official_ntx_dict
+
+
+def get_notarisation_percentages(official_ntx_counts):
+    total_chain_ntx = {
+        "total": 0,
+        "chains": {}
+    }
+    total_epoch_ntx = {
+        "total": 0,
+        "epochs": {}
+    }
+    total_notary_ntx = {
+        "total": 0,
+        "notaries": {}
+    }
+    total_server_ntx = {
+        "total": 0,
+        "servers": {}
+    }
+    for item in official_ntx_counts:
+        if item['chain'] not in total_chain_ntx["chains"]:
+            total_chain_ntx["chains"].update({
+                item['chain']:0
+            })
+        if item['epoch'] not in total_epoch_ntx["epochs"]:
+            total_epoch_ntx["epochs"].update({
+                item['epoch']:0
+            })
+        if item['notary'] not in total_notary_ntx["notaries"]:
+            total_notary_ntx["notaries"].update({
+                item['notary']:0
+            })
+        if item['server'] not in total_server_ntx["servers"]:
+            total_server_ntx["servers"].update({
+                item['server']:0
+            })
+        total_chain_ntx["chains"][item["chain"]] += 1
+        total_epoch_ntx["epochs"][item["epoch"]] += 1
+        total_notary_ntx["notaries"][item["notary"]] += 1
+        total_server_ntx["servers"][item["server"]] += 1
+
+        total_chain_ntx["total"] += 1
+        total_epoch_ntx["total"] += 1
+        total_notary_ntx["total"] += 1
+        total_server_ntx["total"] += 1
+
+    return {
+        "total_chain_ntx":total_chain_ntx,
+        "total_epoch_ntx":total_epoch_ntx,
+        "total_notary_ntx":total_notary_ntx,
+        "total_server_ntx":total_server_ntx,
+    }
+
 
 def get_notary_season_count_pct(season):
     season_chains = get_notarised_chains(season)
     season_notaries = NOTARY_PUBKEYS[season]
-    chain_season_ntx_result = get_chain_ntx_season_aggregates(season)
+    
     season_main_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Main').json()["results"]
     season_3P_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Third_Party').json()["results"]
 
-    total_chain_season_ntx = {}
-
-
-    for item in chain_season_ntx_result:
-        chain = item[0]
-        count = item[3]
-        total_chain_season_ntx.update({
-            chain:count
-        })
+    total_chain_season_ntx = get_official_chain_ntx_totals(season)
+    total_notary_chain_season_ntx = get_official_notary_chain_ntx_totals(season)
 
     notary_season_counts = {}
     results = get_ntx_for_season(season)
@@ -147,7 +477,95 @@ def update_notarised_chain_season(season):
     logger.info(f"{season} season_notarised_counts complete")
 
 
+def get_chain_ntx_pct_dict(official_ntx_dict):
+    chain_ntx_pct_dict = {}
+    for chain in official_ntx_dict["chains"]:
+        pct = official_ntx_dict["chains"][chain]["season_ntx_count_pct"]
+        chain_ntx_pct_dict.update({
+            chain:pct
+        })
+    return chain_ntx_pct_dict
+
 def update_notarised_count_season(season):
+
+    official_ntx_dict = get_official_ntx_dict(season)
+    official_ntx_dict = update_official_ntx_pct(official_ntx_dict)
+    chain_ntx_pct_dict = get_chain_ntx_pct_dict(official_ntx_dict)
+
+    for notary in NOTARY_PUBKEYS[season]:
+
+        season_ntx_count_row = notarised_count_season_row()
+        season_ntx_count_row.time_stamp = time.time()
+        season_ntx_count_row.notary = notary
+        season_ntx_count_row.season = season
+        season_ntx_count_row.other_count = 0
+
+        if notary in official_ntx_dict["notaries"]:
+            season_score = official_ntx_dict["notaries"][notary]["notary_ntx_score"]
+            chain_ntx_counts = official_ntx_dict["notaries"][notary]
+        else:
+            season_score = 0
+            chain_ntx_counts = {}
+
+        if "KMD" in official_ntx_dict["chains"]:
+            btc_count = official_ntx_dict["chains"]["KMD"]["chain_ntx_count"]
+        else:
+            btc_count = 0
+
+        if "Main" in official_ntx_dict["servers"]:
+            antara_count = official_ntx_dict["servers"]["Main"]["server_ntx_count"]
+        else:
+            antara_count = 0
+
+        if "Third_Party" in official_ntx_dict["servers"]:
+            third_party_count = official_ntx_dict["servers"]["Third_Party"]["server_ntx_count"]
+        else:
+            third_party_count = 0
+
+        season_ntx_count_row.season_score = season_score
+        season_ntx_count_row.btc_count = btc_count
+        season_ntx_count_row.antara_count = antara_count
+        season_ntx_count_row.third_party_count = third_party_count
+        season_ntx_count_row.total_ntx_count = btc_count+antara_count+third_party_count
+
+        season_ntx_count_row.chain_ntx_counts = chain_ntx_counts
+        season_ntx_count_row.chain_ntx_pct = chain_ntx_pct_dict
+        season_ntx_count_row.update()
+
+
+
+                servers = ntx_summary[notary]["seasons"][summary_season]['servers']
+
+                if "KMD" in servers:
+                    season_ntx_count_row.btc_count = servers['KMD']['server_ntx_count']
+
+                elif "LTC" in servers:
+                    season_ntx_count_row.btc_count = servers['LTC']['server_ntx_count']
+
+                else: 
+                    season_ntx_count_row.btc_count = 0
+
+                if 'Main' in servers:
+                    season_ntx_count_row.antara_count = servers['Main']['server_ntx_count']
+
+                else:
+                    season_ntx_count_row.antara_count = 0
+
+                if 'Third_Party' in servers:
+                    season_ntx_count_row.third_party_count = servers['Third_Party']['server_ntx_count']
+
+                else:
+                    season_ntx_count_row.third_party_count = 0
+
+                season_ntx_count_row.other_count = 0
+                season_ntx_count_row.total_ntx_count = ntx_summary[notary]["seasons"][summary_season]['season_ntx_count']
+
+                season_ntx_count_row.season_score = ntx_summary[notary]["seasons"][summary_season]["season_score"]
+                season_ntx_count_row.chain_ntx_counts = json.dumps(ntx_summary[notary])
+                season_ntx_count_row.chain_ntx_pct = json.dumps(notary_season_pct[notary])
+
+
+def update_notarised_count_season_OLD(season):
 
     ntx_summary, chain_totals = get_notarisation_data(season)
     chain_ntx_counts, notary_season_pct = get_notary_season_count_pct(season)

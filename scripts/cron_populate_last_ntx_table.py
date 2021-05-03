@@ -89,8 +89,6 @@ if __name__ == "__main__":
                 for chain in season_server_chains:
                     for notary in NOTARY_PUBKEYS[season]:
                         update_latest_ntx(season, server, notary, chain)
-                        #update_latest_ltc_ntx(season, notary)
-                        #update_latest_btc_ntx(season, notary)
             end = time.time()
             logger.info(f">>> {end-start} sec to complete [update_latest_ntx({season})]")
 

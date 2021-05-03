@@ -105,7 +105,7 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
                 ntx_row.scored = True
             else:
                 ntx_row.scored = False
-            ntx_row.update()
+                ntx_row.update()
 
 
             runtime = int(time.time()-start)
@@ -278,80 +278,6 @@ def update_daily_notarised_counts(season):
     logger.info("Notarised blocks daily aggregation for "+season+" notaries finished...")
 
 
-def get_notary_season_count_pct(season):
-    season_chains = get_notarised_chains(season)
-    season_notaries = NOTARY_PUBKEYS[season]
-    chain_season_ntx_result = get_chain_ntx_season_aggregates(season)
-    season_main_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Main').json()["results"]
-    season_3P_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Third_Party').json()["results"]
-
-    total_chain_season_ntx = {}
-
-
-    for item in chain_season_ntx_result:
-        chain = item[0]
-        count = item[3]
-        total_chain_season_ntx.update({
-            chain:count
-        })
-
-    notary_season_counts = {}
-    results = get_ntx_for_season(season)
-
-    for item in results:
-        chain = item[0]
-        notaries = item[1]
-
-        for notary in notaries:
-            if notary not in notary_season_counts:
-                notary_season_counts.update({notary:{}})
-
-            if chain not in notary_season_counts[notary]:
-                notary_season_counts[notary].update({chain:1})
-            else:
-                notary_season_counts[notary][chain] += 1
-
-    notary_season_count_notaries = list(notary_season_counts.keys())
-    for notary in season_notaries:
-        if notary not in notary_season_count_notaries:
-            notary_season_counts.update({notary:{}})
-
-        notary_season_count_notary_chains = list(notary_season_counts[notary].keys())
-        for chain in season_chains:
-            if chain not in notary_season_count_notary_chains:
-                notary_season_counts[notary].update({chain:0})
-
-        
-    notary_season_pct = {}
-    for notary in notary_season_counts:
-
-        chain_ntx_counts = notary_season_counts[notary]
-        btc_count = 0
-        antara_count = 0
-        third_party_count = 0
-        other_count = 0
-        total_ntx_count = 0
-
-        if notary not in notary_season_pct:
-            notary_season_pct.update({notary:{}})
-        for chain in chain_ntx_counts:
-            if chain == "KMD":
-                btc_count += chain_ntx_counts[chain]
-                total_ntx_count += chain_ntx_counts[chain]
-            elif chain in season_3P_coins:
-                third_party_count += chain_ntx_counts[chain]
-                total_ntx_count += chain_ntx_counts[chain]
-            elif chain in season_main_coins:
-                antara_count += chain_ntx_counts[chain]
-                total_ntx_count += chain_ntx_counts[chain]
-            else:
-                other_count += chain_ntx_counts[chain]
-
-            pct = round(chain_ntx_counts[chain]/total_chain_season_ntx[chain]*100,3)
-            notary_season_pct[notary].update({chain:pct})
- 
-    return chain_ntx_counts, notary_season_pct
-
 
 def update_notarised_chain_season(season):
     logger.info("Getting "+season+" season_notarised_counts")
@@ -406,52 +332,6 @@ def update_notarised_chain_season(season):
     logger.info(f"{season} season_notarised_counts complete")
 
 
-def update_notarised_count_season(season):
-
-    ntx_summary, chain_totals = get_notarisation_data(season)
-    chain_ntx_counts, notary_season_pct = get_notary_season_count_pct(season)
-    for notary in ntx_summary:
-
-        for summary_season in ntx_summary[notary]["seasons"]:
-            logger.info(f"Getting season summary for {notary} {summary_season}")
-
-
-            if notary in KNOWN_NOTARIES:
-
-                season_ntx_count_row = notarised_count_season_row()
-                season_ntx_count_row.notary = notary
-                season_ntx_count_row.season = summary_season
-                servers = ntx_summary[notary]["seasons"][summary_season]['servers']
-
-                if "KMD" in servers:
-                    season_ntx_count_row.btc_count = servers['KMD']['server_ntx_count']
-
-                elif "LTC" in servers:
-                    season_ntx_count_row.btc_count = servers['LTC']['server_ntx_count']
-
-                else: 
-                    season_ntx_count_row.btc_count = 0
-
-                if 'Main' in servers:
-                    season_ntx_count_row.antara_count = servers['Main']['server_ntx_count']
-
-                else:
-                    season_ntx_count_row.antara_count = 0
-
-                if 'Third_Party' in servers:
-                    season_ntx_count_row.third_party_count = servers['Third_Party']['server_ntx_count']
-
-                else:
-                    season_ntx_count_row.third_party_count = 0
-
-                season_ntx_count_row.other_count = 0
-                season_ntx_count_row.total_ntx_count = ntx_summary[notary]["seasons"][summary_season]['season_ntx_count']
-
-                season_ntx_count_row.season_score = ntx_summary[notary]["seasons"][summary_season]["season_score"]
-                season_ntx_count_row.chain_ntx_counts = json.dumps(ntx_summary[notary])
-                season_ntx_count_row.chain_ntx_pct = json.dumps(notary_season_pct[notary])
-                season_ntx_count_row.time_stamp = time.time()
-                season_ntx_count_row.update()
 
 def make_ntx_summary_dict(season):
     ntx_summary = {}
@@ -760,12 +640,6 @@ if __name__ == "__main__":
 
     # Uncomment if record contains address rather than notary in [notaries] list (e.g. saved before pubkeys updated)
     # rescan_notaries(SEASON)
-
-    for chain in ["LTC","BTC","KMD"]:
-        sql = f"UPDATE notarised SET epoch = '{chain}', server = '{chain}' WHERE chain = '{chain}';"
-        print(sql)
-        CURSOR.execute(sql)
-        CONN.commit()
 
 
     seasons = get_notarised_seasons()

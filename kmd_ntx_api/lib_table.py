@@ -183,18 +183,17 @@ def get_notary_profile_summary_table(request):
     ntx_season_data = get_notarised_count_season_table(request)
     for item in ntx_season_data:
         chain_ntx_counts = item['chain_ntx_counts']
-        for server in chain_ntx_counts:
-            for chain in chain_ntx_counts[server]["chains"]:
-                if chain not in resp:
-                    resp.update({
-                        chain:{
-                            "season":season,
-                            "server":server,
-                            "chain":chain,
-                            "chain_score":chain_ntx_counts[server]["chains"][chain]["chain_score"],
-                            "chain_ntx_count":chain_ntx_counts[server]["chains"][chain]["chain_ntx_count"]
-                        }
-                    })
+        for chain in chain_ntx_counts["chains"]:
+            if chain not in resp:
+                resp.update({
+                    chain:{
+                        "season":season,
+                        "server":server,
+                        "chain":chain,
+                        "chain_score":chain_ntx_counts["chains"][chain]["notary_chain_ntx_score"],
+                        "chain_ntx_count":chain_ntx_counts["chains"][chain]["notary_chain_ntx_count"]
+                    }
+                })
 
         chain_ntx_pct = item['chain_ntx_pct']
         for chain in chain_ntx_pct:
@@ -206,6 +205,7 @@ def get_notary_profile_summary_table(request):
                 elif chain in ["KMD", "BTC", "LTC"]:
                     server = chain
                 else:
+                    server = "Unknown"
                     logger.warning(f"Can't assign {chain} NTX % for {notary}")
                 resp.update({
                     chain: {
@@ -237,7 +237,7 @@ def get_notary_profile_summary_table(request):
         list_resp.append(resp[chain])
 
     api_resp = {
-        "ntx_season_data":ntx_season_data[0],
+        "ntx_season_data":ntx_season_data,
         "ntx_summary_data":list_resp,
     }
     return api_resp
@@ -406,20 +406,19 @@ def get_notarised_count_season_table(request):
         chain_ntx_pct = item['chain_ntx_pct']
         time_stamp = item['time_stamp']
 
-        if "seasons" in chain_ntx_counts:
-            resp.append({
-                    "season":season,
-                    "notary":notary,
-                    "btc_count":btc_count,
-                    "antara_count":antara_count,
-                    "third_party_count":third_party_count,
-                    "other_count":other_count,
-                    "total_ntx_count":total_ntx_count,
-                    "chain_ntx_counts":chain_ntx_counts["seasons"][season]["servers"],
-                    "chain_ntx_pct":chain_ntx_pct,
-                    "time_stamp":time_stamp,
-                    "chains":{}
-            })
+        resp.append({
+                "season":season,
+                "notary":notary,
+                "btc_count":btc_count,
+                "antara_count":antara_count,
+                "third_party_count":third_party_count,
+                "other_count":other_count,
+                "total_ntx_count":total_ntx_count,
+                "chain_ntx_counts":chain_ntx_counts,
+                "chain_ntx_pct":chain_ntx_pct,
+                "time_stamp":time_stamp,
+                "chains":{}
+        })
 
 
     return resp

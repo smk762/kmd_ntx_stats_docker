@@ -153,8 +153,7 @@ def rescan_notaries(season):
             block_hash, notaries, notary_addresses, ac_ntx_blockhash, \
             ac_ntx_height, txid, opret, season,\
             server, epoch, score_value, scored \
-            FROM notarised \
-            ORDER BY block_time asc"
+            FROM notarised "
     where = []
     if season:
         where.append(f"season = '{season}'")
@@ -162,6 +161,7 @@ def rescan_notaries(season):
     if len(where) > 0:
         sql += " WHERE "
         sql += " AND ".join(where)
+    sql += " ORDER BY block_time asc"
     sql += ";"
 
     try:
@@ -201,14 +201,6 @@ if __name__ == "__main__":
 
     # Uncomment if record contains address rather than notary in [notaries] list (e.g. saved before pubkeys updated)
     # rescan_notaries(SEASON)
-
-    for chain in ["LTC","BTC","KMD"]:
-        sql = f"UPDATE notarised SET epoch = '{chain}', server = '{chain}' WHERE chain = '{chain}';"
-        print(sql)
-        CURSOR.execute(sql)
-        CONN.commit()
-
-
 
     TIP = int(RPC["KMD"].getblockcount())
 
