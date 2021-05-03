@@ -17,8 +17,14 @@
 					<tbody>
 						{% for item in launch_param_rows %}
 							<tr>
-								<td data-data="chain">{{ item.chain }}</td>
-								<td data-data="launch_params" style="text-align: left !important; font-size: 0.9em;">{{ item.launch_params }}</td>
+								<td data-data="chain">
+									<a href='//{{ request.get_host }}/coin_profile/{{ item.chain }}'>
+										{{ item.chain }}
+									</a>
+								</td>
+								<td data-data="launch_params" style="text-align: left !important; font-size: 0.9em;">
+									{{ item.launch_params }}
+								</td>
 							</tr>
 						{% endfor %}
 					</tbody>

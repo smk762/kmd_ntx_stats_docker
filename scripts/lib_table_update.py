@@ -96,12 +96,12 @@ def update_ntx_row(row_data):
     sql = f"INSERT INTO notarised (chain, block_height, \
                                 block_time, block_datetime, block_hash, \
                                 notaries, notary_addresses, ac_ntx_blockhash, ac_ntx_height, \
-                                txid, opret, season, server, scored, score_value, btc_validated, epoch) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                                txid, opret, season, server, scored, score_value, epoch) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
                 ON CONFLICT ON CONSTRAINT unique_txid DO UPDATE SET \
                 season='{row_data[11]}', server='{row_data[12]}', scored='{row_data[13]}', \
                 notaries=ARRAY{row_data[5]}, notary_addresses=ARRAY{row_data[6]}, \
-                score_value={row_data[14]}, epoch='{row_data[16]}';"
+                score_value={row_data[14]}, epoch='{row_data[15]}';"
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()
@@ -111,37 +111,6 @@ def update_ntx_row(row_data):
             logger.debug(row_data)
         CONN.rollback()
 
-
-def update_ntx_records(records):
-    try:
-        execute_values(CURSOR, "INSERT INTO notarised (chain, block_height, \
-                                block_time, block_datetime, block_hash, \
-                                notaries, notary_addresses, ac_ntx_blockhash, ac_ntx_height, \
-                                txid, opret, season, server, scored, btc_validated) \
-                                VALUES %s", records)
-
-        CONN.commit()
-    except Exception as e:
-        if str(e).find('duplicate') == -1:
-            logger.debug(e)
-        CONN.rollback()
-
-def update_validation_notarised_tbl(btc_txid, btc_block_hash, btc_block_ht, opret):
-    sql = "UPDATE notarised SET \
-          chain='BTC', btc_validated='true', \
-          txid='"+btc_txid+"', \
-          block_hash='"+btc_block_hash+"', \
-          block_height="+str(btc_block_ht)+", \
-          opret='"+opret+"' \
-          WHERE opret LIKE '%' || '"+opret[11:33]+"' || '%';"
-    try:
-        CURSOR.execute(sql)
-        CONN.commit()
-    except Exception as e:
-        if str(e).find('duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        CONN.rollback()
 
 
 def update_server_notarised_tbl(old_server, server, chain=None):
@@ -298,12 +267,12 @@ def update_season_mined_count_row(row_data):
     try:
         sql = f"INSERT INTO mined_count_season \
             (name, season, address, blocks_mined, sum_value_mined, \
-            max_value_mined, last_mined_blocktime, last_mined_block, \
-            time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            max_value_mined, max_value_txid, last_mined_blocktime, last_mined_block, \
+            time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_name_season_mined DO UPDATE SET \
             address='{row_data[2]}', blocks_mined={row_data[3]}, sum_value_mined={row_data[4]}, \
-            max_value_mined={row_data[5]}, last_mined_blocktime={row_data[6]}, \
-            last_mined_block={row_data[7]}, time_stamp={row_data[8]};"
+            max_value_mined={row_data[5]}, max_value_txid='{row_data[6]}', last_mined_blocktime={row_data[7]}, \
+            last_mined_block={row_data[8]}, time_stamp={row_data[9]};"
         CURSOR.execute(sql, row_data)
         CONN.commit()
         return 1

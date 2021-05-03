@@ -8,14 +8,14 @@ cursor = conn.cursor()
 #table = 'nn_social'
 #table = 'mined'
 #table = 'mined_count_season'
-#table = 'notarised_tenure'
+table = 'notarised_tenure'
 #table = 'notarised'
 #table = 'coins'
 #table = "scoring_epochs"
 #table = 'nn_ltc_tx'
 #table = 'addresses'
 #table = 'last_notarised'
-table = 'notarised_count_season'
+#table = 'notarised_count_season'
 
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")

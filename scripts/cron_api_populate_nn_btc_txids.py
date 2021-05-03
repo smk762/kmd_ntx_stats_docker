@@ -411,7 +411,6 @@ def scan_btc_transactions(season):
                                     ntx_row.scored = True
                                 else:
                                     ntx_row.scored = False
-                                ntx_row.btc_validated = "true"
                                 ntx_row.update()
 
                 logger.info(f"[scan_btc_transactions] TXID: {txid} ({btc_row.category})")
@@ -424,7 +423,7 @@ if __name__ == "__main__":
     seasons = get_notarised_seasons()
 
     for season in seasons:
-        if season not in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]: 
+        if season not in EXCLUDED_SEASONS: 
             scan_btc_transactions(season)
 
 

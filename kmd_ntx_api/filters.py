@@ -33,7 +33,7 @@ class notarisedFilter(FilterSet):
                   'txid', 'chain', 'block_height', 'block_time',
                   'block_datetime', 'block_hash', 'ac_ntx_blockhash',
                   'ac_ntx_height', 'opret', 'season', 'server', 'epoch',
-                  'scored', 'btc_validated']
+                  'scored']
 
 class notarisedTenureFilter(FilterSet):
     gte_official_start = NumberFilter(field_name="official_start_block_time", lookup_expr='gte')

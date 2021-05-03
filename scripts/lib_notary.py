@@ -203,19 +203,20 @@ def get_dpow_scoring_window(season, chain, server):
         official_end = SEASONS_INFO[season]["end_time"]
 
     if season in PARTIAL_SEASON_DPOW_CHAINS:
+        logger.info(season)
         for partial_season_server in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"]:
-
+            logger.info(f"{partial_season_server} vs {server}")
             if chain in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][partial_season_server]:
-
+                logger.info(f"{chain} in partials")
                 # Overcomes Duel Wielding GLEEC issue.
                 if partial_season_server == server:
 
                     if "start_time" in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][partial_season_server][chain]:
                         official_start = PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][partial_season_server][chain]["start_time"]
-
+                        logger.info(official_start)
                     if "end_time" in PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][partial_season_server][chain]:
                         official_end = PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][partial_season_server][chain]["end_time"]
-
+                        logger.info(official_end)
     scored_list, unscored_list = get_ntx_scored(season, chain, official_start, official_end, server)
 
     return official_start, official_end, scored_list, unscored_list
