@@ -5,9 +5,9 @@ import datetime
 from decimal import Decimal
 
 from lib_const import *
-from lib_table_select import select_from_table, get_season_mined_counts, get_mined_date_aggregates, get_notarised_seasons
+from lib_table_select import select_from_table, get_season_mined_counts, get_mined_date_aggregates, get_notarised_seasons, get_max_value_mined_txid
 from models import season_mined_count_row, daily_mined_count_row, mined_row, get_season_from_block
-
+from lib_helper import has_season_started
 
 ''' 
 This script is intended to run as a cronjob every 5-15 minutes.
@@ -40,7 +40,6 @@ def clear_known_address(address):
     row.delete_address()
 
 def update_miner(block):
-    logger.info(f"[update_miner] Getting info for block [{block}]")
     blockinfo = RPC["KMD"].getblock(str(block), 2)
     for tx in blockinfo['tx']:
         if len(tx['vin']) > 0:
@@ -99,6 +98,7 @@ def update_mined_blocks(season):
 
 # updating daily mined count aggregate table
 def process_aggregates(season):
+
     season_start_time = SEASONS_INFO[season]["start_time"]
     season_start_dt = dt.fromtimestamp(season_start_time)
     start = season_start_dt.date()
@@ -111,23 +111,21 @@ def process_aggregates(season):
     logger.info(f"[process_aggregates] Aggregating daily mined counts from {start} to {end}")
     day = start
 
+    season_notaries = list(NOTARY_PUBKEYS[season].keys())
     time_stamp = int(time.time())
     while day <= end:
         logger.info(f"[process_aggregates] Aggregating daily mined counts for {day}")
         results = get_mined_date_aggregates(day)
 
-        season_notaries = list(NOTARY_PUBKEYS[season].keys())
 
         for item in results:
             if len(item) > 0:
                 row = daily_mined_count_row()
-                logger.info(item)
                 row.notary = item[0]
                 row.blocks_mined = int(item[1])
                 row.sum_value_mined = float(item[2])
                 row.mined_date = day
                 row.time_stamp = time_stamp
-                logger.info(f"[process_aggregates] {day} {row.notary} {row.blocks_mined} {row.sum_value_mined}")
                 row.update()
                 if row.notary in season_notaries:
                     season_notaries.remove(row.notary)
@@ -140,7 +138,6 @@ def process_aggregates(season):
             row.sum_value_mined = 0
             row.mined_date = day
             row.time_stamp = time_stamp
-            logger.info(f"[process_aggregates] {day} {row.notary} {row.blocks_mined} {row.sum_value_mined}")
             row.update()
 
         day += delta
@@ -149,7 +146,7 @@ def process_aggregates(season):
 
 def update_season_mined_counts(season):
 
-    results = get_season_mined_counts(season, POSTSEASON)
+    results = get_season_mined_counts(season)
 
     for item in results:
         row = season_mined_count_row()
@@ -157,18 +154,24 @@ def update_season_mined_counts(season):
         row.address = item[1]
         row.season = season
         row.blocks_mined = int(item[2])
-        row.sum_value_mined = float(item[3])
-        row.max_value_mined = float(item[4])
-        row.last_mined_blocktime = int(item[5])
-        row.last_mined_block = int(item[6])
-        row.update()
+        if row.address in KNOWN_ADDRESSES or row.blocks_mined > 25:
+            max_value_txid = get_max_value_mined_txid(item[4])
+            row.sum_value_mined = float(item[3])
+            row.max_value_mined = float(item[4])
+            row.max_value_txid = max_value_txid
+            row.last_mined_blocktime = int(item[5])
+            row.last_mined_block = int(item[6])
+            row.update()
 
 
 if __name__ == "__main__":
 
     RESCAN_SEASON = False
     scan_depth = 100
+    start = time.time()
     seasons = get_notarised_seasons()
+    end = time.time()
+    logger.info(f">>> {end-start} sec to complete [get_notarised_seasons()]")
 
     # Uncomment to update addresses in DB after updating NON_NOTARY_ADDRESSES
     '''
@@ -182,9 +185,19 @@ if __name__ == "__main__":
         if season not in EXCLUDED_SEASONS:
 
             if season.find("Testnet") == -1:
+                if has_season_started(season):
+                    start = end
+                    update_mined_blocks(season)
+                    end = time.time()
+                    logger.info(f">>> {end-start} sec to complete [update_mined_blocks({season})]")
 
-                update_mined_blocks(season)
+                    start = end
+                    update_season_mined_counts(season)
+                    end = time.time()
+                    logger.info(f">>> {end-start} sec to complete [update_season_mined_counts({season})]")
 
-                update_season_mined_counts(season)
+                    start = end
+                    process_aggregates(season)
+                    end = time.time()
+                    logger.info(f">>> {end-start} sec to complete [process_aggregates({season})]")
 
-                process_aggregates(season)

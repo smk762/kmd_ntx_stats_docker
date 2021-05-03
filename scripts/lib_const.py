@@ -276,6 +276,7 @@ KNOWN_ADDRESSES.update(NON_NOTARY_ADDRESSES)
 
 OTHER_LAUNCH_PARAMS = {
     "BTC":"~/bitcoin/src/bitcoind",
+    "LTC":"~/litecoin/src/litecoind",
     "KMD":"~/komodo/src/komodod", 
     "AYA":"~/AYAv2/src/aryacoind",
     "CHIPS":"~/chips3/src/chipsd",
@@ -288,7 +289,7 @@ OTHER_LAUNCH_PARAMS = {
 }
 OTHER_CONF_FILE = {
     "BTC":"~/.bitcoin/bitcoin.conf",
-    "BTC":"~/.litecoin/litecoin.conf",
+    "LTC":"~/.litecoin/litecoin.conf",
     "KMD":"~/.komodo/komodo.conf",   
     "MCL":"~/.komodo/MCL/MCL.conf", 
     "VOTE2021":"~/.komodo/VOTE2021/VOTE2021.conf",
@@ -312,12 +313,32 @@ OTHER_CLI = {
     "VRSC":"~/VerusCoin/src/verus",   
     "GLEEC-OLD":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
 }
-
-PARTIAL_SEASON_DPOW_CHAINS = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/master/doc/scoring_epochs.json").json()
-PARTIAL_SEASON_DPOW_CHAINS["Season_4"]["Servers"]["dPoW-3P"].update({
-    "GLEEC-OLD": PARTIAL_SEASON_DPOW_CHAINS["Season_4"]["Servers"]["dPoW-3P"]["GLEEC"]
+PARTIAL_SEASON_DPOW_CHAINS = {}
+SCORING_EPOCHS_REPO = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/master/doc/scoring_epochs.json").json()
+SCORING_EPOCHS_REPO["Season_4"]["Servers"]["dPoW-3P"].update({
+    "GLEEC-OLD": SCORING_EPOCHS_REPO["Season_4"]["Servers"]["dPoW-3P"]["GLEEC"]
 })
-del PARTIAL_SEASON_DPOW_CHAINS["Season_4"]["Servers"]["dPoW-3P"]["GLEEC"]
+del SCORING_EPOCHS_REPO["Season_4"]["Servers"]["dPoW-3P"]["GLEEC"]
+
+for season in SCORING_EPOCHS_REPO:
+    PARTIAL_SEASON_DPOW_CHAINS.update({
+        season:{
+            "Servers":{
+                "Main":{},
+                "Third_Party":{}
+            }
+        }
+    })
+
+    for server in SCORING_EPOCHS_REPO[season]["Servers"]:
+        if server == "dPoW-3P":
+            epoch_server = "Third_Party"
+        elif server == "dPoW-Mainnet":
+            epoch_server = "Main"
+        for item in SCORING_EPOCHS_REPO[season]["Servers"][server]:
+            PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][epoch_server].update({
+                    item:SCORING_EPOCHS_REPO[season]["Servers"][server][item]
+                })
 PARTIAL_SEASON_DPOW_CHAINS.update({
     "Season_5_Testnet": {
         "Servers": {
@@ -489,7 +510,8 @@ for season in SEASONS_INFO:
                     score_server = "Main"
                 elif server == "dPoW-3P":
                     score_server = "Third_Party"
-
+                else:
+                    score_server = server
                 SCORING_EPOCHS[season][score_server].update({
                     f"Epoch_{epoch}": {
                         "start":epoch_start_time,

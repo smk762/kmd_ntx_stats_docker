@@ -29,7 +29,7 @@ def notary_profile_view(request, notary=None, season=None):
         url = f"{THIS_SERVER}/api/table/balances"
         notary_balances = requests.get(f"{url}/?season={season}&notary={notary}").json()['results']
 
-        notarised_count_season_data = notary_profile_summary_table['ntx_season_data']
+        notarised_count_season_data = notary_profile_summary_table['ntx_season_data'][0]
         notary_balances_list, notary_balances_graph = get_notary_balances_graph(notary, season)
         notarised_data_24hr = get_notarised_data_24hr(season, None, None, notary)
         notarisation_scores = get_notarisation_scores(season)

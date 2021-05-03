@@ -70,7 +70,7 @@ def get_ac_block_info():
 # https://chainz.cryptoid.info/emc2/api.dws?q=getblockcount
 
 def get_from_electrum(url, port, method, params=[]):
-    params = [params] if type(params) is not list else params
+    params = [params] if not isinstance(params, list) else params
     socket.setdefaulttimeout(5)
     s = socket.create_connection((url, port))
     s.send(json.dumps({"id": 0, "method": method, "params": params}).encode() + b'\n')

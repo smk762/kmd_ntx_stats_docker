@@ -69,7 +69,7 @@ class minedCountSeasonSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = mined_count_season
         fields = ['name', 'address', 'blocks_mined', 'sum_value_mined',
-                  'max_value_mined', 'last_mined_block',
+                  'max_value_mined', 'max_value_txid', 'last_mined_block',
                   'last_mined_blocktime', 'time_stamp', 
                   'season']
 
@@ -105,7 +105,7 @@ class notarisedSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['txid', 'chain', 'block_height', 'block_time',
                   'block_datetime', 'block_hash', 'ac_ntx_blockhash',
                   'ac_ntx_height', 'opret', 'notaries', 'notary_addresses',
-                  'season', 'server', 'epoch', 'scored', 'score_value', 'btc_validated']
+                  'season', 'server', 'epoch', 'scored', 'score_value']
 
 
 class notarisedChainDailySerializer(serializers.HyperlinkedModelSerializer):

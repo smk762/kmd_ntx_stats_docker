@@ -252,7 +252,6 @@ def get_notarised_data_txid(txid=None):
             "epoch":item.epoch,
             "scored":item.scored,
             "score_value":item.score_value,
-            "btc_validated":item.btc_validated
         }
 
     return {"error":"TXID not found!"}

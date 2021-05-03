@@ -381,7 +381,6 @@ def scan_ltc_transactions(season):
                                 ntx_row.score_value = 0
                                 ntx_row.epoch = "LTC"
                                 ntx_row.scored = False
-                                ntx_row.btc_validated = "N/A"
                                 ntx_row.update()
 
                 logger.info(f"[scan_ltc_transactions] TXID: {txid} ({ltc_row.category})")

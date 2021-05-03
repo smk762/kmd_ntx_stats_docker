@@ -47,7 +47,6 @@ def import_ntx(season, server, chain):
                 ntx_row.txid = txid_info["txid"]
                 ntx_row.opret = txid_info["opret"]
                 ntx_row.epoch = txid_info["epoch"]
-                ntx_row.btc_validated = txid_info["btc_validated"]
 
                 if len(txid_info["notary_addresses"]) == 0:
 
@@ -94,7 +93,6 @@ def import_ntx(season, server, chain):
                     ntx_row.scored = True
                 else:
                     ntx_row.scored = False
-                ntx_row.btc_validated = "N/A"
 
                 ntx_row.update()
         except Exception as e:
