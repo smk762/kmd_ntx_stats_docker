@@ -112,7 +112,7 @@
         			{
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='"+explorers[oData.chain]+'tx/'+oData.txid+"'>"+oData.txid.slice(0, 3)+"..."+oData.txid.slice(-3)+"</a>");
+				            $(nTd).html("<a href='"+explorers[oData.chain][0]+'tx/'+oData.txid+"'>"+oData.txid.slice(0, 3)+"..."+oData.txid.slice(-3)+"</a>");
 				        }
 			        },
         		]

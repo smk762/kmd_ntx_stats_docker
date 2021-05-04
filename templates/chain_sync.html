@@ -106,7 +106,17 @@
         			{
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='"+explorers[oData.chain]+'block/'+oData.last_sync_blockhash+"'>"+oData.last_sync_blockhash.slice(0, 3)+"..."+oData.last_sync_blockhash.slice(-3)+"</a>");
+			            	if (!(explorers.hasOwnProperty(oData.chain))) {
+			            		$(nTd).html(oData.address);	
+			            	}
+			            	else if (explorers[oData.chain][0].search("cryptoid") > -1) {
+			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'block.dws?'+oData.last_sync_blockhash+".htm'>"+oData.last_sync_blockhash.slice(0, 3)+"..."+oData.last_sync_blockhash.slice(-3)+"</a>");
+			            	}
+			            	else {
+			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'block/'+oData.last_sync_blockhash+"'>"+oData.last_sync_blockhash.slice(0, 3)+"..."+oData.last_sync_blockhash.slice(-3)+"</a>");
+			            	}
+
+				            
 				        }
 			        },
         			{
@@ -114,9 +124,17 @@
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.last_sync_dexhash == 'no data' ) {
 				            	$(nTd).html(oData.last_sync_dexhash);
-			            	} else {
-				            	$(nTd).html("<a href='"+explorers[oData.chain]+'block/'+oData.last_sync_dexhash+"'>"+oData.last_sync_dexhash.slice(0, 3)+"..."+oData.last_sync_dexhash.slice(-3)+"</a>");
 				            }
+				            else if (!(explorers.hasOwnProperty(oData.chain))) {
+			            		$(nTd).html(oData.last_sync_dexhash.slice(0, 3)+"..."+oData.last_sync_dexhash.slice(-3));	
+			            	}
+			            	else if (explorers[oData.chain][0].search("cryptoid") > -1) {
+			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'block.dws?'+oData.last_sync_dexhash+".htm'>"+oData.last_sync_dexhash.slice(0, 3)+"..."+oData.last_sync_dexhash.slice(-3)+"</a>");
+			            	}
+			            	else {
+			            		$(nTd).html("<a href='"+explorers[oData.chain]+'block/'+oData.last_sync_dexhash+"'>"+oData.last_sync_dexhash.slice(0, 3)+"..."+oData.last_sync_dexhash.slice(-3)+"</a>");
+			            	}
+
 				        }
 			        },
         			{
