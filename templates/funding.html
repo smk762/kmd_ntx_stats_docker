@@ -178,7 +178,15 @@
         			{
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='"+explorers[oData.chain]+'address/'+oData.address+"'>"+oData.address+"</a>");
+			            	if (!(explorers.hasOwnProperty(oData.chain))) {
+			            		$(nTd).html(oData.address);	
+			            	}
+			            	else if (explorers[oData.chain][0].search("cryptoid") > -1) {
+			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'address.dws?'+oData.address+".htm'>"+oData.address+"</a>");	
+			            	}
+			            	else {
+			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'address/'+oData.address+"'>"+oData.address+"</a>");	
+			            	}
 				        }
 			        },
         			{
