@@ -559,7 +559,8 @@ def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None)
 
     for item in notary_epoch_scores:
         notary = item["notary"]
-        chain_ntx = item["chain_ntx_counts"]["seasons"][season]
+        print(notary_epoch_scores)
+        chain_ntx = item["chain_ntx_counts"]
 
         for server in chain_ntx["servers"]:
 
@@ -578,8 +579,8 @@ def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None)
                         if not selected_chain or chain == selected_chain:
                             chain_stats = chain_ntx["servers"][server]["epochs"][epoch]["chains"][chain]
                             score_per_ntx = chain_ntx["servers"][server]["epochs"][epoch]["score_per_ntx"]
-                            epoch_chain_ntx_count = chain_stats["epoch_chain_ntx_count"]
-                            epoch_chain_score = chain_stats["epoch_chain_score"]
+                            epoch_chain_ntx_count = chain_stats["notary_server_epoch_chain_ntx_count"]
+                            epoch_chain_score = chain_stats["notary_server_epoch_chain_ntx_score"]
                             if epoch.find("_") > -1:
                                 epoch_id = epoch.split("_")[1]
                             else:
@@ -596,7 +597,7 @@ def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None)
                             }
 
                             server_epoch_chains.remove(chain)
-                            total += chain_stats["epoch_chain_score"]
+                            total += chain_stats["notary_server_epoch_chain_ntx_score"]
                             rows.append(row)
 
     return rows, total
