@@ -19,19 +19,20 @@ from lib_helper import *
 from models import *
 
 
+
 def update_notarised_chain_season(season):
     logger.info("Getting "+season+" season_notarised_counts")
     ac_block_heights = get_ac_block_info()
 
-    results = get_chain_ntx_season_aggregates(season)
+    results = get_latest_season_chain_ntx(season)
 
     for item in results:
         chain = item[0]
-        block_height = item[1]
+        max_height = item[1]
         max_time = item[2]
         ntx_count = item[3]
         cols = 'block_hash, txid, block_time, opret, ac_ntx_blockhash, ac_ntx_height'
-        conditions = "block_height="+str(block_height)+" AND chain='"+chain+"'"
+        conditions = "block_height="+str(max_height)+" AND chain='"+chain+"'"
         try:
             last_ntx_result = select_from_table('notarised', cols, conditions)[0]
             kmd_ntx_blockhash = last_ntx_result[0]
@@ -52,7 +53,7 @@ def update_notarised_chain_season(season):
                 row = notarised_chain_season_row()
                 row.chain = chain
                 row.ntx_count = ntx_count
-                row.block_height = block_height
+                row.block_height = max_height
                 row.kmd_ntx_blockhash = kmd_ntx_blockhash
                 row.kmd_ntx_txid = kmd_ntx_txid
                 row.kmd_ntx_blocktime = kmd_ntx_blocktime

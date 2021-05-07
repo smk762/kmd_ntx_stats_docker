@@ -163,6 +163,20 @@ def notarised_count_season_table(request):
     })
 
 
+def notary_ntx_table(request):
+    resp = get_notary_ntx_table(request)
+    filters = ['season', 'server', 'epoch', 'chain', 'notary']
+    if "error" in resp:
+        return JsonResponse({
+            "error":resp["error"],
+            "filters":filters
+        })
+    return JsonResponse({
+        "count":len(resp),
+        "filters":filters,
+        "results":resp
+    })
+
 def notarised_table(request):
     resp = get_notarised_table(request)
     filters = ['season', 'server', 'epoch', 'chain', 'notary', 'address']

@@ -3,6 +3,7 @@ import json
 import time
 import random
 import requests
+import calendar
 from decimal import *
 from datetime import datetime as dt
 import datetime
@@ -18,6 +19,7 @@ from models import ltc_tx_row, notarised_row, get_chain_epoch_score_at, get_chai
 
 from lib_const import *
 from known_txids import *
+
 
 
 def get_linked_addresses(addr=None, notary=None):
@@ -245,7 +247,11 @@ def detect_split(txid_data, addresses):
     return False
 
 def scan_ltc_transactions(season):
-    season_ltc_addresses = NOTARY_LTC_ADDRESSES[season][:]+[LTC_NTX_ADDR]
+    season_ltc_addresses_resp = requests.get(f"http://116.203.120.91:8762/api/table/addresses/?season={season}&server=Main&chain=LTC").json()["results"]
+    season_ltc_addresses = []
+    for item in season_ltc_addresses_resp:
+        season_ltc_addresses.append(item["address"])
+    season_ltc_addresses += [LTC_NTX_ADDR]
     num_addr = len(season_ltc_addresses)
     notary_last_ntx = get_notary_last_ntx("LTC")
 
@@ -295,9 +301,11 @@ def scan_ltc_transactions(season):
                 ltc_row.block_height = tx_info['block_height']
 
                 block_time_iso8601 = tx_info['confirmed']
-                parsed_time = dp.parse(block_time_iso8601)
-                ltc_row.block_time = parsed_time.strftime('%s')
+                logger.info(block_time_iso8601)
+                ltc_row.block_time = calendar.timegm(dt.strptime(block_time_iso8601, "%Y-%m-%dT%H:%M:%SZ").timetuple())
+                logger.info(ltc_row.block_time)
                 ltc_row.block_datetime = dt.utcfromtimestamp(int(ltc_row.block_time))
+                logger.info(ltc_row.block_datetime)
 
                 addresses = tx_info['addresses']
                 ltc_row.season, ltc_row.server = get_season_from_addresses(addresses[:], ltc_row.block_time, "LTC", "LTC")
@@ -391,6 +399,8 @@ def scan_ltc_transactions(season):
 
 if __name__ == "__main__":
     
+
+
     seasons = [SEASON]
     for season in seasons:
         scan_ltc_transactions(season)

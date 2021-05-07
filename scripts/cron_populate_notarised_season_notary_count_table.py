@@ -48,7 +48,8 @@ def get_season_ntx_dict(season):
                 "server_ntx_count":0,
                 "server_ntx_score":0,
                 "server_ntx_count_pct":0,
-                "server_ntx_score_pct":0
+                "server_ntx_score_pct":0,
+                    "epochs":{}
             }
         })
         for notary in notaries:
@@ -63,6 +64,17 @@ def get_season_ntx_dict(season):
             })
         epochs = get_notarised_epochs(season, server)
         for epoch in epochs:
+            season_ntx_dict["servers"][server]["epochs"].update({
+                epoch: {
+                    "score_per_ntx":0,
+                    "epoch_ntx_count":0,
+                    "epoch_ntx_score":0,
+                    "epoch_ntx_count_pct":0,
+                    "epoch_ntx_score_pct":0,
+                    "chains":{}
+                }
+
+            })
             for notary in notaries:
                 season_ntx_dict["notaries"][notary]["servers"][server]["epochs"].update({
                     epoch: {
@@ -115,6 +127,16 @@ def get_season_ntx_dict(season):
                         }
 
                     })
+                season_ntx_dict["servers"][server]["epochs"][epoch]["chains"].update({
+                    chain: {
+                        "score_per_ntx":0,
+                        "epoch_chain_ntx_count":0,
+                        "epoch_chain_ntx_score":0,
+                        "epoch_chain_ntx_count_pct":0,
+                        "epoch_chain_ntx_score_pct":0
+                    }
+
+                })
     i = 0
     for notary in notaries:
         i += 1
@@ -128,63 +150,140 @@ def get_season_ntx_dict(season):
             server_epoch_chain_count = item[4]
             server_epoch_chain_score = item[5]
 
+            # Notary Server Epoch Chain Score and Count Totals
             season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_count"] += server_epoch_chain_count
             season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score"] += server_epoch_chain_score
 
+            # Notary Server Epoch Score and Count Totals
             season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_count"] += server_epoch_chain_count
             season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score"] += server_epoch_chain_score
             season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["score_per_ntx"] = score_value
-            
+
+            # Notary Server Score and Count Totals
             season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_count"] += server_epoch_chain_count
             season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score"] += server_epoch_chain_score
 
+            # Notary Chain Score and Count Totals
             season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_count"] += server_epoch_chain_count
             season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score"] += server_epoch_chain_score
 
+            # Notary Score and Count Totals
             season_ntx_dict["notaries"][notary]["notary_ntx_count"] += server_epoch_chain_count
             season_ntx_dict["notaries"][notary]["notary_ntx_score"] += server_epoch_chain_score
 
+            # Global Chain Epoch Score and Count Totals
             season_ntx_dict["chains"][chain]["epochs"][epoch]["chain_epoch_ntx_count"] += server_epoch_chain_count
             season_ntx_dict["chains"][chain]["epochs"][epoch]["chain_epoch_ntx_score"] += server_epoch_chain_score
             season_ntx_dict["chains"][chain]["epochs"][epoch]["score_per_ntx"] = score_value
 
+            # Global Chain Score and Count Totals
             season_ntx_dict["chains"][chain]["chain_ntx_count"] += server_epoch_chain_count
             season_ntx_dict["chains"][chain]["chain_ntx_score"] += server_epoch_chain_score
 
+            # Global Epoch Chain Score and Count Totals
+            season_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["epoch_chain_ntx_count"] += server_epoch_chain_count
+            season_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["epoch_chain_ntx_score"] += server_epoch_chain_score
+
+            # Global Epoch Score and Count Totals
+            season_ntx_dict["servers"][server]["epochs"][epoch]["epoch_ntx_count"] += server_epoch_chain_count
+            season_ntx_dict["servers"][server]["epochs"][epoch]["epoch_ntx_score"] += server_epoch_chain_score
+
+            # Global Server Score and Count Totals
             season_ntx_dict["servers"][server]["server_ntx_count"] += server_epoch_chain_count
             season_ntx_dict["servers"][server]["server_ntx_score"] += server_epoch_chain_score
 
+            # Global Season Score and Count Totals
             season_ntx_dict["season_ntx_count"] += server_epoch_chain_count
             season_ntx_dict["season_ntx_score"] += server_epoch_chain_score
 
     for notary in season_ntx_dict["notaries"]:
-        season_ntx_dict["notaries"][notary]["notary_ntx_count_pct"] = round(safe_div(season_ntx_dict["notaries"][notary]["notary_ntx_count"],season_ntx_dict["season_ntx_count"])*100,3)
-        season_ntx_dict["notaries"][notary]["notary_ntx_score_pct"] = round(safe_div(season_ntx_dict["notaries"][notary]["notary_ntx_score"],season_ntx_dict["season_ntx_score"])*100,3)
-        season_ntx_dict["notaries"][notary]["notary_ntx_score"] = float(season_ntx_dict["notaries"][notary]["notary_ntx_score"])
+        # Notary Percentage of Global Count/Score
+        season_ntx_dict["notaries"][notary]["notary_ntx_count_pct"] = round(
+            safe_div(
+                season_ntx_dict["notaries"][notary]["notary_ntx_count"],
+                season_ntx_dict["season_ntx_count"]
+                )*100,3)
+        season_ntx_dict["notaries"][notary]["notary_ntx_score_pct"] = round(
+            safe_div(
+                season_ntx_dict["notaries"][notary]["notary_ntx_score"],
+                season_ntx_dict["season_ntx_score"]
+                )*100,3)
+        season_ntx_dict["notaries"][notary]["notary_ntx_score"] = float(
+            season_ntx_dict["notaries"][notary]["notary_ntx_score"])
 
         for chain in season_ntx_dict["notaries"][notary]["chains"]:
-            season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_count_pct"] = round(safe_div(season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_count"],season_ntx_dict["season_ntx_count"])*100,3)
-            season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score_pct"] = round(safe_div(season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score"],season_ntx_dict["season_ntx_score"])*100,3)
-            season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score"] = float(season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score"])
+            # Notary Chain Percentage of Global Chain Count/Score
+            season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_count_pct"] = round(
+                safe_div(
+                    season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_count"],
+                    season_ntx_dict["chains"][chain]["chain_ntx_count"]
+                    )*100,3)
+            season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score_pct"] = round(
+                safe_div(
+                    season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score"],
+                    season_ntx_dict["chains"][chain]["chain_ntx_score"]
+                    )*100,3)
+            season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score"] = float(
+                season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score"]
+                )
 
         for server in season_ntx_dict["notaries"][notary]["servers"]:
-            season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_count_pct"] = round(safe_div(season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_count"],season_ntx_dict["season_ntx_count"])*100,3)
-            season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score_pct"] = round(safe_div(season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score"],season_ntx_dict["season_ntx_score"])*100,3)
-            season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score"] = float(season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score"])
+            # Notary Server Percentage of Global Server Count/Score
+            season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_count_pct"] = round(
+                safe_div(
+                    season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_count"],
+                    season_ntx_dict["servers"][server]["server_ntx_count"]
+                    )*100,3)
+            season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score_pct"] = round(
+                safe_div(
+                    season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score"],
+                    season_ntx_dict["servers"][server]["server_ntx_score"]
+                    )*100,3)
+            season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score"] = float(
+                season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score"]
+                )
+
 
             for epoch in season_ntx_dict["notaries"][notary]["servers"][server]["epochs"]:
-                season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_count_pct"] = round(safe_div(season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_count"],season_ntx_dict["season_ntx_count"])*100,3)
-                season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score_pct"] = round(safe_div(season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score"],season_ntx_dict["season_ntx_score"])*100,3)
-                season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score"] = float(season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score"])
+                # Notary Epoch Percentage of Global Epoch Count/Score
+                season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_count_pct"] = round(
+                    safe_div(
+                        season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_count"],
+                        season_ntx_dict["servers"][server]["epochs"][epoch]["epoch_ntx_count"]
+                        )*100,3)
+                season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score_pct"] = round(
+                    safe_div(
+                        season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score"],
+                        season_ntx_dict["servers"][server]["epochs"][epoch]["epoch_ntx_score"]
+                        )*100,3)
+                season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score"] = float(
+                    season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score"]
+                    )
+
 
                 for chain in season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"]:
-                    season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_count_pct"] = round(safe_div(season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_count"],season_ntx_dict["season_ntx_count"])*100,3)
-                    season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score_pct"] = round(safe_div(season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score"],season_ntx_dict["season_ntx_score"])*100,3)
-                    season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score"] = float(season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score"])
+                    # Notary Epoch Chain Percentage of Global Epoch Count/Score
+                    season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_count_pct"] = round(
+                        safe_div(
+                            season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_count"],
+                            season_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["epoch_chain_ntx_count"]
+                            )*100,3)
+                    season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score_pct"] = round(
+                        safe_div(
+                            season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score"],
+                            season_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["epoch_chain_ntx_score"]
+                            )*100,3)
+                    season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score"] = float(
+                        season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score"]
+                        )
 
 
     for chain in season_ntx_dict["chains"]:
-        season_ntx_dict["chains"][chain]["chain_ntx_count_pct"] = round(safe_div(season_ntx_dict["chains"][chain]["chain_ntx_count"],season_ntx_dict["season_ntx_count"])*100,3)
+        season_ntx_dict["chains"][chain]["chain_ntx_count_pct"] = round(
+            safe_div(
+                season_ntx_dict["chains"][chain]["chain_ntx_count"],
+                season_ntx_dict["season_ntx_count"]
+                )*100,3)
         season_ntx_dict["chains"][chain]["chain_ntx_score_pct"] = round(safe_div(season_ntx_dict["chains"][chain]["chain_ntx_score"],season_ntx_dict["season_ntx_score"])*100,3)
         season_ntx_dict["chains"][chain]["chain_ntx_score"] = float(season_ntx_dict["chains"][chain]["chain_ntx_score"])
 
@@ -224,7 +323,7 @@ def update_notarised_count_season(season):
         chain_ntx_pct_dict = {}
         for chain in season_ntx_dict["chains"]:
             chain_ntx_pct_dict.update({
-                chain: season_ntx_dict["chains"][chain]["chain_ntx_count_pct"]
+                chain: season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_count_pct"]
             })
 
         btc_count = 0

@@ -8,7 +8,7 @@ cursor = conn.cursor()
 #table = 'nn_social'
 #table = 'mined'
 #table = 'mined_count_season'
-table = 'notarised_tenure'
+#table = 'notarised_tenure'
 #table = 'notarised'
 #table = 'coins'
 #table = "scoring_epochs"
@@ -16,7 +16,7 @@ table = 'notarised_tenure'
 #table = 'addresses'
 #table = 'last_notarised'
 #table = 'notarised_count_season'
-
+table = 'notarised_chain_season'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())

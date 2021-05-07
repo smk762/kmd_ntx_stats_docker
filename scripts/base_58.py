@@ -19,6 +19,13 @@ class PBC_CoinParams(CoreMainParams):
                        'SCRIPT_ADDR': 85,
                        'SECRET_KEY': 188}
 
+class SFUSD_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 63,
+                       'SCRIPT_ADDR': 85,
+                       'SECRET_KEY': 188}
+
 class BTC_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
     DEFAULT_PORT = 7770
@@ -68,6 +75,7 @@ COIN_PARAMS = {
     "GLEEC": KMD_CoinParams,
     "GLEEC-OLD": GLEEC_3P_CoinParams,
     "PBC": PBC_CoinParams,
+    "SFUSD": SFUSD_CoinParams,
     "CHIPS": KMD_CoinParams,
     "VRSC": KMD_CoinParams,
     "BTC": BTC_CoinParams,

@@ -73,7 +73,13 @@ def kmd_rewards_view(request):
 
 
 def launch_params_view(request):
+    if "season" in request.GET:
+        season = request.GET["season"]
+    else:
+        season = SEASON
     context = {
+        "season":season,
+        "season_clean":season.replace("_"," "),
         "page_title":"Launch Parameters",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()
@@ -94,7 +100,13 @@ def launch_params_view(request):
 
 
 def daemon_cli_view(request):
+    if "season" in request.GET:
+        season = request.GET["season"]
+    else:
+        season = SEASON
     context = {
+        "season":season,
+        "season_clean":season.replace("_"," "),
         "page_title":"Daemon CLIs",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()
