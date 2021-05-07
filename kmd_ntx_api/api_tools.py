@@ -95,10 +95,10 @@ def get_notary_utxo_count(request):
                 "block_tip":resp["block_tip"],
                 "oldest_utxo_height":min_height,
                 "dpow_utxo_count":resp["dpow_utxo_count"],
+                "utxo_count":resp["utxo_count"],
                 "utxos":resp["utxos"]
             }
             return JsonResponse({
-                "count":len(resp),
                 "filters":filters,
                 "results":api_resp
             })

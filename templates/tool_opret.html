@@ -2,23 +2,28 @@
 {% load static %}
 {% block content %}
 	<div class="row col-12 mx-auto my-2" style="color:#FFF;">
-		<div class="card kmd_ui_dark1_bg m-auto col-10">
-		<div class="card-header kmd_ui_dark1_bg col-10 m-auto">
+		<div class="card kmd_ui_dark1_bg m-auto col-12">
+		<div class="card-header kmd_ui_dark1_bg col-12 m-auto">
 			<h4>Decode OP_RETURN</h4>
 		</div>
 			<div class="card-body kmd_ui_dark1_bg m-auto col-12">
 				<form>
-					<div class="form-group"> 
-						<input type="text" class="form-control" id="opret_id" name="OP_RETURN" placeholder="Enter OP_RETURN">
-					</div>	
-									
-					<div class="form-group"> 
-						<button type="submit" class="btn btn-primary">Decode</button>
-					</div>     
-					
+				  <div class="input-group mb-3 mx-auto kmd_ui_dark1_bg col-12">
+				    <div class="input-group-prepend p-0  kmd_ui_dark4_bg" >
+				      <span class="input-group-text  kmd_ui_dark4_bg" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+				      	Enter OP_RETURN
+				      </span>
+				    </div>
+				    <input type="text" class="form-control m-auto kmd_ui_dark3_bg" id="opret_id" name="OP_RETURN" placeholder="{{ OP_RETURN }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 1em; text-align: center;">
+				    <div class="input-group-append p-0  kmd_ui_dark4_bg">
+						<button class="btn btn-dark"style="line-height: 1em; border: solid grey 1px !important;">
+						    Decode
+						</button>
+				    </div>
+				  </div>
 				</form>
+
 				{% if opret_rows %}
-				<div class="col-8 m-auto"><i style="font-size: 0.8em;">Data for OP_RETURN {{ OP_RETURN }}</i></div>
 				<table id="opret_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
 					<thead style="display:none">
 						<tr>

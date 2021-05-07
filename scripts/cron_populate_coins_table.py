@@ -22,9 +22,6 @@ def parse_coins_repo():
     for item in coins_repo:
         coin = item['coin']
 
-        if coin == "SFUSD":
-            coin = "PBC"
-
         if coin in TRANSLATE_COINS:
             logger.warning(f"[parse_coins_repo] Translating {coin} to {TRANSLATE_COINS[coin]}")
             coin = TRANSLATE_COINS[coin]
@@ -172,9 +169,7 @@ def parse_electrum_explorer(coins_data):
         logger.info(f"[parse_electrum_explorer] Adding electrum info for {coin}")
 
         try:
-            if coin == "PBC":
-                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/SFUSD")
-            elif coin == "COQUICASH":
+            if coin == "COQUICASH":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/COQUI")
             elif coin == "WLC21":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/WLC")
@@ -212,9 +207,7 @@ def parse_electrum_explorer(coins_data):
     for coin in coins:
         logger.info(f"[parse_electrum_explorer] Adding Explorer info for {coin}")
         try:
-            if coin == "PBC":
-                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/SFUSD")
-            elif coin == "COQUICASH":
+            if coin == "COQUICASH":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/COQUI")
             elif coin == "WLC21":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/WLC")
@@ -239,9 +232,7 @@ def parse_electrum_explorer(coins_data):
     for coin in coins:
         logger.info(f"[parse_electrum_explorer] Adding Icon info for {coin}")
         try:
-            if coin == "PBC":
-                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/sfusd.png")
-            elif coin == "COQUICASH":
+            if coin == "COQUICASH":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png")
             elif coin == "WLC21":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png")

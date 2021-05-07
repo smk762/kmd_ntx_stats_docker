@@ -25,6 +25,20 @@ def get_chain_ntx_season_aggregates(season):
     except:
         return ()
 
+def get_latest_season_chain_ntx(season):
+    sql = f"SELECT chain, \
+            MAX(block_height), \
+            MAX(block_time), \
+            COUNT(*) \
+            FROM notarised \
+            WHERE season = '{season}' \
+            GROUP BY chain;"
+    CURSOR.execute(sql)
+    try:
+        results = CURSOR.fetchall()
+        return results
+    except:
+        return ()
 
 def get_official_ntx_results(season, group_by, server=None, epoch=None, chain=None, notary=None):
     group_by = ", ".join(group_by)
@@ -528,6 +542,24 @@ def get_notary_last_ntx(chain=None):
             notary_last_ntx.update({notary:{}})
         notary_last_ntx[notary].update({chain:block_height})
     return notary_last_ntx
+
+def get_season_last_ntx(season):
+    # Get chain and time of last ntx
+    sql = "SELECT notary, chain, block_height from last_notarised"
+    if season:
+        sql += f" WHERE season='{season}'"
+    sql += ";"
+    CURSOR.execute(sql)
+    last_ntx = CURSOR.fetchall()
+    season_last_ntx = {}
+    for item in last_ntx:
+        notary = item[0]
+        chain = item[1]
+        block_height = item[2]
+        if notary not in season_last_ntx:
+            season_last_ntx.update({notary:{}})
+        season_last_ntx[notary].update({chain:block_height})
+    return season_last_ntx
 
 def get_existing_notarised_txids(chain=None, season=None, server=None):
 

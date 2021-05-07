@@ -70,7 +70,7 @@ class balance_row():
         if self.validated():
             logger.info(f"Updating [balance] {self.season} | {self.server} | \
                           {self.notary} | {self.chain} | {self.balance} | \
-                          {self.address}")
+                          {self.address} | {self.update_time}")
             update_balances_row(row_data)
         else:
             logger.warning(f"[balance] Row data invalid!")

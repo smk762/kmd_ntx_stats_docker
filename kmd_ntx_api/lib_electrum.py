@@ -21,17 +21,23 @@ def get_utxo_count(chain, pubkey, server):
             address = calc_addr_from_pubkey("KMD", pubkey)
             resp = dexstats.get_utxos(chain, address)
             utxos = []
-            num_unspent = 0
+            utxo_count = 0
+            dpow_utxo_count = 0
             for item in resp:
-                if item['satoshis'] == 10000:
-                    num_unspent +=1
 
-                if item['satoshis'] != 0:
-                    utxos.append(item)
+                if item['satoshis'] == 10000:
+                    dpow_utxo_count +=1
+                    item.update({"dpow_utxo":True})
+                else:
+                    item.update({"dpow_utxo":False})
+
+                utxo_count +=1
+                utxos.append(item)
 
             return {
                 "block_tip":block_tip,
-                "dpow_utxo_count":num_unspent,
+                "utxo_count":utxo_count,
+                "dpow_utxo_count":dpow_utxo_count,
                 "utxos":utxos,
             }
         else:
@@ -46,26 +52,34 @@ def get_utxo_count(chain, pubkey, server):
                 p2pk_resp = get_from_electrum(url, port, 'blockchain.scripthash.listunspent', p2pk_scripthash)
                 p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
                 p2pkh_resp = get_from_electrum(url, port, 'blockchain.scripthash.listunspent', p2pkh_scripthash)
+                headers_resp = get_from_electrum(url, port, 'blockchain.headers.subscribe')
+
+                block_tip = headers_resp['result']['height']
                 resp = p2pk_resp['result'] + p2pkh_resp['result']
                 utxos = []
-                num_unspent = 0
-                for item in p2pkh_resp['result']:
-                    if item['value'] != 0:
+                utxo_count = 0
+                dpow_utxo_count = 0
+                for item in resp:
+                    if item["value"] > 0:
                         utxos.append(item)
 
-                for item in p2pk_resp['result']:
-                    if item['value'] != 0:
-                        utxos.append(item)
+                if chain in ["AYA", "EMC2", "SFUSD"]:
+                    utxo_size = 100000
+                else:
+                    utxo_size = 10000
 
-                    if chain in ["AYA", "EMC2"]:
-                        if item['value'] == 100000:
-                            num_unspent +=1
+                for item in utxos:
+                    utxo_count += 1                         
+                    if item['value'] == utxo_size:
+                        dpow_utxo_count +=1
+                        item.update({"dpow_utxo":True})
                     else:
-                        if item['value'] == 10000:
-                            num_unspent +=1
+                        item.update({"dpow_utxo":False})
+
                 return {
                     "block_tip":block_tip,
-                    "dpow_utxo_count":num_unspent,
+                    "utxo_count":utxo_count,
+                    "dpow_utxo_count":dpow_utxo_count,
                     "utxos":utxos,
                 }
 

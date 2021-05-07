@@ -449,8 +449,8 @@ def get_region_rank(region_notarisation_scores, notary_score):
 
 
 # chain > data
-def get_season_chain_ntx_data(season):
-    ntx_season = get_notarised_chain_season_data(season).values()
+def get_season_chain_ntx_data(season, chain=None):
+    ntx_season = get_notarised_chain_season_data(season, None, chain).values()
     dpow_coins_list = get_dpow_coins_list(season)
     season_chain_ntx_data = {}
     if len(ntx_season) > 0:

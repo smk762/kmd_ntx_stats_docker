@@ -45,7 +45,7 @@ def update_balances_row(row_data):
             VALUES (%s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_chain_address_season_balance DO UPDATE SET \
                 balance={row_data[5]}, \
-                server='{row_data[2]}', \
+                server='{row_data[1]}', \
                 update_time={row_data[6]};"
         CURSOR.execute(sql, row_data)
         CONN.commit()
