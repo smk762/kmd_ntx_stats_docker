@@ -4,35 +4,39 @@
 	<div class="row col-12 mx-auto my-2" style="color:#FFF;">
 		<div class="card kmd_ui_dark1_bg m-auto">
 			<div class="card-header kmd_ui_dark1_bg m-auto">
-				<h4>{{ season }} Latest Chain Notarisations</h4>
+				<h4>{{ page_title }}</h4>
 			</div>
 			<div class="card-body kmd_ui_dark1_bg m-auto">
 				<table id="last_notarised_tbl" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
 					<thead>
 						<tr>
+							<th>Server</th>
 							<th>Chain</th>
-							<th>Ntx Count</th>
-							<th>Ntx Block</th>
-							<th>Current Block</th>
-							<th>Ntx Hash</th>
-							<th>Lag</th>
-							<th>Time since</th>
-							<th>KMD block</th>
+							<th>TXID</th>
+							<th>Notaries</th>
+							<th>Block Height</th>
+							<th>Block Time</th>
+							<th>Time Since</th>
 						</tr>
 					</thead>
 					<tbody>
-						{% for chain, chain_data in season_chain_ntx_data.items %}
+						{% for chain, item in last_notarised_data.items %}
 						<tr>
+							<td style="font-size: 1em" data-data="server">{{ item.server }}</td>
 							<td data-data="chain">
 						  		{{ chain }}
 						  	</td>
-							<td style="font-size: 0.9em" data-data="ntx_count">{{ chain_data.chain_ntx_season }}</th>
-							<td style="font-size: 0.9em" data-data="last_ntx_ac_block">{{ chain_data.last_ntx_ac_block }}</th>
-							<td style="font-size: 0.9em" data-data="ac_block_height">{{ chain_data.ac_block_height }}</th>
-							<td style="font-size: 0.6em" data-data="ac_ntx_blockhash">{{ chain_data.ac_ntx_blockhash }}</th>
-							<td style="font-size: 0.9em" data-data="ntx_lag">{{ chain_data.ntx_lag }}</th>
-							<td style="font-size: 0.9em" data-data="last_ntx_time">{{ chain_data.last_ntx_time }}</th>
-							<td style="font-size: 0.9em" data-data="last_ntx_block">{{ chain_data.last_ntx_block }}</th>
+							<td style="font-size: 0.8em" data-data="txid">
+  								{{ item.txid }}
+							</td>
+							<td style="font-size: 1em" data-data="notaries">
+								<span data-toggle="tooltip" data-placement="top" title="{{ item.notaries }}">
+									<a href="#">[view]</a>
+								</span>
+							</td>
+							<td style="font-size: 1em" data-data="block_height">{{ item.block_height }}</td>
+							<td style="font-size: 1em" data-data="block_time">{{ item.block_time }}</td>
+							<td style="font-size: 1em" data-data="time_since">{{ item.block_time }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>
@@ -47,69 +51,108 @@
     {{ explorers|json_script:"explorers-data" }}
   	<script>
 	    $(document).ready(function() {
+		  	$('[data-toggle="tooltip"]').tooltip();
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 		        $('#last_notarised_tbl').DataTable({
-	        		order: [[ 7, 'desc' ]],
-		        	"paging": false,
+	        		order: [[ 5, 'desc' ]],
+  					"paging": false,
 		        	"columns": [
+				        { "data": "server" },
 				        { "data": "chain" },
-				        { "data": "ntx_count" },
-				        { "data": "last_ntx_ac_block" },
-				        { "data": "ac_block_height" },
-				        { "data": "ac_ntx_blockhash" },
-				        { "data": "ntx_lag" },	
-				        { "data": "last_ntx_time" },
-				        { "data": "last_ntx_block" }
+				        { "data": "txid" },
+				        { "data": "notaries" },
+				        { "data": "block_height" },
+				        { "data": "block_time" },
+				        { "data": "time_since" }
 				    ],
 	        		"columnDefs": [
+
 	        			{
+				            "data": "server",
 				            "targets": 0,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a></span>");
+				            	if (oData.server == "Main") {
+				            		color = "#6f5f23";
+				            	}
+				            	else if (oData.server == "Third_Party") {
+				            		color = "#225d51";
+				            	}
+				            	else if (oData.server == "Testnet") {
+				            		color = "#622C7B";
+				            	}
+				            	else {
+				            		color = "#000";	
+				            	}
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-1' style='background-color:"+color+" !important;'>"+oData.server.replace(/_/g, " ")+"</span>");
+				        	}
+				        },
+
+	        			{
+				            "data": "chain",
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-1'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a></span>");
 					        }
 				        },
 	        			{
-				            "targets": 4,
+				            "data": 'txid',
+				            "targets": 2,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            	if (oData.ac_ntx_blockhash == 'no data' ) {
-					            	$(nTd).html(oData.ac_ntx_blockhash);
-					            }
-					            else if (!(explorers.hasOwnProperty(oData.chain))) {
-				            		$(nTd).html(oData.ac_ntx_blockhash.slice(0, 3)+"..."+oData.ac_ntx_blockhash.slice(-3));	
+				            	if (oData.chain == "BTC") {
+					            	$(nTd).html("<a href='https://www.blockchain.com/btc/tx/"+oData.txid+"'>"+oData.txid+"</a>");
+					            } else  if (oData.chain == "LTC") {
+					            	$(nTd).html("<a href='https://chainz.cryptoid.info/ltc/tx.dws?"+oData.txid+"'>"+oData.txid+"</a>");
+					            } else {
+				            		$(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.txid+"</a>");
 				            	}
-				            	else if (explorers[oData.chain][0].search("cryptoid") > -1) {
-				            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'block.dws?'+oData.ac_ntx_blockhash+".htm'>"+oData.ac_ntx_blockhash.slice(0, 3)+"..."+oData.ac_ntx_blockhash.slice(-3)+"</a>");
-				            	}
-				            	else {
-				            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'block/'+oData.ac_ntx_blockhash+"'>"+oData.ac_ntx_blockhash.slice(0, 3)+"..."+oData.ac_ntx_blockhash.slice(-3)+"</a>");
-				            	}
-			            	
-				        	}
-			            	
+					        }
 				        },
 	        			{
+				            "data": 'notaries',
+				            "targets": 3
+				        },
+		        			{
+				            "data": 'block_height',
+				            "targets": 4,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            	if (oData.chain == "BTC") {
+					            	$(nTd).html("<a href='https://www.blockchain.com/btc/block/"+oData.block_height+"'>"+oData.block_height+"</a>");
+					            } else  if (oData.chain == "LTC") {
+					            	$(nTd).html("<a href='https://chainz.cryptoid.info/ltc/block.dws?"+oData.block_height+".htm'>"+oData.block_height+"</a>");
+					            } else {
+					            	$(nTd).html("<a href='https://komodod.com/b/"+oData.block_height+"'>"+oData.block_height+"</a>");
+					        	}
+					        }
+				        },
+	        			{
+				            "data": 'block_time',
+				            "targets": 5,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-1' !important;'>"+oData.block_time+"</span>");
+					        }
+				        },
+	        			{
+				            "data": 'time_since',
 				            "targets": 6,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            	var time_now = Date.now()/1000;
-				            	totalSeconds = time_now-oData.last_ntx_time
+				            	totalSeconds = time_now-oData.block_time
 				            	days = Math.floor(totalSeconds / 86400);
 							    totalSeconds %= 86400;
 				            	hours = Math.floor(totalSeconds / 3600);
 							    totalSeconds %= 3600;
 							    minutes = Math.floor(totalSeconds / 60);
 							    seconds = totalSeconds % 60;
-							    if (oData.last_ntx_time == 0) {
-							    	timesince = "-"
-							    } else if (days == 0 & hours ==0) {
+							    if (days == 0 & hours ==0) {
 							    	timesince = minutes+" min"
 							    } else if (days == 0) {
 							    	timesince = hours+" hrs, "+minutes+" min"
 							    } else {
 							    	timesince = days+" days, "+hours+" hrs"
 							    }
-					            $(nTd).html(timesince);
+			            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-1' !important;'>"+timesince+"</span>");
 					        }
-				        },
+				        }
 	        		]
 		        });
 	    });

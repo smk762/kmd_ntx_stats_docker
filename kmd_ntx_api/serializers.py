@@ -108,6 +108,13 @@ class notarisedSerializer(serializers.HyperlinkedModelSerializer):
                   'season', 'server', 'epoch', 'scored', 'score_value']
 
 
+class notary_ntxSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = notarised
+        fields = ['txid', 'chain', 'block_height', 'block_time',
+                  'ac_ntx_height', 'score_value']
+
+
 class notarisedChainDailySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = notarised_chain_daily
@@ -120,7 +127,7 @@ class notarisedChainSeasonSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['chain', 'ntx_count', 'block_height', 'kmd_ntx_blockhash',
                   'kmd_ntx_txid', 'kmd_ntx_blocktime', 'opret',
                   'ac_ntx_blockhash', 'ac_ntx_height', 'ac_block_height',
-                  'ntx_lag', 'season']
+                  'ntx_lag', 'season', 'server']
 
 
 class notarisedCountDailySerializer(serializers.HyperlinkedModelSerializer):

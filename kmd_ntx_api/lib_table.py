@@ -185,6 +185,15 @@ def get_notary_profile_summary_table(request):
         chain_ntx_counts = item['chain_ntx_counts']
         for chain in chain_ntx_counts["chains"]:
             if chain not in resp:
+                if chain in season_main_coins:
+                    server = "Main"
+                elif chain in season_3P_coins:
+                    server = "Third_Party"
+                elif chain in ["KMD", "BTC", "LTC"]:
+                    server = chain
+                else:
+                    server = "Unknown"
+                    logger.warning(f"Can't assign {chain} NTX % for {notary}")
                 resp.update({
                     chain:{
                         "season":season,
@@ -423,6 +432,34 @@ def get_notarised_count_season_table(request):
 
     return resp
 
+
+def get_notary_ntx_table(request):
+    season = None
+    server = None
+    epoch = None
+    chain = None
+    notary = None
+
+    if "season" in request.GET:
+        season = request.GET["season"]
+    if "server" in request.GET:
+        server = request.GET["server"]
+    if "epoch" in request.GET:
+        epoch = request.GET["epoch"]
+    if "chain" in request.GET:
+        chain = request.GET["chain"]
+    if "notary" in request.GET:
+        notary = request.GET["notary"]
+    if not season or not chain or not notary:
+        return {
+            "error":"You need to specify all of the following filter parameters: ['season', 'chain', 'notary']"
+        }
+    data = get_notarised_data(season, server, epoch, chain, notary).order_by('-block_time')
+    data = data.values('txid', 'chain', 'block_height', 'block_time', 'ac_ntx_height', 'score_value')
+
+    serializer = notary_ntxSerializer(data, many=True)
+
+    return serializer.data
 
 def get_notarised_table(request):
     season = None

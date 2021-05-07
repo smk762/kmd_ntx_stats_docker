@@ -55,8 +55,8 @@
 			            "data": 'block_height',
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	if (oData.chain == "BTC") {
-				            	$(nTd).html("<a href='"+explorers['BTC']+'block-index/'+oData.block_height+"'>"+oData.block_height+"</a>");
+			            	if (oData.chain == "LTC") {
+				            	$(nTd).html("<a href='https://chainz.cryptoid.info/ltc/block.dws?"+oData.block_height+"'>"+oData.block_height+"</a>");
 				            } else {
 				            	$(nTd).html("<a href='https://komodod.com/b/"+oData.block_height+"'>"+oData.block_height+"</a>");
 				        	}

@@ -357,7 +357,9 @@ class notarised(models.Model):
             models.Index(fields=['server']),
             models.Index(fields=['epoch']),
             models.Index(fields=['chain']),
+            models.Index(fields=['chain', '-block_height']),
             models.Index(fields=['season', 'server']),
+            models.Index(fields=['season', 'server', 'chain']),
             models.Index(fields=['season', 'server', 'epoch']),
             models.Index(fields=['season', 'server', 'epoch', 'chain']),
         ]
@@ -415,7 +417,7 @@ class notarised_chain_season(models.Model):
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=['chain', 'season', 'server'],
+                fields=['chain', 'season'],
                 name='unique_notarised_chain_season_server'
             )
         ]
@@ -523,6 +525,7 @@ class scoring_epochs(models.Model):
                 name='unique_scoring_epoch'
             )
         ]
+
 
 class vote2021(models.Model):
     txid = models.CharField(max_length=64)

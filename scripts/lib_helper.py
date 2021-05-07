@@ -200,6 +200,12 @@ def get_chain_server(chain, season):
     else:
         return "Unofficial"
 
+def get_season_notaries(season):
+    if season in NOTARY_PUBKEYS:
+        notaries = list(NOTARY_PUBKEYS[season].keys())
+        notaries.sort()
+        return notaries
+    return []
 
 
 
@@ -339,16 +345,6 @@ def get_dpow_score_value(season, server, coin, timestamp):
 
     return round(score, 8)
 
-
-# NOT IN USE
-def get_season_notaries(season):
-    notaries = []
-    for season_num in NOTARY_PUBKEYS:
-        if season == season_num[0:8]:
-            for notary in NOTARY_PUBKEYS[season_num]:
-                if notary not in notaries:
-                    notaries.append(notary)
-    return notaries
 
     
 def get_notaries_from_addresses(addresses):

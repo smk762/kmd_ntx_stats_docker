@@ -28,6 +28,10 @@ api_table_urls = [
           api_table.mined_count_season_table,
           name='mined_count_season_table'),
 
+    path('api/table/notary_ntx/',
+          api_table.notary_ntx_table,
+          name='notary_ntx_table'),
+    
     path('api/table/notarised/',
           api_table.notarised_table,
           name='notarised_table'),
