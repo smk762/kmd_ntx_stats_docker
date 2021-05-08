@@ -44,7 +44,7 @@
             <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ info.name }}</li>
                 {% for option in info.nodes %}
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notary_profile/{{ option }}/?season=Season_5"> {{ option }}
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notary_profile/{{ option }}/?season={{ season }}"> {{ option }}
                     </a>
                 </li>
                 {% endfor %}
@@ -61,7 +61,7 @@
             <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ section }}</li>
                 {% for option in info %}
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/coin_profile/{{ option }}/?season=Season_5"> {{ option }}
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/coin_profile/{{ option }}/?season={{ season }}"> {{ option }}
                     </a>
                 </li>
                 {% endfor %}
@@ -107,17 +107,17 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard/?season=Season_5"> {{ season }} Scoreboard
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}"> {{ season }} Scoreboard
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard_24hrs/?season=Season_5"> 24hr Scoreboard
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard_24hrs/?season={{ season }}"> 24hr Scoreboard
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/chains_last_ntx/?season=Season_5"> Last Chain Notarisation
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}"> Last Chain Notarisation
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_24hrs/?season=Season_5"> Last 200 Notarisations
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}"> Last 200 Notarisations
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_tenure/?season=Season_5"> Chain dPoW Tenure
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_tenure/?season={{ season }}"> Chain dPoW Tenure
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/scoring_epochs/?season=Season_5"> dPoW Scoring Epochs
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/scoring_epochs/?season={{ season }}"> dPoW Scoring Epochs
                     </a>
                 </li>
             </ul>
@@ -129,11 +129,11 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/mining_overview/?season=Season_5"> Mining Overview
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/mining_overview/?season={{ season }}"> Mining Overview
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/mining_24hrs/?season=Season_5"> Mining last 24hrs
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}"> Mining last 24hrs
                     </a>
                 </li>
             </ul>
@@ -145,7 +145,7 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/faucet/?season=Season_5"> RICK / MORTY Faucet
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/faucet/?season={{ season }}"> RICK / MORTY Faucet
                     </a>
                 </li>
             </ul>
@@ -157,23 +157,23 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/pubkey_addresses/?season=Season_5"> Address from Pubkey
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/pubkey_addresses/?season={{ season }}"> Address from Pubkey
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/decode_opret/?season=Season_5"> Decode OP_RETURN
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/decode_opret/?season={{ season }}"> Decode OP_RETURN
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/daemon_clis/?season=Season_5"> Daemon CLIs
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/daemon_clis/?season={{ season }}"> Daemon CLIs
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/launch_params/?season=Season_5"> Launch Params
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/launch_params/?season={{ season }}"> Launch Params
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/kmd_rewards/?season=Season_5"> KMD Rewards
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/kmd_rewards/?season={{ season }}"> KMD Rewards
                     </a>
                 </li>
             </ul>
