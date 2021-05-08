@@ -1,6 +1,7 @@
 import requests
 import logging
 import os
+import time
 from dotenv import load_dotenv
 from django.contrib import messages
 
@@ -21,7 +22,11 @@ MESSAGE_TAGS = {
     messages.ERROR: 'alert-danger',
 }
 
-SEASON = "Season_4"
+if time.time() > 1592146800:
+    SEASON = "Season_4"
+if time.time() > 1623682800:
+    SEASON = "Season_5"
+
 
 SEASONS_INFO = {
     "Season_1": {
@@ -58,13 +63,6 @@ SEASONS_INFO = {
             "end_block":3437000,
             "start_time":1623682800,
             "end_time":1773682800,
-            "notaries":[]
-        },
-    "Season_5_Testnet": {
-            "start_block":2299140,
-            "end_block":2436999,
-            "start_time":1615367302,
-            "end_time":1618660800, # April 17th 2021 12pm,
             "notaries":[]
         }
 }
