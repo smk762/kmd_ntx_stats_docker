@@ -11,7 +11,7 @@ def get_region_score_stats(notarisation_scores):
         for notary in notarisation_scores[region]:
             notary_count += 1
             region_total += notarisation_scores[region][notary]["score"]
-        region_average = region_total/notary_count
+        region_average = safe_div(region_total,notary_count)
         region_score_stats.update({
             region:{
                 "notary_count": notary_count,

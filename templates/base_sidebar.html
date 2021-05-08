@@ -12,11 +12,22 @@
 
         <li class="c-sidebar-nav-dropdown">
             <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                <i class="cil-address-book"></i>
+                <span style="padding-left: 12px;">Season 5 Transition</span>
+            </a>
+            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/s5_address_confirmation"> Address Confirmation
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="c-sidebar-nav-dropdown">
+            <a class="c-sidebar-nav-dropdown-toggle" href="#">
                 <i class="cil-badge"></i>
                 <span style="padding-left: 12px;">VOTE 2021</span>
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
-            <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ info.name }}</li>
                 <li class="c-sidebar-nav-item">
                     <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/vote2021"> Vote Tally Results
                     </a>
@@ -33,7 +44,7 @@
             <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ info.name }}</li>
                 {% for option in info.nodes %}
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notary_profile/{{ option }}"> {{ option }}
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notary_profile/{{ option }}/?season={{ season }}"> {{ option }}
                     </a>
                 </li>
                 {% endfor %}
@@ -50,7 +61,7 @@
             <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ section }}</li>
                 {% for option in info %}
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/coin_profile/{{ option }}"> {{ option }}
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/coin_profile/{{ option }}/?season={{ season }}"> {{ option }}
                     </a>
                 </li>
                 {% endfor %}
@@ -96,17 +107,17 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard"> {{ season }} Scoreboard
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}"> {{ season }} Scoreboard
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard_24hrs"> 24hr Scoreboard
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/ntx_scoreboard_24hrs/?season={{ season }}"> 24hr Scoreboard
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/chains_last_ntx"> Last Chain Notarisation
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}"> Last Chain Notarisation
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_24hrs"> Last 200 Notarisations
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}"> Last 200 Notarisations
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_tenure"> Chain dPoW Tenure
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/notarised_tenure/?season={{ season }}"> Chain dPoW Tenure
                     </a>
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/scoring_epochs"> dPoW Scoring Epochs
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/scoring_epochs/?season={{ season }}"> dPoW Scoring Epochs
                     </a>
                 </li>
             </ul>
@@ -118,11 +129,11 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/mining_overview"> Mining Overview
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/mining_overview/?season={{ season }}"> Mining Overview
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/mining_24hrs"> Mining last 24hrs
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}"> Mining last 24hrs
                     </a>
                 </li>
             </ul>
@@ -134,7 +145,7 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/faucet"> RICK / MORTY Faucet
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/faucet/?season={{ season }}"> RICK / MORTY Faucet
                     </a>
                 </li>
             </ul>
@@ -146,23 +157,23 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/pubkey_addresses"> Address from Pubkey
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/pubkey_addresses/?season={{ season }}"> Address from Pubkey
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/decode_opret"> Decode OP_RETURN
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/decode_opret/?season={{ season }}"> Decode OP_RETURN
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/daemon_clis"> Daemon CLIs
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/daemon_clis/?season={{ season }}"> Daemon CLIs
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/launch_params"> Launch Params
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/launch_params/?season={{ season }}"> Launch Params
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/kmd_rewards"> KMD Rewards
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/kmd_rewards/?season={{ season }}"> KMD Rewards
                     </a>
                 </li>
             </ul>
