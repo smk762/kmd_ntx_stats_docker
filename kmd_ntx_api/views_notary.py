@@ -174,9 +174,99 @@ def s5_address_confirmation(request):
         params = f'?season={request.GET["season"]}'
     else:
         season = SEASON
+    addr_confirmed_in_PR = [
+        "alien_AR",
+        "alien_EU",
+        "alien_NA",
+        "alienx_EU",
+        "alienx_NA",
+        "computergenie_NA",
+        "dappvader_SH",
+        "drkush_SH",
+        "goldenman_AR",
+        "kolo_AR",
+        "node-9_EU",
+        "node-9_NA",
+        "nodeone_NA",
+        "nutellaLicka_SH",
+        "ptyx_NA",
+        "phit_SH",
+        "sheeba_SH",
+        "slyris_EU",
+        "strob_SH",
+        "strob_NA",
+        "strobnidan_SH",
+        "tonyl_AR",
+        "tonyl_DEV",
+        "strobnidan_SH",
+        "webworker01_NA",
+        "van_EU"
+    ]
+    pub_confirmed_in_PR = [
+        "alien_AR",
+        "alien_EU",
+        "alien_NA",
+        "alienx_EU",
+        "alienx_NA",
+        "artem_DEV",
+        "artempikulin_AR",
+        "ca333_EU",
+        "chmex_AR",
+        "chmex_EU",
+        "chmex_SH",
+        "cipi_EU",
+        "cipi_AR",
+        "cipi_NA",
+        "cipi2_EU",
+        "collider_SH",
+        "karasugoi_NA",
+        "komodopioneers_EU",
+        "madmax_AR",
+        "madmax_EU",
+        "madmax_NA",
+        "marmarachain_EU",
+        "majora31_SH",
+        "karasugoi_NA",
+        "metaphilibert_SH",
+        "mrlynch_AR",
+        "metaphilibert_SH",
+        "pbca26_NA",
+        "pbca26_SH",
+        "smdmitry_AR",
+        "smdmitry_EU",
+        "pbca26_SH",
+        "mcrypt_AR",
+        "mcrypt_SH",
+        "yurii_DEV"
+    ]
+    pub_confirmed_in_DM = [
+        "gcharang_DEV",
+        "mylo_SH",
+        "hyper_NA",
+        "tokel_AR",
+        "shadowbit_AR",
+        "shadowbit_EU",
+        "shadowbit_DEV",
+        "ocean_AR",
+        "alrighttt_DEV",
+        "ca333_DEV"
+    ]
+    addr_confirmed_in_DM = [
+        "dragonhound_DEV",
+        "dragonhound_NA",
+    ]
     kmd_addresses = requests.get(f"{THIS_SERVER}/api/table/addresses/?season=Season_5&chain=KMD").json()["results"]
     ltc_addresses = requests.get(f"{THIS_SERVER}/api/table/addresses/?season=Season_5&chain=LTC&server=Main").json()["results"]
     addresses = kmd_addresses + ltc_addresses
+    for item in addresses:
+        if item["notary"] in pub_confirmed_in_PR:
+            item.update({"confirmed":"Pubkey (PR)"})
+        elif item["notary"] in addr_confirmed_in_PR:
+            item.update({"confirmed":"Address (PR)"})
+        elif item["notary"] in pub_confirmed_in_DM:
+            item.update({"confirmed":"Pubkey (DM)"})
+        elif item["notary"] in addr_confirmed_in_DM:
+            item.update({"confirmed":"Address (DM)"})
     context = {
         "season":season,
         "season_clean":season.replace("_"," "),

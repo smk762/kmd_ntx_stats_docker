@@ -16,16 +16,18 @@
 							<th data-data="chain">Chain</th>
 							<th data-data="pubkey">Pubkey</th>
 							<th data-data="address">Address</th>
+							<th data-data="confirmed">Confirmed</th>
 						</tr>
 					</thead>
 					<tbody>
 						{% for item in addresses %}
 							<tr>
-								<td data-data="notary">{{ item.notary }}</td>
-								<td data-data="server">{{ item.server }}</td>
-								<td data-data="chain">{{ item.chain }}</td>
-								<td style="font-size: 0.8em;" data-data="pubkey">{{ item.pubkey }}</td>
-								<td style="font-size: 0.9em;"  data-data="address">{{ item.address }}</td>
+								<td style="font-size: 0.8em;" data-data="notary">{{ item.notary }}</td>
+								<td style="font-size: 0.8em;" data-data="server">{{ item.server }}</td>
+								<td style="font-size: 0.8em;" data-data="chain">{{ item.chain }}</td>
+								<td style="font-size: 0.7em;" data-data="pubkey">{{ item.pubkey }}</td>
+								<td style="font-size: 0.7em;"  data-data="address">{{ item.address }}</td>
+								<td style="font-size: 0.7em;"  data-data="confirmed">{{ item.confirmed }}</td>
 							</tr>
 						{% endfor %}
 					</tbody>
@@ -50,7 +52,8 @@
 			        { "data": "server" },
 			        { "data": "chain" },
 			        { "data": "pubkey" },
-			        { "data": "address" }
+			        { "data": "address" },
+			        { "data": "confirmed" }
 			    ],
         		"columnDefs": [
 			        {
@@ -83,7 +86,7 @@
 			            "data": "chain",
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'>"+oData.chain+"</span>");
+				            $(nTd).html("<span class=''>"+oData.chain+"</span>");
 				        }
 			        },
         			{
