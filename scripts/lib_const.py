@@ -28,7 +28,11 @@ OTHER_SERVER = os.getenv("OTHER_SERVER") # set to IP or domain to allow for exte
 THIS_SERVER = os.getenv("THIS_SERVER") # IP / domain of the local server
 API_PAGE_BREAK = int(os.getenv("API_PAGE_BREAK")) # How many pages back to go with verbose API responses
 
-SEASON = "Season_4"
+if time.time() > 1592146800:
+    SEASON = "Season_4"
+if time.time() > 1623682800:
+    SEASON = "Season_5"
+
 
 # Notarisation Addresses
 NTX_ADDR = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
@@ -190,15 +194,18 @@ for season in NOTARY_PUBKEYS:
         notary_id += 1
 
 for season in NOTARY_PUBKEYS:
-    notaries = list(NOTARY_PUBKEYS[season].keys())
-    notaries.sort()
-    for notary in notaries:
-        if season.find("Season_3") != -1:
-            SEASONS_INFO["Season_3"]['notaries'].append(notary)
-        elif season.find("Season_4") != -1:
-            SEASONS_INFO["Season_4"]['notaries'].append(notary)
-        else:
-            SEASONS_INFO[season]['notaries'].append(notary)
+    if season.find("Third_Party") != -1:
+        notaries = list(NOTARY_PUBKEYS[season].keys())
+        notaries.sort()
+        for notary in notaries:
+            if season.find("Season_3") != -1:
+                SEASONS_INFO["Season_3"]['notaries'].append(notary)
+            elif season.find("Season_4") != -1:
+                SEASONS_INFO["Season_4"]['notaries'].append(notary)
+            elif season.find("Season_5") != -1:
+                SEASONS_INFO["Season_5"]['notaries'].append(notary)
+            else:
+                SEASONS_INFO[season]['notaries'].append(notary)
 
 
 # SPECIAL CASE BTC TXIDS

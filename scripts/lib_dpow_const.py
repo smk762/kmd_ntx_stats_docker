@@ -78,13 +78,6 @@ SEASONS_INFO = {
             "start_time":1623682800,
             "end_time":1773682800,
             "notaries":[]
-        },
-    "Season_5_Testnet": {
-            "start_block":2299140,
-            "end_block":2436999,
-            "start_time":1615367302,
-            "end_time":1618660800, # April 17th 2021 12pm,
-            "notaries":[]
         }
 }
 

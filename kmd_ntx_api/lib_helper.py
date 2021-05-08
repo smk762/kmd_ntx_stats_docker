@@ -312,3 +312,7 @@ def prepare_coins_graph_data(graph_data, coins_dict):
     } 
     return data
 
+
+def safe_div(x,y):
+    if y==0: return 0
+    return float(x/y)

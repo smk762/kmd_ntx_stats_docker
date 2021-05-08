@@ -166,3 +166,27 @@ def vote2021_detail_view(request):
     })
 
     return render(request, 'vote2021_detail.html', context)
+
+def s5_address_confirmation(request):
+    # Populate sidebar
+    season = None
+    if "season" in request.GET:
+        params = f'?season={request.GET["season"]}'
+    else:
+        season = SEASON
+    kmd_addresses = requests.get(f"{THIS_SERVER}/api/table/addresses/?season=Season_5&chain=KMD").json()["results"]
+    ltc_addresses = requests.get(f"{THIS_SERVER}/api/table/addresses/?season=Season_5&chain=LTC&server=Main").json()["results"]
+    addresses = kmd_addresses + ltc_addresses
+    context = {
+        "season":season,
+        "season_clean":season.replace("_"," "),
+        "page_title":"Address Confirmation",
+        "explorers": get_explorers(request), # For hyperlinking addresses
+        "addresses":addresses,
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+
+    return render(request, 's5_address_confirmation.html', context)
+
+
