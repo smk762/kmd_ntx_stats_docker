@@ -794,5 +794,7 @@ if __name__ == "__main__":
             update_daily_notarised_chains(season)
             end = time.time()
             logger.info(f">>> {end-start} sec to complete [update_daily_notarised_chains({season})]")
+    CURSOR.close()
+    CONN.close()
             
 

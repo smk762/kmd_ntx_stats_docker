@@ -202,7 +202,7 @@ def get_season_ntx_dict(season):
             safe_div(
                 season_ntx_dict["notaries"][notary]["notary_ntx_count"],
                 season_ntx_dict["season_ntx_count"]
-                )*100,3)
+                )*100,3)*13
         season_ntx_dict["notaries"][notary]["notary_ntx_score_pct"] = round(
             safe_div(
                 season_ntx_dict["notaries"][notary]["notary_ntx_score"],
@@ -217,7 +217,7 @@ def get_season_ntx_dict(season):
                 safe_div(
                     season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_count"],
                     season_ntx_dict["chains"][chain]["chain_ntx_count"]
-                    )*100,3)
+                    )*100,3)*13
             season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score_pct"] = round(
                 safe_div(
                     season_ntx_dict["notaries"][notary]["chains"][chain]["notary_chain_ntx_score"],
@@ -233,7 +233,7 @@ def get_season_ntx_dict(season):
                 safe_div(
                     season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_count"],
                     season_ntx_dict["servers"][server]["server_ntx_count"]
-                    )*100,3)
+                    )*100,3)*13
             season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score_pct"] = round(
                 safe_div(
                     season_ntx_dict["notaries"][notary]["servers"][server]["notary_server_ntx_score"],
@@ -250,7 +250,7 @@ def get_season_ntx_dict(season):
                     safe_div(
                         season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_count"],
                         season_ntx_dict["servers"][server]["epochs"][epoch]["epoch_ntx_count"]
-                        )*100,3)
+                        )*100,3)*13
                 season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score_pct"] = round(
                     safe_div(
                         season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["notary_server_epoch_ntx_score"],
@@ -267,7 +267,7 @@ def get_season_ntx_dict(season):
                         safe_div(
                             season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_count"],
                             season_ntx_dict["servers"][server]["epochs"][epoch]["chains"][chain]["epoch_chain_ntx_count"]
-                            )*100,3)
+                            )*100,3)*13
                     season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score_pct"] = round(
                         safe_div(
                             season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["chains"][chain]["notary_server_epoch_chain_ntx_score"],
@@ -384,3 +384,5 @@ if __name__ == "__main__":
             update_notarised_count_season(season)
             end = time.time()
             logger.info(f">>> {end-start} sec to complete [get_totals({season})]")
+    CURSOR.close()
+    CONN.close()

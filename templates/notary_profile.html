@@ -15,7 +15,7 @@
 							    Notarised Last 24hrs
 							    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
 							    	<a href="//{{ request.get_host }}/notarised_24hrs">
-							    		{{ 24hr_ltc_count }}<br /> BTC
+							    		{{ 24hr_ltc_count }}<br /> LTC
 							    	</a>
 							    </span>
 							    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
@@ -35,7 +35,7 @@
 						    	Notarised Season
 							    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
 							    	<a href="//{{ request.get_host }}/ntx_scoreboard">
-							    		{{ season_btc_count }}<br /> BTC
+							    		{{ season_btc_count }}<br /> LTC
 							    	</a>
 							    </span>
 							    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
@@ -84,7 +84,7 @@
 								{% if notary_name == nn and site_links.icon != '' %}
 									<img class="card-img-top m-auto auto-width p-2" height='96px' src="{{ site_links.icon }}" alt="" style="border-radius: 50%;">
 								{% else %}
-									<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/notary/icon/' %}{{ notary_name }}.png" alt="{{ notary_name }} image here" style="border-radius: 50%;">
+									<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
 								{% endif %}
 							{% endfor %}
 						</div>
@@ -122,9 +122,17 @@
 
 				</div>
         		<div class="row m-auto align-items-center">
-					<h6><a class="sml-social" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season4/elected_nn_social.json">
-						Update
-					</a></h6>
+					<h6>
+						{% if season == "Season_4" %}
+						<a class="sml-social" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season4/elected_nn_social.json">
+							Update
+						</a>
+						{% elif season == "Season_5" %}
+						<a class="sml-social" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season5/elected_nn_social.json">
+							Update
+						</a>
+						{% endif %}
+					</h6>
 				</div>
 				<div class="card-body kmd_ui_dark2_bg kmd_ui_light3 p-0">
 					<p class="card-text ">
@@ -451,7 +459,7 @@
 			            "data": 'ntx_time',
 			            "targets": 6,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' !important;'>"+oData.ntx_time+"</span>");
+			            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'>"+oData.ntx_time+"</span>");
 				        }
 			        }
         		]

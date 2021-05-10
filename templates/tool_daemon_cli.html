@@ -8,15 +8,15 @@
 	
 			<div class="row col-12 mx-auto my-2" style="color:#FFF;">
 				{% for item in daemon_cli_rows %}
-					  <div class="input-group mb-3 kmd_ui_dark1_bg">
+					  <div class="input-group mb-1 kmd_ui_dark1_bg">
 					    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg" >
 					      <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: solid grey 1px !important; line-height: 1em;">
 					      	<a href='//{{ request.get_host }}/coin_profile/{{ item.chain }}'>
 								{{ item.chain }}
 							</a></span>
 					    </div>
-					    <input type="text" class="form-control col-10 kmd_ui_dark1_bg" style="border: solid grey 1px !important; font-size: 0.8em; line-height: 1em;" placeholder="{{ item.daemon_cli }}" value="{{ item.daemon_cli }}" readonly id="{{ item.chain }}_cli">
-					    <div class="input-group-append p-0 kmd_ui_dark4_bg"  style="border: solid grey 1px !important;">
+					    <input type="text" class="form-control col-10 kmd_ui_dark1_bg" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ item.daemon_cli }}" value="{{ item.daemon_cli }}" readonly id="{{ item.chain }}_cli">
+					    <div class="input-group-append p-0 kmd_ui_dark4_bg" style="border: solid grey 1px !important;">
 							<button class="btn" data-clipboard-target="#{{ item.chain }}_cli" style="line-height: 1em;">
 							    <i class="cil-copy"></i>
 							</button>

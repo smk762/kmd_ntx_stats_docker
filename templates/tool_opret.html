@@ -14,7 +14,7 @@
 				      	Enter OP_RETURN
 				      </span>
 				    </div>
-				    <input type="text" class="form-control m-auto kmd_ui_dark3_bg" id="opret_id" name="OP_RETURN" placeholder="{{ OP_RETURN }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 1em; text-align: center;">
+				    <input type="text" class="form-control m-auto kmd_ui_dark3_bg" id="opret_id" name="OP_RETURN" placeholder="{{ OP_RETURN }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center;">
 				    <div class="input-group-append p-0  kmd_ui_dark4_bg">
 						<button class="btn btn-dark"style="line-height: 1em; border: solid grey 1px !important;">
 						    Decode
@@ -23,35 +23,56 @@
 				  </div>
 				</form>
 
-				{% if opret_rows %}
-				<table id="opret_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
-					<thead style="display:none">
-						<tr>
-							<th data-data="key">Key</th>
-							<th data-data="value">Value</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for item in opret_rows %}
-							{% if item.key != 'OP_RETURN' %}
-							<tr>
-								<td data-data="key">{{ item.key }}</td>
-								<td data-data="value">{{ item.value }}</td>
-							</tr>
-							{% endif %}
-						{% endfor %}
-					</tbody>
-				</table>
-				{% endif %}
+				{% for item in opret_rows %}
+				  <div class="input-group mb-1 kmd_ui_dark1_bg">
+				    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg" >
+				      <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: solid grey 1px !important; line-height: 1em; color:
+#82F4E6 !important;">
+				      	{{ item.key }}
+				    </div>
+				    <input type="text" class="form-control col-10 kmd_ui_dark1_bg" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ item.value }}" value="{{ item.value }}" readonly id="x_{{ item.value }}">
+				    <div class="input-group-append p-0 kmd_ui_dark4_bg" style="border: solid grey 1px !important;">
+						<button class="btn" data-clipboard-target="#x_{{ item.value }}" style="line-height: 1em; font-size: 0.8em">
+						    <i class="cil-copy"></i>
+						</button>
+				    </div>
+				  </div>
+				{% endfor %}
 			</div>
 		</div>	
 	</div>
-    <!-- jquery -->
-  
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+    <!-- jquery -->  
   	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
   	
-	{% if opret_rows %}
+	<script>
+
+		function setTooltip(mdi, message) {
+		  $(mdi).tooltip('hide')
+		    .attr('data-original-title', message)
+		    .tooltip('show');
+		}
+
+		function hideTooltip(mdi) {
+		  setTimeout(function() {
+		    $(mdi).tooltip('hide');
+		  }, 1000);
+		}
+
+		var btns = document.querySelectorAll('button');
+		var clipboard = new ClipboardJS(btns);
+
+		clipboard.on('success', function (e) {
+			setTooltip(e.trigger, 'Copied!');
+			hideTooltip(e.trigger);
+		});
+
+		clipboard.on('error', function (e) {
+			console.log(e);
+		});
+	</script>
+  	<!--
   	<script>
 	    $(document).ready(function() {
 	        $('#opret_table').DataTable({ 
@@ -67,5 +88,5 @@
 	        $('#opret_table_info').css({'display':'none'});
 	    });
     </script> 
-    {% endif %}
+-->
 {% endblock %}

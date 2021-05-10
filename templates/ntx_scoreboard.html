@@ -2,9 +2,9 @@
 {% load static %}
 {% block content %}
 
-	{% include "snippets/region_ntx_leaders_2.html" %}
+	{% include "snippets/region_ntx_leaders.html" %}
 
-	{% for region, region_data in notarisation_scores.items %}
+	{% for region, region_data in season_stats_sorted.items %}
 		<div class="row col-12 mx-auto my-2" style="color:#FFF;">
 			<div class="card kmd_ui_dark1_bg m-auto">
 				<div class="card-header kmd_ui_dark1_bg m-auto">
@@ -31,19 +31,19 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for notary, notary_data in region_data.items %}
+							{% for item in region_data %}
 							<tr>
 								<td data-data="rank">
 							  		<span class="badge kmd_ui_dark1_bg p-2">
-							  			{{ notary_data.rank }}
+							  			{{ item.rank }}
 							  		</span>
 							  	</td>
-								<td style="font-size: 1.1em" data-data="notary">{{ notary }}</th>
-								<td data-data="btc">{{ notary_data.btc }}</th>
-								<td data-data="main">{{ notary_data.main }}</th>
-								<td data-data="third_party">{{ notary_data.third_party }}</th>
-								<td data-data="mining">{{ notary_data.mining }}</th>
-								<td style="font-size: 1.1em"  data-data="score">{{ notary_data.score|floatformat:-3 }}</th>
+								<td style="font-size: 1.1em" data-data="notary">{{ item.notary }}</th>
+								<td data-data="btc">{{ item.btc }}</th>
+								<td data-data="main">{{ item.main }}</th>
+								<td data-data="third_party">{{ item.third_party }}</th>
+								<td data-data="mining">{{ item.mining }}</th>
+								<td style="font-size: 1.1em"  data-data="score">{{ item.score|floatformat:-3 }}</th>
 								<td style="font-size: 0.9em" data-data="detail"><a href="//{{ request.get_host }}/notary_epoch_scores/?notary={{ notary }}">More Info</a></th>
 							</tr>
 							{% endfor %}

@@ -23,13 +23,13 @@
 					<tbody>
 					{% for row in mined_season %}
 						<tr>
-							<td data-data="name">{{ row.name }}</td>
-							<td style="font-size: 0.9em" data-data="address">{{ row.address }}</td>
-							<td style="font-size: 0.9em" data-data="blocks_mined">{{ row.blocks_mined }}</td>
-							<td style="font-size: 0.9em" data-data="sum_value_mined">{{ row.sum_value_mined }}</td>
-							<td style="font-size: 0.9em" data-data="max_value_mined">{{ row.max_value_mined }}</td>
-							<td style="font-size: 0.9em" data-data="last_mined_block">{{ row.last_mined_block }}</td>
-							<td style="font-size: 0.9em" data-data="last_mined_blocktime">{{ row.last_mined_blocktime }}</td>
+							<td style="font-size: 1.1em" data-data="name">{{ row.name }}</td>
+							<td style="font-size: 0.1em" data-data="address">{{ row.address }}</td>
+							<td style="font-size: 1em" data-data="blocks_mined">{{ row.blocks_mined }}</td>
+							<td style="font-size: 1em" data-data="sum_value_mined">{{ row.sum_value_mined }}</td>
+							<td style="font-size: 1em" data-data="max_value_mined">{{ row.max_value_mined }}</td>
+							<td style="font-size: 1.2em" data-data="last_mined_block">{{ row.last_mined_block }}</td>
+							<td style="font-size: 1.2em" data-data="last_mined_blocktime">{{ row.last_mined_blocktime }}</td>
 						</tr>
 					{% endfor %}
 					</tbody>
@@ -64,7 +64,7 @@
 			            "data": 'last_mined_block',
 			            "targets": 5,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='https://komodod.com/b/"+oData.last_mined_block+"'>"+oData.last_mined_block+"</a>");
+				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='https://komodod.com/b/"+oData.last_mined_block+"'>"+oData.last_mined_block+"</a></span>");
 				        }
 			        },
         			{
@@ -86,7 +86,7 @@
 						    } else {
 						    	timesince = days+" days, "+hours+" hrs"
 						    }
-				            $(nTd).html(timesince);
+				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'>"+timesince+"</span>");
 				        }
 			        }
 			    ]
