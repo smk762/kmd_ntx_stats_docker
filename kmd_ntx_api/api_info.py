@@ -268,7 +268,6 @@ def notarisation_txid_list(request):
 
 def notary_btc_transactions(request):
     resp = get_notary_btc_transactions(request)
-    logger.info(request.GET)
     filters = ['season', 'category', 'notary', 'address']
     if "error" in resp:
         return JsonResponse({

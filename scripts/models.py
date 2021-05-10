@@ -196,13 +196,14 @@ class tx_row():
 
 
 class nn_social_row():
-    def __init__(self, notary='', twitter='', youtube='', discord='',
-                 telegram='', github='', keybase='', website='',
+    def __init__(self, notary='', twitter='', youtube='', email='',
+                 discord='', telegram='', github='', keybase='', website='',
                  icon='', season=''):
         self.notary = notary
         self.twitter = twitter
         self.youtube = youtube
         self.discord = discord
+        self.email = email
         self.telegram = telegram
         self.github = github
         self.keybase = keybase
@@ -215,7 +216,7 @@ class nn_social_row():
 
     def update(self):
         row_data = (self.notary, self.twitter, self.youtube,
-                    self.discord, self.telegram, self.github,
+                    self.email, self.discord, self.telegram, self.github,
                     self.keybase, self.website, self.icon, self.season)
         if self.validated():
             logger.info(f"Updating NN social {self.season} | {self.notary}")

@@ -3,7 +3,7 @@
     <!-- Sidebar -->
     <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show kmd_ui_dark3_bg" id="sidebar" style="border-right: 1px solid #000 !important;    ">
       <div class="c-sidebar-brand d-md-down-none kmd_ui_dark1_bg">
-        <a href="//{{ request.get_host }}">
+        <a href="//{{ request.get_host }}/?season={{ season }}">
             <img class="c-sidebar-brand-full"height="46" alt="Komodo Logo" src="//{{ request.get_host }}/static/img/brand/KMD_Horiz_Light.png" />
             <img class="c-sidebar-brand-minimized" width="46" height="46" alt="Komodo Logo" src="{% static 'img/brand/KMD_Mark_Color.png' %}" />
         </a>
@@ -17,7 +17,7 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/s5_address_confirmation"> Address Confirmation
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/s5_address_confirmation/?season={{ season }}"> Address Confirmation
                     </a>
                 </li>
             </ul>
@@ -29,7 +29,7 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/vote2021"> Vote Tally Results
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/vote2021/?season={{ season }}"> Vote Tally Results
                     </a>
                 </li>
             </ul>
@@ -173,7 +173,7 @@
                     </a>
                 </li>
                 <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/kmd_rewards/?season={{ season }}"> KMD Rewards
+                    <a class="c-sidebar-nav-link" href="//{{ request.get_host }}/tools/kmd_rewards/"> KMD Rewards
                     </a>
                 </li>
             </ul>

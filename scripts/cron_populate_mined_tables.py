@@ -200,4 +200,6 @@ if __name__ == "__main__":
                     process_aggregates(season)
                     end = time.time()
                     logger.info(f">>> {end-start} sec to complete [process_aggregates({season})]")
+    CURSOR.close()
+    CONN.close()
 

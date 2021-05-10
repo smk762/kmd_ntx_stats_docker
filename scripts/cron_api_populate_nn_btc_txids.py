@@ -425,5 +425,7 @@ if __name__ == "__main__":
     for season in seasons:
         if season not in EXCLUDED_SEASONS: 
             scan_btc_transactions(season)
+    CURSOR.close()
+    CONN.close()
 
 

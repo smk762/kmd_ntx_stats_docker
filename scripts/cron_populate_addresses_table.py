@@ -66,3 +66,5 @@ if __name__ == "__main__":
         #else:
         for server in ["Main", "Third_Party"]:
             populate_addresses(season, server)
+    CURSOR.close()
+    CONN.close()

@@ -163,6 +163,11 @@ def get_regions_info(notary_list):
 
     return regions_info
 
+def get_page_season(request):
+    if "season" in request.GET:
+        if request.GET["season"] in SEASONS_INFO:
+            return request.GET["season"]
+    return SEASON
 
 def day_hr_min_sec(seconds, granularity=2):
     result = []
@@ -224,6 +229,8 @@ def get_notary_region(notary):
     return notary.split("_")[-1]
 
 def get_time_since(timestamp):
+    if timestamp == 0:
+        return -1, "Never"
     now = int(time.time())
     sec_since = now - int(timestamp)
     dms_since = day_hr_min_sec(sec_since)

@@ -27,7 +27,7 @@
 				<h6><b>Address:</b> <a href='https://komodod.com/a/{{ address }}'>{{ address }}</a></h6>
 				<h6><b>Balance:</b> {{ kmd_balance }}</h6>
 				<h6><b>UTXOs eligible:</b> {{ eligible_utxo_count }}/{{ utxo_count }}</h6>
-				<h6><b>Total rewards:</b> {{ total_rewards }} KMD</h6>
+				<h5 style="font-size: 1.2em; background-color:black; border: solid 1px grey" class="badge p-3"><b>Total rewards:</b> {{ total_rewards }} KMD</h5>
 				{% endif %}
 
 				{% if kmd_rewards_rows %}

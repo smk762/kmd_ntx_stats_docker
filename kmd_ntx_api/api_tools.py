@@ -132,7 +132,7 @@ def get_kmd_rewards(request):
         rewards_info = {
             "address": address,
             "utxo_count": utxo_count,
-            "eligible_utxos":{}
+            "utxos":{}
         }
         total_rewards = 0
         balance = 0
@@ -155,7 +155,7 @@ def get_kmd_rewards(request):
                             utxo_rewards = math.floor(utxo['satoshis']/DEVISOR)*reward_period
                             if utxo_rewards < 0:
                                 logger.info("Rewards should never be negative!")
-                            rewards_info['eligible_utxos'].update({
+                            rewards_info['utxos'].update({
                                 utxo['txid']:{
                                     "locktime":locktime,
                                     "utxo_value":utxo['amount'],
@@ -166,10 +166,22 @@ def get_kmd_rewards(request):
                                 }
                             })
                             total_rewards += utxo_rewards/100000000
+
                     except Exception as e:
                         logger.error(f"Exception in [get_kmd_rewards]: {e}")
                         pass
-        eligible_utxo_count = len(rewards_info['eligible_utxos'])
+                else:
+                    rewards_info['utxos'].update({
+                        utxo['txid']:{
+                            "locktime":locktime,
+                            "utxo_value":utxo['amount'],
+                            "sat_rewards":0,
+                            "kmd_rewards":0,
+                            "satoshis":utxo['satoshis'],
+                            "block_height":utxo['height']
+                        }
+                    })
+        eligible_utxo_count = len(rewards_info['utxos'])
         if oldest_utxo_block == 99999999999:
             oldest_utxo_block = 0
         rewards_info.update({

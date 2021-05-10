@@ -161,7 +161,6 @@ def get_nn_btc_tx_data(season=None, notary=None, category=None, address=None, tx
         data = data.filter(category=category)
     if address:
         data = data.filter(address=address)
-    logger.info(data.count())
     return data
 
 

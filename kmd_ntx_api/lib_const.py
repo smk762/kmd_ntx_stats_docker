@@ -107,7 +107,7 @@ DISQUALIFIED = ["etszombi_AR", "etszombi_EU",
                 "fullmoon_AR", "fullmoon_NA", "fullmoon_SH",
                 "chainmakers_NA", "jorian_EU", "phba2061_EU", "peer2cloud_AR",
                 "pungocloud_SH", "starfleet_EU", "swisscertifiers_EU",
-                "titomane_AR", "titomane_EU", "titomane_SH"]
+                "titomane_AR", "titomane_EU", "titomane_SH", "uer2_NA"]
 # COLORS
 BLACK = "#000"
 RED = "#DC0333"

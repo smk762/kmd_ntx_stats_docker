@@ -103,6 +103,8 @@ if __name__ == "__main__":
             update_latest_ntx(season)
             end = time.time()
             logger.info(f">>> {end-start} sec to complete [update_latest_ntx({season})]")
+    CURSOR.close()
+    CONN.close()
 
 
 

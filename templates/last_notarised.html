@@ -91,7 +91,7 @@
 				            "data": "chain",
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-1'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a></span>");
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'>"+oData.chain+"</a></span>");
 					        }
 				        },
 	        			{
@@ -128,7 +128,7 @@
 				            "data": 'block_time',
 				            "targets": 5,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-1' !important;'>"+oData.block_time+"</span>");
+			            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' !important;'>"+oData.block_time+"</span>");
 					        }
 				        },
 	        			{
@@ -150,7 +150,7 @@
 							    } else {
 							    	timesince = days+" days, "+hours+" hrs"
 							    }
-			            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-1' !important;'>"+timesince+"</span>");
+			            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' !important;'>"+timesince+"</span>");
 					        }
 				        }
 	        		]

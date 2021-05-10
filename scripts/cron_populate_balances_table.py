@@ -101,3 +101,5 @@ if __name__ == "__main__":
             logger.warning(f"Skipping season: {season}")
         else:
             get_balances(season)
+    CURSOR.close()
+    CONN.close()

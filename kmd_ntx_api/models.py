@@ -312,6 +312,7 @@ class nn_social(models.Model):
     twitter = models.CharField(max_length=128)
     youtube = models.CharField(max_length=128)
     discord = models.CharField(max_length=128)
+    email = models.CharField(max_length=128)
     telegram = models.CharField(max_length=128)
     github = models.CharField(max_length=128)
     keybase = models.CharField(max_length=128)
@@ -551,3 +552,10 @@ class vote2021(models.Model):
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"
 # to update static files, use "docker-compose run web python3 manage.py collectstatic"
+# Editing pg.conf
+# docker exec -it <pgsql_container_name> bash
+# apt update & apt install nano
+# nano  ./var/lib/postgresql/data/postgresql.conf
+# change max_connections to 1000
+# change max_wal_size to 2gb
+# log_rotation_size to 100mb

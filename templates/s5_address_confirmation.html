@@ -22,10 +22,14 @@
 					<tbody>
 						{% for item in addresses %}
 							<tr>
-								<td style="font-size: 0.8em;" data-data="notary">{{ item.notary }}</td>
+								<td style="font-size: 0.9em;" data-data="notary">{{ item.notary }}</td>
 								<td style="font-size: 0.8em;" data-data="server">{{ item.server }}</td>
-								<td style="font-size: 0.8em;" data-data="chain">{{ item.chain }}</td>
-								<td style="font-size: 0.7em;" data-data="pubkey">{{ item.pubkey }}</td>
+								<td style="font-size: 0.9em;" data-data="chain">{{ item.chain }}</td>
+								<td style="font-size: 0.7em;" data-data="pubkey">
+									<a href="http://{{ request.get_host }}/tools/decode_opret/?OP_RETURN={{ item.pubkey }}">
+										{{ item.pubkey }}
+									</a>
+								</td>
 								<td style="font-size: 0.7em;"  data-data="address">{{ item.address }}</td>
 								<td style="font-size: 0.7em;"  data-data="confirmed">{{ item.confirmed }}</td>
 							</tr>
