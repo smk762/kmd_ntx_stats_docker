@@ -213,16 +213,19 @@ def get_season_stats_sorted(season, coins_dict=None):
 
     notarised_count_season_data = get_notarised_count_season_data(season).values()
     for item in notarised_count_season_data:
-        region = get_notary_region(item["notary"])
+        try:
+            region = get_notary_region(item["notary"])
 
-        season_stats[region].append({
-            "notary": item["notary"],
-            "btc": item["btc_count"],
-            "main": item["antara_count"],
-            "third_party": item["third_party_count"],
-            "mining": nn_mined_season[item["notary"]],
-            "score": float(item["season_score"])
-        })
+            season_stats[region].append({
+                "notary": item["notary"],
+                "btc": item["btc_count"],
+                "main": item["antara_count"],
+                "third_party": item["third_party_count"],
+                "mining": nn_mined_season[item["notary"]],
+                "score": float(item["season_score"])
+            })
+        except:
+            pass
 
     # calc scores
     season_stats_sorted = {}

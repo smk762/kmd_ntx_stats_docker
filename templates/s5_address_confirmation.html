@@ -26,7 +26,7 @@
 								<td style="font-size: 0.8em;" data-data="server">{{ item.server }}</td>
 								<td style="font-size: 0.9em;" data-data="chain">{{ item.chain }}</td>
 								<td style="font-size: 0.7em;" data-data="pubkey">
-									<a href="http://{{ request.get_host }}/tools/decode_opret/?OP_RETURN={{ item.pubkey }}">
+									<a href="http://{{ request.get_host }}/tools/pubkey_addresses/?pubkey={{ item.pubkey }}">
 										{{ item.pubkey }}
 									</a>
 								</td>
