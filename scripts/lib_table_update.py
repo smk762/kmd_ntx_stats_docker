@@ -395,15 +395,15 @@ def update_sync_tbl(row_data):
 def update_nn_social_row(row_data):
     try:
         sql = "INSERT INTO  nn_social \
-            (notary, twitter, youtube, discord, \
+            (notary, twitter, youtube, email, discord, \
             telegram, github, keybase, \
-            website, icon, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            website, icon, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_notary_season_social DO UPDATE SET \
-            twitter='"+str(row_data[1])+"', \
-            youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
-            telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
-            keybase='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
-            icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
+            twitter='"+str(row_data[1])+"', youtube='"+str(row_data[2])+"', \
+            email='"+str(row_data[3])+"', discord='"+str(row_data[4])+"', \
+            telegram='"+str(row_data[5])+"', github='"+str(row_data[6])+"', \
+            keybase='"+str(row_data[7])+"', website='"+str(row_data[8])+"', \
+            icon='"+str(row_data[9])+"', season='"+str(row_data[10])+"';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
         return 1

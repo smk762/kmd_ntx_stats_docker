@@ -7,7 +7,9 @@ from kmd_ntx_api.api_tools import *
 
 
 def decode_opret_view(request):
+    season = get_page_season(request)
     context = {
+        "season":season,
         "page_title":"Decode OP_RETURN Tool",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()
@@ -41,7 +43,9 @@ def decode_opret_view(request):
 
 
 def kmd_rewards_view(request):
+    season = get_page_season(request)
     context = {
+        "season":season,
         "page_title":"KMD Rewards Tool",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()
@@ -54,9 +58,9 @@ def kmd_rewards_view(request):
             messages.error(request, resp["error"])
         else:
             kmd_rewards_rows = []
-            for utxo in resp["eligible_utxos"]:
+            for utxo in resp["utxos"]:
                 row = {"txid":utxo}
-                row.update(resp["eligible_utxos"][utxo])
+                row.update(resp["utxos"][utxo])
                 kmd_rewards_rows.append(row)
 
             context.update({
@@ -73,10 +77,7 @@ def kmd_rewards_view(request):
 
 
 def launch_params_view(request):
-    if "season" in request.GET:
-        season = request.GET["season"]
-    else:
-        season = SEASON
+    season = get_page_season(request)
     context = {
         "season":season,
         "season_clean":season.replace("_"," "),
@@ -100,10 +101,7 @@ def launch_params_view(request):
 
 
 def daemon_cli_view(request):
-    if "season" in request.GET:
-        season = request.GET["season"]
-    else:
-        season = SEASON
+    season = get_page_season(request)
     context = {
         "season":season,
         "season_clean":season.replace("_"," "),
@@ -127,7 +125,9 @@ def daemon_cli_view(request):
 
 
 def pubkey_addresses_view(request):
+    season = get_page_season(request)
     context = {
+        "season":season,
         "page_title":"Pubkey Addresses",
         "sidebar_links":get_sidebar_links(),
         "eco_data_link":get_eco_data_link()

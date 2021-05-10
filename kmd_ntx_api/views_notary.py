@@ -9,10 +9,9 @@ from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_stats import *
 from kmd_ntx_api.lib_graph import *
 
-def notary_profile_view(request, notary=None, season=None):
+def notary_profile_view(request, notary=None):
     # Populate sidebar
-    if not season:
-        season = SEASON
+    season = get_page_season(request)
     
     context = {
         "page_title":"Notary Profile Index",
@@ -33,7 +32,7 @@ def notary_profile_view(request, notary=None, season=None):
         notarised_count_season_data = notary_profile_summary_table['ntx_season_data'][0]
         notary_balances_list, notary_balances_graph = get_notary_balances_graph(notary, season)
         notarised_data_24hr = get_notarised_data_24hr(season, None, None, notary)
-        notarisation_scores = get_notarisation_scores(season)
+        season_stats_sorted = get_season_stats_sorted(season)
         main_notarised_24hr = notarised_data_24hr.filter(server='Main').count()
         third_notarised_24hr = notarised_data_24hr.filter(server='Third_Party').count()
         ltc_notarised_24hr = notarised_data_24hr.filter(server='KMD').count()
@@ -41,7 +40,7 @@ def notary_profile_view(request, notary=None, season=None):
 
         season_score = 0
         last_ntx_time = 0
-        last_btc_ntx_time = 0
+        last_ltc_ntx_time = 0
         last_ntx_chain = ""
         for item in notary_profile_summary_table['ntx_summary_data']:
             season_score += item["chain_score"]
@@ -51,11 +50,11 @@ def notary_profile_view(request, notary=None, season=None):
                 if item["last_block_time"] > last_ntx_time:
                     last_ntx_time = item["last_block_time"]
                     last_ntx_chain = item["chain"]
-
+        rank = get_region_rank(season_stats_sorted[region], notary)
         context.update({
             "page_title":f"{notary} Notary Profile",
             "notary_name": notary,
-            "nn_social": get_nn_social(notary), # Social Media Links
+            "nn_social": get_nn_social(season, notary), # Social Media Links
             "season_btc_count": notarised_count_season_data['btc_count'],
             "season_main_count": notarised_count_season_data['antara_count'],
             "season_third_party_count": notarised_count_season_data['third_party_count'],
@@ -68,7 +67,7 @@ def notary_profile_view(request, notary=None, season=None):
             "last_ntx_chain":last_ntx_chain,
             "mining_summary": get_nn_mining_summary(notary), #  Mining Summary
             "explorers": get_explorers(request), # For hyperlinking addresses
-            "rank": get_region_rank(notarisation_scores[region], notarisation_scores[region][notary]['score']),
+            "rank": rank,
             "ntx_summary_data":notary_profile_summary_table['ntx_summary_data'],
             "notary_balances_graph_data": notary_balances_graph, # Balances in graph format
             "notary_balances": notary_balances, # Balances in table format
@@ -78,21 +77,15 @@ def notary_profile_view(request, notary=None, season=None):
 
     else:
         context.update({
-            "nn_social":get_nn_social(),
-            "nn_info":get_nn_info()
+            "nn_social":get_nn_social(season),
+            "nn_info":get_nn_info(season)
         })
 
         return render(request, 'notary_profile_index.html', context)
 
 def vote2021_view(request):
     # Populate sidebar
-    season = None
-    if "season" in request.GET:
-        params = f'?season={request.GET["season"]}'
-    else:
-        season = SEASON
-        logger.info(request.GET)
-    logger.info(request.GET)
+    season = get_page_season(request)
 
     context = {
         "season":season,
@@ -123,11 +116,7 @@ def vote2021_view(request):
 
 def vote2021_detail_view(request):
     # Populate sidebar
-    season = None
-    if "season" in request.GET:
-        params = f'?season={request.GET["season"]}'
-    else:
-        season = SEASON
+    season = get_page_season(request)
     
     context = {
         "season":season,
@@ -169,11 +158,7 @@ def vote2021_detail_view(request):
 
 def s5_address_confirmation(request):
     # Populate sidebar
-    season = None
-    if "season" in request.GET:
-        params = f'?season={request.GET["season"]}'
-    else:
-        season = SEASON
+    season = get_page_season(request)
     addr_confirmed_in_PR = [
         "alien_AR",
         "alien_EU",

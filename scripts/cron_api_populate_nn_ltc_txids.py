@@ -399,8 +399,6 @@ def scan_ltc_transactions(season):
 
 if __name__ == "__main__":
     
-
-
     seasons = [SEASON]
     for season in seasons:
         scan_ltc_transactions(season)

@@ -422,3 +422,5 @@ if __name__ == "__main__":
     update_coins(coins_data)
 
     logging.info("[coins] table update complete!")
+    CURSOR.close()
+    CONN.close()

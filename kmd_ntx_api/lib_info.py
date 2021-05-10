@@ -47,9 +47,7 @@ def get_epoch_id(season, server, block_time):
                 return epoch_id
 
 
-def get_coin_ntx_summary(chain):
-    now = int(time.time())
-    season = get_season(now)
+def get_coin_ntx_summary(season, chain):
     server = None
 
     chain_ntx_summary = {
@@ -180,12 +178,7 @@ def get_funding_totals(funding_data):
     return funding_totals
 
 
-def get_nn_info(season=None):
-    if not season:
-        season = SEASON
-    # widget using this has been deprecated, but leaving code here for reference
-    # to use in potential replacement functions.
-    #season = SEASON
+def get_nn_info(season):
     notary_list = get_notary_list(season)
     regions_info = get_regions_info(notary_list)
     nn_info = {
@@ -343,9 +336,8 @@ def get_nn_season_ntx_counts(season):
     return nn_season_ntx_counts
 
 
-def get_nn_social(notary_name=None, season=None):
-    if not season:
-        season = SEASON
+def get_nn_social(season, notary_name=None):
+    logger.info(f"season: {season}")
     nn_social_info = {}
     nn_social_data = get_nn_social_data(season, notary_name).values()
     for item in nn_social_data:
@@ -430,10 +422,14 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
 
  
 
-def get_region_rank(region_notarisation_scores, notary_score):
+def get_region_rank(region_season_stats_sorted, notary):
     higher_ranked_notaries = []
-    for notary in region_notarisation_scores:
-        score = region_notarisation_scores[notary]['score']
+    for item in region_season_stats_sorted:
+        if item["notary"] == notary:
+            notary_score = item["score"]
+
+    for item in region_season_stats_sorted:
+        score = item['score']
         if score > notary_score:
             higher_ranked_notaries.append(notary)
     rank = len(higher_ranked_notaries)+1
@@ -636,9 +632,11 @@ def get_sidebar_links(season=None):
     if not season:
         season = SEASON
     notary_list = get_notary_list(season)
+    # logger.info(f"notary_list: {notary_list}")
     region_notaries = get_regions_info(notary_list)
+    # logger.info(f"region_notaries: {region_notaries}")
     coins_dict = get_dpow_server_coins_dict(season)
-    coins_dict = get_dpow_server_coins_dict(season)
+    # logger.info(f"coins_dict: {coins_dict}")
     sidebar_links = {
         "server":os.getenv("SERVER"),
         "chains_menu":coins_dict,
