@@ -41,14 +41,16 @@ def get_top_region_notarisers(region_notary_ranks):
         if region not in top_ntx_count:
             top_ntx_count.update({region:{}})
         for notary in region_notary_ranks[region]:
+
             for chain in region_notary_ranks[region][notary]:
-                if chain not in top_ntx_count:
+                logger.info(f"{region} {notary} {chain}: {region_notary_ranks[region][notary][chain]}")
+                if chain not in top_ntx_count[region]:
                     top_ntx_count[region].update({chain:0})
 
                 if chain not in top_region_notarisers[region]:
                     top_region_notarisers[region].update({chain:{}})
 
-                ntx_count = region_notary_ranks[region][notary][chain]
+                ntx_count = region_notary_ranks[region][notary][chain]["notary_chain_ntx_count"]
                 if ntx_count > top_ntx_count[region][chain]:
                     top_notary = notary
                     top_ntx_count[region].update({chain:ntx_count})
@@ -60,13 +62,16 @@ def get_top_region_notarisers(region_notary_ranks):
     return top_region_notarisers
 
 
-def get_top_coin_notarisers(top_region_notarisers, chain):
+def get_top_coin_notarisers(top_region_notarisers, chain, season):
+    nn_social = get_nn_social(season)
     top_coin_notarisers = {}
     for region in top_region_notarisers:
         if chain in top_region_notarisers[region]:
+            notary = top_region_notarisers[region][chain]["top_notary"]
             top_coin_notarisers.update({
                 region:{
-                    "top_notary": top_region_notarisers[region][chain]["top_notary"],
+                    "top_notary": notary,
+                    "top_notary_icon": nn_social[notary]["icon"],
                     "top_ntx_count": top_region_notarisers[region][chain]["top_ntx_count"]
                 }
             })
@@ -144,7 +149,6 @@ def get_coin_notariser_ranks(season, coins_list=None):
         region_notary_ranks = {
             "TESTNET":{}
         }
-        notary_list = get_notary_list(season)
         coins_list = ["RICK", "MORTY", "LTC"]
 
         for notary in notary_list:
@@ -152,7 +156,6 @@ def get_coin_notariser_ranks(season, coins_list=None):
 
         for item in ntx_season:
             notary = item['notary']
-
             if notary in notary_list:
                 for coin in item['chain_ntx_counts']:
                     if coin in coins_list:
@@ -172,19 +175,14 @@ def get_coin_notariser_ranks(season, coins_list=None):
             if region in ["AR","EU","NA","SH", "DEV"]:
                 region_notary_ranks[region].update({notary:{}})
         for item in ntx_season:
-
-            notary = item['notary']
-            notary = item['notary']
-            notary = item['notary']
-            notary = item['notary']
             notary = item['notary']
             if notary in notary_list:
-                for coin in item['chain_ntx_counts']:
+                for coin in item['chain_ntx_counts']["chains"]:
                     if coin in coins_list:
                         region = get_notary_region(notary)
                         if region in ["AR","EU","NA","SH", "DEV"]:
                             region_notary_ranks[region][notary].update({
-                                coin:item['chain_ntx_counts'][coin]
+                                coin:item['chain_ntx_counts']['chains'][coin]
                             })
     return region_notary_ranks
 

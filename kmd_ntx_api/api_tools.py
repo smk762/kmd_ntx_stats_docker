@@ -120,6 +120,8 @@ def get_kmd_rewards(request):
         address = request.GET["address"]
     if not address:
         return JsonResponse({"error":"You need to specify an adddress, e.g ?address=RCyANUW2H5985zk8p6NHJfPyNBXnTVzGDh"})
+    if len(address) != 34:
+        return JsonResponse({"error":f"Invalid address: {address}"})
     else:
 
         kmd_tiptime = time.time()
@@ -143,44 +145,30 @@ def get_kmd_rewards(request):
                 if utxo['height'] < oldest_utxo_block:
                     oldest_utxo_block = utxo['height']
                 if utxo['height'] < KOMODO_ENDOFERA and utxo['satoshis'] >= MIN_SATOSHIS:
-                    try:
-                        url = f"https://kmd.explorer.dexstats.info/insight-api-komodo/tx/{utxo['txid']}"
-                        locktime = requests.get(url).json()['locktime']
-                        coinage = math.floor((kmd_tiptime-locktime)/ONE_HOUR)
-                        if coinage >= ONE_HOUR and locktime >= LOCKTIME_THRESHOLD:
-                            limit = ONE_YEAR
-                            if utxo['height'] >= ONE_MONTH_CAP_HARDFORK:
-                                limit = ONE_MONTH
-                            reward_period = min(coinage, limit) - 59
-                            utxo_rewards = math.floor(utxo['satoshis']/DEVISOR)*reward_period
-                            if utxo_rewards < 0:
-                                logger.info("Rewards should never be negative!")
-                            rewards_info['utxos'].update({
-                                utxo['txid']:{
-                                    "locktime":locktime,
-                                    "utxo_value":utxo['amount'],
-                                    "sat_rewards":utxo_rewards,
-                                    "kmd_rewards":utxo_rewards/100000000,
-                                    "satoshis":utxo['satoshis'],
-                                    "block_height":utxo['height']
-                                }
-                            })
-                            total_rewards += utxo_rewards/100000000
+                    url = f"https://kmd.explorer.dexstats.info/insight-api-komodo/tx/{utxo['txid']}"
+                    resp = requests.get(url).json()
+                    locktime = resp['locktime']
+                    coinage = math.floor((kmd_tiptime-locktime)/ONE_HOUR)
+                    if coinage >= ONE_HOUR and locktime >= LOCKTIME_THRESHOLD:
+                        limit = ONE_YEAR
+                        if utxo['height'] >= ONE_MONTH_CAP_HARDFORK:
+                            limit = ONE_MONTH
+                        reward_period = min(coinage, limit) - 59
+                        utxo_rewards = math.floor(utxo['satoshis']/DEVISOR)*reward_period
+                        if utxo_rewards < 0:
+                            logger.info("Rewards should never be negative!")
+                        rewards_info['utxos'].update({
+                            utxo['txid']:{
+                                "locktime":locktime,
+                                "utxo_value":utxo['amount'],
+                                "sat_rewards":utxo_rewards,
+                                "kmd_rewards":utxo_rewards/100000000,
+                                "satoshis":utxo['satoshis'],
+                                "block_height":utxo['height']
+                            }
+                        })
+                        total_rewards += utxo_rewards/100000000
 
-                    except Exception as e:
-                        logger.error(f"Exception in [get_kmd_rewards]: {e}")
-                        pass
-                else:
-                    rewards_info['utxos'].update({
-                        utxo['txid']:{
-                            "locktime":locktime,
-                            "utxo_value":utxo['amount'],
-                            "sat_rewards":0,
-                            "kmd_rewards":0,
-                            "satoshis":utxo['satoshis'],
-                            "block_height":utxo['height']
-                        }
-                    })
         eligible_utxo_count = len(rewards_info['utxos'])
         if oldest_utxo_block == 99999999999:
             oldest_utxo_block = 0
