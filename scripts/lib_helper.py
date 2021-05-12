@@ -14,6 +14,8 @@ def handle_dual_server_chains(chain, server):
     return chain
 
 def validate_epoch_chains(epoch_chains, season):
+    if len(epoch_chains) == 0:
+        return False
     for chain in epoch_chains:
         if season in DPOW_EXCLUDED_CHAINS:
             if chain in DPOW_EXCLUDED_CHAINS[season]:
@@ -190,9 +192,12 @@ def get_season_from_addresses(address_list, time_stamp, tx_chain="KMD", chain=No
 def get_chain_server(chain, season):
     if chain in ["KMD", "LTC", "BTC"]:
         return chain
+    if season == SEASON:
+        main_coins = ANTARA_COINS
+        third_party_coins = THIRD_PARTY_COINS
     else:
         main_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={season}&server=Main').json()["results"]
-        third_party_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Third_Party').json()["results"]
+        third_party_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={season}&server=Third_Party').json()["results"]
     if chain in main_coins:
         return "Main"
     elif chain in third_party_coins:

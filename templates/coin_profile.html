@@ -43,32 +43,7 @@
 								<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
 							{% endif %}
 						{% endfor %}
-					</div>
-					<!--
-					<div class="text-left my-auto p-0 col-7">
-					{% for coin, site_links in coin_social.items %}
-						{% if chain == coin %}
-							{% for site, link in site_links.items %}
-								{% if site == 'twitter' and link != '' %}
-									<i class="fab fa-twitter mr-2"></i>  <a class="sml-social" href="https://twitter.com/{{ link }}">{{ link }}</a><br />
-								{% elif site == 'discord' and link != '' %}
-									<i class="fab fa-discord mr-2"></i> <a class="sml-social" href="https://discordapp.com/users/{{ link }}">{{ link }}</a><br />
-								{% elif site == 'github' and link != '' %}
-									<i class="fab fa-github mr-2"></i> <a class="sml-social" href="https://github.com/{{ link }}">{{ link }}</a><br />
-								{% elif site == 'youtube' and link != '' %}
-									<i class="fab fa-youtube mr-2"></i> <a class="sml-social" href="https://www.youtube.com/channel{{ link }}"> Youtube Channel</a><br />
-								{% elif site == 'telegram' and link != '' %}
-									<i class="fab fa-telegram-plane mr-2"></i> <a class="sml-social" href="https://t.me/{{ link }}">{{ link }}</a><br />
-								{% elif site == 'explorer' and link != '' %}
-									<i class="fas fa-search mr-2"></i> <a class="sml-social" href="https://{{ link }}">{{ link }}</a><br />
-								{% elif site == 'website' and link != '' %}
-									<i class="fas fa-desktop mr-2"></i> <a class="sml-social" href="https://{{ link }}">{{ link }}</a><br />
-								{% endif %}
-							{% endfor %}
-						{% endif %}
-					{% endfor %}
-					</div>
-					-->							
+					</div>			
 				</div>
         		<div class="row d-flex justify-content-between align-items-center m-auto">
         			<a href="//{{ request.get_host }}/notary_profile/{{ chain }}" class="text-uppercase">
@@ -146,99 +121,136 @@
 				<div class="card-body kmd_ui_dark2_bg p-0 shadow-none">
 					<ul class="list-group">
 						<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-							<button type="button" class="btn col-12 shadow-none">
-							    <div class="col-12 d-flex justify-content-between align-items-center">
-								    {% for region, data in top_coin_notarisers.items %}
-									    <span class="badge kmd_ui_dark4_bg m-2" style="width:16%; background-color: #26456B !important;">
-									    	<div class="col-12">
-									    		<i class="fas fa-trophy"></i>
-									    	</div>
-									    	<div class="col-12">
-									    		{{ data.top_notary }}<br />{{ data.top_ntx_count }}
-									    	</div>
-									    </span>
-									{% endfor %}
-								</div>
-							</button>
+						    <div class="col-12 d-flex justify-content-between align-items-center">
+							    {% for region, data in top_coin_notarisers.items %}
+								    <span class="badge kmd_ui_dark4_bg m-2" style="width:16%; background-color: #26456B !important;">
+								    	<div class="col-12 mx-auto mt-2">
+								    		<span class="badge kmd_ui_dark1_bg py-1 px-2">
+								    			<i class="fas fa-trophy"></i>
+								    			<span style="font-size: 1.5em; font-weight:900">#1 {{ region }}</span>
+								    			<i class="fas fa-trophy"></i>
+								    		</span>
+								    	</div>
+								    	<div class="col-12">
+											{% if data.top_notary_icon != '' %}
+												<img class="card-img-top m-auto auto-width p-2" height='96px' src="{{ data.top_notary_icon }}" alt="" style="border-radius: 50%;">
+											{% else %}
+												<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
+											{% endif %}									    		
+								    	</div>
+								    	<div class="col-12 mx-auto mb-1">
+								    		<span style="font-size: 1.2em" class="badge kmd_ui_dark1_bg p-2">
+								    			<a href="http://{{ request.get_host }}/notary_profile/{{ data.top_notary }}">
+								    				{{ data.top_notary }}
+								    			</a>
+								    		</span>
+								    	</div>
+								    	<div class="col-12 mx-auto mb-1">
+								    		<span style="font-size: 1em" class="badge kmd_ui_dark1_bg p-2">
+								    			<a href="http://{{ request.get_host }}/api/table/notary_ntx/?season={{ season }}&server={{ server }}&notary={{ data.top_notary }}&chain={{ chain }}">
+								    			{{ data.top_ntx_count }} Notarisations
+								    			</a>
+								    		</span>
+								    	</div>
+								    </span>
+								{% endfor %}
+							</div>
 						</li>
 					</ul>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="row">
-		<div class="card kmd_ui_dark1_bg m-auto col-10">
-			<div class="card-body kmd_ui_dark1_bg">
-				<table id="coins_info_tbl" class="table table-striped table-bordered kmd_ui_light4 col-12 m-auto" style="width:99%">
-					<tbody>
-						<tr>
-							<td data-data="">CLI</td>
-							<td style="font-size: 0.9em; text-align: left;" data-data="">
-								<span class='badge kmd_ui_dark3_bg p-2'>
-									{{ coins_data.coins_info.cli }}
-								</span>
-							</td>
-						</tr>
-						<tr>
-							<td data-data="">Config</td>
-							<td style="font-size: 0.9em; text-align: left;" data-data="">
-								<span class='badge kmd_ui_dark3_bg p-2'>
-									{{ coins_data.coins_info.conf_path }}
-								</span>
-							</td>
-						</tr>
-						<tr>
-							<td data-data="">Launch</td>
-							{% if coins_data.coins_info.launch_params|length > 80 %}
-							<td style="font-size: 0.8em; text-align: left;" data-data="">
-								<div class='kmd_ui_dark3_bg p-2'>
-									{{ coins_data.coins_info.launch_params }}
-								</div>
-							</td>
-							{% else %}
-							<td style="font-size: 0.8em; text-align: left;" data-data="">
-								<span class=' badge kmd_ui_dark3_bg p-2'>
-									{{ coins_data.coins_info.launch_params }}
-								</span>
-							</td>
-							{% endif %}
-						</tr>
-						{% if coins_data.explorers|length > 0 %}
-						<tr>
-							<td data-data="">Explorers</td>
-							<td style="font-size: 0.9em; text-align: left;" data-data="">
-								{% for x in coins_data.explorers %}
-									<span class='badge kmd_ui_dark3_bg p-2'>
-										<a href="{{ x }}">{{ x }}</a>
-									</span>
-								{% endfor %}
-							</td>
-						</tr>
-						{% endif %}
-						{% if coins_data.electrums|length > 0 %}
-						<tr>
-							<td data-data="">Electrums</td>
-							<td style="font-size: 0.9em; text-align: left;" data-data="">
-								{% for x in coins_data.electrums %}
-									<span class='badge kmd_ui_dark3_bg p-2'>{{ x }}</span>
-								{% endfor %}
-							</td>
-						</tr>
-						{% endif %}
-						{% if coins_data.electrums_ssl|length > 0 %}
-						<tr>
-							<td data-data="">Electrums (SSL)</td>
-							<td style="font-size: 0.9em; text-align: left;" data-data="">
-								{% for x in coins_data.electrums_ssl %}
-									<span class='badge kmd_ui_dark3_bg p-2'>{{ x }}</span>
-								{% endfor %}
-							</td>
-						</tr>
-						{% endif %}
-					</tbody>
-				</table>
-			</div>
+	<div class="row col-12 mx-auto my-2" style="color:#FFF;">
+		<div class="input-group mb-1 kmd_ui_dark1_bg">
+		    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border: solid grey 1px !important;">
+		        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+		        	Launch Params
+				</span>
+		    </div>
+		    <input type="text" class="form-control col-10 kmd_ui_dark1_bg" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.launch_params }}" value="{{ coins_data.coins_info.launch_params }}" readonly id="{{ chain }}_params">
+		    <div class="input-group-append p-0 kmd_ui_dark4_bg" style="border: solid grey 1px !important;">
+				<button class="btn" data-clipboard-target="#{{ chain }}_params" style="line-height: 1em;">
+				    <i class="cil-copy"></i>
+				</button>
+		    </div>
 		</div>
+
+		<div class="input-group mb-1 kmd_ui_dark1_bg">
+		    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border: solid grey 1px !important;">
+		        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+		        	CLI
+				</span>
+		    </div>
+		    <input type="text" class="form-control col-10 kmd_ui_dark1_bg" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.cli }}" value="{{ coins_data.coins_info.cli }}" readonly id="{{ chain }}_cli">
+		    <div class="input-group-append p-0 kmd_ui_dark4_bg" style="border: solid grey 1px !important;">
+				<button class="btn" data-clipboard-target="#{{ chain }}_cli" style="line-height: 1em;">
+				    <i class="cil-copy"></i>
+				</button>
+		    </div>
+		</div>
+
+		<div class="input-group mb-1 kmd_ui_dark1_bg">
+		    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border: solid grey 1px !important;">
+		        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+		        	Config
+				</span>
+		    </div>
+		    <input type="text" class="form-control col-10 kmd_ui_dark1_bg" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.conf_path }}" value="{{ coins_data.coins_info.conf_path }}" readonly id="{{ chain }}_conf">
+		    <div class="input-group-append p-0 kmd_ui_dark4_bg" style="border: solid grey 1px !important;">
+				<button class="btn" data-clipboard-target="#{{ chain }}_conf" style="line-height: 1em;">
+				    <i class="cil-copy"></i>
+				</button>
+		    </div>
+		</div>
+		{% if coins_data.explorers|length > 0 %}
+			<div class="input-group mb-1 kmd_ui_dark1_bg" style="border: solid grey 1px !important;">
+			    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border-left: solid grey 1px !important;">
+			        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+			        	Explorers
+					</span>
+			    </div>
+				<div class="justify-content-between col-10">
+				    {% for x in coins_data.explorers %}
+						<span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
+							<a href="{{ x }}">{{ x }}</a>
+						</span>
+					{% endfor %}
+				</div>
+			</div>
+		{% endif %}
+		{% if coins_data.electrums|length > 0 %}
+			<div class="input-group mb-1 kmd_ui_dark1_bg" style="border: solid grey 1px !important;">
+			    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border-left: solid grey 1px !important;">
+			        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+			        	Electrums
+					</span>
+			    </div>
+				<div class="justify-content-between col-10">
+				    {% for x in coins_data.electrums %}
+						<span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
+							{{ x }}
+						</span>
+					{% endfor %}
+				</div>
+			</div>
+		{% endif %}
+		{% if coins_data.electrums_ssl|length > 0 %}
+			<div class="input-group mb-1 kmd_ui_dark1_bg" style="border: solid grey 1px !important;">
+			    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border-left: solid grey 1px !important;">
+			        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+			        	Electrums (SSL)
+					</span>
+			    </div>
+				<div class="justify-content-between col-10">
+				    {% for x in coins_data.electrums_ssl %}
+						<span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
+							{{ x }}
+						</span>
+					{% endfor %}
+				</div>
+			</div>
+		{% endif %}
 	</div>
 	<!--
 	<div class="row">
@@ -290,17 +302,17 @@
 					<table id="balances_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
 						<thead>
 							<tr>
-								<th data-data="notary">NOTARY</th>
-								<th data-data="address">ADDRESS</th>
-								<th data-data="balance">BALANCE</th>
-								<th data-data="server">SERVER</th>
-								<th data-data="update">UPDATED</th>
+								<th data-data="notary">Notary</th>
+								<th data-data="address">Address</th>
+								<th data-data="balance">Balance</th>
+								<th data-data="server">Server</th>
+								<th data-data="update">Since Updated</th>
 							</tr>
 						</thead>
 						<tbody>
 							{% for item in chain_balances %}
 							<tr>
-								<td data-data="notary">{{ item.notary }}</td>
+								<td data-data="notary" class="px-2 text-left">{{ item.notary }}</td>
 								<td data-data="address">{{ item.address }}</td>
 								<td data-data="balance">{{ item.balance|floatformat:-4 }}</td>
 								<td data-data="server">{{ item.server }}</td>
@@ -314,15 +326,41 @@
 		</div>
 	</div>
     <!-- jquery -->
-  
+  	<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
   	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+	<script>
+
+		function setTooltip(mdi, message) {
+		  $(mdi).tooltip('hide')
+		    .attr('data-original-title', message)
+		    .tooltip('show');
+		}
+
+		function hideTooltip(mdi) {
+		  setTimeout(function() {
+		    $(mdi).tooltip('hide');
+		  }, 1000);
+		}
+
+		var btns = document.querySelectorAll('button');
+		var clipboard = new ClipboardJS(btns);
+
+		clipboard.on('success', function (e) {
+			setTooltip(e.trigger, 'Copied!');
+			hideTooltip(e.trigger);
+		});
+
+		clipboard.on('error', function (e) {
+			console.log(e);
+		});
+	</script>
     {{ explorers|json_script:"explorers-data" }}
   	<script>
 	    $(document).ready(function() {
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	        $('#balances_table').DataTable({
-	           "pageLength": 64,
+	           "paging": false,
         		order: [[ 0, 'asc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
         		"columnDefs": [
 			        {
@@ -336,7 +374,7 @@
 			            "data": "address",
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='"+explorers['{{ chain }}'][0]+'address/'+oData.address+"'>"+oData.address+"</a>");
+				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='"+explorers['{{ chain }}'][0]+'address/'+oData.address+"'>"+oData.address+"</a></span>");
 				        }
 			        },
         			{
@@ -351,10 +389,10 @@
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.server == "Main") {
-			            		color = "#6f5f23";
+			            		color = "#018022";
 			            	}
 			            	else if (oData.server == "Third_Party") {
-			            		color = "#225d51";
+			            		color = "#2863bb";
 			            	}
 			            	else if (oData.server == "Testnet") {
 			            		color = "#622C7B";
@@ -362,7 +400,7 @@
 			            	else {
 			            		color = "#000";	
 			            	}
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-1' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
+				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
 			        	}
 			        },
         			{

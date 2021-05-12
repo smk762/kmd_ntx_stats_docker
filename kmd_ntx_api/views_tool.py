@@ -11,7 +11,7 @@ def decode_opret_view(request):
     context = {
         "season":season,
         "page_title":"Decode OP_RETURN Tool",
-        "sidebar_links":get_sidebar_links(),
+        "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link()
     }
 
@@ -47,7 +47,7 @@ def kmd_rewards_view(request):
     context = {
         "season":season,
         "page_title":"KMD Rewards Tool",
-        "sidebar_links":get_sidebar_links(),
+        "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link()
     }
     if "address" in request.GET:
@@ -66,7 +66,7 @@ def kmd_rewards_view(request):
             context.update({
                 "address": address,
                 "kmd_balance": resp["kmd_balance"],
-                "total_rewards": round(resp["total_rewards"],4),
+                "total_rewards": round(resp["total_rewards"],6),
                 "utxo_count": resp["utxo_count"],
                 "eligible_utxo_count": resp["eligible_utxo_count"],
                 "oldest_utxo_block": resp["oldest_utxo_block"],
@@ -82,7 +82,7 @@ def launch_params_view(request):
         "season":season,
         "season_clean":season.replace("_"," "),
         "page_title":"Launch Parameters",
-        "sidebar_links":get_sidebar_links(),
+        "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link()
     }
 
@@ -106,7 +106,7 @@ def daemon_cli_view(request):
         "season":season,
         "season_clean":season.replace("_"," "),
         "page_title":"Daemon CLIs",
-        "sidebar_links":get_sidebar_links(),
+        "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link()
     }
 
@@ -129,7 +129,8 @@ def pubkey_addresses_view(request):
     context = {
         "season":season,
         "page_title":"Pubkey Addresses",
-        "sidebar_links":get_sidebar_links(),
+        "explorers":get_explorers(request),
+        "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link()
     }
     if "pubkey" in request.GET:
