@@ -4,7 +4,7 @@
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-12 px-0 mb-0">
 				<div class="card-body kmd_ui_dark1_bg">
-			    	<h4>{{ season }} Top Region Notarisation Scores</h4>
+			    	<h2>{{ season }} Top Region Notarisation Scores</h2>
 				    <div class="col-12 d-flex justify-content-between align-items-center">
 						{% for region, region_data in season_stats_sorted.items %}
 							{% for item in region_data %}
@@ -26,19 +26,19 @@
 							    	</div>
 							    	{% if region == 'AR' %}
 									<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2 mt-0">
-										<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Asia and Russia</span></a>
+										<a href="http://{{ request.get_host }}/ntx_scoreboard/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Asia and Russia</span></a>
 									</h5>
 									{% elif region == 'EU' %}
 									<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
-										<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>European Union</span></a>
+										<a href="http://{{ request.get_host }}/ntx_scoreboard/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>European Union</span></a>
 									</h5>
 									{% elif region == 'NA' %}
 									<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
-										<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>North America</span></a>
+										<a href="http://{{ request.get_host }}/ntx_scoreboard/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>North America</span></a>
 									</h5>
 									{% elif region == 'SH' %}
 									<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">
-										<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Southern Hemisphere</span></a>
+										<a href="http://{{ request.get_host }}/ntx_scoreboard/#{{ region }}_table"><span class='badge kmd_ui_dark1_bg'>Southern Hemisphere</span></a>
 									</h5>
 									{% elif region == 'DEV' %}
 									<h5 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 m-2">

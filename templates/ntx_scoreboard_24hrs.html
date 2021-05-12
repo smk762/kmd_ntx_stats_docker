@@ -20,29 +20,49 @@
 					<table id="{{ region }}_notarisations" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
 						<thead>
 							<tr>
-								<th>Rank</th>
-								<th>Notary</th>
-								<th>LTC</th>
-								<th>Main</th>
-								<th>3P</th>
-								<th>Mined</th>
-								<th>Score</th>
+								<th class="px-2">Rank</th>
+								<th class="px-4">Notary</th>
+								<th class="px-4">LTC</th>
+								<th class="px-4">Main</th>
+								<th class="px-4">3P</th>
+								<th class="px-4">Mined</th>
+								<th class="px-4">Score</th>
 							</tr>
 						</thead>
 						<tbody>
 							{% for item in region_data %}
 							<tr>
-								<td data-data="rank">
-							  		<span class="badge kmd_ui_dark1_bg p-2">
+								<td data-data="rank" class="px-2">
+							  		<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>
 							  			{{ item.rank }}
 							  		</span>
 							  	</td>
-								<td data-data="chain">{{ item.notary }}</th>
-								<td data-data="btc">{{ item.btc }}</th>
-								<td data-data="main">{{ item.main }}</th>
-								<td data-data="third_party">{{ item.third_party }}</th>
-								<td data-data="mining">{{ item.mining }}</th>
-								<td data-data="score">{{ item.score|floatformat:-3 }}</th>
+								<td data-data="notary" class="px-4">
+									{{ item.notary }}
+								</td>
+								<td data-data="btc" class="px-4">
+									<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>
+										{{ item.btc }}
+							  		</span>
+								</td>
+								<td data-data="main" class="px-4">
+									<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>
+										{{ item.main }}
+							  		</span>
+								</td>
+								<td data-data="third_party" class="px-4">
+									<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>
+										{{ item.third_party }}
+							  		</span>
+								</td>
+								<td data-data="mining" class="px-4">
+									<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>
+										{{ item.mining }}
+							  		</span>
+								</td>
+								<td data-data="score" class="px-4">
+									{{ item.score|floatformat:-3 }}
+								</td>
 							</tr>
 							{% endfor %}
 						</tbody>
@@ -73,7 +93,13 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a></span>");
+					        }
+				        },
+	        			{
+				            "targets": 6,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+oData.score+"</span>");
 					        }
 				        }
 	        		]
@@ -109,7 +135,13 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a></span>");
+					        }
+				        },
+	        			{
+				            "targets": 6,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+oData.score+"</span>");
 					        }
 				        }
 	        		]
@@ -145,7 +177,13 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a></span>");
+					        }
+				        },
+	        			{
+				            "targets": 6,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+oData.score+"</span>");
 					        }
 				        }
 	        		]
@@ -181,7 +219,13 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a></span>");
+					        }
+				        },
+	        			{
+				            "targets": 6,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+oData.score+"</span>");
 					        }
 				        }
 	        		]
@@ -217,7 +261,13 @@
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a></span>");
+					        }
+				        },
+	        			{
+				            "targets": 6,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+oData.score+"</span>");
 					        }
 				        }
 	        		]

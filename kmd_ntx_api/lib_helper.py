@@ -205,8 +205,10 @@ def get_dpow_server_coins_dict(season=None):
     
     return chains_dict
 
-def get_chain_server(chain):
-    coins_dict = get_dpow_server_coins_dict()
+def get_chain_server(chain, season):
+    if chain in ["KMD", "BTC", "LTC"]:
+        return chain
+    coins_dict = get_dpow_server_coins_dict(season)
     for server in coins_dict:
         if chain in coins_dict[server]:
             return server

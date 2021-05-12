@@ -82,10 +82,11 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
         season = request.GET["season"]
     else:
         season = SEASON
-    server = get_chain_server(chain)
+    server = get_chain_server(chain, season)
 
     context = {
         "season":season,
+        "server":server,
         "season_clean":season.replace("_"," "),
         "page_title":"Coin Profile Index",
         "sidebar_links":get_sidebar_links(season),
@@ -111,8 +112,11 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
             max_tick = 10
 
         coin_notariser_ranks = get_coin_notariser_ranks(season)
+        logger.info(coin_notariser_ranks)
         top_region_notarisers = get_top_region_notarisers(coin_notariser_ranks)
-        top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain)
+        #logger.info(top_region_notarisers)
+        top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain, season)
+        #logger.info(top_coin_notarisers)
         chain_ntx_summary = get_coin_ntx_summary(season, chain)
         season_chain_ntx_data = get_season_chain_ntx_data(season)
 
@@ -129,6 +133,8 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
             "max_tick": max_tick,
             "coin_social": get_coin_social(chain),
             "chain_ntx_summary": chain_ntx_summary,
+            "coin_notariser_ranks":coin_notariser_ranks,
+            "top_region_notarisers":top_region_notarisers,
             "top_coin_notarisers":top_coin_notarisers
         })            
 
@@ -136,7 +142,7 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
     else:
         context.update({ 
             "coin_social": get_coin_social(),
-            "server_coins": get_dpow_server_coins_dict()
+            "server_coins": get_dpow_server_coins_dict(season)
         })
         return render(request, 'coin_profile_index.html', context)
 

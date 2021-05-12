@@ -233,15 +233,18 @@ def parse_electrum_explorer(coins_data):
         logger.info(f"[parse_electrum_explorer] Adding Icon info for {coin}")
         try:
             if coin == "COQUICASH":
-                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png")
+                url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png"
+                r = requests.get(url)
+            elif coin == "GLEEC-OLD":
+                url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/gleec.png"
+                r = requests.get(url)
             elif coin == "WLC21":
-                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png")
+                url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png"
+                r = requests.get(url)
             else:
-                r = requests.get(f"https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{coin.lower()}.png")
-            url = f"https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{coin.lower()}.png"
-            r = requests.get(url)
+                url = f"https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{coin.lower()}.png"
+                r = requests.get(url)
             if r.text != "404: Not Found":
-
                 if coin in TRANSLATE_COINS:
                     logger.warning(f"[parse_electrum_explorer] Translating {coin} to {TRANSLATE_COINS[coin]}")
                     coin = TRANSLATE_COINS[coin]
