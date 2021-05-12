@@ -337,7 +337,6 @@ def get_nn_season_ntx_counts(season):
 
 
 def get_nn_social(season, notary_name=None):
-    logger.info(f"season: {season}")
     nn_social_info = {}
     nn_social_data = get_nn_social_data(season, notary_name).values()
     for item in nn_social_data:
@@ -630,13 +629,10 @@ def get_testnet_stats_dict(season, testnet_chains):
 
 def get_sidebar_links(season):
     notary_list = get_notary_list(season)
-    # logger.info(f"notary_list: {notary_list}")
     region_notaries = get_regions_info(notary_list)
-    # logger.info(f"region_notaries: {region_notaries}")
     coins_dict = get_dpow_server_coins_dict(season)
     coins_dict["Main"] += ["KMD", "LTC"]
     coins_dict["Main"].sort()
-    # logger.info(f"coins_dict: {coins_dict}")
     sidebar_links = {
         "server":os.getenv("SERVER"),
         "chains_menu":coins_dict,

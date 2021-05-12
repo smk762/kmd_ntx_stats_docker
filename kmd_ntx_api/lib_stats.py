@@ -9,7 +9,6 @@ def get_region_score_stats(notarisation_scores):
         region_total = 0
         notary_count = 0
         for item in notarisation_scores[region]:
-            logger.info(item)
             notary_count += 1
             region_total += item["score"]
         region_average = safe_div(region_total,notary_count)
@@ -43,7 +42,6 @@ def get_top_region_notarisers(region_notary_ranks):
         for notary in region_notary_ranks[region]:
 
             for chain in region_notary_ranks[region][notary]:
-                logger.info(f"{region} {notary} {chain}: {region_notary_ranks[region][notary][chain]}")
                 if chain not in top_ntx_count[region]:
                     top_ntx_count[region].update({chain:0})
 
@@ -125,7 +123,6 @@ def get_daily_stats_sorted(season=None, coins_dict=None):
         i = 1
         for notary in dec_sorted_scores:
             for item in daily_stats[region]:
-                # logger.info(f"daily: {item}")
                 if notary == item['notary']:
                     new_item = item.copy()
                     new_item.update({"rank":i})
@@ -237,7 +234,6 @@ def get_season_stats_sorted(season, coins_dict=None):
         i = 1
         for notary in dec_sorted_scores:
             for item in season_stats[region]:
-                # logger.info(f"daily: {item}")
                 if notary == item['notary']:
                     new_item = item.copy()
                     new_item.update({"rank":i})
