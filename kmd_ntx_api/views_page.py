@@ -112,11 +112,8 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
             max_tick = 10
 
         coin_notariser_ranks = get_coin_notariser_ranks(season)
-        logger.info(coin_notariser_ranks)
         top_region_notarisers = get_top_region_notarisers(coin_notariser_ranks)
-        #logger.info(top_region_notarisers)
         top_coin_notarisers = get_top_coin_notarisers(top_region_notarisers, chain, season)
-        #logger.info(top_coin_notarisers)
         chain_ntx_summary = get_coin_ntx_summary(season, chain)
         season_chain_ntx_data = get_season_chain_ntx_data(season)
 
