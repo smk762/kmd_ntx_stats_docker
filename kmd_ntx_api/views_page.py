@@ -137,9 +137,12 @@ def coin_profile_view(request, chain=None): # TODO: REVIEW and ALIGN with NOTARY
 
         return render(request, 'coin_profile.html', context)
     else:
+        coins_dict = get_dpow_server_coins_dict(season)
+        coins_dict["Main"] += ["KMD", "LTC"]
+        coins_dict["Main"].sort()
         context.update({ 
             "coin_social": get_coin_social(),
-            "server_coins": get_dpow_server_coins_dict(season)
+            "server_coins": coins_dict
         })
         return render(request, 'coin_profile_index.html', context)
 

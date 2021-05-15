@@ -16,7 +16,8 @@ cursor = conn.cursor()
 #table = 'addresses'
 #table = 'last_notarised'
 #table = 'notarised_count_season'
-table = 'notarised_chain_season'
+#table = 'notarised_chain_season'
+table = 'coin_social'
 
 cursor.execute("SELECT COUNT(*) FROM "+table+";")
 print(cursor.fetchall())

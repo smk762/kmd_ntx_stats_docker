@@ -4,37 +4,37 @@
 	<h2 class="m-auto kmd_ui_light3">{{ season_clean }} Notary Node Profiles</h2>
 	<div class="row m-4">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+			<h4 class="card text-center kmd_ui_light3 col-3 px-0 mt-auto shadow-none" style="border:none !important;">
 				<a href="#AR">
-					<span class='badge p-2' style="border:solid 1px grey; background-color: #000">
+					<span class='col-12 badge p-2' style="border:solid 1px grey; background-color: #000">
 						Asia & Russia
 					</span>
 				</a>
 			</h4>
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+			<h4 class="card text-center kmd_ui_light3 col-3 px-0 mt-auto shadow-none" style="border:none !important;">
 				<a href="#EU">
-					<span class='badge p-2' style="border:solid 1px grey; background-color: #000">
+					<span class='col-12 badge p-2' style="border:solid 1px grey; background-color: #000">
 						European Union
 					</span>
 				</a>
 			</h4>
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+			<h4 class="card text-center kmd_ui_light3 col-3 px-0 mt-auto shadow-none" style="border:none !important;">
 				<a href="#NA">
-					<span class='badge p-2' style="border:solid 1px grey; background-color: #000">
+					<span class='col-12 badge p-2' style="border:solid 1px grey; background-color: #000">
 						North America
 					</span>
 				</a>
 			</h4>
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+			<h4 class="card text-center kmd_ui_light3 col-3 px-0 mt-auto shadow-none" style="border:none !important;">
 				<a href="#SH">
-					<span class='badge p-2' style="border:solid 1px grey; background-color: #000">
+					<span class='col-12 badge p-2' style="border:solid 1px grey; background-color: #000">
 						Southern Hemisphere
 					</span>
 				</a>
 			</h4>
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+			<h4 class="card text-center kmd_ui_light3 col-3 px-0 mt-auto shadow-none" style="border:none !important;">
 				<a href="#DEV">
-					<span class='badge p-2' style="border:solid 1px grey; background-color: #000">
+					<span class='col-12 badge p-2' style="border:solid 1px grey; background-color: #000">
 						Developers
 					</span>
 				</a>
@@ -73,20 +73,62 @@
 							{% for nn, site_links in nn_social.items %}
 								{% if node == nn %}
 									{% for site, link in site_links.items %}
-										{% if site == 'twitter' and link != '' %}
-											<a href="{{ link }}"><i class="fab fa-twitter"></i></a>
-										{% elif site == 'discord' and link != '' %}
-											<a href="https://discordapp.com/users/{{ link }}"><i class="fab fa-discord"></i></a>
-										{% elif site == 'github' and link != '' %}
-											<a href="{{ link }}"><i class="fab fa-github"></i></a>
-										{% elif site == 'youtube' and link != '' %}
-											<a href="{{ link }}"><i class="fab fa-youtube"></i></a>
-										{% elif site == 'keybase' and link != '' %}
-											<a href="https://keybase.io/{{ link }}"><i class="fab fa-keybase"></i></a>
-										{% elif site == 'telegram' and link != '' %}
-											<a href="https://t.me/{{ link }}"><i class="fab fa-telegram-plane"></i></a>
-										{% elif site == 'website' and link != '' %}
-											<a href="{{ link }}"><i class="fas fa-desktop"></i></a>
+										{% if site == 'discord' %}
+											{%  if link != '' %}
+												<a href="https://discordapp.com/users/{{ link }}"><i class="sml-social fab fa-discord mr-2"></i></a>
+											{% else %}
+												<i class="sml-social fab fa-discord mr-2" style="color: #555;"></i>
+											{% endif %}
+											
+										{% elif site == 'email' %}
+											{%  if link != '' %}
+												<a href="{{ link }}"><i class="sml-social far fa-envelope mr-2"></i></a>
+											{% else %}
+												<i class="sml-social far fa-envelope mr-2" style="color: #555;"></i>
+											{% endif %}
+											
+										{% elif site == 'github' %}
+											{%  if link != '' %}
+												<a href="https://github.com/{{ link }}"><i class="sml-social fab fa-github mr-2"></i></a>
+											{% else %}
+												<i class="sml-social fab fa-github mr-2" style="color: #555;"></i>
+											{% endif %}
+
+										{% elif site == 'keybase' %}
+											{%  if link != '' %}
+												<a href="https://keybase.io/{{ link }}"><i class="sml-social fab fa-keybase mr-2"></i></a>
+											{% else %}
+												<i class="sml-social fab fa-keybase mr-2" style="color: #555;"></i>
+											{% endif %}
+
+										{% elif site == 'telegram' %}
+											{%  if link != '' %}
+												<a href="https://t.me/{{ link }}"><i class="sml-social fab fa-telegram-plane mr-2"></i></a>
+											{% else %}
+												<i class="sml-social fab fa-telegram-plane mr-2" style="color: #555;"></i>
+											{% endif %}
+
+										{% elif site == 'twitter' %}
+											{%  if link != '' %}
+												<a href="https://twitter.com/{{ link }}"><i class="sml-social fab fa-twitter mr-2"></i></a>
+											{% else %}
+												<i class="sml-social fab fa-twitter mr-2" style="color: #555;"></i>
+											{% endif %}
+											
+										{% elif site == 'website' %}
+											{%  if link != '' %}
+												<a href="{{ link }}"><i class="sml-social fas fa-desktop mr-2"></i></a>
+											{% else %}
+												<i class="sml-social fas fa-desktop mr-2" style="color: #555;"></i>
+											{% endif %}
+											
+										{% elif site == 'youtube' %}
+											{%  if link != '' %}
+												<a href="https://www.youtube.com/{{ link }}"><i class="sml-social fab fa-youtube mr-2"></i></a>
+											{% else %}
+												<i class="sml-social fab fa-youtube mr-2" style="color: #555;"></i>
+											{% endif %}
+											
 										{% endif %}
 									{% endfor %}
 								{% endif %}

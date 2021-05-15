@@ -596,7 +596,6 @@ def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None)
 
     for item in notary_epoch_scores:
         notary = item["notary"]
-        print(notary_epoch_scores)
         chain_ntx = item["chain_ntx_counts"]
 
         for server in chain_ntx["servers"]:

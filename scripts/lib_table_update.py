@@ -416,18 +416,24 @@ def update_nn_social_row(row_data):
 
 def update_coin_social_row(row_data):
     try:
-        sql = "INSERT INTO  coin_social \
-            (chain, twitter, youtube, discord, \
-            telegram, github, explorer, \
-            website, icon, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_season_social DO UPDATE SET \
-            twitter='"+str(row_data[1])+"', \
-            youtube='"+str(row_data[2])+"', discord='"+str(row_data[3])+"', \
-            telegram='"+str(row_data[4])+"', github='"+str(row_data[5])+"', \
-            explorer='"+str(row_data[6])+"', website='"+str(row_data[7])+"', \
-            icon='"+str(row_data[8])+"', season='"+str(row_data[9])+"';"
+        sql = f"INSERT INTO  coin_social \
+            (chain, discord, email, explorers, github, icon, linkedin, \
+             mining_pools, reddit, telegram, twitter, youtube, website, season) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_chain_season_social \
+            DO UPDATE SET \
+                discord='{row_data[1]}', email='{row_data[2]}', \
+                explorers=ARRAY{row_data[3]}::VARCHAR[], github='{row_data[4]}', \
+                icon='{row_data[5]}', linkedin='{row_data[6]}', \
+                mining_pools=ARRAY{row_data[7]}::VARCHAR[], reddit='{row_data[8]}', \
+                telegram='{row_data[9]}', twitter='{row_data[10]}', \
+                youtube='{row_data[11]}', website='{row_data[12]}', \
+                season='{row_data[13]}';"
+        print(row_data)
+        #print(sql)
         CURSOR.execute(sql, row_data)
         CONN.commit()
+        print("commited")
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:

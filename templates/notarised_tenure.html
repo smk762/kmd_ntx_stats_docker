@@ -8,7 +8,7 @@
 				<h2>{{ season_clean }} Chain Notarisation Tenure</h2>
 			</div>
 			<div class="card-body kmd_ui_dark1_bg m-auto">
-				<table id="notarisations" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+				<table id="notarisations" class="table table-striped table-bordered kmd_ui_light4">
 					<thead>
 						<tr>
 							<th>Chain</th>
@@ -71,7 +71,7 @@
 			            	} else if (icon == "coquicash") {
 			            		icon = "coqui"
 			            	}
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2 mr-auto'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'><img height='16px' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />&nbsp;&nbsp;"+oData.chain+"</a></span>");
+				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2 mr-auto'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'><img height='16px' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />&nbsp;"+oData.chain+"</a></span>");
 				        }
 			        },
         			{
@@ -105,10 +105,10 @@
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.server == "Main") {
-			            		color = "#018022";
+			            		color = "#166b2c";
 			            	}
 			            	else if (oData.server == "Third_Party") {
-			            		color = "#2863bb";
+			            		color = "#259596";
 			            	}
 			            	else if (oData.server == "Testnet") {
 			            		color = "#622C7B";

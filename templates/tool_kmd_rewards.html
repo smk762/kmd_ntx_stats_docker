@@ -27,11 +27,13 @@
 				<h6><b>Address:</b> <a href='https://komodod.com/a/{{ address }}'>{{ address }}</a></h6>
 				<h6><b>Balance:</b> {{ kmd_balance }}</h6>
 				<h6><b>UTXOs eligible:</b> {{ eligible_utxo_count }}/{{ utxo_count }}</h6>
-				<h5 style="font-size: 1.2em; background-color:black; border: solid 1px grey" class="badge p-3"><b>Total rewards:</b> {{ total_rewards }} KMD</h5>
+				<div style="font-size: 1.2em; background-color:black; border: solid 1px grey" class="badge p-3">
+					<b>Total rewards:</b> {{ total_rewards }} KMD
+				</div>
 				{% endif %}
 
 				{% if kmd_rewards_rows %}
-				<table id="opret_table" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+				<table id="opret_table" class="table table-striped table-bordered kmd_ui_light4">
 					<thead>
 						<tr>
 							<th data-data="block_height">Block Height</th>

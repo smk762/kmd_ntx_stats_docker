@@ -10,29 +10,31 @@
 				<table id="ntx_24hr_tbl" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%; visibility: hidden;">
 					<thead>
 						<tr>
-							<th data-data="chain">Chain</th>
-							<th data-data="block_height">Block Height</th>
-							<th data-data="ac_ntx_height">Notarised Height</th>
-							<th data-data="txid">Transaction</th>
-							<th data-data="notaries">Notaries</th>
-							<th data-data="opret">OP RETURN</th>
-							<th data-data="block_time">Time Since</th>
+							<th class="px-3 py-2" data-data="chain">Chain</th>
+							<th class="px-3 py-2" data-data="block_height">Block Height</th>
+							<th class="px-3 py-2" data-data="ac_ntx_height">Notarised Height</th>
+							<th class="px-3 py-2" data-data="txid">Transaction</th>
+							<th class="px-3 py-2" data-data="notaries">Notaries</th>
+							<th class="px-3 py-2" data-data="opret">OP RETURN</th>
+							<th class="px-3 py-2" data-data="block_time">Time Since</th>
 						</tr>
 					</thead>
 					<tbody>
 					{% for row in notarised_24hrs %}
 						<tr>
 							<td style="font-size: 1em;" data-data="chain" class="px-2 text-left">{{ row.chain }}</td>
-							<td style="font-size: 1em;" data-data="block_height">{{ row.block_height }}</td>
-							<td style="font-size: 1em;" data-data="ac_ntx_height">{{ row.ac_ntx_height }}</td>
+							<td style="font-size: 1.2em;" data-data="block_height">{{ row.block_height }}</td>
+							<td style="font-size: 1.2em;" data-data="ac_ntx_height">{{ row.ac_ntx_height }}</td>
 							<td style="font-size: 0.8em;" data-data="txid">{{ row.txid }}</td>
 							<td style="font-size: 0.8em" data-data="notaries">
 								<span class='badge kmd_ui_dark1_bg p-0' style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="{{ row.notaries }}">
 									<i class="fa fa-users" style="color:white;"></i>
 								</span>
 							</td>
-							<td style="font-size: 0.8em;" data-data="opret">{{ row.opret }}</td>
-							<td style="font-size: 1em;" data-data="block_time">{{ row.block_time }}</td>
+							<td data-data="opret">
+								<span style="font-size: 0em;">{{ row.opret }}</span>
+							</td>
+							<td style="font-size: 1.2em;" data-data="block_time">{{ row.block_time }}</td>
 						</tr>
 					{% endfor %}
 					</tbody>
@@ -63,7 +65,7 @@
 			            	} else if (icon == "coquicash") {
 			            		icon = "coqui"
 			            	}
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2 mr-auto' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'><img height='16px' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />&nbsp;&nbsp;"+oData.chain+"</a></span>");
+				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2 mr-auto' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'><img height='16px' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />&nbsp;"+oData.chain+"</a></span>");
 				        }
 			        },
         			{
@@ -117,8 +119,8 @@
 			            		op_return = oData.opret
 			            	}
 
-				            $(nTd).html("<a href='//{{ request.get_host }}/tools/decode_opret/?OP_RETURN="+op_return+"'><span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='"+op_return+"'><i class='fas fa-arrow-right'></i></a></span>");
-				        }
+				            $(nTd).html("<a href='//{{ request.get_host }}/tools/decode_opret/?OP_RETURN="+op_return+"'><span class='badge kmd_ui_dark1_bg p-0' style='font-size: 0.8em; border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='"+op_return+"'><i class='fas fa-arrow-right'></i></a></span>");
+				        } 
 			        },
         			{
 			            "data": 'block_time',

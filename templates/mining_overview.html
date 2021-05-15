@@ -7,10 +7,10 @@
 				<h2>{{ season_clean }} Mining Overview<h2>
 			</div>
 			<div class="card-body kmd_ui_dark1_bg m-auto">
-				<table style="visibility: hidden;" id="mined_overview_tbl" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%">
+				<table style="visibility: hidden;" id="mined_overview_tbl" class="table table-striped table-bordered kmd_ui_light4">
 					<thead>
 						<tr>
-							<th data-data="name">Miner Name</th>
+							<th class="px-4" data-data="name">Miner Name</th>
 							<th data-data="address">Address</th>
 							<th data-data="blocks_mined">Blocks Mined</th>
 							<th data-data="sum_value_mined">Sum Mined</th>
@@ -23,7 +23,7 @@
 					<tbody>
 					{% for row in mined_season %}
 						<tr>
-							<td style="font-size: 1.2em" data-data="name">{{ row.name }}</td>
+							<td class="px-4" style="font-size: 1.2em" data-data="name">{{ row.name }}</td>
 							<td style="font-size: 0.1em" data-data="address">{{ row.address }}</td>
 							<td style="font-size: 1.2em" data-data="blocks_mined">{{ row.blocks_mined }}</td>
 							<td style="font-size: 1.2em" data-data="sum_value_mined">{{ row.sum_value_mined }}</td>
