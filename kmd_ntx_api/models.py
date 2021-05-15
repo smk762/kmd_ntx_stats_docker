@@ -94,16 +94,20 @@ class coins(models.Model):
 
 # TODO: import icon / explorer from 'coins'
 class coin_social(models.Model):
-    chain = models.CharField(max_length=128)
-    twitter = models.CharField(max_length=128)
-    youtube = models.CharField(max_length=128)
-    discord = models.CharField(max_length=128)
-    telegram = models.CharField(max_length=128)
-    github = models.CharField(max_length=128)
-    website = models.CharField(max_length=128)
-    explorer = models.CharField(max_length=128)
-    icon = models.CharField(max_length=128)
-    season = models.CharField(max_length=128)
+    chain = models.CharField(max_length=128, default="")
+    twitter = models.CharField(max_length=128, default="")
+    reddit = models.CharField(max_length=128, default="")
+    email = models.CharField(max_length=128, default="")
+    linkedin = models.CharField(max_length=128, default="")
+    mining_pools = ArrayField(models.CharField(max_length=64), default=list)
+    youtube = models.CharField(max_length=128, default="")
+    discord = models.CharField(max_length=128, default="")
+    telegram = models.CharField(max_length=128, default="")
+    github = models.CharField(max_length=128, default="")
+    website = models.CharField(max_length=128, default="")
+    explorers = ArrayField(models.CharField(max_length=64), default=list)
+    icon = models.CharField(max_length=128, default="")
+    season = models.CharField(max_length=128, default="")
 
     class Meta:
         db_table = 'coin_social'

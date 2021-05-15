@@ -57,13 +57,13 @@ def get_balances_graph_data(request):
             if notary.endswith("_AR"):
                 bg_color.append(RED)
             elif notary.endswith("_EU"):
-                bg_color.append(LT_GREEN)
+                bg_color.append(MAIN_COLOR)
             elif notary.endswith("_NA"):
-                bg_color.append(LT_PURPLE)
+                bg_color.append(THIRD_PARTY_COLOR)
             elif notary.endswith("_SH"):
                 bg_color.append(LT_BLUE)
             else:
-                bg_color.append(LT_ORANGE)
+                bg_color.append(OTHER_COIN_COLOR)
             border_color.append(BLACK)
     elif len(notary_list) == 1:
         notary = notary_list[0]
@@ -71,11 +71,11 @@ def get_balances_graph_data(request):
         chartLabel = notary+ " Notary Balances"
         for chain in chain_list:
             if chain in third_chains:
-                bg_color.append(LT_PURPLE)
+                bg_color.append(THIRD_PARTY_COLOR)
             elif chain in main_chains:
-                bg_color.append(LT_GREEN)
+                bg_color.append(MAIN_COLOR)
             else:
-                bg_color.append(LT_ORANGE)
+                bg_color.append(OTHER_COIN_COLOR)
             border_color.append(BLACK)
     else:
         return {
@@ -162,13 +162,13 @@ def get_daily_ntx_graph_data(request):
             if notary.endswith("_AR"):
                 bg_color.append(RED)
             elif notary.endswith("_EU"):
-                bg_color.append(LT_GREEN)
+                bg_color.append(MAIN_COLOR)
             elif notary.endswith("_NA"):
-                bg_color.append(LT_PURPLE)
+                bg_color.append(THIRD_PARTY_COLOR)
             elif notary.endswith("_SH"):
                 bg_color.append(LT_BLUE)
             else:
-                bg_color.append(LT_ORANGE)
+                bg_color.append(OTHER_COIN_COLOR)
             border_color.append(BLACK)
 
     elif len(notary_list) == 1:
@@ -179,9 +179,9 @@ def get_daily_ntx_graph_data(request):
             if chain in third_chains:
                 bg_color.append(LT_BLUE)
             elif chain in main_chains:
-                bg_color.append(LT_GREEN)
+                bg_color.append(MAIN_COLOR)
             else:
-                bg_color.append(LT_PURPLE)
+                bg_color.append(THIRD_PARTY_COLOR)
             border_color.append(BLACK)
 
     chartdata = []
@@ -241,13 +241,13 @@ def get_notary_balances_graph(notary, season=None):
         border_color.append(BLACK)
 
         if label in ['KMD', 'KMD_3P', 'BTC', 'LTC']:
-            bg_color.append(LT_ORANGE)
+            bg_color.append(OTHER_COIN_COLOR)
 
         elif label in third_chains:
-            bg_color.append(LT_PURPLE)
+            bg_color.append(THIRD_PARTY_COLOR)
 
         elif label in main_chains:
-            bg_color.append(LT_GREEN)
+            bg_color.append(MAIN_COLOR)
 
     chartdata = []
     for label in labels:

@@ -262,13 +262,13 @@ def prepare_regional_graph_data(graph_data):
         if label.endswith("_AR"):
             bg_color.append(RED)
         elif label.endswith("_EU"):
-            bg_color.append(LT_GREEN)
+            bg_color.append(MAIN_COLOR)
         elif label.endswith("_NA"):
-            bg_color.append(LT_PURPLE)
+            bg_color.append(THIRD_PARTY_COLOR)
         elif label.endswith("_SH"):
             bg_color.append(LT_BLUE)
         else:
-            bg_color.append(LT_ORANGE)
+            bg_color.append(OTHER_COIN_COLOR)
         border_color.append(BLACK)
 
     chartdata = []
@@ -301,11 +301,11 @@ def prepare_coins_graph_data(graph_data, coins_dict):
 
     for label in labels:
         if label in third_chains:
-            bg_color.append(LT_PURPLE)
+            bg_color.append(THIRD_PARTY_COLOR)
         elif label in main_chains:
-            bg_color.append(LT_GREEN)
+            bg_color.append(MAIN_COLOR)
         else:
-            bg_color.append(LT_ORANGE)
+            bg_color.append(OTHER_COIN_COLOR)
         border_color.append(BLACK)
 
     chartdata = []

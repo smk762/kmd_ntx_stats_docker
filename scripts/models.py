@@ -200,15 +200,15 @@ class nn_social_row():
                  discord='', telegram='', github='', keybase='', website='',
                  icon='', season=''):
         self.notary = notary
-        self.twitter = twitter
-        self.youtube = youtube
         self.discord = discord
         self.email = email
-        self.telegram = telegram
         self.github = github
-        self.keybase = keybase
-        self.website = website
         self.icon = icon
+        self.keybase = keybase
+        self.telegram = telegram
+        self.twitter = twitter
+        self.youtube = youtube
+        self.website = website
         self.season = season
 
     def validated(self):
@@ -230,30 +230,37 @@ class nn_social_row():
 
 
 class coin_social_row():
-    def __init__(self, coin='', twitter='', youtube='', discord='',
-                 telegram='', github='', explorer='', website='',
-                 icon='', season=''):
-        self.coin = coin
+    def __init__(self='', chain='', discord='', email='', explorers=list,
+                 github='', icon='', linkedin='', mining_pools=list,
+                 reddit='', telegram='', twitter='', youtube='',
+                 website='', season=''):
+        self.chain = chain
+        self.discord = discord
+        self.email = email
+        self.explorers = explorers
+        self.github = github
+        self.icon = icon
+        self.linkedin = linkedin
+        self.mining_pools = mining_pools
+        self.reddit = reddit
+        self.telegram = telegram
         self.twitter = twitter
         self.youtube = youtube
-        self.discord = discord
-        self.telegram = telegram
-        self.github = github
-        self.explorer = explorer
         self.website = website
-        self.icon = icon
         self.season = season
 
     def validated(self):
         return True
 
     def update(self):
-        row_data = (self.coin, self.twitter, self.youtube,
-                    self.discord, self.telegram, self.github,
-                    self.explorer, self.website, self.icon, self.season)
+
+        row_data = (self.chain, self.discord, self.email, self.explorers,
+                    self.github, self.icon, self.linkedin, self.mining_pools,
+                    self.reddit, self.telegram, self.twitter, self.youtube,
+                    self.website, self.season)
         if self.validated():
-            logger.info(f"Updating [coin_social] {self.season} | {self.coin}")
             update_coin_social_row(row_data)
+            logger.info(f"Updated [coin_social] {self.season} | {self.chain}")
         else:
             logger.warning(f"[coin_social] Row data invalid!")
             logger.warning(f"{row_data}")
