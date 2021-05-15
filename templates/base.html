@@ -32,15 +32,341 @@
 
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
-        <!-- Komodo Pallet -->
+        <!-- Komodo Pallet
         <link href="{% static 'css/kmd.css' %}" rel="stylesheet">
+        -->
 
+        <!-- Komodo Pallet -->
         <style type="text/css">
+            /* Style Guide Reference - https://komodoplatform.com/wp-content/uploads/2019/07/Komodo_Style_Guide_2019-V2.pdf */  
+
+            /*
+            h5 {
+                font-size: 1.3em;
+            }
+
+            */
             body {
-                text-transform: unset !important;
+                font-family: 'Rubik';
+                background-color:#101721;
+            }
+            .body_bg {
+                 background-color: #101721 !important;
+            }
+            i { 
+                color:#82F4E6;
             }
             th {
-                text-transform: capitalize; !important;
+                text-transform: capitalize !important;
+            }
+            h6 {
+                font-style: italic;
+                font-size: 1.1em;
+            }
+            a {
+                color:#82F4E6  !important;
+            }
+            a:hover {
+                color:#49cc84 !important;
+            }
+            div#sidebar: {
+                border-right: 1px solid #000 !important;
+                border-left: 1px solid #000 !important;
+            }
+            table {
+                text-align: center !important;
+                border: solid 1px #131313 !important;
+                margin: 0 !important;
+            }
+            th, tr, td, .card-header {
+                text-align: center !important;
+                border: transparent !important;
+            }
+            tr.odd {
+                background-color: #182331 !important;
+            }
+            tr.even {
+                background-color: #1a2939 !important;       
+            }
+            thead {
+                background-color: #1a2939;
+            }
+            th {
+                color:#3CC9BF;
+                padding: 0.2em !important;
+            }
+            td {
+                font-family: 'Courier';
+                vertical-align: middle !important;
+                padding: 0.2em !important;
+            }
+            input, select {
+                background-color:#233548 !important;
+                border: solid 1px #131313 !important;
+                color:#FFF !important;
+            }
+
+            /* Primary Colors */
+            .no_border {
+                border: 0 !important;
+            }
+            .graph_card_header {
+                background-color:#182331 !important;
+            }
+            .graph_card_body {
+                background-color:#1a2939 !important;
+            }
+            .graph_legend {
+                background-color:#1a2939 !important;
+            }
+            .card-header {
+                background-color:#182331 !important;                
+            }
+            .card-body {
+                background-color:#1a2939 !important;                
+            }
+            .card {
+                background: transparent;
+                border: solid 1px #000 !important;
+                box-shadow: none !important;
+            }
+            .card-body i {
+                font-size: 1.4em;
+                margin: 6px;
+            }
+            .card_border {
+                border: solid 1px #000 !important;
+            }
+
+            .kmd_blue {
+                color:#26456B !important;
+            }
+            .kmd_ltblue {
+                color:#2b6680 !important;
+            }
+            .kmd_teal {
+                color:#41EAD4 !important;
+            }
+            .kmd_dkteal {
+                color:#3CC9BF !important;
+            }
+
+            .kmd_blue_bg {
+                background-color:#26456B !important;
+            }
+            .kmd_ltblue_bg {
+                background-color:#2b6680 !important;
+            }
+            .kmd_teal_bg {
+                background-color:#41EAD4 !important;
+            }
+            .kmd_dkteal_bg {
+                background-color:#3CC9BF !important;
+            }
+
+            /* Secondary Colors */
+
+            .kmd_secondary_red {
+                color:#DC0333 !important;
+            }
+            .kmd_secondary_orange {
+                color:#F7931A !important;
+            }
+            .kmd_secondary_green {
+                color:#2FEA8B !important;
+            }
+            .kmd_secondary_ltblue {
+                color:#00E2FF !important;
+            }
+            .kmd_secondary_purple {
+                color:#B541EA !important;
+            }
+            .kmd_secondary_pink {
+                color:#FF1290 !important;
+            }
+
+            .kmd_secondary_red_bg {
+                background-color:#DC0333 !important;
+            }
+            .kmd_secondary_orange_bg {
+                background-color:#F7931A !important;
+            }
+            .kmd_secondary_green_bg {
+                background-color:#2FEA8B !important;
+            }
+            .kmd_secondary_ltblue_bg {
+                background-color:#00E2FF !important;
+            }
+            .kmd_secondary_purple_bg {
+                background-color:#B541EA !important;
+            }
+            .kmd_secondary_pink_bg {
+                background-color:#FF1290 !important;
+            }
+
+            /* Gradient */
+            .kmd_gradient {
+                background: rgb(13,68,117);
+                background: linear-gradient(90deg, rgba(13,68,117,1) 0%, rgba(0,224,191,1) 100%);
+            }
+
+            .kmd_ui_dark1 {
+                color:#182331 !important;   
+            }
+            .kmd_ui_dark2 {
+                color:#1A2939 !important;   
+            }
+            .kmd_ui_dark3 {
+                color:#233548 !important;   
+            }
+            .kmd_ui_dark4 {
+                color:#364C65 !important;   
+            }
+
+            .kmd_ui_light1 {
+                color:#B7BBBF !important;   
+            }
+            .kmd_ui_light2 {
+                color:#F5F5F5 !important;   
+            }
+            .kmd_ui_light3 {
+                color:#E6E6E6 !important;   
+            }
+            .kmd_ui_light4 {
+                color:#FFFFFF !important;   
+            }
+
+            .kmd_ui_dark1_bg {
+                background-color:#182331 !important;    
+            }
+            .kmd_ui_dark2_bg {
+                background-color:#1A2939 !important;    
+            }
+            .kmd_ui_dark3_bg {
+                background-color:#233548 !important;    
+            }
+            .kmd_ui_dark4_bg {
+                background-color:#364C65 !important;    
+            }
+
+            .kmd_ui_light1_bg {
+                background-color:#B7BBBF !important;    
+            }
+            .kmd_ui_light2_bg {
+                background-color:#F5F5F5 !important;    
+            }
+            .kmd_ui_light3_bg {
+                background-color:#E6E6E6 !important;    
+            }
+            .kmd_ui_light4_bg {
+                background-color:#FFFFFF !important;    
+            }
+
+
+            .c-sidebar i {
+                font-size: 28px;
+            }
+            .c-sidebar-nav-dropdown-toggle:hover, .c-sidebar-nav-link:hover {
+                background-color:#26456B !important;
+            }
+            .c-sidebar-nav-link {
+                padding-top:0 !important;
+                padding-bottom:0 !important;
+            }
+
+            .c-header {
+                border-bottom: 1px solid #000 !important;
+            }
+            .c-header i {
+                padding-right: 8px;
+                margin: 0;
+            }
+            .c-footer {
+                border-top: 1px solid #000 !important;
+            }
+            .c-sidebar-nav-title {
+                margin-top: 0px;
+            }
+            .c-sidebar-brand {
+                border-bottom: 1px solid #000 !important;
+            }
+
+            .dropdown-toggle:hover {
+                background-color:#26456B !important;
+                color:#41EAD4 !important;
+                border: solid #3CC9BF 1px !important;
+            }
+            .dropdown-toggle {
+                background-color:#182331 !important;
+                color:#41EAD4 !important;
+                border: solid #26456B 1px !important;
+
+            }
+            .dropdown-menu {
+                background-color:#182331 !important;
+                color:#41EAD4 !important;
+                border: solid #26456B 1px !important;
+
+            }
+            .dropdown-item:hover {
+                background-color:#26456B !important;
+                color:#41EAD4 !important;
+            }
+            .page-item.active .page-link {
+                background-color:#3CC9BF !important;
+                color:#233548 !important;
+                border-color: #26456B !important;
+            }
+            .page-link {
+                background-color:#182331 !important;
+                border-color: #233548 !important;
+            }
+            #graph_title {
+                color:#B7BBBF
+            }
+            .tooltip-inner {
+                max-width: 800px !important;
+                font-size: 0.9em;
+            }
+
+            .auto-width {
+                width : auto;
+            }
+
+            .btn-dark4:hover {
+                background-color:#1A2939 !important;
+                color:#41EAD4 !important;
+                border: solid #3CC9BF 1px !important;
+            }
+            .btn-dark4 {
+                background-color:#182331 !important;
+                color:#41EAD4 !important;
+                border: solid #26456B 1px !important;
+
+            }
+            .btn {
+                color:#E6E6E6;
+            }
+            .btn .badge {
+                top:0;
+                background-color:#182331 !important;
+                font-size: 0.9em;
+            }
+            .container {}
+
+            .list-group-item {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .progress-bar {
+                color:black;
+                font-weight:900;
+            }
+            .progress {
+                background-color:#364C65;
+            }
+            .sml-social {
+                font-size: 0.8em;
             }
             .kmd_green {
                 color: #6bea0c; !important;
@@ -62,19 +388,13 @@
                 border: solid 1px #5a5a5a;
             }
 
-            a {
-                color:#82F4E6  !important;
-            }
-            a:hover {
-                color:#00E2FF !important;
-            }
         </style>
     </head>
     <body class="c-app">
         {% include "base_sidebar.html" %}
         <div class="c-wrapper">
             {% include "base_header.html" %}
-            <div class="c-body kmd_ui_dark2_bg">
+            <div class="c-body body_bg">
               <main class="c-main">
                 <div class="container text-center" width='98%'>
                     <div id="ui-view">

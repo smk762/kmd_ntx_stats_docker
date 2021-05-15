@@ -39,9 +39,9 @@ class coinsSerializer(serializers.HyperlinkedModelSerializer):
 class coinSocialSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = coin_social
-        fields = ['chain', 'twitter', 'youtube', 'discord',
-                  'telegram', 'github', 'website', 'explorer',
-                  'season', 'icon']
+        fields = ['chain', 'discord', 'email', 'explorers', 'github',
+                  'icon', 'linkedin',  'mining_pools', 'reddit',
+                  'telegram', 'twitter', 'youtube',  'website', 'season']
 
 
 class lastNotarisedSerializer(serializers.HyperlinkedModelSerializer):
@@ -96,7 +96,7 @@ class nnSocialSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = nn_social
         fields = ['notary', 'twitter', 'youtube', 'discord', 'telegram',
-                  'github', 'keybase', 'website', 'icon', 'season']
+                  'email', 'github', 'keybase', 'website', 'icon', 'season']
 
 
 class notarisedSerializer(serializers.HyperlinkedModelSerializer):
