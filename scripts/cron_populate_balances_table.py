@@ -89,9 +89,9 @@ if __name__ == "__main__":
 
 
     logger.info(f"Removing stale data...")
-    logger.info(time.time())
-    logger.info(time.time()-24*60*60)
-    sql = f"DELETE FROM balances WHERE update_time < {time.time()-24*60*60};"
+    logger.info(int(time.time()))
+    logger.info(int(time.time()-24*60*60))
+    sql = f"DELETE FROM balances WHERE update_time < {int(time.time()-24*60*60)};"
     logger.info(sql)
     CURSOR.execute(sql)
     CONN.commit()

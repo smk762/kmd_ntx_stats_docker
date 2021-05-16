@@ -2,11 +2,11 @@
 {% load static %}
 {% block content %}
 	<div class="row col-12 mx-auto my-2" style="color:#FFF;">
-		<div class="card kmd_ui_dark1_bg m-auto">
-			<div class="card-header kmd_ui_dark1_bg m-auto">
+		<div class="card m-auto">
+			<div class="card-header m-auto col-12">
 				<h2>Last 200 {{ season_clean }} Notarisations</h2>
 			</div>
-			<div class="card-body kmd_ui_dark1_bg m-auto">
+			<div class="card-body m-auto">
 				<table id="ntx_24hr_tbl" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%; visibility: hidden;">
 					<thead>
 						<tr>
@@ -32,7 +32,7 @@
 								</span>
 							</td>
 							<td data-data="opret">
-								<span style="font-size: 0em;">{{ row.opret }}</span>
+								{{ row.opret }}
 							</td>
 							<td style="font-size: 1.2em;" data-data="block_time">{{ row.block_time }}</td>
 						</tr>
@@ -65,7 +65,7 @@
 			            	} else if (icon == "coquicash") {
 			            		icon = "coqui"
 			            	}
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2 mr-auto' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"'><img height='16px' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />&nbsp;"+oData.chain+"</a></span>");
+				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2 mr-auto' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'><img height='16px' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.chain+"</a></span>");
 				        }
 			        },
         			{
@@ -97,11 +97,11 @@
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.chain == "BTC") {
-				            	$(nTd).html("<a href='https://www.blockchain.com/btc/tx/"+oData.txid+"'><span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='"+oData.txid+"'><i class='fa fa-search'></i></span></a>");
+				            	$(nTd).html("<a href='https://www.blockchain.com/btc/tx/"+oData.txid+"'><span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
 				            } else  if (oData.chain == "LTC") {
-				            	$(nTd).html("<a href='https://chainz.cryptoid.info/ltc/tx.dws?"+oData.txid+"'><span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='"+oData.txid+"'><i class='fa fa-search'></i></span></a>");
+				            	$(nTd).html("<a href='https://chainz.cryptoid.info/ltc/tx.dws?"+oData.txid+"'><span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
 				            } else {
-			            		$(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'><span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='"+oData.txid+"'><i class='fa fa-search'></i></span></a>");
+			            		$(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'><span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
 			            	}
 				        }
 			        },
@@ -119,7 +119,7 @@
 			            		op_return = oData.opret
 			            	}
 
-				            $(nTd).html("<a href='//{{ request.get_host }}/tools/decode_opret/?OP_RETURN="+op_return+"'><span class='badge kmd_ui_dark1_bg p-0' style='font-size: 0.8em; border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='"+op_return+"'><i class='fas fa-arrow-right'></i></a></span>");
+				            $(nTd).html("<a href='//{{ request.get_host }}/tools/decode_opret/?OP_RETURN="+op_return+"&season={{ season }}'><span class='badge kmd_ui_dark1_bg p-0' style='font-size: 0.8em; border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Decode OP_RETURN: "+op_return+"'><i class='fas fa-arrow-right'></i></a></span>");
 				        } 
 			        },
         			{
