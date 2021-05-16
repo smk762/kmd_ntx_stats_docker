@@ -7,34 +7,37 @@
 				<h2 class="m-auto">{{ season_clean }} dPoW Chain Launch Parameters</h2>
 			</div>
 		<div class="card-body m-auto col-12">
-		{% for item in launch_param_rows %}
-			<div class="d-flex flex-row col-12 mb-1">
-			    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border: solid grey 1px !important;">
-			        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none;">
-				      	<a class="" href='//{{ request.get_host }}/coin_profile/{{ item.chain }}'>
-                        {% if item.chain == 'WLC21' %}
-                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
-                        {% elif item.chain == 'GLEEC-OLD' %}
-                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/gleec.png" />
-                        {% elif item.chain == 'COQUICASH' %}
-                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png" />
-                        {% else %}
-                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{{ item.chain|lower }}.png" />
-                        {% endif %}
-                        {{ item.chain }}
-						</a>
-					</span>
-			    </div>
-			    <div class="kmd_ui_dark1_bg col-10" style="border: solid grey 1px !important; font-size: 0.8em; max-width:600px">
-			    	<div class="my-2 mx-auto text-left" id="{{ item.chain }}_params">{{ item.launch_params }}</div>
+			{% for item in launch_param_rows %}
+			<div class="m-auto">
+				<div class="d-flex flex-row col-12 mb-1" style="min-width: 32em;">
+				    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border: solid grey 1px !important;">
+				        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none;">
+					      	<a class="" href='//{{ request.get_host }}/coin_profile/{{ item.chain }}'>
+	                        {% if item.chain == 'WLC21' %}
+	                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
+	                        {% elif item.chain == 'GLEEC-OLD' %}
+	                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/gleec.png" />
+	                        {% elif item.chain == 'COQUICASH' %}
+	                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png" />
+	                        {% else %}
+	                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{{ item.chain|lower }}.png" />
+	                        {% endif %}
+	                        {{ item.chain }}
+							</a>
+						</span>
+				    </div>
+				    <div class="kmd_ui_dark1_bg col-10" style="border: solid grey 1px !important; font-size: 0.8em; max-width:600px">
+				    	<div class="my-2 mx-auto text-left" id="{{ item.chain }}_params">{{ item.launch_params }}</div>
+					</div>
+				    <div class="input-group-append p-0 kmd_ui_dark4_bg"  style="border: solid grey 1px !important;">
+						<button class="btn" data-clipboard-target="#{{ item.chain }}_params" style="">
+						    <i class="cil-copy"></i>
+						</button>
+				    </div>
 				</div>
-			    <div class="input-group-append p-0 kmd_ui_dark4_bg"  style="border: solid grey 1px !important;">
-					<button class="btn" data-clipboard-target="#{{ item.chain }}_params" style="">
-					    <i class="cil-copy"></i>
-					</button>
-			    </div>
 			</div>
-		{% endfor %}
+			{% endfor %}
+		</div>
 	</div>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
 
