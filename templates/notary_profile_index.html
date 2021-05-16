@@ -43,12 +43,12 @@
 	</div>
 	{% for region, info in nn_info.regions_info.items %}	
 	<div class="card text-center">	
-		<div class="card-header kmd_ui_dark1_bg">
+		<div class="card-header">
 			<a id="{{region}}" class="section-anchor">
 				<h4 class="text-uppercase kmd_teal">{{ info.name }}</h4>
 			</a>
 		</div>		
-		<div class="card-body kmd_ui_dark1_bg">
+		<div class="card-body">
 			<div class="row m-1 d-flex justify-content-between">	
             	{% for node in info.nodes %}
             	<div class="card kmd_ui_dark3_bg kmd_ui_light3 col-2 px-0 mx-1">
@@ -57,9 +57,9 @@
 						{% for nn, site_links in nn_social.items %}
 							{% if node == nn %}
 								{% if site_links.icon != '' %}
-									<img class="card-img-top m-auto auto-width p-2" height='96px' src="{{ site_links.icon }}" alt="" style="border-radius: 50%;">
+									<img class="card-img-top auto-width" height='96px' src="{{ site_links.icon }}" alt="" style="border-radius: 50%;">
 								{% else %}
-									<img class="card-img-top m-auto auto-width p-2" height='96px' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
+									<img class="card-img-top auto-width" height='96px' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
 								{% endif %}
 							{% endif %}
 						{% endfor %}

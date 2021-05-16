@@ -2,18 +2,18 @@
 {% load static %}
 {% block content %}
 	<div class="row col-12 mx-auto my-2" style="color:#FFF;">
-		<div class="card kmd_ui_dark1_bg m-auto col-12">
-			<div class="card-header kmd_ui_dark1_bg col-12 m-auto">
+		<div class="card m-auto">
+			<div class="card-header col-12 m-auto">
 				<h2>Season 5 {{ page_title }}</h2>
 			</div>
-			<div class="card-body kmd_ui_dark1_bg m-auto col-12">
+			<div class="card-body m-auto col-12">
 
 				<table id="pubkey_addresses" class="table table-striped table-bordered kmd_ui_light4">
 					<thead>
 						<tr>
 							<th data-data="notary">Notary</th>
-							<th data-data="server">Server</th>
 							<th data-data="chain">Chain</th>
+							<th data-data="server">Server</th>
 							<th data-data="pubkey">Pubkey</th>
 							<th data-data="address">Address</th>
 							<th data-data="confirmed">Confirmed</th>
@@ -22,16 +22,30 @@
 					<tbody>
 						{% for item in addresses %}
 							<tr>
-								<td style="font-size: 0.9em;" data-data="notary">{{ item.notary }}</td>
-								<td style="font-size: 0.8em;" data-data="server">{{ item.server }}</td>
-								<td style="font-size: 0.9em;" data-data="chain">{{ item.chain }}</td>
-								<td style="font-size: 0.7em;" data-data="pubkey">
-									<a href="http://{{ request.get_host }}/tools/pubkey_addresses/?pubkey={{ item.pubkey }}">
-										{{ item.pubkey }}
+								<td style="font-size: 1.2em;" data-data="notary">
+									<span class='badge p-2'>
+										{{ item.notary }}
+									</span>
+								</td>
+								<td style="font-size: 1em;" data-data="chain">
+										{{ item.chain }}
+								</td>
+								<td style="font-size: 1em;" data-data="server">
+									{{ item.server }}
+								</td>
+								<td style="font-size: 1em;" data-data="pubkey">
+									<a href='http://{{ request.get_host }}/tools/pubkey_addresses/?pubkey={{ item.pubkey }}'>
+										<span class='badge p-1' data-toggle='tooltip' data-placement='top' title='All {{ item.pubkey  }} Addresses'>	
+											<i class="fas fa-address-book"></i>								
+										</span>
 									</a>
 								</td>
-								<td style="font-size: 0.7em;"  data-data="address">{{ item.address }}</td>
-								<td style="font-size: 0.7em;"  data-data="confirmed">{{ item.confirmed }}</td>
+								<td style="font-size: 1.2em;"  data-data="address">{{ item.address }}</td>
+								<td style="font-size: 1.2em;"  data-data="confirmed">
+									<span class='badge p-2'>
+										{{ item.confirmed }}
+									</span>
+								</td>
 							</tr>
 						{% endfor %}
 					</tbody>
@@ -53,29 +67,37 @@
         		order: [[ 0, 'asc' ],[ 1, 'asc' ],[ 2, 'asc' ]],
 	        	"columns": [
 			        { "data": "notary" },
-			        { "data": "server" },
 			        { "data": "chain" },
+			        { "data": "server" },
 			        { "data": "pubkey" },
 			        { "data": "address" },
 			        { "data": "confirmed" }
 			    ],
         		"columnDefs": [
-			        {
-			            "data": "notary",
-		                "targets": 0,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+oData.notary+"</span>");
-				        }
-		            },
+	        			{
+				            "data": "chain",
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            	var icon = oData.chain.toLowerCase()
+				            	if (icon == "wlc21") {
+				            		icon = "wlc"
+				            	} else if (icon == "gleec-old") {
+				            		icon = "gleec"
+				            	} else if (icon == "coquicash") {
+				            		icon = "coqui"
+				            	}
+					            $(nTd).html("<span class='badge p-2 mr-auto' style='font-size: 0.9em;'><img height='16px' class='mr-2'  src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' /><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'>"+oData.chain+"</a></span>");
+					        }
+				        },
         			{
 			            "data": "server",
-			            "targets": 1,
+			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.server == "Main") {
-			            		color = "#166b2c";
+			            		color = "#115621";
 			            	}
 			            	else if (oData.server == "Third_Party") {
-			            		color = "#259596";
+			            		color = "#2b53ad";
 			            	}
 			            	else if (oData.server == "Testnet") {
 			            		color = "#622C7B";
@@ -83,28 +105,22 @@
 			            	else {
 			            		color = "#000";	
 			            	}
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-1' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
+				            $(nTd).html("<span class='badge p-2' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
 			        	}
 			        },
-        			{
-			            "data": "chain",
-			            "targets": 2,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class=''>"+oData.chain+"</span>");
-				        }
-			        },
+			        
         			{
 			            "data": "address",
 			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (!(explorers.hasOwnProperty(oData.chain))) {
-			            		$(nTd).html(oData.address);	
+			            		$(nTd).html("<span class='badge p-2'>"+oData.address+"</span>");	
 			            	}
 			            	else if (explorers[oData.chain][0].search("cryptoid") > -1) {
-			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'address.dws?'+oData.address+".htm'>"+oData.address+"</a>");	
+			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'address.dws?'+oData.address+".htm'><span class='badge p-2'>"+oData.address+"</span></a>");	
 			            	}
 			            	else {
-			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'address/'+oData.address+"'>"+oData.address+"</a>");	
+			            		$(nTd).html("<span class='badge p-2'><a href='"+explorers[oData.chain][0]+'address/'+oData.address+"'>"+oData.address+"</span></a>");	
 			            	}
 			            }
 			        }

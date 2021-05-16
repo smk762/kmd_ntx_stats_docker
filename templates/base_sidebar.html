@@ -63,15 +63,15 @@
                 <li class="c-sidebar-nav-item">
                     <a class="c-sidebar-nav-link py-1 my-1" style="font-size:0.9em;" href="//{{ request.get_host }}/coin_profile/{{ option }}/?season={{ season }}">
                         {% if option == 'WLC21' %}
-                            <img height="16px" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
+                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
                         {% elif option == 'GLEEC-OLD' %}
-                            <img height="16px" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/gleec.png" />
+                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/gleec.png" />
                         {% elif option == 'COQUICASH' %}
-                            <img height="16px" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png" />
+                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png" />
                         {% else %}
-                            <img height="16px" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{{ option|lower }}.png" />
+                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{{ option|lower }}.png" />
                         {% endif %}
-                        &nbsp;{{ option }}
+                        {{ option }}
                     </a>
                 </li>
                 {% endfor %}

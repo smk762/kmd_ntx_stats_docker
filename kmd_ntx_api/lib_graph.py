@@ -11,6 +11,8 @@ def get_balances_graph_data(request):
         season = request.GET["season"]
     if "server" in request.GET:
         server = request.GET["server"]
+        if server in ["KMD", "LTC", "BTC"]:
+            server = "Main"
     if "chain" in request.GET:
         chain = request.GET["chain"]
     if "notary" in request.GET:
@@ -55,15 +57,15 @@ def get_balances_graph_data(request):
         chartLabel = chain+ " Notary Balances"
         for notary in notary_list:
             if notary.endswith("_AR"):
-                bg_color.append(RED)
+                bg_color.append(AR_REGION)
             elif notary.endswith("_EU"):
-                bg_color.append(MAIN_COLOR)
+                bg_color.append(EU_REGION)
             elif notary.endswith("_NA"):
-                bg_color.append(THIRD_PARTY_COLOR)
+                bg_color.append(NA_REGION)
             elif notary.endswith("_SH"):
-                bg_color.append(LT_BLUE)
+                bg_color.append(SH_REGION)
             else:
-                bg_color.append(OTHER_COIN_COLOR)
+                bg_color.append(DEV_REGION)
             border_color.append(BLACK)
     elif len(notary_list) == 1:
         notary = notary_list[0]
@@ -209,8 +211,9 @@ def get_notary_balances_graph(notary, season=None):
     notary_balances = get_notary_balances(notary, season)
     main_chains, third_chains = get_dpow_server_coins_dict_lists(season)
 
-    if "HUSH3" in third_chains:
-        third_chains.remove("HUSH3")
+    for chain in RETIRED_CHAINS:
+        if chain in third_chains:
+            third_chains.remove(chain)
 
     main_chains += ["KMD", "BTC", "LTC"]
     main_chains.sort()
@@ -218,11 +221,12 @@ def get_notary_balances_graph(notary, season=None):
     notary_balances_list = []
     for item in notary_balances:
 
-        if item['server'] == 'Third_Party' and item['chain'] == "KMD":
-            chain = "KMD_3P"
-
-        else: 
-            chain = item['chain']
+        chain = item['chain']
+        if item['server'] == 'Third_Party':
+            if item['chain'] == "KMD":
+                chain = "KMD_3P"
+        if item['server'] in ["LTC", "BTC", "KMD"]:
+            item.update({"server":"Main"})
 
         if chain in main_chains and item["server"] == 'Main':
             notary_balances_list.append(item)
