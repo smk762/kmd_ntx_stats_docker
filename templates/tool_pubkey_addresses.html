@@ -5,11 +5,6 @@
 		<div class="card m-auto">
 			<div class="card-header col-12 m-auto">
 				<h2 class="col-12">Get Addresses for Pubkey</h2>
-				{% if pubkey %}
-					<h6>{{ pubkey }}</h6>
-				{% endif %}
-			</div>
-			<div class="card-body m-auto col-12">
 				<form>
 				  <div class="input-group mb-3 kmd_ui_dark1_bg" style="min-width: 50em">
 				    <div class="input-group-prepend p-0" >
@@ -25,6 +20,9 @@
 				    </div>
 				  </div>
 				</form>
+			</div>
+			{% if pubkey %}
+			<div class="card-body m-auto col-12">
 
 				{% if address_rows %}
 				<table id="pubkey_addresses" class="table table-striped table-bordered kmd_ui_light4 m-auto" style="width:99%; visibility: hidden;">
@@ -51,6 +49,7 @@
 				</table>
 				{% endif %}
 			</div>
+			{% endif %}
 		</div>	
 	</div>
     <!-- jquery -->
