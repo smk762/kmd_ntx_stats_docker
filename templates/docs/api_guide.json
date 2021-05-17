@@ -1,0 +1,1509 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "defaultTitle",
+    "description": "defaultDescription",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://stats.kmd.io"
+    }
+  ],
+  "paths": {
+    "/api/info/balances/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "server",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Main"
+          },
+          {
+            "name": "chain",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "KMD"
+          },
+          {
+            "name": "notary",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "alien_AR"
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Season_4"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 1, \"filters\": [\"season\", \"server\", \"notary\", \"chain\"], \"results\": {\"Season_4\": {\"alien_AR\": {\"KMD\": {\"RVrtLPvKrszs7zSggTsXPYsbxc5SwALiEN\": \"9.09163599\"}}}}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/base_58/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "KMD"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"KMD\": {\"pubtype\": 60, \"wiftype\": 188, \"p2shtype\": 85}}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/coins/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "mm2_active",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          },
+          {
+            "name": "chain",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "KMD"
+          },
+          {
+            "name": "dpow_active",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_2"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 1, \"filters\": [\"chain\", \"dpow_active\", \"mm2_active\"], \"results\": {\"KMD\": {\"coins_info\": {\"cli\": \"~/komodo/src/komodo-cli\", \"mm2\": 1, \"coin\": \"KMD\", \"icon\": \"https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/kmd.png\", \"name\": \"komodo\", \"fname\": \"Komodo\", \"txfee\": 1000, \"pubtype\": 60, \"rpcport\": 7771, \"wiftype\": 188, \"p2shtype\": 85, \"protocol\": {\"type\": \"UTXO\"}, \"conf_path\": \"~/.komodo/komodo.conf\", \"txversion\": 4, \"overwintered\": 1, \"avg_blocktime\": 1, \"launch_params\": \"~/komodo/src/komodod\", \"requires_notarization\": true, \"required_confirmations\": 2}, \"dpow\": {\"src\": \"https://github.com/komodoplatform/komodo\", \"server\": \"Main\", \"version\": \"[e159b4e](https://github.com/KomodoPlatform/komodo/tree/e159b4e7a40d3886519401c4074e957a1f9d42ba)\"}, \"dpow_tenure\": {\"Season_4\": {\"KMD\": {\"end_time\": 1617364800, \"start_time\": 1592146800}}}, \"explorers\": [\"https://kmdexplorer.io/\", \"https://kmd.explorer.dexstats.info/\", \"https://komodod.com/\", \"https://www.kmdexplorer.ru/\"], \"electrums\": [\"electrum1.cipig.net:10001\", \"electrum2.cipig.net:10001\", \"electrum3.cipig.net:10001\"], \"electrums_ssl\": [\"electrum1.cipig.net:20001\", \"electrum2.cipig.net:20001\", \"electrum3.cipig.net:20001\"], \"mm2_compatible\": 1, \"dpow_active\": 1}}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/daemon_cli/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "AYA"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_3"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"AYA\": \"~/AYAv2/src/aryacoin-cli\"}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/dpow_server_coins/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "server",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Main"
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Season_4"
+          },
+          {
+            "name": "epoch",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Epoch_0"
+          },
+          {
+            "name": "timestamp",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1592246800"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_4"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 29, \"filters\": [\"season\", \"server\", \"epoch\", \"timestamp\"], \"results\": [\"AXO\", \"BET\", \"BOTS\", \"BTCH\", \"CCL\", \"COQUICASH\", \"CRYPTO\", \"DEX\", \"HODL\", \"ILN\", \"JUMBLR\", \"KOIN\", \"MESH\", \"MGW\", \"MORTY\", \"MSHARK\", \"NINJA\", \"OOT\", \"PANGEA\", \"PGT\", \"PIRATE\", \"REVS\", \"RFOX\", \"RICK\", \"STBL\", \"SUPERNET\", \"THC\", \"WLC21\", \"ZILLA\"]}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/electrums/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "BOTS"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_5"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"BOTS\": [\"electrum1.cipig.net:10007\", \"electrum2.cipig.net:10007\", \"electrum3.cipig.net:10007\"]}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/electrums_ssl/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "MORTY"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_6"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"MORTY\": [\"electrum1.cipig.net:20018\", \"electrum2.cipig.net:20018\", \"electrum3.cipig.net:20018\"]}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/explorers/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "RICK"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_7"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"RICK\": [\"https://rick.explorer.dexstats.info/\"]}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/launch_params/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "PIRATE"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_8"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"PIRATE\": \"~/komodo/src/komodod -ac_name=PIRATE -ac_supply=0 -ac_reward=25600000000 -ac_halving=77777 -ac_private=1 -addnode=88.99.212.81\"}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/mined_count_daily/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "mined_date",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "2021-05-14"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector"
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/notarised_chain_daily/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "notarised_date",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "2021-03-16"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_9"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 36, \"next\": \"http://stats.kmd.io/api/info/notarised_chain_daily/?notarised_date=2021-03-17\", \"previous\": \"http://stats.kmd.io/api/info/notarised_chain_daily/?notarised_date=2021-03-15\", \"filters\": [\"notarised_date\"], \"results\": {\"2021-03-16\": {\"AXO\": 77, \"AYA\": 104, \"BET\": 145, \"BOTS\": 127, \"BTC\": 95, \"BTCH\": 4, \"CCL\": 74, \"CHIPS\": 16, \"COQUICASH\": 129, \"CRYPTO\": 118, \"DEX\": 61, \"EMC2\": 107, \"GLEEC\": 70, \"HODL\": 120, \"ILN\": 139, \"JUMBLR\": 118, \"KOIN\": 101, \"MCL\": 141, \"MESH\": 81, \"MGW\": 123, \"MORTY\": 89, \"MSHARK\": 121, \"NINJA\": 2, \"OOT\": 134, \"PANGEA\": 115, \"PBC\": 140, \"PGT\": 77, \"PIRATE\": 121, \"REVS\": 128, \"RICK\": 106, \"STBL\": 3, \"SUPERNET\": 155, \"THC\": 160, \"VRSC\": 121, \"WLC21\": 145, \"ZILLA\": 79}}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/notarised_count_daily/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "notarised_date",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "2021-05-10"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector"
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/tools/addr_from_base58/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "wiftype",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "188"
+          },
+          {
+            "name": "p2shtype",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "85"
+          },
+          {
+            "name": "pubtype",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "60"
+          },
+          {
+            "name": "pubkey",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "029912212d370ee0fb4d38eefd8bfcd8ab04e2c3b0354020789c29ddf2a35c72d6"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_10"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"pubkey\": \"029912212d370ee0fb4d38eefd8bfcd8ab04e2c3b0354020789c29ddf2a35c72d6\", \"pubtype\": \"60\", \"p2shtype\": \"85\", \"wiftype\": \"188\", \"address\": \"REnXF6VBjvVeWEYPFD4EHi4ToEb7PHsgYY\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/tools/address_from_pubkey/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "coin",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "BTC"
+          },
+          {
+            "name": "pubkey",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_11"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"coin\": \"BTC\", \"pubkey\": \"03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828\", \"address\": \"1E2ac2gxeFR2ir1H3vqETTperWkiXkwy99\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/tools/decode_opreturn/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "OP_RETURN",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_12"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"chain\": \"KMD\", \"notarised_block\": 2318680, \"notarised_blockhash\": \"0000000048b5062870d0d5115d5f3e9dec6cd73fb6b653c731f088a06053fcfc\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/tools/notary_utxos/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "server",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Main"
+          },
+          {
+            "name": "notary",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "dragonhound_NA"
+          },
+          {
+            "name": "chain",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "KMD"
+          },
+          {
+            "name": "season",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Season_4"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector"
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/tools/kmd_rewards/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "RCyANUW2H5985zk8p6NHJfPyNBXnTVzGDh"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_13"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"address\": \"RCyANUW2H5985zk8p6NHJfPyNBXnTVzGDh\", \"utxo_count\": 1, \"utxos\": {\"c76f553497b558cf3bcdffe77d8381922b68fa85e64ec38e88a5ce477efca32f\": {\"locktime\": 1620700056, \"utxo_value\": 17477130.20431399, \"sat_rewards\": 1292330025504, \"kmd_rewards\": 12923.30025504, \"satoshis\": 1747713020431399, \"block_height\": 2387478}}, \"eligible_utxo_count\": 1, \"oldest_utxo_block\": 2387478, \"kmd_balance\": 17477130.20431399, \"total_rewards\": 12923.30025504}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "results": {
+            "type": "object",
+            "properties": {
+              "Season_4": {
+                "type": "object",
+                "properties": {
+                  "alien_AR": {
+                    "type": "object",
+                    "properties": {
+                      "KMD": {
+                        "type": "object",
+                        "properties": {
+                          "RVrtLPvKrszs7zSggTsXPYsbxc5SwALiEN": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "inline_response_200_1": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "results": {
+            "type": "object",
+            "properties": {
+              "KMD": {
+                "type": "object",
+                "properties": {
+                  "wiftype": {
+                    "type": "integer"
+                  },
+                  "p2shtype": {
+                    "type": "integer"
+                  },
+                  "pubtype": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "inline_response_200_2": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "results": {
+            "type": "object",
+            "properties": {
+              "KMD": {
+                "type": "object",
+                "properties": {
+                  "mm2_compatible": {
+                    "type": "integer"
+                  },
+                  "dpow_tenure": {
+                    "type": "object",
+                    "properties": {
+                      "Season_4": {
+                        "type": "object",
+                        "properties": {
+                          "KMD": {
+                            "type": "object",
+                            "properties": {
+                              "start_time": {
+                                "type": "integer"
+                              },
+                              "end_time": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "electrums_ssl": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "electrums": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "explorers": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "dpow": {
+                    "type": "object",
+                    "properties": {
+                      "server": {
+                        "type": "string"
+                      },
+                      "src": {
+                        "type": "string"
+                      },
+                      "version": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "coins_info": {
+                    "type": "object",
+                    "properties": {
+                      "cli": {
+                        "type": "string"
+                      },
+                      "fname": {
+                        "type": "string"
+                      },
+                      "conf_path": {
+                        "type": "string"
+                      },
+                      "launch_params": {
+                        "type": "string"
+                      },
+                      "icon": {
+                        "type": "string"
+                      },
+                      "wiftype": {
+                        "type": "integer"
+                      },
+                      "rpcport": {
+                        "type": "integer"
+                      },
+                      "pubtype": {
+                        "type": "integer"
+                      },
+                      "required_confirmations": {
+                        "type": "integer"
+                      },
+                      "txversion": {
+                        "type": "integer"
+                      },
+                      "protocol": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "mm2": {
+                        "type": "integer"
+                      },
+                      "avg_blocktime": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "txfee": {
+                        "type": "integer"
+                      },
+                      "p2shtype": {
+                        "type": "integer"
+                      },
+                      "overwintered": {
+                        "type": "integer"
+                      },
+                      "requires_notarization": {
+                        "type": "boolean"
+                      },
+                      "coin": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "dpow_active": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "inline_response_200_3": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "results": {
+            "type": "object",
+            "properties": {
+              "AYA": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "inline_response_200_4": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "inline_response_200_5": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "results": {
+            "type": "object",
+            "properties": {
+              "BOTS": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "inline_response_200_6": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "results": {
+            "type": "object",
+            "properties": {
+              "MORTY": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "inline_response_200_7": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "results": {
+            "type": "object",
+            "properties": {
+              "RICK": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "inline_response_200_8": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "results": {
+            "type": "object",
+            "properties": {
+              "PIRATE": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "inline_response_200_9": {
+        "type": "object",
+        "properties": {
+          "next": {
+            "type": "string"
+          },
+          "previous": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "results": {
+            "type": "object",
+            "properties": {
+              "2021-03-16": {
+                "type": "object",
+                "properties": {
+                  "CRYPTO": {
+                    "type": "integer"
+                  },
+                  "MSHARK": {
+                    "type": "integer"
+                  },
+                  "COQUICASH": {
+                    "type": "integer"
+                  },
+                  "NINJA": {
+                    "type": "integer"
+                  },
+                  "AYA": {
+                    "type": "integer"
+                  },
+                  "MESH": {
+                    "type": "integer"
+                  },
+                  "ILN": {
+                    "type": "integer"
+                  },
+                  "STBL": {
+                    "type": "integer"
+                  },
+                  "THC": {
+                    "type": "integer"
+                  },
+                  "PBC": {
+                    "type": "integer"
+                  },
+                  "GLEEC": {
+                    "type": "integer"
+                  },
+                  "BOTS": {
+                    "type": "integer"
+                  },
+                  "CHIPS": {
+                    "type": "integer"
+                  },
+                  "REVS": {
+                    "type": "integer"
+                  },
+                  "EMC2": {
+                    "type": "integer"
+                  },
+                  "MORTY": {
+                    "type": "integer"
+                  },
+                  "WLC21": {
+                    "type": "integer"
+                  },
+                  "VRSC": {
+                    "type": "integer"
+                  },
+                  "ZILLA": {
+                    "type": "integer"
+                  },
+                  "BTCH": {
+                    "type": "integer"
+                  },
+                  "KOIN": {
+                    "type": "integer"
+                  },
+                  "SUPERNET": {
+                    "type": "integer"
+                  },
+                  "CCL": {
+                    "type": "integer"
+                  },
+                  "HODL": {
+                    "type": "integer"
+                  },
+                  "BET": {
+                    "type": "integer"
+                  },
+                  "BTC": {
+                    "type": "integer"
+                  },
+                  "OOT": {
+                    "type": "integer"
+                  },
+                  "DEX": {
+                    "type": "integer"
+                  },
+                  "MCL": {
+                    "type": "integer"
+                  },
+                  "PIRATE": {
+                    "type": "integer"
+                  },
+                  "AXO": {
+                    "type": "integer"
+                  },
+                  "RICK": {
+                    "type": "integer"
+                  },
+                  "PANGEA": {
+                    "type": "integer"
+                  },
+                  "MGW": {
+                    "type": "integer"
+                  },
+                  "PGT": {
+                    "type": "integer"
+                  },
+                  "JUMBLR": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "inline_response_200_10": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "wiftype": {
+            "type": "string"
+          },
+          "p2shtype": {
+            "type": "string"
+          },
+          "pubtype": {
+            "type": "string"
+          },
+          "pubkey": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_200_11": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "coin": {
+            "type": "string"
+          },
+          "pubkey": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_200_12": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "type": "string"
+          },
+          "notarised_block": {
+            "type": "integer"
+          },
+          "notarised_blockhash": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_200_13": {
+        "type": "object",
+        "properties": {
+          "kmd_balance": {
+            "type": "number"
+          },
+          "utxo_count": {
+            "type": "integer"
+          },
+          "address": {
+            "type": "string"
+          },
+          "oldest_utxo_block": {
+            "type": "integer"
+          },
+          "eligible_utxo_count": {
+            "type": "integer"
+          },
+          "utxos": {
+            "type": "object",
+            "properties": {
+              "c76f553497b558cf3bcdffe77d8381922b68fa85e64ec38e88a5ce477efca32f": {
+                "type": "object",
+                "properties": {
+                  "locktime": {
+                    "type": "integer"
+                  },
+                  "utxo_value": {
+                    "type": "number"
+                  },
+                  "kmd_rewards": {
+                    "type": "number"
+                  },
+                  "sat_rewards": {
+                    "type": "number"
+                  },
+                  "block_height": {
+                    "type": "integer"
+                  },
+                  "satoshis": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+          "total_rewards": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

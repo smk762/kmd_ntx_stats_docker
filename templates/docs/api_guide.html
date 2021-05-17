@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <script type="module" src="https://unpkg.com/openapi-explorer/dist/openapi-explorer.min.js"></script>
+  </head>
+  <body>
+    <openapi-explorer spec-url="http://116.203.120.91:8762/docs/json_api_guide/"> </openapi-explorer>
+  </body>
+</html>
+{% endblock %}
