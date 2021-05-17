@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 mx-auto my-1" style="color:#FFF;">
+	<div class="row col-12 mx-auto my-1" style="color: #b9b5b5;">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card text-center kmd_ui_light3 shadow-none">
 				<div class="card-header d-flex justify-content-between">
@@ -54,13 +54,13 @@
 		</div>
 	</div>
 
-	<div class="row col-12 mx-auto my-1" style="color:#FFF;">
+	<div class="row col-12 mx-auto my-1" style="color: #b9b5b5;">
 		<div class="card m-auto">
 			<div class="card-header m-auto col-12">
 				<h4>Last 200 Faucet Transactions</h4>
 			</div>			
 			<div class="card-body m-auto col-12">
-				<table style="visibility: hidden;" id="faucet_tx_tbl" class="table table-striped table-bordered kmd_ui_light4">
+				<table style="visibility: hidden;" id="faucet_tx_tbl" class="table table-striped table-bordered">
 					<thead>
 						<tr>
 							<th data-data="coin">Coin</th>
@@ -77,14 +77,14 @@
 							<td style="font-size: 1.1em;" data-data="coin" class="px-2 text-left">{{ row.coin }}</td>
 							<td style="font-size: 1.1em;" data-data="address">{{ row.address }}</td>
 							<td style="font-size: 1.1em;" data-data="amount">
-								<span class='badge kmd_ui_dark1_bg p-2'>
+								<span class='badge p-2'>
 									{{ row.amount }}
 								</span>
 							</td>
 							<td style="font-size: 0.9em;" data-data="txid">{{ row.txid }}</td>
 							<td style="font-size: 0.9em;" data-data="status">{{ row.status }}</td>
 							<td style="font-size: 1em;" data-data="time_sent">
-								<span class='badge kmd_ui_dark1_bg p-2'>
+								<span class='badge p-2'>
 									{{ row.time_sent }}
 								</span>
 							</td>
@@ -122,7 +122,7 @@
 			            	} else if (icon == "coquicash") {
 			            		icon = "coqui"
 			            	}
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2 mr-auto'><a href='//{{ request.get_host }}/coin_profile/"+oData.coin+"'><img height='16px' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.coin+"</a></span>");
+				            $(nTd).html("<span class='badge p-2 mr-auto'><a href='//{{ request.get_host }}/coin_profile/"+oData.coin+"'><img height='16px' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.coin+"</a></span>");
 				        }
 			        },
         			{
@@ -130,10 +130,10 @@
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.address == 'GalacticFederationPrison') {
-				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='https://www.galacticfederation.org.uk/'>"+oData.address+"</a></span>");			            		
+				            	$(nTd).html("<span class='badge p-2'><a href='https://www.galacticfederation.org.uk/'>"+oData.address+"</a></span>");			            		
 			            	}
 			            	else {
-				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2'><a href='https://"+oData.coin+".explorer.dexstats.info/address/"+oData.address+"'>"+oData.address+"</a></span>");
+				            	$(nTd).html("<span class='badge p-2'><a href='https://"+oData.coin+".explorer.dexstats.info/address/"+oData.address+"'>"+oData.address+"</a></span>");
 				        	}	
 				        }
 			        },
@@ -142,12 +142,12 @@
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.address == 'GalacticFederationPrison') {
-				            	$(nTd).html("<a href='https://www.galacticfederation.org.uk/'><span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Galactic Federation Prison'><i class='fab fa-galactic-senate'></i></span></a>");
+				            	$(nTd).html("<a href='https://www.galacticfederation.org.uk/'><span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Galactic Federation Prison'><i class='fab fa-galactic-senate'></i></span></a>");
 			            	} else if (oData.txid == 'n/a') {
-				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Awaiting drip...'><i class='fas fa-hourglass-half' style='color:white'></i></i></span>");
+				            	$(nTd).html("<span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Awaiting drip...'><i class='fas fa-hourglass-half' style='color:white'></i></i></span>");
 			            	}
 			            	else {
-				            	$(nTd).html("<a href='https://"+oData.coin+".explorer.dexstats.info/tx/"+oData.txid+"'><span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
+				            	$(nTd).html("<a href='https://"+oData.coin+".explorer.dexstats.info/tx/"+oData.txid+"'><span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
 				            }
 				        }
 			        },
@@ -156,12 +156,12 @@
 			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.status == 'pending') {
-				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='In queue...'><i class='far fa-clock' style='color:white;'></i></span>");			            		
+				            	$(nTd).html("<span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='In queue...'><i class='far fa-clock' style='color:white;'></i></span>");			            		
 			            	} else if (oData.status == 'sent') {
-				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Sent!'><i class='fas fa-envelope-open-text' style='color:white;'></i></span>");			            		
+				            	$(nTd).html("<span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Sent!'><i class='fas fa-envelope-open-text' style='color:white;'></i></span>");			            		
 			            	}
 			            	else {			            		
-				            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='In queue...'><i class='far fa-clock' style='color:white;'>"+oData.status+"<i class='far fa-clock' style='color:white;'></i></span>");	
+				            	$(nTd).html("<span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='In queue...'><i class='far fa-clock' style='color:white;'>"+oData.status+"<i class='far fa-clock' style='color:white;'></i></span>");	
 			            	}
 				        }
 			        }

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 mx-auto my-1" style="color:#FFF;">
+	<div class="row col-12 mx-auto my-1" style="color: #b9b5b5;">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card text-center kmd_ui_light3 col-4 px-0 mt-auto shadow-none" style="border:none !important;">
 				<div class="card-body p-0" style="background-color: #101721 !important;">
@@ -9,17 +9,17 @@
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 						    Notarised Last 24hrs
-						    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+						    <span class="badge p-2" style="font-size: 0.9em;">
 						    	<a href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}">
 						    		{{ 24hr_ltc_count }}<br /> LTC
 						    	</a>
 						    </span>
-						    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+						    <span class="badge p-2" style="font-size: 0.9em;">
 						    	<a href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}">
 						    		{{ 24hr_main_count }}<br /> Main
 						    	</a>
 						    </span>
-						    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+						    <span class="badge p-2" style="font-size: 0.9em;">
 						    	<a href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}">
 						    		{{ 24hr_third_party_count }}<br /> 3rd Party
 						    	</a>
@@ -29,17 +29,17 @@
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 					    	Notarised Season
-						    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+						    <span class="badge p-2" style="font-size: 0.9em;">
 						    	<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
 						    		{{ season_btc_count }}<br /> LTC
 						    	</a>
 						    </span>
-						    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+						    <span class="badge p-2" style="font-size: 0.9em;">
 						    	<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
 						    		{{ season_main_count }}<br /> Main
 						    	</a>
 						    </span>
-						    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+						    <span class="badge p-2" style="font-size: 0.9em;">
 						    	<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
 						    		{{ season_third_party_count }}<br /> 3rd Party
 						    	</a>
@@ -50,7 +50,7 @@
 					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 						    Last Notarisation
 						    <a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">
-							    <span id="last_ntx" class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+							    <span id="last_ntx" class="badge p-2" style="font-size: 0.9em;">
 							    	{{ last_ntx_time }}<br />{{ last_ntx_chain }}
 							    </span>
 						    </a>
@@ -60,7 +60,7 @@
 					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 					    	Last LTC Notarisation
 						    <a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">
-							  	<span  id="last_ltc_ntx" class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+							  	<span  id="last_ltc_ntx" class="badge p-2" style="font-size: 0.9em;">
 							  			{{ last_ltc_ntx_time }}
 							  	</span>
 						  	</a>
@@ -69,7 +69,7 @@
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 					    	Region Rank
-							<span  id="last_ltc_ntx" class="badge kmd_ui_dark1_bg p-2" style="font-size: 1.5em;">
+							<span  id="last_ltc_ntx" class="badge p-2" style="font-size: 1.5em;">
 			    				<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
 						    		{{ rank }}
 						    	</a>
@@ -190,12 +190,12 @@
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 						    Mined
-						    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+						    <span class="badge p-2" style="font-size: 0.9em;">
 						    	<a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
 						    		{{ mining_summary.mined_last_24hrs|floatformat:-3 }} KMD<br />Last 24hrs
 						    	</a>
 							</span>
-						    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+						    <span class="badge p-2" style="font-size: 0.9em;">
 						    	<a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
 						    		{{ mining_summary.sum_value_mined|floatformat:-3 }} KMD<br />Season
 						    	</a>
@@ -205,7 +205,7 @@
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 						    Blocks Mined this Season
-						    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+						    <span class="badge p-2" style="font-size: 0.9em;">
 						    	<a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
 						    		{{ mining_summary.blocks_mined }}
 						    	</a>
@@ -215,7 +215,7 @@
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 						    Largest Block Mined
-						    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+						    <span class="badge p-2" style="font-size: 0.9em;">
 						    	<a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
 						    		{{ mining_summary.max_value_mined|floatformat:-3 }} KMD
 						    	</a>
@@ -225,7 +225,7 @@
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 							    Last Mined block
-							    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 0.9em;">
+							    <span class="badge p-2" style="font-size: 0.9em;">
 						    		<a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
 							    		{{ mining_summary.time_since_mined }}
 							    	</a>
@@ -235,7 +235,7 @@
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 							    Notarisation Score
-							    <span class="badge kmd_ui_dark1_bg p-2" style="font-size: 1.5em;">
+							    <span class="badge p-2" style="font-size: 1.5em;">
 		    						<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">{{ season_score|floatformat:-3 }}</a>
 								</span>
 							</div>
@@ -249,12 +249,12 @@
 	<!-- Season Notarisation Stats -->
 	<div class="row my-3">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<div class="card kmd_ui_light4 shadow-none">
+			<div class="card shadow-none">
 				<div class="card-header">
 					<h4>{{ notary_name }} {{ season_clean }} Notarisations Summary</h4>
 				</div>
 				<div class="card-body">
-					<table id="ntx_table" class="table table-striped table-bordered kmd_ui_light4">
+					<table id="ntx_table" class="table table-striped table-bordered">
 						<thead>
 							<tr>
 								<th data-data="ntx_chain">Server</th>
@@ -270,7 +270,7 @@
 							{% for item in ntx_summary_data %}
 								<tr>
 									<td data-data="ntx_chain text-left" class="px-2 text-left">
-								      	<span class="badge kmd_ui_dark1_bg p-2" style='font-size: 0.9em;'>
+								      	<span class="badge p-2" style='font-size: 0.9em;'>
 					                        {% if item.chain == 'WLC21' %}
 					                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
 					                        {% elif item.chain == 'GLEEC-OLD' %}
@@ -285,19 +285,19 @@
 									</td>
 									<td data-data="ntx_server">{{ item.server }}</td>
 									<td data-data="ntx_count">
-										<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>
+										<span class='badge p-2' style='font-size: 0.9em;'>
 											<a href="//{{ request.get_host }}/api/table/notary_ntx/?season={{ season }}&server={{ item.server }}&notary={{ notary_name }}&chain={{ item.chain }}">
 												{{ item.chain_ntx_count }}
 											</a>
 										</span>
 									</td>
 									<td data-data="ntx_pct">
-										<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>
+										<span class='badge p-2' style='font-size: 0.9em;'>
 											{{ item.ntx_pct|floatformat:-3 }}%
 										</span>
 									</td>
 									<td data-data="ntx_score">
-										<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>
+										<span class='badge p-2' style='font-size: 0.9em;'>
 											<a href="//{{ request.get_host }}/notary_epoch_scores?notary={{ notary_name }}&chain={{ item.chain }}&season={{ season }}">
 												{{ item.chain_score|floatformat:-3 }}
 											</a>
@@ -345,12 +345,12 @@
 	</div>	
 	<div class="row my-3">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<div class="card kmd_ui_light4 shadow-none">
+			<div class="card shadow-none">
 				<div class="card-header">
 					<h4>{{ notary_name }} {{ season_clean }} Addresses & Balances</h4>
 				</div>
 				<div class="card-body">
-					<table id="balances_table" class="table table-striped table-bordered kmd_ui_light4">
+					<table id="balances_table" class="table table-striped table-bordered">
 						<thead>
 							<tr>
 								<th data-data="chain">Chain</th>
@@ -412,7 +412,7 @@
 			            	} else if (icon == "coquicash") {
 			            		icon = "coqui"
 			            	}
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2 mr-auto' style='font-size: 0.9em;'><img height='16px' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' /><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'>"+oData.chain+"</a></span>");
+				            $(nTd).html("<span class='badge p-2 mr-auto' style='font-size: 0.9em;'><img height='16px' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' /><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'>"+oData.chain+"</a></span>");
 				        }
         			},
         			{
@@ -431,20 +431,20 @@
 			            	else {
 			            		color = "#000";	
 			            	}
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
+				            $(nTd).html("<span class='badge p-2' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
 			        	}
 			        },
         			{
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (!(explorers.hasOwnProperty(oData.chain))) {
-			            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+oData.address+"</span>");	
+			            		$(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.address+"</span>");	
 			            	}
 			            	else if (explorers[oData.chain][0].search("cryptoid") > -1) {
-			            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='"+explorers[oData.chain][0]+'address.dws?'+oData.address+".htm'>"+oData.address+"</a></span>");	
+			            		$(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='"+explorers[oData.chain][0]+'address.dws?'+oData.address+".htm'>"+oData.address+"</a></span>");	
 			            	}
 			            	else {
-			            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='"+explorers[oData.chain][0]+'address/'+oData.address+"'>"+oData.address+"</a></span>");	
+			            		$(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='"+explorers[oData.chain][0]+'address/'+oData.address+"'>"+oData.address+"</a></span>");	
 			            	}
 			            }
 			        },
@@ -452,7 +452,7 @@
 			            "data": "balance",
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+oData.balance+"</a></span>");
+				            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.balance+"</a></span>");
 				        }
 			        },
         			{
@@ -474,7 +474,7 @@
 						    } else {
 						    	timesince = days+" days, "+hours+" hrs"
 						    }
-		            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+timesince+"</span>");
+		            		$(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+timesince+"</span>");
 				        }
 			        }		
         		]
@@ -512,7 +512,7 @@
 			            	else {
 			            		color = "#000";	
 			            	}
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='background-color:"+color+" !important;'>"+oData.ntx_server.replace(/_/g, " ")+"</span>");
+				            $(nTd).html("<span class='badge p-2' style='background-color:"+color+" !important;'>"+oData.ntx_server.replace(/_/g, " ")+"</span>");
 			        	}
 			        },
         			{
@@ -520,11 +520,11 @@
 			            "targets": 5,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.ntx_chain == "BTC") {
-					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='https://www.blockchain.com/btc/block/"+oData.ntx_block+"'>"+oData.ntx_block+"</a></span>");
+					            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='https://www.blockchain.com/btc/block/"+oData.ntx_block+"'>"+oData.ntx_block+"</a></span>");
    			            	} else if (oData.ntx_chain == "LTC") {
-					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='https://litecoinblockexplorer.net/block/"+oData.ntx_block+"'>"+oData.ntx_block+"</a></span>");
+					            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='https://litecoinblockexplorer.net/block/"+oData.ntx_block+"'>"+oData.ntx_block+"</a></span>");
    			            	} else {
-					            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='http://komodod.com/b/"+oData.ntx_block+"'>"+oData.ntx_block+"</a></span>");
+					            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='http://komodod.com/b/"+oData.ntx_block+"'>"+oData.ntx_block+"</a></span>");
 			            	}
 				        }
 			        },
@@ -532,7 +532,7 @@
 			            "data": 'ntx_time',
 			            "targets": 6,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+oData.ntx_time+"</span>");
+			            	$(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.ntx_time+"</span>");
 				        }
 			        }
         		]

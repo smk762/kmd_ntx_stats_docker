@@ -4,11 +4,11 @@
 <!--
 	<div class="row m-4">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-				<a href="#main"><span class='badge kmd_ui_dark1_bg p-2'>Main Server</span></a>
+			<h4 class="card text-center  kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#main"><span class='badge p-2'>Main Server</span></a>
 			</h4>
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-				<a href="#third"><span class='badge kmd_ui_dark1_bg p-2'>Third Party Server</span></a>
+			<h4 class="card text-center  kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#third"><span class='badge p-2'>Third Party Server</span></a>
 			</h4>
 		</div>
 	</div>
@@ -23,7 +23,7 @@
 		<div class="card-body">
 			<div class="row m-1 d-flex justify-content-between">
             	{% for coin in coins %}
-            	<div class="card kmd_ui_dark3_bg kmd_ui_light3 col-2 px-0 mx-1">
+            	<div class="card  kmd_ui_light3 col-2 px-0 mx-1">
             		<a href="//{{ request.get_host }}/coin_profile/{{ coin }}">
 
 	            		<div class="p-2">
@@ -38,7 +38,7 @@
 						{% endfor %}
 						</div>
 					</a>	
-					<div class="card-body kmd_ui_dark4_bg" style="padding: 1rem; ">
+					<div class="card-body " style="padding: 1rem; ">
 						<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
 	            			<a href="//{{ request.get_host }}/coin_profile/{{ coin }}">
 	            				{{ coin }}
