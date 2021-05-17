@@ -51,7 +51,7 @@
 		<div class="card-body">
 			<div class="row m-1 d-flex justify-content-between">	
             	{% for node in info.nodes %}
-            	<div class="card kmd_ui_dark3_bg kmd_ui_light3 col-2 px-0 mx-1">
+            	<div class="card  kmd_ui_light3 col-2 px-0 mx-1">
             		<a href="//{{ request.get_host }}/notary_profile/{{ node }}/?season={{ season }}">
 	            		<div class="p-1 m-auto">
 						{% for nn, site_links in nn_social.items %}
@@ -65,7 +65,7 @@
 						{% endfor %}
 						</div>
 					</a>	
-					<div class="card-body kmd_ui_dark4_bg" style="padding: 1rem; ">
+					<div class="card-body " style="padding: 1rem; ">
 						<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
 	            			<a href="//{{ request.get_host }}/notary_profile/{{ node }}/?season={{ season }}">
 	            				{{ node }}

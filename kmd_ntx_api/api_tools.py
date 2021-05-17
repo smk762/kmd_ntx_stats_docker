@@ -148,6 +148,7 @@ def get_kmd_rewards(request):
                     url = f"https://kmd.explorer.dexstats.info/insight-api-komodo/tx/{utxo['txid']}"
                     resp = requests.get(url).json()
                     locktime = resp['locktime']
+                    utxo_age = int(kmd_tiptime - locktime)
                     coinage = math.floor((kmd_tiptime-locktime)/ONE_HOUR)
                     if coinage >= ONE_HOUR and locktime >= LOCKTIME_THRESHOLD:
                         limit = ONE_YEAR
@@ -161,6 +162,7 @@ def get_kmd_rewards(request):
                             utxo['txid']:{
                                 "locktime":locktime,
                                 "utxo_value":utxo['amount'],
+                                "utxo_age":utxo_age,
                                 "sat_rewards":utxo_rewards,
                                 "kmd_rewards":utxo_rewards/100000000,
                                 "satoshis":utxo['satoshis'],

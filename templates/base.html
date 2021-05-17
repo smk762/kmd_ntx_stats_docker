@@ -48,10 +48,11 @@
             */
             body {
                 font-family: 'Rubik';
-                background-color:#101721;
+                background-color:#101721 !important;
+                color: #b4b4b4 !important;
             }
-            .body_bg {
-                 background-color: #101721 !important;
+            .badge i:hover {
+                color:#289689;
             }
             i { 
                 color:#82F4E6;
@@ -67,7 +68,7 @@
                 color:#82F4E6  !important;
             }
             a:hover {
-                color:#49cc84 !important;
+                color:#08f2ff !important;
             }
             div#sidebar: {
                 border-right: 1px solid #000 !important;
@@ -75,7 +76,7 @@
             }
             table {
                 text-align: center !important;
-                border: solid 1px #131313 !important;
+                border: solid 1px #3a3a3a !important;
                 margin: 0 !important;
                 min-width: 50em;
                 min-width: 72em;
@@ -98,25 +99,81 @@
             }
             td {
                 font-family: 'Courier';
+                color:#b9b5b5;
                 vertical-align: middle !important;
                 padding-top: 0.4em !important;
                 padding-bottom: 0.4em !important;
             }
             input, select {
-                background-color:#233548 !important;
-                border: solid 1px #131313 !important;
-                color:#FFF !important;
+                background-color:#1e3348 !important;
+                border: solid 1px #3a3a3a !important;
+                color: #b9b5b5 !important;
             }
             h2 {
                 margin-top: 0.25em !important;
                 margin-bottom: 0.75em !important;
             }
+            .input-group-prepend, .input-group-append {
+            }
+            .input-group-text {
+                line-height: 1em;
+                color: #b9b5b5 !important;
+                border: solid grey 1px !important;
+                background-color:#172331 !important;
+            }
+            .append-btn {
+                line-height: 1em;
+                color: #b9b5b5 !important;
+                border: solid grey 1px !important;
+                background-color:#172331 !important;
+            }
+            .append-btn:hover {
+                line-height: 1em;
+                color: #eee !important;
+                border: solid grey 1px !important;
+                background-color:#0957a5 !important;
+            }
+            .append-btn:active {
+                line-height: 1em;
+                color: #eee !important;
+                border: solid grey 1px !important;
+                background-color:#0957a5 !important;
+            }
+            .append-btn:focus {
+                outline: #183353 !important;
+            }
             .list-group li div {
                 min-height: 4em !important;
+                background-color:#1d416d !important;
             }
             .list-group-item {
                 padding-top: 0.25em !important;
                 padding-bottom: 0.25em !important;
+            }
+            .params-field {
+                background-color: #1e3348;
+                border: solid grey 1px !important;
+                font-size: 0.8em;
+                max-width:600px;
+            }
+            .leader-badge {
+                width:16%;
+                border: solid 1px #5a5a5a;
+                background-color: #183353 !important;
+                display: inline-block;
+                padding: 0.25em 0.4em;
+                font-size: 75%;
+                font-weight: 700;
+                line-height: 1;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: baseline;
+                border-radius: 0.25rem;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            }
+            .coin-params-field {
+                background-color: #1e3348;
+                border: solid grey 1px !important;
             }
             .ar_region i {
                 color: #3C819D !important;
@@ -165,7 +222,12 @@
             }
             .card-header {
                /* background-color:#182331 !important; */
-                background-color:#26456b !important;                
+                background-color:#183353 !important;
+            }
+            .card-footer {
+               /* background-color:#182331 !important; */
+                background-color:#183353 !important;
+                border: none;
             }
             .card-body {
                 /* background-color:#1a2939 !important; */
@@ -173,7 +235,7 @@
             }
             .card {
                 background: transparent;
-                border: solid 1px #5a5a5a !important;
+                border: solid 1px #3a3a3a !important;
                 box-shadow: none !important;
                 margin-bottom: 1.5em !important;
                 margin-top: 1.5em !important;
@@ -286,7 +348,7 @@
                 color:#E6E6E6 !important;   
             }
             .kmd_ui_light4 {
-                color:#FFFFFF !important;   
+                color:#b9b5b5 !important;   
             }
 
             .kmd_ui_dark1_bg {
@@ -312,15 +374,18 @@
                 background-color:#E6E6E6 !important;    
             }
             .kmd_ui_light4_bg {
-                background-color:#FFFFFF !important;    
+                background-color:#b9b5b5 !important;    
             }
 
 
             .c-sidebar i {
                 font-size: 28px;
             }
+            .c-sidebar-nav {
+                background-color: #172331;                
+            }
             .c-sidebar-nav-dropdown-toggle:hover, .c-sidebar-nav-link:hover {
-                background-color:#26456B !important;
+                background-color:#183353 !important;
             }
             .c-sidebar-nav-link {
                 padding-top:0 !important;
@@ -328,6 +393,7 @@
             }
 
             .c-header {
+                background-color: #172331 !important;
                 border-bottom: 1px solid #000 !important;
             }
             .c-header i {
@@ -335,6 +401,7 @@
                 margin: 0;
             }
             .c-footer {
+                background-color: #172331 !important;
                 border-top: 1px solid #000 !important;
             }
             .c-sidebar-nav-title {
@@ -342,6 +409,15 @@
             }
             .c-sidebar-brand {
                 border-bottom: 1px solid #000 !important;
+                background-color: #121c27 !important;
+            }
+            .c-sidebar-minimizer {
+                border-right: 1px solid #000 !important;
+                background-color: #172331 !important;
+            }
+            .c-sidebar-minimizer:hover {
+                border-right: 1px solid #000 !important;
+                background-color: #101722 !important;
             }
 
             .dropdown-toggle:hover {
@@ -468,7 +544,7 @@
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                       <span aria-hidden="true">&times;</span>
                                     </button>
-                                    This domain is now being used for development. Update your bookmarks to link to <span class='badge kmd_ui_dark1_bg p-2'><a href="https://stats.kmd.io">stats.kmd.io</a></span>
+                                    This domain is now being used for development. Update your bookmarks to link to <span class='badge p-2'><a href="https://stats.kmd.io">stats.kmd.io</a></span>
                                   </div>                    
                             {% endif %}
                             <!-- Main content here -->
