@@ -113,23 +113,31 @@ paths:
         example: KMD
       - name: mm2_active
         in: query
+        description: "Set 1 for mm2 compatible, or 0 for not mm2 compatible"
         required: false
         style: form
         explode: true
         schema:
           type: string
+          enum:
+          - "0"
+          - "1"
         example: "1"
       - name: dpow_active
         in: query
+        description: "Set 1 for dPoW active, or 0 for not dPoW active"
         required: false
         style: form
         explode: true
         schema:
           type: string
+          enum:
+          - "0"
+          - "1"
         example: "1"
       responses:
         "200":
-          description: Auto generated using Swagger Inspector
+          description: A variety of information about coins
           content:
             application/json:
               schema:
@@ -190,12 +198,12 @@ paths:
     - url: http://stats.kmd.io
   /api/info/dpow_server_coins/:
     get:
-      description: Auto generated using Swagger Inspector
+      description: JSON dict of season dPoW coins for each server
       parameters:
       - name: server
         in: query
         description: dPoW server (Main or Third_Party)
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -207,7 +215,7 @@ paths:
       - name: season
         in: query
         description: Notary Node Season
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -234,7 +242,7 @@ paths:
         example: "1592246800"
       responses:
         "200":
-          description: Auto generated using Swagger Inspector
+          description: dPoW Coins
           content:
             application/json:
               schema:
@@ -370,38 +378,39 @@ paths:
     - url: http://stats.kmd.io
   /api/info/mined_count_daily/:
     get:
-      description: Auto generated using Swagger Inspector
+      description: KMD count and sum value of blocks mined for calendar date
       parameters:
       - name: mined_date
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
           type: string
-        example: 2021-05-14
+        example: 2021-05-14T00:00:00.000+0000
       responses:
         "200":
-          description: Auto generated using Swagger Inspector
+          description: KMD count and sum value of blocks mined for calendar date
       servers:
       - url: http://stats.kmd.io
     servers:
     - url: http://stats.kmd.io
   /api/info/notarised_chain_daily/:
     get:
-      description: Auto generated using Swagger Inspector
+      description: Count of Notarisations for each chain on specific calendar date
       parameters:
       - name: notarised_date
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
           type: string
-        example: 2021-03-16
+        example: 2021-03-16T00:00:00.000+0000
       responses:
         "200":
-          description: Auto generated using Swagger Inspector
+          description: Count of Notarisations for each chain on specific calendar
+            date
           content:
             application/json:
               schema:
@@ -426,54 +435,57 @@ paths:
     - url: http://stats.kmd.io
   /api/info/notarised_count_daily/:
     get:
-      description: Auto generated using Swagger Inspector
+      description: "Data about notarisations on a calendar date, grouped by Notary\
+        \ Node"
       parameters:
       - name: notarised_date
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
           type: string
-        example: 2021-05-10
+        example: 2021-05-10T00:00:00.000+0000
       responses:
         "200":
-          description: Auto generated using Swagger Inspector
+          description: "Data about notarisations on a calendar date, grouped by Notary\
+            \ Node"
       servers:
       - url: http://stats.kmd.io
     servers:
     - url: http://stats.kmd.io
   /api/tools/addr_from_base58/:
     get:
-      description: Auto generated using Swagger Inspector
+      description: "Returns an address calculated from supplied pubkey, wifType, pubType\
+        \ and p2shType"
       parameters:
       - name: wiftype
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
-          type: string
-        example: "188"
+          type: integer
+        example: 188
       - name: p2shtype
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
-          type: string
-        example: "85"
+          type: integer
+        example: 85
       - name: pubtype
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
-          type: string
-        example: "60"
+          type: integer
+        example: 60
       - name: pubkey
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -481,7 +493,8 @@ paths:
         example: 029912212d370ee0fb4d38eefd8bfcd8ab04e2c3b0354020789c29ddf2a35c72d6
       responses:
         "200":
-          description: Auto generated using Swagger Inspector
+          description: "Address calculated from supplied pubkey, wifType, pubType\
+            \ and p2shType"
           content:
             application/json:
               schema:
@@ -497,11 +510,11 @@ paths:
     - url: http://stats.kmd.io
   /api/tools/address_from_pubkey/:
     get:
-      description: Auto generated using Swagger Inspector
+      description: Returns address calculated from supplied pubkey and coin ticker
       parameters:
       - name: coin
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -509,7 +522,7 @@ paths:
         example: BTC
       - name: pubkey
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -517,7 +530,7 @@ paths:
         example: 03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828
       responses:
         "200":
-          description: Auto generated using Swagger Inspector
+          description: Address calculated from supplied pubkey and coin ticker
           content:
             application/json:
               schema:
@@ -532,11 +545,11 @@ paths:
     - url: http://stats.kmd.io
   /api/tools/decode_opreturn/:
     get:
-      description: Auto generated using Swagger Inspector
+      description: Returns data decoded from supplied notarisation OP_RETURN
       parameters:
       - name: OP_RETURN
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -544,7 +557,7 @@ paths:
         example: fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400
       responses:
         "200":
-          description: Auto generated using Swagger Inspector
+          description: Data decoded from supplied notarisation OP_RETURN
           content:
             application/json:
               schema:
@@ -565,7 +578,7 @@ paths:
       - name: server
         in: query
         description: dPoW server (Main or Third_Party)
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -577,7 +590,7 @@ paths:
       - name: notary
         in: query
         description: Name of Notary Node
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -586,7 +599,7 @@ paths:
       - name: chain
         in: query
         description: Chain Ticker of dPoW active coin
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -595,7 +608,7 @@ paths:
       - name: season
         in: query
         description: Notary Node Season
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -606,18 +619,18 @@ paths:
         example: Season_4
       responses:
         "200":
-          description: Auto generated using Swagger Inspector
+          description: Summary of a Notary Node's UTXOs for a chain
       servers:
       - url: http://stats.kmd.io
     servers:
     - url: http://stats.kmd.io
   /api/tools/kmd_rewards/:
     get:
-      description: Auto generated using Swagger Inspector
+      description: Returns pending KMD rewards for supplied address
       parameters:
       - name: address
         in: query
-        required: false
+        required: true
         style: form
         explode: true
         schema:
@@ -625,7 +638,7 @@ paths:
         example: RCyANUW2H5985zk8p6NHJfPyNBXnTVzGDh
       responses:
         "200":
-          description: Auto generated using Swagger Inspector
+          description: Pending KMD rewards for supplied address
           content:
             application/json:
               schema:
@@ -655,19 +668,7 @@ components:
           items:
             type: string
         results:
-          type: object
-          properties:
-            Season_4:
-              type: object
-              properties:
-                alien_AR:
-                  type: object
-                  properties:
-                    KMD:
-                      type: object
-                      properties:
-                        RVrtLPvKrszs7zSggTsXPYsbxc5SwALiEN:
-                          type: string
+          $ref: '#/components/schemas/inline_response_200_results'
     inline_response_200_1:
       type: object
       properties:
@@ -678,17 +679,7 @@ components:
           items:
             type: string
         results:
-          type: object
-          properties:
-            KMD:
-              type: object
-              properties:
-                wiftype:
-                  type: integer
-                p2shtype:
-                  type: integer
-                pubtype:
-                  type: integer
+          $ref: '#/components/schemas/inline_response_200_1_results'
     inline_response_200_2:
       type: object
       properties:
@@ -699,93 +690,7 @@ components:
           items:
             type: string
         results:
-          type: object
-          properties:
-            KMD:
-              type: object
-              properties:
-                mm2_compatible:
-                  type: integer
-                dpow_tenure:
-                  type: object
-                  properties:
-                    Season_4:
-                      type: object
-                      properties:
-                        KMD:
-                          type: object
-                          properties:
-                            start_time:
-                              type: integer
-                            end_time:
-                              type: integer
-                electrums_ssl:
-                  type: array
-                  items:
-                    type: string
-                electrums:
-                  type: array
-                  items:
-                    type: string
-                explorers:
-                  type: array
-                  items:
-                    type: string
-                dpow:
-                  type: object
-                  properties:
-                    server:
-                      type: string
-                    src:
-                      type: string
-                    version:
-                      type: string
-                coins_info:
-                  type: object
-                  properties:
-                    cli:
-                      type: string
-                    fname:
-                      type: string
-                    conf_path:
-                      type: string
-                    launch_params:
-                      type: string
-                    icon:
-                      type: string
-                    wiftype:
-                      type: integer
-                    rpcport:
-                      type: integer
-                    pubtype:
-                      type: integer
-                    required_confirmations:
-                      type: integer
-                    txversion:
-                      type: integer
-                    protocol:
-                      type: object
-                      properties:
-                        type:
-                          type: string
-                    mm2:
-                      type: integer
-                    avg_blocktime:
-                      type: integer
-                    name:
-                      type: string
-                    txfee:
-                      type: integer
-                    p2shtype:
-                      type: integer
-                    overwintered:
-                      type: integer
-                    requires_notarization:
-                      type: boolean
-                    coin:
-                      type: string
-                dpow_active:
-                  type: integer
+          $ref: '#/components/schemas/inline_response_200_2_results'
     inline_response_200_3:
       type: object
       properties:
@@ -796,10 +701,7 @@ components:
           items:
             type: string
         results:
-          type: object
-          properties:
-            AYA:
-              type: string
+          $ref: '#/components/schemas/inline_response_200_3_results'
     inline_response_200_4:
       type: object
       properties:
@@ -823,12 +725,7 @@ components:
           items:
             type: string
         results:
-          type: object
-          properties:
-            BOTS:
-              type: array
-              items:
-                type: string
+          $ref: '#/components/schemas/inline_response_200_5_results'
     inline_response_200_6:
       type: object
       properties:
@@ -839,12 +736,7 @@ components:
           items:
             type: string
         results:
-          type: object
-          properties:
-            MORTY:
-              type: array
-              items:
-                type: string
+          $ref: '#/components/schemas/inline_response_200_6_results'
     inline_response_200_7:
       type: object
       properties:
@@ -855,12 +747,7 @@ components:
           items:
             type: string
         results:
-          type: object
-          properties:
-            RICK:
-              type: array
-              items:
-                type: string
+          $ref: '#/components/schemas/inline_response_200_7_results'
     inline_response_200_8:
       type: object
       properties:
@@ -871,10 +758,7 @@ components:
           items:
             type: string
         results:
-          type: object
-          properties:
-            PIRATE:
-              type: string
+          $ref: '#/components/schemas/inline_response_200_8_results'
     inline_response_200_9:
       type: object
       properties:
@@ -889,83 +773,7 @@ components:
           items:
             type: string
         results:
-          type: object
-          properties:
-            "2021-03-16":
-              type: object
-              properties:
-                CRYPTO:
-                  type: integer
-                MSHARK:
-                  type: integer
-                COQUICASH:
-                  type: integer
-                NINJA:
-                  type: integer
-                AYA:
-                  type: integer
-                MESH:
-                  type: integer
-                ILN:
-                  type: integer
-                STBL:
-                  type: integer
-                THC:
-                  type: integer
-                PBC:
-                  type: integer
-                GLEEC:
-                  type: integer
-                BOTS:
-                  type: integer
-                CHIPS:
-                  type: integer
-                REVS:
-                  type: integer
-                EMC2:
-                  type: integer
-                MORTY:
-                  type: integer
-                WLC21:
-                  type: integer
-                VRSC:
-                  type: integer
-                ZILLA:
-                  type: integer
-                BTCH:
-                  type: integer
-                KOIN:
-                  type: integer
-                SUPERNET:
-                  type: integer
-                CCL:
-                  type: integer
-                HODL:
-                  type: integer
-                BET:
-                  type: integer
-                BTC:
-                  type: integer
-                OOT:
-                  type: integer
-                DEX:
-                  type: integer
-                MCL:
-                  type: integer
-                PIRATE:
-                  type: integer
-                AXO:
-                  type: integer
-                RICK:
-                  type: integer
-                PANGEA:
-                  type: integer
-                MGW:
-                  type: integer
-                PGT:
-                  type: integer
-                JUMBLR:
-                  type: integer
+          $ref: '#/components/schemas/inline_response_200_9_results'
     inline_response_200_10:
       type: object
       properties:
@@ -1011,22 +819,273 @@ components:
         eligible_utxo_count:
           type: integer
         utxos:
-          type: object
-          properties:
-            c76f553497b558cf3bcdffe77d8381922b68fa85e64ec38e88a5ce477efca32f:
-              type: object
-              properties:
-                locktime:
-                  type: integer
-                utxo_value:
-                  type: number
-                kmd_rewards:
-                  type: number
-                sat_rewards:
-                  type: number
-                block_height:
-                  type: integer
-                satoshis:
-                  type: number
+          $ref: '#/components/schemas/inline_response_200_13_utxos'
         total_rewards:
           type: number
+    inline_response_200_results_Season_4_alien_AR_KMD:
+      type: object
+      properties:
+        RVrtLPvKrszs7zSggTsXPYsbxc5SwALiEN:
+          type: string
+    inline_response_200_results_Season_4_alien_AR:
+      type: object
+      properties:
+        KMD:
+          $ref: '#/components/schemas/inline_response_200_results_Season_4_alien_AR_KMD'
+    inline_response_200_results_Season_4:
+      type: object
+      properties:
+        alien_AR:
+          $ref: '#/components/schemas/inline_response_200_results_Season_4_alien_AR'
+    inline_response_200_results:
+      type: object
+      properties:
+        Season_4:
+          $ref: '#/components/schemas/inline_response_200_results_Season_4'
+    inline_response_200_1_results_KMD:
+      type: object
+      properties:
+        wiftype:
+          type: integer
+        p2shtype:
+          type: integer
+        pubtype:
+          type: integer
+    inline_response_200_1_results:
+      type: object
+      properties:
+        KMD:
+          $ref: '#/components/schemas/inline_response_200_1_results_KMD'
+    inline_response_200_2_results_KMD_dpow_tenure_Season_4_KMD:
+      type: object
+      properties:
+        start_time:
+          type: integer
+        end_time:
+          type: integer
+    inline_response_200_2_results_KMD_dpow_tenure_Season_4:
+      type: object
+      properties:
+        KMD:
+          $ref: '#/components/schemas/inline_response_200_2_results_KMD_dpow_tenure_Season_4_KMD'
+    inline_response_200_2_results_KMD_dpow_tenure:
+      type: object
+      properties:
+        Season_4:
+          $ref: '#/components/schemas/inline_response_200_2_results_KMD_dpow_tenure_Season_4'
+    inline_response_200_2_results_KMD_dpow:
+      type: object
+      properties:
+        server:
+          type: string
+        src:
+          type: string
+        version:
+          type: string
+    inline_response_200_2_results_KMD_coins_info_protocol:
+      type: object
+      properties:
+        type:
+          type: string
+    inline_response_200_2_results_KMD_coins_info:
+      type: object
+      properties:
+        cli:
+          type: string
+        fname:
+          type: string
+        conf_path:
+          type: string
+        launch_params:
+          type: string
+        icon:
+          type: string
+        wiftype:
+          type: integer
+        rpcport:
+          type: integer
+        pubtype:
+          type: integer
+        required_confirmations:
+          type: integer
+        txversion:
+          type: integer
+        protocol:
+          $ref: '#/components/schemas/inline_response_200_2_results_KMD_coins_info_protocol'
+        mm2:
+          type: integer
+        avg_blocktime:
+          type: integer
+        name:
+          type: string
+        txfee:
+          type: integer
+        p2shtype:
+          type: integer
+        overwintered:
+          type: integer
+        requires_notarization:
+          type: boolean
+        coin:
+          type: string
+    inline_response_200_2_results_KMD:
+      type: object
+      properties:
+        mm2_compatible:
+          type: integer
+        dpow_tenure:
+          $ref: '#/components/schemas/inline_response_200_2_results_KMD_dpow_tenure'
+        electrums_ssl:
+          type: array
+          items:
+            type: string
+        electrums:
+          type: array
+          items:
+            type: string
+        explorers:
+          type: array
+          items:
+            type: string
+        dpow:
+          $ref: '#/components/schemas/inline_response_200_2_results_KMD_dpow'
+        coins_info:
+          $ref: '#/components/schemas/inline_response_200_2_results_KMD_coins_info'
+        dpow_active:
+          type: integer
+    inline_response_200_2_results:
+      type: object
+      properties:
+        KMD:
+          $ref: '#/components/schemas/inline_response_200_2_results_KMD'
+    inline_response_200_3_results:
+      type: object
+      properties:
+        AYA:
+          type: string
+    inline_response_200_5_results:
+      type: object
+      properties:
+        BOTS:
+          type: array
+          items:
+            type: string
+    inline_response_200_6_results:
+      type: object
+      properties:
+        MORTY:
+          type: array
+          items:
+            type: string
+    inline_response_200_7_results:
+      type: object
+      properties:
+        RICK:
+          type: array
+          items:
+            type: string
+    inline_response_200_8_results:
+      type: object
+      properties:
+        PIRATE:
+          type: string
+    inline_response_200_9_results_20210316:
+      type: object
+      properties:
+        CRYPTO:
+          type: integer
+        MSHARK:
+          type: integer
+        COQUICASH:
+          type: integer
+        NINJA:
+          type: integer
+        AYA:
+          type: integer
+        MESH:
+          type: integer
+        ILN:
+          type: integer
+        STBL:
+          type: integer
+        THC:
+          type: integer
+        PBC:
+          type: integer
+        GLEEC:
+          type: integer
+        BOTS:
+          type: integer
+        CHIPS:
+          type: integer
+        REVS:
+          type: integer
+        EMC2:
+          type: integer
+        MORTY:
+          type: integer
+        WLC21:
+          type: integer
+        VRSC:
+          type: integer
+        ZILLA:
+          type: integer
+        BTCH:
+          type: integer
+        KOIN:
+          type: integer
+        SUPERNET:
+          type: integer
+        CCL:
+          type: integer
+        HODL:
+          type: integer
+        BET:
+          type: integer
+        BTC:
+          type: integer
+        OOT:
+          type: integer
+        DEX:
+          type: integer
+        MCL:
+          type: integer
+        PIRATE:
+          type: integer
+        AXO:
+          type: integer
+        RICK:
+          type: integer
+        PANGEA:
+          type: integer
+        MGW:
+          type: integer
+        PGT:
+          type: integer
+        JUMBLR:
+          type: integer
+    inline_response_200_9_results:
+      type: object
+      properties:
+        "2021-03-16":
+          $ref: '#/components/schemas/inline_response_200_9_results_20210316'
+    inline_response_200_13_utxos_c76f553497b558cf3bcdffe77d8381922b68fa85e64ec38e88a5ce477efca32f:
+      type: object
+      properties:
+        locktime:
+          type: integer
+        utxo_value:
+          type: number
+        kmd_rewards:
+          type: number
+        sat_rewards:
+          type: number
+        block_height:
+          type: integer
+        satoshis:
+          type: number
+    inline_response_200_13_utxos:
+      type: object
+      properties:
+        c76f553497b558cf3bcdffe77d8381922b68fa85e64ec38e88a5ce477efca32f:
+          $ref: '#/components/schemas/inline_response_200_13_utxos_c76f553497b558cf3bcdffe77d8381922b68fa85e64ec38e88a5ce477efca32f'
