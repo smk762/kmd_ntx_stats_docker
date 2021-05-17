@@ -9,7 +9,7 @@
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 							    Notarisations in the Last 24hrs
-							    <span class="badge p-2 kmd_ui_dark1_bg" style="font-size: 1.1em;">
+							    <span class="badge p-2 " style="font-size: 1.1em;">
 							    	{{ chain_ntx_summary.num_chain_ntx_24hr }}
 							    </span>
 							</div>
@@ -17,7 +17,7 @@
 					 	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 						    	Notarisations This Season
-							    <span class="badge p-2 kmd_ui_dark1_bg" style="font-size: 1.1em;">
+							    <span class="badge p-2 " style="font-size: 1.1em;">
 							    	{{ chain_ntx_summary.num_chain_ntx_season }}
 							    </span>
 							</div>									    
@@ -25,7 +25,7 @@
 					  	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 							    Time Since Last Notarisation
-							    <span class="badge p-2 kmd_ui_dark1_bg" style="font-size: 1.1em;">
+							    <span class="badge p-2 " style="font-size: 1.1em;">
 							    	<a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">{{ chain_ntx_summary.time_since_ntx }}</a>
 							    </span>
 							</div>
@@ -140,18 +140,18 @@
 				</div>
 			</div>
 			<div class="card text-center kmd_ui_light1 col-4 px-0 mt-auto shadow-none" style="border:none !important;">
-				<div class="card-body kmd_ui_dark2_bg p-0" style="background-color: #101721 !important;">
+				<div class="card-body  p-0" style="background-color: #101721 !important;">
 					<ul class="list-group">
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 							<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 								{% if chain != 'KMD' %}
 							    	Last Notarisation Block (KMD)
-								    <span class="badge p-2 kmd_ui_dark1_bg" style="font-size: 1.1em;">
+								    <span class="badge p-2 " style="font-size: 1.1em;">
 								    	<a href='https://komodod.com/b/{{ chain_ntx_summary.last_ntx_block }}'>{{ chain_ntx_summary.last_ntx_block }}</a>
 								    </span>
 							    {% else %}
 							    	Last Notarisation Block (LTC)
-								    <span class="badge p-2 kmd_ui_dark1_bg" style="font-size: 1.1em;">
+								    <span class="badge p-2 " style="font-size: 1.1em;">
 								    	<a href='https://chainz.cryptoid.info/ltc/block.dws?{{ chain_ntx_summary.last_ntx_block }}'>{{ chain_ntx_summary.last_ntx_block }}</a>
 								    </span>
 							    {% endif %}
@@ -160,7 +160,7 @@
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 							<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 							    Last Notarisation Block ({{ chain }})
-							    <span class="badge p-2 kmd_ui_dark1_bg" style="font-size: 1.1em;">
+							    <span class="badge p-2 " style="font-size: 1.1em;">
 							    	<a href='{{ coins_data.explorers.0 }}block-index/{{ chain_ntx_summary.last_ntx_ac_block }}'>{{ chain_ntx_summary.last_ntx_ac_block }}</a>
 							    </span>
 							</div>
@@ -168,7 +168,7 @@
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 							<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
 							    Lag
-							    <span class="badge p-2 kmd_ui_dark1_bg" style="font-size: 1.1em;">
+							    <span class="badge p-2 " style="font-size: 1.1em;">
 							    	{{ chain_ntx_summary.ntx_lag }}
 							    </span>
 							</div>
@@ -178,13 +178,13 @@
 			</div>
 		</div>
 	</div>	
-	<div class="row mx-auto" style="color:#FFF;">
+	<div class="row mx-auto" style="color: #b9b5b5;">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card text-center kmd_ui_light3" style="border:none !important; background-color: #101721 !important; box-shadow: none; margin-top:0 !important;">
 		    	<h2>{{ season_clean }} Top Region Notarisation Scores</h2>
 			    <div class="d-flex justify-content-between align-items-center">
 				    {% for region, data in top_coin_notarisers.items %}
-					    <div class="badge" style="width:16%; background-color: #26456B !important;">
+					    <div class="leader-badge">
 					    	{% if region == 'AR' %}
 								<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
 									<a href="http://{{ request.get_host }}/ntx_scoreboard/?season={{ season }}#{{ region }}_table">Asia and Russia</a>
@@ -229,56 +229,56 @@
 			</div>
 		</div>
 	</div>
-	<div class="row col-12 mx-auto my-2" style="color:#FFF;">
-		<div class="input-group mb-1 kmd_ui_dark1_bg">
-		    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border: solid grey 1px !important;">
-		        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
+		<div class="input-group mb-1 ">
+		    <div class="input-group-prepend p-0 col-2  text-center">
+		        <span class="input-group-text col-12 " style="border: none; color: #b9b5b5;">
 		        	Launch Params
 				</span>
 		    </div>
-		    <input type="text" class="form-control col-10 kmd_ui_dark1_bg" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.launch_params }}" value="{{ coins_data.coins_info.launch_params }}" readonly id="{{ chain }}_params">
-		    <div class="input-group-append p-0 kmd_ui_dark4_bg" style="border: solid grey 1px !important;">
-				<button class="btn" data-clipboard-target="#{{ chain }}_params" style="line-height: 1em;">
+		    <input type="text" class="form-control col-10 " style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.launch_params }}" value="{{ coins_data.coins_info.launch_params }}" readonly id="{{ chain }}_params">
+		    <div class="input-group-append p-0">
+				<button class="append-btn" data-clipboard-target="#{{ chain }}_params" style="line-height: 1em;">
 				    <i class="cil-copy"></i>
 				</button>
 		    </div>
 		</div>
 
-		<div class="input-group mb-1 kmd_ui_dark1_bg">
-		    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border: solid grey 1px !important;">
-		        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+		<div class="input-group mb-1 ">
+		    <div class="input-group-prepend p-0 col-2  text-center">
+		        <span class="input-group-text col-12 " style="border: none; color: #b9b5b5;">
 		        	CLI
 				</span>
 		    </div>
-		    <input type="text" class="form-control col-10 kmd_ui_dark1_bg" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.cli }}" value="{{ coins_data.coins_info.cli }}" readonly id="{{ chain }}_cli">
-		    <div class="input-group-append p-0 kmd_ui_dark4_bg" style="border: solid grey 1px !important;">
-				<button class="btn" data-clipboard-target="#{{ chain }}_cli" style="line-height: 1em;">
+		    <input type="text" class="form-control col-10 " style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.cli }}" value="{{ coins_data.coins_info.cli }}" readonly id="{{ chain }}_cli">
+		    <div class="input-group-append p-0">
+				<button class="append-btn" data-clipboard-target="#{{ chain }}_cli" style="line-height: 1em;">
 				    <i class="cil-copy"></i>
 				</button>
 		    </div>
 		</div>
 
-		<div class="input-group mb-1 kmd_ui_dark1_bg">
-		    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border: solid grey 1px !important;">
-		        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+		<div class="input-group mb-1 ">
+		    <div class="input-group-prepend p-0 col-2  text-center">
+		        <span class="input-group-text col-12" style="border: none; color: #b9b5b5;">
 		        	Config
 				</span>
 		    </div>
-		    <input type="text" class="form-control col-10 kmd_ui_dark1_bg" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.conf_path }}" value="{{ coins_data.coins_info.conf_path }}" readonly id="{{ chain }}_conf">
-		    <div class="input-group-append p-0 kmd_ui_dark4_bg" style="border: solid grey 1px !important;">
-				<button class="btn" data-clipboard-target="#{{ chain }}_conf" style="line-height: 1em;">
+		    <input type="text" class="form-control col-10" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.conf_path }}" value="{{ coins_data.coins_info.conf_path }}" readonly id="{{ chain }}_conf">
+		    <div class="input-group-append p-0">
+				<button class="append-btn" data-clipboard-target="#{{ chain }}_conf" style="line-height: 1em;">
 				    <i class="cil-copy"></i>
 				</button>
 		    </div>
 		</div>
 		{% if coins_data.explorers|length > 0 %}
-			<div class="input-group mb-1 kmd_ui_dark1_bg" style="border: solid grey 1px !important;">
-			    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border-left: solid grey 1px !important;">
-			        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+			<div class="input-group mb-1">
+			    <div class="input-group-prepend p-0 col-2  text-center">
+			        <span class="input-group-text col-12 " style="border: none; color: #b9b5b5;">
 			        	Explorers
 					</span>
 			    </div>
-				<div class="justify-content-between col-10">
+				<div class="justify-content-between col-10 coin-params-field">
 				    {% for x in coins_data.explorers %}
 						<span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
 							<a href="{{ x }}">{{ x }}</a>
@@ -288,13 +288,13 @@
 			</div>
 		{% endif %}
 		{% if coins_data.electrums|length > 0 %}
-			<div class="input-group mb-1 kmd_ui_dark1_bg" style="border: solid grey 1px !important;">
-			    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border-left: solid grey 1px !important;">
-			        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+			<div class="input-group mb-1">
+			    <div class="input-group-prepend p-0 col-2  text-center">
+			        <span class="input-group-text col-12" style="border: none; color: #b9b5b5;">
 			        	Electrums
 					</span>
 			    </div>
-				<div class="justify-content-between col-10">
+				<div class="justify-content-between col-10 coin-params-field">
 				    {% for x in coins_data.electrums %}
 						<span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
 							{{ x }}
@@ -304,13 +304,13 @@
 			</div>
 		{% endif %}
 		{% if coins_data.electrums_ssl|length > 0 %}
-			<div class="input-group mb-1 kmd_ui_dark1_bg" style="border: solid grey 1px !important;">
-			    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg text-center" style="border-left: solid grey 1px !important;">
-			        <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: none; color:#FFF;">
+			<div class="input-group mb-1">
+			    <div class="input-group-prepend p-0 col-2 text-center">
+			        <span class="input-group-text col-12 " style="border: none; color: #b9b5b5;">
 			        	Electrums (SSL)
 					</span>
 			    </div>
-				<div class="justify-content-between col-10">
+				<div class="justify-content-between col-10 coin-params-field">
 				    {% for x in coins_data.electrums_ssl %}
 						<span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
 							{{ x }}
@@ -323,34 +323,34 @@
 	<!--
 	<div class="row">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-				<a href="#ntx"><span class='badge kmd_ui_dark1_bg p-2'>Notarisations</span></a>
+			<h4 class="card text-center  kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#ntx"><span class='badge p-2'>Notarisations</span></a>
 			</h4>
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-				<a href="#balances"><span class='badge kmd_ui_dark1_bg p-2'>Balances</span></a>
+			<h4 class="card text-center  kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#balances"><span class='badge p-2'>Balances</span></a>
 			</h4>
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-				<a href="#addresses"><span class='badge kmd_ui_dark1_bg p-2'>Addresses</span></a>
+			<h4 class="card text-center  kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#addresses"><span class='badge p-2'>Addresses</span></a>
 			</h4>
-			<h4 class="card text-center kmd_ui_dark2_bg kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
-				<a href="#funding"><span class='badge kmd_ui_dark1_bg p-2'>Funding</span></a>
+			<h4 class="card text-center  kmd_ui_light3 col-3 px-0 mt-auto shadow-none">
+				<a href="#funding"><span class='badge p-2'>Funding</span></a>
 			</h4>
 		</div>
 	</div>
 	-->
 	<div class="row my-3">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<div class="card text-center kmd_ui_dark4_bg kmd_ui_light3 col-12 px-0">
-				<div class="card-header kmd_ui_dark3_bg d-flex justify-content-between">
+			<div class="card text-center  kmd_ui_light3 col-12 px-0">
+				<div class="card-header  d-flex justify-content-between">
 					<div class="my-auto">
 						{{ season_clean }} {{ chain }} Wallet Balances
 					</div>
 					<div>
-					    <span class="badge kmd_ui_dark1_bg m-2 p-2 ar_region">AR <i class="fa fa-circle" aria-hidden="true"></i></span>
-					    <span class="badge kmd_ui_dark1_bg m-2 p-2 eu_region">EU <i class="fa fa-circle" aria-hidden="true" ></i></span>
-					    <span class="badge kmd_ui_dark1_bg m-2 p-2 na_region">NA <i class="fa fa-circle" aria-hidden="true" ></i></span>
-					    <span class="badge kmd_ui_dark1_bg m-2 p-2 sh_region">SH <i class="fa fa-circle" aria-hidden="true" ></i></span>
-					    <span class="badge kmd_ui_dark1_bg m-2 p-2 dev_region">DEV <i class="fa fa-circle" aria-hidden="true" ></i></span>
+					    <span class="badge m-2 p-2 ar_region">AR <i class="fa fa-circle" aria-hidden="true"></i></span>
+					    <span class="badge m-2 p-2 eu_region">EU <i class="fa fa-circle" aria-hidden="true" ></i></span>
+					    <span class="badge m-2 p-2 na_region">NA <i class="fa fa-circle" aria-hidden="true" ></i></span>
+					    <span class="badge m-2 p-2 sh_region">SH <i class="fa fa-circle" aria-hidden="true" ></i></span>
+					    <span class="badge m-2 p-2 dev_region">DEV <i class="fa fa-circle" aria-hidden="true" ></i></span>
 					</div>
 				</div>
 				<div class="card-body">
@@ -362,12 +362,12 @@
 	</div>	
 	<div class="row my-3">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<div class="card kmd_ui_light4">
+			<div class="card">
 				<div class="card-header">
 					<h4>{{ season_clean }} {{ chain }} Addresses & Balances</h4>
 				</div>
 				<div class="card-body">
-					<table id="balances_table" class="table table-striped table-bordered kmd_ui_light4">
+					<table id="balances_table" class="table table-striped table-bordered">
 						<thead>
 							<tr>
 								<th data-data="notary">Notary</th>
@@ -447,21 +447,21 @@
 			            "data": "notary",
 		                "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"/?season={{ season }}'>"+oData.notary+"</a></span>");
+				            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"/?season={{ season }}'>"+oData.notary+"</a></span>");
 				        }
 		            },
         			{
 			            "data": "address",
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'><a href='"+explorers['{{ chain }}'][0]+'address/'+oData.address+"'>"+oData.address+"</a></span>");
+				            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='"+explorers['{{ chain }}'][0]+'address/'+oData.address+"'>"+oData.address+"</a></span>");
 				        }
 			        },
         			{
 			            "data": "balance",
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.9em;'>"+oData.balance+"</a></span>");
+				            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.balance+"</a></span>");
 				        }
 			        },
         			{
@@ -480,7 +480,7 @@
 			            	else {
 			            		color = "#000";	
 			            	}
-				            $(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
+				            $(nTd).html("<span class='badge p-2' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
 			        	}
 			        },
         			{
@@ -502,7 +502,7 @@
 						    } else {
 						    	timesince = days+" days, "+hours+" hrs"
 						    }
-		            		$(nTd).html("<span class='badge kmd_ui_dark1_bg p-2' style='font-size: 0.8em;'>"+timesince+"</span>");
+		            		$(nTd).html("<span class='badge p-2' style='font-size: 0.8em;'>"+timesince+"</span>");
 				        }
 			        }
         		]

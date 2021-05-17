@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 mx-auto my-2" style="color:#FFF;">
+	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
 		<div class="card m-auto">
 			<div class="card-header col-12 m-auto">
 				<h2 style="min-width: 36em;">Decode Notarisation OP_RETURN Data</h2>
 				<form>
-				  <div class="input-group mb-3 kmd_ui_dark1_bg">
+				  <div class="input-group mb-3 ">
 				    <div class="input-group-prepend p-0" >
-				      <span class="input-group-text  kmd_ui_dark4_bg" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+				      <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;">
 				      	Enter OP_RETURN
 				      </span>
 				    </div>
-				    <input type="text" class="form-control m-auto kmd_ui_dark3_bg" id="opret_id" name="OP_RETURN" placeholder="{{ OP_RETURN }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 44em">
-				    <div class="input-group-append p-0  kmd_ui_dark4_bg">
-						<button class="btn btn-dark"style="line-height: 1em; border: solid grey 1px !important;">
+				    <input type="text" class="form-control m-auto " id="opret_id" name="OP_RETURN" placeholder="{{ OP_RETURN }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 44em">
+				    <div class="input-group-append p-0  ">
+						<button class="append-btn"style="line-height: 1em; border: solid grey 1px !important;">
 						    Decode
 						</button>
 				    </div>
@@ -25,15 +25,15 @@
 			<div class="card-body m-auto col-12">
 
 				{% for item in opret_rows %}
-				  <div class="input-group mb-1 kmd_ui_dark1_bg">
-				    <div class="input-group-prepend p-0 col-2 kmd_ui_dark2_bg" >
-				      <span class="input-group-text col-12 kmd_ui_dark4_bg" style="border: solid grey 1px !important; line-height: 1em; color:
+				  <div class="input-group mb-1 ">
+				    <div class="input-group-prepend p-0 col-2 " >
+				      <span class="input-group-text col-12 " style="border: solid grey 1px !important; line-height: 1em; color:
 	#82F4E6 !important;">
 				      	{{ item.key }}
 				    </div>
-				    <input type="text" class="form-control col-10 kmd_ui_dark1_bg" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ item.value }}" value="{{ item.value }}" readonly id="x_{{ item.value }}">
-				    <div class="input-group-append p-0 kmd_ui_dark4_bg" style="border: solid grey 1px !important;">
-						<button class="btn" data-clipboard-target="#x_{{ item.value }}" style="line-height: 1em; font-size: 0.8em">
+				    <input type="text" class="form-control col-10 " style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ item.value }}" value="{{ item.value }}" readonly id="x_{{ item.value }}">
+				    <div class="input-group-append p-0 " style="border: solid grey 1px !important;">
+						<button class="append-btn" data-clipboard-target="#x_{{ item.value }}" style="line-height: 1em; font-size: 0.8em">
 						    <i class="cil-copy"></i>
 						</button>
 				    </div>
