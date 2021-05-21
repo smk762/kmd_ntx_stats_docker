@@ -3,6 +3,5 @@ ENV PYTHONUNBUFFERED 1
 ENV PGDATA=/pg-data
 RUN mkdir /code
 WORKDIR /code
-COPY requirements.txt /code/
+COPY ./code/ /code/
 RUN pip install -r requirements.txt
-COPY . /code/
