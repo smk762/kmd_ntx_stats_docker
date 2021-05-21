@@ -36,7 +36,7 @@ services:
     build: .
     command: python manage.py runserver 0.0.0.0:8762
     volumes:
-      - .:/code
+      - ./code:/code
       - /var/www/stats.kmd.io/html:/var/www/stats.kmd.io/html
     ports:
       - "8762:8762"
