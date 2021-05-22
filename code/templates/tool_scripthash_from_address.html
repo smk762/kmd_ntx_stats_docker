@@ -29,7 +29,35 @@
 				    <div class="input-group-prepend p-0 col-2 " >
 				      <span class="input-group-text col-12 " style="border: solid grey 1px !important; line-height: 1em; color:
 	#82F4E6 !important;">
-				      	{{ item.key }}
+				      	{% if item.key|lower == 'p2pk' %}
+				      	<a href="https://komodoplatform.com/en/blog/p2pk-pay-to-pubkey/" data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey Explanation">
+				      		{{ item.key|lower }}
+				      	</a>				      	
+				      	<a href="https://learnmeabitcoin.com/technical/p2pk">
+				      		<i data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey Technical Info" class="fas fa-info-circle my-0 py-0" style="font-size: 1.1em"></i>
+				      	</a>
+				      	{% elif item.key|lower == 'p2pkh' %}
+				      	<a href="https://komodoplatform.com/en/blog/p2pkh-pay-to-pubkey-hash/" data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey Hash Explanation" >
+				      		{{ item.key|lower }} 
+				      	</a>
+				      	<a href="https://learnmeabitcoin.com/technical/p2pkh">
+				      		<i data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey Hash Technical Info" class="fas fa-info-circle my-0 py-0" style="font-size: 1.1em"></i>
+				      	</a>
+				      	{% elif item.key|lower == 'p2pkh scripthash' or item.key|lower == 'p2pk scripthash' %}
+				      	<a href="https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-basics.html#script-hashes">
+				      		{{ item.key|lower }} <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Used to Query Electrum Servers" class="fas fa-info-circle my-0 py-0" style="font-size: 1.1em"></i>
+				      	</a>
+				      	{% elif item.key|lower == 'pubkey' %}
+				      	<a href="https://learnmeabitcoin.com/beginners/public_keys">
+				      		{{ item.key }}
+				      	</a>
+				      	{% elif item.key|lower == 'address' %}
+				      	<a href="https://learnmeabitcoin.com/technical/address">
+				      		{{ item.key }}
+				      	</a>
+				      	{% else %}
+				      		{{ item.key }}
+				      	{% endif %}
 				    </div>
 				    <input type="text" class="form-control col-10 " style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ item.value }}" value="{{ item.value }}" readonly id="x_{{ item.value }}">
 				    <div class="input-group-append p-0 " style="border: solid grey 1px !important;">

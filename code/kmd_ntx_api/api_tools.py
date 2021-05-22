@@ -213,9 +213,11 @@ def scripthash_from_address_tool(request):
             try:
                 address = request.GET["address"]
                 scripthash = get_scripthash_from_address(address)
+                p2pkh = address_to_p2pkh(address)
                 return JsonResponse({
                     "address":f"{address}",
-                    "p2pkh_scripthash":f"{scripthash}"
+                    "p2pkh_scripthash":f"{scripthash}",
+                    "p2pkh":f"{p2pkh}"
                 })
             except Exception as e:
                 return JsonResponse({
@@ -231,10 +233,14 @@ def scripthashes_from_pubkey_tool(request):
                 pubkey = request.GET["pubkey"]
                 p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
                 p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
+                p2pkh = pubkey_to_p2pkh(pubkey)
+                p2pk = pubkey_to_p2pk(pubkey)
                 return JsonResponse({
                     "pubkey":f"{pubkey}",
                     "p2pkh_scripthash":f"{p2pkh_scripthash}",
-                    "p2pk_scripthash":f"{p2pk_scripthash}"
+                    "p2pk_scripthash":f"{p2pk_scripthash}",
+                    "p2pkh":f"{p2pkh}",
+                    "p2pk":f"{p2pk}"
                 })
             except Exception as e:
                 return JsonResponse({

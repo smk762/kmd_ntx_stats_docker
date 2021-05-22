@@ -20,10 +20,10 @@
 				<h4 class="text-uppercase kmd_teal">{{ server }}</h4>
 			</a>
 		</div>		
-		<div class="card-body">
+		<div class="card-body" style="background-color: #000 !important;">
 			<div class="row m-1 d-flex justify-content-between">
             	{% for coin in coins %}
-            	<div class="card  kmd_ui_light3 col-2 px-0 mx-1">
+            	<div class="card  kmd_ui_light3 col-2 px-0 mx-1" style="background-color: #111 !important;">
             		<a href="//{{ request.get_host }}/coin_profile/{{ coin }}">
 
 	            		<div class="p-2">
@@ -38,7 +38,7 @@
 						{% endfor %}
 						</div>
 					</a>	
-					<div class="card-body " style="padding: 1rem; ">
+					<div class="card-body " style="padding: 1rem; background-color: #183353 !important;">
 						<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
 	            			<a href="//{{ request.get_host }}/coin_profile/{{ coin }}">
 	            				{{ coin }}
@@ -104,7 +104,7 @@
 											
 										{% elif site == 'website' %}
 											{%  if link != '' %}
-												<a href="{{ link }}"><i class="sml-social fas fa-desktop mr-2"></i></a>
+												<a href="https://{{ link }}"><i class="sml-social fas fa-desktop mr-2"></i></a>
 											{% else %}
 												<i class="sml-social fas fa-desktop mr-2" style="color: #555;"></i>
 											{% endif %}									

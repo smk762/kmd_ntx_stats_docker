@@ -1,13 +1,22 @@
-*/5 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_mined_tables.py
-52 */1 * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_nn_btc_txids.py
-1,13,25,37,49 * * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_ntx_tables.py
-45 */1 * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_funding_table.py
+30 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_api_populate_nn_ltc_txids.py
+5 */6 * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_import_nn_btc_txids.py
+*/12 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_import_nn_ltc_txids.py
+*/6 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_import_notarised.py
+22 6 * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_addresses_table.py
+24 */1 * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_balances_table.py
+32 */1 * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/code/scripts/cron_populate_coins_table.py
+12 4 * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_epochs.py
+12 8  * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_funding_table.py
+*/5 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_mined_tables.py
+*/6 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_notarised_daily_tables.py
+*/7 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_notarised_season_chain_count_table.py
+*/7 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_notarised_season_notary_count_table.py
 
-0 */1 * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_balances_table.py
-0 5  * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_coins_table.py
+*/5 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_notarised_table.py
+*/5 * * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_last_ntx_table.py
 
-0 2 * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_nn_social.py
-0 2 * * * /usr/bin/python3 /home/smk762/kmd_ntx_stats_docker/scripts/populate_coin_social.py
+12 2 * * * /usr/bin/python3 /home/USERNAME/kmd_ntx_stats_docker/code/scripts/cron_populate_social_coins.py
+
 
 
 # Add the lines above to your host machine's crontab
