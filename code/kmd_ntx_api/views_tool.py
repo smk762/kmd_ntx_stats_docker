@@ -164,7 +164,6 @@ def pubkey_addresses_view(request):
     return render(request, 'tool_pubkey_addresses.html', context)
 
 
-
 def convert_addresses_view(request):
     season = get_page_season(request)
     context = {
@@ -210,7 +209,7 @@ def scripthash_from_address_view(request):
         resp = requests.get(url).json()
 
         if "error" in resp:
-            messages.error(request, f"{error}")
+            messages.error(request, f"{resp['error']}")
         else:
             resp_rows = []
             for item in resp:
@@ -239,7 +238,7 @@ def scripthashes_from_pubkey_view(request):
         resp = requests.get(url).json()
 
         if "error" in resp:
-            messages.error(request, f"{error}")
+            messages.error(request, f"{resp['error']}")
         else:
             resp_rows = []
             for item in resp:

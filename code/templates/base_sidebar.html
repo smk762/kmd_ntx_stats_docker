@@ -9,75 +9,6 @@
         </a>
       </div>
       <ul class="c-sidebar-nav ">
-
-        <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown-toggle" href="#">
-                <i class="cil-address-book"></i>
-                <span style="padding-left: 12px;">Season 5 Transition</span>
-            </a>
-            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}s5_address_confirmation/?season={{ season }}"> Address Confirmation
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown-toggle" href="#">
-                <i class="cil-badge"></i>
-                <span style="padding-left: 12px;">VOTE 2021</span>
-            </a>
-            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}vote2021/?season={{ season }}"> Vote Tally Results
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown-toggle" href="#">
-                <i class="cil-balance-scale"></i> 
-                <span style="padding-left: 12px;">NOTARY PROFILES</span>
-            </a>
-            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
-            {% for section, info in sidebar_links.notaries_menu.items %}
-            <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ info.name }}</li>
-                {% for option in info.nodes %}
-                <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notary_profile/{{ option }}/?season={{ season }}"> {{ option }}
-                    </a>
-                </li>
-                {% endfor %}
-            {% endfor %}
-            </ul>
-        </li>
-        <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown-toggle" href="#">
-                <i class="cil-layers"></i> 
-                <span style="padding-left: 12px;">COIN PROFILES</span>
-            </a>
-            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
-            {% for section, info in sidebar_links.chains_menu.items %}
-            <li class="c-sidebar-nav-title" style="line-height:1 !important;">{{ section }}</li>
-                {% for option in info %}
-                <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link py-1 my-1" style="font-size:0.9em;" href="{{ scheme_host }}coin_profile/{{ option }}/?season={{ season }}">
-                        {% if option == 'WLC21' %}
-                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
-                        {% elif option == 'GLEEC-OLD' %}
-                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/gleec.png" />
-                        {% elif option == 'COQUICASH' %}
-                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png" />
-                        {% else %}
-                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{{ option|lower }}.png" />
-                        {% endif %}
-                        {{ option }}
-                    </a>
-                </li>
-                {% endfor %}
-            {% endfor %}
-            </ul>
-        </li>
         <!-- TODO: Review
         <li class="c-sidebar-nav-dropdown">
             <a class="c-sidebar-nav-dropdown-toggle" href="#">
@@ -117,6 +48,10 @@
             </a>
             <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notary_profile/?season={{ season }}"> {{ season_clean }} Notary Profiles
+                    </a>
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}coin_profile/?season={{ season }}"> {{ season_clean }} dPoW Coin Profiles
+                    </a>
                     <a class="c-sidebar-nav-link" href="{{ scheme_host }}ntx_scoreboard/?season={{ season }}"> {{ season_clean }} Scoreboard
                     </a>
                     <a class="c-sidebar-nav-link" href="{{ scheme_host }}ntx_scoreboard_24hrs/?season={{ season }}"> 24hr Scoreboard
@@ -144,18 +79,6 @@
                 </li>
                 <li class="c-sidebar-nav-item">
                     <a class="c-sidebar-nav-link" href="{{ scheme_host }}mining_24hrs/?season={{ season }}"> Mining last 24hrs
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown-toggle" href="#">
-                <i class="cil-drop"></i>   
-                <span style="padding-left: 12px;">FAUCET</span>
-            </a>
-            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav-item">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}faucet/?season={{ season }}"> RICK / MORTY Faucet
                     </a>
                 </li>
             </ul>
@@ -195,6 +118,10 @@
                     <a class="c-sidebar-nav-link" href="{{ scheme_host }}tools/scripthashes_from_pubkey/"> Scripthashes from Pubkey
                     </a>
                 </li>
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}faucet/?season={{ season }}"> RICK / MORTY Faucet
+                    </a>
+                </li>
             </ul>
         </li>
         <!-- TESTNET COMPLETE, leavong here for next season -->
@@ -212,6 +139,30 @@
             </ul>
         </li>
         -->
+        <li class="c-sidebar-nav-dropdown">
+            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                <i class="cil-address-book"></i>
+                <span style="padding-left: 12px;">Season 5 Transition</span>
+            </a>
+            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}s5_address_confirmation/?season={{ season }}"> Address Confirmation
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="c-sidebar-nav-dropdown">
+            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                <i class="cil-badge"></i>
+                <span style="padding-left: 12px;">VOTE 2021</span>
+            </a>
+            <ul class="c-sidebar-nav-dropdown-items" style="line-height:1.3 !important;">
+                <li class="c-sidebar-nav-item">
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}vote2021/?season={{ season }}"> Vote Tally Results
+                    </a>
+                </li>
+            </ul>
+        </li>
         <li class="c-sidebar-nav-dropdown">
           <a class="c-sidebar-nav-dropdown-toggle" href="#">
               <i class="cil-transfer"></i>  <span style="padding-left: 12px;">API</span>
