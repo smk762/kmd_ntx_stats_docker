@@ -38,6 +38,10 @@ frontend_tool_urls = [
           views_tool.scripthash_from_address_view,
           name='scripthash_from_address_view'),
 
+    path('tools/create_raw_transaction/',
+          views_tool.create_raw_transaction_view,
+          name='create_raw_transaction_view'),
+
 ]
 
 

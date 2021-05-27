@@ -80,11 +80,14 @@ def doubleSha256(hex_str):
    hash2 = hashlib.sha256(binhash).digest()
    return hash2
 
-def get_hex(val, byte_length=2):
-    val = hex(new_format)[2:]
+def get_hex(val, byte_length=2, endian='big'):
+    val = hex(int(val))[2:]
     pad_len = byte_length - len(val)
     val = pad_len*"0"+val
-    return val        
+    if endian == 'little':
+        val = lil_endian(val)
+    return val
+
 
 def get_hash160(pubkey):
     bin_pk = binascii.unhexlify(pubkey)
@@ -118,7 +121,7 @@ def pubkey_to_p2pk(pubkey):
 class raw_tx():
     def __init__(self, version='04000080', group_id='85202f89', inputs=list,
                  sequence='feffffff', outputs=list,
-                 expiry_height=0, locktime='', 
+                 expiry_height='00000000', locktime=int(time.time()),
                  valueBalanceSapling="0000000000000000", nSpendsSapling="0",
                  vSpendsSapling="00", nOutputsSapling="0", vOutputsSapling="00"):
         self.version = version
@@ -126,8 +129,8 @@ class raw_tx():
         self.inputs = inputs
         self.sequence = sequence
         self.outputs = outputs
-        self.expiry_height = expiry_height
-        self.locktime = locktime
+        self.expiry_height = expiry_height # TODO: by default, 200 blocks past current tip
+        self.locktime = locktime # time.now()
         self.valueBalanceSapling = valueBalanceSapling
         self.nSpendsSapling = nSpendsSapling
         self.vSpendsSapling = vSpendsSapling
@@ -135,32 +138,48 @@ class raw_tx():
         self.vOutputsSapling = vOutputsSapling
 
     def construct(self):
+        self.locktime = lil_endian(get_hex(self.locktime, byte_length=8))
         self.raw_tx_str = self.version+self.group_id
         self.len_inputs = get_hex(len(self.inputs), byte_length=2)
         self.raw_tx_str += self.len_inputs
-        self.vin_value = 0
-        for vin in inputs:
-            self.raw_tx_str += self.vin["txid"]
-            self.raw_tx_str += self.vin["tx_pos"]
-            self.vin_value += self.vin["value"]
-            if "unlocking_script" in self.vin:
-                unlocking_script = self.vin["unlocking_script"]
+        self.expiry_height = lil_endian(get_hex(int(self.expiry_height), byte_length=8))
+        self.sum_inputs = 0
+        for vin in self.inputs:
+            self.raw_tx_str += lil_endian(vin["tx_hash"])
+            self.raw_tx_str += lil_endian(get_hex(vin["tx_pos"], byte_length=8))
+            print(vin["tx_pos"])
+            print(get_hex(vin["tx_pos"], byte_length=8))
+            print(lil_endian(get_hex(vin["tx_pos"], byte_length=8)))
+            self.sum_inputs += vin["value"]*100000000
+            if "unlocking_script" in vin:
+                unlocking_script = vin["unlocking_script"]
             else:
-                unlocking_script = "00"
-            pubkey = self.vin["pubkey"]
-            self.len_script = len(self.unlocking_script+"0121"+pubkey)
+                unlocking_script = ""
+            pubkey = vin["scriptPubKey"]
+            self.len_script = get_hex(len(unlocking_script+"0121"+pubkey)/2, byte_length=2)
+            
+            if unlocking_script == "":
+                self.raw_tx_str += "00"
+            else:
+                self.raw_tx_str += self.len_script
+                self.raw_tx_str += unlocking_script
+                self.raw_tx_str += "0121"
+                self.raw_tx_str += lil_endian(pubkey)
 
-            self.raw_tx_str += self.len_script
-            self.raw_tx_str += "0121"
-            self.raw_tx_str += self.pubkey            
 
+            self.raw_tx_str += self.sequence
+        self.sum_outputs = 0
         self.len_outputs = get_hex(len(self.outputs), byte_length=2)
         self.raw_tx_str += self.len_outputs
-        for vout in outputs:
-            amount = vout["amount"]
-            self.raw_tx_str += amount
-            self.raw_tx_str += get_hex(len(vout["scriptPubkey"]), byte_length=8)
-            self.raw_tx_str += vout["scriptPubkey"]
+        i = 0
+        for vout in self.outputs:
+            amount = float(vout["amount"])*100000000
+            self.sum_outputs += amount
+            self.raw_tx_str += lil_endian(get_hex(amount, byte_length=16))
+            address = vout["address"]
+            pubKeyHash = address_to_p2pkh(address)
+            self.raw_tx_str += get_hex(len(pubKeyHash)/2, byte_length=2)
+            self.raw_tx_str += pubKeyHash
         self.raw_tx_str += self.locktime
         self.raw_tx_str += self.expiry_height
         self.raw_tx_str += self.valueBalanceSapling
