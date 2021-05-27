@@ -232,3 +232,6 @@ if __name__ == "__main__":
             scan_rpc_for_ntx(season)
             end = time.time()
             logger.info(f">>> {end-start} sec to complete [scan_rpc_for_ntx({season})]")
+    
+    CURSOR.close()
+    CONN.close()
