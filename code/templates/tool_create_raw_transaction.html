@@ -1,0 +1,516 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{{ outputs }}
+	{% if raw_tx %}
+	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
+		<div class="card m-auto">
+			<div class="card-header col-12 m-auto">
+				<h2 style="min-width: 36em;">{{ page_title }}</h2>
+			</div>
+			<div class="card-body col-12 m-auto">
+				<div class="m-auto p-auto">
+				    <div class="input-group m-auto ">
+					    <div class="input-group-prepend p-0 text-left">
+					        <span class="input-group-text" style="border: none;">
+				        		Raw TX
+							</span>
+					    </div>
+					    <div class="col-10 params-field" style="max-width: 85% !important;">
+					    	<div class="my-2 mx-auto text-left" id="raw_tx" style="font-size: 1.4em;">
+					    		{{ raw_tx }}
+					    	</div>
+						</div>
+					    <div class="input-group-append p-0">
+							<button class="append-btn" data-clipboard-target="#raw_tx" style="border: solid 1px grey; line-height: 1em;">
+							    <i class="cil-copy"></i>
+							</button>
+					    </div>
+					</div>
+				</div>
+				<div>
+					<table id="utxo_table" class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th data-data="txid">UTXO Source TXID</th>
+								<th data-data="vout">UTXO Source VOUT</th>
+								<th data-data="amount" id="amount">UTXO Amount</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in tx_inputs %}
+								<tr>
+									<td data-data="txid" style="">
+											 {{ item.tx_hash }}
+									</td>
+									<td data-data="vout">
+											{{ item.tx_pos }}
+									</td>
+									<td data-data="amount">
+											{{ item.value }}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					    <tfoot>
+					        <tr>
+						        <td>
+							    </td>
+						        <td>
+							    </td>
+						        <td>
+						        	<span id="sum_selected"></span>
+							    </td>
+					        </tr>
+					    </tfoot>
+					</table>
+				</div>
+				<div>
+					<table id="utxo_table" class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th data-data="address">Destination Address</th>
+								<th data-data="amount" id="amount">Amount</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in outputs %}
+								<tr>
+									<td data-data="txid" style="">
+											 {{ item.address }}
+									</td>
+									<td data-data="vout">
+											{{ item.amount }}
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					    <tfoot>
+					        <tr>
+						        <td>
+							    </td>
+						        <td>
+						        	<span id="sum_selected"></span>
+							    </td>
+					        </tr>
+					    </tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{% elif not utxos and not selected_utxos %}
+	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
+		<div class="card m-auto">
+			<div class="card-header col-12 m-auto">
+				<h2 style="min-width: 36em;">{{ page_title }}</h2>
+				<form>
+				  <div class="input-group mb-3 ">
+				    <div class="input-group-prepend p-0" >
+				      <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;">
+				      	KMD Address
+				      </span>
+				    </div>
+				    <input type="text" class="form-control m-auto " id="address_id" name="address" placeholder="{{ address }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 44em">
+				    <div class="input-group-append p-0  ">
+						<button class="append-btn" style="line-height: 1em; border: solid grey 1px !important;">
+						    Get UTXOs
+						</button>
+				    </div>
+				  </div>
+				</form>
+			</div>
+		</div>
+	</div>
+	{% else %}
+	<div class="row my-3">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card shadow-none">
+				<div class="card-header">
+					<h4>{{ address }} UTXOs</h4>
+				</div>
+				<div class="card-body">
+					<form>
+						<table style="visibility: hidden;" id="utxo_table" class="table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th data-data="txid">TXID</th>
+									<th data-data="vout">VOUT</th>
+									<th data-data="amount" id="amount">Amount</th>
+									<th data-data="rewards" id="rewards">Rewards</th>
+									<th data-data="confirmations">Confirmations</th>
+									<th data-data="scriptPubKey">scriptPubKey</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in utxos %}
+									<tr>
+										<td data-data="txid" style="">
+												{{ item.txid }}
+										</td>
+										<td data-data="vout">
+												{{ item.vout }}
+										</td>
+										<td data-data="amount">
+												{{ item.amount }}
+										</td>
+										<td data-data="rewards">
+												{{ item.rewards }}
+										</td>
+										<td data-data="confirmations">
+												{{ item.confirmations }}
+										</td>
+										<td style="font-size: 0.1em" data-data="scriptPubKey">
+												{{ item.scriptPubKey }}
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						    <tfoot>
+						        <tr>
+							        <td>
+								    </td>
+							        <td>
+								    </td>
+							        <td>
+								    </td>
+							        <td>
+								    </td>
+							        <td>
+							        	<span id="sum_selected"></span>
+								    </td>
+							        <td>
+								    </td>
+						        </tr>
+						    </tfoot>
+						</table>
+						<div class="row">
+							<div class="input-group mb-3 col-3" id="">
+							</div>
+							<div class="input-group mb-3 col-3" id="">
+							</div>
+						</div>
+						<div id="output_addresses">
+							<div class="row" id="address_row_0">
+								<div class="input-group mb-3 col-9">
+								    <div class="input-group-prepend p-0" >
+								        <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;">
+								      	    To KMD Address <i class="fas fa-check-circle m-0 pl-2" style="font-size: 0.8em;"></i>
+								        </span>
+								    </div>
+								    <input type="text" class="form-control m-auto" id="address_id" name="to_address" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 34em">
+								</div>
+								<div class="input-group mb-3 col-3">
+								    <div class="input-group-prepend p-0" >
+								        <span class="input-group-text" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+								      	    Amount
+								        </span>
+								    </div>
+								    <input type="text" onchange="sanitize_outputs()" class="form-control m-0 " id="output_amount_0" name="output_amount" value="0" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center;" value="">
+								    <div class="input-group-append p-0  ">
+										<button class="append-btn" type="button" onclick="spendMax('#output_amount_0')" style="line-height: 1em; border: solid grey 1px !important;">
+										    Max
+										</button>
+								    </div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="input-group mb-3 col-3 ml-auto" id="">
+								<button class="append-btn col-12" type="button"  id="addAddressRow_btn" onclick="addAddress_Row('#output_addresses')" style="line-height: 1em; border: solid grey 1px !important;">
+								    Add Output Address
+								</button>
+							</div>
+							<div class="input-group mb-3 col-3" id="">
+							    <div class="input-group-prepend p-0" >
+							        <span class="input-group-text" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+							      	    Locktime
+							        </span>
+							    </div>
+							    <input type="text" class="form-control m-0 " id="locktime" name="locktime" value="{{ now }}" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center;" value="">
+							</div>
+							<div class="input-group mb-3 col-3" id="" value="0">
+							    <div class="input-group-prepend p-0" >
+							        <span class="input-group-text" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+							      	    Expiry Height
+							        </span>
+							    </div>
+							    <input type="text" class="form-control m-0 " id="expiry_height" name="expiry_height" value="0" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center;" value="">
+							</div>
+							<div class="input-group mb-3 col-3" id="">
+								<div class="status-label col-12 p-2" style="line-height: 1.2em; border: solid grey 1px !important;">
+								     <span class="col-6 ml-auto">Fees: <span id="fee_val">0</span></span>
+								</div>
+							</div>		
+						</div>
+						<div class="row">
+							<div class="input-group mb-3 col-9" id="">
+								<input type="hidden" name="inputs" id="hidden_inputs" /> 
+								<button class="append-btn col-12 p-2" type="submit" style="line-height: 1em; border: solid grey 1px !important;">
+								    Create Raw Transaction (Testing only!)
+								</button>
+							</div>	
+							<div class="input-group mb-3 col-3" id="">
+								<div class="status-label col-12 p-2" style="line-height: 1.2em; border: solid grey 1px !important;">
+								     <span class="col-6 ml-auto">TX Total: <span id="total_val">0</span></span>
+								</div>
+							</div>		
+						</div>
+					</form>
+				</div>
+			</div>	
+		</div>
+	</div>
+	{% endif %}
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+    <!-- jquery -->  
+  	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  	
+	<script>
+
+
+		function remove_node(id) {
+			$(id).remove()
+		}
+
+		function addAddress_Row (id) {
+			num_rows = $(id).children().length;
+			out_row = 'address_row_'+num_rows
+			out_id = 'output_amount_'+num_rows
+			$(id).append('<div class="row" id="'+out_row+'"> \
+								<div class="input-group mb-3 col-9"> \
+								    <div class="input-group-prepend p-0" > \
+								        <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;"> \
+								      	    To KMD Address \
+								        	<i onclick="remove_node(\'#'+out_row+'\')" class="fas fa-times-circle pl-2 m-0" style="font-size: 0.8em;"></i> \
+								        </span> \
+								    </div> \
+								    <input type="text" class="form-control m-auto" id="address_id" name="to_address" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 34em"> \
+								</div> \
+								<div class="input-group mb-3 col-3"> \
+								    <div class="input-group-prepend p-0" > \
+								        <span class="input-group-text" style="color:white; border: solid grey 1px !important; line-height: 1em;"> \
+								      	    Amount \
+								        </span> \
+								    </div> \
+								    <input type="text" onchange="sanitize_outputs()" class="form-control m-0 " id="'+out_id+'" name="output_amount" value="0" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center;" value=""> \
+								    <div class="input-group-append p-0  "> \
+										<button class="append-btn" type="button" onclick="spendMax(\'#'+out_id+'\')" style="line-height: 1em; border: solid grey 1px !important;"> \
+										    Max \
+										</button> \
+								    </div> \
+								</div> \
+							</div>');
+		}
+
+		function floorRound (num, num_dec) {
+		    var dp = parseInt("1" + "0".repeat(num_dec));
+		    num = parseFloat(num)
+			num = Math.floor(num * dp);
+		    return num / dp;
+		}
+
+		function get_fees(coin='KMD', size=80, sat_per_byte=10) {
+			return 0.0001
+		}
+
+		function get_unallocated(address_rows) {
+			sum_selected = floorRound(parseFloat($("#sum_selected").html()), 5)
+			sum_outputs = get_sum_outputs(address_rows)
+			fees = get_fees()
+			unallocated = sum_selected - sum_outputs - fees
+			return unallocated
+		}
+
+		function spendMax(id) {
+			unallocated = get_unallocated($(id).parent())
+			output_amount = parseFloat($(id).val())
+			$(id).val(floorRound(output_amount+unallocated,5))
+			sanitize_outputs()
+		}
+
+		function get_sum_outputs(address_rows) {
+			num_rows = $(address_rows).children().length;
+			sum_outputs = 0
+			for (var i = 0; i < num_rows; i++) {
+				output_amount = $("#output_amount_"+i).val()
+				if (!($.isNumeric(output_amount))) {
+					output_amount = 0
+					$("#output_amount_"+i).val(0)
+				}
+				sum_outputs += parseFloat(output_amount)
+			}
+			return floorRound(sum_outputs,5)
+		}
+
+    	function zero_NaN(num) {
+			if (!($.isNumeric(output_amount))) {
+				return 0
+			}
+			else {
+				return parseFloat(num)
+			}
+
+    	}
+
+		function sanitize_outputs(address_rows='#output_addresses') {
+			console.log("dsa")
+			sum_selected = floorRound(parseFloat($("#sum_selected").html()),5)
+			sum_outputs = get_sum_outputs(address_rows)
+			fee_val = sum_selected - sum_outputs
+			$("#fee_val").html(floorRound(fee_val,5))
+			$("#total_val").html(sum_outputs+fee_val)
+			/* if fees > 0.001 , red text warning, disable submit */
+			/* if remaining < 0 , red text warning, disable submit */		
+		}
+
+		// Tooltips
+		function setTooltip(mdi, message) {
+		  $(mdi).tooltip('hide')
+		    .attr('data-original-title', message)
+		    .tooltip('show');
+		}
+
+		function hideTooltip(mdi) {
+		  setTimeout(function() {
+		    $(mdi).tooltip('hide');
+		  }, 1000);
+		}
+
+		// Copy to clipboad on button click
+		var btns = document.querySelectorAll('button');
+		var clipboard = new ClipboardJS(btns);
+
+		clipboard.on('success', function (e) {
+			setTooltip(e.trigger, 'Copied!');
+			hideTooltip(e.trigger);
+		});
+
+		clipboard.on('error', function (e) {
+			console.log(e);
+		});
+	</script>
+    {{ explorers|json_script:"explorers-data" }}
+
+  	<script>
+	    $(document).ready(function() {
+	    	$('#utxo_table').css('visibility', 'visible');
+	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
+	        var utxo_table = $('#utxo_table').DataTable({
+	            "paging": false,
+       			"bInfo" : false,
+       			"bFilter": false,
+        		order: [[ 0, 'asc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
+        		"columnDefs": [
+			        {
+			            "data": "txid",
+		                "targets": 0,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(oData.txid);
+				        }
+		            },
+        			{
+			            "data": "vout",
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(oData.vout);
+				        }
+			        },
+        			{
+			            "data": "amount",
+			            "targets": 2,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(oData.amount);
+				        }
+			        },
+        			{
+			            "data": "confirmations",
+			            "targets": 3,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(oData.confirmations);
+			        	}
+			        },
+        			{
+			            "data": "rewards",
+			            "targets": 4,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(oData.rewards);
+			        	}
+			        },
+        			{
+			            "data": "scriptPubKey",
+			            "targets": 5,
+			            "visible": false,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(oData.scriptPubKey);
+			        	}
+			        }
+        		],
+				"initComplete": function (settings, json) {
+					console.log('init')
+				    this.api().columns([2,3]).every(function () {
+				        var column = this;
+				        console.log(column.data())
+				        console.log(column)
+				        var sum = column
+				           .data()
+				           .reduce(function (a, b) { 
+				               a = parseFloat(a, 10);
+				               if(isNaN(a)){ a = 0; }
+				               
+				               b = parseFloat(b, 10);
+				               if(isNaN(b)){ b = 0; }
+				               
+				               return a + b;
+				           });
+						console.log(sum)
+				        $(column.footer()).html('Total: ' + floorRound(sum, 5));
+				    });
+				},
+	        });
+	        $('#selected_utxo_table').DataTable({
+	            "paging": false,
+       			"bInfo" : false,
+       			"bFilter": false,
+        		order: [[ 0, 'asc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
+        		"columnDefs": [
+			        {
+			            "data": "txid",
+		                "targets": 0,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(oData.txid);
+				        }
+		            },
+        			{
+			            "data": "vout",
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(oData.vout);
+				        }
+			        },
+        			{
+			            "data": "amount",
+			            "targets": 2,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(oData.amount);
+				        }
+			        }
+        		],
+	        });
+		    $('#utxo_table tbody').on( 'click', 'tr', function () {
+		        $(this).toggleClass('selected');
+		        var inputs = []
+		        var sum_selected = 0
+		        utxo_table.rows('.selected').every(function(){
+		        	inputs.push(this.data().txid+'|'+parseInt(this.data().vout)+'|'+parseFloat(this.data().amount)+'|'+this.data().scriptPubKey)
+				    sum_selected += parseFloat(this.data().amount)
+				});
+				$("#hidden_inputs").val(inputs)
+				$("#sum_selected").html(floorRound(sum_selected,5))
+			});
+
+	    });
+  </script> 
+{% endblock %}

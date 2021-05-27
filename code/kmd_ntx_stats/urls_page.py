@@ -75,6 +75,10 @@ frontend_page_urls = [
     path('notary_profile/<str:notary>/',
           views_notary.notary_profile_view,
           name='notary_profile_view'),
+
+    path('notary_mining/<str:notary>/',
+          views_notary.notary_mining_view,
+          name='notary_mining_view'),
     
     path('sitemap/',
           views_page.sitemap,

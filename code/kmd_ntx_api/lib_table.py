@@ -631,8 +631,8 @@ def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None)
                                 "epoch_chain_ntx_count":epoch_chain_ntx_count,
                                 "epoch_chain_score":epoch_chain_score
                             }
-
-                            server_epoch_chains.remove(chain)
+                            if chain in server_epoch_chains:
+                                server_epoch_chains.remove(chain)
                             total += chain_stats["notary_server_epoch_chain_ntx_score"]
                             rows.append(row)
 

@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.api_tools import *
+from kmd_ntx_api.lib_base58 import *
 
 
 def decode_opret_view(request):
@@ -223,6 +224,7 @@ def scripthash_from_address_view(request):
 
     return render(request, 'tool_scripthash_from_address.html', context)
 
+
 def scripthashes_from_pubkey_view(request):
     season = get_page_season(request)
     context = {
@@ -251,3 +253,74 @@ def scripthashes_from_pubkey_view(request):
             })
 
     return render(request, 'tool_scripthashes_from_pubkey.html', context)
+
+
+def create_raw_transaction_view(request):
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "now":int(time.time()),
+        "reqget":request.GET,
+        "page_title":"Create Raw Transaction from Address",
+        "scheme_host":get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+    if "address" in request.GET:
+        address = request.GET["address"]
+        rewards_resp = requests.get(f"{THIS_SERVER}/api/tools/kmd_rewards/?address={address}").json()
+        resp = requests.get(f"https://kmd.explorer.dexstats.info/insight-api-komodo/addr/{address}/utxo")
+        utxos = resp.json()
+        if "error" in resp:
+            messages.error(request, resp["error"])
+        else:
+            for utxo in utxos:
+                if utxo["txid"] in rewards_resp["utxos"]:
+                    txid = utxo["txid"]
+                    rewards = rewards_resp["utxos"][txid]["kmd_rewards"]
+                    utxo.update({"rewards":rewards})
+                
+            context.update({
+                "address": address,
+                "utxos": utxos
+            })
+
+    if "inputs" in request.GET:
+        inputs = request.GET["inputs"]
+        output_amounts = request.GET.getlist("output_amount")
+        to_addresses = request.GET.getlist("to_address")
+        locktime = request.GET["locktime"]
+        expiry_height = request.GET["expiry_height"]
+
+        test_tx = raw_tx()
+        tx_inputs = []
+        for vin in inputs.split(","):
+            print(vin)
+            elements = vin.split("|")
+            print(elements)
+            tx_inputs.append({
+                "tx_hash":elements[0],
+                "tx_pos":int(elements[1]),
+                "value":float(elements[2]),
+                "scriptPubKey":elements[3]
+                })
+        test_tx.inputs = tx_inputs
+
+        outputs = []
+        for i in range(len(to_addresses)):
+            outputs.append({
+                "address":to_addresses[i],
+                "amount":output_amounts[i]
+            })
+        test_tx.outputs = outputs
+        test_tx.locktime = locktime
+        raw_hex = test_tx.construct()
+
+        context.update({
+            "tx_inputs": tx_inputs,
+            "outputs": outputs,
+            "raw_tx": raw_hex
+        })
+
+    return render(request, 'tool_create_raw_transaction.html', context)
+
