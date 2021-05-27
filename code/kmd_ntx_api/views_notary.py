@@ -9,6 +9,25 @@ from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_stats import *
 from kmd_ntx_api.lib_graph import *
 
+def notary_mining_view(request, notary=None):
+    if not notary:
+        return render(request, 'dash_index.html', context)
+    season = get_page_season(request)
+    notary_list = get_notary_list(season)
+    notary_mining = get_mined_data(None, notary).values()
+
+    context = {
+        "season":season,
+        "season_clean":season.replace("_"," "),
+        "page_title":"Notary KMD Mining",
+        "scheme_host":get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link(),
+        "notary_mining":notary_mining,
+        "explorers":get_explorers(request)
+    }
+    return render(request, 'notary_mining.html', context)
+
 def notary_profile_view(request, notary=None):
     # Populate sidebar
     season = get_page_season(request)
