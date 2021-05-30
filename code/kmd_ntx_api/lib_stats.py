@@ -242,3 +242,110 @@ def get_season_stats_sorted(season, coins_dict=None):
 
     return season_stats_sorted
 
+
+def get_swaps_coin_stats(from_time, to_time):
+    data = get_swaps_data()
+    data = filter_swaps_timespan(data, from_time, to_time)
+    # coin_count, coin_volume
+    # pair_count, pair_volume
+    # for item in data:
+
+
+def get_swaps_stats(from_time, to_time):
+    data = get_swaps_data()
+    print(from_time)
+    print(to_time)
+    data = filter_swaps_timespan(data, from_time, to_time)
+    taker_pubkeys = data.values('taker_pubkey').annotate(num_swaps=Count('taker_pubkey'))
+    maker_pubkeys = data.values('maker_pubkey').annotate(num_swaps=Count('maker_pubkey'))
+    taker_gui = data.values('taker_gui').annotate(num_swaps=Count('taker_gui'))
+    maker_gui = data.values('maker_gui').annotate(num_swaps=Count('maker_gui'))
+    taker_version = data.values('taker_version').annotate(num_swaps=Count('taker_version'))
+    maker_version = data.values('maker_version').annotate(num_swaps=Count('maker_version'))
+    taker_coin = data.values('taker_coin').annotate(num_swaps=Count('taker_coin'))
+    maker_coin = data.values('maker_coin').annotate(num_swaps=Count('maker_coin'))
+    resp = {
+        "count":data.count(),
+        "taker_pubkeys":[{i['taker_pubkey']:i['num_swaps']} for i in taker_pubkeys],
+        "maker_pubkeys":[{i['maker_pubkey']:i['num_swaps']} for i in maker_pubkeys],
+        "taker_gui":[{i['taker_gui']:i['num_swaps']} for i in taker_gui],
+        "maker_gui":[{i['maker_gui']:i['num_swaps']} for i in maker_gui],
+        "taker_version":[{i['taker_version']:i['num_swaps']} for i in taker_version],
+        "maker_version":[{i['maker_version']:i['num_swaps']} for i in maker_version],
+        "taker_coin":[{i['taker_coin']:i['num_swaps']} for i in taker_coin],
+        "maker_coin":[{i['maker_coin']:i['num_swaps']} for i in maker_coin]
+    }
+    return resp
+
+def get_swaps_gui_stats(from_time, to_time):
+    data = get_swaps_data()
+    print(from_time)
+    print(to_time)
+    data = filter_swaps_timespan(data, from_time, to_time)
+    taker_pubkeys = data.values('taker_pubkey', 'taker_gui').annotate(num_swaps=Count('taker_pubkey'))
+    maker_pubkeys = data.values('maker_pubkey', 'maker_gui').annotate(num_swaps=Count('maker_pubkey'))
+    resp = {
+        "taker": {
+            "TOTAL":0,
+            "desktop":{"TOTAL":0},
+            "android":{"TOTAL":0},
+            "ios":{"TOTAL":0},
+            "dogedex":{"TOTAL":0},
+            "other":{"TOTAL":0}
+        },
+        "maker": {
+            "TOTAL":0,
+            "desktop":{"TOTAL":0},
+            "android":{"TOTAL":0},
+            "ios":{"TOTAL":0},
+            "dogedex":{"TOTAL":0},
+            "other":{"TOTAL":0}
+        }
+    }
+    for item in taker_pubkeys:
+        category = "other"
+        for x in list(resp["taker"].keys()):
+            if item["taker_gui"].lower().find(x) > -1:
+                category = x
+        if item["taker_gui"] not in resp["taker"][category]:
+            resp["taker"][category].update({item["taker_gui"]:{"TOTAL":0}})
+        resp["taker"][category][item["taker_gui"]].update({
+            item['taker_pubkey']:item['num_swaps'],
+        })
+        resp["taker"][category][item["taker_gui"]]["TOTAL"] += item['num_swaps']
+        resp["taker"][category]["TOTAL"] += item['num_swaps']
+        resp["taker"]["TOTAL"] += item['num_swaps']
+
+    for item in maker_pubkeys:
+        category = "other"
+        for x in list(resp["maker"].keys()):
+            if item["maker_gui"].lower().find(x) > -1:
+                category = x
+        if item["maker_gui"] not in resp["maker"][category]:
+            resp["maker"][category].update({item["maker_gui"]:{"TOTAL":0}})
+        resp["maker"][category][item["maker_gui"]].update({
+            item['maker_pubkey']:item['num_swaps'],
+        })
+        resp["maker"][category][item["maker_gui"]]["TOTAL"] += item['num_swaps']
+        resp["maker"][category]["TOTAL"] += item['num_swaps']
+        resp["maker"]["TOTAL"] += item['num_swaps']
+    return resp
+
+
+def get_swaps_pubkey_stats(from_time, to_time):
+    data = get_swaps_data()
+    print(from_time)
+    print(to_time)
+    data = filter_swaps_timespan(data, from_time, to_time)
+    taker_pubkeys = data.values('taker_pubkey', 'taker_gui').annotate(num_swaps=Count('taker_pubkey'))
+    maker_pubkeys = data.values('maker_pubkey', 'maker_gui').annotate(num_swaps=Count('maker_pubkey'))
+    resp = {}
+    for item in taker_pubkeys:
+        print(item)
+        if item["taker_pubkey"] not in resp:
+            resp.update({item["taker_pubkey"]:{"TOTAL":0}})
+        resp[item["taker_pubkey"]].update({
+            item['taker_gui']:item['num_swaps'],
+        })
+        resp[item["taker_pubkey"]]["TOTAL"] += item['num_swaps']
+    return resp

@@ -1,6 +1,17 @@
 version: '3'
   
 services:
+  mm2:
+    image: komodoofficial/atomicdexapi:beta-2.1.3445
+    volumes:
+      - ./mm2:/mm2
+    ports:
+      - "7783:7783"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
   kmd: 
     image: komodoofficial/komodo:cd_release_0918081_dev
     volumes:
@@ -25,6 +36,7 @@ services:
       - POSTGRES_PASSWORD=postgres
     depends_on:
       - kmd
+      - mm2
     ports:
       - "7654:5432"
     logging:
@@ -32,6 +44,7 @@ services:
       options:
         max-size: "20m"
         max-file: "10"
+    
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8762
@@ -41,7 +54,9 @@ services:
     ports:
       - "8762:8762"
     depends_on:
+      - mm2
       - db
+      - kmd
     logging:
       driver: "json-file"
       options:

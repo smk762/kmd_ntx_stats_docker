@@ -1016,3 +1016,89 @@ class vote2021_row():
         sql = f"DELETE FROM [vote2021_row] WHERE txid = '{self.txid}';"
         CURSOR.execute(sql)
         CONN.commit()
+
+class swaps_row():
+    def __init__(self, uuid='', started_at='', taker_coin='', 
+                 taker_amount=0, taker_gui='', taker_version='',
+                 taker_pubkey='', maker_coin='', maker_amount=0,
+                 maker_gui='', maker_version='', maker_pubkey='', time_stamp=''):
+        self.uuid = uuid
+        self.started_at = started_at
+        self.taker_coin = taker_coin
+        self.taker_amount = taker_amount
+        self.taker_gui = taker_gui
+        self.taker_version = taker_version
+        self.taker_pubkey = taker_pubkey
+        self.maker_coin = maker_coin
+        self.maker_amount = maker_amount
+        self.maker_gui = maker_gui
+        self.maker_version = maker_version
+        self.maker_pubkey = maker_pubkey
+        self.time_stamp = time_stamp
+
+    def validated(self):
+        return True
+
+    def update(self):
+        row_data = (self.uuid, self.started_at, self.taker_coin,
+                    self.taker_amount, self.taker_gui, self.taker_version,
+                    self.taker_pubkey, self.maker_coin, self.maker_amount,
+                    self.maker_gui, self.maker_version, self.maker_pubkey, self.time_stamp)
+        if self.validated():
+            logger.info(f"Updating [swaps_row] {row_data}")
+            update_swaps_row(row_data)
+        else:
+            logger.warning(f"[swaps_row] Row data invalid!")
+            logger.warning(f"{row_data}")
+
+    def delete(self, conditions):
+        sql = f"DELETE FROM swaps WHERE {conditions};"
+        CURSOR.execute(sql)
+        CONN.commit()
+
+class swaps_failed_row():
+    def __init__(self, uuid='', started_at='', taker_coin='', 
+                 taker_amount=0, taker_error_type='', taker_error_msg='',
+                 taker_gui='', taker_version='', taker_pubkey='',
+                 maker_coin='', maker_amount=0, maker_error_type='',
+                 maker_error_msg='', maker_gui='', maker_version='',
+                 maker_pubkey='', time_stamp=''):
+        self.uuid = uuid
+        self.started_at = started_at
+        self.taker_coin = taker_coin
+        self.taker_amount = taker_amount
+        self.taker_error_type = taker_error_type
+        self.taker_error_msg = taker_error_msg
+        self.taker_gui = taker_gui
+        self.taker_version = taker_version
+        self.taker_pubkey = taker_pubkey
+        self.maker_coin = maker_coin
+        self.maker_amount = maker_amount
+        self.maker_error_type = maker_error_type
+        self.maker_error_msg = maker_error_msg
+        self.maker_gui = maker_gui
+        self.maker_version = maker_version
+        self.maker_pubkey = maker_pubkey
+        self.time_stamp = time_stamp
+
+    def validated(self):
+        return True
+
+    def update(self):
+        row_data = (self.uuid, self.started_at, self.taker_coin,
+                    self.taker_amount, self.taker_error_type, self.taker_error_msg,
+                    self.taker_gui, self.taker_version, self.taker_pubkey,
+                    self.maker_coin, self.maker_amount,
+                    self.maker_error_type, self.maker_error_msg,
+                    self.maker_gui, self.maker_version, self.maker_pubkey, self.time_stamp)
+        if self.validated():
+            logger.info(f"Updating [swaps_failed_row] {row_data}")
+            update_swaps_failed_row(row_data)
+        else:
+            logger.warning(f"[swaps_failed_row] Row data invalid!")
+            logger.warning(f"{row_data}")
+
+    def delete(self, conditions):
+        sql = f"DELETE FROM swaps_failed WHERE {conditions};"
+        CURSOR.execute(sql)
+        CONN.commit()

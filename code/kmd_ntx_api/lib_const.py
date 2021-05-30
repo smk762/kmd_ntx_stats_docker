@@ -8,6 +8,8 @@ from django.contrib import messages
 
 # ENV VARS
 load_dotenv()
+MM2_USERPASS = os.getenv("MM2_USERPASS")
+MM2_IP = "http://mm2:7783"
 OTHER_SERVER = os.getenv("OTHER_SERVER") # set to IP or domain to allow for external imports of data to avoid API limits
 THIS_SERVER = os.getenv("THIS_SERVER") # IP / domain of the local server
 
@@ -81,6 +83,14 @@ INTERVALS = (
     ('mins', 60),
     ('sec', 1),
     )
+
+SINCE_INTERVALS = {
+    "day":24*3600,
+    "week":7*24*3600,
+    "fortnight":14*24*3600,
+    "month":30*24*3600,
+    "year":365*24*3600,
+}
 
 
 noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'AYA', 'MCL', 'VRSC']

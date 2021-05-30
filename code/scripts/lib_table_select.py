@@ -699,3 +699,11 @@ def get_season_ntx_sum_count(season, server, epoch, chain):
         return results
     else:
         return ()
+        
+def get_table_list():
+    sql = "SELECT * FROM pg_catalog.pg_tables \
+            WHERE schemaname != 'information_schema' \
+            AND schemaname != 'pg_catalog';"
+
+    CURSOR.execute(sql)
+    print(CURSOR.fetchall())
