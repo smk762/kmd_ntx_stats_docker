@@ -24,6 +24,9 @@
         <link rel="stylesheet" href="https://unpkg.com/@coreui/coreui@3.0.0-rc.0/dist/css/coreui.min.css">
         <link rel="stylesheet" href="https://unpkg.com/@coreui/icons/css/all.min.css">
 
+        <!-- Select2 JS https://select2.org/ --> 
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
         <!-- Datepicker -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
 
@@ -116,6 +119,48 @@
                 border: solid 1px #3a3a3a !important;
                 color: #b9b5b5 !important;
             }
+            .select2-results__option {
+                background-color: #334352 !important;
+                color: #b9b5b5 !important;
+                border: none;
+            }
+            .select2-container--default .select2-selection--single {
+                }
+            .select2-results__option:hover {
+                background-color: #183353 !important;
+                color: #b9b5b5 !important;
+                border: none;
+            }
+            .select2-selection__rendered {
+                color: #b9b5b5 !important;
+
+            }
+            .select2-search__field {
+                background-color: #172331 !important;                
+            }
+            .select2-selection, .select2-search  {
+                background-color: #334352 !important;
+                color: #b9b5b5 !important;
+            }
+            /* width */
+            ::-webkit-scrollbar {
+              width: 10px;
+            }
+
+            /* Track */
+            ::-webkit-scrollbar-track {
+              background: #1a2939;
+            }
+
+            /* Handle */
+            ::-webkit-scrollbar-thumb {
+              background: #888;
+            }
+
+            /* Handle on hover */
+            ::-webkit-scrollbar-thumb:hover {
+              background: #555;
+            }
             h2 {
                 margin-top: 0.25em !important;
                 margin-bottom: 0.75em !important;
@@ -159,6 +204,27 @@
                 background-color:#0957a5 !important;
             }
             .append-btn:focus {
+                outline: #183353 !important;
+            }
+            .append-btn2 {
+                line-height: 1em;
+                color: #b9b5b5 !important;
+                border: none;
+                background-color:#172331 !important;
+            }
+            .append-btn2:hover {
+                line-height: 1em;
+                color: #eee !important;
+                border: solid grey 1px !important;
+                background-color:#0957a5 !important;
+            }
+            .append-btn2:active {
+                line-height: 1em;
+                color: #eee !important;
+                border: solid grey 1px !important;
+                background-color:#0957a5 !important;
+            }
+            .append-btn2:focus {
                 outline: #183353 !important;
             }
             .list-group li div {
@@ -592,6 +658,9 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs4-4.1.1/jq-3.3.1/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/b-print-1.6.2/sp-1.1.0/datatables.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
         <script>
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip()

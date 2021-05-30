@@ -166,6 +166,12 @@ def get_regions_info(notary_list):
 
     return regions_info
 
+def get_mm2_coins():
+    r = requests.get(f"{THIS_SERVER}/api/info/coins/?mm2_compatible=1")
+    coins = list(r.json()["results"].keys())
+    coins.sort()
+    return coins
+
 def get_page_season(request):
     if "season" in request.GET:
         if request.GET["season"] in SEASONS_INFO:

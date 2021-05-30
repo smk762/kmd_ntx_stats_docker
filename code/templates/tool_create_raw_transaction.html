@@ -13,7 +13,7 @@
 				    <div class="input-group m-auto ">
 					    <div class="input-group-prepend p-0 text-left">
 					        <span class="input-group-text" style="border: none;">
-				        		Raw TX
+				        		{{ chain }} Raw TX
 							</span>
 					    </div>
 					    <div class="col-10 params-field" style="max-width: 85% !important;">
@@ -32,9 +32,9 @@
 					<table id="utxo_table" class="table table-striped table-bordered">
 						<thead>
 							<tr>
-								<th data-data="txid">UTXO Source TXID</th>
-								<th data-data="vout">UTXO Source VOUT</th>
-								<th data-data="amount" id="amount">UTXO Amount</th>
+								<th data-data="txid">{{ chain }} UTXO Source TXID</th>
+								<th data-data="vout">{{ chain }} UTXO Source VOUT</th>
+								<th data-data="amount" id="amount">{{ chain }} UTXO Amount</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -69,8 +69,8 @@
 					<table id="utxo_table" class="table table-striped table-bordered">
 						<thead>
 							<tr>
-								<th data-data="address">Destination Address</th>
-								<th data-data="amount" id="amount">Amount</th>
+								<th data-data="address">Destination {{ chain }} Address</th>
+								<th data-data="amount" id="amount">{{ chain }} Amount</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -108,9 +108,10 @@
 				<form>
 				  <div class="input-group mb-3 ">
 				    <div class="input-group-prepend p-0" >
-				      <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;">
-				      	KMD Address
-				      </span>
+				        <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;">
+				      	    {{ chain }} Address
+				        </span>
+						<input type="hidden" name="chain" id="chain" value="{{ chain }}" /> 
 				    </div>
 				    <input type="text" class="form-control m-auto " id="address_id" name="address" placeholder="{{ address }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 44em">
 				    <div class="input-group-append p-0  ">
@@ -128,7 +129,7 @@
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card shadow-none">
 				<div class="card-header">
-					<h4>{{ address }} UTXOs</h4>
+					<h4>{{ address }} {{ chain }} UTXOs</h4>
 				</div>
 				<div class="card-body">
 					<form>
@@ -196,7 +197,7 @@
 								<div class="input-group mb-3 col-9">
 								    <div class="input-group-prepend p-0" >
 								        <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;">
-								      	    To KMD Address <i class="fas fa-check-circle m-0 pl-2" style="font-size: 0.8em;"></i>
+								      	    To {{ chain }} Address <i class="fas fa-check-circle m-0 pl-2" style="font-size: 0.8em;"></i>
 								        </span>
 								    </div>
 								    <input type="text" class="form-control m-auto" id="address_id" name="to_address" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 34em">
@@ -240,20 +241,21 @@
 							</div>
 							<div class="input-group mb-3 col-3" id="">
 								<div class="status-label col-12 p-2" style="line-height: 1.2em; border: solid grey 1px !important;">
-								     <span class="col-6 ml-auto">Fees: <span id="fee_val">0</span></span>
+								     <span class="col-6 ml-auto">Fees: <span id="fee_val">0</span> {{ chain }}</span>
 								</div>
 							</div>		
 						</div>
 						<div class="row">
 							<div class="input-group mb-3 col-9" id="">
 								<input type="hidden" name="inputs" id="hidden_inputs" /> 
+								<input type="hidden" name="chain" id="chain" value="{{ chain }}" /> 
 								<button class="append-btn col-12 p-2" type="submit" style="line-height: 1em; border: solid grey 1px !important;">
-								    Create Raw Transaction (Testing only!)
+								    Create {{ chain }} Raw Transaction (Testing only!)
 								</button>
 							</div>	
 							<div class="input-group mb-3 col-3" id="">
 								<div class="status-label col-12 p-2" style="line-height: 1.2em; border: solid grey 1px !important;">
-								     <span class="col-6 ml-auto">TX Total: <span id="total_val">0</span></span>
+								     <span class="col-6 ml-auto">TX Total: <span id="total_val">0</span> {{ chain }}</span>
 								</div>
 							</div>		
 						</div>
@@ -283,7 +285,7 @@
 								<div class="input-group mb-3 col-9"> \
 								    <div class="input-group-prepend p-0" > \
 								        <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;"> \
-								      	    To KMD Address \
+								      	    To {{ chain }} Address \
 								        	<i onclick="remove_node(\'#'+out_row+'\')" class="fas fa-times-circle pl-2 m-0" style="font-size: 0.8em;"></i> \
 								        </span> \
 								    </div> \
