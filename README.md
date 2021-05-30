@@ -18,6 +18,8 @@
 
 - Psychpg2 `sudo apt-get install python-psycopg2` then `sudo apt-get install python3-dev build-essential libpq-dev  libgnutls28-dev gcc`
 
+- mysql-client `sudo apt-get install default-libmysqlclient-dev build-essential`
+
 sudo apt-get install
 # Clone repo
 `git clone https://github.com/smk762/kmd_ntx_stats_docker`
