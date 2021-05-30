@@ -257,7 +257,11 @@ def scripthashes_from_pubkey_view(request):
 
 def create_raw_transaction_view(request):
     season = get_page_season(request)
+    chain = "KMD"
+    if "chain" in request.GET:
+        chain = request.GET["chain"]
     context = {
+        "chain":chain,
         "season":season,
         "now":int(time.time()),
         "reqget":request.GET,
@@ -266,10 +270,11 @@ def create_raw_transaction_view(request):
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link()
     }
+
     if "address" in request.GET:
         address = request.GET["address"]
         rewards_resp = requests.get(f"{THIS_SERVER}/api/tools/kmd_rewards/?address={address}").json()
-        resp = requests.get(f"https://kmd.explorer.dexstats.info/insight-api-komodo/addr/{address}/utxo")
+        resp = requests.get(f"https://{chain}.explorer.dexstats.info/insight-api-komodo/addr/{address}/utxo")
         utxos = resp.json()
         if "error" in resp:
             messages.error(request, resp["error"])

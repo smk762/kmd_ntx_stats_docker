@@ -45,3 +45,24 @@ class notarisedTenureFilter(FilterSet):
         model = notarised
         fields = ['gte_official_start', 'lte_official_start',
                   'gte_official_end', 'lte_official_end', 'season', 'chain']
+
+class swapsFilter(FilterSet):
+    from_time = NumberFilter(field_name="time_stamp", lookup_expr='gte')
+    to_time = NumberFilter(field_name="time_stamp", lookup_expr='lte')
+    class Meta:
+        model = swaps
+        fields = ["uuid", "started_at", "taker_coin", "taker_amount", \
+                 "taker_gui", "taker_version", "taker_pubkey", "maker_coin", \
+                 "maker_amount", "maker_gui", "maker_version", "maker_pubkey"]
+
+
+class swapsFailedFilter(FilterSet):
+    from_time = NumberFilter(field_name="time_stamp", lookup_expr='gte')
+    to_time = NumberFilter(field_name="time_stamp", lookup_expr='lte')
+    class Meta:
+        model = swaps_failed
+        fields = ["uuid", "started_at", "taker_coin", "taker_amount", 
+                 "taker_error_type", "taker_error_msg", "taker_gui", 
+                 "taker_version", "taker_pubkey", "maker_coin", 
+                 "maker_amount", "maker_error_type", "maker_error_msg",
+                 "maker_gui", "maker_version", "maker_pubkey"]

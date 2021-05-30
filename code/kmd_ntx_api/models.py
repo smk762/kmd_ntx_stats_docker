@@ -553,6 +553,83 @@ class vote2021(models.Model):
         ]
 
 
+class swaps(models.Model):
+    uuid = models.CharField(primary_key=True, max_length=36)
+    started_at = models.DateTimeField()
+    time_stamp = models.PositiveIntegerField(default=0)
+    taker_coin = models.CharField(max_length=12)
+    taker_amount = models.FloatField()
+    taker_gui = models.CharField(max_length=64, blank=True, null=True)
+    taker_version = models.CharField(max_length=64, blank=True, null=True)
+    taker_pubkey = models.CharField(max_length=66, blank=True, null=True)
+    maker_coin = models.CharField(max_length=12)
+    maker_amount = models.FloatField()
+    maker_gui = models.CharField(max_length=64, blank=True, null=True)
+    maker_version = models.CharField(max_length=64, blank=True, null=True)
+    maker_pubkey = models.CharField(max_length=66, blank=True, null=True)
+
+    class Meta:
+        db_table = 'swaps'
+        indexes = [
+            models.Index(fields=['taker_coin']),
+            models.Index(fields=['maker_coin']),
+            models.Index(fields=['taker_gui']),
+            models.Index(fields=['maker_gui']),
+            models.Index(fields=['taker_pubkey']),
+            models.Index(fields=['maker_pubkey']),
+            models.Index(fields=['taker_version']),
+            models.Index(fields=['maker_version'])
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['uuid'],
+                name='unique_swap'
+            )
+        ]
+
+
+class swaps_failed(models.Model):
+    uuid = models.CharField(primary_key=True, max_length=36)
+    started_at = models.DateTimeField()
+    time_stamp = models.PositiveIntegerField(default=0)
+    taker_coin = models.CharField(max_length=12)
+    taker_amount = models.FloatField()
+    taker_error_type = models.CharField(max_length=32, blank=True, null=True)
+    taker_error_msg = models.TextField(blank=True, null=True)
+    taker_gui = models.CharField(max_length=64, blank=True, null=True)
+    taker_version = models.CharField(max_length=64, blank=True, null=True)
+    taker_pubkey = models.CharField(max_length=66, blank=True, null=True)
+    maker_coin = models.CharField(max_length=12)
+    maker_amount = models.FloatField()
+    maker_error_type = models.CharField(max_length=32, blank=True, null=True)
+    maker_error_msg = models.TextField(blank=True, null=True)
+    maker_gui = models.CharField(max_length=64, blank=True, null=True)
+    maker_version = models.CharField(max_length=64, blank=True, null=True)
+    maker_pubkey = models.CharField(max_length=66, blank=True, null=True)
+
+    class Meta:
+        db_table = 'swaps_failed'
+        indexes = [
+            models.Index(fields=['taker_coin']),
+            models.Index(fields=['maker_coin']),
+            models.Index(fields=['taker_gui']),
+            models.Index(fields=['maker_gui']),
+            models.Index(fields=['taker_pubkey']),
+            models.Index(fields=['maker_pubkey']),
+            models.Index(fields=['taker_version']),
+            models.Index(fields=['maker_version']),
+            models.Index(fields=['taker_error_type']),
+            models.Index(fields=['maker_error_type'])
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['uuid'],
+                name='unique_swaps_failed'
+            )
+        ]
+
+
+        
 # to make migrations, use "docker-compose run web python3 manage.py makemigrations"
 # to apply migrations, use "docker-compose run web python3 manage.py migrate"
 # to update static files, use "docker-compose run web python3 manage.py collectstatic"

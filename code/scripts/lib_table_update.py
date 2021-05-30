@@ -749,3 +749,62 @@ def update_vote2021_row(row_data):
         if str(e).find('duplicate') == -1:
             logger.debug(row_data)
         CONN.rollback()
+
+
+def update_swaps_row(row_data):
+    try:
+        sql = f"INSERT INTO swaps \
+                (uuid, started_at, taker_coin, taker_amount, \
+                 taker_gui, taker_version, taker_pubkey, maker_coin, \
+                 maker_amount, maker_gui, maker_version, maker_pubkey, time_stamp) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                ON CONFLICT ON CONSTRAINT unique_swap \
+                DO UPDATE SET \
+                 started_at='{row_data[1]}', taker_coin='{row_data[2]}', \
+                 taker_amount={row_data[3]}, taker_gui='{row_data[4]}', \
+                 taker_version='{row_data[5]}', taker_pubkey='{row_data[6]}', \
+                 maker_coin='{row_data[7]}', maker_amount={row_data[8]}, \
+                 maker_gui='{row_data[9]}', maker_version='{row_data[10]}', \
+                 maker_pubkey='{row_data[11]}', time_stamp={row_data[12]};"
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
+    except Exception as e:
+        logger.error(f"Exception in [update_swaps_row]: {e}")
+        logger.error(f"[update_swaps_row] sql: {sql}")
+        logger.error(f"[update_swaps_row] row_data: {row_data}")
+        # input()
+        CONN.rollback()
+
+def update_swaps_failed_row(row_data):
+    taker_err_msg = row_data[5]
+    maker_err_msg = row_data[12]
+    if row_data[5]:
+        taker_err_msg = row_data[5].replace("'","")
+    if row_data[12]:
+        maker_err_msg = row_data[12].replace("'","")
+    try:
+        sql = f"INSERT INTO swaps_failed \
+                (uuid, started_at, taker_coin, taker_amount, \
+                 taker_error_type, taker_error_msg, \
+                 taker_gui, taker_version, taker_pubkey, maker_coin, \
+                 maker_amount, maker_error_type, maker_error_msg, \
+                 maker_gui, maker_version, maker_pubkey, time_stamp) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                ON CONFLICT ON CONSTRAINT unique_swaps_failed \
+                DO UPDATE SET \
+                 started_at='{row_data[1]}', taker_coin='{row_data[2]}', \
+                 taker_amount={row_data[3]}, taker_error_type='{row_data[4]}', \
+                 taker_error_msg='{taker_err_msg}', taker_gui='{row_data[6]}', \
+                 taker_version='{row_data[7]}', taker_pubkey='{row_data[8]}', \
+                 maker_coin='{row_data[9]}', maker_amount={row_data[10]}, \
+                 maker_error_type='{row_data[11]}', maker_error_msg='{maker_err_msg}', \
+                 maker_gui='{row_data[13]}', maker_version='{row_data[14]}', \
+                 maker_pubkey='{row_data[15]}', time_stamp={row_data[16]};"
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
+    except Exception as e:
+        logger.error(f"Exception in [update_swaps_failed_row]: {e}")
+        logger.error(f"[update_swaps_failed_row] sql: {sql}")
+        logger.error(f"[update_swaps_failed_row] row_data: {row_data}")
+        # input()
+        CONN.rollback()

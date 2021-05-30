@@ -339,3 +339,59 @@ def get_vote2021_data(candidate=None, block=None, txid=None,
     return data
 
 
+def get_swaps_failed_data(uuid=None):
+    data = swaps_failed.objects.all()
+    if uuid:
+        data = data.filter(uuid=uuid)
+    return data
+
+def get_swaps_data(uuid=None):
+    data = swaps.objects.all()
+    if uuid:
+        data = data.filter(uuid=uuid)
+    return data
+
+def filter_swaps_coins(data, taker_coin=None, maker_coin=None):
+    if taker_coin:
+        data = data.filter(taker_coin=taker_coin)
+    if maker_coin:
+        data = data.filter(maker_coin=maker_coin)
+    return data
+
+def filter_swaps_gui(data, taker_gui=None, maker_gui=None):
+    if taker_gui:
+        data = data.filter(taker_gui=taker_gui)
+    if maker_gui:
+        data = data.filter(maker_gui=maker_gui)
+    return data
+
+def filter_swaps_version(data, taker_version=None, maker_version=None):
+    if taker_version:
+        data = data.filter(taker_version=taker_version)
+    if maker_version:
+        data = data.filter(maker_version=maker_version)
+    return data
+
+def filter_swaps_pubkey(data, taker_pubkey=None, maker_pubkey=None):
+    if taker_pubkey:
+        data = data.filter(taker_pubkey=taker_pubkey)
+    if maker_pubkey:
+        data = data.filter(maker_pubkey=maker_pubkey)
+    return data
+
+def filter_swaps_error(data, taker_error_type=None, maker_error_type=None):
+    if taker_error_type:
+        data = data.filter(taker_error_type=taker_error_type)
+    if maker_error_type:
+        data = data.filter(maker_error_type=maker_error_type)
+    return data
+
+def filter_swaps_timespan(data, from_time=None, to_time=None):
+    print(data.count())
+    if from_time:
+        data = data.filter(time_stamp__gte=from_time)
+    print(data.count())
+    if to_time:
+        data = data.filter(time_stamp__lte=to_time)
+    print(data.count())
+    return data
