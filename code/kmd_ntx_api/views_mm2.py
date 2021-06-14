@@ -77,11 +77,10 @@ def bestorders_view(request):
     if "coin" in request.GET:
         coin = request.GET["coin"]
     season = get_page_season(request)
-    mm2_coins = get_mm2_coins()
     context = {
         "coin":coin,
         "season":season,
-        "mm2_coins":mm2_coins,
+        "mm2_coins":get_mm2_coins(),
         "scheme_host":get_current_host(request),
         "sidebar_links":get_sidebar_links(season),
         "eco_data_link":get_eco_data_link()
@@ -102,3 +101,57 @@ def bestorders_view(request):
 
 
     return render(request, 'mm2/mm2_bestorders.html', context)
+
+def mm2gui_view(request):
+    to_time = int(time.time())
+    from_time = int(to_time - 60*60*24*14)
+    if "from_time" in request.GET:
+        from_time = int(request.GET["from_time"])
+    if "to_time" in request.GET:
+        to_time = int(request.GET["to_time"])
+    season = get_page_season(request)
+    context = {
+        "from_time": from_time,
+        "to_time": to_time,
+        "from_time_dt": dt.fromtimestamp(from_time),
+        "to_time_dt": dt.fromtimestamp(to_time),        
+        "since_options": list(SINCE_INTERVALS.keys()),
+        "season": season,
+        "scheme_host": get_current_host(request),
+        "sidebar_links": get_sidebar_links(season),
+        "eco_data_link": get_eco_data_link()
+    } 
+
+    return render(request, 'mm2/mm2_gui_stats.html', context)
+
+
+def last200_swaps_view(request):
+    season = get_page_season(request)
+    last_200_swaps = get_last_200_swaps(request)
+    last_200_swaps = format_gui_os_version(last_200_swaps)
+    context = {
+        "last_200_swaps": last_200_swaps,
+        "season": season,
+        "page_title": "Last 200 Swaps",
+        "scheme_host": get_current_host(request),
+        "sidebar_links": get_sidebar_links(season),
+        "eco_data_link": get_eco_data_link()
+    } 
+
+    return render(request, 'mm2/last_200_swaps.html', context)
+
+def last200_failed_swaps_view(request):
+    season = get_page_season(request)
+    last_200_failed_swaps = get_last_200_failed_swaps(request)
+    last_200_failed_swaps = format_gui_os_version(last_200_failed_swaps)
+
+    context = {
+        "last_200_failed_swaps": last_200_failed_swaps,
+        "season": season,
+        "page_title": "Last 200 Failed Swaps",
+        "scheme_host": get_current_host(request),
+        "sidebar_links": get_sidebar_links(season),
+        "eco_data_link": get_eco_data_link()
+    } 
+
+    return render(request, 'mm2/last_200_failed_swaps.html', context)

@@ -3,6 +3,7 @@ import requests
 from django.shortcuts import render
 
 from kmd_ntx_api.lib_info import *
+from kmd_ntx_api.lib_mm2 import *
 from kmd_ntx_api.api_tools import *
 from kmd_ntx_api.lib_base58 import *
 
@@ -260,14 +261,18 @@ def create_raw_transaction_view(request):
     chain = "KMD"
     if "chain" in request.GET:
         chain = request.GET["chain"]
+    if "coin" in request.GET:
+        chain = request.GET["coin"]
     context = {
         "chain":chain,
         "season":season,
         "now":int(time.time()),
+        "20_min_ago":int(time.time()-20*60),
         "reqget":request.GET,
         "page_title":"Create Raw Transaction from Address",
         "scheme_host":get_current_host(request),
         "sidebar_links":get_sidebar_links(season),
+        "mm2_coins":list(get_dexstats_explorers().keys()),
         "eco_data_link":get_eco_data_link()
     }
 
@@ -329,3 +334,24 @@ def create_raw_transaction_view(request):
 
     return render(request, 'tool_create_raw_transaction.html', context)
 
+
+def send_raw_tx_view(request):
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "page_title":"Get Scripthashes from Pubkey",
+        "scheme_host": get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "mm2_coins":list(get_dexstats_explorers().keys()),
+        "eco_data_link":get_eco_data_link()
+    }
+    if "coin" in request.GET or "tx_hex" in request.GET:
+        mm2_resp = send_raw_tx(request)
+
+        if "error" in mm2_resp:
+            messages.error(request, f"{mm2_resp['error']}")
+        else:
+            messages.success(request, f"{mm2_resp}")
+
+
+    return render(request, 'tool_send_raw_transaction.html', context)

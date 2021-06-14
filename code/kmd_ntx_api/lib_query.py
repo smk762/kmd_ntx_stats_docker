@@ -351,6 +351,7 @@ def get_swaps_data(uuid=None):
         data = data.filter(uuid=uuid)
     return data
 
+
 def filter_swaps_coins(data, taker_coin=None, maker_coin=None):
     if taker_coin:
         data = data.filter(taker_coin=taker_coin)

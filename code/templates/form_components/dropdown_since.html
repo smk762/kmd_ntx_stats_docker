@@ -1,0 +1,18 @@
+							    <div class="input-group-prepend pr-0" >
+							        <span class="col-4 input-group-text">
+							      	    Since
+							        </span>
+									<select class="form-control col-8" id='since' name="since" onchange="update_timespan(this, 'from_time','to_time')">
+									{% for option in since_options %}
+										{% if since == option %}
+									    	<option value='{{ option }}' selected>
+										    	{{ option|title }}
+										    </option> 
+									    {% else %}
+									    	<option value='{{ option }}'>
+										    	{{ option|title }}
+										    </option> 
+									    {% endif %}
+									{% endfor %}
+									</select>
+							    </div>
