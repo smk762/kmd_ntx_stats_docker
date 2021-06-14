@@ -15,6 +15,9 @@ def populate_addresses(season, server):
     logger.info(url)
     coins = requests.get(url).json()['results']
     coins += ["BTC", "KMD", "LTC"]
+    if server == "Third_Party": 
+        coins += ["EMC2", "AYA", "CHIPS", "GLEEC-OLD", "MCL", "VRSC", "SFUSD"]
+        coins = list(set(coins))
     coins.sort()
 
     if len(coins) > 0:
