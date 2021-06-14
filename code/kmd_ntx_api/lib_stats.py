@@ -277,7 +277,21 @@ def get_swaps_stats(from_time, to_time):
     }
     return resp
 
-def get_swaps_gui_stats(from_time, to_time):
+
+def get_swaps_gui_stats(request):
+    print(request.GET)
+    to_time = int(time.time())
+    from_time = int(time.time()) - SINCE_INTERVALS["week"]
+    '''
+    if "since" in request.GET:
+        if request.GET["since"] in SINCE_INTERVALS:
+            from_time = to_time - SINCE_INTERVALS[request.GET["since"]]
+    '''
+    if "from_time" in request.GET:
+        from_time = int(request.GET["from_time"])
+    if "to_time" in request.GET:
+        to_time = int(request.GET["to_time"])
+
     data = get_swaps_data()
     print(from_time)
     print(to_time)
@@ -286,62 +300,109 @@ def get_swaps_gui_stats(from_time, to_time):
     maker_pubkeys = data.values('maker_pubkey', 'maker_gui').annotate(num_swaps=Count('maker_pubkey'))
     resp = {
         "taker": {
-            "TOTAL":0,
-            "desktop":{"TOTAL":0},
-            "android":{"TOTAL":0},
-            "ios":{"TOTAL":0},
-            "dogedex":{"TOTAL":0},
-            "other":{"TOTAL":0}
+            "swap_total":0,
+            "pubkey_total":0,
+            "desktop":{"swap_total":0,"pubkey_total":0},
+            "android":{"swap_total":0,"pubkey_total":0},
+            "ios":{"swap_total":0,"pubkey_total":0},
+            "dogedex":{"swap_total":0,"pubkey_total":0},
+            "other":{"swap_total":0,"pubkey_total":0}
         },
         "maker": {
-            "TOTAL":0,
-            "desktop":{"TOTAL":0},
-            "android":{"TOTAL":0},
-            "ios":{"TOTAL":0},
-            "dogedex":{"TOTAL":0},
-            "other":{"TOTAL":0}
+            "swap_total":0,
+            "pubkey_total":0,
+            "desktop":{"swap_total":0,"pubkey_total":0},
+            "android":{"swap_total":0,"pubkey_total":0},
+            "ios":{"swap_total":0,"pubkey_total":0},
+            "dogedex":{"swap_total":0,"pubkey_total":0},
+            "other":{"swap_total":0,"pubkey_total":0}
         }
     }
     for item in taker_pubkeys:
         category = "other"
         for x in list(resp["taker"].keys()):
-            if item["taker_gui"].lower().find(x) > -1:
-                category = x
+            if item["taker_gui"] is not None:
+                if item["taker_gui"].lower().find(x) > -1:
+                    category = x
         if item["taker_gui"] not in resp["taker"][category]:
-            resp["taker"][category].update({item["taker_gui"]:{"TOTAL":0}})
+            resp["taker"][category].update({item["taker_gui"]:{"swap_total":0,"pubkey_total":0}})
         resp["taker"][category][item["taker_gui"]].update({
             item['taker_pubkey']:item['num_swaps'],
         })
-        resp["taker"][category][item["taker_gui"]]["TOTAL"] += item['num_swaps']
-        resp["taker"][category]["TOTAL"] += item['num_swaps']
-        resp["taker"]["TOTAL"] += item['num_swaps']
+        resp["taker"][category][item["taker_gui"]]["pubkey_total"] += 1
+        resp["taker"][category][item["taker_gui"]]["swap_total"] += item['num_swaps']
+        resp["taker"][category]["pubkey_total"] += 1
+        resp["taker"][category]["swap_total"] += item['num_swaps']
+        resp["taker"]["swap_total"] += item['num_swaps']
+
+    resp["taker"]["pubkey_total"] = len(taker_pubkeys)
+
+    for category in resp["taker"]:
+        if category not in ["swap_total", "swap_pct", "pubkey_total"]:
+            pct = resp["taker"][category]["swap_total"]/resp["taker"]["swap_total"]*100
+            resp["taker"][category].update({"swap_pct":pct})
+            for gui in resp["taker"][category]:
+                if gui not in ["swap_total", "swap_pct", "pubkey_total"]:
+                    pct = resp["taker"][category][gui]["swap_total"]/resp["taker"]["swap_total"]*100
+                    category_pct = resp["taker"][category][gui]["swap_total"]/resp["taker"][category]["swap_total"]*100
+                    resp["taker"][category][gui].update({
+                        "swap_pct":pct,
+                        "swap_category_pct":category_pct,
+                    })
+
 
     for item in maker_pubkeys:
         category = "other"
         for x in list(resp["maker"].keys()):
-            if item["maker_gui"].lower().find(x) > -1:
-                category = x
+            if item["maker_gui"] is not None:
+                if item["maker_gui"].lower().find(x) > -1:
+                    category = x
         if item["maker_gui"] not in resp["maker"][category]:
-            resp["maker"][category].update({item["maker_gui"]:{"TOTAL":0}})
+            resp["maker"][category].update({item["maker_gui"]:{"swap_total":0,"pubkey_total":0}})
         resp["maker"][category][item["maker_gui"]].update({
             item['maker_pubkey']:item['num_swaps'],
         })
-        resp["maker"][category][item["maker_gui"]]["TOTAL"] += item['num_swaps']
-        resp["maker"][category]["TOTAL"] += item['num_swaps']
-        resp["maker"]["TOTAL"] += item['num_swaps']
+        resp["maker"][category][item["maker_gui"]]["pubkey_total"] += 1
+        resp["maker"][category][item["maker_gui"]]["swap_total"] += item['num_swaps']
+        resp["maker"][category]["pubkey_total"] += 1
+        resp["maker"][category]["swap_total"] += item['num_swaps']
+        resp["maker"]["swap_total"] += item['num_swaps']
+
+    resp["maker"]["pubkey_total"] = len(maker_pubkeys)
+
+    for category in resp["maker"]:
+        if category  not in ["swap_total", "swap_pct", "pubkey_total"]:
+            pct = resp["maker"][category]["swap_total"]/resp["maker"]["swap_total"]*100
+            resp["maker"][category].update({"swap_pct":pct})
+            for gui in resp["maker"][category]:
+                if gui not in ["swap_total", "swap_pct", "pubkey_total"]: 
+                    pct = resp["maker"][category][gui]["swap_total"]/resp["maker"]["swap_total"]*100
+                    category_pct = resp["maker"][category][gui]["swap_total"]/resp["maker"][category]["swap_total"]*100
+                    resp["maker"][category][gui].update({
+                        "swap_pct":pct,
+                        "swap_category_pct":category_pct,
+                    })
+
     return resp
 
 
-def get_swaps_pubkey_stats(from_time, to_time):
+def get_swaps_pubkey_stats(request):
+    to_time = int(time.time())
+    from_time = int(time.time()) - SINCE_INTERVALS["week"]
+    if "since" in request.GET:
+        if request.GET["since"] in SINCE_INTERVALS:
+            from_time = to_time - SINCE_INTERVALS[request.GET["since"]]
+    if "from_time" in request.GET:
+        from_time = int(request.GET["from_time"])
+    if "to_time" in request.GET:
+        to_time = int(request.GET["to_time"])
+
     data = get_swaps_data()
-    print(from_time)
-    print(to_time)
     data = filter_swaps_timespan(data, from_time, to_time)
     taker_pubkeys = data.values('taker_pubkey', 'taker_gui').annotate(num_swaps=Count('taker_pubkey'))
     maker_pubkeys = data.values('maker_pubkey', 'maker_gui').annotate(num_swaps=Count('maker_pubkey'))
     resp = {}
     for item in taker_pubkeys:
-        print(item)
         if item["taker_pubkey"] not in resp:
             resp.update({item["taker_pubkey"]:{"TOTAL":0}})
         resp[item["taker_pubkey"]].update({

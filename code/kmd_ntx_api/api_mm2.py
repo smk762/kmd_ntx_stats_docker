@@ -8,3 +8,13 @@ def orderbook_api(request):
 
 def bestorders_api(request):
     return JsonResponse(get_bestorders(request))
+
+def last_200_swaps_api(request):
+    data = get_last_200_swaps(request)
+    data = format_gui_os_version(data)
+    return JsonResponse(data, safe=False)
+
+def last_200_failed_swaps_api(request):
+    data = get_last_200_failed_swaps(request)
+    data = format_gui_os_version(data)
+    return JsonResponse(data, safe=False)

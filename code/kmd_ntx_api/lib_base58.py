@@ -121,7 +121,7 @@ def pubkey_to_p2pk(pubkey):
 class raw_tx():
     def __init__(self, version='04000080', group_id='85202f89', inputs=list,
                  sequence='feffffff', outputs=list,
-                 expiry_height='00000000', locktime=int(time.time()),
+                 expiry_height='00000000', locktime=int(time.time()-20*60),
                  valueBalanceSapling="0000000000000000", nSpendsSapling="0",
                  vSpendsSapling="00", nOutputsSapling="0", vOutputsSapling="00"):
         self.version = version

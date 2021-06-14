@@ -40,9 +40,9 @@
 					</a>	
 					<div class="card-body " style="padding: 1rem; background-color: #183353 !important;">
 						<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
-	            			<a href="//{{ request.get_host }}/coin_profile/{{ coin }}">
+	            			<a href="//{{ request.get_host }}/coin_profile/{{ coin }}" style="font-size:1.8em; display: block;">
 	            				{{ coin }}
-							</a><br />
+							</a>
 							{% for ticker, site_links in coin_social.items %}
 								{% if ticker == coin %}
 									{% for site, link in site_links.items %}

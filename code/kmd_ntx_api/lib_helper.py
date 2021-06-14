@@ -5,6 +5,7 @@ import random
 import logging
 import requests
 from .lib_const import *
+import string
 
 logger = logging.getLogger("mylogger")
 
@@ -55,7 +56,21 @@ def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=N
 
 def get_current_host(request):
     scheme = request.is_secure() and "https" or "http"
-    return f'{scheme}://{request.get_host()}/'
+    if THIS_SERVER.find("stats.kmd.io") > -1:
+        return f'https://{request.get_host()}/'
+    else:
+        return f'{scheme}://{request.get_host()}/'
+
+def get_dexstats_explorers():
+    explorers = requests.get(f"{THIS_SERVER}/api/info/explorers/").json()["results"]
+    dexplorers = {}
+    for coin in explorers:
+        for item in explorers[coin]:
+            if item.find("dexstats") > -1:
+                dexplorers.update({coin:item})
+    return dexplorers
+
+
 
 def get_season(time_stamp=None):
     if not time_stamp:
@@ -330,6 +345,9 @@ def prepare_coins_graph_data(graph_data, coins_dict):
     } 
     return data
 
+def is_hex(s):
+    hex_digits = set(string.hexdigits)
+    return all(c in hex_digits for c in s)
 
 def safe_div(x,y):
     if y==0: return 0

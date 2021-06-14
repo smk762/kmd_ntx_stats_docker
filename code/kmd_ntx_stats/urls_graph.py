@@ -13,5 +13,8 @@ api_graph_urls = [
           api_graph.daily_ntx_graph,
           name='daily_ntx_graph'),
 
+    path('api/graph/mm2gui/',
+          api_graph.get_mm2gui_piechart,
+          name='get_mm2gui_piechart'),
 
 ]

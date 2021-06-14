@@ -7,7 +7,7 @@ from kmd_ntx_api import api_graph
 from kmd_ntx_api import api_stats
 from kmd_ntx_stats.urls_source import source_router
 from kmd_ntx_stats.urls_status import api_status_urls
-from kmd_ntx_stats.urls_stats import api_stats_urls
+from kmd_ntx_stats.urls_stats import api_stats_urls, frontend_stats_urls
 from kmd_ntx_stats.urls_graph import api_graph_urls
 from kmd_ntx_stats.urls_info import api_info_urls
 from kmd_ntx_stats.urls_docs import doc_urls
@@ -76,6 +76,7 @@ urlpatterns += api_graph_urls
 urlpatterns += api_info_urls
 urlpatterns += api_status_urls
 urlpatterns += api_stats_urls
+urlpatterns += frontend_stats_urls
 urlpatterns += api_table_urls
 urlpatterns += api_tool_urls
 urlpatterns += api_wallet_urls
