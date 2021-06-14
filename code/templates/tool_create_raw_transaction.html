@@ -106,20 +106,41 @@
 			<div class="card-header col-12 m-auto">
 				<h2 style="min-width: 36em;">{{ page_title }}</h2>
 				<form>
-				  <div class="input-group mb-3 ">
-				    <div class="input-group-prepend p-0" >
-				        <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;">
-				      	    {{ chain }} Address
-				        </span>
-						<input type="hidden" name="chain" id="chain" value="{{ chain }}" /> 
-				    </div>
-				    <input type="text" class="form-control m-auto " id="address_id" name="address" placeholder="{{ address }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 44em">
-				    <div class="input-group-append p-0  ">
-						<button class="append-btn" style="line-height: 1em; border: solid grey 1px !important;">
-						    Get UTXOs
-						</button>
-				    </div>
-				  </div>
+					<div class="input-group mb-3 col-12" id="">
+					    <div class="input-group-prepend p-0 col-1" >
+					        <span class="input-group-text col-12" style="height: 100%; color:white; border: solid grey 1px !important;">
+					      	    Coin
+					        </span>
+					    </div>
+						<select class="form-control col-2" id='chain' name="chain">
+						{% for mm2_coin in mm2_coins %}
+							{% if coin == mm2_coin %}
+						    	<option value='{{ mm2_coin }}' selected>
+							    	{{ mm2_coin }}
+							    </option> 
+						    {% else %}
+						    	<option value='{{ mm2_coin }}'>
+							    	{{ mm2_coin }}
+							    </option> 
+						    {% endif %}
+						{% endfor %}
+						</select>
+						<div class="m-2">
+							
+						</div>
+
+					    <div class="input-group-prepend">
+					        <span class="input-group-text" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+					      	    Address
+					        </span>
+					    </div>
+					    <input type="text" class="form-control m-auto col-8 m-2" id="address_id" name="address" placeholder="{{ address }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 14em">	
+					    <div class="input-group-append p-0">
+							<button class="append-btn2" style="line-height: 1em; border: solid grey 1px !important;">
+							    Get UTXOs
+							</button>
+					    </div>							
+					</div>
 				</form>
 			</div>
 		</div>
@@ -129,7 +150,7 @@
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card shadow-none">
 				<div class="card-header">
-					<h4>{{ address }} {{ chain }} UTXOs</h4>
+					<h4>{{ utxos|length }} {{ address }} {{ chain }} UTXOs</h4>
 				</div>
 				<div class="card-body">
 					<form>
@@ -219,7 +240,7 @@
 						</div>
 						<div class="row">
 							<div class="input-group mb-3 col-3 ml-auto" id="">
-								<button class="append-btn col-12" type="button"  id="addAddressRow_btn" onclick="addAddress_Row('#output_addresses')" style="line-height: 1em; border: solid grey 1px !important;">
+								<button class="std-btn col-12" type="button"  id="addAddressRow_btn" onclick="addAddress_Row('#output_addresses')" style="line-height: 1em; border: solid grey 1px !important;">
 								    Add Output Address
 								</button>
 							</div>
@@ -243,16 +264,16 @@
 								<div class="status-label col-12 p-2" style="line-height: 1.2em; border: solid grey 1px !important;">
 								     <span class="col-6 ml-auto">Fees: <span id="fee_val">0</span> {{ chain }}</span>
 								</div>
-							</div>		
+							</div>
 						</div>
 						<div class="row">
 							<div class="input-group mb-3 col-9" id="">
 								<input type="hidden" name="inputs" id="hidden_inputs" /> 
-								<input type="hidden" name="chain" id="chain" value="{{ chain }}" /> 
-								<button class="append-btn col-12 p-2" type="submit" style="line-height: 1em; border: solid grey 1px !important;">
+								<input type="hidden" name="coin" id="coin" value="{{ chain }}" /> 
+								<button class="std-btn col-12 p-2" type="submit" style="line-height: 1em; border: solid grey 1px !important;">
 								    Create {{ chain }} Raw Transaction (Testing only!)
 								</button>
-							</div>	
+							</div>
 							<div class="input-group mb-3 col-3" id="">
 								<div class="status-label col-12 p-2" style="line-height: 1.2em; border: solid grey 1px !important;">
 								     <span class="col-6 ml-auto">TX Total: <span id="total_val">0</span> {{ chain }}</span>
@@ -265,7 +286,6 @@
 		</div>
 	</div>
 	{% endif %}
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
     <!-- jquery -->  
   	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
@@ -358,7 +378,6 @@
     	}
 
 		function sanitize_outputs(address_rows='#output_addresses') {
-			console.log("dsa")
 			sum_selected = floorRound(parseFloat($("#sum_selected").html()),5)
 			sum_outputs = get_sum_outputs(address_rows)
 			fee_val = sum_selected - sum_outputs
@@ -368,31 +387,6 @@
 			/* if remaining < 0 , red text warning, disable submit */		
 		}
 
-		// Tooltips
-		function setTooltip(mdi, message) {
-		  $(mdi).tooltip('hide')
-		    .attr('data-original-title', message)
-		    .tooltip('show');
-		}
-
-		function hideTooltip(mdi) {
-		  setTimeout(function() {
-		    $(mdi).tooltip('hide');
-		  }, 1000);
-		}
-
-		// Copy to clipboad on button click
-		var btns = document.querySelectorAll('button');
-		var clipboard = new ClipboardJS(btns);
-
-		clipboard.on('success', function (e) {
-			setTooltip(e.trigger, 'Copied!');
-			hideTooltip(e.trigger);
-		});
-
-		clipboard.on('error', function (e) {
-			console.log(e);
-		});
 	</script>
     {{ explorers|json_script:"explorers-data" }}
 
@@ -451,56 +445,33 @@
 			        }
         		],
 				"initComplete": function (settings, json) {
-					console.log('init')
 				    this.api().columns([2,3]).every(function () {
 				        var column = this;
-				        console.log(column.data())
-				        console.log(column)
 				        var sum = column
 				           .data()
 				           .reduce(function (a, b) { 
 				               a = parseFloat(a, 10);
-				               if(isNaN(a)){ a = 0; }
+				               if(isNaN(a)) { a = 0; }
 				               
 				               b = parseFloat(b, 10);
 				               if(isNaN(b)){ b = 0; }
 				               
 				               return a + b;
 				           });
-						console.log(sum)
+						if (sum == 0) {
+							console.log("hide")
+				        	column.visible( false );
+
+						}
 				        $(column.footer()).html('Total: ' + floorRound(sum, 5));
 				    });
 				},
 	        });
-	        $('#selected_utxo_table').DataTable({
-	            "paging": false,
-       			"bInfo" : false,
-       			"bFilter": false,
-        		order: [[ 0, 'asc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
-        		"columnDefs": [
-			        {
-			            "data": "txid",
-		                "targets": 0,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(oData.txid);
-				        }
-		            },
-        			{
-			            "data": "vout",
-			            "targets": 1,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(oData.vout);
-				        }
-			        },
-        			{
-			            "data": "amount",
-			            "targets": 2,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(oData.amount);
-				        }
-			        }
-        		],
-	        });
+
+
+
+
+
 		    $('#utxo_table tbody').on( 'click', 'tr', function () {
 		        $(this).toggleClass('selected');
 		        var inputs = []
@@ -512,6 +483,7 @@
 				$("#hidden_inputs").val(inputs)
 				$("#sum_selected").html(floorRound(sum_selected,5))
 			});
+    		$('#chain').select2();
 
 	    });
   </script> 

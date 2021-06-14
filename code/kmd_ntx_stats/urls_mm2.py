@@ -11,6 +11,14 @@ frontend_mm2_urls = [
     path('mm2/bestorders/',
           views_mm2.bestorders_view,
           name='bestorders_view'),
+    
+    path('mm2/last_200_swaps/',
+          views_mm2.last200_swaps_view,
+          name='bestorders_view'),
+    
+    path('mm2/last_200_failed_swaps/',
+          views_mm2.last200_failed_swaps_view,
+          name='bestorders_view'),
 ]
 
 
@@ -23,4 +31,12 @@ api_mm2_urls = [
     path('api/mm2/bestorders/',
           api_mm2.bestorders_api,
           name='bestorders_api'),
+
+    path('api/mm2/last_200_swaps/',
+          api_mm2.last_200_swaps_api,
+          name='last_200_swaps_api'),
+    
+    path('api/mm2/last_200_failed_swaps/',
+          api_mm2.last_200_failed_swaps_api,
+          name='last_200_failed_swaps_api'),
 ]

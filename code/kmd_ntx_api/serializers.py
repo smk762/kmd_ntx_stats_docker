@@ -191,6 +191,24 @@ class swapsFailedSerializer(serializers.HyperlinkedModelSerializer):
                  "maker_gui", "maker_version", "maker_pubkey"]
 
 
+class swapsSerializerPub(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = swaps
+        fields = ["uuid", "started_at", "time_stamp", "taker_coin", "taker_amount", \
+                 "taker_gui", "taker_version", "maker_coin", \
+                 "maker_amount", "maker_gui", "maker_version"]
+
+
+class swapsFailedSerializerPub(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = swaps_failed
+        fields = ["uuid", "started_at", "time_stamp", "taker_coin", "taker_amount", 
+                 "taker_error_type", "taker_error_msg", "taker_gui", 
+                 "taker_version", "maker_coin", 
+                 "maker_amount", "maker_error_type", "maker_error_msg",
+                 "maker_gui", "maker_version"]
+
+
 
 # Non-Model serializers
 class addrFromBase58Serializer(serializers.Serializer):

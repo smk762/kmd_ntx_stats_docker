@@ -38,6 +38,10 @@ frontend_tool_urls = [
           views_tool.scripthash_from_address_view,
           name='scripthash_from_address_view'),
 
+    path('tools/send_raw_tx/',
+          views_tool.send_raw_tx_view,
+          name='send_raw_tx_view'),
+
     path('tools/create_raw_transaction/',
           views_tool.create_raw_transaction_view,
           name='create_raw_transaction_view'),
@@ -80,4 +84,8 @@ api_tool_urls = [
           api_tools.scripthashes_from_pubkey_tool,
           name='scripthashes_from_pubkey_tool'),
 
+    path('api/tools/send_raw_tx/',
+          api_tools.send_raw_tx_tool,
+          name='send_raw_tx_tool'),
+    
 ]

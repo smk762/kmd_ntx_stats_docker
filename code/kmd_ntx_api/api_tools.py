@@ -8,6 +8,7 @@ from kmd_ntx_api.serializers import addrFromBase58Serializer
 from kmd_ntx_api.lib_info import get_all_coins
 from kmd_ntx_api.lib_base58 import *
 from kmd_ntx_api.lib_electrum import *
+from kmd_ntx_api.lib_mm2 import *
 
 
 def addr_from_base58_tool(request):
@@ -247,3 +248,13 @@ def scripthashes_from_pubkey_tool(request):
                     "error":f"{e}"
                 })
     return JsonResponse({"error": "You need to specify a pubkey, like ?pubkey=<PUBKEY>"})
+
+
+def send_raw_tx_tool(request):
+    try:
+        resp = send_raw_tx(request)
+        return JsonResponse({resp})
+    except Exception as e:
+        return JsonResponse({
+            "error":f"{e}"
+        })
