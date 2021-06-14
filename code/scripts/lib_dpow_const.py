@@ -107,6 +107,7 @@ for season in SCORING_EPOCHS_REPO:
             PARTIAL_SEASON_DPOW_CHAINS[season]["Servers"][epoch_server].update({
                     item:SCORING_EPOCHS_REPO[season]["Servers"][server][item]
                 })
+
 PARTIAL_SEASON_DPOW_CHAINS.update({
     "Season_5_Testnet": {
         "Servers": {
@@ -162,7 +163,9 @@ DPOW_EXCLUDED_CHAINS = {
         "HUF",
         "K64"
     ],
-    "Season_5": [],
+    "Season_5": [
+        "BTC"
+    ],
     "Season_5_Testnet": [
         "BLUR",
         "LABS",
@@ -290,3 +293,45 @@ for season in SEASONS_INFO:
                 })
 
 VALID_SERVERS = ["Main", "Third_Party", "KMD", "BTC", "LTC"]
+
+NEXT_SEASON_CHAINS = {
+    "LTC": ["LTC"],
+    "KMD": ["KMD"],
+    "Main": [
+        "AXO",
+        "BET",
+        "BOTS",
+        "BTCH",
+        "CCL",
+        "COQUICASH",
+        "CRYPTO",
+        "DEX",
+        "GLEEC",
+        "HODL",
+        "ILN",
+        "JUMBLR",
+        "KOIN",
+        "MESH",
+        "MGW",
+        "MORTY",
+        "MSHARK",
+        "NINJA",
+        "OOT",
+        "PANGEA",
+        "PIRATE",
+        "REVS",
+        "RICK",
+        "SUPERNET",
+        "THC",
+        "ZILLA"
+    ],
+    "Third_Party": [
+        "AYA",
+        "CHIPS",
+        "EMC2",
+        "GLEEC-OLD",
+        "MCL",
+        "SFUSD",
+        "VRSC"
+    ]
+}
