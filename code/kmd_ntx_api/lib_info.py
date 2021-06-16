@@ -259,7 +259,7 @@ def get_mined_data_24hr():
 
 
 def get_notarised_data_24hr(season=None, server=None, chain=None, notary=None):
-    return get_notarised_data(season, server, None, chain).filter(block_time__gt=str(int(time.time()-24*60*60)))
+    return get_notarised_data(season, server, None, chain, notary).filter(block_time__gt=str(int(time.time()-24*60*60)))
 
 
 def get_dpow_coins_list(season=None, server=None, epoch=None):

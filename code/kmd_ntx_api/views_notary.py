@@ -60,6 +60,7 @@ def notary_profile_view(request, notary=None):
             ltc_notarised_24hr = notarised_data_24hr.filter(server='KMD').count()
             region = get_notary_region(notary)
 
+
             season_score = 0
             last_ntx_time = 0
             last_ltc_ntx_time = 0
