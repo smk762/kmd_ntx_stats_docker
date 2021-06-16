@@ -13,7 +13,7 @@ services:
         max-size: "20m"
         max-file: "10"
   kmd: 
-    image: komodoofficial/komodo:cd_release_0918081_dev
+    image: komodoofficial/komodo:cd_release_e27c6f9_dev
     volumes:
       - /home/smk762/.komodo:/root/.komodo
       - /home/smk762/.zcash-params:/root/.zcash-params
