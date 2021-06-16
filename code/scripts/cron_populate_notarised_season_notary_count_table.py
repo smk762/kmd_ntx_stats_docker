@@ -376,10 +376,8 @@ if __name__ == "__main__":
 
     logger.info(f"Preparing to populate NTX tables...")
 
-    for season in seasons:
-        if season in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]:
-            logger.warning(f"Skipping season: {season}")
-        else:
+    for season in SEASONS_INFO:
+        if season not in EXCLUDED_SEASONS:
 
             update_notarised_count_season(season)
             end = time.time()

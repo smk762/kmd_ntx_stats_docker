@@ -180,9 +180,10 @@ if __name__ == "__main__":
 
     logger.info(f"Preparing to populate [social_notaries] table...")
     for season in SEASONS_INFO:
-        populate_social_notaries(season)
-        remove_invalid_notaries(season)
-        generate_social_notaries_template(season)
+        if season not in EXCLUDED_SEASONS:
+            populate_social_notaries(season)
+            remove_invalid_notaries(season)
+            generate_social_notaries_template(season)
     
     CURSOR.close()
     CONN.close()

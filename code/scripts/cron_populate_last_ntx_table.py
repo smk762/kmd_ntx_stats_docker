@@ -92,14 +92,9 @@ if __name__ == "__main__":
 
     TIP = int(RPC["KMD"].getblockcount())
 
-    seasons = get_notarised_seasons()
-    logger.info(f"Preparing to populate NTX tables...")
-
-    for season in seasons:
-        start = time.time()
-        if season in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]:
-            logger.warning(f"Skipping season: {season}")
-        else:
+    for season in SEASONS_INFO:
+        if season not in EXCLUDED_SEASONS:
+            start = time.time()
             update_latest_ntx(season)
             end = time.time()
             logger.info(f">>> {end-start} sec to complete [update_latest_ntx({season})]")

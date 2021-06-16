@@ -67,7 +67,7 @@ RETIRED_SMARTCHAINS = ["HUSH3"]
 COINS_INFO = requests.get(f'{THIS_SERVER}/api/info/coins/').json()['results']
 ELECTRUMS = requests.get(f'{THIS_SERVER}/api/info/electrums/').json()['results']
 
-SEASON = 'Season_4'
+SEASON = 'Season_5'
 
 ANTARA_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Main').json()["results"]
 THIRD_PARTY_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Third_Party').json()["results"]

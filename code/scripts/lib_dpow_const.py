@@ -164,7 +164,8 @@ DPOW_EXCLUDED_CHAINS = {
         "K64"
     ],
     "Season_5": [
-        "BTC"
+        "BTC",
+        "ARYA"
     ],
     "Season_5_Testnet": [
         "BLUR",
@@ -175,7 +176,7 @@ DPOW_EXCLUDED_CHAINS = {
 EXCLUDE_DECODE_OPRET_COINS = ['D']
 
 EXCLUDED_SERVERS = ["Unofficial"]
-EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]
+EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_4", "Season_5_Testnet"]
 
 SCORING_EPOCHS = {
 
