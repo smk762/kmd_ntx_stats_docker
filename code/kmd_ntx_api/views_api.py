@@ -21,7 +21,7 @@ def api_sidebar_links(request):
     if 'season' in request.GET:
         season = request.GET["season"]
     else:
-        season = "Season_4"
+        season = SEASON
     resp = get_sidebar_links(season)
     return JsonResponse(resp)
 

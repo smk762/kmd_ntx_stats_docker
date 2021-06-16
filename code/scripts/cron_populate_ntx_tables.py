@@ -212,14 +212,11 @@ if __name__ == "__main__":
 
     TIP = int(RPC["KMD"].getblockcount())
 
-    seasons = get_notarised_seasons()
+
     logger.info(f"Preparing to populate NTX tables...")
 
-    for season in seasons:
-        if season in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]:
-            logger.warning(f"Skipping season: {season}")
-        else:
-    
+    for season in SEASONS_INFO:
+        if season not in EXCLUDED_SEASONS:
             if 'post_season_end_time' in SEASONS_INFO[season]:
                 sql = f"UPDATE notarised SET epoch = 'Unofficial' WHERE season = '{season}' \
                         AND block_time >= {SEASONS_INFO[season]['end_time']} \

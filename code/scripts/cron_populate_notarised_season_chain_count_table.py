@@ -84,16 +84,13 @@ if __name__ == "__main__":
     # rescan_notaries(SEASON)
 
     start = time.time()
-    seasons = get_notarised_seasons()
     end = time.time()
     logger.info(f">>> {end-start} sec to complete [get_notarised_seasons]")
 
     logger.info(f"Preparing to populate NTX tables...")
 
-    for season in seasons:
-        if season in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]:
-            logger.warning(f"Skipping season: {season}")
-        else:
+    for season in SEASONS_INFO:
+        if season not in EXCLUDED_SEASONS:
 
             start = end
             update_notarised_chain_season(season)
