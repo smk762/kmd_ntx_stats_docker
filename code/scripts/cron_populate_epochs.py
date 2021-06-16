@@ -259,18 +259,18 @@ if __name__ == "__main__":
         delete_invalid_seasons()
         delete_invalid_servers()
 
-    # for season in SEASONS_INFO:
-    for season in ["Season_5"]:
-        row = ntx_tenure_row()
-        row.delete(season, "Third_Party", "ARYA")
+    for season in SEASONS_INFO:
         if season not in EXCLUDED_SEASONS:
-            if CLEAN_UP:
-                delete_invalid_season_servers(season)
-            for server in SCORING_EPOCHS[season]:
+            row = ntx_tenure_row()
+            row.delete(season, "Third_Party", "ARYA")
+            if season not in EXCLUDED_SEASONS:
                 if CLEAN_UP:
-                    delete_invalid_season_server_chains(season, server)
-            update_tenure(season)
-            update_epochs(season)
+                    delete_invalid_season_servers(season)
+                for server in SCORING_EPOCHS[season]:
+                    if CLEAN_UP:
+                        delete_invalid_season_server_chains(season, server)
+                update_tenure(season)
+                update_epochs(season)
 
     update_notarised_epoch_scoring()
 

@@ -179,9 +179,7 @@ if __name__ == "__main__":
         logger.info(f"updating {address}")
         clear_known_address(address)
     '''
-
-    for season in seasons:
-
+    for season in SEASONS_INFO:
         if season not in EXCLUDED_SEASONS:
 
             if season.find("Testnet") == -1:

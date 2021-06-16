@@ -10,23 +10,23 @@
 						    <div class="badge" style="width:16%; background-color: #26456B !important;">
 							    	{% if region == 'AR' %}
 										<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-											<a href="http://{{ request.get_host }}/ntx_scoreboard/?season={{ season }}#{{ region }}_table">Asia and Russia</a>
+											<a href="http://{{ request.get_host }}/ntx_scoreboard/#{{ region }}_table/?season={{ season }}">Asia and Russia</a>
 										</span>
 									{% elif region == 'EU' %}
 										<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-											<a href="http://{{ request.get_host }}/ntx_scoreboard/?season={{ season }}#{{ region }}_table">European Union</a>
+											<a href="http://{{ request.get_host }}/ntx_scoreboard/#{{ region }}_table/?season={{ season }}">European Union</a>
 										</span>
 									{% elif region == 'NA' %}
 										<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-											<a href="http://{{ request.get_host }}/ntx_scoreboard/?season={{ season }}#{{ region }}_table">North America</a>
+											<a href="http://{{ request.get_host }}/ntx_scoreboard/#{{ region }}_table/?season={{ season }}">North America</a>
 										</span>
 									{% elif region == 'SH' %}
 										<span class='badge my-1 p-2 mx-auto' style="font-size: 1.2em;">
-											<a href="http://{{ request.get_host }}/ntx_scoreboard/?season={{ season }}#{{ region }}_table">Southern Hemisphere</a>
+											<a href="http://{{ request.get_host }}/ntx_scoreboard/#{{ region }}_table/?season={{ season }}">Southern Hemisphere</a>
 										</span>
 									{% elif region == 'DEV' %}
 										<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-											<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/?season={{ season }}#{{ region }}_table">Development</a>
+											<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table/?season={{ season }}">Development</a>
 										</span>
 									{% endif %}
 						    	<div class="">
