@@ -57,12 +57,9 @@ def notary_profile_view(request, notary=None):
             season_stats_sorted = get_season_stats_sorted(season)
             main_notarised_24hr = notarised_data_24hr.filter(server='Main').count()
             third_notarised_24hr = notarised_data_24hr.filter(server='Third_Party').count()
-            ltc_notarised_24hr = notarised_data_24hr.filter(server='KMD')
-            print(ltc_notarised_24hr.values())
-            ltc_notarised_24hr = ltc_notarised_24hr.count()
+            ltc_notarised_24hr = notarised_data_24hr.filter(server='KMD').count()
             region = get_notary_region(notary)
 
-            print(ltc_notarised_24hr)
 
             season_score = 0
             last_ntx_time = 0
