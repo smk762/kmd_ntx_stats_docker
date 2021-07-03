@@ -55,6 +55,9 @@
 	    $(document).ready(function() {
 	        $('#pubkey_addresses').DataTable({
 	           "pageLength": 50,
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "chain" },

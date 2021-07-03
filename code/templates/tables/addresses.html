@@ -32,6 +32,9 @@
 	<script type="text/javascript">
 	    $(document).ready(function() {
 	        $('#table_id').DataTable({
+	        	"paging": false,
+    			deferRender: true,
+                "orderClasses": false,
         		order: [[ 4, 'desc' ], [ 0, 'asc' ], [ 1, 'asc' ]]
 	        });
 	    });

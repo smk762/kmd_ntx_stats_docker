@@ -65,7 +65,11 @@
   	
   	<script>
 	    $(document).ready(function() {
-	        $('#opret_table').DataTable({  "pageLength": 50,
+	        $('#opret_table').DataTable({
+	        	"paging": true,
+    			deferRender: true,
+                "orderClasses": false,
+	            "pageLength": 50,
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "block_height" },

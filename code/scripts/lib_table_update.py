@@ -49,6 +49,7 @@ def update_balances_row(row_data):
                 update_time={row_data[6]};"
         CURSOR.execute(sql, row_data)
         CONN.commit()
+        logger.info(row_data)
     except Exception as e:
         logger.error(f"Exception in [update_balances_row]: {e}")
         logger.error(f"[update_balances_row] sql: {sql}")

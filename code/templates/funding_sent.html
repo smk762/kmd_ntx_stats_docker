@@ -86,6 +86,9 @@
 	       	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 
 	    /*  $('#table_id').DataTable({
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
 	        	"columns": [
 			        { "data": "chain" },
 			        { "data": "notary" },
@@ -118,6 +121,9 @@
         		]
 	        }); */
 	        $('#totals_table').DataTable({
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
 	        	"columns": [
 			        { "data": "chain" },
 			        { "data": "notary" },

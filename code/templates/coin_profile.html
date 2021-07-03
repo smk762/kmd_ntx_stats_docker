@@ -417,6 +417,8 @@
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	        $('#balances_table').DataTable({
 	           "paging": false,
+    			deferRender: true,
+                "orderClasses": false,
         		order: [[ 0, 'asc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
         		"columnDefs": [
 			        {

@@ -74,7 +74,9 @@
 	<script type="text/javascript">
 	    $(document).ready(function() {
 	        $('#epochs_tbl').DataTable({
-	        	"pagination": false,
+	        	"paging": false,
+    			deferRender: true,
+                "orderClasses": false,
         		order: [[ 0, 'desc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
 	        	"columns": [
 			        { "data": "season" },

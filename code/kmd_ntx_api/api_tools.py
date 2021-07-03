@@ -96,8 +96,9 @@ def get_notary_utxo_count(request):
         min_height = 999999999
         if "utxos" in resp:
             for item in resp["utxos"]:
-                if item["height"] < min_height and item["height"] != 0:
-                    min_height = item["height"]
+                if "height" in item: # avoid unconfirmed
+                    if item["height"] < min_height and item["height"] != 0:
+                        min_height = item["height"]
             if min_height == 999999999:
                 min_height = 0
             api_resp = {

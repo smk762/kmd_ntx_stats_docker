@@ -93,6 +93,8 @@
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	        $('#epoch_scoring_table').DataTable({
 	        	"paging": false,
+    			deferRender: true,
+                "orderClasses": false,
         		order: [[ 1, 'asc' ],[ 2, 'asc' ],[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "chain" },
