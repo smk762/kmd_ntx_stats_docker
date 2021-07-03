@@ -46,6 +46,9 @@
 	        $('#mined_overview_tbl').DataTable({
 
   				"pageLength": 50,
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
         		order: [[ 5, 'desc' ], [ 0, 'asc' ]],
         		"columnDefs": [
         			{

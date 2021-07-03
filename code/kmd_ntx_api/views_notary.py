@@ -13,18 +13,43 @@ def notary_mining_view(request, notary=None):
     if not notary:
         return render(request, 'dash_index.html', context)
     season = get_page_season(request)
-    notary_list = get_notary_list(season)
+
+    start = int(time.time())
     notary_mining = get_mined_data(None, notary).values()
+    end = int(time.time())
+    print(f"get_mined_data: {end-start}")
+
+    start = end
+    notary_list = get_notary_list(season)
+    end = int(time.time())
+    print(f"get_notary_list: {end-start}")
+
+    start = end
+    sidebar_links = get_sidebar_links(season)
+    end = int(time.time())
+    print(f"get_sidebar_links: {end-start}")
+
+    start = end
+    eco_data_link = get_eco_data_link()
+    end = int(time.time())
+    print(f"get_eco_data_link: {end-start}")
+
+    start = end
+    explorers = get_explorers(request)
+    end = int(time.time())
+    print(f"get_eco_data_link: {end-start}")
+
+    
 
     context = {
         "season":season,
         "season_clean":season.replace("_"," "),
         "page_title":"Notary KMD Mining",
         "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link(),
+        "sidebar_links":sidebar_links,
+        "eco_data_link":eco_data_link,
         "notary_mining":notary_mining,
-        "explorers":get_explorers(request)
+        "explorers":explorers
     }
     return render(request, 'notary_mining.html', context)
 

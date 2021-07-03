@@ -172,6 +172,8 @@
 	    	$('#utxo_table').css('visibility', 'visible');
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	        var utxo_table = $('#utxo_table').DataTable({
+    			deferRender: true,
+                "orderClasses": false,
 	            "paging": false,
        			"bInfo" : false,
        			"bFilter": false,
@@ -244,6 +246,8 @@
 				},
 	        });
 	        $('#selected_utxo_table').DataTable({
+    			deferRender: true,
+                "orderClasses": false,
 	            "paging": false,
        			"bInfo" : false,
        			"bFilter": false,

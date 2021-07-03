@@ -79,6 +79,8 @@
 	    $(document).ready(function() {
 		        AR_table = $('#AR_notarisations').DataTable({    
 		        	"paging": false,
+	    			deferRender: true,
+	                "orderClasses": false,
 	        		order: [[ 0, 'asc' ]],
 		        	"columns": [
 				        { "data": "rank" },
@@ -122,6 +124,8 @@
 		        EU_table = $('#EU_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
+	    			deferRender: true,
+	                "orderClasses": false,
 		        	"columns": [
 				        { "data": "rank" },
 				        { "data": "notary" },
@@ -164,6 +168,8 @@
 		        NA_table = $('#NA_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
+	    			deferRender: true,
+	                "orderClasses": false,
 		        	"columns": [
 				        { "data": "rank" },
 				        { "data": "notary" },
@@ -206,6 +212,8 @@
 		        SH_table = $('#SH_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
+	    			deferRender: true,
+	                "orderClasses": false,
 		        	"columns": [
 				        { "data": "rank" },
 				        { "data": "notary" },
@@ -248,6 +256,8 @@
 		        DEV_table = $('#DEV_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
+	    			deferRender: true,
+	                "orderClasses": false,
 		        	"columns": [
 				        { "data": "rank" },
 				        { "data": "notary" },

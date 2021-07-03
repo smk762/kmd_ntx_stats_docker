@@ -50,6 +50,9 @@
 	    $('#ntx_24hr_tbl').css('visibility', 'visible');
 	    var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	        $('#ntx_24hr_tbl').DataTable({
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
   				"pageLength": 50,
         		order: [[ 6, 'desc' ]],
         		"columnDefs": [

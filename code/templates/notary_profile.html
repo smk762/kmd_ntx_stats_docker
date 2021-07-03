@@ -398,7 +398,9 @@
 	    $(document).ready(function() {
 	       	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	        var balTable = $('#balances_table').DataTable({ 
-		        "paging": false,
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
         		order: [[ 3, 'asc' ], [ 0, 'asc' ], [ 1, 'asc' ]],
         		"columnDefs": [
         			{
@@ -481,6 +483,9 @@
 	        });
 	        var ntxTable = $('#ntx_table').DataTable({
         		order: [[ 0, 'asc' ], [ 1, 'asc' ]], 
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
 	        	"columns": [
 			        { "data": "ntx_chain" },
 			        { "data": "ntx_server" },

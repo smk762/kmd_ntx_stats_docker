@@ -63,7 +63,9 @@
 	    var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	    $(document).ready(function() {
 	        $('#pubkey_addresses').DataTable({
-	           "paging": false,
+	        	"paging": false,
+    			deferRender: true,
+                "orderClasses": false,
         		order: [[ 0, 'asc' ],[ 1, 'asc' ],[ 2, 'asc' ]],
 	        	"columns": [
 			        { "data": "notary" },

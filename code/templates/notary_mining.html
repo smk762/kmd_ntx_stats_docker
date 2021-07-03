@@ -38,6 +38,9 @@
 	    $(document).ready(function() {
 	    	$('#mined_24hr_tbl').css('visibility', 'visible');
 	        $('#mined_24hr_tbl').DataTable({
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
   				"pageLength": 50,
     			dom: 'Bfrtip',
 			    buttons: [

@@ -47,7 +47,11 @@
   	
   	<script>
 	    $(document).ready(function() {
-	        AR_table = $('#AR_table').DataTable({  "pageLength": 50,
+	        AR_table = $('#AR_table').DataTable({
+	        	"paging": true,
+    			deferRender: true,
+                "orderClasses": false,
+	            "pageLength": 50,
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "rank" },
@@ -59,7 +63,11 @@
         		"columnDefs": [
 			    ]
 	        });
-	        EU_table = $('#EU_table').DataTable({  "pageLength": 50,
+	        EU_table = $('#EU_table').DataTable({
+	        	"paging": true,
+    			deferRender: true,
+                "orderClasses": false,
+	            "pageLength": 50,
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "rank" },
@@ -69,7 +77,11 @@
 			        { "data": "detail" },
 			    ]
 	        });
-	        NA_table = $('#NA_table').DataTable({  "pageLength": 50,
+	        NA_table = $('#NA_table').DataTable({
+	        	"paging": true,
+    			deferRender: true,
+                "orderClasses": false,
+	            "pageLength": 50,
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "rank" },
@@ -79,7 +91,11 @@
 			        { "data": "detail" },
 			    ]
 	        });
-	        SH_table = $('#SH_table').DataTable({  "pageLength": 50,
+	        SH_table = $('#SH_table').DataTable({
+	           "pageLength": 50,
+	        	"paging": true,
+    			deferRender: true,
+                "orderClasses": false,
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "rank" },
