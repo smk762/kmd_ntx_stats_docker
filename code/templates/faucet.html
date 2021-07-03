@@ -110,6 +110,9 @@
 	    	$('#faucet_tx_tbl').css('visibility', 'visible');
 	        $('#faucet_tx_tbl').DataTable({
   				"pageLength": 25,
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
         		order: [[ 4, 'asc' ]],
         		"columnDefs": [
         			{

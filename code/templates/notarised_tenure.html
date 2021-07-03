@@ -50,6 +50,8 @@
 	        $('#notarisations').DataTable({  "pageLength": 50,
         		order: [[ 1, 'desc' ], [ 2, 'asc' ], [ 0, 'asc' ]],
 	        	"pagination": false,
+    			deferRender: true,
+                "orderClasses": false,
 	        	"columns": [
 			        { "data": "chain" },
 			        { "data": "season" },

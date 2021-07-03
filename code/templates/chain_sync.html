@@ -85,6 +85,9 @@
 	       	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 
 	        $('#chain_sync_table').DataTable({
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "chain" },

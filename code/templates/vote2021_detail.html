@@ -47,7 +47,11 @@
   	
   	<script>
 	    $(document).ready(function() {
-	        $('#{{ candidate }}_votes_table').DataTable({  "pageLength": 50,
+	        $('#{{ candidate }}_votes_table').DataTable({
+	            "pageLength": 50,
+	        	"paging": true,
+    			deferRender: true,
+                "orderClasses": false,
         		order: [[ 0, 'desc' ]],
 	        	"columns": [
 			        { "data": "block_height" },

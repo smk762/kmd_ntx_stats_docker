@@ -80,6 +80,9 @@
   	<script>
 	    $(document).ready(function() {
 	        $('#opret_table').DataTable({ 
+	        	"paging": true,
+    			deferRender: true,
+                "orderClasses": false,
 	        	sDom: 'lrtip',
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
