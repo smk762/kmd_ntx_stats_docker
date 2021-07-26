@@ -6,7 +6,7 @@ from kmd_ntx_api.lib_query import *
 # https://stats-api.atomicdex.io/
 
 def mm2_proxy(params):
-  params.update({"userpass":MM2_USERPASS})
+  params.update({"userpass": MM2_USERPASS})
   print(json.dumps(params))
   r = requests.post(MM2_IP, json.dumps(params))
   print(r.json())
@@ -20,9 +20,9 @@ def get_orderbook(request):
     if "rel" in request.GET:
         rel = request.GET["rel"]
     params = {
-        "method":"orderbook",
-        "base":base,
-        "rel":rel
+        "method": "orderbook",
+        "base": base,
+        "rel": rel
     }
     r = mm2_proxy(params)
     return r.json()
@@ -32,10 +32,10 @@ def get_bestorders(request):
     if "coin" in request.GET:
         coin = request.GET["coin"]
     params = {
-        "method":"best_orders",
-        "coin":coin,
-        "action":"buy",
-        "volume":100,
+        "method": "best_orders",
+        "coin": coin,
+        "action": "buy",
+        "volume": 100,
 
     }
     r = mm2_proxy(params)
@@ -50,9 +50,9 @@ def send_raw_tx(request):
     if "tx_hex" in request.GET:
         tx_hex = request.GET["tx_hex"]
     params = {
-        "method":"send_raw_transaction",
-        "coin":coin,
-        "tx_hex":tx_hex
+        "method": "send_raw_transaction",
+        "coin": coin,
+        "tx_hex": tx_hex
     }
     r = mm2_proxy(params)
     return r.json()
@@ -66,11 +66,11 @@ def electrum(request):
     if coin in electrums:
       servers = electrums[coin]
       for server in servers:
-          server_params.append({"url":server})
+          server_params.append({"url": server})
     params = {
-        "method":"electrum",
-        "coin":coin,
-        "servers":server_params
+        "method": "electrum",
+        "coin": coin,
+        "servers": server_params
     }
     r = mm2_proxy(params)
     return r.json()
@@ -78,9 +78,17 @@ def electrum(request):
 def get_last_200_swaps(request):
     data = get_swaps_data().order_by('-time_stamp')[:200]
     data = data.values()
-    serializer = swapsSerializerPub(data, many=True)
+    serializer = swapsSerializer(data, many=True)
     return serializer.data
 
+def get_failed_swap_by_uuid(request):
+    if 'uuid' in request.GET:
+        data = get_swaps_failed_data(request.GET['uuid']).values()
+        serializer = swapsFailedSerializer(data, many=True)
+        data = serializer.data     
+    else:
+        data = {}
+    return data
 
 def get_last_200_failed_swaps(request):
     data = get_swaps_failed_data().order_by('-time_stamp')[:200]
@@ -165,5 +173,5 @@ def format_gui_os_version(swaps_data):
 
         maker = f"{maker_gui} {maker_os} {maker_gui_version} {maker_mm2_version}"
         taker = f"{taker_gui} {taker_os} {taker_gui_version} {taker_mm2_version}"
-        item.update({"maker":maker, "taker":taker})
+        item.update({"maker": maker, "taker": taker})
     return swaps_data

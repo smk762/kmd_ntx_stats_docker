@@ -29,11 +29,11 @@ def get_epochs_dict(season=None):
 
         if epoch_id not in epochs[season][server]:
             epochs[season][server].update({epoch_id:{
-                "start":start,
-                "end":end,
-                "start_event":start_event,
-                "end_event":end_event,
-                "score_per_ntx":score_per_ntx
+                "start": start,
+                "end": end,
+                "start_event": start_event,
+                "end_event": end_event,
+                "score_per_ntx": score_per_ntx
             }})
 
     return epochs
@@ -152,7 +152,7 @@ def get_low_balances(notary_list, balances_dict, ignore_chains):
 
 
 def get_funding_totals(funding_data):
-    funding_totals = {"fees":{}}
+    funding_totals = {"fees": {}}
     now = int(time.time())
 
     for item in funding_data:
@@ -182,7 +182,7 @@ def get_nn_info(season):
     notary_list = get_notary_list(season)
     regions_info = get_regions_info(notary_list)
     nn_info = {
-        "regions_info":regions_info,
+        "regions_info": regions_info,
     }
     return nn_info
 
@@ -196,7 +196,7 @@ def get_nn_mining_summary(notary, season=None):
     if len(mining_summary) > 0:
         mining_summary = mining_summary[0]
         mining_summary.update({
-            "time_since_mined":get_time_since(mining_summary["last_mined_blocktime"])[1]
+            "time_since_mined": get_time_since(mining_summary["last_mined_blocktime"])[1]
         })
     else:
         mining_summary = {
@@ -229,25 +229,25 @@ def get_notarised_data_txid(txid=None):
     for item in data:
 
         return {
-            "chain":item.chain,
-            "txid":item.txid,
-            "block_hash":item.block_hash,
-            "block_height":item.block_height,
-            "block_time":item.block_time,
-            "block_datetime":item.block_datetime,
-            "notaries":item.notaries,
-            "notary_addresses":item.notary_addresses,
-            "ac_ntx_blockhash":item.ac_ntx_blockhash,
-            "ac_ntx_height":item.ac_ntx_height,
-            "opret":item.opret,
-            "season":item.season,
-            "server":item.server,
-            "epoch":item.epoch,
-            "scored":item.scored,
-            "score_value":item.score_value,
+            "chain": item.chain,
+            "txid": item.txid,
+            "block_hash": item.block_hash,
+            "block_height": item.block_height,
+            "block_time": item.block_time,
+            "block_datetime": item.block_datetime,
+            "notaries": item.notaries,
+            "notary_addresses": item.notary_addresses,
+            "ac_ntx_blockhash": item.ac_ntx_blockhash,
+            "ac_ntx_height": item.ac_ntx_height,
+            "opret": item.opret,
+            "season": item.season,
+            "server": item.server,
+            "epoch": item.epoch,
+            "scored": item.scored,
+            "score_value": item.score_value,
         }
 
-    return {"error":"TXID not found!"}
+    return {"error": "TXID not found!"}
 
 
 def get_mined_season(season, notary=None):
@@ -280,8 +280,8 @@ def get_testnet_addresses(season):
     for item in addresses_data:
         if item["notary"] not in addresses_dict: 
             addresses_dict.update({item["notary"]:item['address']})
-        addresses_dict.update({"jorian":"RJNieyvnmjGGFHHEQKZeQv4SyaEhvfpRvA"})
-        addresses_dict.update({"hsukrd":"RA93ZHcbw94XqyaYoSF88SfBRUGgA8vVJR"})
+        addresses_dict.update({"jorian": "RJNieyvnmjGGFHHEQKZeQv4SyaEhvfpRvA"})
+        addresses_dict.update({"hsukrd": "RA93ZHcbw94XqyaYoSF88SfBRUGgA8vVJR"})
     return addresses_dict
 
 
@@ -364,11 +364,11 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
         coins_dict = get_dpow_server_coins_dict(season)
 
     notary_ntx_24hr = {
-            "btc_ntx":0,
-            "main_ntx":0,
-            "third_party_ntx":0,
-            "most_ntx":"N/A",
-            "score":0
+            "btc_ntx": 0,
+            "main_ntx": 0,
+            "third_party_ntx": 0,
+            "most_ntx": "N/A",
+            "score": 0
         }
 
     main_chains = get_mainnet_chains(coins_dict)
@@ -402,7 +402,7 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
         if chain_ntx_count > max_ntx_count:
             max_chain = chain
             max_ntx_count = chain_ntx_count
-        if chain == "KMD":
+        if chain == "KMD": 
             btc_ntx_count += chain_ntx_count
         elif chain in main_chains:
             main_ntx_count += chain_ntx_count
@@ -411,10 +411,10 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
 
     if max_ntx_count > 0:
         notary_ntx_24hr.update({
-                "btc_ntx":btc_ntx_count,
-                "main_ntx":main_ntx_count,
-                "third_party_ntx":third_party_ntx_count,
-                "most_ntx":str(max_ntx_count)+" ("+str(max_chain)+")"
+                "btc_ntx": btc_ntx_count,
+                "main_ntx": main_ntx_count,
+                "third_party_ntx": third_party_ntx_count,
+                "most_ntx": str(max_ntx_count)+" ("+str(max_chain)+")"
             })
     return notary_ntx_24hr
 
@@ -526,11 +526,11 @@ def get_season_nn_chain_ntx_data(season):
 
             season_nn_chain_ntx_data[notary].update({
                 chain: {
-                    "num_nn_chain_ntx":num_ntx,
-                    "time_since":time_since,
-                    "last_ntx_block":last_ntx_block,
-                    "last_ntx_txid":last_ntx_txid,
-                    "participation_pct":participation_pct
+                    "num_nn_chain_ntx": num_ntx,
+                    "time_since": time_since,
+                    "last_ntx_block": last_ntx_block,
+                    "last_ntx_txid": last_ntx_txid,
+                    "participation_pct": participation_pct
                 }
             })
     return season_nn_chain_ntx_data
@@ -563,26 +563,26 @@ def get_split_stats():
             if season not in split_summary[nn_name]:
                 split_summary[nn_name].update({
                     season: {
-                        "split_count":0,
-                        "last_split_block":0,
-                        "last_split_time":0,
-                        "sum_split_utxos":0,
-                        "average_split_utxos":0,
-                        "sum_fees":0,
-                        "txids":[]
+                        "split_count": 0,
+                        "last_split_block": 0,
+                        "last_split_time": 0,
+                        "sum_split_utxos": 0,
+                        "average_split_utxos": 0,
+                        "sum_fees": 0,
+                        "txids": []
                     }
                 })
 
             fees = int(tx["fees"])/100000000
             num_outputs = int(tx["num_outputs"])
             split_summary[nn_name][season].update({
-                "split_count":split_summary[nn_name][season]["split_count"]+1,
-                "sum_split_utxos":split_summary[nn_name][season]["sum_split_utxos"]+num_outputs,
-                "sum_fees":split_summary[nn_name][season]["sum_fees"]+fees
+                "split_count": split_summary[nn_name][season]["split_count"]+1,
+                "sum_split_utxos": split_summary[nn_name][season]["sum_split_utxos"]+num_outputs,
+                "sum_fees": split_summary[nn_name][season]["sum_fees"]+fees
             })
 
             split_summary[nn_name][season].update({
-                "average_split_utxos":split_summary[nn_name][season]["sum_split_utxos"]/split_summary[nn_name][season]["split_count"],
+                "average_split_utxos": split_summary[nn_name][season]["sum_split_utxos"]/split_summary[nn_name][season]["split_count"],
             })
 
             txid = tx["txid"]
@@ -593,8 +593,8 @@ def get_split_stats():
             block_time = int(tx["block_time"])
             if block_time > split_summary[nn_name][season]["last_split_time"]:
                 split_summary[nn_name][season].update({
-                    "last_split_block":block_height,
-                    "last_split_time":block_time
+                    "last_split_block": block_height,
+                    "last_split_time": block_time
                 })
     return split_summary
 
@@ -619,7 +619,7 @@ def get_testnet_stats_dict(season, testnet_chains):
     for notary in testnet_stats_dict:
         if notary in addresses_dict:
             address = addresses_dict[notary]
-            testnet_stats_dict[notary].update({"Address":address})
+            testnet_stats_dict[notary].update({"Address": address})
         else:
             logger.warning(f"[get_testnet_stats_dict] {notary} not in addresses_dict (address: {address})")
             logger.warning(f"[addresses_dict] {addresses_dict}")
@@ -634,9 +634,9 @@ def get_sidebar_links(season):
     coins_dict["Main"] += ["KMD", "LTC"]
     coins_dict["Main"].sort()
     sidebar_links = {
-        "server":os.getenv("SERVER"),
-        "chains_menu":coins_dict,
-        "notaries_menu":region_notaries,
+        "server": os.getenv("SERVER"),
+        "chains_menu": coins_dict,
+        "notaries_menu": region_notaries,
     }
     return sidebar_links
 
@@ -651,9 +651,9 @@ def get_dpow_server_coins_dict_lists(season):
     for item in dpow_chains:
         epoch_chains = item['epoch_chains']
         server = item["server"]
-        if server == "Main":
+        if server == "Main": 
             main_chains += epoch_chains
-        elif server == "Third_Party":
+        elif server == "Third_Party": 
             third_chains += epoch_chains
     main_chains = list(set(main_chains))
     third_chains = list(set(third_chains))
@@ -690,7 +690,7 @@ def get_api_index(request):
         endpoint_category = ENDPOINTS[endpoint]["category"]
         sidebar_status = ENDPOINTS[endpoint]["sidebar"]
         if (not category or category == endpoint_category) and (not sidebar or sidebar == sidebar_status):
-            item = {"url":f"{THIS_SERVER}/api/{endpoint}"}
+            item = {"url": f"{THIS_SERVER}/api/{endpoint}"}
             item.update(ENDPOINTS[endpoint])
             resp.append(item)
 
@@ -710,7 +710,7 @@ def get_pages_index(request):
         page_category = PAGES[page]["category"]
         sidebar_status = PAGES[page]["sidebar"]
         if (not category or category == page_category) and (not sidebar or sidebar == sidebar_status):
-            item = {"url":f"{THIS_SERVER}/{page}"}
+            item = {"url": f"{THIS_SERVER}/{page}"}
             item.update(PAGES[page])
             resp.append(item)
 
@@ -764,9 +764,9 @@ def get_base_58_coin_params(request):
                 p2shtype = coins_info["p2shtype"]
                 resp.update({
                     chain: {
-                        "pubtype":pubtype,
-                        "wiftype":wiftype,
-                        "p2shtype":p2shtype
+                        "pubtype": pubtype,
+                        "wiftype": wiftype,
+                        "p2shtype": p2shtype
                     }
                 })
     return resp
@@ -782,14 +782,14 @@ def get_coins(request):
     for item in data:
         resp.update({
             item["chain"]:{
-                "coins_info":item["coins_info"],
-                "dpow":item["dpow"],
-                "dpow_tenure":item["dpow_tenure"],
-                "explorers":item["explorers"],
-                "electrums":item["electrums"],
-                "electrums_ssl":item["electrums_ssl"],
-                "mm2_compatible":item["mm2_compatible"],
-                "dpow_active":item["dpow_active"]
+                "coins_info": item["coins_info"],
+                "dpow": item["dpow"],
+                "dpow_tenure": item["dpow_tenure"],
+                "explorers": item["explorers"],
+                "electrums": item["electrums"],
+                "electrums_ssl": item["electrums_ssl"],
+                "mm2_compatible": item["mm2_compatible"],
+                "dpow_active": item["dpow_active"]
             },
         })
 
@@ -833,7 +833,7 @@ def get_dpow_server_coins_info(request):
 
     if not season or not server:
         return {
-            "error":"You need to specify both of the following filter parameters: ['season', 'server']"
+            "error": "You need to specify both of the following filter parameters: ['season', 'server']"
         }
     data = get_scoring_epochs_data(season, server, chain, epoch, timestamp)
     data = data.values('epoch_chains')
@@ -939,9 +939,9 @@ def get_notary_mined_count_daily(request):
 
         resp[str(mined_date)].update({
             notary:{
-                "blocks_mined":blocks_mined,
-                "sum_value_mined":sum_value_mined,
-                "time_stamp":time_stamp
+                "blocks_mined": blocks_mined,
+                "sum_value_mined": sum_value_mined,
+                "time_stamp": time_stamp
             }
         })
     delta = datetime.timedelta(days=1)
@@ -949,10 +949,10 @@ def get_notary_mined_count_daily(request):
     tomorrow = mined_date+delta
     url = request.build_absolute_uri('/api/info/mined_count_daily/')
     return {
-        "count":len(resp[str(mined_date)]),
-        "next":f"{url}?mined_date={tomorrow}",
-        "previous":f"{url}?mined_date={yesterday}",
-        "results":resp
+        "count": len(resp[str(mined_date)]),
+        "next": f"{url}?mined_date={tomorrow}",
+        "previous": f"{url}?mined_date={yesterday}",
+        "results": resp
     }
 
 
@@ -987,10 +987,10 @@ def get_notarised_chain_daily(request):
         tomorrow = today+delta
     url = request.build_absolute_uri('/api/info/notarised_chain_daily/')
     return {
-        "count":len(resp[str(notarised_date)]),
-        "next":f"{url}?notarised_date={tomorrow}",
-        "previous":f"{url}?notarised_date={yesterday}",
-        "results":resp
+        "count": len(resp[str(notarised_date)]),
+        "next": f"{url}?notarised_date={tomorrow}",
+        "previous": f"{url}?notarised_date={yesterday}",
+        "results": resp
     }
 
 
@@ -1012,20 +1012,20 @@ def get_notarised_count_daily(request):
 
             resp[str(notarised_date)].update({
                 notary:{
-                    "btc_count":item['btc_count'],
-                    "antara_count":item['antara_count'],
-                    "third_party_count":item['third_party_count'],
-                    "other_count":item['other_count'],
-                    "total_ntx_count":item['total_ntx_count'],
-                    "time_stamp":item['time_stamp'],
-                    "chains":{}
+                    "btc_count": item['btc_count'],
+                    "antara_count": item['antara_count'],
+                    "third_party_count": item['third_party_count'],
+                    "other_count": item['other_count'],
+                    "total_ntx_count": item['total_ntx_count'],
+                    "time_stamp": item['time_stamp'],
+                    "chains": {}
                 }
             })
             for chain in item['chain_ntx_counts']:
                 resp[str(notarised_date)][notary]["chains"].update({
                     chain:{
-                        "count":item['chain_ntx_counts'][chain],
-                        "percentage":item['chain_ntx_pct'][chain]
+                        "count": item['chain_ntx_counts'][chain],
+                        "percentage": item['chain_ntx_pct'][chain]
                     }
                 })
 
@@ -1040,10 +1040,10 @@ def get_notarised_count_daily(request):
 
     url = request.build_absolute_uri('/api/info/notarised_count_daily/')
     return {
-        "count":len(resp[str(notarised_date)]),
-        "next":f"{url}?notarised_date={tomorrow}",
-        "previous":f"{url}?notarised_date={yesterday}",
-        "results":resp
+        "count": len(resp[str(notarised_date)]),
+        "next": f"{url}?notarised_date={tomorrow}",
+        "previous": f"{url}?notarised_date={yesterday}",
+        "results": resp
     }
 
 
@@ -1055,7 +1055,7 @@ def get_notarised_txid(request):
 
     if not txid:
         return {
-            "error":"You need to specify the following filter parameter: ['txid']"
+            "error": "You need to specify the following filter parameter: ['txid']"
         }
     data = get_notarised_data(None, None, None, None, None, None, txid)
     data = data.values()
@@ -1073,7 +1073,7 @@ def get_notary_nodes_info(request):
 
     if not season:
         return {
-            "error":"You need to specify the following filter parameter: ['season']"
+            "error": "You need to specify the following filter parameter: ['season']"
         }
     data = get_nn_social_data(season).values('notary')
 
@@ -1099,7 +1099,7 @@ def get_split_stats_table(request):
 
     if not season:
         return {
-            "error":"You need to specify the following filter parameter: ['season']"
+            "error": "You need to specify the following filter parameter: ['season']"
         }
     data = get_nn_btc_tx_data(season, notary, category)
     data = data.order_by('-block_height','address').values()
@@ -1110,22 +1110,22 @@ def get_split_stats_table(request):
             if notary not in split_summary:
                 split_summary.update({
                     notary:{
-                        "split_count":0,
-                        "last_split_block":0,
-                        "last_split_time":0,
-                        "sum_split_utxos":0,
-                        "average_split_utxos":0,
-                        "sum_fees":0,
-                        "txids":[]
+                        "split_count": 0,
+                        "last_split_block": 0,
+                        "last_split_time": 0,
+                        "sum_split_utxos": 0,
+                        "average_split_utxos": 0,
+                        "sum_fees": 0,
+                        "txids": []
                     }
                 })
 
             fees = int(item["fees"])/100000000
             num_outputs = int(item["num_outputs"])
             split_summary[notary].update({
-                "split_count":split_summary[notary]["split_count"]+1,
-                "sum_split_utxos":split_summary[notary]["sum_split_utxos"]+num_outputs,
-                "sum_fees":split_summary[notary]["sum_fees"]+fees
+                "split_count": split_summary[notary]["split_count"]+1,
+                "sum_split_utxos": split_summary[notary]["sum_split_utxos"]+num_outputs,
+                "sum_fees": split_summary[notary]["sum_fees"]+fees
             })
             
             split_summary[notary]["txids"].append(item["txid"])
@@ -1138,14 +1138,14 @@ def get_split_stats_table(request):
 
     for notary in split_summary:
         split_summary[notary].update({
-            "average_split_utxos":split_summary[notary]["sum_split_utxos"]/split_summary[notary]["split_count"]
+            "average_split_utxos": split_summary[notary]["sum_split_utxos"]/split_summary[notary]["split_count"]
         })
 
     resp = []
     for notary in split_summary:
         row = {
-            "notary":notary,
-            "season":season
+            "notary": notary,
+            "season": season
         }
         row.update(split_summary[notary])
         resp.append(row)
@@ -1170,12 +1170,12 @@ def get_notary_btc_transactions(request):
 
     if not season or not notary:
         return {
-            "error":"You need to specify both of the following filter parameters: ['season', 'notary']"
+            "error": "You need to specify both of the following filter parameters: ['season', 'notary']"
         }
 
     resp = {
-        "season":season,
-        "notary":notary,
+        "season": season,
+        "notary": notary,
     }
     txid_list = []
     data = get_nn_btc_tx_data(season, notary, category, address).values()
@@ -1195,15 +1195,15 @@ def get_notary_btc_transactions(request):
 
     api_resp = {
         "count": 0,
-        "results":{}
+        "results": {}
     }
 
     for category in resp:
         if category not in ["season", "notary"]:
             api_resp["results"].update({
                 category:{
-                    "count":len(resp[category]),
-                    "txids":resp[category]
+                    "count": len(resp[category]),
+                    "txids": resp[category]
                 }
             })
             api_resp["count"] += len(resp[category])
@@ -1228,12 +1228,12 @@ def get_notary_ltc_transactions(request):
 
     if not season or not notary:
         return {
-            "error":"You need to specify the following filter parameter: ['season', 'notary']"
+            "error": "You need to specify the following filter parameter: ['season', 'notary']"
         }
 
     resp = {
-        "season":season,
-        "notary":notary,
+        "season": season,
+        "notary": notary,
     }
     txid_list = []
     print(season)
@@ -1254,15 +1254,15 @@ def get_notary_ltc_transactions(request):
 
     api_resp = {
         "count": 0,
-        "results":{}
+        "results": {}
     }
 
     for category in resp:
         if category not in ["season", "notary"]:
             api_resp["results"].update({
                 category:{
-                    "count":len(resp[category]),
-                    "txids":resp[category]
+                    "count": len(resp[category]),
+                    "txids": resp[category]
                 }
             })
             api_resp["count"] += len(resp[category])
@@ -1293,7 +1293,7 @@ def get_notarisation_txid_list(request):
 
     if not season or not server or not chain:
         return {
-            "error":"You need to specify the following filter parameters: ['season', 'server', 'chain']"
+            "error": "You need to specify the following filter parameters: ['season', 'server', 'chain']"
         }
 
     data = get_notarised_data(season, server, epoch, chain, notary).values('txid')
@@ -1314,7 +1314,7 @@ def get_notary_btc_txid(request):
 
     if not txid:
         return {
-            "error":"You need to specify the following filter parameter: ['txid']"
+            "error": "You need to specify the following filter parameter: ['txid']"
         }
     data = get_nn_btc_tx_data(None, None, None, None, txid)
     data = data.values()
@@ -1332,7 +1332,7 @@ def get_notary_ltc_txid(request):
 
     if not txid:
         return {
-            "error":"You need to specify the following filter parameter: ['txid']"
+            "error": "You need to specify the following filter parameter: ['txid']"
         }
     data = get_nn_ltc_tx_data(None, None, None, None, txid)
     data = data.values()
@@ -1359,7 +1359,7 @@ def get_btc_txid_list(request):
 
     if not season or not notary:
         return {
-            "error":"You need to specify the following filter parameters: ['season', 'notary']"
+            "error": "You need to specify the following filter parameters: ['season', 'notary']"
         }
 
     data = get_nn_btc_tx_data(season, notary, category, address).values('txid')
@@ -1389,7 +1389,7 @@ def get_ltc_txid_list(request):
 
     if not season or not notary:
         return {
-            "error":"You need to specify the following filter parameters: ['season', 'notary']"
+            "error": "You need to specify the following filter parameters: ['season', 'notary']"
         }
 
     data = get_nn_ltc_tx_data(season, notary, category, address).values('txid')
@@ -1452,7 +1452,7 @@ def get_vote2021_info(request):
 
     if not max_block and not max_blocktime and not max_locktime:
         return {
-            "error":"You need to specify one of the following filter parameters: ['max_block', 'max_blocktime', 'max_locktime']"
+            "error": "You need to specify one of the following filter parameters: ['max_block', 'max_blocktime', 'max_locktime']"
         }
 
     data = get_vote2021_data(candidate, block, txid, max_block, max_blocktime, max_locktime)
@@ -1478,10 +1478,10 @@ def get_vote2021_info(request):
         for item in resp[region]:
             if item["candidate"] in DISQUALIFIED:
                 rank = region_scores[region].index(-1) + 1
-                item.update({"sum_votes":"DISQUALIFIED"})
+                item.update({"sum_votes": "DISQUALIFIED"})
             else:
                 rank = region_scores[region].index(item["sum_votes"]) + 1
-            item.update({"region_rank":rank})
+            item.update({"region_rank": rank})
     for region in resp:
         resp[region] = sorted(resp[region], key = lambda item: item['region_rank'])
     return resp

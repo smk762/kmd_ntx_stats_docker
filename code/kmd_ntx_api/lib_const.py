@@ -10,8 +10,9 @@ from django.contrib import messages
 load_dotenv()
 MM2_USERPASS = os.getenv("MM2_USERPASS")
 MM2_IP = "http://mm2:7783"
-OTHER_SERVER = os.getenv("OTHER_SERVER") # set to IP or domain to allow for external imports of data to avoid API limits
-THIS_SERVER = os.getenv("THIS_SERVER") # IP / domain of the local server
+# set to IP or domain to allow for external imports of data to avoid API limits
+OTHER_SERVER = os.getenv("OTHER_SERVER")
+THIS_SERVER = os.getenv("THIS_SERVER")  # IP / domain of the local server
 
 
 logger = logging.getLogger("mylogger")
@@ -33,63 +34,66 @@ if time.time() > 1623682800:
 
 SEASONS_INFO = {
     "Season_1": {
-            "start_block":1,
-            "end_block":813999,
-            "start_time":1473793441,
-            "end_time":1530921600,
-            "notaries":[]
-        },
+        "start_block": 1,
+        "end_block": 813999,
+        "start_time": 1473793441,
+        "end_time": 1530921600,
+        "notaries": []
+    },
     "Season_2": {
-            "start_block":814000,
-            "end_block":1443999,
-            "start_time":1530921600,
-            "end_time":1563148799,
-            "notaries":[]
-        },
+        "start_block": 814000,
+        "end_block": 1443999,
+        "start_time": 1530921600,
+        "end_time": 1563148799,
+        "notaries": []
+    },
     "Season_3": {
-            "start_block":1444000,
-            "end_block":1921999,
-            "start_time":1563148800,
-            "end_time":1592146799,
-            "notaries":[]
-        },
+        "start_block": 1444000,
+        "end_block": 1921999,
+        "start_time": 1563148800,
+        "end_time": 1592146799,
+        "notaries": []
+    },
     "Season_4": {
-            "start_block":1922000, # https://github.com/KomodoPlatform/komodo/blob/master/src/komodo_globals.h#L47 (block_time 1592172139)
-            "end_block":2436999,
-            "start_time":1592146800, # https://github.com/KomodoPlatform/komodo/blob/master/src/komodo_globals.h#L48
-            "end_time":1617364800, # April 2nd 2021 12pm
-            "post_season_end_time":1623682799,
-            "notaries":[]
-        },
+        # github.com/KomodoPlatform/komodo/blob/master/src/komodo_globals.h#L47
+        # (block_time 1592172139)
+        "start_block": 1922000,
+        "end_block": 2436999,
+        # github.com/KomodoPlatform/komodo/blob/master/src/komodo_globals.h#L48
+        "start_time": 1592146800,
+        "end_time": 1617364800,  # April 2nd 2021 12pm
+        "post_season_end_time": 1623682799,
+        "notaries": []
+    },
     "Season_5": {
-            "start_block":2437000,
-            "end_block":3437000,
-            "start_time":1623682800,
-            "end_time":1773682800,
-            "notaries":[]
-        }
+        "start_block": 2437000,
+        "end_block": 3437000,
+        "start_time": 1623682800,
+        "end_time": 1773682800,
+        "notaries": []
+    }
 }
 
 
-# set at post season to use "post_season_end_time" for aggreagates (e.g. mining)
+# set as true to use "post_season_end_time" for aggreagates (e.g. mining)
 POSTSEASON = True
 
 
-# convert timestamp to human time 
+# convert timestamp to human time
 INTERVALS = (
     ('wks', 604800),  # 60 * 60 * 24 * 7
     ('days', 86400),    # 60 * 60 * 24
     ('hrs', 3600),    # 60 * 60
     ('mins', 60),
     ('sec', 1),
-    )
+)
 
 SINCE_INTERVALS = {
-    "day":24*3600,
-    "week":7*24*3600,
-    "fortnight":14*24*3600,
-    "month":30*24*3600,
-    "year":365*24*3600,
+    "day": 24*3600,
+    "week": 7*24*3600,
+    "fortnight": 14*24*3600,
+    "month": 30*24*3600,
+    "year": 365*24*3600,
 }
 
 
@@ -99,7 +103,8 @@ RETIRED_CHAINS = ["HUSH3", "RFOX", "PGT", "STBL", "PBC"]
 EXCLUDE_DECODE_OPRET_COINS = []
 
 # Links to ecosystem sites
-url = "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json"
+url = "https://raw.githubusercontent.com/"
+url += "gcharang/data/master/info/ecosystem.json"
 r = requests.get(url)
 ECO_DATA = r.json()
 

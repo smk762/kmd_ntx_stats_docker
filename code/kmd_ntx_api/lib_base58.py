@@ -55,19 +55,17 @@ class GAME_CoinParams(CoreMainParams):
                        'SCRIPT_ADDR': 5,
                        'SECRET_KEY': 166}
 
-'''
-class GLEEC_CoinParams(CoreMainParams):
+class GLEEC_OLD_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
     DEFAULT_PORT = 7770
     BASE58_PREFIXES = {'PUBKEY_ADDR': 35,
                        'SCRIPT_ADDR': 38,
                        'SECRET_KEY': 65}
-'''
 
 def sha256(data):
-    digest = hashlib.new("sha256")
-    digest.update(data)
-    return digest.digest()
+    d = hashlib.new("sha256")
+    d.update(data)
+    return d.digest()
 
 def ripemd160(x):
     d = hashlib.new("ripemd160")
@@ -88,7 +86,6 @@ def get_hex(val, byte_length=2, endian='big'):
         val = lil_endian(val)
     return val
 
-
 def get_hash160(pubkey):
     bin_pk = binascii.unhexlify(pubkey)
     sha_pk = sha256(bin_pk)
@@ -96,32 +93,25 @@ def get_hash160(pubkey):
     return binascii.hexlify(ripe_pk)
 
 def address_to_p2pkh(address):
-    # decode base58
     decode_58 = bitcoin.base58.decode(address)
-    # remove prefix and checksum
     decode_58 = decode_58[1:-4]
-    # Add OP codes
     pubKeyHash = "76a914"+binascii.hexlify(decode_58).decode('ascii')+"88ac"
     return pubKeyHash
 
 def pubkey_to_p2pkh(pubkey):
-    # Get HASH160 of pubkey
     hash160 = get_hash160(pubkey)
-    # Add OP codes
     p2pkh = "76a914"+hash160.decode('ascii')+"88ac"
     return p2pkh
 
 def pubkey_to_p2pk(pubkey):
-    # Get HASH160 of pubkey
     hash160 = get_hash160(pubkey)
-    # Add OP codes
     p2pk = "21"+pubkey+"ac"
     return p2pk
 
 class raw_tx():
     def __init__(self, version='04000080', group_id='85202f89', inputs=list,
                  sequence='feffffff', outputs=list,
-                 expiry_height='00000000', locktime=int(time.time()-20*60),
+                 expiry_height='00000000', locktime=int(time.time()-5*60),
                  valueBalanceSapling="0000000000000000", nSpendsSapling="0",
                  vSpendsSapling="00", nOutputsSapling="0", vOutputsSapling="00"):
         self.version = version
@@ -201,10 +191,10 @@ COIN_PARAMS = {
     "AYA": AYA_CoinParams,
     "EMC2": EMC2_CoinParams,
     "GAME": GAME_CoinParams,
-    #"GLEEC": GLEEC_CoinParams,
+    "GLEEC-OLD": GLEEC_OLD_CoinParams,
     "GLEEC": KMD_CoinParams
-}
-
+} 
+ 
 
 def calc_addr_from_pubkey(coin, pubkey):
     bitcoin.params = COIN_PARAMS[coin]

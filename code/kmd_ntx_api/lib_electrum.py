@@ -9,6 +9,7 @@ from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.lib_base58 import *
 import kmd_ntx_api.lib_dexstats as dexstats
 
+
 def get_utxo_count(chain, pubkey, server):
     try:
         endpoint = f"{THIS_SERVER}/api/info/electrums"
@@ -25,33 +26,38 @@ def get_utxo_count(chain, pubkey, server):
             for item in resp:
 
                 if item['satoshis'] == 10000:
-                    dpow_utxo_count +=1
-                    item.update({"dpow_utxo":True})
+                    dpow_utxo_count += 1
+                    item.update({"dpow_utxo": True})
                 else:
-                    item.update({"dpow_utxo":False})
+                    item.update({"dpow_utxo": False})
 
-                utxo_count +=1
+                utxo_count += 1
                 utxos.append(item)
 
             return {
-                "block_tip":block_tip,
-                "utxo_count":utxo_count,
-                "dpow_utxo_count":dpow_utxo_count,
-                "utxos":utxos,
+                "block_tip": block_tip,
+                "utxo_count": utxo_count,
+                "dpow_utxo_count": dpow_utxo_count,
+                "utxos": utxos,
             }
         else:
             if chain == "GLEEC" and server == "Third_Party":
                 chain = "GLEEC-OLD"
             if chain in electrums_info:
-                electrum = random.choice(electrums_info[chain]).split(":")
+                electrum = random.choice(electrums_info[chain]).split(": ")
                 url = electrum[0]
                 port = electrum[1]
                 logger.info(f"{chain} {url}:{port} {pubkey}")
                 p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
-                p2pk_resp = get_from_electrum(url, port, 'blockchain.scripthash.listunspent', p2pk_scripthash)
+                p2pk_resp = get_from_electrum(
+                    url, port, 'blockchain.scripthash.listunspent',
+                    p2pk_scripthash)
                 p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
-                p2pkh_resp = get_from_electrum(url, port, 'blockchain.scripthash.listunspent', p2pkh_scripthash)
-                headers_resp = get_from_electrum(url, port, 'blockchain.headers.subscribe')
+                p2pkh_resp = get_from_electrum(
+                    url, port, 'blockchain.scripthash.listunspent',
+                    p2pkh_scripthash)
+                headers_resp = get_from_electrum(
+                    url, port, 'blockchain.headers.subscribe')
 
                 block_tip = headers_resp['result']['height']
                 resp = p2pk_resp['result'] + p2pkh_resp['result']
@@ -68,53 +74,59 @@ def get_utxo_count(chain, pubkey, server):
                     utxo_size = 10000
 
                 for item in utxos:
-                    utxo_count += 1                         
+                    utxo_count += 1
                     if item['value'] == utxo_size:
-                        dpow_utxo_count +=1
-                        item.update({"dpow_utxo":True})
+                        dpow_utxo_count += 1
+                        item.update({"dpow_utxo": True})
                     else:
-                        item.update({"dpow_utxo":False})
+                        item.update({"dpow_utxo": False})
 
                 return {
-                    "block_tip":block_tip,
-                    "utxo_count":utxo_count,
-                    "dpow_utxo_count":dpow_utxo_count,
-                    "utxos":utxos,
+                    "block_tip": block_tip,
+                    "utxo_count": utxo_count,
+                    "dpow_utxo_count": dpow_utxo_count,
+                    "utxos": utxos,
                 }
 
             else:
-                return {"error":f"{chain} not in electrums"}
+                return {"error": f"{chain} not in electrums"}
                 logger.info(f"{chain} not in electrums")
     except Exception as e:
         return {
-            "error":f"{e}",
+            "error": f"{e}",
             "resp": []
         }
         logger.error(e)
+
 
 def get_scripthash_from_address(address):
     # remove address prefix
     addr_stripped = binascii.hexlify(b58decode_check(address)[1:])
     # Add OP_DUP OP_HASH160 BTYES_PUSHED <ADDRESS> OP_EQUALVERIFY OP_CHECKSIG
     raw_sig_script = b"".join((b"76a914", addr_stripped, b"88ac"))
-    script_hash = hashlib.sha256(codecs.decode(raw_sig_script, 'hex')).digest()[::-1].hex()
+    script_hash = hashlib.sha256(codecs.decode(
+        raw_sig_script, 'hex')).digest()[::-1].hex()
     return script_hash
+
 
 def get_from_electrum(url, port, method, params=[]):
     params = [params] if type(params) is not list else params
     socket.setdefaulttimeout(20)
     s = socket.create_connection((url, port))
-    s.send(json.dumps({"id": 0, "method": method, "params": params}).encode() + b'\n')
+    s.send(json.dumps({"id": 0, "method": method,
+                       "params": params}).encode() + b'\n')
     time.sleep(0.1)
     return json.loads(s.recv(999999)[:-1].decode())
 
+
 def get_p2pk_scripthash_from_pubkey(pubkey):
-    scriptpubkey = '21' +pubkey+ 'ac'
+    scriptpubkey = '21' + pubkey + 'ac'
     scripthex = codecs.decode(scriptpubkey, 'hex')
     s = hashlib.new('sha256', scripthex).digest()
     sha256_scripthash = codecs.encode(s, 'hex').decode("utf-8")
     script_hash = lil_endian(sha256_scripthash)
     return script_hash
+
 
 def get_p2pkh_scripthash_from_pubkey(pubkey):
     publickey = codecs.decode(pubkey, 'hex')
@@ -127,11 +139,14 @@ def get_p2pkh_scripthash_from_pubkey(pubkey):
     script_hash = lil_endian(sha256_scripthash)
     return script_hash
 
+
 def get_full_electrum_balance(pubkey, url, port):
     p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
     p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
-    p2pk_resp = get_from_electrum(url, port, 'blockchain.scripthash.get_balance', p2pk_scripthash)
-    p2pkh_resp = get_from_electrum(url, port, 'blockchain.scripthash.get_balance', p2pkh_scripthash)
+    p2pk_resp = get_from_electrum(
+        url, port, 'blockchain.scripthash.get_balance', p2pk_scripthash)
+    p2pkh_resp = get_from_electrum(
+        url, port, 'blockchain.scripthash.get_balance', p2pkh_scripthash)
     p2pk_confirmed_balance = p2pk_resp['result']['confirmed']
     p2pkh_confirmed_balance = p2pkh_resp['result']['confirmed']
     p2pk_unconfirmed_balance = p2pk_resp['result']['unconfirmed']

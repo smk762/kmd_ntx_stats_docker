@@ -24,15 +24,15 @@ def get_region_score_stats(notarisation_scores):
 
 def get_top_region_notarisers(region_notary_ranks):
     top_region_notarisers = {
-        "AR":{
+        "AR": {
         },
-        "EU":{
+        "EU": {
         },
-        "NA":{
+        "NA": {
         },
-        "SH":{
+        "SH": {
         },
-        "DEV":{
+        "DEV": {
         }
     }
     top_ntx_count = {}
@@ -104,12 +104,12 @@ def get_daily_stats_sorted(season=None, coins_dict=None):
         region = get_notary_region(notary_name)
 
         daily_stats[region].append({
-            "notary":notary_name,
-            "btc":notary_ntx_24hr_summary["btc_ntx"],
-            "main":notary_ntx_24hr_summary["main_ntx"],
-            "third_party":notary_ntx_24hr_summary["third_party_ntx"],
-            "mining":nn_mined_last_24hrs[notary_name],
-            "score":notary_ntx_24hr_summary["score"]
+            "notary": notary_name,
+            "btc": notary_ntx_24hr_summary["btc_ntx"],
+            "main": notary_ntx_24hr_summary["main_ntx"],
+            "third_party": notary_ntx_24hr_summary["third_party_ntx"],
+            "mining": nn_mined_last_24hrs[notary_name],
+            "score": notary_ntx_24hr_summary["score"]
         })
 
     daily_stats_sorted = {}
@@ -125,7 +125,7 @@ def get_daily_stats_sorted(season=None, coins_dict=None):
             for item in daily_stats[region]:
                 if notary == item['notary']:
                     new_item = item.copy()
-                    new_item.update({"rank":i})
+                    new_item.update({"rank": i})
                     daily_stats_sorted[region].append(new_item)
             i += 1
     return daily_stats_sorted
@@ -142,9 +142,9 @@ def get_coin_notariser_ranks(season, coins_list=None):
     notary_list = get_notary_list(season)
     ntx_season = ntx_season.values()
 
-    if season == "Season_5_Testnet":
+    if season == "Season_5_Testnet": 
         region_notary_ranks = {
-            "TESTNET":{}
+            "TESTNET": {}
         }
         coins_list = ["RICK", "MORTY", "LTC"]
 
@@ -161,11 +161,11 @@ def get_coin_notariser_ranks(season, coins_list=None):
                         })
     else:
         region_notary_ranks = {
-            "AR":{},
-            "EU":{},
-            "NA":{},
-            "SH":{},
-            "DEV":{}
+            "AR": {},
+            "EU": {},
+            "NA": {},
+            "SH": {},
+            "DEV": {}
         }
         for notary in notary_list:
             region = get_notary_region(notary)
@@ -236,7 +236,7 @@ def get_season_stats_sorted(season, coins_dict=None):
             for item in season_stats[region]:
                 if notary == item['notary']:
                     new_item = item.copy()
-                    new_item.update({"rank":i})
+                    new_item.update({"rank": i})
                     season_stats_sorted[region].append(new_item)
             i += 1
 
@@ -265,15 +265,15 @@ def get_swaps_stats(from_time, to_time):
     taker_coin = data.values('taker_coin').annotate(num_swaps=Count('taker_coin'))
     maker_coin = data.values('maker_coin').annotate(num_swaps=Count('maker_coin'))
     resp = {
-        "count":data.count(),
-        "taker_pubkeys":[{i['taker_pubkey']:i['num_swaps']} for i in taker_pubkeys],
-        "maker_pubkeys":[{i['maker_pubkey']:i['num_swaps']} for i in maker_pubkeys],
-        "taker_gui":[{i['taker_gui']:i['num_swaps']} for i in taker_gui],
-        "maker_gui":[{i['maker_gui']:i['num_swaps']} for i in maker_gui],
-        "taker_version":[{i['taker_version']:i['num_swaps']} for i in taker_version],
-        "maker_version":[{i['maker_version']:i['num_swaps']} for i in maker_version],
-        "taker_coin":[{i['taker_coin']:i['num_swaps']} for i in taker_coin],
-        "maker_coin":[{i['maker_coin']:i['num_swaps']} for i in maker_coin]
+        "count": data.count(),
+        "taker_pubkeys": [{i['taker_pubkey']:i['num_swaps']} for i in taker_pubkeys],
+        "maker_pubkeys": [{i['maker_pubkey']:i['num_swaps']} for i in maker_pubkeys],
+        "taker_gui": [{i['taker_gui']:i['num_swaps']} for i in taker_gui],
+        "maker_gui": [{i['maker_gui']:i['num_swaps']} for i in maker_gui],
+        "taker_version": [{i['taker_version']:i['num_swaps']} for i in taker_version],
+        "maker_version": [{i['maker_version']:i['num_swaps']} for i in maker_version],
+        "taker_coin": [{i['taker_coin']:i['num_swaps']} for i in taker_coin],
+        "maker_coin": [{i['maker_coin']:i['num_swaps']} for i in maker_coin]
     }
     return resp
 
@@ -300,22 +300,22 @@ def get_swaps_gui_stats(request):
     maker_pubkeys = data.values('maker_pubkey', 'maker_gui').annotate(num_swaps=Count('maker_pubkey'))
     resp = {
         "taker": {
-            "swap_total":0,
-            "pubkey_total":0,
-            "desktop":{"swap_total":0,"pubkey_total":0},
-            "android":{"swap_total":0,"pubkey_total":0},
-            "ios":{"swap_total":0,"pubkey_total":0},
-            "dogedex":{"swap_total":0,"pubkey_total":0},
-            "other":{"swap_total":0,"pubkey_total":0}
+            "swap_total": 0,
+            "pubkey_total": 0,
+            "desktop": {"swap_total": 0,"pubkey_total": 0},
+            "android": {"swap_total": 0,"pubkey_total": 0},
+            "ios": {"swap_total": 0,"pubkey_total": 0},
+            "dogedex": {"swap_total": 0,"pubkey_total": 0},
+            "other": {"swap_total": 0,"pubkey_total": 0}
         },
         "maker": {
-            "swap_total":0,
-            "pubkey_total":0,
-            "desktop":{"swap_total":0,"pubkey_total":0},
-            "android":{"swap_total":0,"pubkey_total":0},
-            "ios":{"swap_total":0,"pubkey_total":0},
-            "dogedex":{"swap_total":0,"pubkey_total":0},
-            "other":{"swap_total":0,"pubkey_total":0}
+            "swap_total": 0,
+            "pubkey_total": 0,
+            "desktop": {"swap_total": 0,"pubkey_total": 0},
+            "android": {"swap_total": 0,"pubkey_total": 0},
+            "ios": {"swap_total": 0,"pubkey_total": 0},
+            "dogedex": {"swap_total": 0,"pubkey_total": 0},
+            "other": {"swap_total": 0,"pubkey_total": 0}
         }
     }
     for item in taker_pubkeys:
@@ -325,7 +325,7 @@ def get_swaps_gui_stats(request):
                 if item["taker_gui"].lower().find(x) > -1:
                     category = x
         if item["taker_gui"] not in resp["taker"][category]:
-            resp["taker"][category].update({item["taker_gui"]:{"swap_total":0,"pubkey_total":0}})
+            resp["taker"][category].update({item["taker_gui"]:{"swap_total": 0,"pubkey_total": 0}})
         resp["taker"][category][item["taker_gui"]].update({
             item['taker_pubkey']:item['num_swaps'],
         })
@@ -340,14 +340,14 @@ def get_swaps_gui_stats(request):
     for category in resp["taker"]:
         if category not in ["swap_total", "swap_pct", "pubkey_total"]:
             pct = resp["taker"][category]["swap_total"]/resp["taker"]["swap_total"]*100
-            resp["taker"][category].update({"swap_pct":pct})
+            resp["taker"][category].update({"swap_pct": pct})
             for gui in resp["taker"][category]:
                 if gui not in ["swap_total", "swap_pct", "pubkey_total"]:
                     pct = resp["taker"][category][gui]["swap_total"]/resp["taker"]["swap_total"]*100
                     category_pct = resp["taker"][category][gui]["swap_total"]/resp["taker"][category]["swap_total"]*100
                     resp["taker"][category][gui].update({
-                        "swap_pct":pct,
-                        "swap_category_pct":category_pct,
+                        "swap_pct": pct,
+                        "swap_category_pct": category_pct,
                     })
 
 
@@ -358,7 +358,7 @@ def get_swaps_gui_stats(request):
                 if item["maker_gui"].lower().find(x) > -1:
                     category = x
         if item["maker_gui"] not in resp["maker"][category]:
-            resp["maker"][category].update({item["maker_gui"]:{"swap_total":0,"pubkey_total":0}})
+            resp["maker"][category].update({item["maker_gui"]:{"swap_total": 0,"pubkey_total": 0}})
         resp["maker"][category][item["maker_gui"]].update({
             item['maker_pubkey']:item['num_swaps'],
         })
@@ -373,14 +373,14 @@ def get_swaps_gui_stats(request):
     for category in resp["maker"]:
         if category  not in ["swap_total", "swap_pct", "pubkey_total"]:
             pct = resp["maker"][category]["swap_total"]/resp["maker"]["swap_total"]*100
-            resp["maker"][category].update({"swap_pct":pct})
+            resp["maker"][category].update({"swap_pct": pct})
             for gui in resp["maker"][category]:
                 if gui not in ["swap_total", "swap_pct", "pubkey_total"]: 
                     pct = resp["maker"][category][gui]["swap_total"]/resp["maker"]["swap_total"]*100
                     category_pct = resp["maker"][category][gui]["swap_total"]/resp["maker"][category]["swap_total"]*100
                     resp["maker"][category][gui].update({
-                        "swap_pct":pct,
-                        "swap_category_pct":category_pct,
+                        "swap_pct": pct,
+                        "swap_category_pct": category_pct,
                     })
 
     return resp
@@ -404,7 +404,7 @@ def get_swaps_pubkey_stats(request):
     resp = {}
     for item in taker_pubkeys:
         if item["taker_pubkey"] not in resp:
-            resp.update({item["taker_pubkey"]:{"TOTAL":0}})
+            resp.update({item["taker_pubkey"]:{"TOTAL": 0}})
         resp[item["taker_pubkey"]].update({
             item['taker_gui']:item['num_swaps'],
         })

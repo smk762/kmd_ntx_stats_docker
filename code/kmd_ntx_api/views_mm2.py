@@ -103,12 +103,18 @@ def bestorders_view(request):
     return render(request, 'mm2/mm2_bestorders.html', context)
 
 def mm2gui_view(request):
+    swaps_data = get_swaps_data()
+    since = "week"
     to_time = int(time.time())
     from_time = int(to_time - 60*60*24*14)
     if "from_time" in request.GET:
         from_time = int(request.GET["from_time"])
     if "to_time" in request.GET:
         to_time = int(request.GET["to_time"])
+    if "since" in request.GET:
+        since = request.GET["since"]
+    swaps_data = filter_swaps_timespan(swaps_data, from_time, to_time) 
+    guis = get_swaps_guis(swaps_data)
     season = get_page_season(request)
     context = {
         "from_time": from_time,
@@ -116,7 +122,9 @@ def mm2gui_view(request):
         "from_time_dt": dt.fromtimestamp(from_time),
         "to_time_dt": dt.fromtimestamp(to_time),        
         "since_options": list(SINCE_INTERVALS.keys()),
+        "since": since,
         "season": season,
+        "guis": guis,
         "scheme_host": get_current_host(request),
         "sidebar_links": get_sidebar_links(season),
         "eco_data_link": get_eco_data_link()

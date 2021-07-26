@@ -267,6 +267,7 @@ def create_raw_transaction_view(request):
         "chain":chain,
         "season":season,
         "now":int(time.time()),
+        "locktime":int(time.time())-10*60,
         "20_min_ago":int(time.time()-20*60),
         "reqget":request.GET,
         "page_title":"Create Raw Transaction from Address",

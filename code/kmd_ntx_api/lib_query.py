@@ -351,6 +351,16 @@ def get_swaps_data(uuid=None):
         data = data.filter(uuid=uuid)
     return data
 
+def get_swaps_guis(swaps_data):
+    q_maker_guis = swaps_data.values('maker_gui').annotate(count=Count('maker_gui'))
+    q_taker_guis = swaps_data.values('taker_gui').annotate(count=Count('taker_gui'))
+    maker_guis = [i for i in q_maker_guis]
+    taker_guis = [i for i in q_taker_guis]
+    return {
+        "maker_guis": maker_guis,
+        "taker_guis": taker_guis
+    }
+
 
 def filter_swaps_coins(data, taker_coin=None, maker_coin=None):
     if taker_coin:

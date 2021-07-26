@@ -55,16 +55,16 @@ def get_api_testnet(request):
                 last_chain_ntx = last_notarisations[notary][chain]["time_since"]
                 last_chain_ntx_time = last_notarisations[notary][chain]["block_time"]
                 testnet_stats_dict[notary].update({
-                    f"Last_{chain}":last_chain_ntx,
-                    f"Last_{chain}_time":last_chain_ntx_time
+                    f"Last_{chain}": last_chain_ntx,
+                    f"Last_{chain}_time": last_chain_ntx_time
                 })
 
             except Exception as e:
                 logger.error(f"[get_api_testnet] Exception: {e} | notary: {notary} | chain: {chain}")
                 logger.warning(f"[get_api_testnet] Setting last_ntx for {notary} | chain: {chain} to > 24hrs")
                 testnet_stats_dict[notary].update({
-                    f"Last_{chain}":"> 24hrs",
-                    f"Last_{chain}_time":0
+                    f"Last_{chain}": "> 24hrs",
+                    f"Last_{chain}_time": 0
                 })
 
         # Get notarisation counts
@@ -75,11 +75,11 @@ def get_api_testnet(request):
                 if notary in testnet_stats_dict:
 
                     if testnet_stats_dict[notary]["Total"] == 0:
-                        testnet_stats_dict[notary].update({"Total":1})
+                        testnet_stats_dict[notary].update({"Total": 1})
 
                     else:
                         count = testnet_stats_dict[notary]["Total"]+1
-                        testnet_stats_dict[notary].update({"Total":count})
+                        testnet_stats_dict[notary].update({"Total": count})
 
                     if testnet_stats_dict[notary][chain] == 0:
                         testnet_stats_dict[notary].update({chain:1})
@@ -99,19 +99,19 @@ def get_api_testnet(request):
                 if notary in testnet_stats_dict:
 
                     if testnet_stats_dict[notary]["24hr_Total"] == 0:
-                        testnet_stats_dict[notary].update({"24hr_Total":1})
+                        testnet_stats_dict[notary].update({"24hr_Total": 1})
 
                     else:
                         count = testnet_stats_dict[notary]["24hr_Total"]+1
-                        testnet_stats_dict[notary].update({"24hr_Total":count})
+                        testnet_stats_dict[notary].update({"24hr_Total": count})
 
                     if testnet_stats_dict[notary][chain] == 0:
-                        testnet_stats_dict[notary].update({f"24hr_{chain}":1})
-                        testnet_stats_dict[notary].update({f"24hr_{chain}":1})
+                        testnet_stats_dict[notary].update({f"24hr_{chain}": 1})
+                        testnet_stats_dict[notary].update({f"24hr_{chain}": 1})
                         
                     else:
                         count = testnet_stats_dict[notary][f"24hr_{chain}"]+1
-                        testnet_stats_dict[notary].update({f"24hr_{chain}":count})
+                        testnet_stats_dict[notary].update({f"24hr_{chain}": count})
                 else:
                     logger.warning(f"[get_api_testnet] {notary} not found in ntx_notaries: {item}")
 
@@ -126,7 +126,7 @@ def get_api_testnet(request):
     i = 0
     for notary in ranked_totals:
         i += 1
-        testnet_stats_dict[notary].update({"Rank":i})
+        testnet_stats_dict[notary].update({"Rank": i})
 
     # Get 24hr notarisation rank
     notary_totals_24hr = {}
@@ -138,7 +138,7 @@ def get_api_testnet(request):
     i = 0
     for notary in ranked_totals_24hr:
         i += 1
-        testnet_stats_dict[notary].update({"24hr_Rank":i})
+        testnet_stats_dict[notary].update({"24hr_Rank": i})
 
     return testnet_stats_dict
 
