@@ -6,15 +6,15 @@ from kmd_ntx_api import api_graph
 api_graph_urls = [
 
     path('api/graph/balances/',
-          api_graph.balances_graph,
-          name='balances_graph'),
+         api_graph.balances_graph,
+         name='balances_graph'),
 
     path('api/graph/daily_ntx/',
-          api_graph.daily_ntx_graph,
-          name='daily_ntx_graph'),
+         api_graph.daily_ntx_graph,
+         name='daily_ntx_graph'),
 
     path('api/graph/mm2gui/',
-          api_graph.get_mm2gui_piechart,
-          name='get_mm2gui_piechart'),
+         api_graph.get_mm2gui_piechart,
+         name='get_mm2gui_piechart'),
 
 ]

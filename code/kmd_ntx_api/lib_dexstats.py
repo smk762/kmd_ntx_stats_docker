@@ -3,14 +3,20 @@ import requests
 # Grabs data from Dexstats explorer APIs
 # e.g. https://kmd.explorer.dexstats.info/insight-api-komodo
 
+
 def get_blocktip(chain):
     try:
-        return requests.get(f"https://{chain.lower()}.explorer.dexstats.info/insight-api-komodo/sync").json()["height"]
+        subdomain = f"https://{chain.lower()}.explorer.dexstats.info"
+        endpoint = f"insight-api-komodo/sync"
+        return requests.get(f"{subdomain}/{endpoint}").json()["height"]
     except:
         return 0
 
+
 def get_utxos(chain, address):
     try:
-        return requests.get(f"https://{chain}.explorer.dexstats.info/insight-api-komodo/addr/{address}/utxo").json()
+        subdomain = f"https://{chain.lower()}.explorer.dexstats.info"
+        endpoint = f"insight-api-komodo/addr/{address}/utxo"
+        return requests.get(f"{subdomain}/{endpoint}").json()
     except:
         return []

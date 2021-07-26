@@ -1,0 +1,101 @@
+
+				<div class="card kmd_ui_light4">
+					<div class="card-header kmd_ui_dark1_bg d-flex justify-content-between">
+						<div>
+							Taker Guis 
+						</div>
+						<div class="my-auto">
+							{{ from_time_dt|date:"H:i d M Y" }} to {{ to_time_dt|date:"H:i d M Y" }}
+						</div>
+					</div>
+					<div class="card-body mt-0 pt-0 kmd_ui_dark1_bg">
+						<table id="tbl_taker_gui" class="table table-striped table-bordered kmd_ui_light4 m-auto">
+							<thead>
+								<tr>
+									<th data-data="gui">GUI</th>
+									<th data-data="count">COUNT</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for i in guis.taker_guis %}
+								<tr>
+									<td data-data="gui">{{ i.taker_gui }}</th>
+									<td data-data="count">{{ i.count }}</th>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="card kmd_ui_light4 d-flex justify-content-between">
+					<div class="card-header kmd_ui_dark1_bg d-flex justify-content-between">
+						<div>
+							Maker Guis 
+						</div>
+						<div class="my-auto">
+							{{ from_time_dt|date:"H:i d M Y" }} to {{ to_time_dt|date:"H:i d M Y" }}
+						</div>
+					</div>
+					<div class="card-body mt-0 pt-0 kmd_ui_dark1_bg">
+						<table id="tbl_maker_gui" class="table table-striped table-bordered kmd_ui_light4 m-auto">
+							<thead>
+								<tr>
+									<th data-data="gui">GUI</th>
+									<th data-data="count">COUNT</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for i in guis.maker_guis %}
+								<tr>
+									<td data-data="gui">{{ i.maker_gui }}</td>
+									<td data-data="count">{{ i.count }}</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			  	<script>
+				    $(document).ready(function() {
+				        $('#tbl_maker_gui').DataTable({
+				           "paging": false,
+			        		order: [[ 1, 'desc' ], [ 0, 'asc' ]],
+			        		"columnDefs": [
+			        			{
+						            "data": "gui",
+						            "targets": 0,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.gui+"</a></span>");
+							        }
+						        },
+			        			{
+						            "data": "count",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.count+"</a></span>");
+							        }
+						        }
+			        		]
+				        });
+				        $('#tbl_taker_gui').DataTable({
+				           "paging": false,
+			        		order: [[ 1, 'desc' ], [ 0, 'asc' ]],
+			        		"columnDefs": [
+			        			{
+						            "data": "gui",
+						            "targets": 0,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.gui+"</a></span>");
+							        }
+						        },
+			        			{
+						            "data": "count",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.count+"</a></span>");
+							        }
+						        }
+			        		]
+				        });
+				    });
+				</script>

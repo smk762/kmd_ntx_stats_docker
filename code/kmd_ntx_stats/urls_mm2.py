@@ -32,6 +32,10 @@ api_mm2_urls = [
           api_mm2.bestorders_api,
           name='bestorders_api'),
 
+    path('api/mm2/failed_swap/',
+          api_mm2.failed_swap_api,
+          name='failed_swap_api'),
+    
     path('api/mm2/last_200_swaps/',
           api_mm2.last_200_swaps_api,
           name='last_200_swaps_api'),
