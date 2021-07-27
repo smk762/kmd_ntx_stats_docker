@@ -152,24 +152,24 @@ def get_regions_info(notary_list):
     notary_list.sort()
     regions_info = {
         'AR':{ 
-            "name":"Asia and Russia",
-            "nodes":[]
+            "name": "Asia and Russia",
+            "nodes": []
             },
         'EU':{ 
-            "name":"Europe",
-            "nodes":[]
+            "name": "Europe",
+            "nodes": []
             },
         'NA':{ 
-            "name":"North America",
-            "nodes":[]
+            "name": "North America",
+            "nodes": []
             },
         'SH':{ 
-            "name":"Southern Hemisphere",
-            "nodes":[]
+            "name": "Southern Hemisphere",
+            "nodes": []
             },
         'DEV':{ 
-            "name":"Developers",
-            "nodes":[]
+            "name": "Developers",
+            "nodes": []
             }
     }
     for notary in notary_list:
@@ -208,7 +208,7 @@ def day_hr_min_sec(seconds, granularity=2):
 def get_eco_data_link():
     item = random.choice(ECO_DATA)
     ad = random.choice(item['ads'])
-    while ad['frequency'] == "never":
+    while ad['frequency'] == "never": 
         item = random.choice(ECO_DATA)
         ad = random.choice(item['ads'])
     link = ad['data']['string1']+" <a href="+ad['data']['link']+"> " \
@@ -223,8 +223,8 @@ def get_dpow_server_coins_dict(season=None):
     dpow_3p_chains = requests.get(f"{url}/?season={season}&server=Third_Party").json()['results']
 
     chains_dict = {
-        "Main":dpow_main_chains,
-        "Third_Party":dpow_3p_chains
+        "Main": dpow_main_chains,
+        "Third_Party": dpow_3p_chains
     }
     
     return chains_dict
@@ -300,11 +300,11 @@ def prepare_regional_graph_data(graph_data):
         chartdata.append(graph_data[label])
     
     data = { 
-        "labels":labels, 
-        "chartLabel":chartLabel, 
-        "chartdata":chartdata, 
-        "bg_color":bg_color, 
-        "border_color":border_color, 
+        "labels": labels, 
+        "chartLabel": chartLabel, 
+        "chartdata": chartdata, 
+        "bg_color": bg_color, 
+        "border_color": border_color, 
     } 
     return data
 
@@ -337,11 +337,11 @@ def prepare_coins_graph_data(graph_data, coins_dict):
         chartdata.append(graph_data[label])
     
     data = { 
-        "labels":labels, 
-        "chartLabel":chartLabel, 
-        "chartdata":chartdata, 
-        "bg_color":bg_color, 
-        "border_color":border_color, 
+        "labels": labels, 
+        "chartLabel": chartLabel, 
+        "chartdata": chartdata, 
+        "bg_color": bg_color, 
+        "border_color": border_color, 
     } 
     return data
 

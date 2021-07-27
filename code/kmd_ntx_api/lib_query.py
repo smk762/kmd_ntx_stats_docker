@@ -351,6 +351,38 @@ def get_swaps_data(uuid=None):
         data = data.filter(uuid=uuid)
     return data
 
+def get_swaps_counts(swaps_data):
+    q_pairs = swaps_data.values('maker_coin', 'taker_coin').annotate(
+                count=Count('taker_coin')
+            )
+    q_maker_guis = swaps_data.values('maker_gui').annotate(count=Count('maker_gui'))
+    q_taker_guis = swaps_data.values('taker_gui').annotate(count=Count('taker_gui'))
+
+    guis = {}
+
+    for i in q_taker_guis:
+        guis.update({i["taker_gui"]:{
+            "taker_swaps":i["count"],
+            "maker_swaps":0
+            }})
+
+    for i in q_maker_guis:
+        if i["maker_gui"] not in guis:
+            guis.update({i["maker_gui"]:{"maker_swaps":i["count"], "taker_swaps":0}})
+        else:
+            guis[i["maker_gui"]].update({"maker_swaps":i["count"]})
+
+    pairs = [
+        {"maker":i['maker_coin'], "taker":i['taker_coin'], "count":i['count']}
+         for i in q_pairs # if i["count"] >= 10
+    ]
+
+    return {
+        "pairs": pairs,
+        "guis": guis
+    }
+
+
 
 def filter_swaps_coins(data, taker_coin=None, maker_coin=None):
     if taker_coin:

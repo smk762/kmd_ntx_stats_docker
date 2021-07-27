@@ -1,0 +1,119 @@
+
+				<div class="card kmd_ui_light4 d-flex justify-content-between">
+					<div class="card-header kmd_ui_dark1_bg d-flex justify-content-between">
+						<div>
+							GUI Swap Counts 
+						</div>
+						<div class="my-auto">
+							{{ from_time_dt|date:"H:i d M Y" }} to {{ to_time_dt|date:"H:i d M Y" }}
+						</div>
+					</div>
+					<div class="card-body mt-0 pt-0 kmd_ui_dark1_bg">
+						<table id="tbl_gui_swaps" class="table table-striped table-bordered kmd_ui_light4 m-auto">
+							<thead>
+								<tr>
+									<th data-data="gui">GUI</th>
+									<th data-data="maker_count">Maker Swaps</th>
+									<th data-data="taker_count">Taker Swaps</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for gui, swaps in swaps_counts.guis.items %}
+								<tr>
+									<td data-data="gui">{{ gui }}</td>
+									<td data-data="maker_count">{{ swaps.maker_swaps }}</td>
+									<td data-data="taker_count">{{ swaps.taker_swaps }}</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="card kmd_ui_light4 d-flex justify-content-between">
+					<div class="card-header kmd_ui_dark1_bg d-flex justify-content-between">
+						<div>
+							Pair Swap Counts 
+						</div>
+						<div class="my-auto">
+							{{ from_time_dt|date:"H:i d M Y" }} to {{ to_time_dt|date:"H:i d M Y" }}
+						</div>
+					</div>
+					<div class="card-body mt-0 pt-0 kmd_ui_dark1_bg">
+						<table id="tbl_pair_swaps" class="table table-striped table-bordered kmd_ui_light4 m-auto">
+							<thead>
+								<tr>
+									<th data-data="maker">Maker</th>
+									<th data-data="taker">Taker</th>
+									<th data-data="swap_count">Swap Count</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for x in swaps_counts.pairs %}
+								<tr>
+									<td data-data="maker">{{ x.maker }}</td>
+									<td data-data="taker">{{ x.taker }}</td>
+									<td data-data="swap_count">{{ x.count }}</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			  	<script>
+				    $(document).ready(function() {
+				        $('#tbl_gui_swaps').DataTable({
+				           "paging": false,
+			        		order: [[ 1, 'desc' ], [ 0, 'asc' ]],
+			        		"columnDefs": [
+			        			{
+						            "data": "gui",
+						            "targets": 0,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.gui);
+							        }
+						        },
+			        			{
+						            "data": "maker_count",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.maker_count);
+							        }
+						        },
+			        			{
+						            "data": "taker_count",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.taker_count);
+							        }
+						        }
+			        		]
+				        });
+				        $('#tbl_pair_swaps').DataTable({
+				           "paging": false,
+			        		order: [[ 1, 'desc' ], [ 0, 'asc' ]],
+			        		"columnDefs": [
+			        			{
+						            "data": "maker",
+						            "targets": 0,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.maker);
+							        }
+						        },
+			        			{
+						            "data": "taker",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.taker);
+							        }
+						        },
+			        			{
+						            "data": "swap_count",
+						            "targets": 2,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.swap_count);
+							        }
+						        }
+			        		]
+				        });
+				    });
+				</script>
