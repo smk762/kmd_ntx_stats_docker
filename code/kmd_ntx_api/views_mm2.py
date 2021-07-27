@@ -114,7 +114,6 @@ def mm2gui_view(request):
     if "since" in request.GET:
         since = request.GET["since"]
     swaps_data = filter_swaps_timespan(swaps_data, from_time, to_time) 
-    guis = get_swaps_guis(swaps_data)
     season = get_page_season(request)
     context = {
         "from_time": from_time,
@@ -124,7 +123,7 @@ def mm2gui_view(request):
         "since_options": list(SINCE_INTERVALS.keys()),
         "since": since,
         "season": season,
-        "guis": guis,
+        "swaps_counts": get_swaps_counts(swaps_data),
         "scheme_host": get_current_host(request),
         "sidebar_links": get_sidebar_links(season),
         "eco_data_link": get_eco_data_link()
