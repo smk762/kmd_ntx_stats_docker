@@ -33,7 +33,8 @@ class coinsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = coins
         fields = ['chain', 'coins_info', 'electrums', 'electrums_ssl',
-                  'explorers', 'dpow', 'dpow_tenure', 'dpow_active', 'mm2_compatible']
+                  'explorers', 'dpow', 'dpow_tenure', 'dpow_active',
+                  'mm2_compatible']
 
 
 class coinSocialSerializer(serializers.HyperlinkedModelSerializer):
@@ -70,7 +71,7 @@ class minedCountSeasonSerializer(serializers.HyperlinkedModelSerializer):
         model = mined_count_season
         fields = ['name', 'address', 'blocks_mined', 'sum_value_mined',
                   'max_value_mined', 'max_value_txid', 'last_mined_block',
-                  'last_mined_blocktime', 'time_stamp', 
+                  'last_mined_blocktime', 'time_stamp',
                   'season']
 
 
@@ -135,26 +136,26 @@ class notarisedCountDailySerializer(serializers.HyperlinkedModelSerializer):
         model = notarised_count_daily
         fields = ['notarised_date', 'notary', 'btc_count', 'antara_count',
                   'third_party_count', 'other_count', 'total_ntx_count',
-                  'chain_ntx_counts', 'chain_ntx_pct', 'time_stamp', 
+                  'chain_ntx_counts', 'chain_ntx_pct', 'time_stamp',
                   'season', 'notarised_date']
 
 
 class notarisedCountSeasonSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = notarised_count_season
-        fields = ['season', 'notary', 'btc_count', 'antara_count', 'third_party_count',
-                  'other_count', 'total_ntx_count', 'chain_ntx_counts',
-                  'chain_ntx_pct', 'time_stamp']
+        fields = ['season', 'notary', 'btc_count', 'antara_count',
+                  'third_party_count', 'other_count', 'total_ntx_count',
+                  'chain_ntx_counts', 'chain_ntx_pct', 'time_stamp']
 
 
 class notarisedTenureSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = notarised_tenure
-        fields = ['season', 'server', 'chain', 'first_ntx_block', 'last_ntx_block', 
-                  'first_ntx_block_time', 'last_ntx_block_time',
-                  'official_start_block_time', 'official_end_block_time',
-                  'scored_ntx_count', 'unscored_ntx_count']
-
+        fields = ['season', 'server', 'chain', 'first_ntx_block',
+                  'last_ntx_block', 'first_ntx_block_time',
+                  'last_ntx_block_time', 'official_start_block_time',
+                  'official_end_block_time', 'scored_ntx_count',
+                  'unscored_ntx_count']
 
 
 class scoringEpochsSerializer(serializers.HyperlinkedModelSerializer):
@@ -163,6 +164,7 @@ class scoringEpochsSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['season', 'server', 'epoch', 'epoch_start',
                   'epoch_end', 'start_event', 'end_event',
                   'epoch_chains', 'score_per_ntx']
+
 
 class vote2021Serializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -176,42 +178,42 @@ class vote2021Serializer(serializers.HyperlinkedModelSerializer):
 class swapsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = swaps
-        fields = ["uuid", "started_at", "taker_coin", "taker_amount", \
-                 "taker_gui", "taker_version", "taker_pubkey", "maker_coin", \
-                 "maker_amount", "maker_gui", "maker_version", "maker_pubkey"]
+        fields = ["uuid", "started_at", "taker_coin", "taker_amount",
+                  "taker_gui", "taker_version", "taker_pubkey",
+                  "maker_coin", "maker_amount", "maker_gui",
+                  "maker_version", "maker_pubkey", "time_stamp"]
 
 
 class swapsFailedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = swaps_failed
-        fields = ["uuid", "started_at", "taker_coin", "taker_amount", 
-                 "taker_error_type", "taker_error_msg", "taker_gui", 
-                 "taker_version", "taker_pubkey", "maker_coin", 
-                 "maker_amount", "maker_error_type", "maker_error_msg",
-                 "maker_gui", "maker_version", "maker_pubkey"]
+        fields = ["uuid", "started_at", "taker_coin", "taker_amount",
+                  "taker_error_type", "taker_error_msg", "taker_gui",
+                  "taker_version", "taker_pubkey", "maker_coin",
+                  "maker_amount", "maker_error_type", "maker_error_msg",
+                  "maker_gui", "maker_version", "maker_pubkey"]
 
 
 class swapsSerializerPub(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = swaps
-        fields = ["uuid", "started_at", "time_stamp", "taker_coin", "taker_amount", \
-                 "taker_gui", "taker_version", "maker_coin", \
-                 "maker_amount", "maker_gui", "maker_version"]
+        fields = ["uuid", "started_at", "time_stamp", "taker_coin",
+                  "taker_amount", "taker_gui", "taker_version",
+                  "maker_coin", "maker_amount", "maker_gui",
+                  "maker_version"]
 
 
 class swapsFailedSerializerPub(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = swaps_failed
-        fields = ["uuid", "started_at", "time_stamp", "taker_coin", "taker_amount", 
-                 "taker_error_type", "taker_error_msg", "taker_gui", 
-                 "taker_version", "maker_coin", 
-                 "maker_amount", "maker_error_type", "maker_error_msg",
-                 "maker_gui", "maker_version"]
-
+        fields = ["uuid", "started_at", "time_stamp", "taker_coin",
+                  "taker_amount", "taker_error_type", "taker_error_msg",
+                  "taker_gui", "taker_version", "maker_coin",
+                  "maker_amount", "maker_error_type", "maker_error_msg",
+                  "maker_gui", "maker_version"]
 
 
 # Non-Model serializers
 class addrFromBase58Serializer(serializers.Serializer):
     class Meta:
         fields = ["pubkey", "pubtype", "wiftype", "p2shtype"]
-

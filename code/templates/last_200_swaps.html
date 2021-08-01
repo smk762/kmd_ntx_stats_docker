@@ -40,6 +40,17 @@
 	    $(document).ready(function() {
 	    	$('#mined_24hr_tbl').css('visibility', 'visible');
 	        $('#mined_24hr_tbl').DataTable({
+			    buttons: [
+			        {
+			            extend: 'csv',
+			            text: 'Export CSV',
+			            exportOptions: {
+			                modifier: {
+			                    search: 'none'
+			                }
+			            }
+			        }
+			    ],
   				"pageLength": 50,
         		order: [[ 0, 'desc' ]],
         		"columnDefs": [

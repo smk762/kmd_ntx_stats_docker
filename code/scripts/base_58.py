@@ -77,6 +77,7 @@ COIN_PARAMS = {
     "PBC": PBC_CoinParams,
     "SFUSD": SFUSD_CoinParams,
     "CHIPS": KMD_CoinParams,
+    "TOKEL": KMD_CoinParams,
     "VRSC": KMD_CoinParams,
     "BTC": BTC_CoinParams,
     "LTC": LTC_CoinParams,
