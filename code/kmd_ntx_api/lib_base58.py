@@ -8,6 +8,7 @@ from bitcoin.wallet import P2PKHBitcoinAddress
 from base58 import b58decode_check
 from .lib_const import *
 
+
 class KMD_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
     DEFAULT_PORT = 7770
@@ -55,6 +56,7 @@ class GAME_CoinParams(CoreMainParams):
                        'SCRIPT_ADDR': 5,
                        'SECRET_KEY': 166}
 
+
 class GLEEC_OLD_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
     DEFAULT_PORT = 7770
@@ -62,21 +64,25 @@ class GLEEC_OLD_CoinParams(CoreMainParams):
                        'SCRIPT_ADDR': 38,
                        'SECRET_KEY': 65}
 
+
 def sha256(data):
     d = hashlib.new("sha256")
     d.update(data)
     return d.digest()
+
 
 def ripemd160(x):
     d = hashlib.new("ripemd160")
     d.update(x)
     return d.digest()
 
-def doubleSha256(hex_str): 
-   hexbin = binascii.unhexlify(hex_str)
-   binhash = hashlib.sha256(hexbin).digest()
-   hash2 = hashlib.sha256(binhash).digest()
-   return hash2
+
+def doubleSha256(hex_str):
+    hexbin = binascii.unhexlify(hex_str)
+    binhash = hashlib.sha256(hexbin).digest()
+    hash2 = hashlib.sha256(binhash).digest()
+    return hash2
+
 
 def get_hex(val, byte_length=2, endian='big'):
     val = hex(int(val))[2:]
@@ -86,11 +92,13 @@ def get_hex(val, byte_length=2, endian='big'):
         val = lil_endian(val)
     return val
 
+
 def get_hash160(pubkey):
     bin_pk = binascii.unhexlify(pubkey)
     sha_pk = sha256(bin_pk)
     ripe_pk = ripemd160(sha_pk)
     return binascii.hexlify(ripe_pk)
+
 
 def address_to_p2pkh(address):
     decode_58 = bitcoin.base58.decode(address)
@@ -98,29 +106,34 @@ def address_to_p2pkh(address):
     pubKeyHash = "76a914"+binascii.hexlify(decode_58).decode('ascii')+"88ac"
     return pubKeyHash
 
+
 def pubkey_to_p2pkh(pubkey):
     hash160 = get_hash160(pubkey)
     p2pkh = "76a914"+hash160.decode('ascii')+"88ac"
     return p2pkh
+
 
 def pubkey_to_p2pk(pubkey):
     hash160 = get_hash160(pubkey)
     p2pk = "21"+pubkey+"ac"
     return p2pk
 
+
 class raw_tx():
-    def __init__(self, version='04000080', group_id='85202f89', inputs=list,
-                 sequence='feffffff', outputs=list,
-                 expiry_height='00000000', locktime=int(time.time()-5*60),
-                 valueBalanceSapling="0000000000000000", nSpendsSapling="0",
-                 vSpendsSapling="00", nOutputsSapling="0", vOutputsSapling="00"):
+    def __init__(self, version='04000080', group_id='85202f89',
+                 inputs=list, sequence='feffffff', outputs=list,
+                 expiry_ht='00000000', locktime=int(time.time()-5*60),
+                 valueBalanceSapling="0000000000000000",
+                 nSpendsSapling="0", vSpendsSapling="00",
+                 nOutputsSapling="0", vOutputsSapling="00"):
         self.version = version
         self.group_id = group_id
         self.inputs = inputs
         self.sequence = sequence
         self.outputs = outputs
-        self.expiry_height = expiry_height # TODO: by default, 200 blocks past current tip
-        self.locktime = locktime # time.now()
+        # TODO: by default, 200 blocks past current tip
+        self.expiry_ht = expiry_ht
+        self.locktime = locktime  # time.now()
         self.valueBalanceSapling = valueBalanceSapling
         self.nSpendsSapling = nSpendsSapling
         self.vSpendsSapling = vSpendsSapling
@@ -132,11 +145,13 @@ class raw_tx():
         self.raw_tx_str = self.version+self.group_id
         self.len_inputs = get_hex(len(self.inputs), byte_length=2)
         self.raw_tx_str += self.len_inputs
-        self.expiry_height = lil_endian(get_hex(int(self.expiry_height), byte_length=8))
+        self.expiry_ht = lil_endian(
+            get_hex(int(self.expiry_ht), byte_length=8))
         self.sum_inputs = 0
         for vin in self.inputs:
             self.raw_tx_str += lil_endian(vin["tx_hash"])
-            self.raw_tx_str += lil_endian(get_hex(vin["tx_pos"], byte_length=8))
+            self.raw_tx_str += lil_endian(
+                get_hex(vin["tx_pos"], byte_length=8))
             print(vin["tx_pos"])
             print(get_hex(vin["tx_pos"], byte_length=8))
             print(lil_endian(get_hex(vin["tx_pos"], byte_length=8)))
@@ -146,8 +161,9 @@ class raw_tx():
             else:
                 unlocking_script = ""
             pubkey = vin["scriptPubKey"]
-            self.len_script = get_hex(len(unlocking_script+"0121"+pubkey)/2, byte_length=2)
-            
+            self.len_script = get_hex(
+                len(unlocking_script+"0121"+pubkey)/2, byte_length=2)
+
             if unlocking_script == "":
                 self.raw_tx_str += "00"
             else:
@@ -155,7 +171,6 @@ class raw_tx():
                 self.raw_tx_str += unlocking_script
                 self.raw_tx_str += "0121"
                 self.raw_tx_str += lil_endian(pubkey)
-
 
             self.raw_tx_str += self.sequence
         self.sum_outputs = 0
@@ -171,7 +186,7 @@ class raw_tx():
             self.raw_tx_str += get_hex(len(pubKeyHash)/2, byte_length=2)
             self.raw_tx_str += pubKeyHash
         self.raw_tx_str += self.locktime
-        self.raw_tx_str += self.expiry_height
+        self.raw_tx_str += self.expiry_ht
         self.raw_tx_str += self.valueBalanceSapling
         self.raw_tx_str += self.nSpendsSapling
         self.raw_tx_str += self.vSpendsSapling
@@ -193,8 +208,8 @@ COIN_PARAMS = {
     "GAME": GAME_CoinParams,
     "GLEEC-OLD": GLEEC_OLD_CoinParams,
     "GLEEC": KMD_CoinParams
-} 
- 
+}
+
 
 def calc_addr_from_pubkey(coin, pubkey):
     bitcoin.params = COIN_PARAMS[coin]
@@ -202,7 +217,7 @@ def calc_addr_from_pubkey(coin, pubkey):
         return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
     except Exception as e:
         logger.error(f"[calc_addr_from_pubkey] Exception: {e}")
-        return {"error":str(e)}
+        return {"error": str(e)}
 
 
 def calc_addr_tool(pubkey, pubtype, p2shtype, wiftype):
@@ -217,28 +232,30 @@ def calc_addr_tool(pubkey, pubtype, p2shtype, wiftype):
     try:
         address = str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
         return {
-            "pubkey":pubkey,
-            "pubtype":pubtype,
-            "p2shtype":p2shtype,
-            "wiftype":wiftype,
-            "address":address
+            "pubkey": pubkey,
+            "pubtype": pubtype,
+            "p2shtype": p2shtype,
+            "wiftype": wiftype,
+            "address": address
         }
 
     except Exception as e:
         logger.error(f"[calc_addr_tool] Exception: {e}")
-        return {"error":str(e)}
+        return {"error": str(e)}
 
 
 # OP_RETURN functions
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
 
+
 def validate_pubkey(pubkey):
     resp = calc_addr_from_pubkey("KMD", pubkey)
     if "error" in resp:
         return False
     return True
-    
+
+
 def get_ticker(x):
     chain = ''
     while len(chain) < 1:
@@ -256,16 +273,16 @@ def get_ticker(x):
     return chain
 
 
-def decode_opret(op_return, coins_list):  
-    
+def decode_opret(op_return, coins_list):
+
     ac_ntx_blockhash = lil_endian(op_return[:64])
 
     try:
-        ac_ntx_height = int(lil_endian(op_return[64:72]),16) 
+        ac_ntx_height = int(lil_endian(op_return[64:72]), 16)
 
     except Exception as e:
         logger.error(f"[decode_opret] Exception: {e}")
-        err = {"error":f"{op_return} is invalid and can not be decoded. {e}"}
+        err = {"error": f"{op_return} is invalid and can not be decoded. {e}"}
         logger.error(err)
         return err
 
@@ -279,30 +296,32 @@ def decode_opret(op_return, coins_list):
 
     if chain == "KMD":
         btc_txid = lil_endian(op_return[72:136])
-        
+
     elif chain not in noMoM:
         # not sure about this bit, need another source to validate the data
         try:
             start = 72+len(chain)*2+4
             end = 72+len(chain)*2+4+64
             MoM_hash = lil_endian(op_return[start:end])
-            MoM_depth = int(lil_endian(op_return[end:]),16)
+            MoM_depth = int(lil_endian(op_return[end:]), 16)
         except Exception as e:
             logger.error(f"[decode_opret] Exception: {e}")
-    resp = { "chain":chain, "notarised_block":ac_ntx_height, "notarised_blockhash":ac_ntx_blockhash }
+    resp = {"chain": chain, "notarised_block": ac_ntx_height,
+            "notarised_blockhash": ac_ntx_blockhash}
     return resp
 
 
 def convert_addresses(address):
     resp = {
-        "results":[],
-        "errors":[]
+        "results": [],
+        "errors": []
     }
 
     try:
-        base58_coins = requests.get(f"{THIS_SERVER}/api/info/base_58/").json()["results"]
+        endpoint = f"{THIS_SERVER}/api/info/base_58/"
+        base58_coins = requests.get(endpoint).json()["results"]
     except:
-        return {"Error": f"cant get base58_coins from {THIS_SERVER}/api/info/base_58/"}
+        return {"Error": f"cant get base58_coins from {endpoint}"}
 
     for coin in base58_coins:
         decoded_bytes = bitcoin.base58.decode(address)
@@ -312,19 +331,24 @@ def convert_addresses(address):
         calculated_checksum = bitcoin.core.Hash(decoded_bytes[:-4])[:4]
 
         if checksum != calculated_checksum:
-            resp["errors"].append(f"Checksum {coin} mismatch: expected {checksum}, got {calculated_checksum}")
+            resp["errors"].append(
+                f"Checksum {coin} mismatch: expected {checksum},"
+                f" got {calculated_checksum}")
 
         new_format = base58_coins[coin]['pubtype']
         if new_format < 16:
             new_addr_format = f"0{hex(new_format)[2:]}"
         else:
             new_addr_format = hex(new_format)[2:]
-        
-        new_ripemedhash = new_addr_format.encode('ascii') + binascii.hexlify(addr)
-        checksum = doubleSha256(new_ripemedhash)[:4] # first 4 bytes, sha256 new_ripemedhash twice 
-        new_ripemedhash_full = new_ripemedhash + binascii.hexlify(checksum)
-        new_address = bitcoin.base58.encode(binascii.unhexlify(new_ripemedhash_full))
+
+        new_ripemedhash = new_addr_format.encode(
+            'ascii') + binascii.hexlify(addr)
+        # first 4 bytes, sha256 new_ripemedhash twice
+        checksum = doubleSha256(new_ripemedhash)[:4]
+        ripemedhash_full = new_ripemedhash + binascii.hexlify(checksum)
+        new_address = bitcoin.base58.encode(
+            binascii.unhexlify(ripemedhash_full))
         print(f"{coin} address: {new_address}")
-        resp["results"].append({f"{coin}":new_address})
+        resp["results"].append({f"{coin}": new_address})
 
     return resp
