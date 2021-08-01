@@ -9,6 +9,9 @@ import string
 
 logger = logging.getLogger("mylogger")
 
+def get_or_none(request, key):
+    return request.GET[key] if key in request.GET else None
+    
 def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
         filter_kwargs = {}

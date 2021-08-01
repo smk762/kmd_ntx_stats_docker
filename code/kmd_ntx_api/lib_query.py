@@ -183,7 +183,7 @@ def get_nn_ltc_tx_data(season=None, notary=None, category=None, address=None, tx
 
 def get_nn_social_data(season=None, notary=None):
     data = nn_social.objects.all()
-    if season:  
+    if season:
         season = season.title()
         data = data.filter(season=season)
     if notary:
@@ -195,7 +195,8 @@ def get_notarised_data(season=None, server=None, epoch=None, chain=None, notary=
     if txid:
         data = notarised.objects.filter(txid=txid)
     else:
-        data = notarised.objects.exclude(season="Season_1").exclude(season="Season_2").exclude(season="Season_3")
+        data = notarised.objects.exclude(season="Season_1").exclude(
+            season="Season_2").exclude(season="Season_3")
     if season:
         season = season.title()
         data = data.filter(season=season)
@@ -309,7 +310,6 @@ def get_scoring_epochs_data(season=None, server=None, chain=None, epoch=None, ti
     return data
 
 
-
 def get_vote2021_data(candidate=None, block=None, txid=None,
                       max_block=None, max_blocktime=None,
                       max_locktime=None, mined_by=None):
@@ -345,43 +345,75 @@ def get_swaps_failed_data(uuid=None):
         data = data.filter(uuid=uuid)
     return data
 
+
 def get_swaps_data(uuid=None):
     data = swaps.objects.all()
     if uuid:
         data = data.filter(uuid=uuid)
     return data
 
+
 def get_swaps_counts(swaps_data):
-    q_pairs = swaps_data.values('maker_coin', 'taker_coin').annotate(
-                count=Count('taker_coin')
-            )
-    q_maker_guis = swaps_data.values('maker_gui').annotate(count=Count('maker_gui'))
-    q_taker_guis = swaps_data.values('taker_gui').annotate(count=Count('taker_gui'))
+    q_pairs_counts = swaps_data.values('maker_coin', 'taker_coin').annotate(
+        count=Count('taker_coin')
+    )
+
+    q_pairs_volumes = swaps_data.values('maker_coin', 'taker_coin').annotate(
+        swap_count=Count('maker_coin'),
+        maker_amount=Sum('maker_amount'),
+        taker_amount=Sum('taker_amount')
+    )
+    q_maker_guis = swaps_data.values(
+        'maker_gui').annotate(count=Count('maker_gui'))
+    q_taker_guis = swaps_data.values(
+        'taker_gui').annotate(count=Count('taker_gui'))
 
     guis = {}
 
     for i in q_taker_guis:
-        guis.update({i["taker_gui"]:{
-            "taker_swaps":i["count"],
-            "maker_swaps":0
-            }})
+        guis.update(
+            {
+                i["taker_gui"]: {
+                    "taker_swaps": i["count"],
+                    "maker_swaps": 0
+                }
+            }
+        )
 
     for i in q_maker_guis:
         if i["maker_gui"] not in guis:
-            guis.update({i["maker_gui"]:{"maker_swaps":i["count"], "taker_swaps":0}})
+            guis.update(
+                {
+                    i["maker_gui"]: {
+                        "maker_swaps": i["count"],
+                        "taker_swaps": 0
+                    }
+                }
+            )
         else:
-            guis[i["maker_gui"]].update({"maker_swaps":i["count"]})
+            guis[i["maker_gui"]].update({"maker_swaps": i["count"]})
 
-    pairs = [
-        {"maker":i['maker_coin'], "taker":i['taker_coin'], "count":i['count']}
-         for i in q_pairs # if i["count"] >= 10
+    pair_counts = [
+        {"maker": i['maker_coin'], "taker":i['taker_coin'], "count":i['count']}
+        for i in q_pairs_counts  # if i["count"] >= 10
+    ]
+
+    pair_volumes = [
+        {
+            "maker": i['maker_coin'],
+            "taker":i['taker_coin'],
+            "swap_count":i['swap_count'],
+            "maker_volume":i['maker_amount'],
+            "taker_volume":i['taker_amount']
+        }
+        for i in q_pairs_volumes  # if i["count"] >= 10
     ]
 
     return {
-        "pairs": pairs,
+        "pair_volumes": pair_volumes,
+        "pair_counts": pair_counts,
         "guis": guis
     }
-
 
 
 def filter_swaps_coins(data, taker_coin=None, maker_coin=None):
@@ -391,12 +423,14 @@ def filter_swaps_coins(data, taker_coin=None, maker_coin=None):
         data = data.filter(maker_coin=maker_coin)
     return data
 
+
 def filter_swaps_gui(data, taker_gui=None, maker_gui=None):
     if taker_gui:
         data = data.filter(taker_gui=taker_gui)
     if maker_gui:
         data = data.filter(maker_gui=maker_gui)
     return data
+
 
 def filter_swaps_version(data, taker_version=None, maker_version=None):
     if taker_version:
@@ -405,6 +439,7 @@ def filter_swaps_version(data, taker_version=None, maker_version=None):
         data = data.filter(maker_version=maker_version)
     return data
 
+
 def filter_swaps_pubkey(data, taker_pubkey=None, maker_pubkey=None):
     if taker_pubkey:
         data = data.filter(taker_pubkey=taker_pubkey)
@@ -412,12 +447,14 @@ def filter_swaps_pubkey(data, taker_pubkey=None, maker_pubkey=None):
         data = data.filter(maker_pubkey=maker_pubkey)
     return data
 
+
 def filter_swaps_error(data, taker_error_type=None, maker_error_type=None):
     if taker_error_type:
         data = data.filter(taker_error_type=taker_error_type)
     if maker_error_type:
         data = data.filter(maker_error_type=maker_error_type)
     return data
+
 
 def filter_swaps_timespan(data, from_time=None, to_time=None):
     print(data.count())

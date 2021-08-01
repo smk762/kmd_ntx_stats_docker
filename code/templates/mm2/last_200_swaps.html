@@ -5,6 +5,60 @@
 		<div class="card m-auto">
 			<div class="card-header m-auto col-12">
 				<h2>{{ page_title }}</h2>
+				<row>
+					<form class="d-flex justify-content-between col-12 m-auto" id="select_base_rel">
+						<!-- Dropdown --> 
+						<div class="col-2">
+						</div>
+						<div class="input-group">
+						    <div class="input-group-prepend p-0 col-3" >
+						        <span class="input-group-text col-12" style="color:white; border: solid grey 1px !important;">
+						      	    Taker
+						        </span>
+						    </div>
+							<select class="form-control col-2" id='taker_coin' name="taker_coin" style='width: 160px;'>
+							{% for coin in mm2_coins %}
+								{% if coin == taker_coin %}
+							    	<option value='{{ coin }}' selected>
+								    	{{ coin }}
+								    </option> 
+							    {% else %}
+							    	<option value='{{ coin }}'>
+								    	{{ coin }}
+								    </option> 
+							    {% endif %}
+							{% endfor %}
+							</select>
+						</div>
+						<div class="input-group">
+						    <div class="input-group-prepend p-0 col-3" >
+						        <span class="input-group-text col-12" style="color:white; border: solid grey 1px !important;">
+						      	    Maker
+						        </span>
+						    </div>
+							<select class="form-control col-2" id='maker_coin' name="maker_coin" style='width: 160px;'>
+							{% for coin in mm2_coins %}
+								{% if coin == maker_coin %}
+							    	<option value='{{ coin }}' selected>
+								    	{{ coin }}
+							    	</option> 
+							    {% else %}
+							    	<option value='{{ coin }}'>
+								    	{{ coin }}
+							    	</option> 
+							    {% endif %}
+							{% endfor %}
+							</select>
+						</div>
+
+						<button class="append-btn2 col-1" type="submit" style="border: solid grey 1px !important;">
+						    Update
+						</button>
+						<div class="col-2">
+						</div>
+
+					</form>
+				</row>		
 			</div>			
 			<div class="card-body m-auto">
 				<table style="visibility: hidden;" id="last_swaps_tbl" class="table table-striped table-bordered">
@@ -46,6 +100,17 @@
 	    $(document).ready(function() {
 	    	$('#last_swaps_tbl').css('visibility', 'visible');
 	        $('#last_swaps_tbl').DataTable({
+			    buttons: [
+			        {
+			            extend: 'csv',
+			            text: 'Export CSV',
+			            exportOptions: {
+			                modifier: {
+			                    search: 'none'
+			                }
+			            }
+			        }
+			    ],
   				"pageLength": 50,
         		order: [[ 8, 'desc' ]],
         		"columnDefs": [
@@ -143,22 +208,12 @@
 			            "data": 'timestamp',
 			            "targets": 8,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	var time_now = Date.now()/1000;
-			            	totalSeconds = time_now-oData.timestamp
-			            	days = Math.floor(totalSeconds / 86400);
-						    totalSeconds %= 86400;
-			            	hours = Math.floor(totalSeconds / 3600);
-						    totalSeconds %= 3600;
-						    minutes = Math.floor(totalSeconds / 60);
-						    seconds = totalSeconds % 60;
-						    if (days == 0 & hours ==0) {
-						    	timesince = minutes+" min"
-						    } else if (days == 0) {
-						    	timesince = hours+" hrs, "+minutes+" min"
-						    } else {
-						    	timesince = days+" days, "+hours+" hrs"
-						    }
-				            $(nTd).html("<span class='badge p-2'>"+timesince+"</span>");
+
+
+			            	ts = oData.timestamp*1000
+			            	dt = new Date(ts).toLocaleString("en-US")
+
+				            $(nTd).html("<span class='badge p-2'>"+dt+"</span>");
 				        }
 			        }
 			    ],
@@ -166,6 +221,8 @@
 				"initComplete": function (settings, json) {
 	            }
 	        });
+    		$('#maker_coin').select2();
+    		$('#taker_coin').select2();
 	    });
 	</script>
 {% endblock %}

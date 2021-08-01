@@ -1,3 +1,4 @@
+from .lib_helper import get_or_none
 import requests
 import json
 from kmd_ntx_api.lib_const import *
@@ -76,7 +77,11 @@ def electrum(request):
     return r.json()
 
 def get_last_200_swaps(request):
-    data = get_swaps_data().order_by('-time_stamp')[:200]
+    data = get_swaps_data()
+    taker_coin = get_or_none(request, "taker_coin")
+    maker_coin = get_or_none(request, "maker_coin")
+    data = filter_swaps_coins(data, taker_coin, maker_coin)
+    data = data.order_by('-time_stamp')[:200]
     data = data.values()
     serializer = swapsSerializer(data, many=True)
     return serializer.data
