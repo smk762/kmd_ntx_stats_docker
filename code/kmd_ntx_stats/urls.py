@@ -13,7 +13,9 @@ from kmd_ntx_stats.urls_info import api_info_urls
 from kmd_ntx_stats.urls_docs import doc_urls
 from kmd_ntx_stats.urls_mm2 import frontend_mm2_urls, api_mm2_urls
 from kmd_ntx_stats.urls_table import api_table_urls
+from kmd_ntx_stats.urls_community import frontend_community_urls
 from kmd_ntx_stats.urls_wallet import api_wallet_urls
+
 from kmd_ntx_stats.urls_page import frontend_page_urls
 from kmd_ntx_stats.urls_tool import frontend_tool_urls, api_tool_urls
 
@@ -83,3 +85,4 @@ urlpatterns += api_wallet_urls
 urlpatterns += doc_urls
 urlpatterns += api_mm2_urls
 urlpatterns += frontend_mm2_urls
+urlpatterns += frontend_community_urls
