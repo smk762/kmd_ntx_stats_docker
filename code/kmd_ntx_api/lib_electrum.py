@@ -98,6 +98,8 @@ def get_utxo_count(chain, pubkey, server):
         }
         logger.error(e)
 
+def get_balance(coin, address):
+    sh = get_scripthash_from_address(address)
 
 def get_scripthash_from_address(address):
     # remove address prefix
@@ -140,19 +142,29 @@ def get_p2pkh_scripthash_from_pubkey(pubkey):
     return script_hash
 
 
-def get_full_electrum_balance(pubkey, url, port):
-    p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
-    p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
+def get_full_electrum_balance(url, port, address=None, pubkey=None):
+    if pubkey:
+        p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
+        p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
+        p2pkh_resp = get_from_electrum(
+            url, port, 'blockchain.scripthash.get_balance', p2pkh_scripthash)
+        p2pkh_confirmed_balance = p2pkh_resp['result']['confirmed']
+        p2pkh_unconfirmed_balance = p2pkh_resp['result']['unconfirmed']
+    elif address:
+        p2pk_scripthash = get_scripthash_from_address(address)
+        p2pkh_confirmed_balance = 0
+        p2pkh_unconfirmed_balance = 0
+    else:
+        return -1
+
     p2pk_resp = get_from_electrum(
         url, port, 'blockchain.scripthash.get_balance', p2pk_scripthash)
-    p2pkh_resp = get_from_electrum(
-        url, port, 'blockchain.scripthash.get_balance', p2pkh_scripthash)
     p2pk_confirmed_balance = p2pk_resp['result']['confirmed']
-    p2pkh_confirmed_balance = p2pkh_resp['result']['confirmed']
     p2pk_unconfirmed_balance = p2pk_resp['result']['unconfirmed']
-    p2pkh_unconfirmed_balance = p2pkh_resp['result']['unconfirmed']
+
     total_confirmed = p2pk_confirmed_balance + p2pkh_confirmed_balance
     total_unconfirmed = p2pk_unconfirmed_balance + p2pkh_unconfirmed_balance
+
     total = total_confirmed + total_unconfirmed
     return total/100000000
     # NINJA returns "1", TODO: check electrum version etc.
