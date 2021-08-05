@@ -230,8 +230,9 @@ def get_notary_profile_summary_table(request):
             resp[chain].update({"ntx_pct": chain_ntx_pct[chain]})
 
     last_ntx = get_last_notarised_table(request)
-
+    print(last_ntx)
     for item in last_ntx:
+        print(item)
         chain = item['chain']
         # filter out post season chains e.g. etomic
         if chain in resp:

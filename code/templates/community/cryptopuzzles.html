@@ -11,7 +11,9 @@
 			</div>			
 			<div class="card-body m-auto col-12">
 				<div>
-					<img src="{{ x.puzzle_image }}" />
+					{% for img in x.puzzle_images %}
+						<a href="{{ img }}" target="blank"><img src="{{ img }}" class="col-3" /></a>
+					{% endfor %}
 				</div>
 				<div class="m-2">
 					{{ x.puzzle_text }}

@@ -86,9 +86,14 @@
 			            "data": 'ac_ntx_height',
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	
+			            	if (oData.chain == "TOKEL") {
+			            		console.log(oData.chain)
+			            		console.log(explorers[oData.chain])
+			            	}
 			            	if (oData.chain == "LTC") {
 				            	$(nTd).html("<span class='badge p-2'><a href='https://komodod.com/b/"+oData.ac_ntx_height+"'>"+oData.ac_ntx_height+"</a></span>");
-			            	} else {
+			            	} else {			            		
 			            		$(nTd).html("<span class='badge p-2'><a href='"+explorers[oData.chain][0]+'block-index/'+oData.ac_ntx_height+"'>"+oData.ac_ntx_height+"</a></span>");
 			            	}
 				            
