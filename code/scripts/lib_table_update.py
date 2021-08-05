@@ -454,6 +454,8 @@ def update_last_ntx_row(row_data):
             block_time='"+str(row_data[4])+"', \
             season='"+str(row_data[5])+"', \
             server='"+str(row_data[6])+"';"
+        if row_data[1] == "TOKEL":
+            print(sql)
         CURSOR.execute(sql, row_data)
         CONN.commit()
         
