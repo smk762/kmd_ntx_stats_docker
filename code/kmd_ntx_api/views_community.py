@@ -10,9 +10,19 @@ def puzzles_view(request):
     season = get_page_season(request)
     puzzles = {
         "August 2021": {
-            "puzzle_images": ['https://i.imgur.com/pkgUSxk.png', 'https://i.imgur.com/WqSCQ8P.png', 'https://i.imgur.com/wq2ETVN.png'],
+            "puzzle_images": [
+                'https://i.imgur.com/pkgUSxk.png',
+                'https://i.imgur.com/WqSCQ8P.png',
+                'https://i.imgur.com/wq2ETVN.png',
+                'https://i.imgur.com/fwFN1ey.jpg'
+            ],
             "puzzle_text": "Seed is 24 words and BIP39 compliant",
-            "puzzle_value": get_full_electrum_balance("electrum1.cipig.net", 10001, "RUe4FBVXVGzN3KNYUF4EwwV4y3sZhQdJHh", None),
+            "puzzle_value": get_full_electrum_balance(
+                "electrum1.cipig.net",
+                10001,
+                "RUe4FBVXVGzN3KNYUF4EwwV4y3sZhQdJHh",
+                None
+            ),
             "puzzle_winner": None
         }
     }
