@@ -88,6 +88,7 @@ def get_notary_utxo_count(request):
             "error": f"You need to specify all filter params: {filters}"
         })
     endpoint = f"{THIS_SERVER}/api/table/addresses"
+    
     params = f"?season={season}&server={server}&chain={chain}&notary={notary}"
     addr_info = requests.get(f"{endpoint}/{params}").json()["results"]
     if len(addr_info) == 1:
