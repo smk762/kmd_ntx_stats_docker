@@ -4,7 +4,7 @@
     <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show " id="sidebar" style="border-right: 1px solid #000 !important;    ">
       <div class="c-sidebar-brand d-md-down-none ">
         <a href="{{ scheme_host }}?season={{ season }}">
-            <img class="c-sidebar-brand-full"height="46" alt="Komodo Logo" src="{{ scheme_host }}static/img/brand/KMD_Horiz_Light.png" />
+            <img class="c-sidebar-brand-full" height="46" alt="Komodo Logo" src="{{ scheme_host }}static/img/brand/KMD_Horiz_Light.png" />
             <img class="c-sidebar-brand-minimized" width="46" height="46" alt="Komodo Logo" src="{% static 'img/brand/KMD_Mark_Color.png' %}" />
         </a>
       </div>
@@ -45,21 +45,29 @@
                 <span style="padding-left: 12px;">NOTARISATION</span>
             <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notary_profile/?season={{ season }}"> {{ season_clean }} Notary Profiles
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notary_profile/?season={{ season }}" title="">
+                         {{ season_clean }} Notary Profiles
                     </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}coin_profile/?season={{ season }}"> {{ season_clean }} dPoW Coin Profiles
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}coin_profile/?season={{ season }}">
+                         {{ season_clean }} dPoW Coin Profiles
                     </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}ntx_scoreboard/?season={{ season }}"> {{ season_clean }} Scoreboard
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}ntx_scoreboard/?season={{ season }}">
+                         {{ season_clean }} Scoreboard
                     </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}ntx_scoreboard_24hrs/?season={{ season }}"> 24hr Scoreboard
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}ntx_scoreboard_24hrs/?season={{ season }}">
+                         24hr Scoreboard
                     </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}chains_last_ntx/?season={{ season }}"> Last Chain Notarisation
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}chains_last_ntx/?season={{ season }}">
+                         Last Chain Notarisation
                     </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notarised_24hrs/?season={{ season }}"> Last 200 Notarisations
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notarised_24hrs/?season={{ season }}">
+                         Last 200 Notarisations
                     </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notarised_tenure/?season={{ season }}"> Chain dPoW Tenure
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notarised_tenure/?season={{ season }}">
+                         Chain dPoW Tenure
                     </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}scoring_epochs/?season={{ season }}"> dPoW Scoring Epochs
+                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}scoring_epochs/?season={{ season }}">
+                         dPoW Scoring Epochs
                     </a>
                 </li>
             </ul>

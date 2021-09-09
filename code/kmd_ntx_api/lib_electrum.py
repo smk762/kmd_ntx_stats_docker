@@ -114,10 +114,16 @@ def get_scripthash_from_address(address):
 def get_from_electrum(url, port, method, params=[]):
     params = [params] if type(params) is not list else params
     socket.setdefaulttimeout(20)
+
     s = socket.create_connection((url, port))
+    s.send(json.dumps({"id": 0, "method": 'server.version',
+                       "params": ['ElectrumX 1.16.0', '1.4']}).encode() + b'\n')
+    print(json.loads(s.recv(999999)[:-1].decode()))
+    time.sleep(0.1)
     s.send(json.dumps({"id": 0, "method": method,
                        "params": params}).encode() + b'\n')
     time.sleep(0.1)
+
     return json.loads(s.recv(999999)[:-1].decode())
 
 
@@ -156,9 +162,9 @@ def get_full_electrum_balance(url, port, address=None, pubkey=None):
         p2pkh_unconfirmed_balance = 0
     else:
         return -1
-
     p2pk_resp = get_from_electrum(
         url, port, 'blockchain.scripthash.get_balance', p2pk_scripthash)
+    print(p2pk_resp)
     p2pk_confirmed_balance = p2pk_resp['result']['confirmed']
     p2pk_unconfirmed_balance = p2pk_resp['result']['unconfirmed']
 

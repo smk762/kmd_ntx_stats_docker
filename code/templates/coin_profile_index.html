@@ -30,9 +30,9 @@
 						{% for ticker, site_links in coin_social.items %}
 							{% if ticker == coin %}
 								{% if site_links.icon != '' %}
-									<img class="card-img-top auto-width" height='96px' src="{{ site_links.icon }}" alt="{{ coin }} image " style="border-radius: 50%;">
+									<img class="card-img-top auto-width" height='96' src="{{ site_links.icon }}" alt="{{ coin }} image " style="border-radius: 50%;">
 								{% else %}
-									<img class="card-img-top auto-width" height='96px' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
+									<img class="card-img-top auto-width" height='96' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
 								{% endif %}
 							{% endif %}
 						{% endfor %}
