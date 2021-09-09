@@ -92,9 +92,9 @@
 	            		<div class="p-1 m-auto">
 							{% for nn, site_links in nn_social.items %}
 								{% if notary_name == nn and site_links.icon != '' %}
-									<img class="card-img-top auto-width" height='128px' src="{{ site_links.icon }}" alt=""  style="border-radius: 50%; margin:0 !important">
+									<img class="card-img-top auto-width" height='128' src="{{ site_links.icon }}" alt=""  style="border-radius: 50%; margin:0 !important">
 								{% else %}
-									<img class="card-img-top auto-width" height='128px' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%; margin:0 !important">
+									<img class="card-img-top auto-width" height='128' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%; margin:0 !important">
 								{% endif %}
 							{% endfor %}
 						</div>
@@ -414,7 +414,7 @@
 			            	} else if (icon == "coquicash") {
 			            		icon = "coqui"
 			            	}
-				            $(nTd).html("<span class='badge p-2 mr-auto' style='font-size: 0.9em;'><img height='16px' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' /><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'>"+oData.chain+"</a></span>");
+				            $(nTd).html("<span class='badge p-2 mr-auto' style='font-size: 0.9em;'><img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' /><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'>"+oData.chain+"</a></span>");
 				        }
         			},
         			{

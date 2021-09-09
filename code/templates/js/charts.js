@@ -1,6 +1,5 @@
-
-        // ChartJS functions
         <script>
+        // ChartJS functions
             function drawLineGraph(data, id) { 
                 var labels = data.labels; 
                 var chartLabel = data.chartLabel; 
