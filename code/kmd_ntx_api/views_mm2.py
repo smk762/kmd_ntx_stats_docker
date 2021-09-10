@@ -8,6 +8,7 @@ from kmd_ntx_api.lib_mm2 import *
 
 
 def orderbook_view(request):
+    season = get_page_season(request)
     context = {
         "season": get_page_season(request),
         "mm2_coins": get_mm2_coins(),
