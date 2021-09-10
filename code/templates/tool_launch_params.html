@@ -3,10 +3,10 @@
 {% block content %}
 	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
 		<div class="card m-auto">
-			<div class="card-header col-12 m-auto">
+			<div class="card-header flex">
 				<h2 class="m-auto">{{ season_clean }} dPoW Chain Launch Parameters</h2>
 			</div>
-		<div class="card-body m-auto col-12">
+		<div class="card-body flex">
 			{% for item in launch_param_rows %}
 			    <div class="input-group mb-1 ">
 				    <div class="input-group-prepend p-0 col-2 text-left">
@@ -25,7 +25,7 @@
 							</a>
 						</span>
 				    </div>
-				    <div class="col-10 params-field">
+				    <div class="col-9 params-field">
 				    	<div class="my-2 mx-auto text-left" id="{{ item.chain }}_params">{{ item.launch_params }}</div>
 					</div>
 				    <div class="input-group-append p-0">
