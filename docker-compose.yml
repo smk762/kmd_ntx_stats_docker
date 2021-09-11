@@ -15,6 +15,7 @@ services:
   kmd: 
     image: komodoofficial/komodo:cd_release_e27c6f9_dev
     volumes:
+      - ./code:/code
       - /home/smk762/.komodo:/root/.komodo
       - /home/smk762/.zcash-params:/root/.zcash-params
     ports:
