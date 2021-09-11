@@ -85,14 +85,21 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
     logger.info("Notarised blocks updated!")
 
 
-def scan_rpc_for_ntx(season):
+def scan_rpc_for_ntx(season, TIP, BLOCK_NOTIFY=False):
     start_block = SEASONS_INFO[season]["start_block"]
     end_block = SEASONS_INFO[season]["end_block"]
 
-    if SKIP_UNTIL_YESTERDAY:
+    if BLOCK_NOTIFY:
+        start_block = TIP
+        logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
+        unrecorded_KMD_txids = get_unrecorded_KMD_txids(TIP, season, start_block, end_block, BLOCK_NOTIFY)
+        unrecorded_KMD_txids.sort()
+        update_KMD_notarisations(unrecorded_KMD_txids)
+
+    elif SKIP_UNTIL_YESTERDAY:
         start_block = TIP - 24*60*2
         logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
-        unrecorded_KMD_txids = get_unrecorded_KMD_txids(TIP, season)
+        unrecorded_KMD_txids = get_unrecorded_KMD_txids(TIP, season, start_block, BLOCK_NOTIFY)
         unrecorded_KMD_txids.sort()
         update_KMD_notarisations(unrecorded_KMD_txids)
 
@@ -112,13 +119,12 @@ def scan_rpc_for_ntx(season):
             window = random.choice(windows)
 
             logger.info(f"Processing notarisations for blocks {window[0]} - {window[1]}")
-            unrecorded_KMD_txids = get_unrecorded_KMD_txids(TIP, season, window[0], window[1])
+            unrecorded_KMD_txids = get_unrecorded_KMD_txids(TIP, season, window[0], window[1], BLOCK_NOTIFY)
             unrecorded_KMD_txids.sort()
             update_KMD_notarisations(unrecorded_KMD_txids)
 
             windows.remove(window)
             
-
 
 def rescan_chain(season, chain):
     if chain in ["KMD", "BTC", "LTC"]:
@@ -215,7 +221,7 @@ if __name__ == "__main__":
                 CONN.commit()
 
             start = time.time()
-            scan_rpc_for_ntx(season)
+            scan_rpc_for_ntx(season, TIP, False)
             end = time.time()
             logger.info(f">>> {end-start} sec to complete [scan_rpc_for_ntx({season})]")
     

@@ -35,12 +35,12 @@
 								{{ row.epoch }}
 							</td>
 							<td style="font-size: 1em;" class='py-2' data-data="epoch_start">
-								<span style="font-size: 0.9em;">{{ row.start_event }}</span>
-								{{ row.epoch_start|time:"G:i:s" }} {{ row.epoch_start|date:"M d Y" }}
+								<span style="font-size: 0.9em;">{{ row.start_event }}
+								{{ row.epoch_start|time:"G:i:s" }} {{ row.epoch_start|date:"M d Y" }}</span>
 							</td>
 							<td style="font-size: 1em;" class='py-2' data-data="epoch_end">
-								<span style="font-size: 0.9em;">{{ row.end_event }}</span>
-								{{ row.epoch_end|time:"G:i:s" }} {{ row.epoch_end|date:"M d Y" }}
+								<span style="font-size: 0.9em;">{{ row.end_event }}
+								{{ row.epoch_end|time:"G:i:s" }} {{ row.epoch_end|date:"M d Y" }}</span>
 							</td>
 							<td style="font-size: 1em;" data-data="duration">
 								{{ row.duration|div:86400|floatformat:0  }}
@@ -50,27 +50,24 @@
 							</td>
 							</td>
 							<td style="font-size: 0.9em;" class='py-2' data-data="epoch_chains">
-								<span class='badge p-0' style="border: solid #5a5a5a 1px; border-radius: 50%; background-color: #000;" data-toggle="tooltip" data-placement="top" title="{{ row.epoch_chains }}">
+								<span class='badge p-0' style="border: solid #5a5a5a 1px; border-radius: 50%; background-color: #000;" data-toggle="tooltip" title="{{ row.epoch_chains }}">
 									<i class="fas fa-network-wired" style="color:white;"></i>
 								</span>									
 							</td>
 							<td style="font-size: 1.2em;" data-data="score_per_ntx">
-								<span class='badge p-2' style="border: solid #5a5a5a 1px; background-color: #000;">
 									{{ row.score_per_ntx }}
-								</span>
 							</td>
 						</tr>
 					{% endfor %}
 					</tbody>
-
 				</table>
-				<h6 style="font-size: 0.8em;"><i>Note: Score for KMD to LTC/BTC notarisations are 0.0325 each</i></h6>
+			</div>
+			<div class="card-footer flex">
+				<h6><i>Note: Score for KMD to LTC/BTC notarisations are 0.0325 each</i></h6>
 			</div>
 		</div>
 	</div>
 
-    <!-- jquery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 	<script>
 	    $(document).ready(function() {
 	        $('#epochs_tbl').DataTable({
@@ -114,7 +111,7 @@
 				            	else {
 				            		color = "#000";	
 				            	}
-					            $(nTd).html("<span class='badge p-2' style='border: solid #5a5a5a 1px; background-color:"+color+" !important;'>"+oData.season.replace(/_/g, " ")+"</span>");
+					            $(nTd).html(oData.season.replace(/_/g, " "));
 					        }
 				        },
 	        			{
@@ -132,28 +129,28 @@
 				            	else {
 				            		color = "#000";	
 				            	}
-					            $(nTd).html("<span class='badge p-2' style='border: solid #5a5a5a 1px; background-color:"+color+" !important;'>"+oData.server.replace(/_/g, " ")+"</span>");
+					            $(nTd).html(oData.server.replace(/_/g, " "));
 					        }
 				        },
 	        			{
 				            "data": 'epoch',
 				            "targets": 2,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<span class='badge p-2' style='border: solid #5a5a5a 1px; background-color:#000 !important;'>"+oData.epoch+"</span>");
-					        }
-				        },
-	        			{	
-				            "data": 'num_chains',
-				            "targets": 6,
-				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<span class='badge p-2' style='border: solid #5a5a5a 1px; background-color:#000 !important;'>"+oData.num_chains+"</span>");
+					            $(nTd).html(oData.epoch);
 					        }
 				        },
 	        			{
 				            "data": 'duration',
 				            "targets": 5,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					            $(nTd).html("<span class='badge p-2' style='border: solid #5a5a5a 1px; background-color:#000 !important;'>"+oData.duration+"</span>");
+					            $(nTd).html(oData.duration);
+					        }
+				        },
+	        			{
+				            "data": 'num_chains',
+				            "targets": 6,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html(oData.num_chains);
 					        }
 				        }
 	        		]
