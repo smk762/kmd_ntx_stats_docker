@@ -268,9 +268,8 @@
 						</thead>
 						<tbody>
 							{% for item in ntx_summary_data %}
-								<tr>
-									<td data-data="ntx_chain text-left" class="px-2 text-left">
-								      	<span class="badge p-2" style='font-size: 0.9em;'>
+								<tr class="py-0">
+									<td data-data="ntx_chain text-left" class="text-left">
 					                        {% if item.chain == 'WLC21' %}
 					                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
 					                        {% elif item.chain == 'GLEEC-OLD' %}
@@ -281,27 +280,20 @@
 					                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{{ item.chain|lower }}.png" />
 					                        {% endif %}
 					                        <a href='//{{ request.get_host }}/coin_profile/{{ item.chain }}/?season={{ season }}'>{{ item.chain }}</a>
-										</span>
 									</td>
 									<td data-data="ntx_server">{{ item.server }}</td>
 									<td data-data="ntx_count">
-										<span class='badge p-2' style='font-size: 0.9em;'>
 											<a href="//{{ request.get_host }}/api/table/notary_ntx/?season={{ season }}&server={{ item.server }}&notary={{ notary_name }}&chain={{ item.chain }}">
 												{{ item.chain_ntx_count }}
 											</a>
-										</span>
 									</td>
 									<td data-data="ntx_pct">
-										<span class='badge p-2' style='font-size: 0.9em;'>
 											{{ item.ntx_pct|floatformat:-3 }}%
-										</span>
 									</td>
 									<td data-data="ntx_score">
-										<span class='badge p-2' style='font-size: 0.9em;'>
 											<a href="//{{ request.get_host }}/notary_epoch_scores?notary={{ notary_name }}&chain={{ item.chain }}&season={{ season }}">
 												{{ item.chain_score|floatformat:-3 }}
 											</a>
-										</span>
 									</td>
 									<td data-data="ntx_block">
 										{{ item.last_block_height }}
@@ -414,7 +406,7 @@
 			            	} else if (icon == "coquicash") {
 			            		icon = "coqui"
 			            	}
-				            $(nTd).html("<span class='badge p-2 mr-auto' style='font-size: 0.9em;'><img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' /><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'>"+oData.chain+"</a></span>");
+				            $(nTd).html("<img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' /><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'>"+oData.chain+"</a>");
 				        }
         			},
         			{
@@ -433,20 +425,20 @@
 			            	else {
 			            		color = "#000";	
 			            	}
-				            $(nTd).html("<span class='badge p-2' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
+				            $(nTd).html(oData.server);
 			        	}
 			        },
         			{
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (!(explorers.hasOwnProperty(oData.chain))) {
-			            		$(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.address+"</span>");	
+			            		$(nTd).html(oData.address);	
 			            	}
 			            	else if (explorers[oData.chain][0].search("cryptoid") > -1) {
-			            		$(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='"+explorers[oData.chain][0]+'address.dws?'+oData.address+".htm'>"+oData.address+"</a></span>");	
+			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'address.dws?'+oData.address+".htm'>"+oData.address+"</a>");	
 			            	}
 			            	else {
-			            		$(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='"+explorers[oData.chain][0]+'address/'+oData.address+"'>"+oData.address+"</a></span>");	
+			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'address/'+oData.address+"'>"+oData.address+"</a>");	
 			            	}
 			            }
 			        },
@@ -454,7 +446,7 @@
 			            "data": "balance",
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.balance+"</a></span>");
+				            $(nTd).html(oData.balance);
 				        }
 			        },
         			{
@@ -476,7 +468,7 @@
 						    } else {
 						    	timesince = days+" days, "+hours+" hrs"
 						    }
-		            		$(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+timesince+"</span>");
+		            		$(nTd).html(timesince);
 				        }
 			        }		
         		]
@@ -517,7 +509,7 @@
 			            	else {
 			            		color = "#000";	
 			            	}
-				            $(nTd).html("<span class='badge p-2' style='background-color:"+color+" !important;'>"+oData.ntx_server.replace(/_/g, " ")+"</span>");
+				            $(nTd).html(oData.ntx_server.replace(/_/g, " "));
 			        	}
 			        },
         			{
@@ -525,11 +517,11 @@
 			            "targets": 5,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	if (oData.ntx_chain == "BTC") {
-					            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='https://www.blockchain.com/btc/block/"+oData.ntx_block+"'>"+oData.ntx_block+"</a></span>");
+					            $(nTd).html("<a href='https://www.blockchain.com/btc/block/"+oData.ntx_block+"'>"+oData.ntx_block+"</a>");
    			            	} else if (oData.ntx_chain == "LTC") {
-					            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='https://litecoinblockexplorer.net/block/"+oData.ntx_block+"'>"+oData.ntx_block+"</a></span>");
+					            $(nTd).html("<a href='https://litecoinblockexplorer.net/block/"+oData.ntx_block+"'>"+oData.ntx_block+"</a>");
    			            	} else {
-					            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='http://komodod.com/b/"+oData.ntx_block+"'>"+oData.ntx_block+"</a></span>");
+					            $(nTd).html("<a href='http://komodod.com/b/"+oData.ntx_block+"'>"+oData.ntx_block+"</a>");
 			            	}
 				        }
 			        },
@@ -537,7 +529,7 @@
 			            "data": 'ntx_time',
 			            "targets": 6,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.ntx_time+"</span>");
+			            	$(nTd).html(oData.ntx_time);
 				        }
 			        }
         		]

@@ -4,34 +4,32 @@
 	<div class="row mt-2">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card text-center kmd_ui_light3 col-4 px-0 mt-auto shadow-none" style="border:none !important;">
-				<div class="card-body p-0" style="background-color: #101721 !important;">
-					<ul class="list-group">
-					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
-							    Notarisations in the Last 24hrs
-							    <span class="badge p-2 " style="font-size: 1.1em;">
-							    	{{ chain_ntx_summary.num_chain_ntx_24hr }}
-							    </span>
-							</div>
-					  	</li>
-					 	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
-						    	Notarisations This Season
-							    <span class="badge p-2 " style="font-size: 1.1em;">
-							    	{{ chain_ntx_summary.num_chain_ntx_season }}
-							    </span>
-							</div>									    
-					  	</li>
-					  	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
-							    Time Since Last Notarisation
-							    <span class="badge p-2 " style="font-size: 1.1em;">
-							    	<a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">{{ chain_ntx_summary.time_since_ntx }}</a>
-							    </span>
-							</div>
-					  	</li>
-					</ul> 	
-				</div>
+				<ul class="list-group">
+				    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+				        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+						    Notarisations in the Last 24hrs
+						    <span class="badge p-2 " style="font-size: 1.1em;">
+						    	{{ chain_ntx_summary.num_chain_ntx_24hr }}
+						    </span>
+						</div>
+				  	</li>
+				 	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+				        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					    	Notarisations This Season
+						    <span class="badge p-2 " style="font-size: 1.1em;">
+						    	{{ chain_ntx_summary.num_chain_ntx_season }}
+						    </span>
+						</div>									    
+				  	</li>
+				  	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+				        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+						    Time Since Last Notarisation
+						    <span class="badge p-2 " style="font-size: 1.1em;">
+						    	<a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">{{ chain_ntx_summary.time_since_ntx }}</a>
+						    </span>
+						</div>
+				  	</li>
+				</ul> 
 			</div>
         	<div class="card kmd_ui_light3 my-0 mx-auto shadow-none" style="border:none !important; background-color: #101721 !important;">
         		<div class="my-auto">

@@ -551,9 +551,8 @@ def ntx_scoreboard_24hrs(request):
 def notary_epoch_scores_view(request):
     season = get_page_season(request)
 
-    notary_list = get_notary_list(season)
     if not "notary" in request.GET:
-        notary = random.choice(notary_list)
+        notary = random.choice(get_notary_list(season))
     else:
         notary = request.GET["notary"]
 

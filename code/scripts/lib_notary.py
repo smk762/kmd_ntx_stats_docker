@@ -223,8 +223,8 @@ def get_dpow_scoring_window(season, chain, server):
 
 
 
-def get_unrecorded_KMD_txids(tip, season, start_block=None, end_block=None):
-    recorded_txids = []
+def get_unrecorded_KMD_txids(tip, season, start_block=None, end_block=None, BLOCK_NOTIFY=False):
+    
     if not start_block:
         start_block = SEASONS_INFO[season]["start_block"]
     if not end_block:
@@ -233,19 +233,22 @@ def get_unrecorded_KMD_txids(tip, season, start_block=None, end_block=None):
     if end_block <= tip:
         tip = end_block
 
-    if SKIP_UNTIL_YESTERDAY:
-        start_block = tip - 24*60*2
-
     all_txids = []
     chunk_size = 100000
 
+    logger.info(f"Processing notarisations for {season}, blocks {start_block} - {end_block}")
+
     while tip - start_block > chunk_size:
         logger.info("Getting notarization TXIDs from block chain data for blocks " \
-               +str(start_block+1)+" to "+str(start_block+chunk_size)+"...")
-        all_txids += get_ntx_txids(NTX_ADDR, start_block+1, start_block+chunk_size)
+               +str(start_block)+" to "+str(start_block+chunk_size)+"...")
+        all_txids += get_ntx_txids(NTX_ADDR, start_block, start_block+chunk_size)
         start_block += chunk_size
-    all_txids += get_ntx_txids(NTX_ADDR, start_block+1, tip)
-    recorded_txids = get_existing_notarised_txids()
+    all_txids += get_ntx_txids(NTX_ADDR, start_block, tip)
+
+    if BLOCK_NOTIFY:
+        recorded_txids = []
+    else:
+        recorded_txids = get_existing_notarised_txids()
     logger.info(f"Scanned txids: {len(all_txids)}")
     logger.info(f"Recorded txids: {len(recorded_txids)}")
     unrecorded_txids = list(set(all_txids) - set(recorded_txids))
