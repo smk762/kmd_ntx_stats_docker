@@ -50,9 +50,11 @@
 								</span>
 							</td>
 							<td style='font-size: 1em;' data-data="detail">
-								<a href="//{{ request.get_host }}/api/table/notarised/?notary={{ notary }}&chain={{ row.chain }}&season={{ season }}&epoch=Epoch_{{ row.epoch }}&server={{ row.server }}">
-									<i class='fas fa-arrow-right'></i>
-								</a>
+								<span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='{{ notary }} {{ row.chain }} epoch {{ row.epoch }} score detail'>
+									<a href="//{{ request.get_host }}/api/table/notarised/?notary={{ notary }}&chain={{ row.chain }}&season={{ season }}&epoch=Epoch_{{ row.epoch }}&server={{ row.server }}">
+										<i class='fas fa-arrow-right'></i>
+									</a>
+								</span>
 							</td>
 						</tr>
 						{% endfor %}
