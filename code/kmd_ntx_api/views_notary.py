@@ -8,6 +8,7 @@ from django.shortcuts import render
 from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_stats import *
 from kmd_ntx_api.lib_graph import *
+from kmd_ntx_api.api_table import notary_ntx_table
 
 def notary_mining_view(request, notary=None):
     if not notary:
@@ -52,6 +53,37 @@ def notary_mining_view(request, notary=None):
         "explorers":explorers
     }
     return render(request, 'notary_mining.html', context)
+
+def notary_chain_ntx_detail_view(request):
+    # Populate sidebar
+    season = get_page_season(request)
+
+    notary = None
+    if 'notary' in request.GET:
+        notary = request.GET["notary"]
+    chain = None
+    if 'chain' in request.GET:
+        chain = request.GET["chain"]
+    server = None
+    if 'server' in request.GET:
+        server = request.GET["server"]
+
+    url = f"{THIS_SERVER}/api/table/notary_ntx"
+    chain_ntx_table = requests.get(f"{url}/?season={season}&server={server}&notary={notary}&chain={chain}").json()['results']
+
+    context = {
+        "page_title":"Notary Profile Index",
+        "notary":notary,
+        "season":season,
+        "chain":chain,
+        "season_clean":season.replace("_"," "),
+        "scheme_host":get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link(),
+        "chain_ntx": chain_ntx_table
+    }
+
+    return render(request, 'notary/notary_chain_ntx_detail.html', context)
 
 def notary_profile_view(request, notary=None):
     # Populate sidebar

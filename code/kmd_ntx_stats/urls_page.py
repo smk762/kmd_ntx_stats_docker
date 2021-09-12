@@ -68,6 +68,10 @@ frontend_page_urls = [
           views_notary.notary_profile_view,
           name='notary_profile'),
 
+    path('notary/notary_chain_ntx_detail/',
+          views_notary.notary_chain_ntx_detail_view,
+          name='notary_chain_ntx_detail'),    
+
     path('s5_address_confirmation/',
           views_notary.s5_address_confirmation,
           name='s5_address_confirmation'),
