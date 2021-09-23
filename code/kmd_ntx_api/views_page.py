@@ -262,9 +262,12 @@ def faucet(request):
     faucet_supply_resp = requests.get(f"https://faucet.komodo.live/rm_faucet_balances").json()
 
     for node in faucet_supply_resp:
-        print(faucet_supply_resp[node])
-        faucet_supply["RICK"] += faucet_supply_resp[node]["RICK"]
-        faucet_supply["MORTY"] += faucet_supply_resp[node]["MORTY"]
+        print(f"{node} {faucet_supply_resp[node]}")
+        try:
+            faucet_supply["RICK"] += faucet_supply_resp[node]["RICK"]
+            faucet_supply["MORTY"] += faucet_supply_resp[node]["MORTY"]
+        except:
+            pass
 
     pending_tx_resp = requests.get(f"https://faucet.komodo.live/show_pending_tx").json()
     pending_tx_list = []
