@@ -2,7 +2,9 @@ version: '3'
   
 services:
   mm2:
-    image: komodoofficial/atomicdexapi:beta-2.1.3445
+    build: 
+      context: mm2
+      dockerfile: Dockerfile
     volumes:
       - ./mm2:/mm2
     ports:
@@ -13,7 +15,7 @@ services:
         max-size: "20m"
         max-file: "10"
   kmd: 
-    image: komodoofficial/komodo:cd_release_e27c6f9_dev
+    image: komodoofficial/komodo:cd_release_ecb4784_dev
     volumes:
       - ./code:/code
       - /home/smk762/.komodo:/root/.komodo
@@ -48,7 +50,7 @@ services:
     
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8762
+    command: bash -c "python manage.py runserver 0.0.0.0:8762 && /code/scripts/collect_seednode_stats.py start"
     volumes:
       - ./code:/code
       - /var/www/stats.kmd.io/html:/var/www/stats.kmd.io/html
