@@ -69,11 +69,27 @@ def populate_coins_social(season):
             coin_social.explorers = []
 
             if chain in coin_info:
-                if "coins_info" in coin_info[chain]:
-                    if "icon" in coin_info[chain]["coins_info"]:
-                        coin_social.icon = coin_info[chain]["coins_info"]["icon"]
-                if "explorers" in coin_info[chain]:
-                    coin_social.explorers = coin_info[chain]["explorers"]
+                if chain == "PIRATE":
+                    if "coins_info" in coin_info["ARRR"]:
+                        if "icon" in coin_info["ARRR"]["coins_info"]:
+                            coin_social.icon = coin_info["ARRR"]["coins_info"]["icon"]
+                    if "explorers" in coin_info["ARRR"]:
+                        coin_social.explorers = coin_info["ARRR"]["explorers"]
+
+                if chain == "TOKEL":
+                    if "coins_info" in coin_info["TKL"]:
+                        if "icon" in coin_info["TKL"]["coins_info"]:
+                            coin_social.icon = coin_info["TKL"]["coins_info"]["icon"]
+                    if "explorers" in coin_info["TKL"]:
+                        coin_social.explorers = coin_info["TKL"]["explorers"]
+
+                else:
+
+                    if "coins_info" in coin_info[chain]:
+                        if "icon" in coin_info[chain]["coins_info"]:
+                            coin_social.icon = coin_info[chain]["coins_info"]["icon"]
+                    if "explorers" in coin_info[chain]:
+                        coin_social.explorers = coin_info[chain]["explorers"]
 
             if chain in chain_social:
                 print(f"chain_social[chain]: {chain_social[chain]}")
