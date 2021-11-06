@@ -170,25 +170,3 @@ def last200_failed_swaps_view(request):
     }
 
     return render(request, 'mm2/last_200_failed_swaps.html', context)
-
-
-def version_by_hour(request):
-    season = get_page_season(request)
-    start = time.time()- 24*60*60
-    end = time.time()
-    if 'start' in request.GET:
-        start = request.GET["start"]
-    if 'end' in request.GET:
-        end = request.GET["end"]
-    context = {
-        "season": season,
-        "start": int(start),
-        "end": int(end),
-        "start_str": datetime.fromtimestamp(int(start)).strftime("%m/%d/%Y, %H:%M:%S"),
-        "end_str": datetime.fromtimestamp(int(end)).strftime("%m/%d/%Y, %H:%M:%S"),
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link()
-    }
-
-    return render(request, 'mm2/mm2_version_by_hour.html', context)

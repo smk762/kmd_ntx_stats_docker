@@ -6,32 +6,6 @@ from kmd_ntx_api.lib_query import *
 
 # https://stats-api.atomicdex.io/
 
-def get_nn_mm2_stats(request):
-    name = get_or_none(request, "name")
-    version = get_or_none(request, "version")
-    limit = get_or_none(request, "limit")
-    data = get_nn_mm2_stats_data(name, version, limit)
-    data = data.values()
-    serializer = mm2statsSerializer(data, many=True)
-    return serializer.data
-
-def get_nn_mm2_stats_by_hour(request):
-    start = get_or_none(request, "start")
-    if not start:
-        start = time.time() - 60 * 60 *24
-    end = get_or_none(request, "end")
-    if not end:
-        end = time.time()
-    notary = get_or_none(request, "notary")
-    print(start)
-    print(end)
-    if request.GET.get("chart"):
-        data = get_nn_mm2_stats_by_hour_chart_data(int(start), int(end), notary)
-    else:
-        data = get_nn_mm2_stats_by_hour_data(int(start), int(end), notary)
-
-    return data
-
 def mm2_proxy(params):
   params.update({"userpass": MM2_USERPASS})
   print(json.dumps(params))

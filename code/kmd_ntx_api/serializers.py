@@ -213,12 +213,6 @@ class swapsFailedSerializerPub(serializers.HyperlinkedModelSerializer):
                   "maker_gui", "maker_version"]
 
 
-class mm2statsSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = mm2_version_stats
-        fields = ["name", "version", "timestamp", "error"]
-
-
 # Non-Model serializers
 class addrFromBase58Serializer(serializers.Serializer):
     class Meta:

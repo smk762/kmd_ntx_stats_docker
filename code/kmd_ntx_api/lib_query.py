@@ -15,121 +15,6 @@ from kmd_ntx_api.serializers import *
 
 load_dotenv()
 
-def get_timespan_season(start, end):
-    season = get_season()
-    if not start:
-        start = time.time() - 60*60*24
-    if not end:
-        end = time.time()
-    else:
-        season = get_season((end+start)/2)
-    return start, end, season
-
-def get_nn_mm2_stats_by_hour_chart_data(start, end, notary=None):
-    start, end, season = get_timespan_season(start, end)
-    print(start)
-    print(end)
-    print(season)
-    stats = get_nn_mm2_stats_by_hour_data(start, end, notary)
-    ts_dict = stats["ts_dict"]
-    # Chartify
-    # need to setup something to populate this via the dpow repo.
-    valid_versions = [
-        "2.1.4401_mm2.1_87837cb54_Linux_Release"]
-    colors_dict = {}
-
-    notaries = get_nn_social_data(season).values('notary')
-    notary_list = []
-    for item in notaries:
-        if item['notary'] not in notary_list:
-            notary_list.append(item['notary'])
-    notary_list.sort()
-
-    for notary in notary_list:
-        colors_dict.update({notary:[]})
-
-    hours_list = []
-    dates_list = []
-    valid_cell_color = '#00cf6677'
-    invalid_cell_color = '#ffa00099'
-    no_data_cell_color = '#FFFFFF11'
-    for date in ts_dict:
-        dates_list.append(date)
-        for hour in ts_dict[date]:
-            hours_list.append(date+" "+hour)
-            for notary in notary_list:
-                color = no_data_cell_color
-                for version in ts_dict[date][hour]:
-                    if version in valid_versions:
-                        if notary in ts_dict[date][hour][version]:
-                            color = valid_cell_color
-                            break
-                    else:
-                        if notary in ts_dict[date][hour][version]:
-                            color = invalid_cell_color
-                            break
-
-                colors_dict[notary].append(color)
-
-    chart_data = {
-        "dates_list": dates_list,
-        "hours_list": hours_list,
-        "colors_dict": colors_dict
-    }
-    return {
-        "chart_data": chart_data
-    }
-
-
-def get_nn_mm2_stats_by_hour_data(start, end, notary=None):
-    start, end, season = get_timespan_season(start, end)
-
-    data = mm2_version_stats.objects.filter(
-        timestamp__range=(start, end)
-    )
-    if notary:
-        data = data.filter(name=notary)
-    data = data.order_by("-timestamp")
-
-    ts_dict = {}
-    nn_dict = {}
-    rows = []
-    for i in data.values():
-        
-        i["date"], i["hour"] = date_hour(i["timestamp"]).split(" ")
-        rows.append(i)
-
-        if i["date"] not in ts_dict:
-            ts_dict.update({i["date"]:{}})
-        if i["hour"] not in ts_dict[i["date"]]:
-            ts_dict[i["date"]].update({i["hour"]:{}})
-        if i["version"] not in ts_dict[i["date"]][i["hour"]]:
-            ts_dict[i["date"]][i["hour"]].update({i["version"]:[]})
-        if i["name"] not in ts_dict[i["date"]][i["hour"]][i["version"]]:
-            ts_dict[i["date"]][i["hour"]][i["version"]].append(i["name"])
-        
-
-        if i["name"] not in nn_dict:
-            nn_dict.update({i["name"]:{}})
-
-        if i["date"] not in nn_dict[i["name"]]:
-            nn_dict[i["name"]].update({i["date"]:{}})
-
-        if i["hour"] not in nn_dict[i["name"]][i["date"]]:
-            nn_dict[i["name"]][i["date"]].update({i["hour"]:[]})
-
-        if i["version"] not in nn_dict[i["name"]][i["date"]][i["hour"]]:
-            nn_dict[i["name"]][i["date"]][i["hour"]].append(i["version"])
-
-
-    resp = {
-        "ts_dict":ts_dict,
-        "nn_dict":nn_dict,
-        "rows":rows
-    }
-    return resp
-
-
 
 def get_addresses_data(season=None, server=None, chain=None, notary=None, address=None):
     data = addresses.objects.all()
@@ -171,16 +56,6 @@ def get_balances_data(season=None, server=None, chain=None, notary=None, address
 
     return data.order_by('-season', 'server', 'chain', 'notary')
 
-def get_nn_mm2_stats_data(name=None, version=None, limit=None):
-    data = mm2_version_stats.objects.all()
-    if name:
-        data = data.filter(name=name)
-    if version:
-        data = data.filter(version=version)
-    data = data.order_by("-timestamp")
-    if limit:
-        data = data[:limit]
-    return data
 
 # TODO: Awaiting delegation to crons / db table
 def get_chain_sync_data(chain=None):

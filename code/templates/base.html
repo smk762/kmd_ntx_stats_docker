@@ -41,9 +41,6 @@
         <!-- Datepicker -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
 
-        <!-- Datetimepicker -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha512-f0tzWhCwVFS3WeYaofoLWkTP62ObhewQ1EZn65oSYDZUg1+CyywGKkWzm8BxaJj5HGKI72PnMH9jYyIFz+GH7g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
         <!-- Datatables -->
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4-4.1.1/jq-3.3.1/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/b-print-1.6.2/sp-1.1.0/datatables.min.css"/>
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.3/css/select.dataTables.min.css"/>
@@ -55,7 +52,6 @@
         -->
 
         <!-- Komodo Pallet -->
-
 
         {% include "css/kmd.css" %}
     </head>
@@ -118,9 +114,6 @@
 
         <!-- ClipboardJS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
-
-        <!-- DateTimePicker -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha512-AIOTidJAcHBH2G/oZv9viEGXRqDNmfdPVPYOYKGy3fti0xIplnlgMHUGfuNRzC6FkzIo0iIxgFnr9RikFxK+sw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
         <script>
             Chart.defaults.global.defaultFontColor = 'white';
@@ -191,10 +184,6 @@
             })
         $('#since').select2();
 
-        $('.dt_picker').datetimepicker({
-            theme:'dark', 
-            maxDate:new Date(),
-        });
 
         </script>
         {% include "plugins/statcounter.js" %}
