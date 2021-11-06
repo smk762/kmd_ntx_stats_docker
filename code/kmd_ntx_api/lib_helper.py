@@ -17,6 +17,8 @@ def date_hour(timestamp):
     hour = int(hour)+1
     return f"{date} {hour}:00"
 
+logger = logging.getLogger("mylogger")
+
 def get_or_none(request, key):
     return request.GET[key] if key in request.GET else None
     

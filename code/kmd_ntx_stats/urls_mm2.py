@@ -25,7 +25,6 @@ frontend_mm2_urls = [
          name='version_by_hour'),
 ]
 
-
 # API mm2 V2
 api_mm2_urls = [
     path('api/mm2/version_stats/',
