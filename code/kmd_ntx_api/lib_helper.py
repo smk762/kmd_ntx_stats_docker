@@ -6,8 +6,16 @@ import logging
 import requests
 from .lib_const import *
 import string
+import itertools
+from datetime import datetime
+
 
 logger = logging.getLogger("mylogger")
+
+def date_hour(timestamp):
+    date, hour = datetime.fromtimestamp(timestamp).strftime("%x %H").split(" ")
+    hour = int(hour)+1
+    return f"{date} {hour}:00"
 
 def get_or_none(request, key):
     return request.GET[key] if key in request.GET else None
