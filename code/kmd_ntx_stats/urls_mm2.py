@@ -19,11 +19,25 @@ frontend_mm2_urls = [
     path('mm2/last_200_failed_swaps/',
          views_mm2.last200_failed_swaps_view,
          name='last200_failed_swaps_view'),
+    
+    path('mm2/version_by_hour/',
+         views_mm2.version_by_hour,
+         name='version_by_hour'),
 ]
 
 
 # API mm2 V2
 api_mm2_urls = [
+    path('api/mm2/version_stats/',
+         api_mm2.nn_mm2_stats_api,
+         name='nn_mm2_stats_api'),
+
+    path('api/mm2/version_stats_by_hour/',
+         api_mm2.nn_mm2_stats_by_hour_api,
+         name='nn_mm2_stats_by_hour_api'),
+
+
+
     path('api/mm2/orderbook/',
          api_mm2.orderbook_api,
          name='orderbook_api'),
