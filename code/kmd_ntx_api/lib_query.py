@@ -129,8 +129,6 @@ def get_nn_mm2_stats_by_hour_data(start, end, notary=None):
     }
     return resp
 
-
-
 def get_addresses_data(season=None, server=None, chain=None, notary=None, address=None):
     data = addresses.objects.all()
     if season:

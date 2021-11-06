@@ -94,6 +94,17 @@ def get_version_stats_from_sqlite_db(from_time=0, version=None):
 	    resp.append(dict(row))
 	return resp
 
+
+def empty_table():
+	rows = cursor.execute("DELETE FROM stats_nodes;")
+	conn.commit()
+	print('Deleted', cursor.rowcount, 'records from the table.')
+
+def get_version_stats_from_db():
+	rows = cursor.execute("SELECT * FROM stats_nodes WHERE version != ''").fetchall()
+	for row in rows:
+	    print(dict(row))
+
 def get_registered_nodes_from_db():
         rows = cursor.execute("SELECT * FROM nodes;").fetchall()
         for row in rows:
@@ -170,3 +181,21 @@ if __name__ == '__main__':
 	conn.close()
 	CONN.close()
 
+            print(dict(row))
+
+
+if __name__ == '__main__':
+	if len(sys.argv) > 1:
+		if sys.argv[1] == 'empty':
+			empty_table()
+		if sys.argv[1] == 'start':
+			start_stats_collection()
+		if sys.argv[1] == 'nodes':
+			get_registered_nodes_from_db()
+		if sys.argv[1] == 'register':
+			notary_seeds = get_seedinfo_from_csv()
+			add_notaries(notary_seeds)
+
+	get_local_version()
+	get_version_stats_from_db()
+	conn.close()

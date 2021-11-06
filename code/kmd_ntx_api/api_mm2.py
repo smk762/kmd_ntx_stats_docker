@@ -17,6 +17,9 @@ def nn_mm2_stats_by_hour_api(request):
 def bestorders_api(request):
     return JsonResponse(get_orderbook(request))
 
+def bestorders_api(request):
+    return JsonResponse(get_orderbook(request))
+
 def failed_swap_api(request):
     return JsonResponse(get_failed_swap_by_uuid(request), safe=False)
 
