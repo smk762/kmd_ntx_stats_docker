@@ -92,7 +92,7 @@ api_tool_urls = [
           api_tools.send_raw_tx_tool,
           name='send_raw_tx_tool'),
     
-    path('api/tools/mm2/get_enable_command/',
-          api_tools.get_enable_command,
-          name='get_enable_command'),
+    path('api/tools/mm2/get_enable_commands/',
+          api_tools.get_enable_commands,
+          name='get_enable_commands'),
 ]
