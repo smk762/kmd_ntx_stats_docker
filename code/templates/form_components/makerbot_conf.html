@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load static %}
+{% load coin_filter %}
+{% block content %}
+
+<form action="" method="get"> 
+
+	<div class="row d-flex justify-content-around">
+		<div class="col-11">
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:25%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.price_url.label }}
+			      	</span>
+				</div>
+				{{ form.price_url }}
+			</div>
+		</div>
+		<div class="col-11">
+			{% for error in form.price_url.errors %}
+			{{ error|escape }}
+			{% endfor %}
+		</div>
+	</div>
+	<div class="row d-flex justify-content-around">
+		<div class="col-5">
+
+			{{ form.base.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.base.label }}
+			      	</span>
+				</div>
+				{{ form.base }}
+			</div>
+
+			{{ form.base_confs.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.base_confs.label }}
+			      	</span>
+				</div>
+				{{ form.base_confs }}
+			</div>
+
+			{{ form.base_nota.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.base_nota.label }}
+			      	</span>
+				</div>
+				{{ form.base_nota }}
+			</div>
+
+			{{ form.spread.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.spread.label }}
+			      	</span>
+				</div>
+				{{ form.spread }}
+			</div>
+
+			{{ form.max_trade.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.max_trade.label }}
+			      	</span>
+				</div>
+				{{ form.max_trade }}
+			</div>
+
+			{{ form.price_elipsed_validity.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.price_elipsed_validity.label }}
+			      	</span>
+				</div>
+				{{ form.price_elipsed_validity }}
+			</div>
+
+			{{ form.create_bidirectional_config.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.create_bidirectional_config.label }}
+			      	</span>
+				</div>
+				{{ form.create_bidirectional_config }}
+			</div>
+
+		</div>
+
+		<div class="col-5">
+
+			{{ form.rel.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.rel.label }}
+			      	</span>
+				</div>
+				{{ form.rel }}
+			</div>
+
+			{{ form.rel_confs.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.rel_confs.label }}
+			      	</span>
+				</div>
+				{{ form.rel_confs }}
+			</div>
+
+			{{ form.rel_nota.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.rel_nota.label }}
+			      	</span>
+				</div>
+				{{ form.rel_nota }}
+			</div>
+
+			{{ form.min_volume_usd.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.min_volume_usd.label }}
+			      	</span>
+				</div>
+				{{ form.min_volume_usd }}
+			</div>
+
+			{{ form.enable.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.enable.label }}
+			      	</span>
+				</div>
+				{{ form.enable }}
+			</div>
+
+			{{ form.check_last_bidirectional_trade_thresh_hold.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.check_last_bidirectional_trade_thresh_hold.label }}
+			      	</span>
+				</div>
+				{{ form.check_last_bidirectional_trade_thresh_hold }}
+			</div>
+
+
+			{{ form.add_to_existing_config.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.add_to_existing_config.label }}
+			      	</span>
+				</div>
+				{{ form.add_to_existing_config }}
+			</div>
+
+		</div>
+
+	</div>
+
+
+	<div class="row d-flex justify-content-around">
+		<div class="col-5">
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.bot_refresh_rate.label }}
+			      	</span>
+				</div>
+				{{ form.bot_refresh_rate }}
+			</div>
+			<div class="col-10">
+				{% for error in form.bot_refresh_rate.errors %}
+				{{ error|escape }}
+				{% endfor %}
+			</div>
+		</div>
+
+		<div class="col-5">
+			<input type="submit" class='btn btn-block' value="Generate Makerbot Config">
+		</div>
+	</div>
+
+{% if form_resp %}
+<div class="d-flex justify-content-around col-10 p-3 m-3 mx-auto" style="background-color: #334352; border-radius:0.5em;">
+	<pre style="text-align:left; color:white;" id="conf_str">
+curl --location --request POST 'http://127.0.0.1:7783' --header 'Content-Type: application/json' --data-raw '{
+    "userpass": "'${userpass}'",
+    "mmrpc": "2.0",
+    "method": "start_simple_market_maker_bot",
+    "params": {
+        "price_url": "{{ price_url }}",
+        "bot_refresh_rate": {{ bot_refresh_rate }},
+        "cfg": {{ form_resp|pretty_json }} }, "id": 0 }'
+	</pre>
+	<button type='button' class="append-btn" data-clipboard-target="#conf_str" style="line-height: 1em; position: absolute; top:10px; right: 10px;">
+	    <i class="cil-copy"></i>
+	</button>
+</div>
+{% endif %}
+
+<input type="hidden" name="existing_config" value="{{ form_resp }}">
+
+</form>
+{% endblock %}

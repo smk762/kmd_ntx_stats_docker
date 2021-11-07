@@ -245,6 +245,29 @@ class mined_count_season(models.Model):
         ]
 
 
+
+
+class mm2_version_stats(models.Model):
+    name = models.CharField(max_length=128)
+    version = models.CharField(max_length=128)
+    timestamp = models.PositiveIntegerField(default=0)
+    error = models.CharField(max_length=256)
+
+    class Meta:
+        db_table = 'mm2_version_stats'
+        indexes = [
+            models.Index(fields=['timestamp'])
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'timestamp'],
+                name='unique_mm2_version_stat'
+            )
+        ]
+
+
+
+
 class nn_btc_tx(models.Model):
     txid = models.CharField(max_length=64)
     block_hash = models.CharField(max_length=64)

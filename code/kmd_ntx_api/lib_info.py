@@ -881,6 +881,16 @@ def get_electrums(request):
             resp.update({chain:electrums})
     return resp
 
+def get_mm2_coins_list():
+    data = get_coins_data(None, True)
+    data = data.order_by('chain').values('chain')
+
+    resp = []
+    for item in data:
+        chain = item['chain']
+        resp.append(chain)
+    return resp
+
 
 def get_electrums_ssl(request):
     chain = None

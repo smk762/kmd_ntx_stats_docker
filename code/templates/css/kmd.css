@@ -139,7 +139,15 @@
                 border: solid grey 1px !important;
                 background-color:#11253e !important;                
             }
+            .input-group {
+                height: 1.3em;
+                margin-bottom: 2em !important;
+            }
             .input-group-prepend, .input-group-append {
+            }
+            .input-group-append span {
+                margin-top: auto;
+                margin-bottom: auto;
             }
             .input-group-text {
                 line-height: 1em;
@@ -360,10 +368,6 @@
                 margin: 6px;
             }
 
-            .input-group-append span {
-                margin-top: auto;
-                margin-bottom: auto;
-            }
             .kmd_blue {
                 color:#11253e !important;
             }
@@ -586,6 +590,13 @@
             }
             .btn {
                 color:#E6E6E6;
+                border: solid 1px grey !important;
+                border-radius: 0.25em !important;
+            }
+            .btn:hover {
+                color:#E6E6E6;
+                background-color: green !important;
+                border: solid 1px blue !important;
             }
             .btn .badge {
                 top:0;
@@ -637,5 +648,11 @@
                 text-align: center; */
                 border-radius: 0;
                 min-width: 5em;
+            }
+            .xdsoft_calendar table {
+                 min-width: 0;
+            }
+            .graph_container {
+                height: 1000px;
             }
         </style>
