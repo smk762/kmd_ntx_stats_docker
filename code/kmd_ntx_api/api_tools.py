@@ -262,32 +262,39 @@ def send_raw_tx_tool(request):
         })
 
 
-def get_enable_command(request):
-    try:
-        coin_info = get_coins_data(request.GET["coin"])
-        serializer = coinsSerializer(coin_info, many=True)
-        coin = serializer.data[0]["chain"]
-        protocol = serializer.data[0]["coins_info"]["protocol"]["type"]
-        electrums = serializer.data[0]["electrums"]
-        compatible = serializer.data[0]["mm2_compatible"] == 1
+def get_enable_commands(request):
+    coin_info = get_coins_data()
+    serializer = coinsSerializer(coin_info, many=True)
+    enable_commands = { "commands":{}}
+    incompatible_coins = []
+    other_protocols = []
+    coins_without_electrum = []
+    for item in serializer.data:
+        coin = item["chain"]
+        protocol = None
+        print(item["coins_info"])
+        if "protocol" in item["coins_info"]:
+            protocol = item["coins_info"]["protocol"]["type"]
+        electrums = item["electrums"]
+        compatible = item["mm2_compatible"] == 1
         if protocol != "UTXO":
-            return JsonResponse({
-                "error":f"{coin} is not UTXO protocol (other protocols not yet handled)",
-                "coin_info": serializer.data[0]
-            })
-
-        if len(electrums) > 0 and compatible:
+            other_protocols.append(protocol)
+        if not compatible:
+            incompatible_coins.append(coin)
+        if len(electrums) > 0:
             resp = 'curl --url "http://127.0.0.1:7783" --data '
             resp_json = {"userpass":"'$userpass'","method":"electrum","coin":coin, "servers": []}
             for electrum in electrums:
                 resp_json["servers"].append({"url":electrum})
             print(f"{resp} {json.dumps(resp_json)}")
-            return HttpResponse(f"{resp} '{json.dumps(resp_json)}'")
-        return JsonResponse({
-            "error":f"{coin} is not compatible, or has no electrums listed",
-            "coin_info": serializer.data[0]
+            enable_commands["commands"].update({
+                coin:f"{resp} '{json.dumps(resp_json)}'"
+            })
+        else:
+            coins_without_electrum.append(coin)
+    enable_commands.update({
+        "incompatible_coins":incompatible_coins,
+        "other_protocols":other_protocols,
+        "coins_without_electrum":coins_without_electrum
         })
-    except Exception as e:
-        return JsonResponse({
-            "error":f"{e}"
-        })
+    return JsonResponse(enable_commands)
