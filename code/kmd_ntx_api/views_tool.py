@@ -2,6 +2,7 @@
 import requests
 from django.shortcuts import render
 
+from kmd_ntx_api.forms import *
 from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_mm2 import *
 from kmd_ntx_api.api_tools import *
@@ -356,3 +357,90 @@ def send_raw_tx_view(request):
 
 
     return render(request, 'tool_send_raw_transaction.html', context)
+
+
+def makerbot_conf_view(request):
+    mm2_coins = list(get_dexstats_explorers().keys())
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "page_title":"Generate Simple Market Maker Configuration",
+        "scheme_host": get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "mm2_coins":mm2_coins,
+        "eco_data_link":get_eco_data_link()
+    }
+
+
+
+    if request.GET: 
+        form = MakerbotForm(request.GET)
+        form_resp = {
+             f"{request.GET['base']}/{request.GET['rel']}": {
+                "base": request.GET['base'],
+                "rel": request.GET['rel'],
+                "balance_percent": float(request.GET['max_trade'])/100,
+                "min_volume_usd": request.GET['min_volume_usd'],
+                "spread": str(1+float(request.GET['spread'])/100),
+                "base_confs": int(request.GET['base_confs']),
+                "base_nota": request.GET['base_nota'] == "True",
+                "rel_confs": int(request.GET['rel_confs']),
+                "rel_nota": request.GET['rel_nota'] == "True",
+                "enable": request.GET['enable'] == "True",
+                "price_elapsed_validity": int(request.GET['price_elipsed_validity']),
+                "check_last_bidirectional_trade_thresh_hold": request.GET['check_last_bidirectional_trade_thresh_hold'] == "True"
+            }
+
+        }
+        context.update({
+            "bot_refresh_rate":request.GET['bot_refresh_rate'],
+            "price_url":request.GET['price_url']
+        })
+        if float(request.GET['max_trade']) == 100:
+            form_resp[f"{request.GET['base']}/{request.GET['rel']}"].update({"max": True})
+        else:
+            form_resp[f"{request.GET['base']}/{request.GET['rel']}"].update({
+                "balance_percent": float(request.GET['max_trade'])/100
+            })        
+
+        if request.GET['create_bidirectional_config'] == "True":
+            form_resp.update({
+                 f"{request.GET['rel']}/{request.GET['base']}": {
+                    "base": request.GET['rel'],
+                    "rel": request.GET['base'],
+                    "min_volume_usd": request.GET['min_volume_usd'],
+                    "spread": str(1+float(request.GET['spread'])/100),
+                    "base_confs": int(request.GET['rel_confs']),
+                    "base_nota": request.GET['rel_nota'] == "True",
+                    "rel_confs": int(request.GET['base_confs']),
+                    "rel_nota": request.GET['base_nota'] == "True",
+                    "enable": request.GET['enable'] == "True",
+                    "price_elapsed_validity": int(request.GET['price_elipsed_validity']),
+                    "check_last_bidirectional_trade_thresh_hold": request.GET['check_last_bidirectional_trade_thresh_hold'] == "True"
+                }
+            })
+            if float(request.GET['max_trade']) == 100:
+                form_resp[f"{request.GET['rel']}/{request.GET['base']}"].update({"max": True})
+            else:
+                form_resp[f"{request.GET['rel']}/{request.GET['base']}"].update({
+                    "balance_percent": float(request.GET['max_trade'])/100
+                })                    
+        try:
+            if request.GET['add_to_existing_config'] == "True":
+                if len(request.GET['existing_config']) > 0:
+                    existing_cfg = json.loads(request.GET['existing_config'].replace("\'", "\"").replace("True", "true").replace("False", "false"))
+                    form_resp.update(existing_cfg)
+        except Exception as e:
+            messages.error(request, 'e')
+        print(form_resp)
+        context.update({
+            "form_resp":form_resp
+        })
+        
+    else:
+       form = MakerbotForm() 
+    context.update({
+        "form":form
+    })
+
+    return render(request, 'form_components/makerbot_conf.html', context)

@@ -22,6 +22,10 @@ frontend_tool_urls = [
           views_tool.launch_params_view,
           name='launch_params_view'),
 
+    path('tools/makerbot_cfg/',
+          views_tool.makerbot_conf_view,
+          name='makerbot_conf_view'),
+
     path('tools/pubkey_addresses/',
           views_tool.pubkey_addresses_view,
           name='pubkey_addresses_view'),
@@ -88,4 +92,7 @@ api_tool_urls = [
           api_tools.send_raw_tx_tool,
           name='send_raw_tx_tool'),
     
+    path('api/tools/mm2/get_enable_command/',
+          api_tools.get_enable_command,
+          name='get_enable_command'),
 ]

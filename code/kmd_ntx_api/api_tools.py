@@ -2,9 +2,9 @@
 import time
 import math
 from rest_framework.response import Response
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from rest_framework import permissions, viewsets, authentication
-from kmd_ntx_api.serializers import addrFromBase58Serializer
+from kmd_ntx_api.serializers import *
 from kmd_ntx_api.lib_info import get_all_coins
 from kmd_ntx_api.lib_base58 import *
 from kmd_ntx_api.lib_electrum import *
@@ -256,6 +256,37 @@ def send_raw_tx_tool(request):
     try:
         resp = send_raw_tx(request)
         return JsonResponse({resp})
+    except Exception as e:
+        return JsonResponse({
+            "error":f"{e}"
+        })
+
+
+def get_enable_command(request):
+    try:
+        coin_info = get_coins_data(request.GET["coin"])
+        serializer = coinsSerializer(coin_info, many=True)
+        coin = serializer.data[0]["chain"]
+        protocol = serializer.data[0]["coins_info"]["protocol"]["type"]
+        electrums = serializer.data[0]["electrums"]
+        compatible = serializer.data[0]["mm2_compatible"] == 1
+        if protocol != "UTXO":
+            return JsonResponse({
+                "error":f"{coin} is not UTXO protocol (other protocols not yet handled)",
+                "coin_info": serializer.data[0]
+            })
+
+        if len(electrums) > 0 and compatible:
+            resp = 'curl --url "http://127.0.0.1:7783" --data '
+            resp_json = {"userpass":"'$userpass'","method":"electrum","coin":coin, "servers": []}
+            for electrum in electrums:
+                resp_json["servers"].append({"url":electrum})
+            print(f"{resp} {json.dumps(resp_json)}")
+            return HttpResponse(f"{resp} '{json.dumps(resp_json)}'")
+        return JsonResponse({
+            "error":f"{coin} is not compatible, or has no electrums listed",
+            "coin_info": serializer.data[0]
+        })
     except Exception as e:
         return JsonResponse({
             "error":f"{e}"
