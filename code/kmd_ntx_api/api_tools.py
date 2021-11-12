@@ -261,40 +261,256 @@ def send_raw_tx_tool(request):
             "error":f"{e}"
         })
 
+def is_testnet(coin):
+    if coin in ["BNBT", "ETHR", "AVAXT", "tQTUM", "MATICTEST"]:
+        return True
+    return False
+
+
+def get_contracts(platform):
+    if is_testnet(platform):
+        contract = SWAP_CONTRACTS[platform]["testnet"]["swap_contract"]
+        fallback_contract = SWAP_CONTRACTS[platform]["testnet"]["fallback_contract"]
+    else:
+        contract = SWAP_CONTRACTS[platform]["mainnet"]["swap_contract"]
+        fallback_contract = SWAP_CONTRACTS[platform]["mainnet"]["fallback_contract"]
+
+    return {
+        "swap_contract_address":contract,
+        "fallback_swap_contract":fallback_contract,
+    }
 
 def get_enable_commands(request):
     coin_info = get_coins_data()
     serializer = coinsSerializer(coin_info, many=True)
-    enable_commands = { "commands":{}}
+    enable_commands = { "commands":{
+     "UTXO":{},
+     "QTUM":{},
+     "ONE":{},
+     "QRC20":{},
+     "None":{}
+     }}
     incompatible_coins = []
-    other_protocols = []
+    protocols = []
+    platforms = []
+    other_platforms = []
     coins_without_electrum = []
+
+    need_to_fix = [
+        'ONE', 'HPY', 'ZAT', 'BOT', 'EPC', 'QC', 'NVC-QRC20',
+        'QIAIR', 'QI', 'XVC-QRC20', 'INK', 'FENIX', 'SPC', 'AWR',
+        'HLC', 'MED', 'LSTR', 'QBT', 'PLY', 'TSL', 'OC', 'ENT',
+        'CFUN', 'PUT', 'WID', 'AVAX', 'AVAXT', 'ARRR', 'ETC', 'BNB',
+        'ETH', 'ETH-ARB20', 'ETHK-OPT20', 'ETHR', 'FTM', 'BNBT', 'HT',
+        'KCS', 'SBCH', 'MATICTEST', 'ETHR-ARB20', 'FTMT', 'MATIC', 'MOVR',
+        'UBQ', 'tBCH', 'ZOMBIE', 'PAXG-PLG20', 'JST', 'THX',
+        'USDT-SLP', 'USDF', 'sTST'
+        ]
+    
+    ignore_coins = [
+        "GLEEC-OLD",
+
+    ]
     for item in serializer.data:
         coin = item["chain"]
-        protocol = None
-        print(item["coins_info"])
-        if "protocol" in item["coins_info"]:
-            protocol = item["coins_info"]["protocol"]["type"]
         electrums = item["electrums"]
         compatible = item["mm2_compatible"] == 1
-        if protocol != "UTXO":
-            other_protocols.append(protocol)
-        if not compatible:
-            incompatible_coins.append(coin)
-        if len(electrums) > 0:
-            resp = 'curl --url "http://127.0.0.1:7783" --data '
-            resp_json = {"userpass":"'$userpass'","method":"electrum","coin":coin, "servers": []}
-            for electrum in electrums:
-                resp_json["servers"].append({"url":electrum})
-            print(f"{resp} {json.dumps(resp_json)}")
-            enable_commands["commands"].update({
-                coin:f"{resp} '{json.dumps(resp_json)}'"
-            })
+        protocol = None
+        platform = None
+        resp_json = {} 
+        if "protocol" in item["coins_info"]:
+            protocol = item["coins_info"]["protocol"]["type"]
+            protocols.append(protocol)
+            if "protocol_data" in item["coins_info"]["protocol"]:
+                if "platform" in item["coins_info"]["protocol"]["protocol_data"]:
+                    platform = item["coins_info"]["protocol"]["protocol_data"]["platform"]
+                    platforms.append(platform)
+                    if platform not in enable_commands["commands"]:
+                        enable_commands["commands"].update({
+                            platform: {}
+                        })
+
+        if platform in SWAP_CONTRACTS:
+            resp_json.update(get_contracts(platform))
+        elif coin in SWAP_CONTRACTS:
+            resp_json.update(get_contracts(coin))
         else:
-            coins_without_electrum.append(coin)
+            other_platforms.append(platform)
+            print(f"{platform} not in {SWAP_CONTRACTS}")
+
+
+        if protocol == "UTXO":
+            if len(electrums) > 0:
+                resp_json.update({
+                    "userpass":"'$userpass'"
+                    ,"method":"electrum",
+                    "coin":coin,
+                    "servers": []
+                })
+                for electrum in electrums:
+                    resp_json["servers"].append({"url":electrum})
+                enable_commands["commands"]["UTXO"].update({
+                    coin:resp_json
+                })
+
+        elif protocol == "QRC20" or coin == 'QTUM':
+
+            resp_json.update({
+                "userpass":"'$userpass'"
+                ,"method":"electrum",
+                "coin":coin,
+                "servers": [
+                    {"url":"electrum1.cipig.net:10050"},
+                    {"url":"electrum2.cipig.net:10050"},
+                    {"url":"electrum3.cipig.net:10050"}
+                ]
+            })
+            enable_commands["commands"]["QTUM"].update({
+                coin:resp_json
+            })
+
+        elif protocol == "tQTUM" or coin == 'tQTUM':
+            resp_json.update({
+                "userpass":"'$userpass'"
+                ,"method":"electrum",
+                "coin":coin,
+                "servers": [
+                    {"url":"electrum1.cipig.net:10050"},
+                    {"url":"electrum2.cipig.net:10050"},
+                    {"url":"electrum3.cipig.net:10050"}
+                ]
+            })
+
+            enable_commands["commands"]["QRC20"].update({
+                coin:resp_json
+            })
+
+        else:
+
+            resp_json.update({
+                "userpass":"'$userpass'",
+                "method":"enable",
+                "coin":coin,
+            })
+
+
+            if platform == 'BNB' or coin == 'BNB':
+                resp_json.update({
+                    "urls": [
+                        "http://bsc1.cipig.net:8655",
+                        "http://bsc2.cipig.net:8655",
+                        "http://bsc3.cipig.net:8655"
+                    ]
+                })
+
+            elif platform == 'ETHR' or coin == 'ETHR':
+                resp_json.update({
+                    "urls": [
+                        "https://ropsten.infura.io/v3/1d059a9aca7d49a3a380c71068bffb1c",
+                    ]
+                })
+            elif platform == 'ETH' or coin == 'ETH':
+                resp_json.update({
+                    "urls": [
+                        "http://eth1.cipig.net:8555",
+                        "http://eth2.cipig.net:8555",
+                        "http://eth3.cipig.net:8555"
+                    ],
+                    "gas_station_url":"https://ethgasstation.info/json/ethgasAPI.json"
+                })
+
+            elif platform == 'ETH-ARB20' or coin == 'ETH-ARB20':
+                resp_json.update({
+                    "urls": [
+                        "https://arb1.arbitrum.io/rpc"
+                    ]
+                })
+            elif platform == 'ONE' or coin == 'ONE':
+                resp_json.update({
+                    "urls": [
+                        "https://api.harmony.one",
+                        "https://api.s0.t.hmny.io"
+                    ]
+                })
+            elif platform == 'MATIC' or coin == 'MATIC':
+                resp_json.update({
+                    "urls": [
+                        "https://polygon-rpc.com"
+                    ]
+                })
+            elif platform == 'MATICTEST' or coin == 'MATICTEST':
+                resp_json.update({
+                    "urls": [
+                        "https://polygon-rpc.com"
+                    ]
+                })
+            elif platform == 'AVAX' or coin == 'AVAX':
+                resp_json.update({
+                    "urls": [
+                        "https://api.avax.network/ext/bc/C/rpc"
+                    ]
+                })
+            elif platform == 'AVAXT' or coin == 'AVAXT':
+                resp_json.update({
+                    "urls": [
+                        "https://api.avax.network/ext/bc/C/rpc"
+                    ]
+                })
+            elif platform == 'BNBT' or coin == 'BNBT':
+                resp_json.update({
+                    "urls": [
+                        "https://data-seed-prebsc-1-s2.binance.org:8545"
+                    ]
+                })
+            elif platform == 'MOVR' or coin == 'MOVR':
+                resp_json.update({
+                    "urls": [
+                        "https://rpc.moonriver.moonbeam.network"
+                    ]
+                })
+            elif platform == 'FTM' or coin == 'FTM':
+                resp_json.update({
+                    "urls": [
+                        "https://rpc.ftm.tools/"
+                    ]
+                })
+            elif platform == 'KCS' or coin == 'KCR':
+                resp_json.update({
+                    "urls": [
+                        "https://rpc-mainnet.kcc.network"
+                    ]
+                })
+            elif platform == 'HT' or coin == 'HCC':
+                resp_json.update({
+                    "urls": [
+                        "https://http-mainnet.hecochain.com"
+                    ]
+                })
+
+            elif platform == 'QTUM' or coin == 'QTUM':
+                resp_json.update({
+                    "urls": [
+                        "electrum1.cipig.net:10050",
+                        "electrum2.cipig.net:10050",
+                        "electrum3.cipig.net:10050"
+                    ]
+                })
+
+            if platform:
+                enable_commands["commands"][platform].update({
+                    coin:resp_json
+                })
+            else:
+                enable_commands["commands"]["None"].update({
+                    coin:resp_json
+                })
+            
     enable_commands.update({
         "incompatible_coins":incompatible_coins,
-        "other_protocols":other_protocols,
+        "protocols":list(set(protocols)),
+        "platforms":list(set(platforms)),
+        "other_platforms":list(set(other_platforms)),
         "coins_without_electrum":coins_without_electrum
         })
     return JsonResponse(enable_commands)
+
