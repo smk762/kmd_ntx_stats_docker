@@ -371,20 +371,17 @@ def makerbot_conf_view(request):
         "eco_data_link":get_eco_data_link()
     }
 
-
-
     if request.GET: 
         form = MakerbotForm(request.GET)
         if request.GET['base'] == request.GET['rel']:
             messages.error(request, 'Sell and Buy coins need to be different')
         else:
-
             form_resp = {
                  f"{request.GET['base']}/{request.GET['rel']}": {
                     "base": request.GET['base'],
                     "rel": request.GET['rel'],
-                    "balance_percent": float(request.GET['max_trade'])/100,
-                    "min_volume_usd": request.GET['min_volume_usd'],
+                    "min_volume": {request.GET['min_trade_type']:request.GET['min_trade']},
+                    "max_volume": {request.GET['max_trade_type']:request.GET['max_trade']},
                     "spread": str(1+float(request.GET['spread'])/100),
                     "base_confs": int(request.GET['base_confs']),
                     "base_nota": request.GET['base_nota'] == "True",
@@ -396,23 +393,26 @@ def makerbot_conf_view(request):
                 }
 
             }
+            if request.GET['min_trade_type'] == 'pct':
+                form_resp[f"{request.GET['base']}/{request.GET['rel']}"].update({
+                    "min_volume": {request.GET['min_trade_type']:float(request.GET['min_trade'])/100},
+                })
+            if request.GET['max_trade_type'] == 'pct':
+                form_resp[f"{request.GET['base']}/{request.GET['rel']}"].update({
+                    "max_volume": {request.GET['max_trade_type']:float(request.GET['max_trade'])/100},
+                })
             context.update({
                 "bot_refresh_rate":request.GET['bot_refresh_rate'],
                 "price_url":request.GET['price_url']
-            })
-            if float(request.GET['max_trade']) == 100:
-                form_resp[f"{request.GET['base']}/{request.GET['rel']}"].update({"max": True})
-            else:
-                form_resp[f"{request.GET['base']}/{request.GET['rel']}"].update({
-                    "balance_percent": float(request.GET['max_trade'])/100
-                })        
+            })   
 
             if request.GET['create_bidirectional_config'] == "True":
                 form_resp.update({
                      f"{request.GET['rel']}/{request.GET['base']}": {
                         "base": request.GET['rel'],
                         "rel": request.GET['base'],
-                        "min_volume_usd": request.GET['min_volume_usd'],
+                        "min_volume": {request.GET['min_trade_type']:request.GET['min_trade']},
+                        "max_volume": {request.GET['max_trade_type']:request.GET['max_trade']},
                         "spread": str(1+float(request.GET['spread'])/100),
                         "base_confs": int(request.GET['rel_confs']),
                         "base_nota": request.GET['rel_nota'] == "True",
@@ -423,12 +423,15 @@ def makerbot_conf_view(request):
                         "check_last_bidirectional_trade_thresh_hold": request.GET['check_last_bidirectional_trade_thresh_hold'] == "True"
                     }
                 })
-                if float(request.GET['max_trade']) == 100:
-                    form_resp[f"{request.GET['rel']}/{request.GET['base']}"].update({"max": True})
-                else:
+                if request.GET['min_trade_type'] == 'pct':
                     form_resp[f"{request.GET['rel']}/{request.GET['base']}"].update({
-                        "balance_percent": float(request.GET['max_trade'])/100
-                    })                    
+                        "min_volume": {request.GET['min_trade_type']:float(request.GET['min_trade'])/100},
+                    })
+                if request.GET['max_trade_type'] == 'pct':
+                    form_resp[f"{request.GET['rel']}/{request.GET['base']}"].update({
+                        "max_volume": {request.GET['max_trade_type']:float(request.GET['max_trade'])/100},
+                    })
+
             try:
                 if request.GET['add_to_existing_config'] == "True":
                     if len(request.GET['existing_config']) > 0:
