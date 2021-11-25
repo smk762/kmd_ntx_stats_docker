@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from django.http import JsonResponse
-
 from kmd_ntx_api.lib_mm2 import *
 
 
@@ -11,14 +10,18 @@ def orderbook_api(request):
 def nn_mm2_stats_api(request):
     return JsonResponse(get_nn_mm2_stats(request), safe=False)
 
+
 def nn_mm2_stats_by_hour_api(request):
     return JsonResponse(get_nn_mm2_stats_by_hour(request), safe=False)
 
-def bestorders_api(request):
-    return JsonResponse(get_orderbook(request))
 
 def bestorders_api(request):
     return JsonResponse(get_orderbook(request))
+
+
+def bestorders_api(request):
+    return JsonResponse(get_orderbook(request))
+
 
 def failed_swap_api(request):
     return JsonResponse(get_failed_swap_by_uuid(request), safe=False)
