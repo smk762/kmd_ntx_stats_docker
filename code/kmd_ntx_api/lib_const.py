@@ -189,6 +189,16 @@ SWAP_CONTRACTS = {
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
         }
     },
+    "FTMT": {
+        "mainnet": {
+            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
+            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
+        },
+        "testnet": {
+            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
+            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
+        }
+    },
     "ONE": {
         "mainnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
@@ -211,7 +221,29 @@ SWAP_CONTRACTS = {
             "gas_station": "https://gasstation-mumbai.matic.today/"
         }
     },
+    "MATICTEST": {
+        "mainnet": {
+            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
+            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
+            "gas_station": "https://gasstation-mainnet.matic.network/"
+        },
+        "testnet": {
+            "swap_contract": "0x73c1Dd989218c3A154C71Fc08Eb55A24Bd2B3A10",
+            "fallback_contract": "0x73c1Dd989218c3A154C71Fc08Eb55A24Bd2B3A10",
+            "gas_station": "https://gasstation-mumbai.matic.today/"
+        }
+    },
     "AVAX": {
+        "mainnet": {
+            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
+            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
+        },
+        "testnet": {
+            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
+            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
+        }
+    },
+    "AVAXT": {
         "mainnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
@@ -299,6 +331,46 @@ SWAP_CONTRACTS = {
         "testnet": {
             "swap_contract": "0xba8b71f3544b93e2f681f996da519a98ace0107a",
             "fallback_contract": "0xba8b71f3544b93e2f681f996da519a98ace0107a"
+        }
+    },
+    "tQTUM": {
+        "mainnet": {
+            "swap_contract": "0x2f754733acd6d753731c00fee32cb484551cc15d",
+            "fallback_contract": "0x2f754733acd6d753731c00fee32cb484551cc15d"
+        },
+        "testnet": {
+            "swap_contract": "0xba8b71f3544b93e2f681f996da519a98ace0107a",
+            "fallback_contract": "0xba8b71f3544b93e2f681f996da519a98ace0107a"
+        }
+    },
+    "ARB": {
+        "mainnet": {
+            "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
+            "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
+        },
+        "testnet": {
+            "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
+            "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
+        }
+    },
+    "OPT": {
+        "mainnet": {
+            "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
+            "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
+        },
+        "testnet": {
+            "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
+            "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
+        }
+    },
+    "SBCH": {
+        "mainnet": {
+            "swap_contract": "0x25bF2AAB8749AD2e4360b3e0B738f3Cd700C4D68",
+            "fallback_contract": "0x25bF2AAB8749AD2e4360b3e0B738f3Cd700C4D68"
+        },
+        "testnet": {
+            "swap_contract": "0x25bF2AAB8749AD2e4360b3e0B738f3Cd700C4D68",
+            "fallback_contract": "0x25bF2AAB8749AD2e4360b3e0B738f3Cd700C4D68"
         }
     }
 }

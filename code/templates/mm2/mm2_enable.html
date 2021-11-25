@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+{% load coin_filter %}
+{% block content %}
+
+<form action="" method="get"> 
+	<div class="row d-flex justify-content-around">
+		<div class="col-5">
+
+			{{ form.coin.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.coin.label }}
+			      	</span>
+				</div>
+				{{ form.coin }}
+			</div>
+		</div>
+
+		<div class="col-5">
+
+			{{ form.add_to_batch_command.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.add_to_batch_command.label }}
+			      	</span>
+				</div>
+				{{ form.add_to_batch_command }}
+			</div>
+
+		</div>
+
+	</div>
+	<div class="row d-flex justify-content-around">
+		<div class="col-5">
+
+			{{ form.confs.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.confs.label }}
+			      	</span>
+				</div>
+				{{ form.confs }}
+			</div>
+		</div>
+
+		<div class="col-5">
+
+			{{ form.nota.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.nota.label }}
+			      	</span>
+				</div>
+				{{ form.nota }}
+			</div>
+
+		</div>
+
+	</div>
+
+
+	<div class="row d-flex justify-content-around">
+
+		<div class="col-5">
+
+			{{ form.tx_history.errors }}
+		    <div class="input-group">
+			    <div class="input-group-prepend" style="width:66%" >
+			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+			      		{{ form.tx_history.label }}
+			      	</span>
+				</div>
+				{{ form.tx_history }}
+			</div>
+
+		</div>
+	</div>
+
+	<div class="row d-flex justify-content-around">
+		<div class="">
+			<input type="submit" class='btn btn-block' value="Generate Enable Command">
+		</div>
+	</div>
+
+{% if form_resp %}
+<div class="d-flex justify-content-around col-10 p-3 m-3 mx-auto" style="background-color: #334352; border-radius:0.5em;">
+	<pre style="text-align:left; color:white;" id="enable_str">
+curl --url "http://127.0.0.1:7783" --data '
+{{ form_resp|pretty_json }}'
+	</pre>
+	<button type='button' class="append-btn" data-clipboard-target="#enable_str" style="line-height: 1em; position: absolute; top:10px; right: 10px;">
+	    <i class="cil-copy"></i>
+	</button>
+</div>
+{% endif %}
+
+<input type="hidden" name="existing_command" value="{{ form_resp }}">
+
+</form>
+
+{% endblock %}
+

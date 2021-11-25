@@ -23,6 +23,10 @@ frontend_mm2_urls = [
     path('mm2/version_by_hour/',
          views_mm2.version_by_hour,
          name='version_by_hour'),
+
+    path('mm2/get_enable_command/',
+         views_mm2.mm2_enable_command_view,
+         name='mm2_enable_command_view'),
 ]
 
 # API mm2 V2

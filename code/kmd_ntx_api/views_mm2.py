@@ -5,6 +5,7 @@ from .lib_helper import get_or_none
 
 from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_mm2 import *
+from kmd_ntx_api.forms import *
 
 
 def orderbook_view(request):
@@ -192,3 +193,59 @@ def version_by_hour(request):
     }
 
     return render(request, 'mm2/mm2_version_by_hour.html', context)
+
+
+def mm2_enable_command_view(request):
+    mm2_coins = list(get_dexstats_explorers().keys())
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "page_title":"Generate AtomicDEX-API Enable Command",
+        "scheme_host": get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "mm2_coins":mm2_coins,
+        "eco_data_link":get_eco_data_link()
+    }
+
+    if request.GET: 
+        coin = request.GET["coin"]
+        form = EnableCommandForm(request.GET)
+        url = f'{get_current_host(request)}api/tools/mm2/get_enable_commands'
+        r = requests.get(f'{url}/?coin={coin}')
+        command_str = r.json()
+        command_str["userpass"] = "'$userpass'"
+        form_resp = [command_str]
+        try:
+            if request.GET['add_to_batch_command'] == "True":
+                if len(request.GET['existing_command']) > 0:
+                    command_str = request.GET['existing_command']
+                    command_str = command_str.replace("'$userpass'", "$userpass")
+                    command_str = command_str.replace("\'", "\"")
+                    command_str = command_str.replace("True", "true")
+                    command_str = command_str.replace("False", "false")
+                    print("---------")
+                    print(form_resp)
+                    print("---------")
+                    print(command_str)
+                    print("---------")
+                    existing_commands = json.loads(command_str)
+                    for i in existing_commands:
+                        if i["coin"] != coin:
+                            i['userpass'] = "'$userpass'"
+                            print(i)
+                            print("#########")
+                            form_resp.append(i)
+        except Exception as e:
+            messages.error(request, e)
+        print(form_resp)
+        context.update({
+            "form_resp":form_resp
+        })
+        
+    else:
+       form = EnableCommandForm() 
+    context.update({
+        "form":form
+    })
+
+    return render(request, 'mm2/mm2_enable.html', context)

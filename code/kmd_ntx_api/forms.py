@@ -4,6 +4,10 @@ from kmd_ntx_api.lib_info import *
 from kmd_ntx_api.lib_mm2 import *
 from kmd_ntx_api.widgets import *
 
+mm2_coins = get_mm2_coins_list()
+TF_CHOICES = [(True,True), (False,False)]
+COIN_CHOICES = [(i,i) for i in mm2_coins]
+
 class MakerbotForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(MakerbotForm, self).__init__(*args, **kwargs)
@@ -12,8 +16,6 @@ class MakerbotForm(forms.Form):
         self.fields["max_trade_type"].widget.attrs['class'] = 'form-control clear_bhp input-lbl-dark text-left'
         self.fields["min_trade_type"].widget.attrs['class'] = 'form-control clear_bhp input-lbl-dark text-left'
 
-    mm2_coins = get_mm2_coins_list()
-    TF_CHOICES = [(True,True), (False,False)]
 
     MAX_CHOICES = [
         ("percentage","Max. balance percentage to trade"),
@@ -24,7 +26,6 @@ class MakerbotForm(forms.Form):
         ("usd","Min. USD value to trade")
         ]
 
-    COIN_CHOICES = [(i,i) for i in mm2_coins]
     base = forms.ChoiceField(
         label='Coin to Sell',
         required=True,
@@ -148,4 +149,53 @@ class MakerbotForm(forms.Form):
         choices=TF_CHOICES,
         initial=True
         )
+
+
+class EnableCommandForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(EnableCommandForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
+
+    mm2_coins = get_mm2_coins_list
+
+    coin = forms.ChoiceField(
+        label='Coin to Enable',
+        required=True,
+        widget=forms.Select,
+        choices=COIN_CHOICES
+        )
+
+    add_to_batch_command = forms.ChoiceField(
+        label="Add to batch command",
+        required=True,
+        widget=forms.Select,
+        choices=TF_CHOICES,
+        initial=True
+        )
+    
+    confs = forms.IntegerField(
+        label='Required swap confirmations',
+        required=True,
+        initial=3,
+        min_value=1,
+        max_value=5
+        )
+
+    nota = forms.ChoiceField(
+        label='Requires swap notarisation',
+        required=True,
+        widget=forms.Select,
+        choices=TF_CHOICES,
+        initial=True
+        )
+
+    tx_history = forms.ChoiceField(
+        label='Preload transaction history',
+        required=True,
+        widget=forms.Select,
+        choices=TF_CHOICES,
+        initial=True
+        )
+
 

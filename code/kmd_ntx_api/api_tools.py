@@ -262,7 +262,7 @@ def send_raw_tx_tool(request):
         })
 
 def is_testnet(coin):
-    if coin in ["BNBT", "ETHR", "AVAXT", "tQTUM", "MATICTEST"]:
+    if coin in ["BNBT", "ETHR", "AVAXT", "tQTUM", "MATICTEST", "AVAXT"]:
         return True
     return False
 
@@ -281,14 +281,13 @@ def get_contracts(platform):
     }
 
 def get_enable_commands(request):
-    coin_info = get_coins_data()
+    selected_coin = None
+    if "coin" in request.GET:
+        selected_coin = request.GET["coin"]
+
+    coin_info = get_coins_data(selected_coin, 1)
     serializer = coinsSerializer(coin_info, many=True)
     enable_commands = { "commands":{
-     "UTXO":{},
-     "QTUM":{},
-     "ONE":{},
-     "QRC20":{},
-     "None":{}
      }}
     incompatible_coins = []
     protocols = []
@@ -297,18 +296,15 @@ def get_enable_commands(request):
     coins_without_electrum = []
 
     need_to_fix = [
-        'ONE', 'HPY', 'ZAT', 'BOT', 'EPC', 'QC', 'NVC-QRC20',
-        'QIAIR', 'QI', 'XVC-QRC20', 'INK', 'FENIX', 'SPC', 'AWR',
-        'HLC', 'MED', 'LSTR', 'QBT', 'PLY', 'TSL', 'OC', 'ENT',
-        'CFUN', 'PUT', 'WID', 'AVAX', 'AVAXT', 'ARRR', 'ETC', 'BNB',
-        'ETH', 'ETH-ARB20', 'ETHK-OPT20', 'ETHR', 'FTM', 'BNBT', 'HT',
-        'KCS', 'SBCH', 'MATICTEST', 'ETHR-ARB20', 'FTMT', 'MATIC', 'MOVR',
-        'UBQ', 'tBCH', 'ZOMBIE', 'PAXG-PLG20', 'JST', 'THX',
-        'USDT-SLP', 'USDF', 'sTST'
-        ]
+        'QRC20', 'ETC', 'ARRR', 'QTUM-segwit',
+        'tQTUM-segwit', 'ETHK-OPT20', 'UBQ', 'SBCH', 'ETHR-ARB20',
+        'ZOMBIE', 'tBCH', 'JST', 'PAXG-PLG20', 'CELR-ARB20', 'USDT-ARB20',
+        'sTST', 'USDF', 'USDT-SLP'
+    ]
+
     
     ignore_coins = [
-        "GLEEC-OLD",
+        "GLEEC-OLD"
 
     ]
     for item in serializer.data:
@@ -347,9 +343,13 @@ def get_enable_commands(request):
                     "coin":coin,
                     "servers": []
                 })
+                if "UTXO" not in enable_commands["commands"]:
+                    enable_commands["commands"].update({
+                        "UTXO": {}
+                    })   
                 for electrum in electrums:
                     resp_json["servers"].append({"url":electrum})
-                enable_commands["commands"]["UTXO"].update({
+                enable_commands["commands"][protocol].update({
                     coin:resp_json
                 })
 
@@ -365,22 +365,30 @@ def get_enable_commands(request):
                     {"url":"electrum3.cipig.net:10050"}
                 ]
             })
+            if "QTUM" not in enable_commands["commands"]:
+                enable_commands["commands"].update({
+                    "QTUM": {}
+                })    
             enable_commands["commands"]["QTUM"].update({
                 coin:resp_json
             })
 
-        elif protocol == "tQTUM" or coin == 'tQTUM':
+
+        elif protocol == "tQTUM" or coin == 'tQTUM' or coin == 'QRC20':
             resp_json.update({
-                "userpass":"'$userpass'"
-                ,"method":"electrum",
+                "userpass":"'$userpass'",
+                "method":"electrum",
                 "coin":coin,
                 "servers": [
-                    {"url":"electrum1.cipig.net:10050"},
-                    {"url":"electrum2.cipig.net:10050"},
-                    {"url":"electrum3.cipig.net:10050"}
+                    {"url":"electrum1.cipig.net:10071"},
+                    {"url":"electrum2.cipig.net:10071"},
+                    {"url":"electrum3.cipig.net:10071"}
                 ]
             })
-
+            if "QRC20" not in enable_commands["commands"]:
+                enable_commands["commands"].update({
+                    "QRC20": {}
+                })    
             enable_commands["commands"]["QRC20"].update({
                 coin:resp_json
             })
@@ -422,7 +430,7 @@ def get_enable_commands(request):
             elif platform == 'ETH-ARB20' or coin == 'ETH-ARB20':
                 resp_json.update({
                     "urls": [
-                        "https://arb1.arbitrum.io/rpc"
+                        "https://rinkeby.arbitrum.io/rpc"
                     ]
                 })
             elif platform == 'ONE' or coin == 'ONE':
@@ -468,49 +476,76 @@ def get_enable_commands(request):
                         "https://rpc.moonriver.moonbeam.network"
                     ]
                 })
+                
             elif platform == 'FTM' or coin == 'FTM':
                 resp_json.update({
                     "urls": [
                         "https://rpc.ftm.tools/"
                     ]
                 })
-            elif platform == 'KCS' or coin == 'KCR':
+            elif platform == 'FTMT' or coin == 'FTMT':
+                resp_json.update({
+                    "urls": [
+                        "https://rpc.testnet.fantom.network/"
+                    ]
+                })
+
+            elif platform == 'KCS' or coin == 'KCS':
                 resp_json.update({
                     "urls": [
                         "https://rpc-mainnet.kcc.network"
                     ]
                 })
-            elif platform == 'HT' or coin == 'HCC':
+            elif platform == 'HT' or coin == 'HT':
                 resp_json.update({
                     "urls": [
                         "https://http-mainnet.hecochain.com"
                     ]
                 })
-
-            elif platform == 'QTUM' or coin == 'QTUM':
+            elif platform == 'UBQ' or coin == 'UBQ':
                 resp_json.update({
                     "urls": [
-                        "electrum1.cipig.net:10050",
-                        "electrum2.cipig.net:10050",
-                        "electrum3.cipig.net:10050"
+                        "https://rpc.octano.dev/"
+                    ]
+                })
+            elif platform == 'ETC' or coin == 'ETC':
+                resp_json.update({
+                    "urls": [
+                        "https://www.ethercluster.com/etc"
+                    ]
+                })
+            elif platform == 'OPT20' or coin == 'ETHK-OPT20':
+                resp_json.update({
+                    "urls": [
+                        "https://kovan.optimism.io"
                     ]
                 })
 
             if platform:
+                if platform not in enable_commands["commands"]:
+                    enable_commands["commands"].update({
+                        platform: {}
+                    })    
                 enable_commands["commands"][platform].update({
                     coin:resp_json
                 })
             else:
-                enable_commands["commands"]["None"].update({
+                if "Unknown" not in enable_commands["commands"]:
+                    enable_commands["commands"].update({
+                        "Unknown": {}
+                    })    
+                enable_commands["commands"]["Unknown"].update({
                     coin:resp_json
                 })
-            
-    enable_commands.update({
-        "incompatible_coins":incompatible_coins,
-        "protocols":list(set(protocols)),
-        "platforms":list(set(platforms)),
-        "other_platforms":list(set(other_platforms)),
-        "coins_without_electrum":coins_without_electrum
-        })
-    return JsonResponse(enable_commands)
+    if selected_coin is None:
+        enable_commands.update({
+            "incompatible_coins":incompatible_coins,
+            "protocols":list(set(protocols)),
+            "platforms":list(set(platforms)),
+            "other_platforms":list(set(other_platforms)),
+            "coins_without_electrum":coins_without_electrum
+            })
+        return JsonResponse(enable_commands)
+    else: 
+        return JsonResponse(resp_json)
 
