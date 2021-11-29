@@ -13,6 +13,11 @@ def handle_dual_server_chains(chain, server):
         return "GLEEC-OLD"
     return chain
 
+def handle_translate_chains(chain):
+    if chain in TRANSLATE_COINS:
+        return TRANSLATE_COINS[chain]
+    return chain
+
 def validate_epoch_chains(epoch_chains, season):
     if len(epoch_chains) == 0:
         return False

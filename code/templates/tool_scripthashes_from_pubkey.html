@@ -1,75 +1,73 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-		<div class="card m-auto">
-			<div class="card-header flex">
-				<h2 style="min-width: 36em;">{{ page_title }}</h2>
+	<div class="row col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title flex">
+				{{ page_title }}
+			</div>
+			<div class="card-body table_card_body">
 				<form>
 				  <div class="input-group mb-3 ">
-				    <div class="input-group-prepend p-0" >
-				      <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;">
+				    <div class="input-group-prepend prepend-label-left p-0" >
+				      <span class="input-group-text">
 				      	Enter Pubkey
 				      </span>
 				    </div>
-				    <input type="text" class="form-control m-auto " id="opret_id" name="pubkey" placeholder="{{ pubkey }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 44em">
+				    <input type="text" class="form-control m-auto " id="opret_id" name="pubkey" placeholder="{{ pubkey }}">
 				    <div class="input-group-append p-0  ">
-						<button class="append-btn"style="line-height: 1em; border: solid grey 1px !important;">
+						<button class="append-btn">
 						    Get Scripthash
 						</button>
 				    </div>
 				  </div>
 				</form>
+				{% if resp_rows %}
+					{% for item in resp_rows %}
+					<div class="input-group mb-1 ">
+					    <div class="input-group-prepend prepend-label-left p-0 col-2" >
+					      <span class="input-group-text col-12">
+					      	{% if item.key|lower == 'p2pk' %}
+					      	<a href="https://komodoplatform.com/en/blog/p2pk-pay-to-pubkey/">
+					      		{{ item.key|lower }}
+					      	</a>				      	
+					      	<a href="https://learnmeabitcoin.com/technical/p2pk">
+					      		<i data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey" class="fas fa-info-circle ml-1 py-0"></i>
+					      	</a>
+					      	{% elif item.key|lower == 'p2pkh' %}
+					      	<a href="https://komodoplatform.com/en/blog/p2pkh-pay-to-pubkey-hash/">
+					      		{{ item.key|lower }} 
+					      	</a>
+					      	<a href="https://learnmeabitcoin.com/technical/p2pkh">
+					      		<i data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey Hash" class="fas fa-info-circle  ml-1 py-0"></i>
+					      	</a>
+					      	{% elif item.key|lower == 'p2pkh scripthash' or item.key|lower == 'p2pk scripthash' %}
+					      	<a href="https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-basics.html#script-hashes">
+					      		{{ item.key|lower }} <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Used to Query Electrum Servers" class="fas fa-info-circle  ml-1 py-0"></i>
+					      	</a>
+					      	{% elif item.key|lower == 'pubkey' %}
+					      	<a href="https://learnmeabitcoin.com/beginners/public_keys">
+					      		{{ item.key }}
+					      	</a>
+					      	{% elif item.key|lower == 'address' %}
+					      	<a href="https://learnmeabitcoin.com/technical/address">
+					      		{{ item.key }}
+					      	</a>
+					      	{% else %}
+					      		{{ item.key }}
+					      	{% endif %}
+					        </span>
+					    </div>
+					    <input type="text" class="form-control col-10" placeholder="{{ item.value }}" value="{{ item.value }}" readonly id="x_{{ item.value }}">
+					    <div class="input-group-append p-0">
+							<button class="append-btn" data-clipboard-target="#x_{{ item.value }}">
+							    <i class="cil-copy"></i>
+							</button>
+					    </div>
+					</div>
+					{% endfor %}
+				{% endif %}
 			</div>
-			{% if resp_rows %}
-			<div class="card-body flex">
-
-				{% for item in resp_rows %}
-				  <div class="input-group mb-1 ">
-				    <div class="input-group-prepend p-0 col-2 " >
-				      <span class="input-group-text col-12 " style="border: solid grey 1px !important; line-height: 1em; color:
-	#82F4E6 !important;">
-				      	{% if item.key|lower == 'p2pk' %}
-				      	<a href="https://komodoplatform.com/en/blog/p2pk-pay-to-pubkey/">
-				      		{{ item.key|lower }}
-				      	</a>				      	
-				      	<a href="https://learnmeabitcoin.com/technical/p2pk">
-				      		<i data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey" class="fas fa-info-circle my-0 py-0" style="font-size: 1.1em"></i>
-				      	</a>
-				      	{% elif item.key|lower == 'p2pkh' %}
-				      	<a href="https://komodoplatform.com/en/blog/p2pkh-pay-to-pubkey-hash/">
-				      		{{ item.key|lower }} 
-				      	</a>
-				      	<a href="https://learnmeabitcoin.com/technical/p2pkh">
-				      		<i data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey Hash" class="fas fa-info-circle my-0 py-0" style="font-size: 1.1em"></i>
-				      	</a>
-				      	{% elif item.key|lower == 'p2pkh scripthash' or item.key|lower == 'p2pk scripthash' %}
-				      	<a href="https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-basics.html#script-hashes">
-				      		{{ item.key|lower }} <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Used to Query Electrum Servers" class="fas fa-info-circle my-0 py-0" style="font-size: 1.1em"></i>
-				      	</a>
-				      	{% elif item.key|lower == 'pubkey' %}
-				      	<a href="https://learnmeabitcoin.com/beginners/public_keys">
-				      		{{ item.key }}
-				      	</a>
-				      	{% elif item.key|lower == 'address' %}
-				      	<a href="https://learnmeabitcoin.com/technical/address">
-				      		{{ item.key }}
-				      	</a>
-				      	{% else %}
-				      		{{ item.key }}
-				      	{% endif %}
-				        </span>
-				    </div>
-				    <input type="text" class="form-control col-10 " style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ item.value }}" value="{{ item.value }}" readonly id="x_{{ item.value }}">
-				    <div class="input-group-append p-0 " style="border: solid grey 1px !important;">
-						<button class="append-btn" data-clipboard-target="#x_{{ item.value }}" style="line-height: 1em; font-size: 0.8em">
-						    <i class="cil-copy"></i>
-						</button>
-				    </div>
-				  </div>
-				{% endfor %}
-			</div>
-			{% endif %}
 		</div>	
 	</div>
     <!-- jquery -->  

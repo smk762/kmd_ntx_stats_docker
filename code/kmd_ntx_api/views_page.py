@@ -287,6 +287,8 @@ def faucet(request):
             "status":item[6]
         })
         pending_index.append(item[0])
+        if len(tx_rows) >= 250:
+            break
     sent_tx_resp = requests.get(f"https://faucet.komodo.live/show_faucet_db").json()
     sent_tx_list = []
     now = time.time()

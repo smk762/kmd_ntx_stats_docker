@@ -10,11 +10,10 @@ def get_balances_graph_data(request):
     if server in ["KMD", "LTC", "BTC"]:
         server = "Main"
 
-    if not season or not server or (not chain and not notary):
+    if not season or (not notary and not chain):
         return {
-            "error": "You need to specify both of the following \
-                      filter parameters: ['season', 'server'] and at \
-                      least one of the following ['notary', 'chain']"
+            "error": "You need to specify the following \
+                      filter parameter: ['season'] and either of ['notary', 'chain']"
         }
 
     data = get_balances_data(season, server, chain, notary).values()
@@ -22,6 +21,8 @@ def get_balances_graph_data(request):
     chain_list = []
     balances_dict = {}
     for item in data:
+        print(item)
+
         if item['notary'] not in notary_list:
             notary_list.append(item['notary'])
         if item['chain'] not in chain_list:

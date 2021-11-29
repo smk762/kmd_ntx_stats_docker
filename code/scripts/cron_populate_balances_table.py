@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     for season in SEASONS_INFO:
         #if season in EXCLUDED_SEASONS:
-        if season in ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_5_Testnet"]:
+        if season in ["Season_1", "Season_2", "Season_3", "Season_4", "Unofficial", "Season_5_Testnet"]:
             logger.warning(f"Skipping season: {season}")
         else:
             get_balances(season)

@@ -71,12 +71,18 @@ class GLEEC_3P_CoinParams(CoreMainParams):
 
 COIN_PARAMS = {
     "KMD": KMD_CoinParams,
+    "VOTE2021": KMD_CoinParams,
+    "WLC21": KMD_CoinParams,
     "MCL": KMD_CoinParams,
+    "RFOX": KMD_CoinParams,
+    "STBL": KMD_CoinParams,
+    "PGT": KMD_CoinParams,
     "GLEEC": KMD_CoinParams,
     "GLEEC-OLD": GLEEC_3P_CoinParams,
     "PBC": PBC_CoinParams,
     "SFUSD": SFUSD_CoinParams,
     "CHIPS": KMD_CoinParams,
+    "TKL": KMD_CoinParams,
     "TOKEL": KMD_CoinParams,
     "VRSC": KMD_CoinParams,
     "BTC": BTC_CoinParams,

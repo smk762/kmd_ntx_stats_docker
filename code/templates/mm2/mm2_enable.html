@@ -6,10 +6,9 @@
 <form action="" method="get"> 
 	<div class="row d-flex justify-content-around">
 		<div class="col-5">
-
 			{{ form.coin.errors }}
-		    <div class="input-group">
-			    <div class="input-group-prepend" style="width:66%" >
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
 			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
 			      		{{ form.coin.label }}
 			      	</span>
@@ -19,26 +18,24 @@
 		</div>
 
 		<div class="col-5">
-
 			{{ form.add_to_batch_command.errors }}
-		    <div class="input-group">
-			    <div class="input-group-prepend" style="width:66%" >
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
 			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
 			      		{{ form.add_to_batch_command.label }}
 			      	</span>
 				</div>
 				{{ form.add_to_batch_command }}
 			</div>
-
 		</div>
-
 	</div>
+
 	<div class="row d-flex justify-content-around">
 		<div class="col-5">
 
 			{{ form.confs.errors }}
-		    <div class="input-group">
-			    <div class="input-group-prepend" style="width:66%" >
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
 			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
 			      		{{ form.confs.label }}
 			      	</span>
@@ -50,8 +47,8 @@
 		<div class="col-5">
 
 			{{ form.nota.errors }}
-		    <div class="input-group">
-			    <div class="input-group-prepend" style="width:66%" >
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
 			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
 			      		{{ form.nota.label }}
 			      	</span>
@@ -69,8 +66,8 @@
 		<div class="col-5">
 
 			{{ form.tx_history.errors }}
-		    <div class="input-group">
-			    <div class="input-group-prepend" style="width:66%" >
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
 			      	<span class="input-group-text" style="width:100%" style="color:white; border: solid grey 1px !important; line-height: 1em;">
 			      		{{ form.tx_history.label }}
 			      	</span>
@@ -79,13 +76,13 @@
 			</div>
 
 		</div>
-	</div>
 
-	<div class="row d-flex justify-content-around">
-		<div class="">
+		<div class="col-5">
 			<input type="submit" class='btn btn-block' value="Generate Enable Command">
 		</div>
 	</div>
+	<a class='btn-dark4 p-2' href="https://developers.komodoplatform.com/basic-docs/atomicdex-api-legacy/electrum.html">View Docs</a>
+
 
 {% if form_resp %}
 <div class="d-flex justify-content-around col-10 p-3 m-3 mx-auto" style="background-color: #334352; border-radius:0.5em;">

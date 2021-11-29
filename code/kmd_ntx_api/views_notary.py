@@ -45,7 +45,7 @@ def notary_mining_view(request, notary=None):
     context = {
         "season":season,
         "season_clean":season.replace("_"," "),
-        "page_title":"Notary KMD Mining",
+        "page_title": f"{notary} Notary KMD Mining",
         "scheme_host":get_current_host(request),
         "sidebar_links":sidebar_links,
         "eco_data_link":eco_data_link,
@@ -109,7 +109,9 @@ def notary_profile_view(request, notary=None):
             notary_balances_tbl = requests.get(f"{url}/?season={season}&notary={notary}").json()['results']
 
             notarised_count_season_data = notary_profile_summary_table['ntx_season_data'][0]
-            notary_balances_list, notary_balances_graph = get_notary_balances_graph(notary, season)
+            # notary_balances_list, notary_balances_graph = get_notary_balances_graph(notary, season)
+            url = f"http://116.203.120.91:8762/api/graph/balances/?season={season}&notary={notary}"
+            notary_balances_graph = requests.get(url).json()["results"]
             notarised_data_24hr = get_notarised_data_24hr(season, None, None, notary)
             season_stats_sorted = get_season_stats_sorted(season)
             main_notarised_24hr = notarised_data_24hr.filter(server='Main').count()

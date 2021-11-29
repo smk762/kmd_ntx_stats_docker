@@ -1,0 +1,81 @@
+
+{% load static %}
+            	<div class="card notary_card">
+            		<div class="card-header notary_card_header notary_card_name">
+            			<a href="//{{ request.get_host }}/notary_profile/{{ node }}/?season={{ season }}">
+            				{{ node }}
+						</a>
+						{% for nn, site_links in nn_social.items %}
+							{% if node == nn %}
+	            				{% include "components/cards/card_img.html" with img_src=site_links.icon alt_text=nn profile_page="notary_profile" profile_name=node  %}
+							{% endif %}
+						{% endfor %}
+					</div>
+					<div class="card-body notary_card_body">
+						<p class="card-text notary_card_text">
+							{% for nn, site_links in nn_social.items %}
+								{% if node == nn %}
+									{% for site, link in site_links.items %}
+										{% if site == 'discord' %}
+											{%  if link != '' %}
+												<a href="https://discordapp.com/users/{{ link }}"><i class="fab fa-discord mr-2 social-icon"></i></a>
+											{% else %}
+												<i class="fab fa-discord mr-2 social-icon-disabled"></i>
+											{% endif %}
+											
+										{% elif site == 'email' %}
+											{%  if link != '' %}
+												<a href="{{ link }}"><i class="far fa-envelope mr-2 social-icon"></i></a>
+											{% else %}
+												<i class="far fa-envelope mr-2 social-icon-disabled"></i>
+											{% endif %}
+											
+										{% elif site == 'github' %}
+											{%  if link != '' %}
+												<a href="https://github.com/{{ link }}"><i class="fab fa-github mr-2 social-icon"></i></a>
+											{% else %}
+												<i class="fab fa-github mr-2 social-icon-disabled"></i>
+											{% endif %}
+
+										{% elif site == 'keybase' %}
+											{%  if link != '' %}
+												<a href="https://keybase.io/{{ link }}"><i class="fab fa-keybase mr-2 social-icon"></i></a>
+											{% else %}
+												<i class="fab fa-keybase mr-2 social-icon-disabled"></i>
+											{% endif %}
+
+										{% elif site == 'telegram' %}
+											{%  if link != '' %}
+												<a href="https://t.me/{{ link }}"><i class="fab fa-telegram-plane mr-2 social-icon"></i></a>
+											{% else %}
+												<i class="fab fa-telegram-plane mr-2 social-icon-disabled"></i>
+											{% endif %}
+
+										{% elif site == 'twitter' %}
+											{%  if link != '' %}
+												<a href="https://twitter.com/{{ link }}"><i class="fab fa-twitter mr-2 social-icon"></i></a>
+											{% else %}
+												<i class="fab fa-twitter mr-2 social-icon-disabled"></i>
+											{% endif %}
+											
+										{% elif site == 'website' %}
+											{%  if link != '' %}
+												<a href="{{ link }}"><i class="fas fa-desktop mr-2 social-icon"></i></a>
+											{% else %}
+												<i class="fas fa-desktop mr-2 social-icon-disabled"></i>
+											{% endif %}
+											
+										{% elif site == 'youtube' %}
+											{%  if link != '' %}
+												<a href="https://www.youtube.com/{{ link }}"><i class="fab fa-youtube mr-2 social-icon"></i></a>
+											{% else %}
+												<i class="fab fa-youtube mr-2 social-icon-disabled"></i>
+											{% endif %}
+											
+										{% endif %}
+									{% endfor %}
+								{% endif %}
+							{% endfor %}
+						</p>
+					</div>
+				</div>	

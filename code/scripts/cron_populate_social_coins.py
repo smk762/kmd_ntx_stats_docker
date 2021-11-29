@@ -4,6 +4,7 @@ import json
 import time
 import requests
 from lib_const import *
+from lib_helper import *
 from lib_notary import get_season
 from models import coin_social_row
 
@@ -13,6 +14,19 @@ def generate_social_coins_template(season):
     dpow_main_chains = requests.get(f"{url}/?season={season}&server=Main").json()['results']
     dpow_3p_chains = requests.get(f"{url}/?season={season}&server=Third_Party").json()['results']
     all_chains = dpow_3p_chains+dpow_main_chains+["KMD", "LTC", "BTC"]
+
+    translated_chains_main = []
+    for chain in dpow_main_chains:
+        translated_chain = handle_translate_chains(chain)
+        translated_chains_main.append(translated_chain)
+
+    translated_chains_3p = []
+    for chain in dpow_3p_chains:
+        translated_chain = handle_translate_chains(chain)
+        translated_chains_3p.append(translated_chain)
+
+    all_chains = list(set(translated_chains_main + translated_chains_3p + ["KMD", "LTC", "BTC"]))
+
     try:
         url = f"https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/{season.lower().replace('_', '')}/coin_social.json"
         logger.info(url)
@@ -43,6 +57,14 @@ def generate_social_coins_template(season):
             for item in repo_info[chain]:
                 print(f"{chain} {item}: {repo_info[chain][item]}")
                 template[chain].update({item:repo_info[chain][item]})
+
+        elif chain in TRANSLATE_COINS:
+            print(f"{chain} repo_info[chain]: {repo_info[chain]}")
+            
+            for item in repo_info[chain]:
+                print(f"{chain} {item}: {repo_info[chain][item]}")
+                template[handle_translate_chains(chain)].update({item:repo_info[chain][item]})
+                
 
     with open(f"{os.path.dirname(os.path.abspath(__file__))}/social_coins_{season.lower()}.json", 'w+') as j:
         json.dump(template, j, indent = 4, sort_keys=True)

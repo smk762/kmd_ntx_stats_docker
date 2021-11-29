@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import time
-import requests
 from lib_const import *
 from lib_helper import *
 from models import scoring_epoch_row, ntx_tenure_row

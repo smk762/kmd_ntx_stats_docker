@@ -1,39 +1,7 @@
-	<div class="row m-1">
-		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<h4 class="card text-center kmd_ui_light3 col-3 px-0 mt-auto shadow-none" style="border:none !important;">
-				<a href="#AR">
-					<span class='col-12 badge p-2' style="font-size: 0.5em; border:solid 1px grey; background-color: #000">
-						Asia & Russia
-					</span>
-				</a>
-			</h4>
-			<h4 class="card text-center kmd_ui_light3 col-3 px-0 mt-auto shadow-none" style="border:none !important;">
-				<a href="#EU">
-					<span class='col-12 badge p-2' style="font-size: 0.5em; border:solid 1px grey; background-color: #000">
-						Europe
-					</span>
-				</a>
-			</h4>
-			<h4 class="card text-center kmd_ui_light3 col-3 px-0 mt-auto shadow-none" style="border:none !important;">
-				<a href="#NA">
-					<span class='col-12 badge p-2' style="font-size: 0.5em; border:solid 1px grey; background-color: #000">
-						North America
-					</span>
-				</a>
-			</h4>
-			<h4 class="card text-center kmd_ui_light3 col-3 px-0 mt-auto shadow-none" style="border:none !important;">
-				<a href="#SH">
-					<span class='col-12 badge p-2' style="font-size: 0.5em; border:solid 1px grey; background-color: #000">
-						Southern Hemisphere
-					</span>
-				</a>
-			</h4>
-			<h4 class="card text-center kmd_ui_light3 col-3 px-0 mt-auto shadow-none" style="border:none !important;">
-				<a href="#DEV">
-					<span class='col-12 badge p-2' style="font-size: 0.5em; border:solid 1px grey; background-color: #000">
-						Developers
-					</span>
-				</a>
-			</h4>
-		</div>
+	<div class="btn-group d-flex justify-content-between mb-4 mt-2" role="group" aria-label="region_anchors">
+		{% include "components/buttons/anchor_button.html" with btn_text="Asia and Russia" btn_url="#AR" btn_cols="col-2" %}
+		{% include "components/buttons/anchor_button.html" with btn_text="Europe" btn_url="#EU" btn_cols="col-2" %}
+		{% include "components/buttons/anchor_button.html" with btn_text="North America" btn_url="#NA" btn_cols="col-2" %}
+		{% include "components/buttons/anchor_button.html" with btn_text="Southern Hemisphere" btn_url="#SH" btn_cols="col-2" %}
+		{% include "components/buttons/anchor_button.html" with btn_text="Developers" btn_url="#DEV" btn_cols="col-2" %}
 	</div>

@@ -3,6 +3,7 @@ import json
 import time
 import requests
 from lib_const import *
+from lib_helper import *
 from lib_table_select import get_notarised_chains
 from models import coins_row
 
@@ -22,9 +23,7 @@ def parse_coins_repo():
     for item in coins_repo:
         coin = item['coin']
 
-        if coin in TRANSLATE_COINS:
-            logger.warning(f"[parse_coins_repo] Translating {coin} to {TRANSLATE_COINS[coin]}")
-            coin = TRANSLATE_COINS[coin]
+        coin = handle_translate_chains(coin)
 
         coins_data.update({coin:{"coins_info":item}})
         if 'asset' in item:
@@ -89,9 +88,7 @@ def parse_dpow_coins(coins_data):
             if coin == "GleecBTC" and server == "Third_Party":
                 logger.warning(f"[parse_dpow_coins] Translating GleecBTC to GLEEC-OLD")
                 coin = "GLEEC-OLD"
-            elif coin in TRANSLATE_COINS:
-                logger.warning(f"[parse_dpow_coins] Translating {coin} to {TRANSLATE_COINS[coin]}")
-                coin = TRANSLATE_COINS[coin]
+            coin = handle_translate_chains(coin)
 
             logger.info(f"[parse_dpow_coins] Adding {coin} to dpow")
 
@@ -114,11 +111,9 @@ def parse_assetchains(coins_data):
     r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/komodo/dev/src/assetchains.json")
     ac_json = r.json()
     for item in ac_json:
-        coin = item['ac_name']
+        ac_name = item['ac_name']
 
-        if coin in TRANSLATE_COINS:
-            logger.warning(f"[parse_assetchains] Translating {coin} to {TRANSLATE_COINS[coin]}")
-            coin = TRANSLATE_COINS[coin]
+        coin = handle_translate_chains(ac_name)
 
         params = "~/komodo/src/komodod"
         for k,v in item.items():
@@ -133,8 +128,8 @@ def parse_assetchains(coins_data):
         if "coins_info" not in coins_data[coin]:
             coins_data[coin].update({"coins_info":{}})
 
-        coins_data[coin]["coins_info"].update({"cli":'~/komodo/src/komodo-cli -ac_name='+coin})
-        coins_data[coin]["coins_info"].update({"conf_path":'~/.komodo/'+coin+'/'+coin+'.conf'})
+        coins_data[coin]["coins_info"].update({"cli":'~/komodo/src/komodo-cli -ac_name='+ac_name})
+        coins_data[coin]["coins_info"].update({"conf_path":'~/.komodo/'+ac_name+'/'+ac_name+'.conf'})
         coins_data[coin]["coins_info"].update({"launch_params":params})
 
     for coin in OTHER_CLI:
@@ -209,6 +204,8 @@ def parse_electrum_explorer(coins_data):
         try:
             if coin == "COQUICASH":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/COQUI")
+            elif coin == "ARRR":
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/PIRATE")
             elif coin == "WLC21":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/WLC")
             else:

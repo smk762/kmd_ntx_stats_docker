@@ -3,77 +3,59 @@
 {% block content %}
 	<div class="row col-12 mx-auto my-1" style="color: #b9b5b5;">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<div class="card text-center kmd_ui_light3 col-4 px-0 mt-auto shadow-none" style="border:none !important;">
+			<div class="card text-center kmd_ui_light3 col-4 px-0 m-auto shadow-none" style="border:none !important;">
 				<div class="card-body p-0" style="background-color: #101721 !important;">
 					<ul class="list-group">
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 						    Notarised Last 24hrs
-						    <span class="badge p-2" style="font-size: 0.9em;">
-						    	<a href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}">
-						    		{{ 24hr_ltc_count }}<br /> LTC
-						    	</a>
-						    </span>
-						    <span class="badge p-2" style="font-size: 0.9em;">
-						    	<a href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}">
-						    		{{ 24hr_main_count }}<br /> Main
-						    	</a>
-						    </span>
-						    <span class="badge p-2" style="font-size: 0.9em;">
-						    	<a href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}">
-						    		{{ 24hr_third_party_count }}<br /> 3rd Party
-						    	</a>
-						    </span>
-						</div>
-					  </li>
-					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
-					    	Notarised Season
-						    <span class="badge p-2" style="font-size: 0.9em;">
-						    	<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
-						    		{{ season_btc_count }}<br /> LTC
-						    	</a>
-						    </span>
-						    <span class="badge p-2" style="font-size: 0.9em;">
-						    	<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
-						    		{{ season_main_count }}<br /> Main
-						    	</a>
-						    </span>
-						    <span class="badge p-2" style="font-size: 0.9em;">
-						    	<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
-						    		{{ season_third_party_count }}<br /> 3rd Party
-						    	</a>
-						    </span>
-						</div>									    
-					  </li>
-					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
-						    Last Notarisation
-						    <a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">
-							    <span id="last_ntx" class="badge p-2" style="font-size: 0.9em;">
-							    	{{ last_ntx_time }}<br />{{ last_ntx_chain }}
-							    </span>
+							<a href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}">
+						    	{% include "components/badges/stats_badge.html" with stat_val=24hr_ltc_count stat_label="LTC" %}
+						    </a>
+							<a href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}">
+						    	{% include "components/badges/stats_badge.html" with stat_val=24hr_main_count stat_label="Main" %}
+						    </a>
+							<a href="//{{ request.get_host }}/notarised_24hrs/?season={{ season }}">
+						    	{% include "components/badges/stats_badge.html" with stat_val=24hr_third_party_count stat_label="3rd Party" %}
 						    </a>
 						</div>
 					  </li>
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
-					    	Last LTC Notarisation
-						    <a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">
-							  	<span  id="last_ltc_ntx" class="badge p-2" style="font-size: 0.9em;">
-							  			{{ last_ltc_ntx_time }}
-							  	</span>
-						  	</a>
+					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+					    	Notarised Season
+							<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+						    	{% include "components/badges/stats_badge.html" with stat_val=season_btc_count stat_label="LTC" %}
+						    </a>
+							<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+						    	{% include "components/badges/stats_badge.html" with stat_val=season_main_count stat_label="Main" %}
+						    </a>
+							<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+						    	{% include "components/badges/stats_badge.html" with stat_val=season_third_party_count stat_label="3rd Party" %}
+						    </a>
+						</div>									    
+					  </li>
+					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+						    Last Notarisation
+							<a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">
+   						    	{% include "components/badges/stats_badge.html" with stat_val=last_ntx_time stat_label=last_ntx_chain %}
+						    </a>
 						</div>
 					  </li>
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+					    	Last LTC Notarisation
+							<a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">
+   						    	{% include "components/badges/stats_badge.html" with stat_val=last_ltc_ntx_time stat_label="" %}
+						    </a>
+						</div>
+					  </li>
+					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 					    	Region Rank
-							<span  id="last_ltc_ntx" class="badge p-2" style="font-size: 1.5em;">
-			    				<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
-						    		{{ rank }}
-						    	</a>
-						    </span>
+							<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+					    		{% include "components/badges/stats_badge.html" with stat_val=rank stat_label="" %}
+						    </a>
 						</div>
 					  </li>
 					</ul> 							
@@ -81,163 +63,56 @@
 			</div>
 
 			<!-- Social Media Links -->
-        	<div class="card kmd_ui_light3 my-0 mx-auto shadow-none" style="border:none !important;">
-        		<div class="my-auto">
-	        		<div class="row my-0 mx-auto align-items-center">
-	        			<h3 class="col-12">
-	        				{{ notary_name }}
-	        			</h3>
-					</div>
-	        		<div class="row my-0 mx-auto">
-	            		<div class="p-1 m-auto">
-							{% for nn, site_links in nn_social.items %}
-								{% if notary_name == nn and site_links.icon != '' %}
-									<img class="card-img-top auto-width" height='128' src="{{ site_links.icon }}" alt=""  style="border-radius: 50%; margin:0 !important">
-								{% else %}
-									<img class="card-img-top auto-width" height='128' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%; margin:0 !important">
-								{% endif %}
-							{% endfor %}
-						</div>
-					</div>
-	        		<div class="row d-flex justify-content-between align-items-center">
-						<div class="row d-flex justify-content-between align-items-center m-auto" style="font-size: 1.6em;">
-						{% for nn, site_links in nn_social.items %}
-							{% if notary_name == nn %}
-								{% for site, link in site_links.items %}
-									{% if site == 'discord' %}
-										{%  if link != '' %}
-											<a href="https://discordapp.com/users/{{ link }}"><i class="sml-social fab fa-discord m-1 "></i></a>
-										{% else %}
-											<i class="sml-social fab fa-discord m-1 " style="color: #555;"></i>
-										{% endif %}
-										
-									{% elif site == 'email' %}
-										{%  if link != '' %}
-											<a href="{{ link }}"><i class="sml-social far fa-envelope m-1 "></i></a>
-										{% else %}
-											<i class="sml-social far fa-envelope m-1 " style="color: #555;"></i>
-										{% endif %}
-										
-									{% elif site == 'github' %}
-										{%  if link != '' %}
-											<a href="https://github.com/{{ link }}"><i class="sml-social fab fa-github m-1 "></i></a>
-										{% else %}
-											<i class="sml-social fab fa-github m-1 " style="color: #555;"></i>
-										{% endif %}
-
-									{% elif site == 'keybase' %}
-										{%  if link != '' %}
-											<a href="https://keybase.io/{{ link }}"><i class="sml-social fab fa-keybase m-1 "></i></a>
-										{% else %}
-											<i class="sml-social fab fa-keybase m-1 " style="color: #555;"></i>
-										{% endif %}
-
-									{% elif site == 'telegram' %}
-										{%  if link != '' %}
-											<a href="https://t.me/{{ link }}"><i class="sml-social fab fa-telegram-plane m-1 "></i></a>
-										{% else %}
-											<i class="sml-social fab fa-telegram-plane m-1 " style="color: #555;"></i>
-										{% endif %}
-
-									{% elif site == 'twitter' %}
-										{%  if link != '' %}
-											<a href="https://twitter.com/{{ link }}"><i class="sml-social fab fa-twitter m-1 "></i></a>
-										{% else %}
-											<i class="sml-social fab fa-twitter m-1 " style="color: #555;"></i>
-										{% endif %}
-										
-									{% elif site == 'website' %}
-										{%  if link != '' %}
-											<a href="{{ link }}"><i class="sml-social fas fa-desktop m-1 "></i></a>
-										{% else %}
-											<i class="sml-social fas fa-desktop m-1 " style="color: #555;"></i>
-										{% endif %}
-										
-									{% elif site == 'youtube' %}
-										{%  if link != '' %}
-											<a href="https://www.youtube.com/{{ link }}"><i class="sml-social fab fa-youtube m-1 "></i></a>
-										{% else %}
-											<i class="sml-social fab fa-youtube m-1 " style="color: #555;"></i>
-										{% endif %}
-										
-									{% endif %}
-								{% endfor %}
-							{% endif %}
-						{% endfor %}
-						</div>	
-					</div>
-	        		<div class="row my-0 mx-auto align-items-center">
-						<h6 class="col-12">
-							{% if season == "Season_4" %}
-							<a class="sml-social" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season4/elected_nn_social.json">
-								Update
-							</a>
-							{% elif season == "Season_5" %}
-							<a class="sml-social" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season5/elected_nn_social.json">
-								Update
-							</a>
-							{% endif %}
-						</h6>
-					</div>
-				</div>
+        	<div class="card notary_card shadow-none" style="margin-top: 1.5rem;">
+            		{% include "components/cards/notary_profile_card.html" %}
 			</div>
 
 
 			<!-- Mining Summary -->
-			<div class="card text-center kmd_ui_light3 col-4 px-0 mt-auto shadow-none" style="border:none !important;">
+			<div class="card text-center kmd_ui_light3 col-4 px-0 m-auto shadow-none" style="border:none !important;">
 				<div class="card-body p-0" style="background-color: #101721 !important;">
 					<ul class="list-group">
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 						    Mined
-						    <span class="badge p-2" style="font-size: 0.9em;">
-						    	<a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
-						    		{{ mining_summary.mined_last_24hrs|floatformat:-3 }} KMD<br />Last 24hrs
-						    	</a>
-							</span>
-						    <span class="badge p-2" style="font-size: 0.9em;">
-						    	<a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
-						    		{{ mining_summary.sum_value_mined|floatformat:-3 }} KMD<br />Season
-						    	</a>
-							</span>
+						    <a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
+					    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.mined_last_24hrs|floatformat:-3 stat_label="KMD Last 24hrs" %}
+					    	</a>
+						    <a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
+					    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.sum_value_mined|floatformat:-3 stat_label="KMD Season"  %}
+					    	</a>
 						</div>
 					  </li>
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 						    Blocks Mined this Season
-						    <span class="badge p-2" style="font-size: 0.9em;">
-						    	<a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
-						    		{{ mining_summary.blocks_mined }}
-						    	</a>
-							</span>
+						    <a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
+					    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.blocks_mined stat_label="" %}
+					    	</a>
 						</div>
 					  </li>
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 						    Largest Block Mined
-						    <span class="badge p-2" style="font-size: 0.9em;">
-						    	<a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
-						    		{{ mining_summary.max_value_mined|floatformat:-3 }} KMD
-						    	</a>
-							</span>
+						    <a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
+					    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.max_value_mined|floatformat:-3 stat_label="KMD" %}
+					    	</a>
 						</div>
 					  </li>
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					    	<div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 							    Last Mined block
-							    <span class="badge p-2" style="font-size: 0.9em;">
-						    		<a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
-							    		{{ mining_summary.time_since_mined }}
-							    	</a>
-								</span>
+							    <a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
+						    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.time_since_mined stat_label="KMD" %}
+					    		</a>
 							</div>
 					  	</li>
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    	<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					    	<div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 							    Notarisation Score
-							    <span class="badge p-2" style="font-size: 1.5em;">
-		    						<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">{{ season_score|floatformat:-3 }}</a>
-								</span>
+							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+						    		{% include "components/badges/stats_badge.html" with stat_val=season_score|floatformat:-3 stat_label="" %}
+					    		</a>
 							</div>
 					  	</li>
 					</ul> 
@@ -249,11 +124,11 @@
 	<!-- Season Notarisation Stats -->
 	<div class="row my-3">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<div class="card shadow-none">
-				<div class="card-header flex">
-					<h4>{{ notary_name }} {{ season_clean }} Notarisations Summary</h4>
+			<div class="card table_card">
+				<div class="card-header table_card_title flex">
+					{{ notary_name }} {{ season_clean }} Notarisations Summary
 				</div>
-				<div class="card-body">
+				<div class="card-body table_card_body">
 					<table id="ntx_table" class="table table-striped table-bordered">
 						<thead>
 							<tr>
@@ -274,6 +149,10 @@
 					                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
 					                        {% elif item.chain == 'GLEEC-OLD' %}
 					                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/gleec.png" />
+					                        {% elif item.chain == 'TOKEL' %}
+					                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/tkl.png" />
+					                        {% elif item.chain == 'PIRATE' %}
+					                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/arrr.png" />
 					                        {% elif item.chain == 'COQUICASH' %}
 					                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png" />
 					                        {% else %}
@@ -312,10 +191,8 @@
 	<div class="row my-3">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card text-center kmd_ui_light3 col-12 px-0 shadow-none">
-				<div class="card-header d-flex justify-content-between">
-					<div class="my-auto">
-						<h4>{{ notary_name }} {{ season_clean }} Wallet Balances</h4>
-					</div>
+				<div class="card-header graph_card_title flex justify-content-between">
+					{{ notary_name }} {{ season_clean }} Wallet Balances
 					<div>
 					    <span class="badge m-2 p-2 main_server graph_legend">
 					    	MAIN<i class="fa fa-circle ml-2" aria-hidden="true" style="font-size: 1.2em;"></i>
@@ -324,11 +201,11 @@
 					    	3RD PARTY<i class="fa fa-circle ml-2" aria-hidden="true" style="font-size: 1.2em;"></i>
 					    </span>
 					    <span class="badge m-2 p-2 btc_kmd_server graph_legend">
-					    	BTC / KMD<i class="fa fa-circle ml-2" aria-hidden="true" style="font-size: 1.2em;"></i>
+					    	BTC / LTC / KMD<i class="fa fa-circle ml-2" aria-hidden="true" style="font-size: 1.2em;"></i>
 					    </span>
 					</div>
 				</div>
-				<div class="card-body graph_card_body">
+				<div class="card-body">
 					<span id="graph_title"></span>
 				    <canvas id="balances_graph"></canvas> 
 				</div>	
@@ -337,11 +214,11 @@
 	</div>	
 	<div class="row my-3">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<div class="card shadow-none">
-				<div class="card-header flex">
-					<h4>{{ notary_name }} {{ season_clean }} Addresses & Balances</h4>
+			<div class="card table_card">
+				<div class="card-header table_card_title flex">
+					{{ notary_name }} {{ season_clean }} Addresses & Balances
 				</div>
-				<div class="card-body">
+				<div class="card-body table_card_body">
 					<table id="balances_table" class="table table-striped table-bordered">
 						<thead>
 							<tr>
@@ -354,7 +231,7 @@
 						</thead>
 						<tbody>
 							{% for item in notary_balances %}
-								{% if item.coin == "BTC" or item.coin == "LTC" %}
+								{% if item.chain == "BTC" or item.chain == "LTC" %}
 									{% if item.server != "Third_Party" %}
 										<tr>
 											<td data-data="chain" class="px-2 text-left">{{ item.chain }}</td>
@@ -392,7 +269,7 @@
 	        var balTable = $('#balances_table').DataTable({ 
     			deferRender: true,
                 "orderClasses": false,
-    			"paging": true,
+    			"paging": false,
         		order: [[ 3, 'asc' ], [ 0, 'asc' ], [ 1, 'asc' ]],
         		"columnDefs": [
         			{
@@ -477,7 +354,7 @@
         		order: [[ 0, 'asc' ], [ 1, 'asc' ]], 
     			deferRender: true,
                 "orderClasses": false,
-    			"paging": true,
+		        "paging": false,
 	        	"columns": [
 			        { "data": "ntx_chain" },
 			        { "data": "ntx_server" },
@@ -487,7 +364,6 @@
 			        { "data": "ntx_block" },
 			        { "data": "ntx_time" }
 			    ], 
-		        "paging": false,
         		"columnDefs": [
         			{
 			            "data": 'ntx_chain',

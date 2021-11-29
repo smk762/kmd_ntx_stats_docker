@@ -1,0 +1,98 @@
+{% load static %}
+
+        		<div class="my-auto">
+	        		<div class="row my-0 mx-auto align-items-center">
+	        			<h3 class="col-12" style="margin-top: 0.75rem;">
+	        				{{ notary_name }}
+	        			</h3>
+					</div>
+	        		<div class="row my-0 mx-auto">
+	            		<div class="p-1 m-auto">
+							{% for nn, site_links in nn_social.items %}
+								{% if notary_name == nn and site_links.icon != '' %}
+									<img class="card-img-top auto-width" height='128' src="{{ site_links.icon }}" alt=""  style="border-radius: 50%; margin:0 !important">
+								{% else %}
+									<img class="card-img-top auto-width" height='128' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%; margin:0 !important">
+								{% endif %}
+							{% endfor %}
+						</div>
+					</div>
+					<div class="justify-content-md-center" style="font-size: 1.6rem;">
+						{% for nn, site_links in nn_social.items %}
+							{% if notary_name == nn %}
+								{% for site, link in site_links.items %}
+									{% if site == 'discord' %}
+										{%  if link != '' %}
+											<a href="https://discordapp.com/users/{{ link }}"><i class="fab fa-discord mr-2 social-icon"></i></a>
+										{% else %}
+											<i class="fab fa-discord mr-2 social-icon-disabled"></i>
+										{% endif %}
+										
+									{% elif site == 'email' %}
+										{%  if link != '' %}
+											<a href="{{ link }}"><i class="far fa-envelope mr-2 social-icon"></i></a>
+										{% else %}
+											<i class="far fa-envelope mr-2 social-icon-disabled"></i>
+										{% endif %}
+										
+									{% elif site == 'github' %}
+										{%  if link != '' %}
+											<a href="https://github.com/{{ link }}"><i class="fab fa-github mr-2 social-icon"></i></a>
+										{% else %}
+											<i class="fab fa-github mr-2 social-icon-disabled"></i>
+										{% endif %}
+
+									{% elif site == 'keybase' %}
+										{%  if link != '' %}
+											<a href="https://keybase.io/{{ link }}"><i class="fab fa-keybase mr-2 social-icon"></i></a>
+										{% else %}
+											<i class="fab fa-keybase mr-2 social-icon-disabled"></i>
+										{% endif %}
+
+									{% elif site == 'telegram' %}
+										{%  if link != '' %}
+											<a href="https://t.me/{{ link }}"><i class="fab fa-telegram-plane mr-2 social-icon"></i></a>
+										{% else %}
+											<i class="fab fa-telegram-plane mr-2 social-icon-disabled"></i>
+										{% endif %}
+
+									{% elif site == 'twitter' %}
+										{%  if link != '' %}
+											<a href="https://twitter.com/{{ link }}"><i class="fab fa-twitter mr-2 social-icon"></i></a>
+										{% else %}
+											<i class="fab fa-twitter mr-2 social-icon-disabled"></i>
+										{% endif %}
+										
+									{% elif site == 'website' %}
+										{%  if link != '' %}
+											<a href="{{ link }}"><i class="fas fa-desktop mr-2 social-icon"></i></a>
+										{% else %}
+											<i class="fas fa-desktop mr-2 social-icon-disabled"></i>
+										{% endif %}
+										
+									{% elif site == 'youtube' %}
+										{%  if link != '' %}
+											<a href="https://www.youtube.com/{{ link }}"><i class="fab fa-youtube mr-2 social-icon"></i></a>
+										{% else %}
+											<i class="fab fa-youtube mr-2 social-icon-disabled"></i>
+										{% endif %}
+										
+									{% endif %}
+								{% endfor %}
+							{% endif %}
+						{% endfor %}
+					</div>
+	        		<div class="row my-0 mx-auto align-items-center">
+						<h6 class="col-12">
+							{% if season == "Season_4" %}
+							<a class="sml-link" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season4/elected_nn_social.json">
+								Update
+							</a>
+							{% elif season == "Season_5" %}
+							<a class="sml-link" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season5/elected_nn_social.json">
+								Update
+							</a>
+							{% endif %}
+						</h6>
+					</div>
+				</div>

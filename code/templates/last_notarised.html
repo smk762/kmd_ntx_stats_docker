@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-		<div class="card m-auto">
-			<div class="card-header flex">
-				<h2>Last {{ season_clean }} Chain Notarisation</h2>
+	<div class="row col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title flex">
+				Last {{ season_clean }} Chain Notarisation
 			</div>
-			<div class="card-body flex">
+			<div class="card-body table_card_body">
 				<table style="visibility: hidden;" id="last_notarised_tbl" class="table table-striped table-bordered">
 					<thead>
 						<tr>
@@ -24,17 +24,17 @@
 							<td data-data="chain" class="px-4 text-left">
 						  		{{ chain }}
 						  	</td>
-							<td style="font-size: 1.1em" data-data="server" class="px-4">{{ item.server }}</td>
-							<td style="font-size: 1.2em" data-data="block_height" class="px-4">{{ item.block_height }}</td>
-							<td style="font-size: 0.8em" data-data="txid" class="px-4">
+							<td data-data="server" class="px-4">{{ item.server }}</td>
+							<td data-data="block_height" class="px-4">{{ item.block_height }}</td>
+							<td data-data="txid" class="px-4">
   								{{ item.txid }}
 							</td>
-							<td style="font-size: 0.8em" data-data="notaries" class="px-4">
+							<td data-data="notaries" class="px-4">
 								<span class='badge p-0' style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="{{ item.notaries }}">
 									<i class="fas fa-user-friends" style="color:white;"></i>
 								</span>
 							</td>
-							<td style="font-size: 1.2em" data-data="block_time" class="px-4">{{ item.block_time }}</td>
+							<td data-data="block_time" class="px-4">{{ item.block_time }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>
@@ -76,7 +76,7 @@
 				            	} else if (icon == "coquicash") {
 				            		icon = "coqui"
 				            	}
-					            $(nTd).html("<span class='badge p-2 mr-auto' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'><img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.chain+"</a></span>");
+					            $(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'><img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.chain+"</a>");
 					        }
 				        },
 	        			{
@@ -95,7 +95,7 @@
 				            	else {
 				            		color = "#000";	
 				            	}
-					            $(nTd).html("<span class='badge p-2 ' style='background-color:"+color+" !important;'>"+oData.server.replace(/_/g, " ")+"</span>");
+					            $(nTd).html(oData.server.replace(/_/g, " "));
 				        	}
 				        },
 		        		{
@@ -103,11 +103,11 @@
 				            "targets": 2,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            	if (oData.chain == "BTC") {
-					            	$(nTd).html("<span class='badge p-2'><a href='https://www.blockchain.com/btc/block/"+oData.block_height+"'>"+oData.block_height+"</a></span>");
+					            	$(nTd).html("<a href='https://www.blockchain.com/btc/block/"+oData.block_height+"'>"+oData.block_height+"</a>");
 					            } else  if (oData.chain == "LTC") {
-					            	$(nTd).html("<span class='badge p-2'><a href='https://chainz.cryptoid.info/ltc/block.dws?"+oData.block_height+".htm'>"+oData.block_height+"</a></span>");
+					            	$(nTd).html("<a href='https://chainz.cryptoid.info/ltc/block.dws?"+oData.block_height+".htm'>"+oData.block_height+"</a>");
 					            } else {
-					            	$(nTd).html("<span class='badge p-2'><a href='https://komodod.com/b/"+oData.block_height+"'>"+oData.block_height+"</a></span>");
+					            	$(nTd).html("<a href='https://komodod.com/b/"+oData.block_height+"'>"+oData.block_height+"</a>");
 					        	}
 					        }
 				        },
@@ -116,11 +116,11 @@
 				            "targets": 3,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            	if (oData.chain == "BTC") {
-					            	$(nTd).html("<a href='https://www.blockchain.com/btc/tx/"+oData.txid+"'><span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
+					            	$(nTd).html("<a href='https://www.blockchain.com/btc/tx/"+oData.txid+"'><span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
 					            } else  if (oData.chain == "LTC") {
-					            	$(nTd).html("<a href='https://chainz.cryptoid.info/ltc/tx.dws?"+oData.txid+"'><span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
+					            	$(nTd).html("<a href='https://chainz.cryptoid.info/ltc/tx.dws?"+oData.txid+"'><span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
 					            } else {
-				            		$(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'><span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
+				            		$(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'><span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
 				            	}
 					        }
 				        },
@@ -147,7 +147,7 @@
 							    } else {
 							    	timesince = days+" days, "+hours+" hrs"
 							    }
-			            		$(nTd).html("<span class='badge p-2'>"+timesince+"</span>");
+			            		$(nTd).html(timesince);
 					        }
 				        }
 	        		]
