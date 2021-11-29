@@ -5,95 +5,11 @@
     {% include "anchors/regions.html" %}
 	{% for region, info in nn_info.regions_info.items %}
 			<a id="{{region}}" class="section-anchor">
-				<h1 class="text-uppercase kmd_teal">{{ info.name }}</h1>
+				<div class="text-uppercase notary_region_title">{{ info.name }}</div>
 			</a>
 			<div class="row m-1 d-flex justify-content-between">	
             	{% for node in info.nodes %}
-            	<div class="card  kmd_ui_light3 col-2 px-0 mx-1" style="background-color: #111 !important;">
-            		<a href="//{{ request.get_host }}/notary_profile/{{ node }}/?season={{ season }}">
-	            		<div class="p-1 m-auto">
-						{% for nn, site_links in nn_social.items %}
-							{% if node == nn %}
-								{% if site_links.icon != '' %}
-									<img class="card-img-top auto-width" height='96' src="{{ site_links.icon }}" alt="" style="border-radius: 50%;">
-								{% else %}
-									<img class="card-img-top auto-width" height='96' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
-								{% endif %}
-							{% endif %}
-						{% endfor %}
-						</div>
-					</a>	
-					<div class="card-body " style="padding: 1rem; background-color: #11253e !important;">
-						<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
-	            			<a href="//{{ request.get_host }}/notary_profile/{{ node }}/?season={{ season }}">
-	            				{{ node }}
-							</a><br />
-							{% for nn, site_links in nn_social.items %}
-								{% if node == nn %}
-									{% for site, link in site_links.items %}
-										{% if site == 'discord' %}
-											{%  if link != '' %}
-												<a href="https://discordapp.com/users/{{ link }}"><i class="sml-social fab fa-discord mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-discord mr-2" style="color: #555;"></i>
-											{% endif %}
-											
-										{% elif site == 'email' %}
-											{%  if link != '' %}
-												<a href="{{ link }}"><i class="sml-social far fa-envelope mr-2"></i></a>
-											{% else %}
-												<i class="sml-social far fa-envelope mr-2" style="color: #555;"></i>
-											{% endif %}
-											
-										{% elif site == 'github' %}
-											{%  if link != '' %}
-												<a href="https://github.com/{{ link }}"><i class="sml-social fab fa-github mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-github mr-2" style="color: #555;"></i>
-											{% endif %}
-
-										{% elif site == 'keybase' %}
-											{%  if link != '' %}
-												<a href="https://keybase.io/{{ link }}"><i class="sml-social fab fa-keybase mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-keybase mr-2" style="color: #555;"></i>
-											{% endif %}
-
-										{% elif site == 'telegram' %}
-											{%  if link != '' %}
-												<a href="https://t.me/{{ link }}"><i class="sml-social fab fa-telegram-plane mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-telegram-plane mr-2" style="color: #555;"></i>
-											{% endif %}
-
-										{% elif site == 'twitter' %}
-											{%  if link != '' %}
-												<a href="https://twitter.com/{{ link }}"><i class="sml-social fab fa-twitter mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-twitter mr-2" style="color: #555;"></i>
-											{% endif %}
-											
-										{% elif site == 'website' %}
-											{%  if link != '' %}
-												<a href="{{ link }}"><i class="sml-social fas fa-desktop mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fas fa-desktop mr-2" style="color: #555;"></i>
-											{% endif %}
-											
-										{% elif site == 'youtube' %}
-											{%  if link != '' %}
-												<a href="https://www.youtube.com/{{ link }}"><i class="sml-social fab fa-youtube mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-youtube mr-2" style="color: #555;"></i>
-											{% endif %}
-											
-										{% endif %}
-									{% endfor %}
-								{% endif %}
-							{% endfor %}
-						</p>
-					</div>
-				</div>	
+            		{% include "components/cards/notary_card.html" %}
                 {% endfor %}
 			</div>	
 	{% endfor %}

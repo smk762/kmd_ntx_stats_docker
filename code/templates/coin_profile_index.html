@@ -13,112 +13,17 @@
 		</div>
 	</div>
 -->
-	{% for server, coins in server_coins.items %}	
-	<div class="card text-center">	
-		<div class="card-header flex">
-			<a id="{{server}}" class="section-anchor">
-				<h4 class="text-uppercase kmd_teal">{{ server }}</h4>
-			</a>
-		</div>		
-		<div class="card-body" style="background-color: #000 !important;">
-			<div class="row m-1 d-flex justify-content-between">
-            	{% for coin in coins %}
-            	<div class="card  kmd_ui_light3 col-2 px-0 mx-1" style="background-color: #111 !important;">
-            		<a href="//{{ request.get_host }}/coin_profile/{{ coin }}">
-
-	            		<div class="p-2">
-						{% for ticker, site_links in coin_social.items %}
-							{% if ticker == coin %}
-								{% if site_links.icon != '' %}
-									<img class="card-img-top auto-width" height='96' src="{{ site_links.icon }}" alt="{{ coin }} image " style="border-radius: 50%;">
-								{% else %}
-									<img class="card-img-top auto-width" height='96' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
-								{% endif %}
-							{% endif %}
-						{% endfor %}
-						</div>
-					</a>	
-					<div class="card-body">
-						<p class="card-text kmd_ui_light3 text-uppercase" style="font-size: 0.9em; ">
-	            			<a href="//{{ request.get_host }}/coin_profile/{{ coin }}" style="font-size:1.8em; display: block;">
-	            				{{ coin }}
-							</a>
-							{% for ticker, site_links in coin_social.items %}
-								{% if ticker == coin %}
-									{% for site, link in site_links.items %}
-										{% if site == 'discord' %}
-											{%  if link != '' %}
-												<a href="https://discordapp.com/users/{{ link }}"><i class="sml-social fab fa-discord mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-discord mr-2" style="color: #555;"></i>
-											{% endif %}
-
-										{% elif site == 'email' %}
-											{%  if link != '' %}
-												<a href="https://discordapp.com/users/{{ link }}"><i class="sml-social far fa-envelope mr-2"></i></a>
-											{% else %}
-												<i class="sml-social far fa-envelope mr-2" style="color: #555;"></i>
-											{% endif %}
-
-										{% elif site == 'github' %}
-											{%  if link != '' %}
-												<a href="https://github.com/{{ link }}"><i class="sml-social fab fa-github mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-github mr-2" style="color: #555;"></i>
-											{% endif %}
-
-										{% elif site == 'linkedin' %}
-											{%  if link != '' %}
-												<a href="https://github.com/{{ link }}"><i class="sml-social fab fa-linkedin mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-linkedin mr-2" style="color: #555;"></i>
-											{% endif %}
-
-										{% elif site == 'reddit' %}
-											{%  if link != '' %}
-												<a href="https://github.com/{{ link }}"><i class="sml-social fab fab fa-reddit-square mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-reddit-square mr-2" style="color: #555;"></i>
-											{% endif %}
-											
-										{% elif site == 'telegram' %}
-											{%  if link != '' %}
-												<a href="https://t.me/{{ link }}"><i class="sml-social fab fa-telegram-plane mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-telegram-plane mr-2" style="color: #555;"></i>
-											{% endif %}
-											
-										{% elif site == 'twitter' %}
-											{%  if link != '' %}
-												<a href="https://twitter.com/{{ link }}"><i class="sml-social fab fa-twitter mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-twitter mr-2" style="color: #555;"></i>
-											{% endif %}
-											
-										{% elif site == 'youtube' %}
-											{%  if link != '' %}
-												<a href="https://www.youtube.com/{{ link }}"><i class="sml-social fab fa-youtube mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fab fa-youtube mr-2" style="color: #555;"></i>
-											{% endif %}
-											
-										{% elif site == 'website' %}
-											{%  if link != '' %}
-												<a href="https://{{ link }}"><i class="sml-social fas fa-desktop mr-2"></i></a>
-											{% else %}
-												<i class="sml-social fas fa-desktop mr-2" style="color: #555;"></i>
-											{% endif %}									
-										{% endif %}
-									{% endfor %}
-								{% endif %}
-							{% endfor %}
-						</p>
-					</div>
-				</div>	
-                {% endfor %}
-			</div>		
-		</div>		
-	</div>		
+	<h2 class="m-auto kmd_ui_light3">{{ season_clean }} dPoW Coin Profiles</h2>
+    {% include "anchors/servers.html" %}
+	{% for server, coins in server_coins.items %}
+		<a id="{{server}}" class="section-anchor">
+			<div class="text-uppercase notary_server_title">{{ server }}</div>
+		</a>
+		<div class="row m-1 d-flex justify-content-between">
+        	{% for coin in coins %}
+            	{% include "components/cards/coin_card.html" %}
+            {% endfor %}
+        </div>
 	{% endfor %}
 {% endblock %}
 

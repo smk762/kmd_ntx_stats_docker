@@ -1,66 +1,63 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-		<div class="card m-auto">
-			<div class="card-header flex">
-				<h2>{{ page_title }}</h2>
-				<row>
-					<form style="visibility: hidden;" class="d-flex justify-content-between col-12 m-auto" id="select_base_rel">
-						<!-- Dropdown --> 
-						<div class="col-2">
-						</div>
-						<div class="input-group">
-						    <div class="input-group-prepend p-0 col-3" >
-						        <span class="input-group-text col-12" style="color:white; border: solid grey 1px !important;">
-						      	    Base
-						        </span>
-						    </div>
-							<select class="form-control col-2" id='base' name="base" style='width: 160px;'>
-							{% for coin in mm2_coins %}
-								{% if coin == base %}
-							    	<option value='{{ coin }}' selected>
-								    	{{ coin }}
-								    </option> 
-							    {% else %}
-							    	<option value='{{ coin }}'>
-								    	{{ coin }}
-								    </option> 
-							    {% endif %}
-							{% endfor %}
-							</select>
-						</div>
-						<div class="input-group">
-						    <div class="input-group-prepend p-0 col-3" >
-						        <span class="input-group-text col-12" style="color:white; border: solid grey 1px !important;">
-						      	    Rel
-						        </span>
-						    </div>
-							<select class="form-control col-2" id='rel' name="rel" style='width: 160px;'>
-							{% for coin in mm2_coins %}
-								{% if coin == rel %}
-							    	<option value='{{ coin }}' selected>
-								    	{{ coin }}
-							    	</option> 
-							    {% else %}
-							    	<option value='{{ coin }}'>
-								    	{{ coin }}
-							    	</option> 
-							    {% endif %}
-							{% endfor %}
-							</select>
-						</div>
-
-						<button class="append-btn2 col-1" type="submit" style="border: solid grey 1px !important;">
-						    Update
-						</button>
-						<div class="col-2">
-						</div>
-
-					</form>
-				</row>			
+	<div class="row col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title flex">
+				{{ page_title }}
 			</div>			
-			<div class="card-body flex">
+			<div class="card-body table_card_body flex">
+				<form style="visibility: hidden;" class="d-flex justify-content-between col-12 mx-auto my-4" id="select_base_rel">
+					<!-- Dropdown --> 
+					<div class="col-2">
+					</div>
+					<div class="input-group">
+					    <div class="input-group-prepend prepend-label-left p-0 col-3" >
+					        <span class="input-group-text col-12">
+					      	    Base
+					        </span>
+					    </div>
+						<select class="form-control col-2" id='base' name="base" style='width: 160px;'>
+						{% for coin in mm2_coins %}
+							{% if coin == base %}
+						    	<option value='{{ coin }}' selected>
+							    	{{ coin }}
+							    </option> 
+						    {% else %}
+						    	<option value='{{ coin }}'>
+							    	{{ coin }}
+							    </option> 
+						    {% endif %}
+						{% endfor %}
+						</select>
+					</div>
+					<div class="input-group">
+					    <div class="input-group-prepend prepend-label-left p-0 col-3" >
+					        <span class="input-group-text col-12">
+					      	    Rel
+					        </span>
+					    </div>
+						<select class="form-control col-2" id='rel' name="rel" style='width: 160px;'>
+						{% for coin in mm2_coins %}
+							{% if coin == rel %}
+						    	<option value='{{ coin }}' selected>
+							    	{{ coin }}
+						    	</option> 
+						    {% else %}
+						    	<option value='{{ coin }}'>
+							    	{{ coin }}
+						    	</option> 
+						    {% endif %}
+						{% endfor %}
+						</select>
+					</div>
+
+					<button class="btn-dark4" type="submit">
+					    Update
+					</button>
+					<div class="col-2">
+					</div>
+				</form>
 				<h4>Sell {{ base }} for {{ rel }}</h4>
 				<table style="visibility: hidden;" id="bids" class="table table-striped table-bordered">
 					<thead>
@@ -76,7 +73,7 @@
 					<tbody>
 					{% for row in bids %}
 						<tr>
-							<td style="font-size: 1.2em;" data-data="base">
+							<td data-data="base">
 	                        {% if base == 'WLC21' %}
 	                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
 	                        {% elif base == 'GLEEC-OLD' %}
@@ -88,7 +85,7 @@
 	                        {% endif %}
 							{{ base }}
 							</td>
-							<td style="font-size: 1.2em;" data-data="rel">
+							<td data-data="rel">
 	                        {% if rel == 'WLC21' %}
 	                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
 	                        {% elif rel == 'GLEEC-OLD' %}
@@ -100,16 +97,14 @@
 	                        {% endif %}
 							{{ rel }}
 							</td>
-							<td style="font-size: 1.2em;" data-data="price">{{ row.price|floatformat:-8 }}</td>
-							<td style="font-size: 1.2em;" data-data="min_volume">{{ row.min_volume|floatformat:-8 }}</td>
-							<td style="font-size: 1.2em;" data-data="maxvolume">{{ row.maxvolume|floatformat:-8 }}</td>
-							<td style="font-size: 1.2em;" data-data="base_total">{{ row.base_total|floatformat:-8 }}</td>
+							<td data-data="price">{{ row.price|floatformat:-8 }}</td>
+							<td data-data="min_volume">{{ row.min_volume|floatformat:-8 }}</td>
+							<td data-data="maxvolume">{{ row.maxvolume|floatformat:-8 }}</td>
+							<td data-data="base_total">{{ row.base_total|floatformat:-8 }}</td>
 						</tr>
 					{% endfor %}
 					</tbody>
 				</table>
-			</div>		
-			<div class="card-body flex">
 				<h4>Buy {{ base }} with {{ rel }}</h4>
 				<table style="visibility: hidden;" id="asks" class="table table-striped table-bordered">
 					<thead>
@@ -125,7 +120,7 @@
 					<tbody>
 					{% for row in asks %}
 						<tr>
-							<td style="font-size: 1.2em;" data-data="rel">
+							<td data-data="rel">
 	                        {% if rel == 'WLC21' %}
 	                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
 	                        {% elif rel == 'GLEEC-OLD' %}
@@ -137,7 +132,7 @@
 	                        {% endif %}
 							{{ rel }}
 							</td>
-							<td style="font-size: 1.2em;" data-data="base">
+							<td data-data="base">
 	                        {% if base == 'WLC21' %}
 	                            <img height="16px" class='mr-2' src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
 	                        {% elif base == 'GLEEC-OLD' %}
@@ -149,10 +144,10 @@
 	                        {% endif %}
 							{{ base }}
 							</td>
-							<td style="font-size: 1.2em;" data-data="price">{{ row.price|floatformat:-8 }}</td>
-							<td style="font-size: 1.2em;" data-data="min_volume">{{ row.min_volume|floatformat:-8 }}</td>
-							<td style="font-size: 1.2em;" data-data="maxvolume">{{ row.maxvolume|floatformat:-8 }}</td>
-							<td style="font-size: 1.2em;" data-data="rel_total">{{ row.rel_total|floatformat:-8 }}</td>
+							<td data-data="price">{{ row.price|floatformat:-8 }}</td>
+							<td data-data="min_volume">{{ row.min_volume|floatformat:-8 }}</td>
+							<td data-data="maxvolume">{{ row.maxvolume|floatformat:-8 }}</td>
+							<td data-data="rel_total">{{ row.rel_total|floatformat:-8 }}</td>
 						</tr>
 					{% endfor %}
 					</tbody>

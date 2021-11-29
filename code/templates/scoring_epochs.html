@@ -2,12 +2,12 @@
 {% load static %}
 {% block content %}
 {% load mathfilters %}
-	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-		<div class="card m-auto">
-			<div class="card-header flex">
-				<h2>{{ season_clean }} Scoring Epochs</h2>
+	<div class="row col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title flex">
+				{{ season_clean }} Scoring Epochs
 			</div>
-			<div class="card-body flex">
+			<div class="card-body table_card_body flex">
 				<table id="epochs_tbl" class="table table-striped table-bordered">
 					<thead>
 						<tr>
@@ -25,36 +25,36 @@
 					<tbody>
 					{% for row in epochs %}
 						<tr>
-							<td style="font-size: 1.1em;" data-data="season">
+							<td data-data="season">
 								{{ row.season }}
 							</td>
-							<td style="font-size: 1em;" data-data="server">
+							<td data-data="server">
 								{{ row.server }}
 							</td>
-							<td style="font-size: 1em;" data-data="epoch">
+							<td data-data="epoch">
 								{{ row.epoch }}
 							</td>
-							<td style="font-size: 1em;" class='py-2' data-data="epoch_start">
-								<span style="font-size: 0.9em;">{{ row.start_event }}
-								{{ row.epoch_start|time:"G:i:s" }} {{ row.epoch_start|date:"M d Y" }}</span>
+							<td class='py-2' data-data="epoch_start">
+								{{ row.start_event }}
+								{{ row.epoch_start|time:"G:i:s" }} {{ row.epoch_start|date:"M d Y" }}
 							</td>
-							<td style="font-size: 1em;" class='py-2' data-data="epoch_end">
-								<span style="font-size: 0.9em;">{{ row.end_event }}
-								{{ row.epoch_end|time:"G:i:s" }} {{ row.epoch_end|date:"M d Y" }}</span>
+							<td class='py-2' data-data="epoch_end">
+								{{ row.end_event }}
+								{{ row.epoch_end|time:"G:i:s" }} {{ row.epoch_end|date:"M d Y" }}
 							</td>
-							<td style="font-size: 1em;" data-data="duration">
+							<td data-data="duration">
 								{{ row.duration|div:86400|floatformat:0  }}
 							</td>
-							<td style="font-size: 1em;" data-data="num_chains">
+							<td data-data="num_chains">
 								{{ row.num_epoch_chains }}
 							</td>
 							</td>
-							<td style="font-size: 0.9em;" class='py-2' data-data="epoch_chains">
-								<span class='badge p-0' style="border: solid #5a5a5a 1px; border-radius: 50%; background-color: #000;" data-toggle="tooltip" title="{{ row.epoch_chains }}">
+							<td class='py-2' data-data="epoch_chains">
+								<span class='p-0' data-toggle="tooltip" title="{{ row.epoch_chains }}">
 									<i class="fas fa-network-wired" style="color:white;"></i>
 								</span>									
 							</td>
-							<td style="font-size: 1.2em;" data-data="score_per_ntx">
+							<td data-data="score_per_ntx">
 									{{ row.score_per_ntx }}
 							</td>
 						</tr>
@@ -62,8 +62,8 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="card-footer flex">
-				<h6><i>Note: Score for KMD to LTC/BTC notarisations are 0.0325 each</i></h6>
+			<div class="card-footer table_card_footer flex">
+				<i>Note: Score for KMD to LTC/BTC notarisations are 0.0325 each</i>
 			</div>
 		</div>
 	</div>

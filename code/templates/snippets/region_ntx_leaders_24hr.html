@@ -7,43 +7,17 @@
 					{% for region, region_data in daily_stats_sorted.items %}
 						{% for item in region_data %}
 							{% if item.rank == 1 %}
-						    <div class="badge" style="width:16%; background-color: #26456B !important;">
-							    	{% if region == 'AR' %}
-										<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-											<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table/?season={{ season }}">Asia and Russia</a>
-										</span>
-										{% elif region == 'EU' %}
-										<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-											<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table/?season={{ season }}">European Union</a>
-										</span>
-										{% elif region == 'NA' %}
-										<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-											<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table/?season={{ season }}">North America</a>
-										</span>
-										{% elif region == 'SH' %}
-										<span class='badge my-1 p-2 mx-auto' style="font-size: 1.2em;">
-											<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table/?season={{ season }}">Southern Hemisphere</a>
-										</span>
-										{% elif region == 'DEV' %}
-										<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-											<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/#{{ region }}_table/?season={{ season }}">Development</a>
-										</span>
-									{% endif %}
-						    	<div class="">
-									{% for nn, site_links in nn_social.items %}
-										{% if item.notary == nn %}
-											{% if site_links.icon != '' %}
-												<img class="card-img-top auto-width" height='96' src="{{ site_links.icon }}" alt="" style="border-radius: 50%;">
-											{% else %}
-												<img class="card-img-top auto-width" height='96' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
-											{% endif %}
-										{% endif %}
-									{% endfor %}
-						    	</div>
-						    	<div class="">
-						    		<a class="badge p-2 my-1 mx-auto" style="font-size: 1.3em" href="http://{{ request.get_host }}/notary_profile/{{ item.notary }}/?season={{ season }}"> {{ item.notary }} <br /><span style="font-size: 1.3em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
-						    	</div>
-						    </div>
+						    	{% if region == 'AR' %}
+									{% include "snippets/region_leader_scores.html" with region_name="Asia and Russia" alt_text=item.notary %}
+								{% elif region == 'EU' %}
+									{% include "snippets/region_leader_scores.html" with region_name="European Union" alt_text=item.notary %}
+								{% elif region == 'NA' %}
+									{% include "snippets/region_leader_scores.html" with region_name="North America" alt_text=item.notary %}
+								{% elif region == 'SH' %}
+									{% include "snippets/region_leader_scores.html" with region_name="Southern Hemisphere" alt_text=item.notary %}
+								{% elif region == 'DEV' %}
+									{% include "snippets/region_leader_scores.html" with region_name="Development" alt_text=item.notary %}
+								{% endif %}	
 							{% endif %}
 						{% endfor %}
 					{% endfor %}

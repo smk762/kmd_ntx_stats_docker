@@ -1,0 +1,11 @@
+
+{% load static %}
+            		<a href="//{{ request.get_host }}/{{ profile_page }}/{{ profile_name }}/?season={{ season }}">
+	            		<div class="p-1 m-auto">
+	            			{% if alt_text == "NINJA" %}
+	            			<img class="notary_card_img auto-width" height='96' src="/static/img/coins/icon/ninja.png" alt="{{ alt_text }}">
+	            			{% else %}
+							<img class="notary_card_img auto-width" height='96' src="{{ img_src }}" alt="{{ alt_text }}">
+	            			{% endif %}
+						</div>
+					</a>	

@@ -58,14 +58,14 @@
 			            "data": 'block_height',
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge p-2'><a href='https://komodod.com/b/"+oData.block_height+"'>"+oData.block_height+"</a></span>");
+				            $(nTd).html("<a href='https://komodod.com/b/"+oData.block_height+"'>"+oData.block_height+"</a></span>");
 				        }
 			        },
         			{
 			            "data": 'name',
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge p-2'><a href='https://komodod.com/a/"+oData.address+"'>"+oData.name+"</a></span>");
+				            $(nTd).html("<a href='https://komodod.com/a/"+oData.address+"'>"+oData.name+"</a></span>");
 				        }
 			        },
         			{
@@ -77,7 +77,7 @@
 			            "data": 'value',
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge p-2'><a href='https://komodod.com/t/"+oData.txid+"'>"+oData.value+"</a></span>");
+				            $(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.value+"</a></span>");
 				        }
 			        },
         			{
@@ -104,7 +104,7 @@
 						    } else {
 						    	timesince = days+" days, "+hours+" hrs"
 						    }
-				            $(nTd).html("<span class='badge p-2'>"+timesince+"</span>");
+				            $(nTd).html(timesince);
 				        }
 			        }
 			    ],

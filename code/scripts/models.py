@@ -24,6 +24,7 @@ class addresses_row():
 
     def update(self):
         self.chain = handle_dual_server_chains(self.chain, self.server)
+        self.chain = handle_translate_chains(self.chain)
         row_data = (self.season, self.server, self.notary,
                     self.notary_id, self.address, self.pubkey,
                     self.chain)
@@ -64,6 +65,7 @@ class balance_row():
     def update(self):
         self.update_time = int(time.time())
         self.chain = handle_dual_server_chains(self.chain, self.server)
+        self.chain = handle_translate_chains(self.chain)
         row_data = (self.season, self.server, self.notary,
             self.address, self.chain, self.balance,
             self.update_time)
@@ -100,6 +102,7 @@ class coins_row():
         return True
 
     def update(self):
+        self.chain = handle_translate_chains(self.chain)
         self.chain = handle_translate_chains(self.chain)
         row_data = (self.chain, self.coins_info, self.electrums,
             self.electrums_ssl, self.explorers, self.dpow,
@@ -253,6 +256,7 @@ class coin_social_row():
         return True
 
     def update(self):
+        self.chain = handle_translate_chains(self.chain)
 
         row_data = (self.chain, self.discord, self.email, self.explorers,
                     self.github, self.icon, self.linkedin, self.mining_pools,
@@ -290,6 +294,7 @@ class funding_row():
         return True
 
     def update(self):
+        self.chain = handle_translate_chains(self.chain)
         row_data = (self.chain, self.txid, self.vout, self.amount,
                     self.block_hash, self.block_height, self.block_time,
                     self.category, self.fee, self.address, self.notary,
@@ -319,6 +324,7 @@ class notarised_chain_daily_row():
         return True
 
     def update(self):
+        self.chain = handle_translate_chains(self.chain)
         self.chain = handle_dual_server_chains(self.chain, self.server)
         row_data = (self.season, self.server, self.chain,
                     self.ntx_count, self.notarised_date)
@@ -447,6 +453,7 @@ class notarised_chain_season_row():
         return True
 
     def update(self):
+        self.chain = handle_translate_chains(self.chain)
         row_data = (self.chain, self.ntx_count, self.block_height,
             self.kmd_ntx_blockhash, self.kmd_ntx_txid, self.kmd_ntx_blocktime,
             self.opret, self.ac_ntx_blockhash, self.ac_ntx_height,
@@ -486,6 +493,7 @@ class last_notarised_row():
         return True
 
     def update(self):
+        self.chain = handle_translate_chains(self.chain)
         self.chain = handle_dual_server_chains(self.chain, self.server)
         row_data = (self.notary, self.chain, self.txid, self.block_height,
             self.block_time, self.season, self.server)
@@ -843,6 +851,7 @@ class notarised_row():
         self.notaries.sort()
         self.notary_addresses.sort()
         self.chain = handle_dual_server_chains(self.chain, self.server)
+        self.chain = handle_translate_chains(self.chain)
         season_server_epoch = validate_season_server_epoch(
             self.season, self.server, self.epoch,
             self.notary_addresses, self.block_time, 
@@ -909,6 +918,7 @@ class ntx_tenure_row():
 
     def update(self):
         # TODO: Validation start / end within season window
+        self.chain = handle_translate_chains(self.chain)
 
         if self.chain in ["KMD" ,"LTC", "BTC"]:
             self.server = self.chain

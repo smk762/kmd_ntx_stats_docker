@@ -1,18 +1,20 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-		<div class="card m-auto">
-			<div class="card-header flex">
-				<h2>Komodo Active User Rewards</h2>
+	<div class="row col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title flex">
+				Komodo Active User Rewards
+			</div>
+			<div class="card-body table_card_body">
 				<form>
-				  <div class="input-group mb-3" style="min-width: 50em">
-				    <div class="input-group-prepend p-0" >
+				  <div class="input-group mb-3" >
+				    <div class="input-group-prepend prepend-label-left p-0">
 				      <span class="input-group-text prepend-span">
 				      	Enter KMD Address
 				      </span>
 				    </div>
-				    <input type="text" class="form-control m-auto" id="address_id" name="address" placeholder="{{ address }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 1em; text-align: center; min-width: 44em">
+				    <input type="text" class="form-control m-auto" id="address_id" name="address" placeholder="{{ address }}">
 				    <div class="input-group-append p-0">
 						<button class="append-btn">
 						    Show Rewards
@@ -20,10 +22,7 @@
 				    </div>
 				  </div>
 				</form>
-			</div>
 			{% if kmd_rewards_rows %}
-			<div class="card-body flex">
-
 				<table id="opret_table" class="table table-striped table-bordered">
 					<thead>
 						<tr>
@@ -37,17 +36,17 @@
 					<tbody>
 						{% for item in kmd_rewards_rows %}
 							<tr>
-								<td style="font-size: 1.2em" data-data="block_height">{{ item.block_height }}</td>
-								<td style="font-size: 1.2em" data-data="utxo_value">{{ item.utxo_value }}</td>
-								<td style="font-size: 1.2em" data-data="reward">{{ item.kmd_rewards }}</td>
-								<td style="font-size: 1.2em" data-data="utxo_age">{{ item.utxo_age }}</td>
-								<td style="font-size: 0.9em" data-data="txid">{{ item.txid }}</td>
+								<td data-data="block_height">{{ item.block_height }}</td>
+								<td data-data="utxo_value">{{ item.utxo_value }}</td>
+								<td data-data="reward">{{ item.kmd_rewards }}</td>
+								<td data-data="utxo_age">{{ item.utxo_age }}</td>
+								<td data-data="txid">{{ item.txid }}</td>
 							</tr>
 						{% endfor %}
 					</tbody>
 				</table>
 			</div>
-			<div class="card-footer flex">
+			<div class="card-footer table_card_footer flex">
 				<h6><b>Address:</b> <a href='https://komodod.com/a/{{ address }}'>{{ address }}</a></h6>
 				<h6><b>Balance:</b> {{ kmd_balance }}</h6>
 				<h6><b>UTXOs eligible:</b> {{ eligible_utxo_count }}/{{ utxo_count }}</h6>
@@ -83,21 +82,21 @@
 			            "data": "block_height",
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge p-2'><a href='https://komodod.com/b/"+oData.block_height+"'>"+oData.block_height+"</a></span>");
+				            $(nTd).html("<a href='https://komodod.com/b/"+oData.block_height+"'>"+oData.block_height+"</a>");
 				        }
 			        },
         			{
 			            "data": "utxo_value",
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge p-2'>"+oData.utxo_value+"</span>");
+				            $(nTd).html(oData.utxo_value);
 				        }
 			        },
         			{
 			            "data": "reward",
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge p-2'>"+oData.reward+"</span>");
+				            $(nTd).html(oData.reward);
 				        }
 			        },
         			{
@@ -118,14 +117,14 @@
 						    } else {
 						    	timesince = days+" days, "+hours+" hrs"
 						    }
-		            		$(nTd).html("<span class='badge p-2' style='font-size: 0.8em;'>"+timesince+"</span>");
+		            		$(nTd).html(timesince);
 				        }
 			        },
         			{
 			            "data": 'txid',
 			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'><span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
+			            	$(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'><span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
 				        }
 			        }
         		]

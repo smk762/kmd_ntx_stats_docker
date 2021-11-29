@@ -3,26 +3,26 @@
 {% block content %}
 {{ outputs }}
 	{% if raw_tx %}
-	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-		<div class="card m-auto">
-			<div class="card-header flex">
-				<h2 style="min-width: 36em;">{{ page_title }}</h2>
+	<div class="row col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title flex">
+				{{ page_title }}
 			</div>
-			<div class="card-footer flex">
+			<div class="card-body table_card_body">
 				<div class="m-auto p-auto">
 				    <div class="input-group m-auto ">
-					    <div class="input-group-prepend p-0 text-left">
-					        <span class="input-group-text" style="border: none;">
+					    <div class="input-group-prepend prepend-label-left p-0 text-left">
+					        <span class="input-group-text">
 				        		{{ chain }} Raw TX
 							</span>
 					    </div>
 					    <div class="col-10 params-field" style="max-width: 85% !important;">
-					    	<div class="my-2 mx-auto text-left" id="raw_tx" style="font-size: 1.4em;">
+					    	<div class="my-2 mx-auto text-left" id="raw_tx">
 					    		{{ raw_tx }}
 					    	</div>
 						</div>
 					    <div class="input-group-append p-0">
-							<button class="append-btn" data-clipboard-target="#raw_tx" style="border: solid 1px grey; line-height: 1em;">
+							<button class="append-btn" data-clipboard-target="#raw_tx">
 							    <i class="cil-copy"></i>
 							</button>
 					    </div>
@@ -101,14 +101,16 @@
 	</div>
 
 	{% elif not utxos and not selected_utxos %}
-	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-		<div class="card m-auto">
-			<div class="card-header flex">
-				<h2 style="min-width: 36em;">{{ page_title }}</h2>
+	<div class="row col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title flex">
+				{{ page_title }}
+			</div>
+			<div class="card-body table_card_body">
 				<form>
 					<div class="input-group mb-3 col-12" id="">
 					    <div class="input-group-prepend p-0 col-1" >
-					        <span class="input-group-text col-12" style="height: 100%; color:white; border: solid grey 1px !important;">
+					        <span class="input-group-text prepend-label-left col-12">
 					      	    Coin
 					        </span>
 					    </div>
@@ -130,13 +132,13 @@
 						</div>
 
 					    <div class="input-group-prepend">
-					        <span class="input-group-text" style="color:white; border: solid grey 1px !important; line-height: 1em;">
+					        <span class="input-group-text prepend-label-left">
 					      	    Address
 					        </span>
 					    </div>
-					    <input type="text" class="form-control m-auto col-8 m-2" id="address_id" name="address" placeholder="{{ address }}"  style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 14em">	
+					    <input type="text" class="form-control m-auto col-8 m-2" id="address_id" name="address" placeholder="{{ address }}">
 					    <div class="input-group-append p-0">
-							<button class="append-btn2" style="line-height: 1em; border: solid grey 1px !important;">
+							<button class="append-btn2">
 							    Get UTXOs
 							</button>
 					    </div>							
@@ -146,142 +148,140 @@
 		</div>
 	</div>
 	{% else %}
-	<div class="row my-3">
-		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<div class="card shadow-none">
-				<div class="card-header flex">
-					<h4>{{ utxos|length }} {{ address }} {{ chain }} UTXOs</h4>
-				</div>
-				<div class="card-body">
-					<form>
-						<table style="visibility: hidden;" id="utxo_table" class="table table-striped table-bordered">
-							<thead>
+	<div class="row col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title flex">
+				{{ utxos|length }} {{ address }} {{ chain }} UTXOs
+			</div>
+			<div class="card-body table_card_body">
+				<form>
+					<table style="visibility: hidden;" id="utxo_table" class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th data-data="txid">TXID</th>
+								<th data-data="vout">VOUT</th>
+								<th data-data="amount" id="amount">Amount</th>
+								<th data-data="rewards" id="rewards">Rewards</th>
+								<th data-data="confirmations">Confirmations</th>
+								<th data-data="scriptPubKey">scriptPubKey</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in utxos %}
 								<tr>
-									<th data-data="txid">TXID</th>
-									<th data-data="vout">VOUT</th>
-									<th data-data="amount" id="amount">Amount</th>
-									<th data-data="rewards" id="rewards">Rewards</th>
-									<th data-data="confirmations">Confirmations</th>
-									<th data-data="scriptPubKey">scriptPubKey</th>
+									<td data-data="txid" style="">
+											{{ item.txid }}
+									</td>
+									<td data-data="vout">
+											{{ item.vout }}
+									</td>
+									<td data-data="amount">
+											{{ item.amount }}
+									</td>
+									<td data-data="rewards">
+											{{ item.rewards }}
+									</td>
+									<td data-data="confirmations">
+											{{ item.confirmations }}
+									</td>
+									<td style="font-size: 0.1em" data-data="scriptPubKey">
+											{{ item.scriptPubKey }}
+									</td>
 								</tr>
-							</thead>
-							<tbody>
-								{% for item in utxos %}
-									<tr>
-										<td data-data="txid" style="">
-												{{ item.txid }}
-										</td>
-										<td data-data="vout">
-												{{ item.vout }}
-										</td>
-										<td data-data="amount">
-												{{ item.amount }}
-										</td>
-										<td data-data="rewards">
-												{{ item.rewards }}
-										</td>
-										<td data-data="confirmations">
-												{{ item.confirmations }}
-										</td>
-										<td style="font-size: 0.1em" data-data="scriptPubKey">
-												{{ item.scriptPubKey }}
-										</td>
-									</tr>
-								{% endfor %}
-							</tbody>
-						    <tfoot>
-						        <tr>
-							        <td>
-								    </td>
-							        <td>
-								    </td>
-							        <td>
-								    </td>
-							        <td>
-								    </td>
-							        <td>
-							        	<span id="sum_selected"></span>
-								    </td>
-							        <td>
-								    </td>
-						        </tr>
-						    </tfoot>
-						</table>
-						<div class="row">
-							<div class="input-group mb-3 col-3" id="">
-							</div>
-							<div class="input-group mb-3 col-3" id="">
-							</div>
+							{% endfor %}
+						</tbody>
+					    <tfoot>
+					        <tr>
+						        <td>
+							    </td>
+						        <td>
+							    </td>
+						        <td>
+							    </td>
+						        <td>
+							    </td>
+						        <td>
+						        	<span id="sum_selected"></span>
+							    </td>
+						        <td>
+							    </td>
+					        </tr>
+					    </tfoot>
+					</table>
+					<div class="row">
+						<div class="input-group mb-3 col-3" id="">
 						</div>
-						<div id="output_addresses">
-							<div class="row" id="address_row_0">
-								<div class="input-group mb-3 col-9">
-								    <div class="input-group-prepend p-0" >
-								        <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;">
-								      	    To {{ chain }} Address <i class="fas fa-check-circle m-0 pl-2" style="font-size: 0.8em;"></i>
-								        </span>
-								    </div>
-								    <input type="text" class="form-control m-auto" id="address_id" name="to_address" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 34em">
-								</div>
-								<div class="input-group mb-3 col-3">
-								    <div class="input-group-prepend p-0" >
-								        <span class="input-group-text" style="color:white; border: solid grey 1px !important; line-height: 1em;">
-								      	    Amount
-								        </span>
-								    </div>
-								    <input type="text" onchange="sanitize_outputs()" class="form-control m-0 " id="output_amount_0" name="output_amount" value="0" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center;" value="">
-								    <div class="input-group-append p-0  ">
-										<button class="append-btn" type="button" onclick="spendMax('#output_amount_0')" style="line-height: 1em; border: solid grey 1px !important;">
-										    Max
-										</button>
-								    </div>
-								</div>
-							</div>
+						<div class="input-group mb-3 col-3" id="">
 						</div>
-						<div class="row">
-							<div class="input-group mb-3 col-3 ml-auto" id="">
-								<button class="std-btn col-12" type="button"  id="addAddressRow_btn" onclick="addAddress_Row('#output_addresses')" style="line-height: 1em; border: solid grey 1px !important;">
-								    Add Output Address
-								</button>
-							</div>
-							<div class="input-group mb-3 col-3" id="">
-							    <div class="input-group-prepend p-0" >
-							        <span class="input-group-text" style="color:white; border: solid grey 1px !important; line-height: 1em;">
-							      	    Locktime
+					</div>
+					<div id="output_addresses">
+						<div class="row" id="address_row_0">
+							<div class="input-group mb-3 col-9">
+							    <div class="input-group-prepend prepend-label-left p-0" >
+							        <span class="input-group-text">
+							      	    To {{ chain }} Address <i class="fas fa-check-circle m-0 pl-2"></i>
 							        </span>
 							    </div>
-							    <input type="text" class="form-control m-0 " id="locktime" name="locktime" value="{{ locktime }}" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center;" value="">
+							    <input type="text" class="form-control m-auto" id="address_id" name="to_address">
 							</div>
-							<div class="input-group mb-3 col-3" id="" value="0">
-							    <div class="input-group-prepend p-0" >
-							        <span class="input-group-text" style="color:white; border: solid grey 1px !important; line-height: 1em;">
-							      	    Expiry Height
+							<div class="input-group mb-3 col-3">
+							    <div class="input-group-prepend prepend-label-left p-0">
+							        <span class="input-group-text">
+							      	    Amount
 							        </span>
 							    </div>
-							    <input type="text" class="form-control m-0 " id="expiry_height" name="expiry_height" value="0" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center;" value="">
-							</div>
-							<div class="input-group mb-3 col-3" id="">
-								<div class="status-label col-12 p-2" style="line-height: 1.2em; border: solid grey 1px !important;">
-								     <span class="col-6 ml-auto">Fees: <span id="fee_val">0</span> {{ chain }}</span>
-								</div>
+							    <input type="text" onchange="sanitize_outputs()" class="form-control m-0 " id="output_amount_0" name="output_amount" value="0" value="">
+							    <div class="input-group-append p-0  ">
+									<button class="append-btn" type="button" onclick="spendMax('#output_amount_0')">
+									    Max
+									</button>
+							    </div>
 							</div>
 						</div>
-						<div class="row">
-							<div class="input-group mb-3 col-9" id="">
-								<input type="hidden" name="inputs" id="hidden_inputs" /> 
-								<input type="hidden" name="coin" id="coin" value="{{ chain }}" /> 
-								<button class="std-btn col-12 p-2" type="submit" style="line-height: 1em; border: solid grey 1px !important;">
-								    Create {{ chain }} Raw Transaction (Testing only!)
-								</button>
-							</div>
-							<div class="input-group mb-3 col-3" id="">
-								<div class="status-label col-12 p-2" style="line-height: 1.2em; border: solid grey 1px !important;">
-								     <span class="col-6 ml-auto">TX Total: <span id="total_val">0</span> {{ chain }}</span>
-								</div>
-							</div>		
+					</div>
+					<div class="row">
+						<div class="input-group mb-3 col-3 ml-auto" id="">
+							<button class="std-btn col-12" type="button"  id="addAddressRow_btn" onclick="addAddress_Row('#output_addresses')">
+							    Add Output Address
+							</button>
 						</div>
-					</form>
-				</div>
+						<div class="input-group mb-3 col-3" id="">
+						    <div class="input-group-prepend prepend-label-left p-0" >
+						        <span class="input-group-text">
+						      	    Locktime
+						        </span>
+						    </div>
+						    <input type="text" class="form-control m-0" id="locktime" name="locktime" value="{{ locktime }}" value="">
+						</div>
+						<div class="input-group mb-3 col-3" id="" value="0">
+						    <div class="input-group-prepend prepend-label-left p-0" >
+						        <span class="input-group-text">
+						      	    Expiry Height
+						        </span>
+						    </div>
+						    <input type="text" class="form-control m-0" id="expiry_height" name="expiry_height" value="0">
+						</div>
+						<div class="input-group mb-3 col-3" id="">
+							<div class="status-label col-12 p-2">
+							     <span class="col-6 ml-auto">Fees: <span id="fee_val">0</span> {{ chain }}</span>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="input-group mb-3 col-9" id="">
+							<input type="hidden" name="inputs" id="hidden_inputs" /> 
+							<input type="hidden" name="coin" id="coin" value="{{ chain }}" /> 
+							<button class="std-btn col-12 p-2" type="submit">
+							    Create {{ chain }} Raw Transaction (Testing only!)
+							</button>
+						</div>
+						<div class="input-group mb-3 col-3" id="">
+							<div class="status-label col-12 p-2">
+							     <span class="col-6 ml-auto">TX Total: <span id="total_val">0</span> {{ chain }}</span>
+							</div>
+						</div>		
+					</div>
+				</form>
 			</div>	
 		</div>
 	</div>
@@ -303,8 +303,8 @@
 			out_id = 'output_amount_'+num_rows
 			$(id).append('<div class="row" id="'+out_row+'"> \
 								<div class="input-group mb-3 col-9"> \
-								    <div class="input-group-prepend p-0" > \
-								        <span class="input-group-text  " style="color:white; border: solid grey 1px !important; line-height: 1em;"> \
+								    <div class="input-group-prepend prepend-label-left p-0" > \
+								        <span class="input-group-text " style="color:white; border: solid grey 1px !important; line-height: 1em;"> \
 								      	    To {{ chain }} Address \
 								        	<i onclick="remove_node(\'#'+out_row+'\')" class="fas fa-times-circle pl-2 m-0" style="font-size: 0.8em;"></i> \
 								        </span> \
@@ -312,7 +312,7 @@
 								    <input type="text" class="form-control m-auto" id="address_id" name="to_address" style="border: solid grey 1px !important; font-size: 1em; line-height: 0.7em; text-align: center; min-width: 34em"> \
 								</div> \
 								<div class="input-group mb-3 col-3"> \
-								    <div class="input-group-prepend p-0" > \
+								    <div class="input-group-prepend prepend-label-left p-0" > \
 								        <span class="input-group-text" style="color:white; border: solid grey 1px !important; line-height: 1em;"> \
 								      	    Amount \
 								        </span> \
@@ -469,10 +469,6 @@
 				    });
 				},
 	        });
-
-
-
-
 
 		    $('#utxo_table tbody').on( 'click', 'tr', function () {
 		        $(this).toggleClass('selected');

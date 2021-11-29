@@ -1,174 +1,78 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row mt-2">
+	<div class="row col-12 mx-auto my-1" style="color: #b9b5b5;">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<div class="card text-center kmd_ui_light3 col-4 px-0 mt-auto shadow-none" style="border:none !important;">
-				<ul class="list-group">
-				    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-				        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
-						    Notarisations in the Last 24hrs
-						    <span class="badge p-2 " style="font-size: 1.1em;">
-						    	{{ chain_ntx_summary.num_chain_ntx_24hr }}
-						    </span>
-						</div>
-				  	</li>
-				 	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-				        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
-					    	Notarisations This Season
-						    <span class="badge p-2 " style="font-size: 1.1em;">
-						    	{{ chain_ntx_summary.num_chain_ntx_season }}
-						    </span>
-						</div>									    
-				  	</li>
-				  	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-				        <div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
-						    Time Since Last Notarisation
-						    <span class="badge p-2 " style="font-size: 1.1em;">
-						    	<a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">{{ chain_ntx_summary.time_since_ntx }}</a>
-						    </span>
-						</div>
-				  	</li>
-				</ul> 
-			</div>
-        	<div class="card kmd_ui_light3 my-0 mx-auto shadow-none" style="border:none !important; background-color: #101721 !important;">
-        		<div class="my-auto">
-	        		<div class="my-0 mx-auto align-items-center">
-	    				<h2 class="col-12">
-	    					{{ chain }}
-	    				</h2>						
-					</div>
-	        		<div class="row my-0 mx-auto">
-	            		<div class="p-1 m-auto">
-							{% for coin, site_links in coin_social.items %}
-								{% if chain == coin and site_links.icon != '' %}
-									<img class="card-img-top auto-width" height='108' src="{{ site_links.icon }}" alt="{{ chain }} image here" style="border-radius: 50%; margin:0 !important">
-								{% else %}
-									<img class="card-img-top auto-width" height='108' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%; margin:0 !important">
-								{% endif %}
-							{% endfor %}
-						</div>			
-					</div>
-	        		<div class="row d-flex justify-content-between align-items-center">
-						<div class="row d-flex justify-content-between align-items-center m-auto" style="font-size: 1.6em;">
-						{% for coin, site_links in coin_social.items %}
-							{% if chain == coin %}
-								{% for site, link in site_links.items %}
-									{% if site == 'discord' %}
-										{%  if link != '' %}
-											<a href="https://discordapp.com/users/{{ link }}"><i class="sml-social m-1 fab fa-discord"></i></a>
-										{% else %}
-											<i class="sml-social m-1 fab fa-discord" style="color: #555;"></i>
-										{% endif %}
-
-									{% elif site == 'email' %}
-										{%  if link != '' %}
-											<a href="https://discordapp.com/users/{{ link }}"><i class="sml-social m-1 far fa-envelope"></i></a>
-										{% else %}
-											<i class="sml-social far fa-envelope m-1" style="color: #555;"></i>
-										{% endif %}
-
-									{% elif site == 'github' %}
-										{%  if link != '' %}
-											<a href="https://github.com/{{ link }}"><i class="sml-social fab fa-github m-1"></i></a>
-										{% else %}
-											<i class="sml-social fab fa-github m-1" style="color: #555;"></i>
-										{% endif %}
-
-									{% elif site == 'linkedin' %}
-										{%  if link != '' %}
-											<a href="https://github.com/{{ link }}"><i class="sml-social fab fa-linkedin m-1"></i></a>
-										{% else %}
-											<i class="sml-social fab fa-linkedin m-1" style="color: #555;"></i>
-										{% endif %}
-
-									{% elif site == 'reddit' %}
-										{%  if link != '' %}
-											<a href="https://github.com/{{ link }}"><i class="sml-social fab fab fa-reddit-square m-1"></i></a>
-										{% else %}
-											<i class="sml-social fab fa-reddit-square m-1" style="color: #555;"></i>
-										{% endif %}
-										
-									{% elif site == 'telegram' %}
-										{%  if link != '' %}
-											<a href="https://t.me/{{ link }}"><i class="sml-social fab fa-telegram-plane "></i></a>
-										{% else %}
-											<i class="sml-social fab fa-telegram-plane" style="color: #555;"></i>
-										{% endif %}
-										
-									{% elif site == 'twitter' %}
-										{%  if link != '' %}
-											<a href="https://twitter.com/{{ link }}"><i class="sml-social fab fa-twitter m-1"></i></a>
-										{% else %}
-											<i class="sml-social fab fa-twitter m-1" style="color: #555;"></i>
-										{% endif %}
-										
-									{% elif site == 'youtube' %}
-										{%  if link != '' %}
-											<a href="https://www.youtube.com/{{ link }}"><i class="sml-social fab fa-youtube m-1"></i></a>
-										{% else %}
-											<i class="sml-social fab fa-youtube m-1" style="color: #555;"></i>
-										{% endif %}
-										
-									{% elif site == 'website' %}
-										{%  if link != '' %}
-											<a href="https://{{ link }}"><i class="sml-social fas fa-desktop m-1"></i></a>
-										{% else %}
-											<i class="sml-social fas fa-desktop m-1" style="color: #555;"></i>
-										{% endif %}									
-									{% endif %}
-								{% endfor %}
-							{% endif %}
-						{% endfor %}
-						</div>
-					</div>
-	        		<div class="row my-0 mx-auto align-items-center">
-						<h6 class="col-12">
-							{% if season == "Season_4" %}
-							<a class="sml-social" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season4/coin_social.json">
-								Update
-							</a>
-							{% elif season == "Season_5" %}
-							<a class="sml-social" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season5/coin_social.json">
-								Update
-							</a>
-							{% endif %}
-						</h6>
-					</div>
-				</div>
-			</div>
-			<div class="card text-center kmd_ui_light1 col-4 px-0 mt-auto shadow-none" style="border:none !important;">
-				<div class="card-body  p-0" style="background-color: #101721 !important;">
+			<div class="card text-center kmd_ui_light3 col-4 px-0 m-auto shadow-none" style="border:none !important;">
+				<div class="card-body p-0" style="background-color: #101721 !important;">
 					<ul class="list-group">
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-							<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+							    Notarisations in the Last 24hrs
+								<a href="//{{ request.get_host }}/api/table/notarised_24hrs/?season={{ season }}&chain={{ chain }}">
+   					    		{% include "components/badges/stats_badge.html" with stat_val=chain_ntx_summary.num_chain_ntx_24hr stat_label="" %}
+   					    		</a>
+							</div>
+					  	</li>
+					 	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+						    	Notarisations This Season
+								<a href="//{{ request.get_host }}/api/info/notarisation_txid_list/?season={{ season }}&server={{ server }}&chain={{ chain }}">
+	   					    		{% include "components/badges/stats_badge.html" with stat_val=chain_ntx_summary.num_chain_ntx_season stat_label="" %}
+	   					    	</a>
+							</div>									    
+					  	</li>
+					  	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+							    Time Since Last Notarisation
+							    <a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">
+   					    			{% include "components/badges/stats_badge.html" with stat_val=chain_ntx_summary.time_since_ntx stat_label="" %}
+   					    		</a>
+							</div>
+					  	</li>
+					</ul> 
+				</div>
+			</div>
+
+			<!-- Social Media Links -->
+        	<div class="card coin_card shadow-none" style="margin-top: 1.5rem;">
+            		{% include "components/cards/coin_profile_card.html" %}
+			</div>
+
+			<div class="card text-center kmd_ui_light3 col-4 px-0 m-auto shadow-none" style="border:none !important;">
+				<div class="card-body p-0" style="background-color: #101721 !important;">
+					<ul class="list-group">
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 								{% if chain != 'KMD' %}
 							    	Last Notarisation Block (KMD)
-								    <span class="badge p-2 " style="font-size: 1.1em;">
-								    	<a href='https://komodod.com/b/{{ chain_ntx_summary.last_ntx_block }}'>{{ chain_ntx_summary.last_ntx_block }}</a>
-								    </span>
+
+
+								    <a href='https://komodod.com/b/{{ chain_ntx_summary.last_ntx_block }}'>
+					    				{% include "components/badges/stats_badge.html" with stat_val=chain_ntx_summary.last_ntx_block stat_label="" %}
+					    			</a>
+
 							    {% else %}
 							    	Last Notarisation Block (LTC)
-								    <span class="badge p-2 " style="font-size: 1.1em;">
-								    	<a href='https://chainz.cryptoid.info/ltc/block.dws?{{ chain_ntx_summary.last_ntx_block }}'>{{ chain_ntx_summary.last_ntx_block }}</a>
-								    </span>
+								    <a href='https://chainz.cryptoid.info/ltc/block.dws?{{ chain_ntx_summary.last_ntx_block }}'>
+					    				{% include "components/badges/stats_badge.html" with stat_val=chain_ntx_summary.last_ntx_block stat_label="" %}
+					    			</a>
 							    {% endif %}
 							</div>
 					    </li>
+
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-							<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 							    Last Notarisation Block ({{ chain }})
-							    <span class="badge p-2 " style="font-size: 1.1em;">
-							    	<a href='{{ coins_data.explorers.0 }}block-index/{{ chain_ntx_summary.last_ntx_ac_block }}'>{{ chain_ntx_summary.last_ntx_ac_block }}</a>
-							    </span>
+						    	<a href='{{ coins_data.explorers.0 }}block-index/{{ chain_ntx_summary.last_ntx_ac_block }}'>
+				    				{% include "components/badges/stats_badge.html" with stat_val=chain_ntx_summary.last_ntx_ac_block stat_label="" %}
+						    	</a>
 							</div>
 					    </li>
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-							<div class="p-2 kmd_blue_bg col-12 d-flex justify-content-between align-items-center" style="text-transform:none; border-radius: 0.25rem; border: solid 1px #5a5a5a !important;">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 							    Lag
-							    <span class="badge p-2 " style="font-size: 1.1em;">
-							    	{{ chain_ntx_summary.ntx_lag }}
-							    </span>
+							    {% include "components/badges/stats_badge.html" with stat_val=chain_ntx_summary.ntx_lag stat_label="" %}
 							</div>
 					    </li>
 					</ul> 
@@ -176,65 +80,39 @@
 			</div>
 		</div>
 	</div>	
+
+
 	<div class="row mx-auto" style="color: #b9b5b5;">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card text-center kmd_ui_light3" style="border:none !important; background-color: #101721 !important; box-shadow: none; margin-top:0 !important;">
 		    	<h2>{{ season_clean }} Top Region Notarisation Scores</h2>
 			    <div class="d-flex justify-content-between align-items-center">
 				    {% for region, data in top_coin_notarisers.items %}
-					    <div class="leader-badge">
-					    	{% if region == 'AR' %}
-								<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-									<a href="http://{{ request.get_host }}/ntx_scoreboard/?season={{ season }}#{{ region }}_table">Asia and Russia</a>
-								</span>
-							{% elif region == 'EU' %}
-								<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-									<a href="http://{{ request.get_host }}/ntx_scoreboard/?season={{ season }}#{{ region }}_table">European Union</a>
-								</span>
-							{% elif region == 'NA' %}
-								<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-									<a href="http://{{ request.get_host }}/ntx_scoreboard/?season={{ season }}#{{ region }}_table">North America</a>
-								</span>
-							{% elif region == 'SH' %}
-								<span class='badge my-1 p-2 mx-auto' style="font-size: 1.2em;">
-									<a href="http://{{ request.get_host }}/ntx_scoreboard/?season={{ season }}#{{ region }}_table">Southern Hemisphere</a>
-								</span>
-							{% elif region == 'DEV' %}
-								<span class='badge my-1 p-2 mx-auto' style="font-size: 1.3em;">
-									<a href="http://{{ request.get_host }}/ntx_scoreboard_24hrs/?season={{ season }}#{{ region }}_table">Development</a>
-								</span>
-							{% endif %}	
-
-					    	<div class="">
-								{% if data.top_notary_icon != '' %}
-									<img class="card-img-top auto-width" height='96' src="{{ data.top_notary_icon }}" alt="" style="border-radius: 50%;">
-								{% else %}
-									<img class="card-img-top auto-width" height='96' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%;">
-								{% endif %}									    		
-					    	</div>
-					    	<div class="">
-					    		<a class="badge my-1 p-2 mx-auto" style="font-size: 1.3em"  href="http://{{ request.get_host }}/notary_profile/{{ data.top_notary }}/?season={{ season }}">
-					    			{{ data.top_notary }}<br />
-					    			<span style="font-size: 1.2em; line-height: 1.3em;">
-					    				{{ data.top_ntx_count }}
-					    			</span>
-					    			<br /> Notarisations
-					    		</a>
-					    	</div>
-					    </div>
+				    	{% if region == 'AR' %}
+							{% include "snippets/region_leader.html" with region_name="Asia and Russia" alt_text=data.top_notary %}
+						{% elif region == 'EU' %}
+							{% include "snippets/region_leader.html" with region_name="European Union" alt_text=data.top_notary %}
+						{% elif region == 'NA' %}
+							{% include "snippets/region_leader.html" with region_name="North America" alt_text=data.top_notary %}
+						{% elif region == 'SH' %}
+							{% include "snippets/region_leader.html" with region_name="Southern Hemisphere" alt_text=data.top_notary %}
+						{% elif region == 'DEV' %}
+							{% include "snippets/region_leader.html" with region_name="Development" alt_text=data.top_notary %}
+						{% endif %}	
 					{% endfor %}
 				</div>
 			</div>
 		</div>
 	</div>
+
 	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-		<div class="input-group mb-1 ">
-		    <div class="input-group-prepend p-0 col-2  text-center">
-		        <span class="input-group-text col-12 " style="border: none; color: #b9b5b5;">
+		<div class="input-group mb-2">
+		    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+		        <span class="input-group-text col-12 m-auto">
 		        	Launch Params
 				</span>
 		    </div>
-		    <input type="text" class="form-control col-10 " style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.launch_params }}" value="{{ coins_data.coins_info.launch_params }}" readonly id="{{ chain }}_params">
+		    <input type="text" class="form-control col-10 " style=" font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.launch_params }}" value="{{ coins_data.coins_info.launch_params }}" readonly id="{{ chain }}_params">
 		    <div class="input-group-append p-0">
 				<button class="append-btn" data-clipboard-target="#{{ chain }}_params" style="line-height: 1em;">
 				    <i class="cil-copy"></i>
@@ -242,13 +120,13 @@
 		    </div>
 		</div>
 
-		<div class="input-group mb-1 ">
-		    <div class="input-group-prepend p-0 col-2  text-center">
-		        <span class="input-group-text col-12 " style="border: none; color: #b9b5b5;">
+		<div class="input-group mb-2">
+		    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+		        <span class="input-group-text col-12 m-auto">
 		        	CLI
 				</span>
 		    </div>
-		    <input type="text" class="form-control col-10 " style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.cli }}" value="{{ coins_data.coins_info.cli }}" readonly id="{{ chain }}_cli">
+		    <input type="text" class="form-control col-10 " style="font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.cli }}" value="{{ coins_data.coins_info.cli }}" readonly id="{{ chain }}_cli">
 		    <div class="input-group-append p-0">
 				<button class="append-btn" data-clipboard-target="#{{ chain }}_cli" style="line-height: 1em;">
 				    <i class="cil-copy"></i>
@@ -256,13 +134,13 @@
 		    </div>
 		</div>
 
-		<div class="input-group mb-1 ">
-		    <div class="input-group-prepend p-0 col-2  text-center">
-		        <span class="input-group-text col-12" style="border: none; color: #b9b5b5;">
+		<div class="input-group mb-2">
+		    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+		        <span class="input-group-text col-12 m-auto">
 		        	Config
 				</span>
 		    </div>
-		    <input type="text" class="form-control col-10" style="border: solid grey 1px !important; font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.conf_path }}" value="{{ coins_data.coins_info.conf_path }}" readonly id="{{ chain }}_conf">
+		    <input type="text" class="form-control col-10" style="font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.conf_path }}" value="{{ coins_data.coins_info.conf_path }}" readonly id="{{ chain }}_conf">
 		    <div class="input-group-append p-0">
 				<button class="append-btn" data-clipboard-target="#{{ chain }}_conf" style="line-height: 1em;">
 				    <i class="cil-copy"></i>
@@ -270,9 +148,9 @@
 		    </div>
 		</div>
 		{% if coins_data.explorers|length > 0 %}
-			<div class="input-group mb-1">
-			    <div class="input-group-prepend p-0 col-2  text-center">
-			        <span class="input-group-text col-12 " style="border: none; color: #b9b5b5;">
+			<div class="input-group mb-2">
+		    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+		        <span class="input-group-text col-12 m-auto">
 			        	Explorers
 					</span>
 			    </div>
@@ -286,9 +164,9 @@
 			</div>
 		{% endif %}
 		{% if coins_data.electrums|length > 0 %}
-			<div class="input-group mb-1">
-			    <div class="input-group-prepend p-0 col-2  text-center">
-			        <span class="input-group-text col-12" style="border: none; color: #b9b5b5;">
+			<div class="input-group mb-2">
+			    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+			        <span class="input-group-text col-12 m-auto">
 			        	Electrums
 					</span>
 			    </div>
@@ -302,9 +180,9 @@
 			</div>
 		{% endif %}
 		{% if coins_data.electrums_ssl|length > 0 %}
-			<div class="input-group mb-1">
-			    <div class="input-group-prepend p-0 col-2 text-center">
-			        <span class="input-group-text col-12 " style="border: none; color: #b9b5b5;">
+			<div class="input-group mb-2">
+			    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+			        <span class="input-group-text col-12 m-auto">
 			        	Electrums (SSL)
 					</span>
 			    </div>
@@ -353,41 +231,31 @@
 				</div>
 				<div class="card-body">
 					<span id="graph_title"></span>
-				    <canvas id="myChartBar"></canvas> 
+				    <canvas id="balances_graph"></canvas> 
 				</div>	
 			</div>	
 		</div>	
 	</div>	
-	<div class="row my-3">
-		<div class="card-deck d-flex justify-content-between col-12 m-auto">
-			<div class="card">
-				<div class="card-header flex">
-					<h4>{{ season_clean }} {{ chain }} Addresses & Balances</h4>
-				</div>
-				<div class="card-body">
-					<table id="balances_table" class="table table-striped table-bordered">
-						<thead>
-							<tr>
-								<th data-data="notary">Notary</th>
-								<th data-data="address">Address</th>
-								<th data-data="balance">Balance</th>
-								<th data-data="server">Server</th>
-								<th data-data="update">Since Updated</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for item in chain_balances %}
-								{% if chain == "BTC" or chain == "LTC" %}
-									{% if item.server != "Third_Party" %}
-										<tr>
-											<td data-data="notary" class="px-2 text-left">{{ item.notary }}</td>
-											<td data-data="address">{{ item.address }}</td>
-											<td data-data="balance">{{ item.balance|floatformat:-4 }}</td>
-											<td data-data="server">{{ item.server }}</td>
-											<td data-data="update">{{ item.update_time }}</td>
-										</tr>
-									{% endif %}
-								{% else %}
+	<div class="row col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title flex">
+				{{ season_clean }} {{ chain }} Addresses & Balances
+			</div>
+			<div class="card-body table_card_body">
+				<table id="balances_table" class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th data-data="notary">Notary</th>
+							<th data-data="address">Address</th>
+							<th data-data="balance">Balance</th>
+							<th data-data="server">Server</th>
+							<th data-data="update">Since Updated</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in chain_balances %}
+							{% if chain == "BTC" or chain == "LTC" %}
+								{% if item.server != "Third_Party" %}
 									<tr>
 										<td data-data="notary" class="px-2 text-left">{{ item.notary }}</td>
 										<td data-data="address">{{ item.address }}</td>
@@ -396,11 +264,19 @@
 										<td data-data="update">{{ item.update_time }}</td>
 									</tr>
 								{% endif %}
-							{% endfor %}
-						</tbody>
-					</table>
-				</div>
-			</div>	
+							{% else %}
+								<tr>
+									<td data-data="notary" class="px-2 text-left">{{ item.notary }}</td>
+									<td data-data="address">{{ item.address }}</td>
+									<td data-data="balance">{{ item.balance|floatformat:-4 }}</td>
+									<td data-data="server">{{ item.server }}</td>
+									<td data-data="update">{{ item.update_time }}</td>
+								</tr>
+							{% endif %}
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
     <!-- jquery -->
@@ -423,21 +299,21 @@
 			            "data": "notary",
 		                "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"/?season={{ season }}'>"+oData.notary+"</a></span>");
+				            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"/?season={{ season }}'>"+oData.notary+"</a>");
 				        }
 		            },
         			{
 			            "data": "address",
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'><a href='"+explorers['{{ chain }}'][0]+'address/'+oData.address+"'>"+oData.address+"</a></span>");
+				            $(nTd).html("<a href='"+explorers['{{ chain }}'][0]+'address/'+oData.address+"'>"+oData.address+"</a>");
 				        }
 			        },
         			{
 			            "data": "balance",
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<span class='badge p-2' style='font-size: 0.9em;'>"+oData.balance+"</a></span>");
+				            $(nTd).html(oData.balance);
 				        }
 			        },
         			{
@@ -456,7 +332,7 @@
 			            	else {
 			            		color = "#000";	
 			            	}
-				            $(nTd).html("<span class='badge p-2' style='background-color:"+color+" !important;'>"+oData.server+"</span>");
+				            $(nTd).html(oData.server);
 			        	}
 			        },
         			{
@@ -478,7 +354,7 @@
 						    } else {
 						    	timesince = days+" days, "+hours+" hrs"
 						    }
-		            		$(nTd).html("<span class='badge p-2' style='font-size: 0.8em;'>"+timesince+"</span>");
+		            		$(nTd).html(timesince);
 				        }
 			        }
         		]
@@ -490,7 +366,7 @@
 	      success: function(data) { 
 	      	//document.getElementById('graph_title').innerHTML = data.chartLabel;
 	        //drawLineGraph(data, 'myChartline'); 
-	        drawBarGraph(data['results'], 'myChartBar'); 
+	        drawBarGraph(data['results'], 'balances_graph'); 
 	        console.log("drawing"); 
 	      }, 
 	      error: function(error_data) { 
