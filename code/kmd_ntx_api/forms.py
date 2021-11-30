@@ -125,7 +125,7 @@ class MakerbotForm(forms.Form):
     price_url = forms.CharField(
         label="Price API",
         required=True,
-        initial="http://price.cipig.net:1313/api/v2/tickers?expire_at=600"
+        initial="https://prices.cipig.net:1717/api/v2/tickers?expire_at=600"
         )
     
     bot_refresh_rate =  forms.IntegerField(
