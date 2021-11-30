@@ -372,83 +372,93 @@ def makerbot_conf_view(request):
     }
 
     if request.GET: 
-        form = MakerbotForm(request.GET)
-        if request.GET['base'] == request.GET['rel']:
-            messages.error(request, 'Sell and Buy coins need to be different')
-        else:
-            form_resp = {
-                 f"{request.GET['base']}/{request.GET['rel']}": {
-                    "base": request.GET['base'],
-                    "rel": request.GET['rel'],
-                    "min_volume": {request.GET['min_trade_type']:request.GET['min_trade']},
-                    "max_volume": {request.GET['max_trade_type']:request.GET['max_trade']},
-                    "spread": str(1+float(request.GET['spread'])/100),
-                    "base_confs": int(request.GET['base_confs']),
-                    "base_nota": request.GET['base_nota'] == "True",
-                    "rel_confs": int(request.GET['rel_confs']),
-                    "rel_nota": request.GET['rel_nota'] == "True",
-                    "enable": request.GET['enable'] == "True",
-                    "price_elapsed_validity": int(request.GET['price_elipsed_validity']),
-                    "check_last_bidirectional_trade_thresh_hold": request.GET['check_last_bidirectional_trade_thresh_hold'] == "True"
-                }
-
-            }
-            if request.GET['min_trade_type'] == 'pct':
-                form_resp[f"{request.GET['base']}/{request.GET['rel']}"].update({
-                    "min_volume": {request.GET['min_trade_type']:float(request.GET['min_trade'])/100},
-                })
-            if request.GET['max_trade_type'] == 'pct':
-                form_resp[f"{request.GET['base']}/{request.GET['rel']}"].update({
-                    "max_volume": {request.GET['max_trade_type']:float(request.GET['max_trade'])/100},
-                })
+        try:
+            form = MakerbotForm(request.GET)
             context.update({
-                "bot_refresh_rate":request.GET['bot_refresh_rate'],
-                "price_url":request.GET['price_url']
-            })   
-
-            if request.GET['create_bidirectional_config'] == "True":
-                form_resp.update({
-                     f"{request.GET['rel']}/{request.GET['base']}": {
-                        "base": request.GET['rel'],
-                        "rel": request.GET['base'],
+                "form": form
+            })
+            if request.GET['base'] == request.GET['rel']:
+                messages.error(request, 'Sell and Buy coins need to be different')
+            else:
+                form_resp = {
+                     f"{request.GET['base']}/{request.GET['rel']}": {
+                        "base": request.GET['base'],
+                        "rel": request.GET['rel'],
                         "min_volume": {request.GET['min_trade_type']:request.GET['min_trade']},
                         "max_volume": {request.GET['max_trade_type']:request.GET['max_trade']},
                         "spread": str(1+float(request.GET['spread'])/100),
-                        "base_confs": int(request.GET['rel_confs']),
-                        "base_nota": request.GET['rel_nota'] == "True",
-                        "rel_confs": int(request.GET['base_confs']),
-                        "rel_nota": request.GET['base_nota'] == "True",
+                        "base_confs": int(request.GET['base_confs']),
+                        "base_nota": request.GET['base_nota'] == "True",
+                        "rel_confs": int(request.GET['rel_confs']),
+                        "rel_nota": request.GET['rel_nota'] == "True",
                         "enable": request.GET['enable'] == "True",
                         "price_elapsed_validity": int(request.GET['price_elipsed_validity']),
                         "check_last_bidirectional_trade_thresh_hold": request.GET['check_last_bidirectional_trade_thresh_hold'] == "True"
                     }
-                })
+
+                }
                 if request.GET['min_trade_type'] == 'pct':
-                    form_resp[f"{request.GET['rel']}/{request.GET['base']}"].update({
+                    form_resp[f"{request.GET['base']}/{request.GET['rel']}"].update({
                         "min_volume": {request.GET['min_trade_type']:float(request.GET['min_trade'])/100},
                     })
                 if request.GET['max_trade_type'] == 'pct':
-                    form_resp[f"{request.GET['rel']}/{request.GET['base']}"].update({
+                    form_resp[f"{request.GET['base']}/{request.GET['rel']}"].update({
                         "max_volume": {request.GET['max_trade_type']:float(request.GET['max_trade'])/100},
                     })
+                context.update({
+                    "bot_refresh_rate":request.GET['bot_refresh_rate'],
+                    "price_url":request.GET['price_url']
+                })   
 
-            try:
-                if request.GET['add_to_existing_config'] == "True":
-                    if len(request.GET['existing_config']) > 0:
-                        existing_cfg = json.loads(request.GET['existing_config'].replace("\'", "\"").replace("True", "true").replace("False", "false"))
-                        form_resp.update(existing_cfg)
-            except Exception as e:
-                messages.error(request, 'e')
-            print(form_resp)
-            context.update({
-                "form_resp":form_resp
-            })
+                if request.GET['create_bidirectional_config'] == "True":
+                    form_resp.update({
+                         f"{request.GET['rel']}/{request.GET['base']}": {
+                            "base": request.GET['rel'],
+                            "rel": request.GET['base'],
+                            "min_volume": {request.GET['min_trade_type']:request.GET['min_trade']},
+                            "max_volume": {request.GET['max_trade_type']:request.GET['max_trade']},
+                            "spread": str(1+float(request.GET['spread'])/100),
+                            "base_confs": int(request.GET['rel_confs']),
+                            "base_nota": request.GET['rel_nota'] == "True",
+                            "rel_confs": int(request.GET['base_confs']),
+                            "rel_nota": request.GET['base_nota'] == "True",
+                            "enable": request.GET['enable'] == "True",
+                            "price_elapsed_validity": int(request.GET['price_elipsed_validity']),
+                            "check_last_bidirectional_trade_thresh_hold": request.GET['check_last_bidirectional_trade_thresh_hold'] == "True"
+                        }
+                    })
+                    if request.GET['min_trade_type'] == 'pct':
+                        form_resp[f"{request.GET['rel']}/{request.GET['base']}"].update({
+                            "min_volume": {request.GET['min_trade_type']:float(request.GET['min_trade'])/100},
+                        })
+                    if request.GET['max_trade_type'] == 'pct':
+                        form_resp[f"{request.GET['rel']}/{request.GET['base']}"].update({
+                            "max_volume": {request.GET['max_trade_type']:float(request.GET['max_trade'])/100},
+                        })
+
+                try:
+                    if request.GET['add_to_existing_config'] == "True":
+                        if len(request.GET['existing_config']) > 0:
+                            existing_cfg = json.loads(request.GET['existing_config'].replace("\'", "\"").replace("True", "true").replace("False", "false"))
+                            form_resp.update(existing_cfg)
+                except Exception as e:
+                    messages.error(request, 'e')
+                    print(e)
+                print(form_resp)
+                context.update({
+                    "form_resp":form_resp
+                })
+            print("rendering with formdata")
+            return render(request, 'form_components/makerbot_conf.html', context)
+        except Exception as e:
+            print(e)
         
-    else:
-       form = MakerbotForm() 
+    form = MakerbotForm() 
     context.update({
-        "form":form
+        "form": form
     })
-
+    print("rendering without formdata")
     return render(request, 'form_components/makerbot_conf.html', context)
+
+    
 
