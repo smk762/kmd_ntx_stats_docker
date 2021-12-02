@@ -11,8 +11,8 @@
 						<div class="col-2">
 						</div>
 						<div class="input-group">
-						    <div class="input-group-prepend p-0 col-3" >
-						        <span class="input-group-text col-12" style="color:white; border: solid grey 1px !important;">
+						    <div class="input-group-prepend prepend-label-left p-0 col-3" >
+						        <span class="input-group-text col-12">
 						      	    Taker
 						        </span>
 						    </div>
@@ -31,8 +31,8 @@
 							</select>
 						</div>
 						<div class="input-group">
-						    <div class="input-group-prepend p-0 col-3" >
-						        <span class="input-group-text col-12" style="color:white; border: solid grey 1px !important;">
+						    <div class="input-group-prepend prepend-label-left p-0 col-3" >
+						        <span class="input-group-text col-12">
 						      	    Maker
 						        </span>
 						    </div>
@@ -51,9 +51,7 @@
 							</select>
 						</div>
 
-						<button class="append-btn2 col-1" type="submit" style="border: solid grey 1px !important;">
-						    Update
-						</button>
+						<input type="submit" class='btn-dark-4 btn sm-2' value="Update">
 						<div class="col-2">
 						</div>
 
@@ -126,7 +124,7 @@
 			            	} else if (icon == "coquicash") {
 			            		icon = "coqui"
 			            	}
-				            $(nTd).html("<span class='badge p-2 mr-auto' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/coin_profile/"+oData.taker_coin+"/?season={{ season }}'><img height='16px' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.taker_amount+" "+oData.taker_coin+"</a></span>");
+				            $(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.taker_coin+"/?season={{ season }}'><img height='16px' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.taker_amount+" "+oData.taker_coin+"</a>");
 				        }
 			        },
         			{
@@ -141,7 +139,7 @@
 			            	} else if (icon == "coquicash") {
 			            		icon = "coqui"
 			            	}
-				            $(nTd).html("<span class='badge p-2 mr-auto' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/coin_profile/"+oData.maker_coin+"/?season={{ season }}'><img height='16px' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.maker_amount+" "+oData.maker_coin+"</a></span>");
+				            $(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.maker_coin+"/?season={{ season }}'><img height='16px' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.maker_amount+" "+oData.maker_coin+"</a>");
 				        }
 			        },
         			{
@@ -213,7 +211,7 @@
 			            	ts = oData.timestamp*1000
 			            	dt = new Date(ts).toLocaleString("en-US")
 
-				            $(nTd).html("<span class='badge p-2'>"+dt+"</span>");
+				            $(nTd).html(dt);
 				        }
 			        }
 			    ],

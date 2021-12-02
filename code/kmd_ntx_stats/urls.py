@@ -4,14 +4,14 @@ from rest_framework import routers
 from kmd_ntx_api import views_api
 from kmd_ntx_api import api_tools
 from kmd_ntx_api import api_graph
-from kmd_ntx_api import api_stats
+
+from kmd_ntx_stats.urls_atomicdex import frontend_atomicdex_urls, api_atomicdex_urls
+
 from kmd_ntx_stats.urls_source import source_router
 from kmd_ntx_stats.urls_status import api_status_urls
-from kmd_ntx_stats.urls_stats import api_stats_urls, frontend_stats_urls
 from kmd_ntx_stats.urls_graph import api_graph_urls
 from kmd_ntx_stats.urls_info import api_info_urls
 from kmd_ntx_stats.urls_docs import doc_urls
-from kmd_ntx_stats.urls_mm2 import frontend_mm2_urls, api_mm2_urls
 from kmd_ntx_stats.urls_table import api_table_urls
 from kmd_ntx_stats.urls_community import frontend_community_urls
 from kmd_ntx_stats.urls_wallet import api_wallet_urls
@@ -72,17 +72,16 @@ urlpatterns = [
 
 ]
 
+urlpatterns += frontend_atomicdex_urls
+urlpatterns += api_atomicdex_urls
+
 urlpatterns += frontend_page_urls
 urlpatterns += frontend_tool_urls
 urlpatterns += api_graph_urls
 urlpatterns += api_info_urls
 urlpatterns += api_status_urls
-urlpatterns += api_stats_urls
-urlpatterns += frontend_stats_urls
 urlpatterns += api_table_urls
 urlpatterns += api_tool_urls
 urlpatterns += api_wallet_urls
 urlpatterns += doc_urls
-urlpatterns += api_mm2_urls
-urlpatterns += frontend_mm2_urls
 urlpatterns += frontend_community_urls

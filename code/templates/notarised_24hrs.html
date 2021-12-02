@@ -22,11 +22,11 @@
 					<tbody>
 					{% for row in notarised_24hrs %}
 						<tr>
-							<td style="font-size: 1em;" data-data="chain" class="px-2 text-left">{{ row.chain }}</td>
-							<td style="font-size: 1.2em;" data-data="block_height">{{ row.block_height }}</td>
-							<td style="font-size: 1.2em;" data-data="ac_ntx_height">{{ row.ac_ntx_height }}</td>
-							<td style="font-size: 0.8em;" data-data="txid">{{ row.txid }}</td>
-							<td style="font-size: 0.8em" data-data="notaries">
+							<td data-data="chain" class="px-2 text-left">{{ row.chain }}</td>
+							<td data-data="block_height">{{ row.block_height }}</td>
+							<td data-data="ac_ntx_height">{{ row.ac_ntx_height }}</td>
+							<td data-data="txid">{{ row.txid }}</td>
+							<td data-data="notaries">
 								<span class='badge p-0' style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="{{ row.notaries }}">
 									<i class="fa fa-users" style="color:white;"></i>
 								</span>
@@ -34,7 +34,7 @@
 							<td data-data="opret">
 								{{ row.opret }}
 							</td>
-							<td style="font-size: 1.2em;" data-data="block_time">{{ row.block_time }}</td>
+							<td data-data="block_time">{{ row.block_time }}</td>
 						</tr>
 					{% endfor %}
 					</tbody>

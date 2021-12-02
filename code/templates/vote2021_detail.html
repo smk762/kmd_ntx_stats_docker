@@ -20,15 +20,15 @@
 					<tbody>
 						{% for item in vote2021_detail_table %}
 							<tr>
-								<td style="font-size: 1.2em;" data-data="block_height">{{ item.block_height }}</td>
-								<td style="font-size: 1.2em;" data-data="votes">
+								<td data-data="block_height">{{ item.block_height }}</td>
+								<td data-data="votes">
 									<span class='badge p-2'>
 										{{ item.votes }}
 									</span>
 								</td>
-								<td style="font-size: 1em;" data-data="txid">{{ item.txid }}</td>
-								<td style="font-size: 1.2em;" data-data="lock_time">{{ item.lock_time }}</td>
-								<td style="font-size: 1.2em;" data-data="lock_time_human">
+								<td data-data="txid">{{ item.txid }}</td>
+								<td data-data="lock_time">{{ item.lock_time }}</td>
+								<td data-data="lock_time_human">
 									<span class='badge p-2'>
 										{{ item.lock_time_human }}
 									</span>

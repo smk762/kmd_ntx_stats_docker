@@ -3,6 +3,7 @@ import requests
 import json
 from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.lib_query import *
+from kmd_ntx_api.lib_info import *
 
 # https://stats-api.atomicdex.io/
 
@@ -14,6 +15,7 @@ def get_nn_mm2_stats(request):
     data = data.values()
     serializer = mm2statsSerializer(data, many=True)
     return serializer.data
+
 
 def get_nn_mm2_stats_by_hour(request):
     start = get_or_none(request, "start")
@@ -32,12 +34,14 @@ def get_nn_mm2_stats_by_hour(request):
 
     return data
 
+
 def mm2_proxy(params):
   params.update({"userpass": MM2_USERPASS})
   print(json.dumps(params))
   r = requests.post(MM2_IP, json.dumps(params))
   print(r.json())
   return r
+
 
 def get_orderbook(request):
     base = "KMD"
@@ -54,6 +58,7 @@ def get_orderbook(request):
     r = mm2_proxy(params)
     return r.json()
 
+
 def get_bestorders(request):
     coin = "KMD"
     if "coin" in request.GET:
@@ -67,6 +72,7 @@ def get_bestorders(request):
     }
     r = mm2_proxy(params)
     return r.json()
+
 
 def send_raw_tx(request):
     print(electrum(request))
@@ -83,6 +89,7 @@ def send_raw_tx(request):
     }
     r = mm2_proxy(params)
     return r.json()
+
 
 def electrum(request):
     coin = "KMD"
@@ -102,6 +109,7 @@ def electrum(request):
     r = mm2_proxy(params)
     return r.json()
 
+
 def get_last_200_swaps(request):
     data = get_swaps_data()
     taker_coin = get_or_none(request, "taker_coin")
@@ -112,6 +120,7 @@ def get_last_200_swaps(request):
     serializer = swapsSerializer(data, many=True)
     return serializer.data
 
+
 def get_failed_swap_by_uuid(request):
     if 'uuid' in request.GET:
         data = get_swaps_failed_data(request.GET['uuid']).values()
@@ -121,11 +130,13 @@ def get_failed_swap_by_uuid(request):
         data = {}
     return data
 
+
 def get_last_200_failed_swaps(request):
     data = get_swaps_failed_data().order_by('-time_stamp')[:200]
     data = data.values()
     serializer = swapsFailedSerializerPub(data, many=True)
     return serializer.data
+
 
 def format_gui_os_version(swaps_data):
     for item in swaps_data:
@@ -206,3 +217,192 @@ def format_gui_os_version(swaps_data):
         taker = f"{taker_gui} {taker_os} {taker_gui_version} {taker_mm2_version}"
         item.update({"maker": maker, "taker": taker})
     return swaps_data
+
+
+def get_swaps_coin_stats(from_time, to_time):
+    data = get_swaps_data()
+    data = filter_swaps_timespan(data, from_time, to_time)
+    # coin_count, coin_volume
+    # pair_count, pair_volume
+    # for item in data:
+
+
+def get_swaps_stats(from_time, to_time):
+    data = get_swaps_data()
+    print(from_time)
+    print(to_time)
+    data = filter_swaps_timespan(data, from_time, to_time)
+    taker_pubkeys = data.values('taker_pubkey').annotate(num_swaps=Count('taker_pubkey'))
+    maker_pubkeys = data.values('maker_pubkey').annotate(num_swaps=Count('maker_pubkey'))
+    taker_gui = data.values('taker_gui').annotate(num_swaps=Count('taker_gui'))
+    maker_gui = data.values('maker_gui').annotate(num_swaps=Count('maker_gui'))
+    taker_version = data.values('taker_version').annotate(num_swaps=Count('taker_version'))
+    maker_version = data.values('maker_version').annotate(num_swaps=Count('maker_version'))
+    taker_coin = data.values('taker_coin').annotate(num_swaps=Count('taker_coin'))
+    maker_coin = data.values('maker_coin').annotate(num_swaps=Count('maker_coin'))
+    resp = {
+        "count": data.count(),
+        "taker_pubkeys": [{i['taker_pubkey']:i['num_swaps']} for i in taker_pubkeys],
+        "maker_pubkeys": [{i['maker_pubkey']:i['num_swaps']} for i in maker_pubkeys],
+        "taker_gui": [{i['taker_gui']:i['num_swaps']} for i in taker_gui],
+        "maker_gui": [{i['maker_gui']:i['num_swaps']} for i in maker_gui],
+        "taker_version": [{i['taker_version']:i['num_swaps']} for i in taker_version],
+        "maker_version": [{i['maker_version']:i['num_swaps']} for i in maker_version],
+        "taker_coin": [{i['taker_coin']:i['num_swaps']} for i in taker_coin],
+        "maker_coin": [{i['maker_coin']:i['num_swaps']} for i in maker_coin]
+    }
+    return resp
+
+
+def get_swaps_gui_stats(request):
+    print(request.GET)
+    to_time = int(time.time())
+    from_time = int(time.time()) - SINCE_INTERVALS["week"]
+    '''
+    if "since" in request.GET:
+        if request.GET["since"] in SINCE_INTERVALS:
+            from_time = to_time - SINCE_INTERVALS[request.GET["since"]]
+    '''
+    if "from_time" in request.GET:
+        from_time = int(request.GET["from_time"])
+    if "to_time" in request.GET:
+        to_time = int(request.GET["to_time"])
+
+    data = get_swaps_data()
+    print(from_time)
+    print(to_time)
+    data = filter_swaps_timespan(data, from_time, to_time)
+    taker_pubkeys = data.values('taker_pubkey', 'taker_gui').annotate(num_swaps=Count('taker_pubkey'))
+    maker_pubkeys = data.values('maker_pubkey', 'maker_gui').annotate(num_swaps=Count('maker_pubkey'))
+    resp = {
+        "taker": {
+            "swap_total": 0,
+            "pubkey_total": 0,
+            "desktop": {"swap_total": 0,"pubkey_total": 0},
+            "android": {"swap_total": 0,"pubkey_total": 0},
+            "ios": {"swap_total": 0,"pubkey_total": 0},
+            "dogedex": {"swap_total": 0,"pubkey_total": 0},
+            "other": {"swap_total": 0,"pubkey_total": 0}
+        },
+        "maker": {
+            "swap_total": 0,
+            "pubkey_total": 0,
+            "desktop": {"swap_total": 0,"pubkey_total": 0},
+            "android": {"swap_total": 0,"pubkey_total": 0},
+            "ios": {"swap_total": 0,"pubkey_total": 0},
+            "dogedex": {"swap_total": 0,"pubkey_total": 0},
+            "other": {"swap_total": 0,"pubkey_total": 0}
+        }
+    }
+    for item in taker_pubkeys:
+        category = "other"
+        for x in list(resp["taker"].keys()):
+            if item["taker_gui"] is not None:
+                if item["taker_gui"].lower().find(x) > -1:
+                    category = x
+        if item["taker_gui"] not in resp["taker"][category]:
+            resp["taker"][category].update({item["taker_gui"]:{"swap_total": 0,"pubkey_total": 0}})
+        resp["taker"][category][item["taker_gui"]].update({
+            item['taker_pubkey']:item['num_swaps'],
+        })
+        resp["taker"][category][item["taker_gui"]]["pubkey_total"] += 1
+        resp["taker"][category][item["taker_gui"]]["swap_total"] += item['num_swaps']
+        resp["taker"][category]["pubkey_total"] += 1
+        resp["taker"][category]["swap_total"] += item['num_swaps']
+        resp["taker"]["swap_total"] += item['num_swaps']
+
+    resp["taker"]["pubkey_total"] = len(taker_pubkeys)
+
+    for category in resp["taker"]:
+        if category not in ["swap_total", "swap_pct", "pubkey_total"]:
+            pct = resp["taker"][category]["swap_total"]/resp["taker"]["swap_total"]*100
+            resp["taker"][category].update({"swap_pct": pct})
+            for gui in resp["taker"][category]:
+                if gui not in ["swap_total", "swap_pct", "pubkey_total"]:
+                    pct = resp["taker"][category][gui]["swap_total"]/resp["taker"]["swap_total"]*100
+                    category_pct = resp["taker"][category][gui]["swap_total"]/resp["taker"][category]["swap_total"]*100
+                    resp["taker"][category][gui].update({
+                        "swap_pct": pct,
+                        "swap_category_pct": category_pct,
+                    })
+
+
+    for item in maker_pubkeys:
+        category = "other"
+        for x in list(resp["maker"].keys()):
+            if item["maker_gui"] is not None:
+                if item["maker_gui"].lower().find(x) > -1:
+                    category = x
+        if item["maker_gui"] not in resp["maker"][category]:
+            resp["maker"][category].update({item["maker_gui"]:{"swap_total": 0,"pubkey_total": 0}})
+        resp["maker"][category][item["maker_gui"]].update({
+            item['maker_pubkey']:item['num_swaps'],
+        })
+        resp["maker"][category][item["maker_gui"]]["pubkey_total"] += 1
+        resp["maker"][category][item["maker_gui"]]["swap_total"] += item['num_swaps']
+        resp["maker"][category]["pubkey_total"] += 1
+        resp["maker"][category]["swap_total"] += item['num_swaps']
+        resp["maker"]["swap_total"] += item['num_swaps']
+
+    resp["maker"]["pubkey_total"] = len(maker_pubkeys)
+
+    for category in resp["maker"]:
+        if category  not in ["swap_total", "swap_pct", "pubkey_total"]:
+            pct = resp["maker"][category]["swap_total"]/resp["maker"]["swap_total"]*100
+            resp["maker"][category].update({"swap_pct": pct})
+            for gui in resp["maker"][category]:
+                if gui not in ["swap_total", "swap_pct", "pubkey_total"]: 
+                    pct = resp["maker"][category][gui]["swap_total"]/resp["maker"]["swap_total"]*100
+                    category_pct = resp["maker"][category][gui]["swap_total"]/resp["maker"][category]["swap_total"]*100
+                    resp["maker"][category][gui].update({
+                        "swap_pct": pct,
+                        "swap_category_pct": category_pct,
+                    })
+    return resp
+
+
+def get_swaps_pubkey_stats(request):
+    to_time = int(time.time())
+    from_time = int(time.time()) - SINCE_INTERVALS["week"]
+    if "since" in request.GET:
+        if request.GET["since"] in SINCE_INTERVALS:
+            from_time = to_time - SINCE_INTERVALS[request.GET["since"]]
+    if "from_time" in request.GET:
+        from_time = int(request.GET["from_time"])
+    if "to_time" in request.GET:
+        to_time = int(request.GET["to_time"])
+
+    data = get_swaps_data()
+    data = filter_swaps_timespan(data, from_time, to_time)
+    taker_pubkeys = data.values('taker_pubkey', 'taker_gui').annotate(num_swaps=Count('taker_pubkey'))
+    maker_pubkeys = data.values('maker_pubkey', 'maker_gui').annotate(num_swaps=Count('maker_pubkey'))
+    resp = {}
+    for item in taker_pubkeys:
+        if item["taker_pubkey"] not in resp:
+            resp.update({item["taker_pubkey"]:{"TOTAL": 0}})
+        resp[item["taker_pubkey"]].update({
+            item['taker_gui']:item['num_swaps'],
+        })
+        resp[item["taker_pubkey"]]["TOTAL"] += item['num_swaps']
+    return resp
+
+
+def get_contracts(platform):
+    if is_testnet(platform):
+        contract = SWAP_CONTRACTS[platform]["testnet"]["swap_contract"]
+        fallback_contract = SWAP_CONTRACTS[platform]["testnet"]["fallback_contract"]
+    else:
+        contract = SWAP_CONTRACTS[platform]["mainnet"]["swap_contract"]
+        fallback_contract = SWAP_CONTRACTS[platform]["mainnet"]["fallback_contract"]
+
+    return {
+        "swap_contract_address":contract,
+        "fallback_swap_contract":fallback_contract,
+    }
+
+
+def is_testnet(coin):
+    if coin in ["BNBT", "ETHR", "AVAXT", "tQTUM", "MATICTEST", "AVAXT"]:
+        return True
+    return False
+
