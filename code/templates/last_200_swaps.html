@@ -21,12 +21,12 @@
 					<tbody>
 					{% for row in mined_24hrs %}
 						<tr>
-							<td style="font-size: 1.2em;" data-data="block_height">{{ row.block_height }}</td>
-							<td style="font-size: 1.2em;" data-data="name" class="pr-4">{{ row.name }}</td>
+							<td data-data="block_height">{{ row.block_height }}</td>
+							<td data-data="name" class="pr-4">{{ row.name }}</td>
 							<td style="font-size: 0em;" data-data="address" style="display: none">{{ row.address }}</td>
-							<td style="font-size: 1.2em;" data-data="value">{{ row.value }}</td>
+							<td data-data="value">{{ row.value }}</td>
 							<td style="font-size: 0em;" data-data="txid" style="display: none">{{ row.txid }}</td>
-							<td style="font-size: 1.2em;" data-data="block_time">{{ row.block_time }}</td>
+							<td data-data="block_time">{{ row.block_time }}</td>
 						</tr>
 					{% endfor %}
 					</tbody>

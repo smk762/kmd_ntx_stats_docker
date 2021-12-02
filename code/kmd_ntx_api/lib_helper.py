@@ -218,6 +218,9 @@ def day_hr_min_sec(seconds, granularity=2):
     return ', '.join(result[:granularity])
 
 
+def sort_dict(item: dict):
+    return {k: sort_dict(v) if isinstance(v, dict) else v for k, v in sorted(item.items())}
+    
 def get_eco_data_link():
     item = random.choice(ECO_DATA)
     ad = random.choice(item['ads'])

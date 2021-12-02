@@ -8,6 +8,7 @@
 				{% for ticker, site_links in coin_social.items %}
 					{% if ticker == coin %}
         				{% include "components/cards/card_img.html" with img_src=site_links.icon alt_text=ticker profile_page="coin_profile" profile_name=coin %}
+						
 					{% endif %}
 				{% endfor %}
 			</div>

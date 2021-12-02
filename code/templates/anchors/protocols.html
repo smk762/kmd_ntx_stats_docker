@@ -1,0 +1,5 @@
+	<div class="row d-flex justify-content-between mb-4 mt-2" role="group" aria-label="protocol_anchors">
+		{% for protocol in activation_data %}
+			{% include "components/buttons/anchor_button.html" with btn_text=protocol btn_url="#"|add:protocol btn_cols="col-2" %}
+		{% endfor %}
+	</div>
