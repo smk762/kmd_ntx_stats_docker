@@ -8,7 +8,6 @@ from kmd_ntx_api.serializers import *
 from kmd_ntx_api.lib_info import get_all_coins
 from kmd_ntx_api.lib_base58 import *
 from kmd_ntx_api.lib_electrum import *
-from kmd_ntx_api.lib_mm2 import *
 from kmd_ntx_api.lib_helper import *
 
 

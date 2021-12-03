@@ -17,11 +17,22 @@ def date_hour(timestamp):
     hour = int(hour)+1
     return f"{date} {hour}:00"
 
-logger = logging.getLogger("mylogger")
+def get_context(request):
+    mm2_coins = list(get_dexstats_explorers().keys())
+    season = get_page_season(request)
+    scheme_host = get_current_host(request)
+    return {
+        "season":season,
+        "scheme_host": scheme_host,
+        "mm2_coins":mm2_coins,
+        "eco_data_link":get_eco_data_link()
+    }
+
 
 def get_or_none(request, key):
     return request.GET[key] if key in request.GET else None
     
+
 def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
         filter_kwargs = {}
@@ -67,12 +78,14 @@ def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=N
         queryset = queryset.filter(**filter_kwargs)
     return queryset
 
+
 def get_current_host(request):
     scheme = request.is_secure() and "https" or "http"
     if THIS_SERVER.find("stats.kmd.io") > -1:
         return f'https://{request.get_host()}/'
     else:
         return f'{scheme}://{request.get_host()}/'
+
 
 def get_dexstats_explorers():
     explorers = requests.get(f"{THIS_SERVER}/api/info/explorers/").json()["results"]
@@ -82,7 +95,6 @@ def get_dexstats_explorers():
             if item.find("dexstats") > -1:
                 dexplorers.update({coin:item})
     return dexplorers
-
 
 
 def get_season(time_stamp=None):

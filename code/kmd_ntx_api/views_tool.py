@@ -4,7 +4,6 @@ from django.shortcuts import render
 
 from kmd_ntx_api.forms import *
 from kmd_ntx_api.lib_info import *
-from kmd_ntx_api.lib_mm2 import *
 from kmd_ntx_api.api_tools import *
 from kmd_ntx_api.lib_base58 import *
 

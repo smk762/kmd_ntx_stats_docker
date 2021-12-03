@@ -1,7 +1,7 @@
 from django import forms
 
 from kmd_ntx_api.lib_info import *
-from kmd_ntx_api.lib_mm2 import *
+from kmd_ntx_api.lib_atomicdex import *
 from kmd_ntx_api.widgets import *
 
 mm2_coins = get_mm2_coins_list()

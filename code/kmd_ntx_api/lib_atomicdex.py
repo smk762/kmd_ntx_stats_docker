@@ -388,6 +388,7 @@ def get_swaps_pubkey_stats(request):
 
 
 def get_contracts(platform):
+    print(platform)
     if is_testnet(platform):
         contract = SWAP_CONTRACTS[platform]["testnet"]["swap_contract"]
         fallback_contract = SWAP_CONTRACTS[platform]["testnet"]["fallback_contract"]
@@ -402,7 +403,7 @@ def get_contracts(platform):
 
 
 def is_testnet(coin):
-    if coin in ["BNBT", "ETHR", "AVAXT", "tQTUM", "MATICTEST", "AVAXT"]:
+    if coin in ["BNBT", "ETHR", "AVAXT", "tQTUM", "MATICTEST", "AVAXT", "FTMT"]:
         return True
     return False
 
