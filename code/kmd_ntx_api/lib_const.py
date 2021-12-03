@@ -152,18 +152,9 @@ SWAP_CONTRACTS = {
             "swap_contract": "0x24ABE4c71FC658C91313b6552cd40cD808b3Ea80",
             "fallback_contract": "0x8500AFc0bc5214728082163326C2FF0C73f4a871",
             "gas_station": "https://ethgasstation.info/json/ethgasAPI.json"
-        },
-        "testnet": {
-            "swap_contract": "0x6b5A52217006B965BB190864D62dc3d270F7AaFD",
-            "fallback_contract": "0x7Bc1bBDD6A0a722fC9bffC49c921B685ECB84b94"
         }
     },
     "ETHR": {
-        "mainnet": {
-            "swap_contract": "0x24ABE4c71FC658C91313b6552cd40cD808b3Ea80",
-            "fallback_contract": "0x8500AFc0bc5214728082163326C2FF0C73f4a871",
-            "gas_station": "https://ethgasstation.info/json/ethgasAPI.json"
-        },
         "testnet": {
             "swap_contract": "0x6b5A52217006B965BB190864D62dc3d270F7AaFD",
             "fallback_contract": "0x7Bc1bBDD6A0a722fC9bffC49c921B685ECB84b94"
@@ -173,27 +164,15 @@ SWAP_CONTRACTS = {
         "mainnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
-        },
-        "testnet": {
-            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
         }
     },
     "FTM": {
         "mainnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
-        },
-        "testnet": {
-            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
         }
     },
     "FTMT": {
-        "mainnet": {
-            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
-        },
         "testnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
@@ -203,10 +182,6 @@ SWAP_CONTRACTS = {
         "mainnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
-        },
-        "testnet": {
-            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
         }
     },
     "MATIC": {
@@ -214,19 +189,9 @@ SWAP_CONTRACTS = {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "gas_station": "https://gasstation-mainnet.matic.network/"
-        },
-        "testnet": {
-            "swap_contract": "0x73c1Dd989218c3A154C71Fc08Eb55A24Bd2B3A10",
-            "fallback_contract": "0x73c1Dd989218c3A154C71Fc08Eb55A24Bd2B3A10",
-            "gas_station": "https://gasstation-mumbai.matic.today/"
         }
     },
     "MATICTEST": {
-        "mainnet": {
-            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "gas_station": "https://gasstation-mainnet.matic.network/"
-        },
         "testnet": {
             "swap_contract": "0x73c1Dd989218c3A154C71Fc08Eb55A24Bd2B3A10",
             "fallback_contract": "0x73c1Dd989218c3A154C71Fc08Eb55A24Bd2B3A10",
@@ -237,17 +202,9 @@ SWAP_CONTRACTS = {
         "mainnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
-        },
-        "testnet": {
-            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
         }
     },
     "AVAXT": {
-        "mainnet": {
-            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
-        },
         "testnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
@@ -255,30 +212,18 @@ SWAP_CONTRACTS = {
     },
     "BNB": {
         "mainnet": {
-            "swap_contract": "0xcCD17C913aD7b772755Ad4F0BDFF7B34C6339150",
-            "fallback_contract": "0xeDc5b89Fe1f0382F9E4316069971D90a0951DB31"
-        },
-        "testnet": {
             "swap_contract": "0xeDc5b89Fe1f0382F9E4316069971D90a0951DB31",
-            "fallback_contract": "0xcCD17C913aD7b772755Ad4F0BDFF7B34C6339150"
+            "fallback_contract": "0xeDc5b89Fe1f0382F9E4316069971D90a0951DB31"
         }
     },
     "BNBT": {
-        "mainnet": {
-            "swap_contract": "0xcCD17C913aD7b772755Ad4F0BDFF7B34C6339150",
-            "fallback_contract": "0xeDc5b89Fe1f0382F9E4316069971D90a0951DB31"
-        },
         "testnet": {
-            "swap_contract": "0xeDc5b89Fe1f0382F9E4316069971D90a0951DB31",
+            "swap_contract": "0xcCD17C913aD7b772755Ad4F0BDFF7B34C6339150",
             "fallback_contract": "0xcCD17C913aD7b772755Ad4F0BDFF7B34C6339150"
         }
     },
     "ETH-ARB20": {
         "mainnet": {
-            "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
-            "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
-        },
-        "testnet": {
             "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
             "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
         }
@@ -287,18 +232,10 @@ SWAP_CONTRACTS = {
         "mainnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
-        },
-        "testnet": {
-            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
         }
     },
     "KCS": {
         "mainnet": {
-            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
-        },
-        "testnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
         }
@@ -307,18 +244,10 @@ SWAP_CONTRACTS = {
         "mainnet": {
             "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
             "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
-        },
-        "testnet": {
-            "swap_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE",
-            "fallback_contract": "0x9130b257D37A52E52F21054c4DA3450c72f595CE"
         }
     },
     "OPTIMISM": {
         "mainnet": {
-            "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
-            "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
-        },
-        "testnet": {
             "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
             "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
         }
@@ -347,28 +276,16 @@ SWAP_CONTRACTS = {
         "mainnet": {
             "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
             "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
-        },
-        "testnet": {
-            "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
-            "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
         }
     },
     "OPT": {
         "mainnet": {
             "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
             "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
-        },
-        "testnet": {
-            "swap_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce",
-            "fallback_contract": "0x9130b257d37a52e52f21054c4da3450c72f595ce"
         }
     },
     "SBCH": {
         "mainnet": {
-            "swap_contract": "0x25bF2AAB8749AD2e4360b3e0B738f3Cd700C4D68",
-            "fallback_contract": "0x25bF2AAB8749AD2e4360b3e0B738f3Cd700C4D68"
-        },
-        "testnet": {
             "swap_contract": "0x25bF2AAB8749AD2e4360b3e0B738f3Cd700C4D68",
             "fallback_contract": "0x25bF2AAB8749AD2e4360b3e0B738f3Cd700C4D68"
         }

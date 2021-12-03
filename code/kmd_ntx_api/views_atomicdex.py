@@ -4,74 +4,78 @@ from django.shortcuts import render
 from .lib_helper import get_or_none
 
 from kmd_ntx_api.lib_info import *
-from kmd_ntx_api.lib_mm2 import *
+from kmd_ntx_api.lib_atomicdex import *
 from kmd_ntx_api.forms import *
 
 
-def orderbook_view(request):
+def activation_commands_view(request):
     season = get_page_season(request)
+    scheme_host = get_current_host(request)
+    url = f"{scheme_host}api/atomicdex/activation_commands/"
+    data = requests.get(url).json()["commands"]
+    activation_data = {}
+    for protocol in data:
+        if len(data[protocol]) != 0:
+            activation_data.update({protocol:data[protocol]})
+
     context = {
-        "season": get_page_season(request),
-        "mm2_coins": get_mm2_coins(),
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link()
+        "season":season,
+        "page_title":"Generate AtomicDEX-API Enable Command",
+        "scheme_host": scheme_host,
+        "sidebar_links":get_sidebar_links(season),
+        "activation_data":activation_data,
+        "eco_data_link":get_eco_data_link()
     }
-    orderbook = get_orderbook(request)
+    return render(request, 'atomicdex/activation_commands.html', context)
 
-    if "bids" in orderbook:
-        base = orderbook["base"]
-        rel = orderbook["rel"]
-        context.update({
-            "base": base,
-            "rel": rel
-        })
-        bids = []
-        for bid in orderbook["bids"]:
-            price = bid["price"]
-            maxvolume = bid["maxvolume"]
-            min_volume = bid["min_volume"]
-            bids.append({
-                "base": base,
-                "rel": rel,
-                "price": price,
-                "maxvolume": maxvolume,
-                "min_volume": min_volume,
-                "base_total": float(maxvolume)/float(price)
+
+def batch_activation_form_view(request):
+    context = get_context(request)
+    context.update({
+        "page_title":"Generate AtomicDEX-API Batch Activation Commands",
+        "sidebar_links":get_sidebar_links(season)
+    })
+
+    if request.GET:
+        try:
+            coin = request.GET["coin"]
+            form = EnableCommandForm(request.GET)
+            context.update({
+                "form":form
             })
-
-        context.update({
-            "bids": bids
-        })
-
-    if "asks" in orderbook:
-        base = orderbook["base"]
-        rel = orderbook["rel"]
-        context.update({
-            "base": base,
-            "page_title": f"AtomicDEX {base}/{rel} Orderbook",
-            "rel": rel
-        })
-
-        asks = []
-        for ask in orderbook["asks"]:
-            price = ask["price"]
-            maxvolume = ask["maxvolume"]
-            min_volume = ask["min_volume"]
-            asks.append({
-                "base": base,
-                "rel": rel,
-                "price": price,
-                "maxvolume": maxvolume,
-                "min_volume": min_volume,
-                "rel_total": float(maxvolume)*float(price)
+            url = f"{scheme_host}api/atomicdex/activation_commands"
+            r = requests.get(f'{url}/?coin={coin}')
+            command_str = r.json()
+            command_str["userpass"] = "'$userpass'"
+            form_resp = [command_str]
+            try:
+                if request.GET['add_to_batch_command'] == "True":
+                    if len(request.GET['existing_command']) > 0:
+                        command_str = request.GET['existing_command']
+                        command_str = command_str.replace("'$userpass'", "$userpass")
+                        command_str = command_str.replace("\'", "\"")
+                        command_str = command_str.replace("True", "true")
+                        command_str = command_str.replace("False", "false")
+                        existing_commands = json.loads(command_str)
+                        for i in existing_commands:
+                            if i["coin"] != coin:
+                                i['userpass'] = "'$userpass'"
+                                form_resp.append(i)
+            except Exception as e:
+                messages.error(request, e)
+            context.update({
+                "form_resp":form_resp
             })
+            return render(request, 'atomicdex/batch_activation_form.html', context)
+        except Exception as e:
+            print(e)
+        
+    form = EnableCommandForm() 
+    context.update({
+        "form":form
+    })
 
-        context.update({
-            "asks": asks
-        })
-
-    return render(request, 'atomicdex/orderbook.html', context)
+    return render(request, 'atomicdex/batch_activation_form.html', context)
 
 
 def bestorders_view(request):
@@ -173,104 +177,6 @@ def last_200_failed_swaps_view(request):
     return render(request, 'atomicdex/last_200_failed_swaps.html', context)
 
 
-def seednode_version_stats_view(request):
-    season = get_page_season(request)
-    start = time.time()- 24*60*60
-    end = time.time()
-    if 'start' in request.GET:
-        start = request.GET["start"]
-    if 'end' in request.GET:
-        end = request.GET["end"]
-    context = {
-        "season": season,
-        "start": int(start),
-        "end": int(end),
-        "start_str": datetime.fromtimestamp(int(start)).strftime("%m/%d/%Y, %H:%M:%S"),
-        "end_str": datetime.fromtimestamp(int(end)).strftime("%m/%d/%Y, %H:%M:%S"),
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link()
-    }
-
-    return render(request, 'atomicdex/seednode_version_stats.html', context)
-
-
-def activation_commands_view(request):
-    season = get_page_season(request)
-    scheme_host = get_current_host(request)
-    url = f"{scheme_host}api/atomicdex/activation_commands/"
-    data = requests.get(url).json()["commands"]
-    activation_data = {}
-    for protocol in data:
-        if len(data[protocol]) != 0:
-            activation_data.update({protocol:data[protocol]})
-
-    context = {
-        "season":season,
-        "page_title":"Generate AtomicDEX-API Enable Command",
-        "scheme_host": scheme_host,
-        "sidebar_links":get_sidebar_links(season),
-        "activation_data":activation_data,
-        "eco_data_link":get_eco_data_link()
-    }
-    return render(request, 'atomicdex/activation_commands.html', context)
-
-
-def batch_activation_form_view(request):
-    mm2_coins = list(get_dexstats_explorers().keys())
-    season = get_page_season(request)
-    scheme_host = get_current_host(request)
-    context = {
-        "season":season,
-        "page_title":"Generate AtomicDEX-API Batch Activation Commands",
-        "scheme_host": scheme_host,
-        "sidebar_links":get_sidebar_links(season),
-        "mm2_coins":mm2_coins,
-        "eco_data_link":get_eco_data_link()
-    }
-
-    if request.GET:
-        try:
-            coin = request.GET["coin"]
-            form = EnableCommandForm(request.GET)
-            context.update({
-                "form":form
-            })
-            url = f"{scheme_host}api/atomicdex/activation_commands"
-            r = requests.get(f'{url}/?coin={coin}')
-            command_str = r.json()
-            command_str["userpass"] = "'$userpass'"
-            form_resp = [command_str]
-            try:
-                if request.GET['add_to_batch_command'] == "True":
-                    if len(request.GET['existing_command']) > 0:
-                        command_str = request.GET['existing_command']
-                        command_str = command_str.replace("'$userpass'", "$userpass")
-                        command_str = command_str.replace("\'", "\"")
-                        command_str = command_str.replace("True", "true")
-                        command_str = command_str.replace("False", "false")
-                        existing_commands = json.loads(command_str)
-                        for i in existing_commands:
-                            if i["coin"] != coin:
-                                i['userpass'] = "'$userpass'"
-                                form_resp.append(i)
-            except Exception as e:
-                messages.error(request, e)
-            context.update({
-                "form_resp":form_resp
-            })
-            return render(request, 'atomicdex/batch_activation_form.html', context)
-        except Exception as e:
-            print(e)
-        
-    form = EnableCommandForm() 
-    context.update({
-        "form":form
-    })
-
-    return render(request, 'atomicdex/batch_activation_form.html', context)
-
-
 def makerbot_config_form_view(request):
     mm2_coins = list(get_dexstats_explorers().keys())
     season = get_page_season(request)
@@ -370,5 +276,91 @@ def makerbot_config_form_view(request):
     })
     return render(request, 'atomicdex/makerbot_config_form.html', context)
 
-    
+
+def orderbook_view(request):
+    season = get_page_season(request)
+    context = {
+        "season": get_page_season(request),
+        "mm2_coins": get_mm2_coins(),
+        "scheme_host": get_current_host(request),
+        "sidebar_links": get_sidebar_links(season),
+        "eco_data_link": get_eco_data_link()
+    }
+    orderbook = get_orderbook(request)
+
+    if "bids" in orderbook:
+        base = orderbook["base"]
+        rel = orderbook["rel"]
+        context.update({
+            "base": base,
+            "rel": rel
+        })
+        bids = []
+        for bid in orderbook["bids"]:
+            price = bid["price"]
+            maxvolume = bid["maxvolume"]
+            min_volume = bid["min_volume"]
+            bids.append({
+                "base": base,
+                "rel": rel,
+                "price": price,
+                "maxvolume": maxvolume,
+                "min_volume": min_volume,
+                "base_total": float(maxvolume)/float(price)
+            })
+
+        context.update({
+            "bids": bids
+        })
+
+    if "asks" in orderbook:
+        base = orderbook["base"]
+        rel = orderbook["rel"]
+        context.update({
+            "base": base,
+            "page_title": f"AtomicDEX {base}/{rel} Orderbook",
+            "rel": rel
+        })
+
+        asks = []
+        for ask in orderbook["asks"]:
+            price = ask["price"]
+            maxvolume = ask["maxvolume"]
+            min_volume = ask["min_volume"]
+            asks.append({
+                "base": base,
+                "rel": rel,
+                "price": price,
+                "maxvolume": maxvolume,
+                "min_volume": min_volume,
+                "rel_total": float(maxvolume)*float(price)
+            })
+
+        context.update({
+            "asks": asks
+        })
+
+    return render(request, 'atomicdex/orderbook.html', context)
+
+
+def seednode_version_stats_view(request):
+    season = get_page_season(request)
+    start = time.time()- 24*60*60
+    end = time.time()
+    if 'start' in request.GET:
+        start = request.GET["start"]
+    if 'end' in request.GET:
+        end = request.GET["end"]
+    context = {
+        "season": season,
+        "start": int(start),
+        "end": int(end),
+        "start_str": datetime.fromtimestamp(int(start)).strftime("%m/%d/%Y, %H:%M:%S"),
+        "end_str": datetime.fromtimestamp(int(end)).strftime("%m/%d/%Y, %H:%M:%S"),
+        "scheme_host": get_current_host(request),
+        "sidebar_links": get_sidebar_links(season),
+        "eco_data_link": get_eco_data_link()
+    }
+
+    return render(request, 'atomicdex/seednode_version_stats.html', context)
 
