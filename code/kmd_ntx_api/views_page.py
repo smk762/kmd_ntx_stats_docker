@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import time
 import random
 import numpy as np
@@ -12,7 +11,6 @@ from kmd_ntx_api.api_table import *
 from kmd_ntx_api.lib_testnet import *
 from kmd_ntx_api.api_status import *
 
-    
 
 def chains_last_ntx(request):
     season = get_page_season(request)

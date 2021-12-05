@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import math
 import requests
 from django.shortcuts import render
 from .lib_helper import get_or_none
@@ -345,7 +346,7 @@ def orderbook_view(request):
 
 def seednode_version_stats_view(request):
     season = get_page_season(request)
-    start = time.time()- 24*60*60
+    start = time.time() - 24*60*60
     end = time.time()
     if 'start' in request.GET:
         start = request.GET["start"]
@@ -363,4 +364,105 @@ def seednode_version_stats_view(request):
     }
 
     return render(request, 'atomicdex/seednode_version_stats.html', context)
+
+
+def seednode_version_stats_hourly_table_view(request):
+    season = get_page_season(request)
+    if 'date' in request.GET:
+        stats_date = request.GET["date"]
+    else:
+        stats_date = "Today"
+
+    date_ts = floor_to_utc_day(time.time())
+    if 'date_ts' in request.GET:
+        print(f"request.GET: {request.GET}")
+        try:
+            date_ts = int(request.GET["date_ts"])
+            if date_ts > time.time()*10:
+                date_ts /= 1000
+        except Exception as e:
+            print(e)
+            pass
+
+    print(stats_date)
+    start = floor_to_utc_day(date_ts)
+    end = start + 24*60*60
+
+
+    version_scores = get_nn_seed_version_scores_hourly_table(request, start, end)
+    context = {
+        "season": season,
+        "date": stats_date,
+        "date_ts": date_ts,
+        "stats_date": stats_date,
+        "scheme_host": get_current_host(request),
+        "sidebar_links": get_sidebar_links(season),
+        "eco_data_link": get_eco_data_link(),
+        "headers": version_scores["headers"],
+        "scores": version_scores["scores"]
+    }
+
+    return render(request, 'atomicdex/seednode_version_stats_hourly_table.html', context)
+
+
+def seednode_version_stats_daily_table_view(request):
+    season = get_page_season(request)
+
+    end = time.time() + 24 * 60 * 60
+    start = end - 14 * (24 * 60 * 60)
+
+    if "start" in request.GET:
+        start = int(request.GET["start"])
+        
+
+    start = floor_to_utc_day(start)
+    end = start + 14 * (24 * 60 * 60)
+
+
+    print(date_hour(start))
+    print(date_hour(end))
+    prev_ts = start - 15 * (24 * 60 * 60)
+    next_ts = end + (24 * 60 * 60)
+
+    from_date  = date_hour(start - (24 * 60 * 60)).split(" ")[0]
+    to_date = date_hour(end - (24 * 60 * 60)).split(" ")[0]
+
+
+    version_scores = get_nn_seed_version_scores_daily_table(request, start, end)
+    context = {
+        "to_date": to_date,
+        "from_date": from_date,
+        "prev_ts": prev_ts,
+        "next_ts": next_ts,
+        "season": season,
+        "scheme_host": get_current_host(request),
+        "sidebar_links": get_sidebar_links(season),
+        "eco_data_link": get_eco_data_link(),
+        "headers": version_scores["headers"],
+        "scores": version_scores["scores"]
+    }
+
+    return render(request, 'atomicdex/seednode_version_stats_daily_table.html', context)
+
+
+def seednode_version_stats_month_table_view(request):
+    season = get_page_season(request)
+
+    start = SEASONS_INFO[season]["start_time"]
+    end = SEASONS_INFO[season]["end_time"]
+
+    version_scores = get_nn_seed_version_scores_month_table(request, start, end)
+    print(start)
+    print(end)
+    print(version_scores)
+    context = {
+        "season": season,
+        "scheme_host": get_current_host(request),
+        "sidebar_links": get_sidebar_links(season),
+        "eco_data_link": get_eco_data_link(),
+        "headers": version_scores["headers"],
+        "scores": version_scores["scores"]
+    }
+
+    return render(request, 'atomicdex/seednode_version_stats_month_table.html', context)
 

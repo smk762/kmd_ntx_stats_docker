@@ -108,6 +108,7 @@ def get_daily_stats_sorted(season=None, coins_dict=None):
             "btc": notary_ntx_24hr_summary["btc_ntx"],
             "main": notary_ntx_24hr_summary["main_ntx"],
             "third_party": notary_ntx_24hr_summary["third_party_ntx"],
+            "seed": notary_ntx_24hr_summary["seed_node_status"],
             "mining": nn_mined_last_24hrs[notary_name],
             "score": notary_ntx_24hr_summary["score"]
         })
@@ -129,8 +130,6 @@ def get_daily_stats_sorted(season=None, coins_dict=None):
                     daily_stats_sorted[region].append(new_item)
             i += 1
     return daily_stats_sorted
-
-
 
 # returns region > notary > chain > season ntx count
 def get_coin_notariser_ranks(season, coins_list=None):
@@ -197,6 +196,7 @@ def get_season_stats_sorted(season, coins_dict=None):
         nn_mined_season.update({item['name']:item['season_blocks_mined']})
 
     season_stats = {}
+    nn_seed_season = {}
     for notary in notary_list:
 
         region = get_notary_region(notary)
@@ -205,6 +205,14 @@ def get_season_stats_sorted(season, coins_dict=None):
 
         if notary not in nn_mined_season:
             nn_mined_season.update({notary:0})
+
+        if notary not in nn_seed_season:
+            nn_seed_season.update({notary:0})
+
+    nn_seed_season_data = get_seed_stat_season(season)
+    for item in nn_seed_season_data:
+        nn_seed_season.update({item['name']:round(item['sum_score'],2)})
+    print(nn_seed_season)
 
     notarised_count_season_data = get_notarised_count_season_data(season).values()
     for item in notarised_count_season_data:
@@ -216,10 +224,12 @@ def get_season_stats_sorted(season, coins_dict=None):
                 "btc": item["btc_count"],
                 "main": item["antara_count"],
                 "third_party": item["third_party_count"],
+                "seed": nn_seed_season[item["notary"]],
                 "mining": nn_mined_season[item["notary"]],
-                "score": float(item["season_score"])
+                "score": float(item["season_score"])+nn_seed_season[item["notary"]]
             })
-        except:
+        except Exception as e:
+            print(e)
             pass
 
     # calc scores
@@ -239,6 +249,6 @@ def get_season_stats_sorted(season, coins_dict=None):
                     new_item.update({"rank": i})
                     season_stats_sorted[region].append(new_item)
             i += 1
-
+    print(season_stats_sorted)
     return season_stats_sorted
 

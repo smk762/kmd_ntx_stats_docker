@@ -25,8 +25,6 @@ def get_nn_mm2_stats_by_hour(request):
     if not end:
         end = time.time()
     notary = get_or_none(request, "notary")
-    print(start)
-    print(end)
     if request.GET.get("chart"):
         data = get_nn_mm2_stats_by_hour_chart_data(int(start), int(end), notary)
     else:

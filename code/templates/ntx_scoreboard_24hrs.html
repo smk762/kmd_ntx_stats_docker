@@ -25,6 +25,7 @@
 								<th class="py-2 px-4">LTC</th>
 								<th class="py-2 px-4">Main</th>
 								<th class="py-2 px-4">3P</th>
+								<th class="py-2 px-4">Seed</th>
 								<th class="py-2 px-4">Mined</th>
 								<th class="py-2 px-4">Score</th>
 							</tr>
@@ -53,6 +54,11 @@
 								<td data-data="third_party" class="px-4">
 									
 										{{ item.third_party }}
+							  		</span>
+								</td>
+								<td data-data="seed" class="px-4">
+									
+										{{ item.seed }}
 							  		</span>
 								</td>
 								<td data-data="mining" class="px-4">
@@ -88,6 +94,7 @@
 				        { "data": "btc" },
 				        { "data": "main" },
 				        { "data": "third_party" },	
+				        { "data": "seed" },	
 				        { "data": "mining" },
 				        { "data": "score" }
 				    ],
@@ -99,7 +106,7 @@
 					        }
 				        },
 	        			{
-				            "targets": 6,
+				            "targets": 7,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 					            $(nTd).html(oData.score);
 					        }
@@ -132,6 +139,7 @@
 				        { "data": "btc" },
 				        { "data": "main" },
 				        { "data": "third_party" },	
+				        { "data": "seed" },	
 				        { "data": "mining" },
 				        { "data": "score" }
 				    ],
@@ -143,7 +151,7 @@
 					        }
 				        },
 	        			{
-				            "targets": 6,
+				            "targets": 7,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 					            $(nTd).html(oData.score);
 					        }
@@ -176,6 +184,7 @@
 				        { "data": "btc" },
 				        { "data": "main" },
 				        { "data": "third_party" },	
+				        { "data": "seed" },	
 				        { "data": "mining" },
 				        { "data": "score" }
 				    ],
@@ -187,7 +196,7 @@
 					        }
 				        },
 	        			{
-				            "targets": 6,
+				            "targets": 7,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 					            $(nTd).html(oData.score);
 					        }
@@ -220,6 +229,7 @@
 				        { "data": "btc" },
 				        { "data": "main" },
 				        { "data": "third_party" },	
+				        { "data": "seed" },	
 				        { "data": "mining" },
 				        { "data": "score" }
 				    ],
@@ -231,7 +241,7 @@
 					        }
 				        },
 	        			{
-				            "targets": 6,
+				            "targets": 7,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 					            $(nTd).html(oData.score);
 					        }
@@ -264,6 +274,7 @@
 				        { "data": "btc" },
 				        { "data": "main" },
 				        { "data": "third_party" },	
+				        { "data": "seed" },	
 				        { "data": "mining" },
 				        { "data": "score" }
 				    ],
@@ -275,7 +286,7 @@
 					        }
 				        },
 	        			{
-				            "targets": 6,
+				            "targets": 7,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 					            $(nTd).html(oData.score);
 					        }

@@ -5,5 +5,5 @@ source userpass
 echo $userpass
 sleep 5
 ./version.sh
-./start_stats.sh 300
+./start_stats.sh 900
 tail -f ./mm2.log

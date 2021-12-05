@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load mathfilters %}
+	<div class="row col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title flex">
+				<span class="mx-1">{{ season_clean }} MM2 Version Monthly Stats</span>
+				<a href="../seednode_version_stats_daily_table" class="icon-href h5"><i class="fas fa-search-plus"></i></a>
+				<br />
+				<span style="font-size: 1rem;">
+					<span class="mx-1">{{ season }}</span>
+				</span>
+			</div>
+			<div class="card-body table_card_body" style="overflow-x: scroll;">
+				<table id="mm2_version_tbl" class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							{% for header in headers %}		
+								<th style="font-size: 0.7rem;">{{ header }}</th>
+							{% endfor %}
+						</tr>
+					</thead>
+					<tbody>
+					{% for notary, score_list in scores.items %}
+						<tr>
+							<td data-data="notary">{{ notary }}</td>
+							{% for score in score_list %}
+								{% if score > 0 %}
+									<td style="background-color: #104d1b;">{{ score }}</td>
+								{% else %}
+									<td>{{ score }}</td>
+								{% endif %}
+							{% endfor %}
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<div class="card-footer flex">
+				<i>Times are in UTC</i>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+
+		function getOffset() {
+			var d = new Date();
+			return d.getTimezoneOffset()*60*1000;
+		}
+
+		function local_date_str(date_str) {
+		  var d = Date.parse(date_str);
+		  var offset = getOffset()
+		  var x = new Date(d-offset)
+		  var ds = x.toLocaleDateString();
+		  var ts = x.toLocaleTimeString();
+		  return ds+" "+ts;
+		}
+
+		{% autoescape off %}
+
+		$('#start').val(local_date_str('{{start_str}}'))
+		$('#end').val(local_date_str('{{end_str}}'))
+		{% endautoescape %}
+		$(document).ready(function() {
+	        $('#mm2_version_tbl').DataTable({
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": false,
+  				"pageLength": 50,
+        		order: [[ 0, 'asc' ]],
+        		"columnDefs": [
+		            { orderable: true, className: 'reorder', targets: 0 },
+		            { orderable: true, className: 'reorder', targets: $('#mm2_version_tbl').find('th').length - 1 },
+		            { orderable: false, targets: '_all' }
+			    ],
+                // Custom DataTables search filter input styling
+				"initComplete": function (settings, json) {
+	            }
+	        });
+	        console.log($('#mm2_version_tbl').find('th').length - 1)
+	    });
+
+	</script>
+{% endblock %}

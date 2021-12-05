@@ -216,7 +216,7 @@ class swapsFailedSerializerPub(serializers.HyperlinkedModelSerializer):
 class mm2statsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = mm2_version_stats
-        fields = ["name", "version", "timestamp", "error"]
+        fields = ["name", "version", "timestamp", "error", "score"]
 
 
 # Non-Model serializers

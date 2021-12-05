@@ -215,7 +215,7 @@ function get_versionData(url) {
 }
 
 {% autoescape off %}
-url = "/api/mm2/version_stats_by_hour/?chart=1&start={{start}}&end={{end}}"
+url = "/api/atomicdex/version_stats_by_hour/?chart=1&start={{start}}&end={{end}}"
 
 $('#start').val(local_date_str('{{start_str}}'))
 $('#end').val(local_date_str('{{end_str}}'))
@@ -231,7 +231,7 @@ function update_chart() {
     myChart.destroy()
 	console.log(start)
 	console.log(end)
-	url = "/api/mm2/version_stats_by_hour/?chart=1&start="+start+"&end="+end
+	url = "/api/atomicdex/version_stats_by_hour/?chart=1&start="+start+"&end="+end
 	get_versionData(url)
 }
 
