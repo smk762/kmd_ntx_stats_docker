@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from lib_helper import get_base_context
+from kmd_ntx_api.lib_helper import get_base_context
 
 
 def error_400(request,  exception):
