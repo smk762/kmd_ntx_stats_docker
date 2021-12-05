@@ -172,7 +172,7 @@ def round_ts_to_hour(timestamp):
 def get_version_score(version, timestamp):
 	active_versions_at = get_active_mm2_versions(timestamp)
 	if version in active_versions_at:
-		return 1
+		return 0.2
 	return 0
 
 

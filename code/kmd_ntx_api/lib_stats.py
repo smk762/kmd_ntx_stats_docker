@@ -108,6 +108,7 @@ def get_daily_stats_sorted(season=None, coins_dict=None):
             "btc": notary_ntx_24hr_summary["btc_ntx"],
             "main": notary_ntx_24hr_summary["main_ntx"],
             "third_party": notary_ntx_24hr_summary["third_party_ntx"],
+            "seed": notary_ntx_24hr_summary["seed_node_status"],
             "mining": nn_mined_last_24hrs[notary_name],
             "score": notary_ntx_24hr_summary["score"]
         })

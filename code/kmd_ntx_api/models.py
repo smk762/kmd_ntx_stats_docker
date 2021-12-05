@@ -250,7 +250,7 @@ class mm2_version_stats(models.Model):
     version = models.CharField(max_length=128)
     timestamp = models.PositiveIntegerField(default=0)
     error = models.CharField(max_length=256)
-    score = models.PositiveIntegerField(default=0)
+    score = models.FloatField(default=0)
 
     class Meta:
         db_table = 'mm2_version_stats'
