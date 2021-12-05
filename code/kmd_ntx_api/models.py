@@ -247,6 +247,7 @@ class mined_count_season(models.Model):
 
 class mm2_version_stats(models.Model):
     name = models.CharField(max_length=128)
+    season = models.CharField(max_length=128, default='')
     version = models.CharField(max_length=128)
     timestamp = models.PositiveIntegerField(default=0)
     error = models.CharField(max_length=256)

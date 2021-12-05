@@ -603,6 +603,15 @@ def get_mined_data(season=None, name=None, address=None):
         data = data.filter(address=address)
     return data
 
+def get_seed_version_data(season=None, name=None):
+    data = mm2_version_stats.objects.all()
+    if season:
+        season = season.title()
+        data = data.filter(season=season)
+    if name:
+        data = data.filter(name=name)
+    return data
+
 
 def get_nn_btc_tx_data(season=None, notary=None, category=None, address=None, txid=None):
     if txid:

@@ -14,6 +14,8 @@ import requests
 import logging
 import logging.handlers
 
+from lib_helper import *
+
 logger = logging.getLogger()
 handler = logging.StreamHandler()
 formatter = logging.Formatter(
@@ -33,6 +35,7 @@ DB_PATH = os.getenv("DB_PATH")
 conn = sqlite3.connect(DB_PATH)
 conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
+
 
 def mm2_proxy(method, params=None):
 	if not params:
@@ -135,8 +138,8 @@ def get_registered_nodes_from_db():
 def update_mm2_version_stats_row(row_data):
     try:
         sql = f"INSERT INTO mm2_version_stats \
-                    (name, version, timestamp, error, score) \
-                VALUES (%s, %s, %s, %s, %s);"
+                    (name, season, version, timestamp, error, score) \
+                VALUES (%s, %s, %s, %s, %s, %s);"
         CURSOR.execute(sql, row_data)
         CONN.commit()
     except Exception as e:
@@ -185,8 +188,10 @@ def migrate_sqlite_to_pgsql(ts):
 		print(row)
 		if row["version"] != '':
 			hr_timestamp = round_ts_to_hour(row["timestamp"])
+
+			season = get_season(hr_timestamp)
 			score = get_version_score(row["version"], hr_timestamp)
-			row_data = (row["name"], row["version"], hr_timestamp, row["error"], score)
+			row_data = (row["name"], season, row["version"], hr_timestamp, row["error"], score)
 			print(row_data)
 			update_mm2_version_stats_row(row_data)
 

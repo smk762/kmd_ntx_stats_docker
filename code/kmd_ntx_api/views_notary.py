@@ -120,18 +120,25 @@ def notary_profile_view(request, notary=None):
             region = get_notary_region(notary)
 
 
-            season_score = 0
+            ntx_score = 0
+            seed_score = 0
             last_ntx_time = 0
             last_ltc_ntx_time = 0
             last_ntx_chain = ""
             for item in notary_profile_summary_table['ntx_summary_data']:
-                season_score += item["chain_score"]
+                ntx_score += item["chain_score"]
                 if "last_block_time" in item:
                     if item["chain"] == "LTC":
                         last_ltc_ntx_time = item["last_block_time"]
                     if item["last_block_time"] > last_ntx_time:
                         last_ntx_time = item["last_block_time"]
                         last_ntx_chain = item["chain"]
+
+            seed_score_data = get_seed_stat_season(season, notary).values()
+            for item in seed_score_data:
+                seed_score += item["score"]
+            print(f"seed_score: {seed_score}")
+            season_score = ntx_score + seed_score
             rank = get_region_rank(season_stats_sorted[region], notary)
             context.update({
                 "page_title":f"{notary} Notary Profile",
@@ -143,6 +150,8 @@ def notary_profile_view(request, notary=None):
                 "24hr_ltc_count": ltc_notarised_24hr,
                 "24hr_main_count": main_notarised_24hr,
                 "24hr_third_party_count": third_notarised_24hr,
+                "seed_score":seed_score,
+                "ntx_score":ntx_score,
                 "season_score":season_score,
                 "last_ltc_ntx_time":get_time_since(last_ltc_ntx_time)[1],
                 "last_ntx_time":get_time_since(last_ntx_time)[1],

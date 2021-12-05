@@ -253,6 +253,11 @@ def get_notarised_data_txid(txid=None):
 def get_mined_season(season, notary=None):
      return get_mined_data(season, notary).values('name').annotate(season_blocks_mined=Count('value'))
 
+
+def get_seed_stat_season(season, notary=None):
+     return get_seed_version_data(season, notary).values('name').annotate(sum_score=Sum('score'))
+
+
 # Deprecate later
 def get_mined_data_24hr():
     return get_mined_data().filter(block_time__gt=str(int(time.time()-24*60*60)))
@@ -418,15 +423,15 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
     ).values()
     notary_ntx_24hr["score"] = float(notary_ntx_24hr["score"])
     for item in seed_data:
-        seed_node_score += item["score"]
-        notary_ntx_24hr["score"] += item["score"]
+        seed_node_score += round(item["score"], 2)
+        notary_ntx_24hr["score"] += round(item["score"], 2)
 
     if max_ntx_count > 0:
         notary_ntx_24hr.update({
                 "btc_ntx": btc_ntx_count,
                 "main_ntx": main_ntx_count,
                 "third_party_ntx": third_party_ntx_count,
-                "seed_node_status": int(seed_node_score),
+                "seed_node_status": round(seed_node_score, 2),
                 "most_ntx": str(max_ntx_count)+" ("+str(max_chain)+")"
             })
     return notary_ntx_24hr
