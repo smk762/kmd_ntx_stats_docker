@@ -67,7 +67,7 @@ def get_context(request):
 def get_base_context(request):
     season = get_page_season(request)
     scheme_host = get_current_host(request)
-    return context {
+    return {
         "season":season,
         "scheme_host": scheme_host,
         "sidebar_links":get_sidebar_links(season),
