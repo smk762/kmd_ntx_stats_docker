@@ -50,14 +50,20 @@
 						    </a>
 						</div>
 					  </li>
-					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
-					    	Region Rank
-							<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
-					    		{% include "components/badges/stats_badge.html" with stat_val=rank stat_label="" %}
-						    </a>
-						</div>
-					  </li>
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					    	<div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+							    Score
+							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+						    		{% include "components/badges/stats_badge.html" with stat_val=ntx_score|floatformat:-3 stat_label="Notarisation" %}
+					    		</a>
+							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+						    		{% include "components/badges/stats_badge.html" with stat_val=seed_score|floatformat:-3 stat_label="Seed Node" %}
+					    		</a>
+							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+						    		{% include "components/badges/stats_badge.html" with stat_val=season_score|floatformat:-3 stat_label="Total" %}
+					    		</a>
+							</div>
+					  	</li>
 					</ul> 							
 				</div>
 			</div>
@@ -72,34 +78,34 @@
 			<div class="card text-center kmd_ui_light3 col-4 px-0 m-auto shadow-none" style="border:none !important;">
 				<div class="card-body p-0" style="background-color: #101721 !important;">
 					<ul class="list-group">
-					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
-						    Mined
-						    <a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
-					    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.mined_last_24hrs|floatformat:-3 stat_label="KMD Last 24hrs" %}
-					    	</a>
-						    <a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
-					    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.sum_value_mined|floatformat:-3 stat_label="KMD Season"  %}
-					    	</a>
-						</div>
-					  </li>
-					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
-						    Blocks Mined this Season
-						    <a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
-					    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.blocks_mined stat_label="" %}
-					    	</a>
-						</div>
-					  </li>
-					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
-						    Largest Block Mined
-						    <a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
-					    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.max_value_mined|floatformat:-3 stat_label="KMD" %}
-					    	</a>
-						</div>
-					  </li>
-					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+						    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+							    Mined
+							    <a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
+						    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.mined_last_24hrs|floatformat:-3 stat_label="KMD Last 24hrs" %}
+						    	</a>
+							    <a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
+						    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.sum_value_mined|floatformat:-3 stat_label="KMD Season"  %}
+						    	</a>
+							</div>
+					    </li>
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+						    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+							    Blocks Mined this Season
+							    <a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
+						    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.blocks_mined stat_label="" %}
+						    	</a>
+							</div>
+					    </li>
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+						    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+							    Largest Block Mined
+							    <a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
+						    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.max_value_mined|floatformat:-3 stat_label="KMD" %}
+						    	</a>
+							</div>
+					    </li>
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    	<div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 							    Last Mined block
 							    <a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
@@ -108,13 +114,13 @@
 							</div>
 					  	</li>
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    	<div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
-							    Notarisation Score
-							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
-						    		{% include "components/badges/stats_badge.html" with stat_val=season_score|floatformat:-3 stat_label="" %}
-					    		</a>
+						    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+						    	Region Rank
+								<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+						    		{% include "components/badges/stats_badge.html" with stat_val=rank stat_label="" %}
+							    </a>
 							</div>
-					  	</li>
+					    </li>
 					</ul> 
 				</div>
 			</div>
