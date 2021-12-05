@@ -152,9 +152,6 @@ class raw_tx():
             self.raw_tx_str += lil_endian(vin["tx_hash"])
             self.raw_tx_str += lil_endian(
                 get_hex(vin["tx_pos"], byte_length=8))
-            print(vin["tx_pos"])
-            print(get_hex(vin["tx_pos"], byte_length=8))
-            print(lil_endian(get_hex(vin["tx_pos"], byte_length=8)))
             self.sum_inputs += vin["value"]*100000000
             if "unlocking_script" in vin:
                 unlocking_script = vin["unlocking_script"]
@@ -353,7 +350,6 @@ def convert_addresses(address):
         ripemedhash_full = new_ripemedhash + binascii.hexlify(checksum)
         new_address = bitcoin.base58.encode(
             binascii.unhexlify(ripemedhash_full))
-        print(f"{coin} address: {new_address}")
         resp["results"].append({f"{coin}": new_address})
 
     return resp

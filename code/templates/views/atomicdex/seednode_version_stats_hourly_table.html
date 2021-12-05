@@ -5,7 +5,7 @@
 	<div class="row col-12 m-auto">
 		<div class="card table_card">
 			<div class="card-header table_card_title flex">
-				<a href="../seednode_version_stats_daily_table" class="icon-href h5"><i class="fas fa-search-minus"></i></a>
+				<a href="../seednode_version_stats_daily" class="icon-href h5"><i class="fas fa-search-minus"></i></a>
 				<span class="mx-1">{{ season_clean }} MM2 Version Hourly Stats {{ stats_date }}</span>				
 			</div>
 			<div class="card-body table_card_body" style="overflow-x: scroll;">
@@ -50,7 +50,7 @@
 									</td>
 								{% elif score == 0.2 %}
 									<td style="padding: 0.2rem !important;">
-										<i class="fas fa-check-circle" style="color: #1f8b32;"></i>
+										<i class="fas fa-check-circle" style="color: #377c43;"></i>
 									</td>
 								{% else %}
 									<td style="padding: 0.2rem !important;">{{ score }}</td>
@@ -62,7 +62,8 @@
 				</table>
 			</div>
 			<div class="card-footer flex">
-				<i>Times are in UTC</i>
+				<i>Times are in UTC.</i>
+				The current active mm2 version: {{ active_version }}
 			</div>
 		</div>
 	</div>

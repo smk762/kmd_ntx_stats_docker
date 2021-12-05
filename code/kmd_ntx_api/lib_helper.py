@@ -35,9 +35,6 @@ def floor_to_utc_day(ts):
 
 def date_hour(timestamp):
     date, hour = datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%x %H").split(" ")
-    print(date)
-    print(hour)
-    print(timestamp)
     return f"{date} {hour}:00"
 
 def get_context(request):

@@ -18,29 +18,22 @@ def notary_mining_view(request, notary=None):
     start = int(time.time())
     notary_mining = get_mined_data(None, notary).values()
     end = int(time.time())
-    print(f"get_mined_data: {end-start}")
 
     start = end
     notary_list = get_notary_list(season)
     end = int(time.time())
-    print(f"get_notary_list: {end-start}")
 
     start = end
     sidebar_links = get_sidebar_links(season)
     end = int(time.time())
-    print(f"get_sidebar_links: {end-start}")
 
     start = end
     eco_data_link = get_eco_data_link()
     end = int(time.time())
-    print(f"get_eco_data_link: {end-start}")
 
     start = end
     explorers = get_explorers(request)
     end = int(time.time())
-    print(f"get_eco_data_link: {end-start}")
-
-    
 
     context = {
         "season":season,
@@ -137,7 +130,6 @@ def notary_profile_view(request, notary=None):
             seed_score_data = get_seed_stat_season(season, notary).values()
             for item in seed_score_data:
                 seed_score += item["score"]
-            print(f"seed_score: {seed_score}")
             season_score = ntx_score + seed_score
             rank = get_region_rank(season_stats_sorted[region], notary)
             context.update({

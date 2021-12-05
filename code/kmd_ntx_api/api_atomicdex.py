@@ -98,8 +98,6 @@ def activation_commands_api(request):
             resp_json.update(get_contracts(coin))
         else:
             other_platforms.append(platform)
-            print(f"{platform} not in {SWAP_CONTRACTS}")
-
 
         if protocol == "UTXO":
             platform = 'UTXO'
@@ -299,8 +297,6 @@ def activation_commands_api(request):
                     ]
                 })
         if compatible and len(resp_json) > 0:
-            print(item["coins_info"])
-            print(resp_json)
             is_valid_enable = (resp_json['method'] == 'enable' and 'urls' in resp_json)
             is_valid_electrum = (resp_json['method'] == 'electrum' and 'servers' in resp_json)
             if is_valid_enable or is_valid_electrum:

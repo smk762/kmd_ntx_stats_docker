@@ -6,7 +6,7 @@
 		<div class="card table_card">
 			<div class="card-header table_card_title flex">
 				<span class="mx-1">{{ season_clean }} MM2 Version Monthly Stats</span>
-				<a href="../seednode_version_stats_daily_table" class="icon-href h5"><i class="fas fa-search-plus"></i></a>
+				<a href="../seednode_version_stats_daily" class="icon-href h5"><i class="fas fa-search-plus"></i></a>
 				<br />
 				<span style="font-size: 1rem;">
 					<span class="mx-1">{{ season }}</span>
@@ -38,7 +38,8 @@
 				</table>
 			</div>
 			<div class="card-footer flex">
-				<i>Times are in UTC</i>
+				<i>Times are in UTC.</i>
+				The current active mm2 version: {{ active_version }}
 			</div>
 		</div>
 	</div>

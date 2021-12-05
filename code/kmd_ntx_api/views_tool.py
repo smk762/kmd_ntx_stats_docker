@@ -8,164 +8,6 @@ from kmd_ntx_api.api_tools import *
 from kmd_ntx_api.lib_base58 import *
 
 
-def decode_opret_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"Decode OP_RETURN Tool",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
-
-    if "OP_RETURN" in request.GET:
-        OP_RETURN = request.GET["OP_RETURN"].replace("OP_RETURN ", "")
-
-        if OP_RETURN == "":
-            messages.error(request, f"No OP_RETURN input!")
-
-        elif validate_opret(OP_RETURN):
-
-            url = f"{THIS_SERVER}/api/tools/decode_opreturn/?OP_RETURN={OP_RETURN}"
-            decoded = requests.get(url).json()
-
-            opret_rows = [{"key":"OP_RETURN", "value":OP_RETURN}]
-            for item in decoded:
-                key_val = item.replace("_", " ").title()
-                opret_rows.append({"key":key_val, "value":decoded[item]})
-
-            context.update({
-                "OP_RETURN": OP_RETURN,
-                "opret_rows": opret_rows,
-            })
-
-        else:
-            messages.error(request, f"Invalid OP_RETURN: {OP_RETURN}")
-
-    return render(request, 'tool_opret.html', context)
-
-
-def kmd_rewards_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"KMD Rewards Tool",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
-    if "address" in request.GET:
-        address = request.GET["address"]
-        url = f"{THIS_SERVER}/api/tools/kmd_rewards"
-        resp = requests.get(f"{url}/?address={address}").json()
-        if "error" in resp:
-            messages.error(request, resp["error"])
-        else:
-            kmd_rewards_rows = []
-            for utxo in resp["utxos"]:
-                row = {"txid":utxo}
-                row.update(resp["utxos"][utxo])
-                kmd_rewards_rows.append(row)
-
-            context.update({
-                "address": address,
-                "kmd_balance": resp["kmd_balance"],
-                "total_rewards": round(resp["total_rewards"],6),
-                "utxo_count": resp["utxo_count"],
-                "eligible_utxo_count": resp["eligible_utxo_count"],
-                "oldest_utxo_block": resp["oldest_utxo_block"],
-                "kmd_rewards_rows": kmd_rewards_rows,
-            })
-
-    return render(request, 'tool_kmd_rewards.html', context)
-
-
-def launch_params_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "season_clean":season.replace("_"," "),
-        "page_title":"Launch Parameters",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
-
-    url = f"{THIS_SERVER}/api/info/launch_params"
-    launch_params = requests.get(url).json()["results"]
-
-    launch_param_rows = []
-    for chain in launch_params:
-        launch_param_rows.append({"chain":chain, "launch_params":launch_params[chain]})
-
-    context.update({
-        "launch_param_rows": launch_param_rows,
-    })
-
-    return render(request, 'tool_launch_params.html', context)
-
-
-def daemon_cli_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "season_clean":season.replace("_"," "),
-        "page_title":"Daemon CLIs",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
-
-    url = f"{THIS_SERVER}/api/info/daemon_cli"
-    daemon_cli = requests.get(url).json()["results"]
-
-    daemon_cli_rows = []
-    for chain in daemon_cli:
-        daemon_cli_rows.append({"chain":chain, "daemon_cli":daemon_cli[chain]})
-
-    context.update({
-        "daemon_cli_rows": daemon_cli_rows,
-    })
-
-    return render(request, 'tool_daemon_cli.html', context)
-
-
-def pubkey_addresses_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"Pubkey Addresses",
-        "explorers":get_explorers(request),
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
-    if "pubkey" in request.GET:
-        pubkey = request.GET["pubkey"]
-        if pubkey == "":
-            messages.error(request, f"No pubkey input!")
-        elif validate_pubkey(pubkey):
-            base_58_coins = requests.get(f"{THIS_SERVER}/api/info/base_58/").json()["results"]
-            base_58_coins_list = list(base_58_coins.keys())
-            address_rows = []
-            
-            for coin in base_58_coins_list:
-                pubtype = base_58_coins[coin]["pubtype"]
-                p2shtype = base_58_coins[coin]["p2shtype"]
-                wiftype = base_58_coins[coin]["wiftype"]
-                address_row = calc_addr_tool(pubkey, pubtype, p2shtype, wiftype)
-                address_row.update({"coin":coin})
-                address_rows.append(address_row)
-            context.update({
-                "pubkey": pubkey,
-                "address_rows": address_rows,
-            })
-        else:
-            messages.error(request, f"Invalid pubkey: {pubkey}")
-
-    return render(request, 'tool_pubkey_addresses.html', context)
-
-
 def convert_addresses_view(request):
     season = get_page_season(request)
     context = {
@@ -193,67 +35,7 @@ def convert_addresses_view(request):
                 "address_rows": address_rows,
             })
 
-    return render(request, 'tool_convert_addresses.html', context)
-
-
-def scripthash_from_address_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"Get Scripthash from Address",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
-    if "address" in request.GET:
-        address = request.GET["address"]
-        url = f"{THIS_SERVER}/api/tools/scripthash_from_address/?address={address}"
-        resp = requests.get(url).json()
-
-        if "error" in resp:
-            messages.error(request, f"{resp['error']}")
-        else:
-            resp_rows = []
-            for item in resp:
-                key_val = item.replace("_", " ").title()
-                resp_rows.append({"key":key_val, "value":resp[item]})
-
-            context.update({
-                "address":address,
-                "resp_rows": resp_rows
-            })
-
-    return render(request, 'tool_scripthash_from_address.html', context)
-
-
-def scripthashes_from_pubkey_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"Get Scripthashes from Pubkey",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
-    if "pubkey" in request.GET:
-        pubkey = request.GET["pubkey"]
-        url = f"{THIS_SERVER}/api/tools/scripthashes_from_pubkey/?pubkey={pubkey}"
-        resp = requests.get(url).json()
-
-        if "error" in resp:
-            messages.error(request, f"{resp['error']}")
-        else:
-            resp_rows = []
-            for item in resp:
-                key_val = item.replace("_", " ").title()
-                resp_rows.append({"key":key_val, "value":resp[item]})
-
-            context.update({
-                "pubkey":pubkey,
-                "resp_rows": resp_rows
-            })
-
-    return render(request, 'tool_scripthashes_from_pubkey.html', context)
+    return render(request, 'views/tools/tool_convert_addresses.html', context)
 
 
 def create_raw_transaction_view(request):
@@ -306,9 +88,7 @@ def create_raw_transaction_view(request):
         test_tx = raw_tx()
         tx_inputs = []
         for vin in inputs.split(","):
-            print(vin)
             elements = vin.split("|")
-            print(elements)
             tx_inputs.append({
                 "tx_hash":elements[0],
                 "tx_pos":int(elements[1]),
@@ -333,7 +113,225 @@ def create_raw_transaction_view(request):
             "raw_tx": raw_hex
         })
 
-    return render(request, 'tool_create_raw_transaction.html', context)
+    return render(request, 'views/tools/tool_create_raw_transaction.html', context)
+
+
+def daemon_cli_view(request):
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "season_clean":season.replace("_"," "),
+        "page_title":"Daemon CLIs",
+        "scheme_host":get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+
+    url = f"{THIS_SERVER}/api/info/daemon_cli"
+    daemon_cli = requests.get(url).json()["results"]
+
+    daemon_cli_rows = []
+    for chain in daemon_cli:
+        daemon_cli_rows.append({"chain":chain, "daemon_cli":daemon_cli[chain]})
+
+    context.update({
+        "daemon_cli_rows": daemon_cli_rows,
+    })
+
+    return render(request, 'views/tools/tool_daemon_cli.html', context)
+
+
+def decode_opret_view(request):
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "page_title":"Decode OP_RETURN Tool",
+        "scheme_host":get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+
+    if "OP_RETURN" in request.GET:
+        OP_RETURN = request.GET["OP_RETURN"].replace("OP_RETURN ", "")
+
+        if OP_RETURN == "":
+            messages.error(request, f"No OP_RETURN input!")
+
+        elif validate_opret(OP_RETURN):
+
+            url = f"{THIS_SERVER}/api/tools/decode_opreturn/?OP_RETURN={OP_RETURN}"
+            decoded = requests.get(url).json()
+
+            opret_rows = [{"key":"OP_RETURN", "value":OP_RETURN}]
+            for item in decoded:
+                key_val = item.replace("_", " ").title()
+                opret_rows.append({"key":key_val, "value":decoded[item]})
+
+            context.update({
+                "OP_RETURN": OP_RETURN,
+                "opret_rows": opret_rows,
+            })
+
+        else:
+            messages.error(request, f"Invalid OP_RETURN: {OP_RETURN}")
+
+    return render(request, 'views/tools/tool_decode_opret.html', context)
+
+
+def kmd_rewards_view(request):
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "page_title":"KMD Rewards Tool",
+        "scheme_host":get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+    if "address" in request.GET:
+        address = request.GET["address"]
+        url = f"{THIS_SERVER}/api/tools/kmd_rewards"
+        resp = requests.get(f"{url}/?address={address}").json()
+        if "error" in resp:
+            messages.error(request, resp["error"])
+        else:
+            kmd_rewards_rows = []
+            for utxo in resp["utxos"]:
+                row = {"txid":utxo}
+                row.update(resp["utxos"][utxo])
+                kmd_rewards_rows.append(row)
+
+            context.update({
+                "address": address,
+                "kmd_balance": resp["kmd_balance"],
+                "total_rewards": round(resp["total_rewards"],6),
+                "utxo_count": resp["utxo_count"],
+                "eligible_utxo_count": resp["eligible_utxo_count"],
+                "oldest_utxo_block": resp["oldest_utxo_block"],
+                "kmd_rewards_rows": kmd_rewards_rows,
+            })
+
+    return render(request, 'views/tools/tool_kmd_rewards.html', context)
+
+
+def launch_params_view(request):
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "season_clean":season.replace("_"," "),
+        "page_title":"Launch Parameters",
+        "scheme_host":get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+
+    url = f"{THIS_SERVER}/api/info/launch_params"
+    launch_params = requests.get(url).json()["results"]
+
+    launch_param_rows = []
+    for chain in launch_params:
+        launch_param_rows.append({"chain":chain, "launch_params":launch_params[chain]})
+
+    context.update({
+        "launch_param_rows": launch_param_rows,
+    })
+
+    return render(request, 'views/tools/tool_launch_params.html', context)
+
+
+def pubkey_addresses_view(request):
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "page_title":"Pubkey Addresses",
+        "explorers":get_explorers(request),
+        "scheme_host":get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+    if "pubkey" in request.GET:
+        pubkey = request.GET["pubkey"]
+        if pubkey == "":
+            messages.error(request, f"No pubkey input!")
+        elif validate_pubkey(pubkey):
+            base_58_coins = requests.get(f"{THIS_SERVER}/api/info/base_58/").json()["results"]
+            base_58_coins_list = list(base_58_coins.keys())
+            address_rows = []
+            
+            for coin in base_58_coins_list:
+                pubtype = base_58_coins[coin]["pubtype"]
+                p2shtype = base_58_coins[coin]["p2shtype"]
+                wiftype = base_58_coins[coin]["wiftype"]
+                address_row = calc_addr_tool(pubkey, pubtype, p2shtype, wiftype)
+                address_row.update({"coin":coin})
+                address_rows.append(address_row)
+            context.update({
+                "pubkey": pubkey,
+                "address_rows": address_rows,
+            })
+        else:
+            messages.error(request, f"Invalid pubkey: {pubkey}")
+
+    return render(request, 'views/tools/tool_pubkey_addresses.html', context)
+
+
+def scripthashes_from_pubkey_view(request):
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "page_title":"Get Scripthashes from Pubkey",
+        "scheme_host":get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+    if "pubkey" in request.GET:
+        pubkey = request.GET["pubkey"]
+        url = f"{THIS_SERVER}/api/tools/scripthashes_from_pubkey/?pubkey={pubkey}"
+        resp = requests.get(url).json()
+
+        if "error" in resp:
+            messages.error(request, f"{resp['error']}")
+        else:
+            resp_rows = []
+            for item in resp:
+                key_val = item.replace("_", " ").title()
+                resp_rows.append({"key":key_val, "value":resp[item]})
+
+            context.update({
+                "pubkey":pubkey,
+                "resp_rows": resp_rows
+            })
+
+    return render(request, 'views/tools/tool_scripthashes_from_pubkey.html', context)
+
+
+def scripthash_from_address_view(request):
+    season = get_page_season(request)
+    context = {
+        "season":season,
+        "page_title":"Get Scripthash from Address",
+        "scheme_host":get_current_host(request),
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+    if "address" in request.GET:
+        address = request.GET["address"]
+        url = f"{THIS_SERVER}/api/tools/scripthash_from_address/?address={address}"
+        resp = requests.get(url).json()
+
+        if "error" in resp:
+            messages.error(request, f"{resp['error']}")
+        else:
+            resp_rows = []
+            for item in resp:
+                key_val = item.replace("_", " ").title()
+                resp_rows.append({"key":key_val, "value":resp[item]})
+
+            context.update({
+                "address":address,
+                "resp_rows": resp_rows
+            })
+
+    return render(request, 'views/tools/tool_scripthash_from_address.html', context)
 
 
 def send_raw_tx_view(request):
@@ -355,4 +353,4 @@ def send_raw_tx_view(request):
             messages.success(request, f"{mm2_resp}")
 
 
-    return render(request, 'tool_send_raw_transaction.html', context)
+    return render(request, 'views/tools/tool_send_raw_transaction.html', context)
