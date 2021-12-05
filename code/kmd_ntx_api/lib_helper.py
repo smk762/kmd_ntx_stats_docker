@@ -1,20 +1,43 @@
 #!/usr/bin/env python3
 import time
 import json
+import math
 import random
 import logging
 import requests
 from .lib_const import *
 import string
 import itertools
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 logger = logging.getLogger("mylogger")
 
+
+def get_active_mm2_versions(ts):
+    data = requests.get(VERSION_TIMESPANS_URL).json()
+    active_versions = []
+    for version in data:
+        if int(ts) > data[version]["start"] and int(ts) < data[version]["end"]:
+            active_versions.append(version)
+    return active_versions
+
+
+def is_mm2_version_valid(version, timestamp):
+    active_versions = get_active_mm2_versions(timestamp)
+    if version in active_versions:
+        return True
+    return False
+
+
+def floor_to_utc_day(ts):
+    return math.floor(ts/(24*60*60))*(24*60*60)
+
 def date_hour(timestamp):
-    date, hour = datetime.fromtimestamp(timestamp).strftime("%x %H").split(" ")
-    hour = int(hour)+1
+    date, hour = datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%x %H").split(" ")
+    print(date)
+    print(hour)
+    print(timestamp)
     return f"{date} {hour}:00"
 
 def get_context(request):

@@ -14,6 +14,7 @@ MM2_IP = "http://mm2:7783"
 OTHER_SERVER = os.getenv("OTHER_SERVER")
 THIS_SERVER = os.getenv("THIS_SERVER")  # IP / domain of the local server
 
+VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/smk762/DragonhoundTools/master/atomicdex/seednode_version.json"
 
 logger = logging.getLogger("mylogger")
 

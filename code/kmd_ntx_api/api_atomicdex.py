@@ -15,6 +15,9 @@ def seednode_version_stats_hourly_api(request):
     return JsonResponse(get_nn_mm2_stats_by_hour(request), safe=False)
 
 
+def nn_seed_version_scores_table_api(request):
+    return JsonResponse(get_nn_seed_version_scores_hourly_table(request), safe=False)
+
 def bestorders_api(request):
     return JsonResponse(get_orderbook(request))
 

@@ -758,6 +758,14 @@
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
             }
+            .append-label-right {
+                background-color: #0d0f1c;
+                border: solid 1px #303030 !important;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+                border-top-right-radius: 0.25rem;
+                border-bottom-right-radius: 0.25rem;
+            }
 
             .table_card {
                  width: inherit;
@@ -869,6 +877,16 @@
             .select2-selection, .select2-search  {
                 background-color: #334352 !important;
                 color: #aeaeae !important;
+            }
+
+            .icon-href {
+                filter: brightness(0.5);
+            }
+            .icon-href:hover {
+                filter: brightness(0.9);
+            }
+            .skinny-table td {
+                padding: 0.25rem !important;
             }
 
         </style>
