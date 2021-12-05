@@ -341,14 +341,6 @@ def get_nn_seed_version_scores_month_table(request, start=None, end=None):
         "scores": notary_scores
         }
 
-def get_notary_list(season):
-    notaries = get_nn_social_data(season).values('notary')
-    notary_list = []
-    for item in notaries:
-        if item['notary'] not in notary_list:
-            notary_list.append(item['notary'])
-    notary_list.sort()
-    return notary_list
 
 
 def get_nn_mm2_stats_by_hour_chart_data(start, end, notary=None):
