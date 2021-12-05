@@ -48,6 +48,16 @@ def get_context(request):
         "eco_data_link":get_eco_data_link()
     }
 
+def get_base_context(request):
+    season = get_page_season(request)
+    scheme_host = get_current_host(request)
+    context = {
+        "season":season,
+        "scheme_host": scheme_host,
+        "sidebar_links":get_sidebar_links(season),
+        "eco_data_link":get_eco_data_link()
+    }
+
 
 def get_or_none(request, key):
     return request.GET[key] if key in request.GET else None
