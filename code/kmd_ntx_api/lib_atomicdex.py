@@ -35,9 +35,9 @@ def get_nn_mm2_stats_by_hour(request):
 
 def mm2_proxy(params):
   params.update({"userpass": MM2_USERPASS})
-  print(json.dumps(params))
+  #print(json.dumps(params))
   r = requests.post(MM2_IP, json.dumps(params))
-  print(r.json())
+  #print(r.json())
   return r
 
 
@@ -73,7 +73,7 @@ def get_bestorders(request):
 
 
 def send_raw_tx(request):
-    print(electrum(request))
+    # print(electrum(request))
     coin = "KMD"
     tx_hex = ""
     if "coin" in request.GET:
@@ -227,8 +227,6 @@ def get_swaps_coin_stats(from_time, to_time):
 
 def get_swaps_stats(from_time, to_time):
     data = get_swaps_data()
-    print(from_time)
-    print(to_time)
     data = filter_swaps_timespan(data, from_time, to_time)
     taker_pubkeys = data.values('taker_pubkey').annotate(num_swaps=Count('taker_pubkey'))
     maker_pubkeys = data.values('maker_pubkey').annotate(num_swaps=Count('maker_pubkey'))
@@ -253,7 +251,6 @@ def get_swaps_stats(from_time, to_time):
 
 
 def get_swaps_gui_stats(request):
-    print(request.GET)
     to_time = int(time.time())
     from_time = int(time.time()) - SINCE_INTERVALS["week"]
     '''
@@ -267,8 +264,6 @@ def get_swaps_gui_stats(request):
         to_time = int(request.GET["to_time"])
 
     data = get_swaps_data()
-    print(from_time)
-    print(to_time)
     data = filter_swaps_timespan(data, from_time, to_time)
     taker_pubkeys = data.values('taker_pubkey', 'taker_gui').annotate(num_swaps=Count('taker_pubkey'))
     maker_pubkeys = data.values('maker_pubkey', 'maker_gui').annotate(num_swaps=Count('maker_pubkey'))
@@ -386,7 +381,6 @@ def get_swaps_pubkey_stats(request):
 
 
 def get_contracts(platform):
-    print(platform)
     if is_testnet(platform):
         contract = SWAP_CONTRACTS[platform]["testnet"]["swap_contract"]
         fallback_contract = SWAP_CONTRACTS[platform]["testnet"]["fallback_contract"]

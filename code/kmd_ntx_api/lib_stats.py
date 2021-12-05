@@ -212,7 +212,6 @@ def get_season_stats_sorted(season, coins_dict=None):
     nn_seed_season_data = get_seed_stat_season(season)
     for item in nn_seed_season_data:
         nn_seed_season.update({item['name']:round(item['sum_score'],2)})
-    print(nn_seed_season)
 
     notarised_count_season_data = get_notarised_count_season_data(season).values()
     for item in notarised_count_season_data:
@@ -229,7 +228,7 @@ def get_season_stats_sorted(season, coins_dict=None):
                 "score": float(item["season_score"])+nn_seed_season[item["notary"]]
             })
         except Exception as e:
-            print(e)
+            #print(e)
             pass
 
     # calc scores
@@ -249,6 +248,5 @@ def get_season_stats_sorted(season, coins_dict=None):
                     new_item.update({"rank": i})
                     season_stats_sorted[region].append(new_item)
             i += 1
-    print(season_stats_sorted)
     return season_stats_sorted
 

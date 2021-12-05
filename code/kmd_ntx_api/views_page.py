@@ -260,7 +260,7 @@ def faucet(request):
     faucet_supply_resp = requests.get(f"https://faucet.komodo.live/rm_faucet_balances").json()
 
     for node in faucet_supply_resp:
-        print(f"{node} {faucet_supply_resp[node]}")
+
         try:
             faucet_supply["RICK"] += faucet_supply_resp[node]["RICK"]
             faucet_supply["MORTY"] += faucet_supply_resp[node]["MORTY"]

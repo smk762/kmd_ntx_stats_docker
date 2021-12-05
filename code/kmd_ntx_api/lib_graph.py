@@ -21,7 +21,6 @@ def get_balances_graph_data(request):
     chain_list = []
     balances_dict = {}
     for item in data:
-        print(item)
 
         if item['notary'] not in notary_list:
             notary_list.append(item['notary'])

@@ -37,19 +37,15 @@ frontend_atomicdex_urls = [
          views_atomicdex.orderbook_view,
          name='orderbook_view'),
 
-    path('atomicdex/seednode_version_stats/',
-         views_atomicdex.seednode_version_stats_view,
-         name='seednode_version_stats_view'),
-
-    path('atomicdex/seednode_version_stats_hourly_table/',
+    path('atomicdex/seednode_version_stats_hourly/',
          views_atomicdex.seednode_version_stats_hourly_table_view,
          name='seednode_version_stats_hourly_table_view'),
 
-    path('atomicdex/seednode_version_stats_daily_table/',
+    path('atomicdex/seednode_version_stats_daily/',
          views_atomicdex.seednode_version_stats_daily_table_view,
          name='seednode_version_stats_daily_table_view'),
 
-    path('atomicdex/seednode_version_stats_month_table/',
+    path('atomicdex/seednode_version_stats_month/',
          views_atomicdex.seednode_version_stats_month_table_view,
          name='seednode_version_stats_month_table_view'),
 ]

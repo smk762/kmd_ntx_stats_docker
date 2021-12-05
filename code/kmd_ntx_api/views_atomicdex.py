@@ -27,10 +27,11 @@ def activation_commands_view(request):
         "activation_data":activation_data,
         "eco_data_link":get_eco_data_link()
     }
-    return render(request, 'atomicdex/activation_commands.html', context)
+    return render(request, 'views/atomicdex/activation_commands.html', context)
 
 
 def batch_activation_form_view(request):
+    season = get_page_season(request)
     context = get_context(request)
     context.update({
         "page_title":"Generate AtomicDEX-API Batch Activation Commands",
@@ -67,7 +68,7 @@ def batch_activation_form_view(request):
             context.update({
                 "form_resp":form_resp
             })
-            return render(request, 'atomicdex/batch_activation_form.html', context)
+            return render(request, 'views/atomicdex/batch_activation_form.html', context)
         except Exception as e:
             print(e)
         
@@ -76,7 +77,7 @@ def batch_activation_form_view(request):
         "form":form
     })
 
-    return render(request, 'atomicdex/batch_activation_form.html', context)
+    return render(request, 'views/atomicdex/batch_activation_form.html', context)
 
 
 def bestorders_view(request):
@@ -106,7 +107,7 @@ def bestorders_view(request):
         "bestorders": rows
     })
 
-    return render(request, 'atomicdex/bestorders.html', context)
+    return render(request, 'views/atomicdex/bestorders.html', context)
 
 
 def gui_stats_view(request):
@@ -136,7 +137,7 @@ def gui_stats_view(request):
         "eco_data_link": get_eco_data_link()
     }
 
-    return render(request, 'atomicdex/gui_stats.html', context)
+    return render(request, 'views/atomicdex/gui_stats.html', context)
 
 
 def last_200_swaps_view(request):
@@ -155,7 +156,7 @@ def last_200_swaps_view(request):
         "eco_data_link": get_eco_data_link()
     }
 
-    return render(request, 'atomicdex/last_200_swaps.html', context)
+    return render(request, 'views/atomicdex/last_200_swaps.html', context)
 
 
 def last_200_failed_swaps_view(request):
@@ -175,7 +176,7 @@ def last_200_failed_swaps_view(request):
         "eco_data_link": get_eco_data_link()
     }
 
-    return render(request, 'atomicdex/last_200_failed_swaps.html', context)
+    return render(request, 'views/atomicdex/last_200_failed_swaps.html', context)
 
 
 def makerbot_config_form_view(request):
@@ -263,11 +264,10 @@ def makerbot_config_form_view(request):
                 except Exception as e:
                     messages.error(request, 'e')
                     print(e)
-                print(form_resp)
                 context.update({
                     "form_resp":form_resp
                 })
-            return render(request, 'atomicdex/makerbot_config_form.html', context)
+            return render(request, 'views/atomicdex/makerbot_config_form.html', context)
         except Exception as e:
             print(e)
         
@@ -275,7 +275,7 @@ def makerbot_config_form_view(request):
     context.update({
         "form": form
     })
-    return render(request, 'atomicdex/makerbot_config_form.html', context)
+    return render(request, 'views/atomicdex/makerbot_config_form.html', context)
 
 
 def orderbook_view(request):
@@ -341,29 +341,7 @@ def orderbook_view(request):
             "asks": asks
         })
 
-    return render(request, 'atomicdex/orderbook.html', context)
-
-
-def seednode_version_stats_view(request):
-    season = get_page_season(request)
-    start = time.time() - 24*60*60
-    end = time.time()
-    if 'start' in request.GET:
-        start = request.GET["start"]
-    if 'end' in request.GET:
-        end = request.GET["end"]
-    context = {
-        "season": season,
-        "start": int(start),
-        "end": int(end),
-        "start_str": datetime.fromtimestamp(int(start)).strftime("%m/%d/%Y, %H:%M:%S"),
-        "end_str": datetime.fromtimestamp(int(end)).strftime("%m/%d/%Y, %H:%M:%S"),
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link()
-    }
-
-    return render(request, 'atomicdex/seednode_version_stats.html', context)
+    return render(request, 'views/atomicdex/orderbook.html', context)
 
 
 def seednode_version_stats_hourly_table_view(request):
@@ -375,7 +353,6 @@ def seednode_version_stats_hourly_table_view(request):
 
     date_ts = floor_to_utc_day(time.time())
     if 'date_ts' in request.GET:
-        print(f"request.GET: {request.GET}")
         try:
             date_ts = int(request.GET["date_ts"])
             if date_ts > time.time()*10:
@@ -384,9 +361,10 @@ def seednode_version_stats_hourly_table_view(request):
             print(e)
             pass
 
-    print(stats_date)
     start = floor_to_utc_day(date_ts)
     end = start + 24*60*60
+
+    active_version = " & ".join(get_active_mm2_versions(time.time()))
 
 
     version_scores = get_nn_seed_version_scores_hourly_table(request, start, end)
@@ -398,11 +376,12 @@ def seednode_version_stats_hourly_table_view(request):
         "scheme_host": get_current_host(request),
         "sidebar_links": get_sidebar_links(season),
         "eco_data_link": get_eco_data_link(),
+        "active_version": active_version,
         "headers": version_scores["headers"],
         "scores": version_scores["scores"]
     }
 
-    return render(request, 'atomicdex/seednode_version_stats_hourly_table.html', context)
+    return render(request, 'views/atomicdex/seednode_version_stats_hourly_table.html', context)
 
 
 def seednode_version_stats_daily_table_view(request):
@@ -419,13 +398,12 @@ def seednode_version_stats_daily_table_view(request):
     end = start + 14 * (24 * 60 * 60)
 
 
-    print(date_hour(start))
-    print(date_hour(end))
     prev_ts = start - 15 * (24 * 60 * 60)
     next_ts = end + (24 * 60 * 60)
 
     from_date  = date_hour(start - (24 * 60 * 60)).split(" ")[0]
     to_date = date_hour(end - (24 * 60 * 60)).split(" ")[0]
+    active_version = " & ".join(get_active_mm2_versions(time.time()))
 
 
     version_scores = get_nn_seed_version_scores_daily_table(request, start, end)
@@ -435,6 +413,7 @@ def seednode_version_stats_daily_table_view(request):
         "prev_ts": prev_ts,
         "next_ts": next_ts,
         "season": season,
+        "active_version": active_version,
         "scheme_host": get_current_host(request),
         "sidebar_links": get_sidebar_links(season),
         "eco_data_link": get_eco_data_link(),
@@ -442,7 +421,7 @@ def seednode_version_stats_daily_table_view(request):
         "scores": version_scores["scores"]
     }
 
-    return render(request, 'atomicdex/seednode_version_stats_daily_table.html', context)
+    return render(request, 'views/atomicdex/seednode_version_stats_daily_table.html', context)
 
 
 def seednode_version_stats_month_table_view(request):
@@ -450,19 +429,18 @@ def seednode_version_stats_month_table_view(request):
 
     start = SEASONS_INFO[season]["start_time"]
     end = SEASONS_INFO[season]["end_time"]
+    active_version = " & ".join(get_active_mm2_versions(time.time()))
 
     version_scores = get_nn_seed_version_scores_month_table(request, start, end)
-    print(start)
-    print(end)
-    print(version_scores)
     context = {
         "season": season,
         "scheme_host": get_current_host(request),
         "sidebar_links": get_sidebar_links(season),
         "eco_data_link": get_eco_data_link(),
+        "active_version": active_version,
         "headers": version_scores["headers"],
         "scores": version_scores["scores"]
     }
 
-    return render(request, 'atomicdex/seednode_version_stats_month_table.html', context)
+    return render(request, 'views/atomicdex/seednode_version_stats_month_table.html', context)
 

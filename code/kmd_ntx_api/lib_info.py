@@ -1264,7 +1264,6 @@ def get_notary_ltc_transactions(request):
         "notary": notary,
     }
     txid_list = []
-    print(season)
     data = get_nn_ltc_tx_data(season, notary, category, address).values()
 
     for item in data:

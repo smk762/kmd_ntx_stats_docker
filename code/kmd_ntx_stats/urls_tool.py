@@ -10,13 +10,21 @@ frontend_tool_urls = [
           views_tool.convert_addresses_view,
           name='convert_addresses_view'),
 
-    path('tools/decode_opret/',
-          views_tool.decode_opret_view,
-          name='decode_opret_view'),
+    path('tools/create_raw_transaction/',
+          views_tool.create_raw_transaction_view,
+          name='create_raw_transaction_view'),
 
     path('tools/daemon_clis/',
           views_tool.daemon_cli_view,
           name='daemon_cli_view'),
+
+    path('tools/decode_opret/',
+          views_tool.decode_opret_view,
+          name='decode_opret_view'),
+
+    path('tools/kmd_rewards/',
+          views_tool.kmd_rewards_view,
+          name='kmd_rewards_view'),
 
     path('tools/launch_params/',
           views_tool.launch_params_view,
@@ -25,10 +33,6 @@ frontend_tool_urls = [
     path('tools/pubkey_addresses/',
           views_tool.pubkey_addresses_view,
           name='pubkey_addresses_view'),
-
-    path('tools/kmd_rewards/',
-          views_tool.kmd_rewards_view,
-          name='kmd_rewards_view'),
 
     path('tools/scripthashes_from_pubkey/',
           views_tool.scripthashes_from_pubkey_view,
@@ -41,11 +45,6 @@ frontend_tool_urls = [
     path('tools/send_raw_tx/',
           views_tool.send_raw_tx_view,
           name='send_raw_tx_view'),
-
-    path('tools/create_raw_transaction/',
-          views_tool.create_raw_transaction_view,
-          name='create_raw_transaction_view'),
-
 ]
 
 

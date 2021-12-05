@@ -112,7 +112,6 @@ def get_last_mined_table(request):
     resp = []
     # name num sum max last
     for item in data:
-        print(item)
         season = item['season']
         name = item['name']
         address = item['address']
@@ -230,9 +229,7 @@ def get_notary_profile_summary_table(request):
             resp[chain].update({"ntx_pct": chain_ntx_pct[chain]})
 
     last_ntx = get_last_notarised_table(request)
-    print(last_ntx)
     for item in last_ntx:
-        print(item)
         chain = item['chain']
         # filter out post season chains e.g. etomic
         if chain in resp:
@@ -482,12 +479,10 @@ def get_notarised_table(request):
         notary = request.GET["notary"]
     if "address" in request.GET:
         address = request.GET["address"]
-    print(chain)
     if not season or not server or not chain or not notary:
         return {
             "error": "You need to specify all of the following filter parameters: ['season', 'server', 'chain', 'notary']"
         }
-    print(chain)
     data = get_notarised_data(season, server, epoch, chain, notary, address).order_by('-block_time')
     data = data.values()
 
