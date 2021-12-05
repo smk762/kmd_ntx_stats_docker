@@ -37,6 +37,22 @@ def date_hour(timestamp):
     date, hour = datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%x %H").split(" ")
     return f"{date} {hour}:00"
 
+def get_notary_list(season):
+    return requests.get(f"{THIS_SERVER}/api/info/notary_nodes/?season={season}").json()["results"]
+
+def get_sidebar_links(season):
+    notary_list = get_notary_list(season)
+    region_notaries = get_regions_info(notary_list)
+    coins_dict = get_dpow_server_coins_dict(season)
+    coins_dict["Main"] += ["KMD", "LTC"]
+    coins_dict["Main"].sort()
+    sidebar_links = {
+        "server": os.getenv("SERVER"),
+        "chains_menu": coins_dict,
+        "notaries_menu": region_notaries,
+    }
+    return sidebar_links
+
 def get_context(request):
     mm2_coins = list(get_dexstats_explorers().keys())
     season = get_page_season(request)

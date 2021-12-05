@@ -645,20 +645,6 @@ def get_testnet_stats_dict(season, testnet_chains):
     return testnet_stats_dict
 
 
-def get_sidebar_links(season):
-    notary_list = get_notary_list(season)
-    region_notaries = get_regions_info(notary_list)
-    coins_dict = get_dpow_server_coins_dict(season)
-    coins_dict["Main"] += ["KMD", "LTC"]
-    coins_dict["Main"].sort()
-    sidebar_links = {
-        "server": os.getenv("SERVER"),
-        "chains_menu": coins_dict,
-        "notaries_menu": region_notaries,
-    }
-    return sidebar_links
-
-
 def get_dpow_server_coins_dict_lists(season):
 
     dpow_chains = get_scoring_epochs_data(season).values('epoch_chains', 'server')
@@ -680,17 +666,6 @@ def get_dpow_server_coins_dict_lists(season):
     third_chains.sort()
 
     return main_chains, third_chains
-
-
-def get_notary_list(season):
-    notaries = get_nn_social_data(season).values('notary')
-    notary_list = []
-    for item in notaries:
-        if item['notary'] not in notary_list:
-            notary_list.append(item['notary'])
-    notary_list.sort()
-    return notary_list
-
 
 ### V2 for API/INFO
 
