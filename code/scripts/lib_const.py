@@ -48,7 +48,7 @@ LTC_NTX_ADDR = 'LhGojDga6V1fGzQfNGcYFAfKnDvsWeuAsP'
 # KMD RPC Proxy
 RPC = {}
 RPC["KMD"] = def_credentials("KMD")
-RPC["VOTE2021"] = def_credentials("VOTE2021")
+#RPC["VOTE2021"] = def_credentials("VOTE2021")
 noMoM = ['CHIPS', 'GAME', 'EMC2', 'AYA', 'GLEEC-OLD']
 
 # KMD REWARDS CONSTANTS
