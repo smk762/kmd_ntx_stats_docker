@@ -33,6 +33,7 @@ def activation_commands_view(request):
 def batch_activation_form_view(request):
     season = get_page_season(request)
     context = get_context(request)
+    scheme_host = get_current_host(request)
     context.update({
         "page_title":"Generate AtomicDEX-API Batch Activation Commands",
         "sidebar_links":get_sidebar_links(season)
