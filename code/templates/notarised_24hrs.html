@@ -69,6 +69,8 @@
 			            		icon = "coqui"
 			            	} else if (icon == "tokel") {
 			            		icon = "tkl"
+			            	} else if (icon == "pirate") {
+			            		icon = "arrr"
 			            	}
 				            $(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'><img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.chain+"</a>");
 				        }
@@ -89,15 +91,7 @@
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	
-			            	if (oData.chain == "TOKEL") {			            		
-			            		$(nTd).html("<a href='"+explorers['TKL'][0]+'block-index/'+oData.ac_ntx_height+"'>"+oData.ac_ntx_height+"</a>");
-			            	}
-			            	else if (oData.chain == "LTC") {
-				            	$(nTd).html("<a href='https://tokel.explorer.dexstats.info/block-index/"+oData.ac_ntx_height+"'>"+oData.ac_ntx_height+"</a>");
-			            	}
-			            	else {			            		
-			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'block-index/'+oData.ac_ntx_height+"'>"+oData.ac_ntx_height+"</a>");
-			            	}
+			            	$(nTd).html("<a href='"+explorers[oData.chain][0]+'block-index/'+oData.ac_ntx_height+"'>"+oData.ac_ntx_height+"</a>");
 				            
 				        }
 			        },

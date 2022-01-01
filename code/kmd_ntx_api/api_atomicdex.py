@@ -67,6 +67,7 @@ def activation_commands_api(request):
     other_platforms = []
     coins_without_electrum = []
     invalid_configs = {}
+    resp_json = {} 
 
     
     ignore_coins = [

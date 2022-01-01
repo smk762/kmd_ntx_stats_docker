@@ -64,7 +64,7 @@ DEVISOR = 10512000
 # Some coins are named differently between dpow and coins repo...
 TRANSLATE_COINS = {'COQUI': 'COQUICASH', 'OURC': 'OUR',
                    'WLC': 'WLC21', 'GleecBTC': 'GLEEC-OLD',
-                   'PIRATE': 'ARRR', 'TOKEL': 'TKL'}
+                   'ARRR': "PIRATE", 'TKL':'TOKEL'}
 
 # Coins categorised
 OTHER_COINS = []

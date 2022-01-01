@@ -14,7 +14,7 @@ It should be run as a cronjob every 12-24 hours
 '''
 
 
-# Gets coins info from coins repo
+# Gets coins info from coins repo (Uses "ARRR, TKL")
 def parse_coins_repo():
     r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/coins")
     coins_repo = r.json()
@@ -22,8 +22,8 @@ def parse_coins_repo():
     coins_data = {}
     for item in coins_repo:
         coin = item['coin']
-
         coin = handle_translate_chains(coin)
+        item['coin'] = coin
 
         coins_data.update({coin:{"coins_info":item}})
         if 'asset' in item:
@@ -60,7 +60,7 @@ def parse_coins_repo():
     return coins_data
 
 
-# Gets dpow info from dpow repo
+# Gets dpow info from dpow repo (Uses "PIRATE, TOKEL")
 def parse_dpow_coins(coins_data):
     r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/README.md")
     dpow_readme = r.text
@@ -106,7 +106,7 @@ def parse_dpow_coins(coins_data):
     return coins_data
 
 
-# Gets launch params from komodo repo
+# Gets launch params from komodo repo (Uses "PIRATE")
 def parse_assetchains(coins_data):
     r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/komodo/dev/src/assetchains.json")
     ac_json = r.json()
@@ -156,11 +156,12 @@ def parse_assetchains(coins_data):
     return coins_data
 
 
-# Gets Electrum / Explorer info from coins repo
+# Gets Electrum / Explorer info from coins repo (Uses TKL)
 def parse_electrum_explorer(coins_data):
     coins = list(coins_data.keys())
     coins.sort()
     for coin in coins:
+        coin = handle_translate_chains(coin)
         logger.info(f"[parse_electrum_explorer] Adding electrum info for {coin}")
 
         try:
@@ -168,6 +169,10 @@ def parse_electrum_explorer(coins_data):
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/COQUI")
             elif coin == "WLC21":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/WLC")
+            elif coin == "PIRATE":
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/ARRR")
+            elif coin == "TOKEL":
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/TKL")
             else:
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+coin)
             electrums = r.json()
@@ -200,14 +205,17 @@ def parse_electrum_explorer(coins_data):
 
 
     for coin in coins:
+        coin = handle_translate_chains(coin)
         logger.info(f"[parse_electrum_explorer] Adding Explorer info for {coin}")
         try:
             if coin == "COQUICASH":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/COQUI")
-            elif coin == "ARRR":
-                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/PIRATE")
+            elif coin == "PIRATE":
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/ARRR")
             elif coin == "WLC21":
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/WLC")
+            elif coin == "TOKEL":
+                r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/TKL")
             else:
                 r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/"+coin)
             explorers = r.json()
@@ -227,6 +235,7 @@ def parse_electrum_explorer(coins_data):
                 logger.error(f"Exception in [parse_electrum_explorer]: {e} {r.text}")
 
     for coin in coins:
+        coin = handle_translate_chains(coin)
         logger.info(f"[parse_electrum_explorer] Adding Icon info for {coin}")
         try:
             if coin == "COQUICASH":
@@ -234,6 +243,12 @@ def parse_electrum_explorer(coins_data):
                 r = requests.get(url)
             elif coin == "GLEEC-OLD":
                 url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/gleec.png"
+                r = requests.get(url)
+            elif coin == "TOKEL":
+                url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/tkl.png"
+                r = requests.get(url)
+            elif coin == "PIRATE":
+                url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/arrr.png"
                 r = requests.get(url)
             elif coin == "WLC21":
                 url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png"
@@ -262,6 +277,7 @@ def get_dpow_tenure(coins_data):
     notarised_chains = get_notarised_chains()
 
     for coin in notarised_chains:
+        coin = handle_translate_chains(coin)
         url = f'{THIS_SERVER}/api/table/notarised_tenure/?chain={coin}'
         logger.info(url)
         notarised_tenure = requests.get(url).json()["results"]
@@ -332,6 +348,7 @@ def get_dpow_tenure(coins_data):
                                         coins_data[coin]["dpow_tenure"][season][server].update({"end_time":end_time})
                             
     for coin in coins_data:
+        coin = handle_translate_chains(coin)
         logger.info(f"[get_dpow_tenure] setting dpow tenure: {coin}")
 
         if "dpow_tenure" not in coins_data[coin]:
@@ -352,6 +369,7 @@ def remove_old_coins(coins_data):
 
 def update_coins(coins_data):
     for coin in coins_data:
+        coin = handle_translate_chains(coin)
         logger.info(f"[update_coins] Updating {coin}")
         coin_data = coins_row()
         coin_data.chain = coin
