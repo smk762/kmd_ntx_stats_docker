@@ -103,7 +103,6 @@ class coins_row():
 
     def update(self):
         self.chain = handle_translate_chains(self.chain)
-        self.chain = handle_translate_chains(self.chain)
         row_data = (self.chain, self.coins_info, self.electrums,
             self.electrums_ssl, self.explorers, self.dpow,
             self.dpow_tenure, self.dpow_active, self.mm2_compatible)
@@ -453,6 +452,7 @@ class notarised_chain_season_row():
         return True
 
     def update(self):
+        self.chain = handle_dual_server_chains(self.chain, self.server)
         self.chain = handle_translate_chains(self.chain)
         row_data = (self.chain, self.ntx_count, self.block_height,
             self.kmd_ntx_blockhash, self.kmd_ntx_txid, self.kmd_ntx_blocktime,
@@ -918,6 +918,7 @@ class ntx_tenure_row():
 
     def update(self):
         # TODO: Validation start / end within season window
+        self.chain = handle_dual_server_chains(self.chain, self.server)
         self.chain = handle_translate_chains(self.chain)
 
         if self.chain in ["KMD" ,"LTC", "BTC"]:

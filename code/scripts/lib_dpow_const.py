@@ -5,13 +5,14 @@ OTHER_LAUNCH_PARAMS = {
     "LTC":"~/litecoin/src/litecoind",
     "KMD":"~/komodo/src/komodod", 
     "AYA":"~/AYAv2/src/aryacoind",
-    "CHIPS":"~/chips3/src/chipsd",
+    "CHIPS":"~/chips/src/chipsd",
     "EMC2":"~/einsteinium/src/einsteiniumd",
+    "TOKEL": "~/tokelkomodo/src/komodod -ac_name=TOKEL -ac_supply=100000000 -ac_eras=2 -ac_cbmaturity=1 -ac_reward=100000000,4250000000 -ac_end=80640,0 -ac_decay=0,77700000 -ac_halving=0,525600 -ac_cc=555 -ac_ccenable=236,245,246,247 -ac_adaptivepow=6 -addnode=135.125.204.169 -addnode=192.99.71.125 -addnode=144.76.140.197 -addnode=135.181.92.123 ",
     "VRSC":"~/VerusCoin/src/verusd",
     "GLEEC":"~/komodo/src/komodod -ac_name=GLEEC -ac_supply=210000000 -ac_public=1 -ac_staked=100 -addnode=95.217.161.126",
     "VOTE2021":"~/komodo/src/komodod  -ac_name=VOTE2021 -ac_public=1 -ac_supply=129848152 -addnode=77.74.197.115",
     "GLEEC-OLD":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",
-    "MCL":"~/Marmara-v.1.0/src/komodod -ac_name=MCL -pubkey=$pubkey -ac_supply=2000000 -ac_cc=2 -addnode=37.148.210.158 -addnode=37.148.212.36 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000 -daemon"
+    "MCL":"~/marmara/src/komodod -ac_name=MCL -ac_supply=2000000 -ac_cc=2 -addnode=37.148.210.158 -addnode=37.148.212.36 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000 -daemon"
 }
 OTHER_CONF_FILE = {
     "BTC":"~/.bitcoin/bitcoin.conf",
@@ -19,6 +20,7 @@ OTHER_CONF_FILE = {
     "LTC":"~/.litecoin/litecoin.conf",
     "KMD":"~/.komodo/komodo.conf",   
     "MCL":"~/.komodo/MCL/MCL.conf", 
+    "TOKEL":"~/.komodo/TOKEL/TOKEL.conf", 
     "VOTE2021":"~/.komodo/VOTE2021/VOTE2021.conf",
     "AYA":"~/.aryacoin/aryacoin.conf",
     "CHIPS":"~/.chips/chips.conf",
@@ -33,10 +35,11 @@ OTHER_CLI = {
     "LTC":"~/litecoin/src/litecoin-cli",
     "KMD":"~/komodo/src/komodo-cli",
     "MCL":"~/komodo/src/komodo-cli -ac_name=MCL",
+    "TOKEL":"~/komodo/src/komodo-cli -ac_name=TOKEL", 
     "GLEEC":"~/komodo/src/komodo-cli -ac_name=GLEEC",
     "VOTE2021":"~/komodo/src/komodo-cli -ac_name=VOTE2021",
     "AYA":"~/AYAv2/src/aryacoin-cli",
-    "CHIPS":"~/chips3/src/chips-cli",
+    "CHIPS":"~/chips/src/chips-cli",
     "EMC2":"~/einsteinium/src/einsteinium-cli",
     "VRSC":"~/VerusCoin/src/verus",   
     "GLEEC-OLD":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
@@ -333,6 +336,7 @@ NEXT_SEASON_CHAINS = {
         "GLEEC-OLD",
         "MCL",
         "SFUSD",
-        "VRSC"
+        "VRSC",
+        "TOKEL"
     ]
 }

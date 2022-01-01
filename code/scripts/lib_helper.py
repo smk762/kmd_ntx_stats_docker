@@ -4,19 +4,23 @@ from lib_table_select import *
 def lil_endian(hex_str):
     return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
 
+
 def safe_div(x,y):
     if y==0: return 0
     return float(x/y)
+
 
 def handle_dual_server_chains(chain, server):
     if chain == "GLEEC" and server == "Third_Party":
         return "GLEEC-OLD"
     return chain
 
+
 def handle_translate_chains(chain):
     if chain in TRANSLATE_COINS:
         return TRANSLATE_COINS[chain]
     return chain
+
 
 def validate_epoch_chains(epoch_chains, season):
     if len(epoch_chains) == 0:
@@ -28,6 +32,7 @@ def validate_epoch_chains(epoch_chains, season):
                 return False
     return True
 
+
 def validate_season_server_epoch(season, server, epoch, notary_addresses, block_time, chain, txid, notaries):
     if season in DPOW_EXCLUDED_CHAINS:
         if chain in DPOW_EXCLUDED_CHAINS[season]:
@@ -38,10 +43,6 @@ def validate_season_server_epoch(season, server, epoch, notary_addresses, block_
     epoch = get_chain_epoch_at(season, server, chain, block_time)
     return season, server, epoch
 
-def handle_translate_chains(chain):
-    if chain in TRANSLATE_COINS:
-        return TRANSLATE_COINS[chain]
-    return chain
 
 def get_name_from_address(address):
     if address in KNOWN_ADDRESSES:
@@ -58,6 +59,7 @@ def get_season_from_block(block):
             if block >= SEASONS_INFO[season]['start_block'] and block <= end_block:
                 return season
     return None
+
 
 def has_season_started(season):
     now = time.time()

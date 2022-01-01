@@ -75,6 +75,10 @@
 				            		icon = "gleec"
 				            	} else if (icon == "coquicash") {
 				            		icon = "coqui"
+				            	} else if (icon == "tokel") {
+				            		icon = "tkl"
+				            	} else if (icon == "pirate") {
+				            		icon = "arrr"
 				            	}
 					            $(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'><img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.chain+"</a>");
 					        }
