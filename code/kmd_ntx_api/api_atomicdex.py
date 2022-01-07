@@ -115,6 +115,8 @@ def activation_commands_api(request):
                     })   
                 for electrum in electrums:
                     resp_json["servers"].append({"url":electrum})
+            if coin == "TOKEL":
+                resp_json.update({"coin":"TKL"})
 
         elif protocol == "QRC20" or coin in ['QTUM', 'QTUM-segwit']:
             platform = 'QRC20'
