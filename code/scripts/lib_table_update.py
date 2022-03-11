@@ -246,8 +246,8 @@ def update_mined_row(row_data):
     try:
         sql = "INSERT INTO mined \
             (block_height, block_time, block_datetime, \
-             value, address, name, txid, season) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) \
+             value, address, name, txid, diff, season) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_block DO UPDATE SET \
             block_time='"+str(row_data[1])+"', \
             block_datetime='"+str(row_data[2])+"', \
@@ -255,7 +255,8 @@ def update_mined_row(row_data):
             address='"+str(row_data[4])+"', \
             name='"+str(row_data[5])+"', \
             txid='"+str(row_data[6])+"', \
-            season='"+str(row_data[7])+"';"
+            diff='"+str(row_data[7])+"', \
+            season='"+str(row_data[8])+"';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
     except Exception as e:

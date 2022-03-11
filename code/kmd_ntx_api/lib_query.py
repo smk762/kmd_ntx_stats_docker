@@ -578,6 +578,7 @@ def get_mined_data(season=None, name=None, address=None):
         data = data.filter(name=name)
     if address:
         data = data.filter(address=address)
+    data = data.order_by('block_height')
     return data
 
 def get_seed_version_data(season=None, name=None):

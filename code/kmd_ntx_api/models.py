@@ -180,6 +180,7 @@ class mined(models.Model):
     address = models.CharField(max_length=34)
     name = models.CharField(max_length=34)
     txid = models.CharField(max_length=64)
+    diff = models.FloatField(default=0)
     season = models.CharField(max_length=34)
 
     class Meta:
