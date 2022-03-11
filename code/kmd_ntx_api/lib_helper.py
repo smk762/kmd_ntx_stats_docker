@@ -30,6 +30,9 @@ def is_mm2_version_valid(version, timestamp):
     return False
 
 
+def get_active_coins():
+    return requests.get(f"{THIS_SERVER}/api/info/coins/?dpow_active=1")
+
 def floor_to_utc_day(ts):
     return math.floor(ts/(24*60*60))*(24*60*60)
 

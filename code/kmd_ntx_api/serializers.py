@@ -56,7 +56,7 @@ class minedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = mined
         fields = ['block_height', 'block_time', 'block_datetime',
-                  'value', 'address', 'name', 'txid', 'season']
+                  'value', 'address', 'name', 'txid', 'diff', 'season']
 
 
 class minedCountDailySerializer(serializers.HyperlinkedModelSerializer):

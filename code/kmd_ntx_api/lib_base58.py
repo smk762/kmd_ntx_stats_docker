@@ -32,6 +32,13 @@ class LTC_CoinParams(CoreMainParams):
                        'SCRIPT_ADDR': 5,
                        'SECRET_KEY': 176}
 
+class MIL_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 50,
+                       'SCRIPT_ADDR': 196,
+                       'SECRET_KEY': 239}
+
 
 class AYA_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
@@ -195,6 +202,7 @@ class raw_tx():
 COIN_PARAMS = {
     "KMD": KMD_CoinParams,
     "MCL": KMD_CoinParams,
+    "MIL": MIL_CoinParams,
     "CHIPS": KMD_CoinParams,
     "VRSC": KMD_CoinParams,
     "PGT": KMD_CoinParams,

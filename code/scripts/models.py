@@ -519,7 +519,7 @@ class last_notarised_row():
 
 class mined_row():
     def __init__(self, block_height='', block_time='', block_datetime='', 
-             value='', address='', name='', txid='', season=''):
+             value='', address='', name='', txid='', diff=0, season=''):
         self.block_height = block_height
         self.block_time = block_time
         self.block_datetime = block_datetime
@@ -527,6 +527,7 @@ class mined_row():
         self.address = address
         self.name = name
         self.txid = txid
+        self.diff = diff
         self.season = season
 
     def validated(self):
@@ -539,7 +540,7 @@ class mined_row():
         self.season = get_season_from_block(self.block_height)
         self.name = get_name_from_address(self.address)
         row_data = (self.block_height, self.block_time, self.block_datetime, 
-            self.value, self.address, self.name, self.txid, self.season)
+            self.value, self.address, self.name, self.txid, self.diff, self.season)
 
         if self.validated():
             update_mined_row(row_data)

@@ -399,3 +399,138 @@ def get_seasons_from_address(addr, chain="KMD"):
             if addr == season_addr:
                 addr_seasons.append(season)
     return addr_seasons
+
+def get_dpow_coin_src(src):
+    try:
+        return src.split("(")[1].replace(")","")
+    except:
+        return src
+
+def get_dpow_coin_server(server):
+    if server.lower() == "dpow-3p":
+        return "Third_Party"
+    elif server.lower() == "dpow-mainnet":
+        return "Main"
+
+def get_dpow_launch_params(item):
+    params = "~/komodo/src/komodod"
+    for k, v in item.items():
+        if k == 'addnode':
+            for ip in v:
+                params += " -"+k+"="+ip
+        else:
+            params += " -"+k+"="+str(v)
+    return params
+
+
+def get_dpow_conf_path(ac_name):
+    return f"~/.komodo/{ac_name}/{ac_name}.conf"
+
+
+def get_dpow_cli(ac_name):
+    return f"~/komodo/src/komodo-cli -ac_name={ac_name}"
+
+
+def pre_populate_coins_data(coins_data, coin):
+    if coin not in coins_data:
+        coins_data.update({coin: {}})
+    if "coins_info" not in coins_data[coin]:
+        coins_data[coin].update({"coins_info": {}})
+    if "dpow" not in coins_data[coin]:
+        coins_data[coin].update({"dpow": {}})
+    if "dpow_tenure" not in coins_data[coin]:
+        coins_data[coin].update({"dpow_tenure": {}})
+    if "dpow_active" not in coins_data[coin]:
+        coins_data[coin].update({"dpow_active": 0})
+    if "electrums" not in coins_data[coin]:
+        coins_data[coin].update({"electrums": []})
+    if "electrums_ssl" not in coins_data[coin]:
+        coins_data[coin].update({"electrums_ssl": []})
+    if "explorers" not in coins_data[coin]:
+        coins_data[coin].update({"explorers": []})
+    if "mm2_compatible" not in coins_data[coin]:
+        coins_data[coin].update({"mm2_compatible": 0})
+    return coins_data
+
+
+def get_coins_repo_electrums(coins_data, coin):
+    try:
+        if coin == "COQUICASH":
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/COQUI")
+        elif coin == "WLC21":
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/WLC")
+        elif coin == "PIRATE":
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/ARRR")
+        elif coin == "TOKEL":
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/TKL")
+        else:
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/electrums/"+coin)
+        
+        for electrum in r.json():
+            if "protocol" in electrum:
+                if electrum['protocol'] == "SSL":
+                    coins_data[coin]['electrums_ssl'].append(electrum['url'])
+                else:
+                    coins_data[coin]['electrums'].append(electrum['url'])
+            else:
+                coins_data[coin]['electrums'].append(electrum['url'])
+
+    except Exception as e:
+        if r.text != "404: Not Found":
+            logger.error(f"Exception in [parse_electrum_explorer]: {e} {r.text}")
+                
+    return coins_data
+
+
+def get_coins_repo_explorers(coins_data, coin):
+    try:
+        if coin == "COQUICASH":
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/COQUI")
+        elif coin == "PIRATE":
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/ARRR")
+        elif coin == "WLC21":
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/WLC")
+        elif coin == "TOKEL":
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/TKL")
+        else:
+            r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/explorers/"+coin)
+
+        for explorer in r.json():
+            coins_data[coin]['explorers'].append(explorer.replace("/tx/", "/").replace("/tx.dws?", "/"))
+
+    except Exception as e:
+        if r.text != "404: Not Found":
+            logger.error(f"Exception in [parse_electrum_explorer]: {e} {r.text}")
+                
+    return coins_data
+
+
+def get_coins_repo_icons(coins_data, coin):
+    try:
+        if coin == "COQUICASH":
+            url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png"
+            r = requests.get(url)
+        elif coin == "GLEEC-OLD":
+            url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/gleec.png"
+            r = requests.get(url)
+        elif coin == "TOKEL":
+            url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/tkl.png"
+            r = requests.get(url)
+        elif coin == "PIRATE":
+            url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/arrr.png"
+            r = requests.get(url)
+        elif coin == "WLC21":
+            url = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png"
+            r = requests.get(url)
+        else:
+            url = f"https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{coin.lower()}.png"
+            r = requests.get(url)
+
+        if r.text != "404: Not Found":
+            coins_data[coin]["coins_info"].update({"icon":url})
+
+    except Exception as e:
+        if r.text != "404: Not Found":
+            logger.error(f"Exception in [parse_electrum_explorer]: {e} {r.text}")
+                
+    return coins_data

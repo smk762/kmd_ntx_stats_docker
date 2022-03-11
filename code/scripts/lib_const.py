@@ -249,7 +249,23 @@ NON_NOTARY_ADDRESSES = {
     "RKLBUAQjAQSP4wybMiVWSFGvFP7nQHcEbN": "Mining-Dutch (Mining Pool)",
     "RHEx3ZVnK9u1AVroUfW3YBCEb7YLuzx775": "Tangery (Mining Pool)",
     "RH9Ti1vkrtE2RMcYCZG1f9UWeaoHPuN24K": "CoolMine (Mining Pool)",
-    "RT2v445xYCHZYnQytczFqAwegP6ossURME": "k1pool"
+    "RT2v445xYCHZYnQytczFqAwegP6ossURME": "k1pool (Mining Pool)",
+    "RUU3qudGCMrZXUuLtcBv9JA7Kh6sqcxdTx": "ProHashing (Mining Pool)",
+    "RX6gDozvqSnNeF4sQ9ut4LcBaWz31C3h64": "ProHashing (Mining Pool)",
+    "RUvuwoNas63C4nKZvYeDdkJ9cYwbqDg3wR": "ProHashing (Mining Pool)",
+    "RXvu9FoSSSSYw9aTP6bfcC66uk1eqvLsfB": "ProHashing (Mining Pool)"
 }
 
 KNOWN_ADDRESSES.update(NON_NOTARY_ADDRESSES)
+
+"""
+RWJfjMTVfKQ2bacWyFVPRP67DALvMzh7eC
+RWhC2FnjukXKGJYQUsG64as5qXMcJKwtHp
+RVUwbRCRkEBVTLiNfMdg1bBkHoQ6HunuEy
+RToaffC8JwdiXKUT6hGEf6H4MUqwqadm7D
+RTG9HXg9qe5xYhB3yvm3NPEcy19wFAnAbg
+RSt4txor2WUy5cXs2Phq9C8SdgRaRSJbGq
+RSgbyteEhckCdiuELguyYMz6VDDV5fGcpP
+RRX5wBhNNZBercrmNHTgE5SeHbudoM6uLo
+equihash.pro
+"""

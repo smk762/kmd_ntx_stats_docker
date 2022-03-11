@@ -61,6 +61,13 @@ class GAME_CoinParams(CoreMainParams):
                        'SCRIPT_ADDR': 5,
                        'SECRET_KEY': 166}
 
+class MIL_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 50,
+                       'SCRIPT_ADDR': 196,
+                       'SECRET_KEY': 239}
+                       
 class GLEEC_3P_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
     DEFAULT_PORT = 7770
@@ -71,6 +78,7 @@ class GLEEC_3P_CoinParams(CoreMainParams):
 
 COIN_PARAMS = {
     "KMD": KMD_CoinParams,
+    "MIL": MIL_CoinParams,
     "VOTE2021": KMD_CoinParams,
     "WLC21": KMD_CoinParams,
     "MCL": KMD_CoinParams,
@@ -95,3 +103,10 @@ COIN_PARAMS = {
 def get_addr_from_pubkey(coin, pubkey):
     bitcoin.params = COIN_PARAMS[coin]
     return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
+
+SMARTCHAIN_BASE_58 = {
+                "pubtype": 60,
+                "p2shtype": 85,
+                "wiftype": 188,
+                "txfee": 1000
+            }

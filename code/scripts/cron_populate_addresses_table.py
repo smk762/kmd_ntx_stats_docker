@@ -55,6 +55,7 @@ def populate_addresses(season, server):
 
 if __name__ == "__main__":
 
+    # TODO: Populate Addresses for active coins not et notarised.
     logger.info(f"Preparing to populate [addresses] table...")
 
     # uncomment to clear table

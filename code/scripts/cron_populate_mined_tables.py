@@ -61,6 +61,7 @@ def update_miner(block):
                 row.address = address
                 row.name = name
                 row.txid = tx['txid']
+                row.diff = blockinfo['difficulty']
                 row.season = get_season_from_block(block)
                 row.value = Decimal(tx['vout'][0]['value'])
                 row.update()
