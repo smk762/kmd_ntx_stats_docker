@@ -8,7 +8,7 @@ from datetime import datetime as dt
 import datetime
 import dateutil.parser as dp
 from lib_helper import *
-from lib_notary import *
+from lib_notarisation import *
 from lib_table_update import update_nn_btc_tx_notary_from_addr
 from lib_table_select import get_existing_nn_btc_txids, get_existing_notarised_txids, get_notarised_seasons
 from lib_api import get_btc_tx_info
@@ -39,7 +39,7 @@ def get_linked_addresses(addr=None, notary=None):
             address = row[0]
             notary = row[1].replace(" (linked)", "")
 
-            if notary in ALL_SEASON_NOTARIES:
+            if notary in KNOWN_NOTARIES:
 
                 if notary not in linked_addresses:
                     if addr not in ALL_SEASON_NOTARY_BTC_ADDRESSES:
@@ -217,8 +217,8 @@ def detect_spam(btc_row, addresses, vouts):
         btc_row.category = "SPAM"
         for vout in vouts:
             btc_row.address = addresses[0]
-            btc_row.notary = get_notary_from_btc_address(btc_row.address, btc_row.season)
-            if btc_row.notary != "non-NN":
+            btc_row.notary = get_name_from_address(btc_row.address)
+            if btc_row.notary in KNOWN_NOTARIES:
                 btc_row.update()
         return True
     return False
@@ -232,7 +232,7 @@ def detect_cipi_faucet(btc_row, addresses, vins):
         btc_row.input_index = -99
         btc_row.output_index = -99
         btc_row.address = addresses[0]
-        btc_row.notary = get_notary_from_btc_address(btc_row.address, btc_row.season)
+        btc_row.notary = get_name_from_address(btc_row.address)
         btc_row.update()
         return True
     return False
@@ -245,7 +245,7 @@ def detect_split(btc_row, addresses):
         btc_row.input_index = -99
         btc_row.output_index = -99
         btc_row.address = addresses[0]
-        btc_row.notary = get_notary_from_btc_address(btc_row.address, btc_row.season)
+        btc_row.notary = get_name_from_address(btc_row.address)
         btc_row.update()
         return True
     return False
@@ -259,7 +259,6 @@ def scan_btc_transactions(season):
 
     i = 0
 
-
     while len(season_btc_addresses) > 0:
         if BTC_NTX_ADDR in season_btc_addresses:
             notary_address = BTC_NTX_ADDR
@@ -267,18 +266,10 @@ def scan_btc_transactions(season):
             notary_address = random.choice(season_btc_addresses)
         i += 1
 
-        if notary_address in NN_BTC_ADDRESSES_DICT[season]:
-            notary_name = NN_BTC_ADDRESSES_DICT[season][notary_address]
-        else:
-            notary_name = "non-NN"
-
         existing_nn_btc_txids = get_existing_nn_btc_txids(notary_address)
         existing_notarised_txids = get_existing_notarised_txids("BTC")
         existing_txids = list(set(existing_nn_btc_txids)&set(existing_notarised_txids))
         txids = get_new_nn_btc_txids(existing_txids, notary_address)
-
-        logger.info(f"[scan_btc_transactions] {len(existing_txids)} EXIST IN DB FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
-        logger.info(f"[scan_btc_transactions] {len(txids)} NEW TXIDs TO PROCESS FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
 
         num_txids = len(txids)
 
@@ -308,7 +299,9 @@ def scan_btc_transactions(season):
                 btc_row.block_datetime = dt.utcfromtimestamp(int(btc_row.block_time))
 
                 addresses = tx_info['addresses']
-                btc_row.season, btc_row.server = get_season_from_addresses(addresses[:], btc_row.block_time, "BTC", "BTC")
+                btc_row.season, btc_row.server = get_season_server_from_addresses(
+                                                    addresses[:], "BTC"
+                                                )
 
                 vouts = tx_info["outputs"]
                 vins = tx_info["inputs"]
@@ -359,7 +352,7 @@ def scan_btc_transactions(season):
                         btc_row.input_sats = vin['output_value']
                         btc_row.input_index = input_index
                         btc_row.address = vin["addresses"][0]
-                        btc_row.notary = get_notary_from_btc_address(btc_row.address, btc_row.season)
+                        btc_row.notary = get_name_from_address(btc_row.address)
                         btc_row.update()
                         input_index += 1
                         notary_list.append(btc_row.notary)
@@ -371,7 +364,7 @@ def scan_btc_transactions(season):
                             btc_row.input_index = -1
                             btc_row.input_sats = -1
                             btc_row.address = vout["addresses"][0]
-                            btc_row.notary = get_notary_from_btc_address(btc_row.address, btc_row.season)
+                            btc_row.notary = get_name_from_address(btc_row.address)
                             btc_row.output_sats = vout['value']
                             btc_row.output_index = output_index
                             btc_row.update()
@@ -382,9 +375,8 @@ def scan_btc_transactions(season):
                         for vout in vouts:
                             if 'data_hex' in vout:
                                 opret = vout['data_hex']
-
-                                opret_url = f'{THIS_SERVER}/api/tools/decode_opreturn/?OP_RETURN={opret}'
-                                r = requests.get(opret_url)
+ 
+                                r = requests.get(get_decode_opret_url(opret))
                                 kmd_ntx_info = r.json()
 
                                 ac_ntx_height = kmd_ntx_info['notarised_block']

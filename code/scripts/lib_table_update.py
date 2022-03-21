@@ -49,7 +49,6 @@ def update_balances_row(row_data):
                 update_time={row_data[6]};"
         CURSOR.execute(sql, row_data)
         CONN.commit()
-        logger.info(row_data)
     except Exception as e:
         logger.error(f"Exception in [update_balances_row]: {e}")
         logger.error(f"[update_balances_row] sql: {sql}")
@@ -455,8 +454,6 @@ def update_last_ntx_row(row_data):
             block_time='"+str(row_data[4])+"', \
             season='"+str(row_data[5])+"', \
             server='"+str(row_data[6])+"';"
-        if row_data[1] == "TOKEL":
-            print(sql)
         CURSOR.execute(sql, row_data)
         CONN.commit()
         
@@ -550,7 +547,8 @@ def update_nn_btc_tx_row(row_data):
                                 output_index, output_sats, fees, num_inputs, num_outputs) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_btc_nn_txid DO UPDATE SET \
-        notary='"+str(row_data[6])+"', category='"+str(row_data[8])+"';"
+        notary='"+str(row_data[6])+"', category='"+str(row_data[8])+"', \
+        season='"+str(row_data[7])+"';"
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()
@@ -643,10 +641,12 @@ def update_nn_ltc_tx_row(row_data):
                                 block_time, block_datetime, \
                                 address, notary, season, category, \
                                 input_index, input_sats, \
-                                output_index, output_sats, fees, num_inputs, num_outputs) \
+                                output_index, output_sats, fees, num_inputs, \
+                                num_outputs) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_ltc_nn_txid DO UPDATE SET \
-        notary='"+str(row_data[6])+"', category='"+str(row_data[8])+"';"
+        notary='"+str(row_data[6])+"', category='"+str(row_data[8])+"', \
+        season='"+str(row_data[7])+"';"
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()

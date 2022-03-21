@@ -1,14 +1,14 @@
-import os
+#!/usr/bin/env python3
 import time
 import requests
 import logging
 import logging.handlers
-from dotenv import load_dotenv
 
 import alerts
+from lib_urls import *
 from lib_dpow_const import *
 from lib_db import CONN, CURSOR
-from base_58 import COIN_PARAMS, get_addr_from_pubkey
+from lib_crypto import COIN_PARAMS, get_addr_from_pubkey
 from lib_rpc import def_credentials
 from notary_pubkeys import NOTARY_PUBKEYS
 from s5_candidates import VOTE2021_ADDRESSES_DICT
@@ -21,35 +21,48 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-# ENV VARS
-load_dotenv()
 
 # set this to False in .env when originally populating the table, or rescanning
 SKIP_PAST_SEASONS = (os.getenv("SKIP_PAST_SEASONS") == 'True')
+
 # set this to True in .env to quickly update tables with most recent data
 SKIP_UNTIL_YESTERDAY = (os.getenv("SKIP_UNTIL_YESTERDAY") == 'True')
+
+# Rescan full season
+RESCAN_SEASON = False
+RESCAN_CHUNK_SIZE = 100000
+
 # set to IP or domain to allow for external imports of data to avoid API limits
-OTHER_SERVER = os.getenv("OTHER_SERVER")
-THIS_SERVER = os.getenv("THIS_SERVER")  # IP / domain of the local server
+
 # How many pages back to go with verbose API responses
 API_PAGE_BREAK = int(os.getenv("API_PAGE_BREAK"))
-
-if time.time() > 1592146800:
-    SEASON = "Season_4"
-if time.time() > 1623682800:
-    SEASON = "Season_5"
-
 
 # Notarisation Addresses
 NTX_ADDR = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
 BTC_NTX_ADDR = '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg'
 LTC_NTX_ADDR = 'LhGojDga6V1fGzQfNGcYFAfKnDvsWeuAsP'
 
-# KMD RPC Proxy
-RPC = {}
-RPC["KMD"] = def_credentials("KMD")
-#RPC["VOTE2021"] = def_credentials("VOTE2021")
+NON_NOTARY_ADDRESSES = {
+    "RRDRX84ETUUeAU2bFZr2TScYazYxziofYd": "Luxor (Mining Pool)",
+    "RSXGTHQSqwcMw1vowKfEE7sQ8fAmv1tmso": "LuckPool (Mining Pool)",
+    "RR7MvgQikm5Mt2wAaRMmWy1qfwAZTQ5eaV": "ZergPool (Mining Pool)",
+    "RVtg94k4yjx5JznUt47fpHZkWC2wA5KqCQ": "ZPool (Mining Pool)",
+    "RKA3nd9q1s9fqyBCDLMDkK3TAjTgdUxbEV": "Mining-Dutch (Mining Pool)",
+    "RAE4r5zQg2jzBq6yHt3DpKppf6hFTpVW2m": "SoloPool (Mining Pool)",
+    "RDPYwhSRoE5XRe15WwXQpxL4D9Y6dAhihy": "MiningFool (Mining Pool)",
+    "RKLBUAQjAQSP4wybMiVWSFGvFP7nQHcEbN": "Mining-Dutch (Mining Pool)",
+    "RHEx3ZVnK9u1AVroUfW3YBCEb7YLuzx775": "Tangery (Mining Pool)",
+    "RH9Ti1vkrtE2RMcYCZG1f9UWeaoHPuN24K": "CoolMine (Mining Pool)",
+    "RT2v445xYCHZYnQytczFqAwegP6ossURME": "k1pool (Mining Pool)",
+    "RUU3qudGCMrZXUuLtcBv9JA7Kh6sqcxdTx": "ProHashing (Mining Pool)",
+    "RX6gDozvqSnNeF4sQ9ut4LcBaWz31C3h64": "ProHashing (Mining Pool)",
+    "RUvuwoNas63C4nKZvYeDdkJ9cYwbqDg3wR": "ProHashing (Mining Pool)",
+    "RXvu9FoSSSSYw9aTP6bfcC66uk1eqvLsfB": "ProHashing (Mining Pool)"
+}
+
+
 noMoM = ['CHIPS', 'GAME', 'EMC2', 'AYA', 'GLEEC-OLD']
+
 
 # KMD REWARDS CONSTANTS
 KOMODO_ENDOFERA = 7777777
@@ -61,28 +74,27 @@ ONE_MONTH = 31 * 24 * 60
 ONE_YEAR = 365 * 24 * 60
 DEVISOR = 10512000
 
-# Some coins are named differently between dpow and coins repo...
-TRANSLATE_COINS = {'COQUI': 'COQUICASH', 'OURC': 'OUR',
-                   'WLC': 'WLC21', 'GleecBTC': 'GLEEC-OLD',
-                   'ARRR': "PIRATE", 'TKL':'TOKEL'}
 
 # Coins categorised
 OTHER_COINS = []
 ANTARA_COINS = []
 THIRD_PARTY_COINS = []
-RETIRED_SMARTCHAINS = ["HUSH3"]
 
-COINS_INFO = requests.get(f'{THIS_SERVER}/api/info/coins/').json()['results']
-ELECTRUMS = requests.get(f'{THIS_SERVER}/api/info/electrums/').json()['results']
+COINS_INFO = requests.get(get_coins_info_url()).json()['results']
+KNOWN_COINS = COINS_INFO.keys()
+ELECTRUMS = requests.get(get_electrums_info_url()).json()['results']
 
-SEASON = 'Season_5'
 
-ANTARA_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Main').json()["results"]
-THIRD_PARTY_COINS = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Third_Party').json()["results"]
+now = time.time()
+for s in SEASONS_INFO:
+    if now > SEASONS_INFO[s]["start_time"] and now < SEASONS_INFO[s]["end_time"]:
+        season = s
+        break
 
-ALL_COINS = ANTARA_COINS + THIRD_PARTY_COINS + ['BTC', 'KMD', 'LTC']
-ALL_ANTARA_COINS = ANTARA_COINS + \
-    RETIRED_SMARTCHAINS  # add retired smartchains here
+ANTARA_COINS = requests.get(get_dpow_server_coins_url(season, 'Main')).json()["results"]
+THIRD_PARTY_COINS = requests.get(get_dpow_server_coins_url(season, 'Third_Party')).json()["results"]
+
+ALL_ANTARA_COINS = ANTARA_COINS + RETIRED_SMARTCHAINS
 
 
 # Defines BASE_58 coin parameters
@@ -96,24 +108,15 @@ for coin in THIRD_PARTY_COINS:
         print(alerts.send_telegram(f"{__name__}: {coin} doesnt have params defined!"))
 
 
-# set at post season to use "post_season_end_time" for aggreagates (e.g. mining)
-POSTSEASON = True
+
 
 # BTC specific addresses. TODO: This could be reduced / merged.
 NOTARIES = {}
-ALL_SEASON_NOTARIES = []
-
 
 for season in SEASONS_INFO:
-    NOTARIES.update({season: []})
-    try:
-        addresses = requests.get(f"{THIS_SERVER}/api/source/addresses/?chain=KMD&season={season}").json()
-        for item in addresses['results']:
-            NOTARIES[season].append(item["notary"])
-            ALL_SEASON_NOTARIES.append(item["notary"])
-    except Exception as e:
-        logger.info(f"Addresses API might be down! {e}")
-ALL_SEASON_NOTARIES = list(set(ALL_SEASON_NOTARIES))
+    if season in NOTARY_PUBKEYS:
+        NOTARIES.update({season: []})
+        NOTARIES[season] = NOTARY_PUBKEYS[season].keys()
 
 NN_BTC_ADDRESSES_DICT = {}
 NOTARY_BTC_ADDRESSES = {}
@@ -123,7 +126,7 @@ ALL_SEASON_NOTARY_BTC_ADDRESSES = []
 for season in SEASONS_INFO:
     NN_BTC_ADDRESSES_DICT.update({season: {}})
     try:
-        addresses = requests.get(f"{THIS_SERVER}/api/table/addresses/?chain=BTC&season={season}").json()
+        addresses = requests.get(get_source_addresses_url(season, None, "BTC")).json()
         for item in addresses['results']:
             ALL_SEASON_NOTARY_BTC_ADDRESSES.append(item["address"])
             ALL_SEASON_NN_BTC_ADDRESSES_DICT.update(
@@ -138,6 +141,8 @@ for season in SEASONS_INFO:
 
 ALL_SEASON_NOTARY_BTC_ADDRESSES = list(set(ALL_SEASON_NOTARY_BTC_ADDRESSES))
 
+
+
 NN_LTC_ADDRESSES_DICT = {}
 NOTARY_LTC_ADDRESSES = {}
 ALL_SEASON_NN_LTC_ADDRESSES_DICT = {}
@@ -146,7 +151,7 @@ ALL_SEASON_NOTARY_LTC_ADDRESSES = []
 for season in SEASONS_INFO:
     NN_LTC_ADDRESSES_DICT.update({season: {}})
     try:
-        addresses = requests.get(f"{THIS_SERVER}/api/table/addresses/?chain=LTC&season={season}").json()
+        addresses = requests.get(get_source_addresses_url(season, "Main", "LTC")).json()
         for item in addresses['results']:
             ALL_SEASON_NOTARY_LTC_ADDRESSES.append(item["address"])
             ALL_SEASON_NN_LTC_ADDRESSES_DICT.update(
@@ -166,16 +171,16 @@ NOTARY_ADDRESSES_DICT = {}
 
 for season in NOTARY_PUBKEYS:
     NOTARY_ADDRESSES_DICT.update({season: {}})
-    notaries = list(NOTARY_PUBKEYS[season].keys())
-    notaries.sort()
-    for notary in notaries:
-        if notary not in NOTARY_ADDRESSES_DICT:
-            NOTARY_ADDRESSES_DICT[season].update({notary: {}})
+    if season in NOTARY_PUBKEYS:
+        notaries = list(NOTARY_PUBKEYS[season].keys())
+        for notary in notaries:
+            if notary not in NOTARY_ADDRESSES_DICT:
+                NOTARY_ADDRESSES_DICT[season].update({notary: {}})
 
-        for coin in COIN_PARAMS:
-            NOTARY_ADDRESSES_DICT[season][notary].update({
-                coin: get_addr_from_pubkey(coin, NOTARY_PUBKEYS[season][notary])
-            })
+            for coin in COIN_PARAMS:
+                NOTARY_ADDRESSES_DICT[season][notary].update({
+                    coin: get_addr_from_pubkey(coin, NOTARY_PUBKEYS[season][notary])
+                })
 
 
 # lists all season, name, address and id info for each notary
@@ -188,7 +193,6 @@ for season in NOTARY_PUBKEYS:
     notary_id = 0
     ADDRESS_INFO.update({season: {}})
     notaries = list(NOTARY_PUBKEYS[season].keys())
-    notaries.sort()
     for notary in notaries:
         if notary not in NOTARY_INFO:
             NOTARY_INFO.update({
@@ -211,8 +215,8 @@ for season in NOTARY_PUBKEYS:
         NOTARY_INFO[notary]['Pubkeys'].append(NOTARY_PUBKEYS[season][notary])
         notary_id += 1
 
-for season in NOTARY_PUBKEYS:
-    if season.find("Third_Party") != -1:
+for season in SEASONS_INFO:
+    if season in NOTARY_PUBKEYS:
         notaries = list(NOTARY_PUBKEYS[season].keys())
         notaries.sort()
         for notary in notaries:
@@ -222,6 +226,8 @@ for season in NOTARY_PUBKEYS:
                 SEASONS_INFO["Season_4"]['notaries'].append(notary)
             elif season.find("Season_5") != -1:
                 SEASONS_INFO["Season_5"]['notaries'].append(notary)
+            elif season.find("Season_6") != -1:
+                SEASONS_INFO["Season_6"]['notaries'].append(notary)
             else:
                 SEASONS_INFO[season]['notaries'].append(notary)
 
@@ -238,34 +244,19 @@ for season in NOTARY_ADDRESSES_DICT:
             address = NOTARY_ADDRESSES_DICT[season][notary][coin]
             KNOWN_ADDRESSES.update({address: notary})
 
-NON_NOTARY_ADDRESSES = {
-    "RRDRX84ETUUeAU2bFZr2TScYazYxziofYd": "Luxor (Mining Pool)",
-    "RSXGTHQSqwcMw1vowKfEE7sQ8fAmv1tmso": "LuckPool (Mining Pool)",
-    "RR7MvgQikm5Mt2wAaRMmWy1qfwAZTQ5eaV": "ZergPool (Mining Pool)",
-    "RVtg94k4yjx5JznUt47fpHZkWC2wA5KqCQ": "ZPool (Mining Pool)",
-    "RKA3nd9q1s9fqyBCDLMDkK3TAjTgdUxbEV": "Mining-Dutch (Mining Pool)",
-    "RAE4r5zQg2jzBq6yHt3DpKppf6hFTpVW2m": "SoloPool (Mining Pool)",
-    "RDPYwhSRoE5XRe15WwXQpxL4D9Y6dAhihy": "MiningFool (Mining Pool)",
-    "RKLBUAQjAQSP4wybMiVWSFGvFP7nQHcEbN": "Mining-Dutch (Mining Pool)",
-    "RHEx3ZVnK9u1AVroUfW3YBCEb7YLuzx775": "Tangery (Mining Pool)",
-    "RH9Ti1vkrtE2RMcYCZG1f9UWeaoHPuN24K": "CoolMine (Mining Pool)",
-    "RT2v445xYCHZYnQytczFqAwegP6ossURME": "k1pool (Mining Pool)",
-    "RUU3qudGCMrZXUuLtcBv9JA7Kh6sqcxdTx": "ProHashing (Mining Pool)",
-    "RX6gDozvqSnNeF4sQ9ut4LcBaWz31C3h64": "ProHashing (Mining Pool)",
-    "RUvuwoNas63C4nKZvYeDdkJ9cYwbqDg3wR": "ProHashing (Mining Pool)",
-    "RXvu9FoSSSSYw9aTP6bfcC66uk1eqvLsfB": "ProHashing (Mining Pool)"
-}
 
 KNOWN_ADDRESSES.update(NON_NOTARY_ADDRESSES)
+KNOWN_NOTARIES = list(set(KNOWN_NOTARIES))
+KNOWN_NOTARIES.sort()
 
-"""
-RWJfjMTVfKQ2bacWyFVPRP67DALvMzh7eC
-RWhC2FnjukXKGJYQUsG64as5qXMcJKwtHp
-RVUwbRCRkEBVTLiNfMdg1bBkHoQ6HunuEy
-RToaffC8JwdiXKUT6hGEf6H4MUqwqadm7D
-RTG9HXg9qe5xYhB3yvm3NPEcy19wFAnAbg
-RSt4txor2WUy5cXs2Phq9C8SdgRaRSJbGq
-RSgbyteEhckCdiuELguyYMz6VDDV5fGcpP
-RRX5wBhNNZBercrmNHTgE5SeHbudoM6uLo
-equihash.pro
-"""
+CLEAN_UP = False
+
+def is_postseason(timestamp=None):
+    if not timestamp:
+        timestamp = int(time.time())
+    for season in SEASONS_INFO:
+        if "post_season_end_time" in SEASONS_INFO[season]:
+            if timestamp >= SEASONS_INFO[season]["post_season_end_time"]:
+                if timestamp <= SEASONS_INFO[season]["end_time"]:
+                    return True
+    return False

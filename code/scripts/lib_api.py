@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import requests
 import sys
 import json
@@ -138,3 +139,36 @@ def api_sleep_or_exit(resp, exit=None):
     else:
         #print(resp)
         return True
+
+
+def get_dexstats_balance(chain, addr):
+    url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/addr/'+addr
+    r = requests.get(url)
+    balance = r.json()['balance']
+    return balance
+
+
+def get_ac_block_info():
+    ac_block_info = {}
+    for chain in ANTARA_COINS:
+        if chain not in RETIRED_DPOW_CHAINS:
+            try:
+                url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/sync'
+                r = requests.get(url)
+                ac_block_info.update({chain:{"height":r.json()['blockChainHeight']}})
+                url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/block-index/'+str(r.json()['blockChainHeight'])
+                r = requests.get(url) 
+                ac_block_info[chain].update({"hash":r.json()['blockHash']})
+            except Exception as e:
+                logger.warning(chain+" failed in ac_block_info")
+                logger.warning(e)
+    return ac_block_info
+
+# TODO: refactor to use ELECTRUMS const for non-Dexstats urls
+# Might need to expand ELECTRUMS to include endpoints formsat
+# http://kmd.explorer.dexstats.info/insight-api-komodo/block-index/8888
+# http://explorer.chips.cash/api/getblockcount
+# http://chips.komodochainz.info/ext/getbalance/RSAzPFzgTZHNcxLNLdGyVPbjbMA8PRY7Ss
+# https://explorer.aryacoin.io/api/getblockcount
+# https://chainz.cryptoid.info/emc2/api.dws?q=getbalance&a=RFUN8XezmmZt47pzVmoz7aN5LtFNV9pyuj
+# https://chainz.cryptoid.info/emc2/api.dws?q=getblockcount
