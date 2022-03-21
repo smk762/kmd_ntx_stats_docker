@@ -2,25 +2,25 @@
 import json
 import time
 import requests
-from base_58 import SMARTCHAIN_BASE_58
 from lib_const import *
 from lib_helper import *
-from lib_table_select import get_notarised_chains
+from lib_urls import *
 from models import coins_row
-
+from lib_crypto import SMARTCHAIN_BASE_58
+from lib_table_select import get_notarised_chains
 
 '''
 This script scans the komodo, coins and dpow repositories and updates contexual info about the chains in the "coins" table.
 It should be run as a cronjob every 12-24 hours
 '''
 
-
 # Gets coins info from coins repo (Uses "ARRR, TKL")
 def parse_coins_repo():
-    r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/coins/master/coins")
-    coins_repo = r.json()
 
     coins_data = {}
+    r = requests.get(get_coins_repo_coins_url())
+    coins_repo = r.json()
+
     for item in coins_repo:
         coin = handle_translate_chains(item['coin'])
         coins_data = pre_populate_coins_data(coins_data, coin)
@@ -35,14 +35,16 @@ def parse_coins_repo():
         if "mm2" not in coins_data[coin]["coins_info"]:
             coins_data[coin]["coins_info"].update({"mm2": 0})
 
-        coins_data[coin].update({"mm2_compatible": coins_data[coin]["coins_info"]["mm2"]})
+        coins_data[coin].update({
+                    "mm2_compatible": coins_data[coin]["coins_info"]["mm2"]
+                })
 
     return coins_data
 
 
 # Gets dpow info from dpow repo (Uses "PIRATE, TOKEL")
 def parse_dpow_coins(coins_data):
-    r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/README.md")
+    r = requests.get(get_dpow_readme_url())
     dpow_readme = r.text
     lines = dpow_readme.splitlines()
 
@@ -69,7 +71,7 @@ def parse_dpow_coins(coins_data):
 
 # Gets launch params from komodo repo (Uses "PIRATE")
 def parse_assetchains(coins_data):
-    r = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/iguana/assetchains.json")
+    r = requests.get(get_dpow_assetchains_url())
     for item in r.json():
 
         ac_name = item['ac_name']
@@ -77,9 +79,9 @@ def parse_assetchains(coins_data):
         coins_data = pre_populate_coins_data(coins_data, coin)
 
         coins_data[coin]["coins_info"].update({
-            "cli": get_dpow_cli(ac_name),
-            "conf_path": get_dpow_conf_path(ac_name),
-            "launch_params": get_dpow_launch_params(item)
+            "cli": get_assetchain_cli(ac_name),
+            "conf_path": get_assetchain_conf_path(ac_name),
+            "launch_params": get_assetchain_launch_params(item)
         })
 
     for coin in OTHER_CLI:
@@ -127,12 +129,10 @@ def get_dpow_tenure(coins_data):
 
     for coin in notarised_chains:
         coin = handle_translate_chains(coin)
-        if coin == "GLEEC" and server == "Third_Party":
-            coin = "GLEEC-OLD"
         coins_data = pre_populate_coins_data(coins_data, coin)
-        url = f'{THIS_SERVER}/api/table/notarised_tenure/?chain={coin}'
-        logger.info(url)
+        url = get_notarised_tenure_table_url(None, None, coin)
         notarised_tenure = requests.get(url).json()["results"]
+
         if len(notarised_tenure) > 0:
             notarised_tenure = notarised_tenure[0]
             if "season" in notarised_tenure:
@@ -171,7 +171,7 @@ def get_dpow_tenure(coins_data):
 
 
 def remove_old_coins(coins_data):
-    current_coins = requests.get(f"{THIS_SERVER}/api/info/coins/").json()["results"]
+    current_coins = requests.get(get_coins_info_url()).json()["results"]
     for coin in current_coins:
         if coin not in coins_data:
             logger.info(f"[remove_old_coins] Removing {coin}")
@@ -195,22 +195,3 @@ def update_coins(coins_data):
         coin_data.dpow_active = coins_data[coin]['dpow_active']
         coin_data.mm2_compatible = coins_data[coin]['mm2_compatible']
         coin_data.update()
-
-
-if __name__ == "__main__":
-
-    logger.info(f"Preparing to populate [coins] table...")
-
-    # Gets data from coins repo, komodo repo and dpow repo...
-    coins_data = parse_coins_repo()
-    coins_data = parse_dpow_coins(coins_data)
-    coins_data = parse_assetchains(coins_data)
-    coins_data = parse_electrum_explorer(coins_data)
-    coins_data = get_dpow_tenure(coins_data)
-
-    remove_old_coins(coins_data)
-    update_coins(coins_data)
-
-    logging.info("[coins] table update complete!")
-    CURSOR.close()
-    CONN.close()

@@ -7,8 +7,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-json_path = '/home/smk762/atomic_stats/dashboard/json/'
-
 def connect_db():
     conn = psycopg2.connect(
         host='localhost',

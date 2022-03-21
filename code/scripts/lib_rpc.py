@@ -44,3 +44,11 @@ def def_credentials(chain):
     except:
         print("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in "+coin_config_file)
 
+def get_ntx_txids(NTX_ADDR, start, end):
+    return RPC["KMD"].getaddresstxids({"addresses": [NTX_ADDR], "start":start, "end":end})
+
+
+# KMD RPC Proxy
+RPC = {}
+RPC["KMD"] = def_credentials("KMD")
+#RPC["VOTE2021"] = def_credentials("VOTE2021")

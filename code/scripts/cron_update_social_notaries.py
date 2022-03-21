@@ -5,14 +5,17 @@ import requests
 import logging
 import logging.handlers
 from lib_const import *
+from decorators import *
+from lib_helper import get_season_notaries
+from lib_urls import get_notary_nodes_repo_elected_nn_social_url, get_notary_addresses_url
 from models import nn_social_row
 
+
+@print_runtime
 def generate_social_notaries_template(season):
-    notaries = list(NOTARY_PUBKEYS[season].keys())
+    notaries = get_season_notaries(season)
     try:
-        url = f"https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/{season.lower().replace('_', '')}/elected_nn_social.json"
-        logger.info(url)
-        repo_info = requests.get(url).json()
+        repo_info = requests.get(get_notary_nodes_repo_elected_nn_social_url(season)).json()
     except Exception as e:
         logger.warning(e)
         repo_info = {}
@@ -43,7 +46,7 @@ def generate_social_notaries_template(season):
         notary_name = split_name[0]
         notary_region = split_name[1]
         if notary_region not in template[notary_name]["regions"]:
-            notary_addresses = requests.get(f"{THIS_SERVER}/api/wallet/notary_addresses/?season={season}&notary={notary}").json()
+            notary_addresses = requests.get(get_notary_addresses_url(season, notary)).json()
             template[notary_name]["regions"].update({
                 notary_region:{}
             })
@@ -66,10 +69,11 @@ def generate_social_notaries_template(season):
     with open(f"{os.path.dirname(os.path.abspath(__file__))}/social_notaries_{season.lower()}.json", 'w+') as j:
         json.dump(template, j, indent = 4, sort_keys=True)
 
+
+@print_runtime
 def populate_social_notaries(season):
-    url = f"https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/{season.lower().replace('_', '')}/elected_nn_social.json"
     try:
-        r = requests.get(url)
+        r = requests.get(get_notary_nodes_repo_elected_nn_social_url(season))
         elected_nn_social = r.json()
 
         for notary in NOTARY_PUBKEYS[season]:
@@ -160,6 +164,7 @@ def populate_social_notaries(season):
             nn_social.update()
 
 
+@print_runtime
 def remove_invalid_notaries(season):
     # e.g. jorian changed name in Testnet, used same pubkey
     sql = "SELECT notary FROM nn_social WHERE \
@@ -175,6 +180,7 @@ def remove_invalid_notaries(season):
                 CONN.commit()
     except Exception as e:
         logger.error(f"Error in [populate_social_notaries]: {e}")
+
 
 if __name__ == "__main__":
 

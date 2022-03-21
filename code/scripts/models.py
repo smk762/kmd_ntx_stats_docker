@@ -1,5 +1,6 @@
 from lib_const import *
 from lib_helper import *
+from lib_validate import *
 from lib_table_select import get_epochs
 from lib_table_update import *
 
@@ -23,8 +24,7 @@ class addresses_row():
         return True
 
     def update(self):
-        self.chain = handle_dual_server_chains(self.chain, self.server)
-        self.chain = handle_translate_chains(self.chain)
+        self.server, self.chain = handle_dual_server_chains(self.server, self.chain)
         row_data = (self.season, self.server, self.notary,
                     self.notary_id, self.address, self.pubkey,
                     self.chain)
@@ -45,7 +45,7 @@ class addresses_row():
 
 class balance_row():
     def __init__(self, season='', server='', notary='', address='',
-                 chain='', balance='', update_time=0):
+                 chain='', balance=0, update_time=0):
         self.notary = notary
         self.chain = chain
         self.balance = balance
@@ -56,23 +56,23 @@ class balance_row():
 
     def validated(self):
         for i in [self.season, self.server, self.notary,
-                  self.address, self.chain, self.balance,
-                  self.update_time]:
+                  self.address, self.chain, self.update_time]:
             if i == '':
                 return False
         return True
 
     def update(self):
         self.update_time = int(time.time())
-        self.chain = handle_dual_server_chains(self.chain, self.server)
-        self.chain = handle_translate_chains(self.chain)
+        self.server, self.chain = handle_dual_server_chains(
+                                    self.server, self.chain, self.address
+                                )
+        self.balance = get_balance(self.chain, self.pubkey, self.address, self.server)
         row_data = (self.season, self.server, self.notary,
             self.address, self.chain, self.balance,
             self.update_time)
+
         if self.validated():
-            logger.info(f"Updating [balance] {self.season} | {self.server} | \
-                          {self.notary} | {self.chain} | {self.balance} | \
-                          {self.address} | {self.update_time}")
+            logger.info(f"Updating [balance] {self.season} | {self.server} | {self.notary} | {self.chain} | {self.balance} | {self.address} | {self.update_time}")
             update_balances_row(row_data)
         else:
             logger.warning(f"[balance] Row data invalid!")
@@ -117,7 +117,8 @@ class coins_row():
         CURSOR.execute(f"DELETE FROM coins WHERE chain = '{self.chain}';")
         CONN.commit()
         logger.info(f"Deleted {self.chain} from [coins] ")
-        
+  
+
 # TODO: DEPRECATE in S5, no more BTC
 class tx_row():
     def __init__(self, txid='', block_hash='', block_height='',
@@ -171,6 +172,8 @@ class tx_row():
             
         if self.notary.find("linked") != -1:
             self.notary = get_name_from_address(self.address)
+
+        self.season = get_season(self.block_time)
 
         row_data = (self.txid, self.block_hash, self.block_height,
                     self.block_time, self.block_datetime, self.address,
@@ -310,6 +313,80 @@ class funding_row():
         CURSOR.execute(sql)
         CONN.commit()
 
+
+class notarised_row():
+    def __init__(self, chain='', block_height='', 
+                 block_time='', block_datetime='', block_hash='', 
+                 notaries=list, notary_addresses=list, ac_ntx_blockhash='',
+                 ac_ntx_height='', txid='', opret='', season='', server='',
+                 scored=True, score_value=0, epoch=''):
+        self.chain = chain
+        self.block_height = block_height
+        self.block_time = block_time
+        self.block_datetime = block_datetime
+        self.block_hash = block_hash
+        self.notaries = notaries
+        self.notary_addresses = notary_addresses
+        self.ac_ntx_blockhash = ac_ntx_blockhash
+        self.ac_ntx_height = ac_ntx_height
+        self.txid = txid
+        self.opret = opret
+        self.season = season
+        self.server = server
+        self.epoch = epoch
+        self.score_value = score_value
+        self.scored = scored
+
+    def validated(self):
+
+        if len(self.chain) > 12:
+            return False
+
+        for notary in self.notaries:
+            if len(notary) > 20:
+                return False
+
+        return True
+
+    def update(self):
+        self.server, self.chain = handle_dual_server_chains(
+                                    self.server, self.chain,
+                                    self.notary_addresses[0]
+                                )
+
+        self.season, self.server, self.epoch = validate_season_server_epoch(
+            self.season, self.server, self.epoch,
+            self.notary_addresses, self.block_time, 
+            self.chain, self.txid, self.notaries)
+
+        self.score_value = get_chain_epoch_score_at(
+            self.season, self.server, self.chain, int(self.block_time))
+        self.scored = get_scored(self.score_value)
+
+        # Sort lists for slightly simpler aggregation
+        self.notaries.sort()
+        self.notary_addresses.sort()
+
+        row_data = (self.chain, self.block_height, 
+                    self.block_time, self.block_datetime, self.block_hash, 
+                    self.notaries, self.notary_addresses,
+                    self.ac_ntx_blockhash, self.ac_ntx_height, self.txid,
+                    self.opret, self.season, self.server, self.scored,
+                    self.score_value, self.epoch)
+
+        if self.validated():
+            logger.info(f"Updating [notarised] {self.block_datetime} {self.txid} {self.season} {self.server} {self.epoch} | {self.scored} {self.score_value} {self.chain} ")
+            update_ntx_row(row_data)
+        else:
+            logger.warning(f"[notarised] row invalid {self.block_datetime} {self.txid} {self.season} {self.server} {self.epoch} | {self.scored} {self.score_value} {self.chain}")
+            logger.warning(f"{row_data}")
+
+    def delete(self):
+        CURSOR.execute(f"DELETE FROM notarised WHERE txid = '{self.txid}';")
+        CONN.commit()
+
+
+
 class notarised_chain_daily_row():
     def __init__(self, season='', server='', chain='',
                  ntx_count='', notarised_date=''):
@@ -323,13 +400,11 @@ class notarised_chain_daily_row():
         return True
 
     def update(self):
-        self.chain = handle_translate_chains(self.chain)
-        self.chain = handle_dual_server_chains(self.chain, self.server)
+        self.server, self.chain = handle_dual_server_chains(self.server, self.chain)
         row_data = (self.season, self.server, self.chain,
                     self.ntx_count, self.notarised_date)
         if self.validated():
-            logger.info(f"Updating [notarised_chain_daily] {self.chain} \
-                          {self.notarised_date}")
+            logger.info(f"Updating [notarised_chain_daily] {self.chain} {self.notarised_date}")
             update_daily_notarised_chain_row(row_data)
         else:
             logger.warning(f"[notarised_chain_daily_row] Row data invalid!")
@@ -371,15 +446,14 @@ class notarised_count_daily_row():
                     self.chain_ntx_pct, self.time_stamp, self.season,
                     self.notarised_date)
         if self.validated():
-            logger.info(f"Updating [notarised_count_daily] \
-                          {self.notary} {self.notarised_date}")
+            logger.info(f"Updating [notarised_count_daily] {self.notarised_date} {self.notary}")
             update_daily_notarised_count_row(row_data)
         else:
             logger.warning(f"[notarised_count_daily_row] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
-        sql = f"DELETE FROM [notarised_count_daily] \
+        sql = f"DELETE FROM notarised_count_daily \
                 WHERE notary = '{self.notary}' \
                 AND notarised_date = '{self.notarised_date}';"
         CURSOR.execute(sql)
@@ -414,8 +488,7 @@ class notarised_count_season_row():
                     self.season_score, self.chain_ntx_pct, self.time_stamp,
                     self.season)
         if self.validated():
-            logger.info(f"Updating [notarised_count_season] {self.notary} \
-                          {self.season} {self.season_score}")
+            logger.info(f"Updating [notarised_count_season] {self.notary} {self.season} {self.season_score}")
             update_season_notarised_count_row(row_data)
         else:
             logger.warning(f"[notarised_count_season] Row data invalid!")
@@ -452,8 +525,7 @@ class notarised_chain_season_row():
         return True
 
     def update(self):
-        self.chain = handle_dual_server_chains(self.chain, self.server)
-        self.chain = handle_translate_chains(self.chain)
+        self.server, self.chain = handle_dual_server_chains(self.server, self.chain)
         row_data = (self.chain, self.ntx_count, self.block_height,
             self.kmd_ntx_blockhash, self.kmd_ntx_txid, self.kmd_ntx_blocktime,
             self.opret, self.ac_ntx_blockhash, self.ac_ntx_height,
@@ -493,13 +565,11 @@ class last_notarised_row():
         return True
 
     def update(self):
-        self.chain = handle_translate_chains(self.chain)
-        self.chain = handle_dual_server_chains(self.chain, self.server)
+        self.server, self.chain = handle_dual_server_chains(self.server, self.chain)
         row_data = (self.notary, self.chain, self.txid, self.block_height,
             self.block_time, self.season, self.server)
         if self.validated():
-            logger.info(f"[last_notarised] Updating {self.notary} \
-                {self.chain} {self.season} {self.server} {self.block_height}")
+            logger.info(f"[last_notarised] Updating {self.season} {self.server} {self.chain} {self.block_height} {self.notary}")
             update_last_ntx_row(row_data)
         else:
             logger.warning(f"[last_notarised] Row data invalid!")
@@ -533,7 +603,17 @@ class mined_row():
     def validated(self):
         for item in [self.address, self.name, self.season]:
             if item == '':
+                logger.warning(f"No value for {item}!")
                 return False
+
+        if self.name in KNOWN_NOTARIES:
+            if self.name not in NOTARY_ADDRESSES_DICT[self.season][self.name]["KMD"]:
+                for season in SEASONS_INFO:
+                    if self.name in NOTARY_ADDRESSES_DICT[season]:
+                        if self.address in NOTARY_ADDRESSES_DICT[season][self.name]["KMD"]:
+                            self.season = season
+                            return True
+
         return True
 
     def update(self):
@@ -544,8 +624,7 @@ class mined_row():
 
         if self.validated():
             update_mined_row(row_data)
-            logger.info(f"Updated [mined] {self.block_height} | {self.name} | \
-                          {self.season} | {self.value} ")
+            logger.info(f"Updated [mined] {row_data}")
 
         else:
             logger.warning(f"[mined] Row data invalid!")
@@ -584,24 +663,25 @@ class season_mined_count_row():
     def validated(self):
         for item in [self.address, self.name, self.season]:
             if item == '':
+                logger.warning(f"No value for {item}!")
                 return False
         if self.season.find("Testnet") != -1:
+            logger.warning(f"Ignoring testnet")
             return False
-        # TODO: functionise this
         if self.name in NOTARY_PUBKEYS[self.season]:
             if self.address != NOTARY_ADDRESSES_DICT[self.season][self.name]["KMD"]:
+                logger.warning(f"{self.address} not in NOTARY_ADDRESSES_DICT")
                 return False
         return True
 
     def update(self):
+        self.name = get_name_from_address(self.address)
         row_data = (self.name, self.season, self.address, self.blocks_mined, 
             self.sum_value_mined, self.max_value_mined, self.max_value_txid,
             self.last_mined_blocktime, self.last_mined_block, self.time_stamp) 
         if self.validated():
             update_season_mined_count_row(row_data)
-            logger.info(f"[mined_count_season] updated: {self.name} {self.season} \
-                          {self.blocks_mined} {self.last_mined_block} \
-                          {self.sum_value_mined} {self.max_value_txid}")
+            logger.info(f"[mined_count_season] updated: {row_data}")
         else:
             logger.warning(f"[mined_count_season] Row data invalid!")
             logger.warning(f"{row_data}")
@@ -645,9 +725,7 @@ class daily_mined_count_row():
         row_data = (self.notary, self.blocks_mined, self.sum_value_mined, \
                     self.mined_date, self.time_stamp)
         if self.validated():
-            logger.info(f"Updating [mined_count_daily] {self.notary} \
-                          {self.mined_date} {self.blocks_mined} \
-                          {self.sum_value_mined} ")
+            logger.info(f"Updating [mined_count_daily] {row_data}")
             update_daily_mined_count_row(row_data)
         else:
             logger.warning(f"[mined_count_daily] Row data invalid!")
@@ -716,6 +794,8 @@ class ltc_tx_row():
         if self.notary.find("linked") != -1:
             self.notary = get_name_from_address(self.address)
 
+        self.season = get_season(self.block_time)
+
         row_data = (
             self.txid, self.block_hash, self.block_height,
             self.block_time, self.block_datetime, self.address,
@@ -727,12 +807,11 @@ class ltc_tx_row():
             msg = f"[ltc_tx_row] Adding {self.season} {self.txid} \
                     {self.category} for {self.notary}"
             if self.input_index != -1:
-                logger.info(f"{msg} VIN {self.input_index}")
+                msg += f"VIN {self.input_index}"
             elif self.output_index != -1:
-                logger.info(f"{msg} VOUT {self.output_index}")
-            else:
-                logger.info(msg)
+                msg += f"VOUT {self.output_index}"
             update_nn_ltc_tx_row(row_data)
+            logger.info(msg)
         else:
             url = f"{OTHER_SERVER}/api/info/nn_ltc_txid/?txid={self.txid}"
             logger.warning(f"[ltc_tx_row] Row data invalid!")
@@ -809,87 +888,6 @@ class scoring_epoch_row():
             logger.warning(f"Deleted [scoring_epochs] row: {season} {server} {epoch}")
 
 
-class notarised_row():
-    def __init__(self, chain='', block_height='', 
-                 block_time='', block_datetime='', block_hash='', 
-                 notaries=list, notary_addresses=list, ac_ntx_blockhash='',
-                 ac_ntx_height='', txid='', opret='', season='', server='',
-                 scored=True, score_value=0, epoch=''):
-        self.chain = chain
-        self.block_height = block_height
-        self.block_time = block_time
-        self.block_datetime = block_datetime
-        self.block_hash = block_hash
-        self.notaries = notaries
-        self.notary_addresses = notary_addresses
-        self.ac_ntx_blockhash = ac_ntx_blockhash
-        self.ac_ntx_height = ac_ntx_height
-        self.txid = txid
-        self.opret = opret
-        self.season = season
-        self.server = server
-        self.epoch = epoch
-        self.score_value = score_value
-        self.scored = scored
-
-    def validated(self):
-        if len(self.chain) > 12:
-            return False
-
-        if self.epoch not in ["KMD", "LTC", "BTC", "Unofficial"]:
-            if self.epoch.find("Epoch") == -1:
-                logger.warning(f"Invalid epoch {self.epoch}")
-                return False
-
-        if self.server in ["Main", "Third_Party", "KMD", "LTC", "BTC"]:
-            for notary in self.notaries[:]:
-                if len(notary) > 20:
-                    return False
-        return True
-
-    def update(self):
-        # Sort lists for slightly simpler aggregation
-        self.notaries.sort()
-        self.notary_addresses.sort()
-        self.chain = handle_dual_server_chains(self.chain, self.server)
-        self.chain = handle_translate_chains(self.chain)
-        season_server_epoch = validate_season_server_epoch(
-            self.season, self.server, self.epoch,
-            self.notary_addresses, self.block_time, 
-            self.chain, self.txid, self.notaries)
-        self.season, self.server, self.epoch = season_server_epoch
-        self.score_value = get_chain_epoch_score_at(
-            self.season, self.server, self.chain, self.block_time)
-
-        if self.score_value > 0:
-            self.scored = True
-        else:
-            self.scored = False
-
-        row_data = (self.chain, self.block_height, 
-                    self.block_time, self.block_datetime, self.block_hash, 
-                    self.notaries, self.notary_addresses,
-                    self.ac_ntx_blockhash, self.ac_ntx_height, self.txid,
-                    self.opret, self.season, self.server, self.scored,
-                    self.score_value, self.epoch)
-        if self.validated():
-            logger.info(f"Updating [notarised] {self.txid} {self.chain} | \
-                          {self.season} {self.server} {self.epoch} | \
-                          {self.scored} {self.score_value} | \
-                          {self.block_datetime}")
-            update_ntx_row(row_data)
-        else:
-            logger.warning(f"[notarised] row invalid {self.chain} \
-                             {self.season} {self.server} {self.epoch} \
-                             {self.scored} {self.score_value} \
-                             {self.block_datetime}")
-            logger.warning(f"{row_data}")
-
-    def delete(self):
-        CURSOR.execute(f"DELETE FROM notarised WHERE txid = '{self.txid}';")
-        CONN.commit()
-
-
 class ntx_tenure_row():
     def __init__(self, chain='', first_ntx_block='', 
             last_ntx_block='', first_ntx_block_time='',
@@ -919,8 +917,7 @@ class ntx_tenure_row():
 
     def update(self):
         # TODO: Validation start / end within season window
-        self.chain = handle_dual_server_chains(self.chain, self.server)
-        self.chain = handle_translate_chains(self.chain)
+        self.server, self.chain = handle_dual_server_chains(self.server, self.chain)
 
         if self.chain in ["KMD" ,"LTC", "BTC"]:
             self.server = self.chain
@@ -937,10 +934,7 @@ class ntx_tenure_row():
                     self.scored_ntx_count, self.season, self.server)
 
         if self.validated():
-            logger.info(f">>> Updating [notarised_tenure] {self.chain} \
-                          {self.season} | {self.server} | \
-                          {self.scored_ntx_count} scored | \
-                          {self.unscored_ntx_count} unscored")
+            logger.info(f">>> Updating [notarised_tenure] {self.season} {self.server} {self.chain} | {self.scored_ntx_count} scored | {self.unscored_ntx_count} unscored")
             update_notarised_tenure_row(row_data)
 
         else:
@@ -1029,6 +1023,7 @@ class vote2021_row():
         CURSOR.execute(sql)
         CONN.commit()
 
+
 class swaps_row():
     def __init__(self, uuid='', started_at='', taker_coin='', 
                  taker_amount=0, taker_gui='', taker_version='',
@@ -1067,6 +1062,7 @@ class swaps_row():
         sql = f"DELETE FROM swaps WHERE {conditions};"
         CURSOR.execute(sql)
         CONN.commit()
+
 
 class swaps_failed_row():
     def __init__(self, uuid='', started_at='', taker_coin='', 

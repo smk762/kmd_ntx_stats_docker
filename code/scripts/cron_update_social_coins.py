@@ -5,14 +5,15 @@ import time
 import requests
 from lib_const import *
 from lib_helper import *
-from lib_notary import get_season
+from decorators import *
+from lib_urls import get_dpow_server_coins_url, get_notary_nodes_repo_coin_social_url
 from models import coin_social_row
 
 
+@print_runtime
 def generate_social_coins_template(season):
-    url = f"{THIS_SERVER}/api/info/dpow_server_coins"
-    dpow_main_chains = requests.get(f"{url}/?season={season}&server=Main").json()['results']
-    dpow_3p_chains = requests.get(f"{url}/?season={season}&server=Third_Party").json()['results']
+    dpow_main_chains = requests.get(get_dpow_server_coins_url(season, "Main")).json()['results']
+    dpow_3p_chains = requests.get(get_dpow_server_coins_url(season, "Third_Party")).json()['results']
     all_chains = dpow_3p_chains+dpow_main_chains+["KMD", "LTC", "BTC"]
 
     translated_chains_main = []
@@ -28,8 +29,7 @@ def generate_social_coins_template(season):
     all_chains = list(set(translated_chains_main + translated_chains_3p + ["KMD", "LTC", "BTC"]))
 
     try:
-        url = f"https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/{season.lower().replace('_', '')}/coin_social.json"
-        logger.info(url)
+        url = get_notary_nodes_repo_coin_social_url(season)
         repo_info = requests.get(url).json()
     except Exception as e:
         logger.error(f"Error getting info from {url} {e}")
@@ -70,17 +70,17 @@ def generate_social_coins_template(season):
         json.dump(template, j, indent = 4, sort_keys=True)
 
 
+@print_runtime
 def populate_coins_social(season):
     try:
         with open(f"{os.path.dirname(os.path.abspath(__file__))}/social_coins_{season.lower()}.json", 'r') as j:
             chain_social = json.load(j)
 
-        url = f"{THIS_SERVER}/api/info/dpow_server_coins"
-        dpow_main_chains = requests.get(f"{url}/?season={season}&server=Main").json()['results']
-        dpow_3p_chains = requests.get(f"{url}/?season={season}&server=Third_Party").json()['results']
+        dpow_main_chains = requests.get(get_dpow_server_coins_url(season, "Main")).json()['results']
+        dpow_3p_chains = requests.get(get_dpow_server_coins_url(season, "Third_Party")).json()['results']
         all_chains = dpow_3p_chains+dpow_main_chains+["KMD", "LTC", "BTC"]
 
-        coin_info = requests.get(f"{THIS_SERVER}/api/info/coins/").json()['results']
+        coin_info = requests.get(get_coins_info_url()).json()['results']
 
         for chain in all_chains:
 

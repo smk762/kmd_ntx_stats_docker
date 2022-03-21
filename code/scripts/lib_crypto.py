@@ -1,10 +1,14 @@
+#!/usr/bin/env python3
+import hashlib
+import codecs
 import bitcoin
+import binascii
 from bitcoin.core import x
 from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
 
-# check /src/chainparams.cpp for params
 
+# For more params, check a project's /src/chainparams.cpp file
 class KMD_CoinParams(CoreMainParams):
     MESSAGE_START = b'\x24\xe9\x27\x64'
     DEFAULT_PORT = 7770
@@ -100,9 +104,6 @@ COIN_PARAMS = {
     "GAME": GAME_CoinParams
 }
 
-def get_addr_from_pubkey(coin, pubkey):
-    bitcoin.params = COIN_PARAMS[coin]
-    return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
 
 SMARTCHAIN_BASE_58 = {
                 "pubtype": 60,
@@ -110,3 +111,52 @@ SMARTCHAIN_BASE_58 = {
                 "wiftype": 188,
                 "txfee": 1000
             }
+
+
+def get_addr_from_pubkey(coin, pubkey):
+    bitcoin.params = COIN_PARAMS[coin]
+    return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
+
+
+def lil_endian(hex_str):
+    return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
+
+
+def get_p2pk_scripthash_from_pubkey(pubkey):
+    scriptpubkey = '21' +pubkey+ 'ac'
+    scripthex = codecs.decode(scriptpubkey, 'hex')
+    s = hashlib.new('sha256', scripthex).digest()
+    sha256_scripthash = codecs.encode(s, 'hex').decode("utf-8")
+    script_hash = lil_endian(sha256_scripthash)
+    return script_hash
+
+
+def get_p2pkh_scripthash_from_pubkey(pubkey):
+    publickey = codecs.decode(pubkey, 'hex')
+    s = hashlib.new('sha256', publickey).digest()
+    r = hashlib.new('ripemd160', s).digest()
+    scriptpubkey = "76a914"+codecs.encode(r, 'hex').decode("utf-8")+"88ac"
+    h = codecs.decode(scriptpubkey, 'hex')
+    s = hashlib.new('sha256', h).digest()
+    sha256_scripthash = codecs.encode(s, 'hex').decode("utf-8")
+    script_hash = lil_endian(sha256_scripthash)
+    return script_hash
+
+
+def get_opret_ticker(scriptPubKey_asm):
+    
+    scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
+    chain = ''
+    while len(chain) < 1:
+        for i in range(len(scriptPubKeyBinary)):
+            if chr(scriptPubKeyBinary[i]).encode() == b'\x00':
+                j = i+1
+                while j < len(scriptPubKeyBinary)-1:
+                    chain += chr(scriptPubKeyBinary[j])
+                    j += 1
+                    if chr(scriptPubKeyBinary[j]).encode() == b'\x00':
+                        break
+                break
+    if chr(scriptPubKeyBinary[-4])+chr(scriptPubKeyBinary[-3])+chr(scriptPubKeyBinary[-2]) == "KMD":
+        chain = "KMD"
+    return str(chain)

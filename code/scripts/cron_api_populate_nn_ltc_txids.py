@@ -10,7 +10,7 @@ import datetime
 import dateutil.parser as dp
 
 from lib_helper import *
-from lib_notary import *
+from lib_notarisation import *
 from lib_table_update import update_nn_ltc_tx_notary_from_addr
 from lib_table_select import get_existing_nn_ltc_txids, get_existing_notarised_txids
 from lib_api import get_ltc_tx_info
@@ -43,7 +43,7 @@ def get_linked_addresses(addr=None, notary=None):
             address = row[0]
             notary = row[1].replace(" (linked)", "")
 
-            if notary in ALL_SEASON_NOTARIES:
+            if notary in KNOWN_NOTARIES:
 
                 if notary not in linked_addresses:
                     if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
@@ -61,10 +61,6 @@ def is_linked_address(addr, notary=None):
     else:
         return False
 
-def is_notary_address(addr):
-    if addr in ALL_SEASON_NOTARY_LTC_ADDRESSES:
-        return True
-    return False
 
 def detect_ntx(vins, vouts, addresses):
     if LTC_NTX_ADDR in addresses and len(vouts) == 2:
@@ -88,7 +84,7 @@ def detect_replenish(vins, vouts):
     vin_non_notary_addresses = []
     for vin in vins:
         address = vin["addresses"][0]
-        if is_notary_address(address):
+        if is_notary_ltc_address(address):
             notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
             vin_notaries.append(notary)
         elif is_linked_address(address, "dragonhound_NA"):
@@ -108,7 +104,7 @@ def detect_replenish(vins, vouts):
         if vout["addresses"]:
             sats = vout["value"]
             address = vout["addresses"][0]
-            if is_notary_address(address):
+            if is_notary_ltc_address(address):
                 if sats >= 1000000:
                     notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
                     if notary != "dragonhound_NA":
@@ -138,7 +134,7 @@ def detect_consolidate(vins, vouts):
     vin_non_notary_addresses = []
     for vin in vins:
         address = vin["addresses"][0]
-        if is_notary_address(address):
+        if is_notary_ltc_address(address):
             notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
             vin_notaries.append(notary)
         else:
@@ -151,13 +147,13 @@ def detect_consolidate(vins, vouts):
         vout_non_notary_addresses = []
         for vout in vouts:
             address = vout["addresses"][0]
-            if is_notary_address(address):
+            if is_notary_ltc_address(address):
                 notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
                 vout_notaries.append(notary)
             else:
                 vout_non_notary_addresses.append(address)
 
-        if len(list(set(vout_notaries))) == 1 and is_notary_address(vouts[0]["addresses"][0]):
+        if len(list(set(vout_notaries))) == 1 and is_notary_ltc_address(vouts[0]["addresses"][0]):
             if notary == vout_notaries[0]:
                 for addr in vin_non_notary_addresses:
                     if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
@@ -174,7 +170,7 @@ def update_notary_linked_vins(vins):
     vin_non_notary_addresses = []
     for vin in vins:
         address = vin["addresses"][0]
-        if is_notary_address(address):
+        if is_notary_ltc_address(address):
             notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
             vin_notaries.append(notary)
         else:
@@ -189,14 +185,14 @@ def update_notary_linked_vins(vins):
 def detect_intra_notary(vins, vouts):
     for vin in vins:
         address = vin["addresses"][0]
-        if is_notary_address(address):
+        if is_notary_ltc_address(address):
             notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
         else:
             return False
 
     for vout in vouts:
         address = vout["addresses"][0]
-        if is_notary_address(address):
+        if is_notary_ltc_address(address):
             notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
         else:
             return False
@@ -213,8 +209,8 @@ def detect_spam(txid_data, addresses, vouts):
         txid_data.category = "SPAM"
         for vout in vouts:
             txid_data.address = addresses[0]
-            txid_data.notary = get_notary_from_ltc_address(txid_data.address, txid_data.season)
-            if txid_data.notary != "non-NN":
+            txid_data.notary = get_name_from_address(txid_data.address)
+            if txid_data.notary in KNOWN_NOTARIES:
                 txid_data.update()
         return True
     return False
@@ -228,7 +224,7 @@ def detect_cipi_faucet(txid_data, addresses, vins):
         txid_data.input_index = -99
         txid_data.output_index = -99
         txid_data.address = addresses[0]
-        txid_data.notary = get_notary_from_ltc_address(txid_data.address, txid_data.season)
+        txid_data.notary = get_name_from_address(txid_data.address)
         txid_data.update()
         return True
     return False
@@ -241,7 +237,7 @@ def detect_split(txid_data, addresses):
         txid_data.input_index = -99
         txid_data.output_index = -99
         txid_data.address = addresses[0]
-        txid_data.notary = get_notary_from_ltc_address(txid_data.address, txid_data.season)
+        txid_data.notary = get_name_from_address(txid_data.address)
         txid_data.update()
         return True
     return False
@@ -265,18 +261,10 @@ def scan_ltc_transactions(season):
             notary_address = random.choice(season_ltc_addresses)
         i += 1
 
-        if notary_address in NN_LTC_ADDRESSES_DICT[season]:
-            notary_name = NN_LTC_ADDRESSES_DICT[season][notary_address]
-        else:
-            notary_name = "non-NN"
-
         existing_nn_ltc_txids = get_existing_nn_ltc_txids(notary_address)
         existing_notarised_txids = get_existing_notarised_txids("LTC")
         existing_txids = list(set(existing_nn_ltc_txids)&set(existing_notarised_txids))
         txids = get_new_nn_ltc_txids(existing_txids, notary_address)
-
-        logger.info(f"[scan_ltc_transactions] {len(existing_txids)} EXIST IN DB FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
-        logger.info(f"[scan_ltc_transactions] {len(txids)} NEW TXIDs TO PROCESS FOR {notary_address} | {notary_name} {season} ({i}/{num_addr})")
 
         num_txids = len(txids)
 
@@ -308,7 +296,9 @@ def scan_ltc_transactions(season):
                 logger.info(ltc_row.block_datetime)
 
                 addresses = tx_info['addresses']
-                ltc_row.season, ltc_row.server = get_season_from_addresses(addresses[:], ltc_row.block_time, "LTC", "LTC")
+                ltc_row.season, ltc_row.server = get_season_server_from_addresses(
+                                                    addresses[:], "LTC"
+                                                )
 
 
                 vouts = tx_info["outputs"]
@@ -340,7 +330,7 @@ def scan_ltc_transactions(season):
                         ltc_row.input_sats = vin['output_value']
                         ltc_row.input_index = input_index
                         ltc_row.address = vin["addresses"][0]
-                        ltc_row.notary = get_notary_from_ltc_address(ltc_row.address, ltc_row.season)
+                        ltc_row.notary = get_name_from_address(ltc_row.address)
                         ltc_row.update()
                         input_index += 1
                         notary_list.append(ltc_row.notary)
@@ -352,7 +342,7 @@ def scan_ltc_transactions(season):
                             ltc_row.input_index = -1
                             ltc_row.input_sats = -1
                             ltc_row.address = vout["addresses"][0]
-                            ltc_row.notary = get_notary_from_ltc_address(ltc_row.address, ltc_row.season)
+                            ltc_row.notary = get_name_from_address(ltc_row.address)
                             ltc_row.output_sats = vout['value']
                             ltc_row.output_index = output_index
                             ltc_row.update()
@@ -364,8 +354,7 @@ def scan_ltc_transactions(season):
                             if 'data_hex' in vout:
                                 opret = vout['data_hex']
 
-                                opret_url = f'{THIS_SERVER}/api/tools/decode_opreturn/?OP_RETURN={opret}'
-                                r = requests.get(opret_url)
+                                r = requests.get(get_decode_opret_url(opret))
                                 kmd_ntx_info = r.json()
 
                                 ac_ntx_height = kmd_ntx_info['notarised_block']
@@ -399,9 +388,10 @@ def scan_ltc_transactions(season):
 
 if __name__ == "__main__":
     
-    seasons = [SEASON]
+    seasons = get_notarised_seasons()
     for season in seasons:
-        scan_ltc_transactions(season)
+        if season not in EXCLUDED_SEASONS:
+            scan_ltc_transactions(season)
 
     CURSOR.close()
     CONN.close()
