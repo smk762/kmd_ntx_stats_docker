@@ -5,9 +5,9 @@ from lib_const import *
 from decorators import *
 from lib_urls import *
 from models import addresses_row
-from lib_helper import get_pubkeys, handle_dual_server_chains
+from lib_helper import get_pubkeys
 from lib_threads import update_notary_balances_thread
-from lib_crypto import get_addr_from_pubkey
+
 
 @print_runtime
 def get_balances(season):
@@ -75,8 +75,8 @@ def populate_addresses(season, server):
             for coin in coins:
                 row = addresses_row()
                 row.season = season
-                row.server, row.chain = handle_dual_server_chains(server, coin)
-                row.address = get_addr_from_pubkey(row.chain, pubkey)
+                row.server = server
+                row.chain = coin
                 row.notary_id = i
                 row.notary = notary
                 row.pubkey = pubkey
@@ -90,3 +90,4 @@ def delete_stale_balances():
     sql = f"DELETE FROM balances WHERE update_time < {int(time.time()-24*60*60)};"
     CURSOR.execute(sql)
     CONN.commit()
+

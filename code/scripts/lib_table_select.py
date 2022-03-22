@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-import os
-import time
 from lib_const import *
-from decorators import *
+from lib_helper import is_postseason
+from decorators import print_runtime
 
 def get_latest_chain_ntx_info(chain, height):
     sql = f"SELECT ac_ntx_blockhash, ac_ntx_height, opret, block_hash, txid \
@@ -26,6 +25,7 @@ def get_latest_season_chain_ntx(season):
         return results
     except:
         return ()
+
 
 def get_official_ntx_results(season, group_by, server=None, epoch=None, chain=None, notary=None):
     group_by = ", ".join(group_by)
@@ -57,6 +57,7 @@ def get_official_ntx_results(season, group_by, server=None, epoch=None, chain=No
     except:
         return ()
 
+
 def get_chain_ntx_season_aggregates(season):
     sql = f"SELECT chain, MAX(block_height), \
                           MAX(block_time), \
@@ -71,6 +72,7 @@ def get_chain_ntx_season_aggregates(season):
         return results
     except:
         return ()
+
 
 def get_notarised_chain_date_aggregates(season, day):
     sql = f"SELECT chain, COALESCE(MAX(block_height), 0), \
@@ -91,6 +93,7 @@ def get_notarised_chain_date_aggregates(season, day):
         logger.warning(f"No get_notarised_chain_date_aggregates results for {day} {season}")
         return ()
 
+
 def get_notarised_for_day(season, day):
     sql = f"SELECT chain, notaries \
            FROM notarised \
@@ -103,6 +106,7 @@ def get_notarised_for_day(season, day):
         return results
     except:
         return ()
+
 
 def get_mined_date_aggregates(day):
     sql = "SELECT name, COUNT(*), SUM(value) FROM mined WHERE \
@@ -121,6 +125,7 @@ def get_mined_date_aggregates(day):
         return results
     except:
         return ()
+
 
 def get_epochs(season=None, server=None):
     sql = "SELECT season, server, epoch, epoch_start, epoch_end, \
@@ -231,6 +236,7 @@ def get_dates_list(table, date_col):
         date_list.append(date[0])
     return date_list
 
+
 def get_existing_dates_list(table, date_col):
     sql = "SELECT "+date_col+" \
            FROM "+table+";"
@@ -241,12 +247,14 @@ def get_existing_dates_list(table, date_col):
         date_list.append(date[0])
     return date_list
 
+
 def get_records_for_date(table, date_col, date):
     sql = "SELECT * \
            FROM "+table+" WHERE \
            DATE_TRUNC('day',"+date_col+") = '"+str(date)+"';"
     CURSOR.execute(sql)
     return CURSOR.fetchall()
+
 
 def select_from_table(table, cols, conditions=None):
     sql = "SELECT "+cols+" FROM "+table
@@ -259,6 +267,7 @@ def select_from_table(table, cols, conditions=None):
         return results
     else:
         return ()
+
 
 def get_tenure_chains(season=None, server=None):
     sql = "SELECT DISTINCT chain from notarised_tenure"
@@ -279,25 +288,30 @@ def get_tenure_chains(season=None, server=None):
     resp.sort()
     return resp
 
+
 def get_min_from_table(table, col):
     sql = "SELECT MIN("+col+") FROM "+table
     CURSOR.execute(sql)
     return CURSOR.fetchone()[0]
+
 
 def get_max_from_table(table, col):
     sql = "SELECT MAX("+col+") FROM "+table
     CURSOR.execute(sql)
     return CURSOR.fetchone()[0]
 
+
 def get_count_from_table(table, col):
     sql = "SELECT COALESCE(COUNT("+col+"), 0) FROM "+table
     CURSOR.execute(sql)
     return CURSOR.fetchone()[0]
 
+
 def get_sum_from_table(table, col):
     sql = "SELECT SUM("+col+") FROM "+table
     CURSOR.execute(sql)
     return CURSOR.fetchone()[0]
+
 
 def get_table_names():
     sql = "SELECT tablename FROM pg_catalog.pg_tables \
@@ -328,6 +342,7 @@ def get_season_mined_counts(season):
     else:
         return ()
 
+
 def get_max_value_mined_txid(max_value, season=None):
     sql = f"SELECT txid FROM mined WHERE value = {max_value}"
     if season:
@@ -340,6 +355,7 @@ def get_max_value_mined_txid(max_value, season=None):
     else:
         return ''
 
+
 def season_server_chain_has_ntx(season, chain, server):
     CURSOR.execute("SELECT COUNT(txid) \
                     FROM notarised WHERE chain = '"+chain+"' \
@@ -349,6 +365,7 @@ def season_server_chain_has_ntx(season, chain, server):
         return False
     return True
 
+
 def get_ntx_min_max(season, chain, server):
     CURSOR.execute("SELECT MAX(block_height), MAX(block_time), \
                     MIN(block_height), MIN(block_time), COUNT(*) \
@@ -356,6 +373,7 @@ def get_ntx_min_max(season, chain, server):
                     AND season = '"+season+"' \
                     AND server = '"+server+"';")
     return CURSOR.fetchone()
+
 
 def get_ntx_scored(season, chain, lowest_block_time, highest_block_time, server):
     scored_list = []
@@ -391,6 +409,7 @@ def get_ntx_scored(season, chain, lowest_block_time, highest_block_time, server)
 
     return scored_list, unscored_list
 
+
 @print_runtime
 def get_notarised_chains(season=None, server=None, epoch=None):
 
@@ -422,6 +441,7 @@ def get_notarised_chains(season=None, server=None, epoch=None):
 
     return chains
 
+
 @print_runtime
 def get_notarised_epochs(season=None, server=None):
 
@@ -451,6 +471,7 @@ def get_notarised_epochs(season=None, server=None):
         logger.warning(f"No [get_notarised_epochs] results for {season} {server}| {sql}? {e}")
 
     return epochs
+
 
 @print_runtime
 def get_notarised_seasons(chain=None):
@@ -486,6 +507,7 @@ def get_notarised_seasons(chain=None):
         logger.warning(f"No [get_notarised_seasons] results for {chain}| {sql}? {e}")
 
     return seasons
+
 
 @print_runtime
 def get_notarised_servers(season=None):
@@ -550,6 +572,7 @@ def get_notary_last_ntx(chain=None):
         notary_last_ntx[notary].update({chain:block_height})
     return notary_last_ntx
 
+
 def get_season_last_ntx(season):
     # Get chain and time of last ntx
     sql = "SELECT notary, chain, block_height from last_notarised"
@@ -567,6 +590,7 @@ def get_season_last_ntx(season):
             season_last_ntx.update({notary:{}})
         season_last_ntx[notary].update({chain:block_height})
     return season_last_ntx
+
 
 def get_existing_notarised_txids(chain=None, season=None, server=None):
 
@@ -593,6 +617,7 @@ def get_existing_notarised_txids(chain=None, season=None, server=None):
         recorded_txids.append(txid[0])
     return recorded_txids
 
+
 def get_existing_nn_btc_txids(address=None, category=None, season=None, notary=None):
     recorded_txids = []
     sql = f"SELECT DISTINCT txid from nn_btc_tx"
@@ -618,6 +643,7 @@ def get_existing_nn_btc_txids(address=None, category=None, season=None, notary=N
         recorded_txids.append(txid[0])
     return recorded_txids
 
+
 def get_non_notary_btc_txids():
     non_notary_txids = []
     logger.info("Getting non-notary TXIDs from database...")
@@ -627,6 +653,7 @@ def get_non_notary_btc_txids():
     for txid in txids:
         non_notary_txids.append(txid[0])
     return non_notary_txids
+
 
 def get_replenish_addresses():
     replenish_addr = []
@@ -638,8 +665,6 @@ def get_replenish_addresses():
         replenish_addr.append(addr[0])
     return replenish_addr
 
-
-#### LTC
 
 def get_existing_nn_ltc_txids(address=None, category=None, season=None, notary=None):
     recorded_txids = []

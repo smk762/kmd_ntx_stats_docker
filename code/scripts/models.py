@@ -1,7 +1,6 @@
 from lib_const import *
-from lib_helper import *
-from lib_validate import *
-from lib_table_select import get_epochs
+import lib_validate
+import lib_crypto
 from lib_table_update import *
 
 class addresses_row():
@@ -24,23 +23,23 @@ class addresses_row():
         return True
 
     def update(self):
-        self.server, self.chain = handle_dual_server_chains(self.server, self.chain)
+
+        self.server, self.chain = lib_validate.handle_dual_server_chains(self.server, self.chain)
+        self.address = lib_crypto.get_addr_from_pubkey(self.chain, self.pubkey)
+
         row_data = (self.season, self.server, self.notary,
                     self.notary_id, self.address, self.pubkey,
                     self.chain)
         if self.validated():
             update_addresses_row(row_data)
-            logger.info(f"Updated [addresses] | {self.season} | \
-                {self.server} | {self.notary} | {self.address} | \
-                {self.chain}")
+            logger.info(f"Updated [addresses] | {self.season} | {self.server} | {self.notary} | {self.address} | {self.chain}")
         else:
             logger.warning(f"[addresses] Row data invalid!")
             logger.warning(f"{row_data}")
 
     def delete(self):
         delete_addresses_row(self.season, self.chain, self.address)
-        logger.info(f"Deleted [addresses] row {self.season} | \
-                      {self.chain} | {self.address}")
+        logger.info(f"Deleted [addresses] row {self.season} | {self.chain} | {self.address}")
 
 
 class balance_row():
@@ -63,10 +62,10 @@ class balance_row():
 
     def update(self):
         self.update_time = int(time.time())
-        self.server, self.chain = handle_dual_server_chains(
+        self.server, self.chain = lib_validate.handle_dual_server_chains(
                                     self.server, self.chain, self.address
                                 )
-        self.balance = get_balance(self.chain, self.pubkey, self.address, self.server)
+        self.balance = lib_validate.get_balance(self.chain, self.pubkey, self.address, self.server)
         row_data = (self.season, self.server, self.notary,
             self.address, self.chain, self.balance,
             self.update_time)
@@ -102,7 +101,7 @@ class coins_row():
         return True
 
     def update(self):
-        self.chain = handle_translate_chains(self.chain)
+        self.chain = lib_validate.handle_translate_chains(self.chain)
         row_data = (self.chain, self.coins_info, self.electrums,
             self.electrums_ssl, self.explorers, self.dpow,
             self.dpow_tenure, self.dpow_active, self.mm2_compatible)
@@ -171,9 +170,9 @@ class tx_row():
             self.notary = "BTC_NTX_ADDR"
             
         if self.notary.find("linked") != -1:
-            self.notary = get_name_from_address(self.address)
+            self.notary = lib_validate.get_name_from_address(self.address)
 
-        self.season = get_season(self.block_time)
+        self.season = lib_validate.get_season(self.block_time)
 
         row_data = (self.txid, self.block_hash, self.block_height,
                     self.block_time, self.block_datetime, self.address,
@@ -258,7 +257,7 @@ class coin_social_row():
         return True
 
     def update(self):
-        self.chain = handle_translate_chains(self.chain)
+        self.chain = lib_validate.handle_translate_chains(self.chain)
 
         row_data = (self.chain, self.discord, self.email, self.explorers,
                     self.github, self.icon, self.linkedin, self.mining_pools,
@@ -296,7 +295,7 @@ class funding_row():
         return True
 
     def update(self):
-        self.chain = handle_translate_chains(self.chain)
+        self.chain = lib_validate.handle_translate_chains(self.chain)
         row_data = (self.chain, self.txid, self.vout, self.amount,
                     self.block_hash, self.block_height, self.block_time,
                     self.category, self.fee, self.address, self.notary,
@@ -342,6 +341,9 @@ class notarised_row():
         if len(self.chain) > 12:
             return False
 
+        if "Unofficial" in [self.season, self.server]:
+            return False
+
         for notary in self.notaries:
             if len(notary) > 20:
                 return False
@@ -349,19 +351,27 @@ class notarised_row():
         return True
 
     def update(self):
-        self.server, self.chain = handle_dual_server_chains(
-                                    self.server, self.chain,
-                                    self.notary_addresses[0]
-                                )
+        self.season = lib_validate.get_season(self.block_time)
+        self.season, self.server = lib_validate.get_season_server_from_addresses(
+            self.notary_addresses, self.chain
+        )
+        self.server, self.chain = lib_validate.handle_dual_server_chains(
+            self.server, self.chain, self.notary_addresses[0]
+        )
 
-        self.season, self.server, self.epoch = validate_season_server_epoch(
-            self.season, self.server, self.epoch,
-            self.notary_addresses, self.block_time, 
-            self.chain, self.txid, self.notaries)
+        self.season, self.server, self.epoch = lib_validate.validate_season_server_epoch(
+            self.season, self.server, self.notary_addresses, self.block_time, self.chain
+        )
 
-        self.score_value = get_chain_epoch_score_at(
-            self.season, self.server, self.chain, int(self.block_time))
-        self.scored = get_scored(self.score_value)
+        self.season, self.server = lib_validate.check_excluded_chains(
+            self.season, self.server, self.chain
+        )
+
+        self.score_value = lib_validate.get_chain_epoch_score_at(
+            self.season, self.server, self.chain, int(self.block_time)
+        )
+
+        self.scored = lib_validate.get_scored(self.score_value)
 
         # Sort lists for slightly simpler aggregation
         self.notaries.sort()
@@ -386,7 +396,6 @@ class notarised_row():
         CONN.commit()
 
 
-
 class notarised_chain_daily_row():
     def __init__(self, season='', server='', chain='',
                  ntx_count='', notarised_date=''):
@@ -400,9 +409,13 @@ class notarised_chain_daily_row():
         return True
 
     def update(self):
-        self.server, self.chain = handle_dual_server_chains(self.server, self.chain)
+        self.server = lib_validate.get_chain_server(self.chain, self.season)
+        self.server, self.chain = lib_validate.handle_dual_server_chains(
+            self.server, self.chain
+        )
         row_data = (self.season, self.server, self.chain,
-                    self.ntx_count, self.notarised_date)
+                    self.ntx_count, self.notarised_date
+        )
         if self.validated():
             logger.info(f"Updating [notarised_chain_daily] {self.chain} {self.notarised_date}")
             update_daily_notarised_chain_row(row_data)
@@ -525,7 +538,9 @@ class notarised_chain_season_row():
         return True
 
     def update(self):
-        self.server, self.chain = handle_dual_server_chains(self.server, self.chain)
+
+        self.server = lib_validate.get_chain_server(self.chain, self.season)
+        self.server, self.chain = lib_validate.handle_dual_server_chains(self.server, self.chain)
         row_data = (self.chain, self.ntx_count, self.block_height,
             self.kmd_ntx_blockhash, self.kmd_ntx_txid, self.kmd_ntx_blocktime,
             self.opret, self.ac_ntx_blockhash, self.ac_ntx_height,
@@ -565,7 +580,8 @@ class last_notarised_row():
         return True
 
     def update(self):
-        self.server, self.chain = handle_dual_server_chains(self.server, self.chain)
+        self.server = lib_validate.get_chain_server(self.chain, self.season)
+        self.server, self.chain = lib_validate.handle_dual_server_chains(self.server, self.chain)
         row_data = (self.notary, self.chain, self.txid, self.block_height,
             self.block_time, self.season, self.server)
         if self.validated():
@@ -617,8 +633,8 @@ class mined_row():
         return True
 
     def update(self):
-        self.season = get_season_from_block(self.block_height)
-        self.name = get_name_from_address(self.address)
+        self.season = lib_validate.get_season_from_block(self.block_height)
+        self.name = lib_validate.get_name_from_address(self.address)
         row_data = (self.block_height, self.block_time, self.block_datetime, 
             self.value, self.address, self.name, self.txid, self.diff, self.season)
 
@@ -675,7 +691,7 @@ class season_mined_count_row():
         return True
 
     def update(self):
-        self.name = get_name_from_address(self.address)
+        self.name = lib_validate.get_name_from_address(self.address)
         row_data = (self.name, self.season, self.address, self.blocks_mined, 
             self.sum_value_mined, self.max_value_mined, self.max_value_txid,
             self.last_mined_blocktime, self.last_mined_block, self.time_stamp) 
@@ -792,9 +808,9 @@ class ltc_tx_row():
             self.notary = "LTC_NTX_ADDR"
 
         if self.notary.find("linked") != -1:
-            self.notary = get_name_from_address(self.address)
+            self.notary = lib_validate.get_name_from_address(self.address)
 
-        self.season = get_season(self.block_time)
+        self.season = lib_validate.get_season(self.block_time)
 
         row_data = (
             self.txid, self.block_hash, self.block_height,
@@ -844,7 +860,7 @@ class scoring_epoch_row():
         if self.server in EXCLUDED_SERVERS:
             logger.warning(f"{self.server} in EXCLUDED_SERVERS")
             return False
-        epoch_chains_validated = validate_epoch_chains(
+        epoch_chains_validated = lib_validate.validate_epoch_chains(
                                         self.epoch_chains, self.season)
         return epoch_chains_validated
 
@@ -917,7 +933,7 @@ class ntx_tenure_row():
 
     def update(self):
         # TODO: Validation start / end within season window
-        self.server, self.chain = handle_dual_server_chains(self.server, self.chain)
+        self.server, self.chain = lib_validate.handle_dual_server_chains(self.server, self.chain)
 
         if self.chain in ["KMD" ,"LTC", "BTC"]:
             self.server = self.chain

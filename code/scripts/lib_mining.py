@@ -8,7 +8,7 @@ from lib_const import *
 from lib_helper import *
 from decorators import *
 from models import mined_row, daily_mined_count_row, season_mined_count_row
-from lib_table_select import select_from_table, get_mined_date_aggregates, get_max_value_mined_txid
+from lib_table_select import *
 
 
 def get_mined_row(block_height, chain="KMD"):
@@ -20,19 +20,15 @@ def get_mined_row(block_height, chain="KMD"):
             if 'coinbase' in tx['vin'][0]:
                 if 'addresses' in tx['vout'][0]['scriptPubKey']:
                     address = tx['vout'][0]['scriptPubKey']['addresses'][0]
-                    name = get_name_from_address(address)
                 else:
                     address = "N/A"
-                    name = "non-standard"
 
                 row.block_height = block_height
                 row.block_time = blockinfo['time']
                 row.block_datetime = dt.utcfromtimestamp(blockinfo['time'])
                 row.address = address
-                row.name = name
                 row.txid = tx['txid']
                 row.diff = blockinfo['difficulty']
-                row.season = get_season_from_block(block_height)
                 row.value = Decimal(tx['vout'][0]['value'])
                 break
     return row

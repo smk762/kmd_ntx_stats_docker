@@ -4,10 +4,11 @@ import random
 import datetime
 from datetime import datetime as dt
 
+import lib_epochs
 from lib_rpc import *
 from lib_const import *
 from lib_table_select import *
-from lib_crypto import get_opret_ticker
+from lib_crypto import get_opret_ticker, lil_endian
 from lib_helper import *
 from models import *
 from lib_threads import *
@@ -129,7 +130,6 @@ def update_notarised_chain_season_table(season):
     for item in get_chain_ntx_season_aggregates(season):
         chain = item[0]
         block_height = item[1]
-        server = get_chain_server(chain, season)
 
         cols = 'block_hash, txid, block_time, opret, ac_ntx_blockhash, ac_ntx_height'
         conditions = f"block_height={block_height} AND chain='{chain}'"
@@ -156,7 +156,6 @@ def update_notarised_chain_season_table(season):
         row.ac_block_height = ac_block_height
         row.ntx_lag = ntx_lag
         row.season = season
-        row.server = server
         row.update()
 
 
@@ -203,7 +202,6 @@ def update_KMD_notarisations(unrecorded_KMD_txids):
             ntx_row.ac_ntx_height = row_data[8]
             ntx_row.txid = row_data[9]
             ntx_row.opret = row_data[10]
-            ntx_row.season = row_data[11]
             ntx_row.update()
 
             runtime = int(time.time()-start)
@@ -505,11 +503,9 @@ def get_notarised_data(txid):
                             #  This ignores them)
 
                             if chain.upper() == chain:
-                                season, server = get_season_server_from_addresses(address_list, chain)
-                                season, server = check_excluded_chains(season, server, chain)
                                 row_data = (chain, this_block_height, block_time, block_datetime,
                                             block_hash, notary_list, address_list, ac_ntx_blockhash, ac_ntx_height,
-                                            txid, opret, season, server, "N/A")
+                                            txid, opret, "N/A")
                                 return row_data
     except Exception as e:
         alerts.send_telegram(f"[{__name__}] [get_notarised_data] TXID: {txid}. Error: {e}")
@@ -541,9 +537,9 @@ def prepopulate_season_ntx_dict(season):
     servers = get_notarised_servers(season)
     epochs = get_notarised_epochs(season)
     chains = get_notarised_chains(season)
-    server_epochs = get_server_epochs(season)
+    server_epochs = lib_epochs.get_server_epochs(season)
 
-    server_epoch_chains = get_server_epoch_chains(season, server_epochs)
+    server_epoch_chains = lib_epochs.get_server_epoch_chains(season, server_epochs)
 
     for chain in chains:
         season_ntx_dict["chains"].update(
@@ -600,7 +596,6 @@ def update_last_notarised_table(season):
     season_last_ntx = get_season_last_ntx(season)
     notaries = get_season_notaries(season)
     for chain in chains:
-        server = get_chain_server(chain, season)
 
         for notary in notaries:
             if notary not in season_last_ntx:
@@ -637,7 +632,6 @@ def update_last_notarised_table(season):
                     row.block_height = block_height
                     row.block_time = block_time
                     row.season = season
-                    row.server = server
                     row.update()
             else:
                 row = last_notarised_row()
@@ -647,7 +641,6 @@ def update_last_notarised_table(season):
                 row.block_height = 0
                 row.block_time = 0
                 row.season = season
-                row.server = server
                 row.update()
 
 
@@ -658,7 +651,6 @@ def update_daily_chain_ntx(season, day):
         row = notarised_chain_daily_row()
         row.season = season
         row.chain = item[0]
-        row.server = get_chain_server(row.chain, season)
         row.ntx_count = item[3]
         row.notarised_date = str(day)
         row.update()
@@ -746,6 +738,8 @@ def import_ntx(season, server, chain):
             ntx_row.txid = txid_info["txid"]
             ntx_row.opret = txid_info["opret"]
             ntx_row.epoch = txid_info["epoch"]
+            ntx_row.season = txid_info["season"]
+            ntx_row.server = txid_info["server"]
 
             if len(txid_info["notary_addresses"]) == 0:
 
@@ -762,11 +756,6 @@ def import_ntx(season, server, chain):
                 else:
                     row_data = get_notarised_data(txid, coins_list)
                     ntx_row.notary_addresses = row_data[6]
-
-                ntx_row.season, ntx_row.server = get_season_server_from_addresses(
-                                                    ntx_row.notary_addresses,
-                                                    ntx_row.chain
-                                                )
                     
             else:
                 ntx_row.notary_addresses = txid_info["notary_addresses"]
@@ -972,7 +961,7 @@ def import_nn_btc_txids(season):
         for txid in txid_list:
             j += 1
             logger.info(f">>> Categorising {txid} for {j}/{num_txid}")
-            txid_url = f"{OTHER_SERVER}/api/info/notary_btc_txid/?txid={txid}"
+            txid_url = get_notary_btc_txid_url(txid, False)
             time.sleep(0.02)
             r = requests.get(txid_url)
             try:
@@ -1003,3 +992,82 @@ def import_nn_btc_txids(season):
         addresses.remove(notary_address)
 
 
+
+def get_chain_ntx_count_dict(season, day):
+    # get daily ntx total for each chain
+    chain_ntx_count_dict = {}
+    chains_aggr_resp = get_notarised_chain_date_aggregates(season, day)
+
+    for item in chains_aggr_resp:
+        chain = item[0]
+        max_block = item[1]
+        max_blocktime = item[2]
+        ntx_count = item[3]
+        chain_ntx_count_dict.update({chain:ntx_count})
+    return chain_ntx_count_dict
+
+
+def get_notary_ntx_count_dict(season, day):
+    notary_ntx_count_dict = {}
+    notarised_on_day = get_notarised_for_day(season, day)
+
+    for item in notarised_on_day:
+        notaries = item[1]
+        chain = item[0]
+        for notary in notaries:
+            if notary not in notary_ntx_count_dict:
+                notary_ntx_count_dict.update({notary:{}})
+            if chain not in notary_ntx_count_dict[notary]:
+                notary_ntx_count_dict[notary].update({chain:1})
+            else:
+                count = notary_ntx_count_dict[notary][chain]+1
+                notary_ntx_count_dict[notary].update({chain:count})
+
+    return notary_ntx_count_dict
+
+
+def get_notary_count_categorized(notary_ntx_count_dict, chain_ntx_count_dict):
+
+    season_main_coins = requests.get(
+                        get_dpow_server_coins_url(season, 'Main')
+                    ).json()["results"]
+
+    season_3P_coins = requests.get(
+                        get_dpow_server_coins_url(season, 'Third_Party')
+                    ).json()["results"]
+
+    # iterate over notary chain counts to calculate scoring category counts.
+    notary_counts = {}
+    notary_ntx_pct = {}
+
+    for notary in notary_ntx_count_dict:
+        notary_ntx_pct.update({notary:{}})
+        notary_counts.update({notary:{
+                "btc_count":0,
+                "antara_count":0,
+                "third_party_count":0,
+                "other_count":0,
+                "total_ntx_count":0
+            }})
+
+        for chain in notary_ntx_count_dict[notary]:
+            if chain == "KMD":
+                count = notary_counts[notary]["btc_count"] + notary_ntx_count_dict[notary][chain]
+                notary_counts[notary].update({"btc_count":count})
+            elif chain in season_main_coins:
+                count = notary_counts[notary]["antara_count"] + notary_ntx_count_dict[notary][chain]
+                notary_counts[notary].update({"antara_count":count})
+            elif chain in season_3P_coins:
+                count = notary_counts[notary]["third_party_count"] + notary_ntx_count_dict[notary][chain]
+                notary_counts[notary].update({"third_party_count":count})
+            else:
+                count = notary_counts[notary]["other_count"] + notary_ntx_count_dict[notary][chain]
+                notary_counts[notary].update({"other_count":count})
+
+            count = notary_counts[notary]["total_ntx_count"] + notary_ntx_count_dict[notary][chain]
+            notary_counts[notary].update({"total_ntx_count":count})
+
+            pct = round(notary_ntx_count_dict[notary][chain] / chain_ntx_count_dict[chain] * 100, 2)
+            notary_ntx_pct[notary].update({chain:pct})
+
+    return notary_counts, notary_ntx_pct

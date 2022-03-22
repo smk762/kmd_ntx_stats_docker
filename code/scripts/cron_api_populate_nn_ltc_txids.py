@@ -14,9 +14,9 @@ from lib_notarisation import *
 from lib_table_update import update_nn_ltc_tx_notary_from_addr
 from lib_table_select import get_existing_nn_ltc_txids, get_existing_notarised_txids
 from lib_api import get_ltc_tx_info
+from models import ltc_tx_row, notarised_row
 
-from models import ltc_tx_row, notarised_row, get_chain_epoch_score_at, get_chain_epoch_at
-
+from lib_validate import *
 from lib_const import *
 from known_txids import *
 
@@ -296,9 +296,6 @@ def scan_ltc_transactions(season):
                 logger.info(ltc_row.block_datetime)
 
                 addresses = tx_info['addresses']
-                ltc_row.season, ltc_row.server = get_season_server_from_addresses(
-                                                    addresses[:], "LTC"
-                                                )
 
 
                 vouts = tx_info["outputs"]

@@ -288,9 +288,13 @@ SEASONS_INFO = {
         }
 }
 
+
+# Rescan full season
+RESCAN_SEASON = False
+RESCAN_CHUNK_SIZE = 100000
+
 # set at post season to use "post_season_end_time" for aggreagates (e.g. mining)
 POSTSEASON = True
-RESCAN_SEASON = False
 
 DPOW_EXCLUDED_CHAINS = {
     "Season_1": [],

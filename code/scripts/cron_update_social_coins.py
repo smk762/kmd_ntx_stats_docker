@@ -8,6 +8,7 @@ from lib_helper import *
 from decorators import *
 from lib_urls import get_dpow_server_coins_url, get_notary_nodes_repo_coin_social_url
 from models import coin_social_row
+from lib_validate import *
 
 
 @print_runtime

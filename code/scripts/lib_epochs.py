@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from lib_table_select import *
 from lib_table_update import *
-from lib_helper import *
+import lib_validate
 from models import ntx_tenure_row, scoring_epoch_row
 
 def delete_invalid_servers():
@@ -11,6 +11,31 @@ def delete_invalid_servers():
         logger.info(f"Deleting invalid server {server} from [ntx_tenure] table...")
         row = ntx_tenure_row()
         row.delete(None, server)
+
+
+@print_runtime
+def get_server_epochs(season):
+    server_epochs = {}
+    servers = get_notarised_servers(season)
+    for server in servers:
+        server_epochs.update({
+            server: get_notarised_epochs(season, server)
+        })
+    return server_epochs
+
+
+@print_runtime
+def get_server_epoch_chains(season, server_epochs):
+    server_epoch_chains = {}
+    for server in server_epochs:
+        server_epoch_chains.update({
+            server:{}
+        })
+        for epoch in server_epochs[server]:
+            server_epoch_chains[server].update({
+                epoch: get_notarised_chains(season, server, epoch)
+            })
+    return server_epoch_chains
 
 
 def delete_invalid_seasons():
@@ -177,7 +202,7 @@ def update_epochs(season):
                     num_chains = len(active_chains)
 
             else:
-                active_chains, num_chains = get_server_active_scoring_dpow_chains_at_time(
+                active_chains, num_chains = lib_validate.get_server_active_scoring_dpow_chains_at_time(
                                                 season,
                                                 server,
                                                 epoch_midpoint
@@ -216,7 +241,7 @@ def update_epochs(season):
 
                 try:
                     if len(epoch_row.epoch_chains) != 0:
-                        epoch_row.score_per_ntx = get_chain_epoch_score_at(
+                        epoch_row.score_per_ntx = lib_validate.get_chain_epoch_score_at(
                                                     season,
                                                     server,
                                                     epoch_row.epoch_chains[0],
@@ -281,3 +306,5 @@ def get_dpow_scoring_window(season, chain, server):
 
     scored_list, unscored_list = get_ntx_scored(season, chain, official_start, official_end, server)
     return official_start, official_end, scored_list, unscored_list
+
+

@@ -85,6 +85,18 @@ def get_coins_repo_coins_url(branch='master'):
     return f"https://raw.githubusercontent.com/KomodoPlatform/coins/{branch}/coins"
 
 
+def get_coins_repo_electrums_url(branch='master'):
+    return f"https://raw.githubusercontent.com/KomodoPlatform/coins/{branch}/electrums"
+
+
+def get_coins_repo_explorers_url(branch='master'):
+    return f"https://raw.githubusercontent.com/KomodoPlatform/coins/{branch}/explorers"
+
+
+def get_coins_repo_icons_url(branch='master'):
+    return f"https://raw.githubusercontent.com/KomodoPlatform/coins/{branch}/icons"
+
+
 def get_dpow_readme_url(branch='master'):
     return f"https://raw.githubusercontent.com/KomodoPlatform/dPoW/{branch}/README.md"
 

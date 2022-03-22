@@ -4,6 +4,7 @@ import time
 import requests
 from lib_const import *
 from lib_helper import *
+from lib_validate import *
 from lib_urls import *
 from models import coins_row
 from lib_crypto import SMARTCHAIN_BASE_58

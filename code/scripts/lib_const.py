@@ -22,15 +22,6 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 
-# set this to False in .env when originally populating the table, or rescanning
-SKIP_PAST_SEASONS = (os.getenv("SKIP_PAST_SEASONS") == 'True')
-
-# set this to True in .env to quickly update tables with most recent data
-SKIP_UNTIL_YESTERDAY = (os.getenv("SKIP_UNTIL_YESTERDAY") == 'True')
-
-# Rescan full season
-RESCAN_SEASON = False
-RESCAN_CHUNK_SIZE = 100000
 
 # set to IP or domain to allow for external imports of data to avoid API limits
 
@@ -106,8 +97,6 @@ for coin in THIRD_PARTY_COINS:
         COIN_PARAMS.update({coin: COIN_PARAMS[coin]})
     else:
         print(alerts.send_telegram(f"{__name__}: {coin} doesnt have params defined!"))
-
-
 
 
 # BTC specific addresses. TODO: This could be reduced / merged.
@@ -250,13 +239,3 @@ KNOWN_NOTARIES = list(set(KNOWN_NOTARIES))
 KNOWN_NOTARIES.sort()
 
 CLEAN_UP = False
-
-def is_postseason(timestamp=None):
-    if not timestamp:
-        timestamp = int(time.time())
-    for season in SEASONS_INFO:
-        if "post_season_end_time" in SEASONS_INFO[season]:
-            if timestamp >= SEASONS_INFO[season]["post_season_end_time"]:
-                if timestamp <= SEASONS_INFO[season]["end_time"]:
-                    return True
-    return False
