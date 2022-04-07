@@ -18,7 +18,6 @@ def scan_rewards():
     scan_blocks.sort()
     scan_blocks.reverse()
     for i in scan_blocks:
-        print(i)
         lib_wallet.get_rewards_tx_data(i)
 
 

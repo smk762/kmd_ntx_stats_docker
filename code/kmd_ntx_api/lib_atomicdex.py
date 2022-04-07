@@ -65,7 +65,6 @@ def get_bestorders(request):
         "action": helper.get_or_none(request, "action", "buy"),
         "volume": helper.get_or_none(request, "volume", 100),
     }
-    print(params)
     r = mm2_proxy(params)
     return r.json()
 
@@ -186,11 +185,6 @@ def format_gui_os_version(swaps_data):
 
         maker = f"{maker_gui} {maker_os} {maker_gui_version} {maker_mm2_version}"
         taker = f"{taker_gui} {taker_os} {taker_gui_version} {taker_mm2_version}"
-        print(maker_gui)
-        print(maker_os)
-        print(maker_gui_version)
-        print(maker_mm2_version)
-        print(maker)
 
         item.update({
             "taker_gui": taker,
