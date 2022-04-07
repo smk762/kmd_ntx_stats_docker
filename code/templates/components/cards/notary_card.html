@@ -25,35 +25,35 @@
 											
 										{% elif site == 'email' %}
 											{%  if link != '' %}
-												<a href="{{ link }}"><i class="far fa-envelope mr-2 social-icon"></i></a>
+												<a href="mailto:{{ link }}"><i class="far fa-envelope mr-2 social-icon"></i></a>
 											{% else %}
 												<i class="far fa-envelope mr-2 social-icon-disabled"></i>
 											{% endif %}
 											
 										{% elif site == 'github' %}
 											{%  if link != '' %}
-												<a href="https://github.com/{{ link }}"><i class="fab fa-github mr-2 social-icon"></i></a>
+												<a href="{{ link }}"><i class="fab fa-github mr-2 social-icon"></i></a>
 											{% else %}
 												<i class="fab fa-github mr-2 social-icon-disabled"></i>
 											{% endif %}
 
 										{% elif site == 'keybase' %}
 											{%  if link != '' %}
-												<a href="https://keybase.io/{{ link }}"><i class="fab fa-keybase mr-2 social-icon"></i></a>
+												<a href="{{ link }}"><i class="fab fa-keybase mr-2 social-icon"></i></a>
 											{% else %}
 												<i class="fab fa-keybase mr-2 social-icon-disabled"></i>
 											{% endif %}
 
 										{% elif site == 'telegram' %}
 											{%  if link != '' %}
-												<a href="https://t.me/{{ link }}"><i class="fab fa-telegram-plane mr-2 social-icon"></i></a>
+												<a href="{{ link }}"><i class="fab fa-telegram-plane mr-2 social-icon"></i></a>
 											{% else %}
 												<i class="fab fa-telegram-plane mr-2 social-icon-disabled"></i>
 											{% endif %}
 
 										{% elif site == 'twitter' %}
 											{%  if link != '' %}
-												<a href="https://twitter.com/{{ link }}"><i class="fab fa-twitter mr-2 social-icon"></i></a>
+												<a href="{{ link }}"><i class="fab fa-twitter mr-2 social-icon"></i></a>
 											{% else %}
 												<i class="fab fa-twitter mr-2 social-icon-disabled"></i>
 											{% endif %}
@@ -67,7 +67,7 @@
 											
 										{% elif site == 'youtube' %}
 											{%  if link != '' %}
-												<a href="https://www.youtube.com/{{ link }}"><i class="fab fa-youtube mr-2 social-icon"></i></a>
+												<a href="{{ link }}"><i class="fab fa-youtube mr-2 social-icon"></i></a>
 											{% else %}
 												<i class="fab fa-youtube mr-2 social-icon-disabled"></i>
 											{% endif %}

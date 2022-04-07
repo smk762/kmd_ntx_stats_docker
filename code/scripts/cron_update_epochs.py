@@ -16,16 +16,17 @@ def populate_epochs():
 
     for season in SEASONS_INFO:
         if season not in EXCLUDED_SEASONS:
-            if season not in EXCLUDED_SEASONS:
-                if CLEAN_UP:
-                    lib_epochs.delete_invalid_season_servers(season)
-                for server in SCORING_EPOCHS[season]:
-                    if CLEAN_UP:
-                        lib_epochs.delete_invalid_season_server_chains(season, server)
-                lib_epochs.update_tenure(season)
-                lib_epochs.update_epochs(season)
+            if CLEAN_UP:
+                lib_epochs.delete_invalid_season_servers(season)
+
+                for server in SEASONS_INFO[season]["servers"]:
+                    lib_epochs.delete_invalid_season_server_coins(season, server)
+
+            lib_epochs.update_tenure(season)
+            lib_epochs.update_epochs(season)
 
     lib_epochs.update_notarised_epoch_scoring()
+
 
     CURSOR.close()
     CONN.close()

@@ -3,9 +3,12 @@ import hashlib
 import codecs
 import bitcoin
 import binascii
+import requests
 from bitcoin.core import x
 from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
+import alerts
+import lib_urls  
 
 
 # For more params, check a project's /src/chainparams.cpp file
@@ -104,6 +107,24 @@ COIN_PARAMS = {
     "GAME": GAME_CoinParams
 }
 
+COINS_INFO = requests.get(lib_urls.get_coins_info_url()).json()['results']
+
+# Defines BASE_58 coin parameters
+for coin in COINS_INFO:
+    if "pubtype" in COINS_INFO[coin]["coins_info"] and "wiftype" in COINS_INFO[coin]["coins_info"] and "p2shtype" in COINS_INFO[coin]["coins_info"]:
+        if COINS_INFO[coin]["coins_info"]["pubtype"] == 60:
+            if COINS_INFO[coin]["coins_info"]["wiftype"] == 188:
+                if COINS_INFO[coin]["coins_info"]["p2shtype"] == 85:
+                    COIN_PARAMS.update({coin: COIN_PARAMS["KMD"]})
+
+    elif "dpow" in COINS_INFO[coin]:
+        if "server" in COINS_INFO[coin]["dpow"]:
+            if COINS_INFO[coin]["dpow"]["server"] == "Third_Party":
+                if coin in COIN_PARAMS:
+                    COIN_PARAMS.update({coin: COIN_PARAMS[coin]})
+                else:
+                    print(alerts.send_telegram(f"{__name__}: {coin} doesnt have params defined!"))
+
 
 SMARTCHAIN_BASE_58 = {
                 "pubtype": 60,
@@ -114,13 +135,30 @@ SMARTCHAIN_BASE_58 = {
 
 
 def get_addr_from_pubkey(coin, pubkey):
-    bitcoin.params = COIN_PARAMS[coin]
-    return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
+    if coin in COIN_PARAMS:
+        bitcoin.params = COIN_PARAMS[coin]
+        return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
+    return None
 
 
-def lil_endian(hex_str):
-    return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
-
+def get_opret_ticker(scriptPubKey_asm):
+    
+    scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
+    coin = ''
+    while len(coin) < 1:
+        for i in range(len(scriptPubKeyBinary)):
+            if chr(scriptPubKeyBinary[i]).encode() == b'\x00':
+                j = i+1
+                while j < len(scriptPubKeyBinary)-1:
+                    coin += chr(scriptPubKeyBinary[j])
+                    j += 1
+                    if chr(scriptPubKeyBinary[j]).encode() == b'\x00':
+                        break
+                break
+    if chr(scriptPubKeyBinary[-4])+chr(scriptPubKeyBinary[-3])+chr(scriptPubKeyBinary[-2]) == "KMD":
+        coin = "KMD"
+    return str(coin)
+    
 
 def get_p2pk_scripthash_from_pubkey(pubkey):
     scriptpubkey = '21' +pubkey+ 'ac'
@@ -143,20 +181,5 @@ def get_p2pkh_scripthash_from_pubkey(pubkey):
     return script_hash
 
 
-def get_opret_ticker(scriptPubKey_asm):
-    
-    scriptPubKeyBinary = binascii.unhexlify(scriptPubKey_asm[70:])
-    chain = ''
-    while len(chain) < 1:
-        for i in range(len(scriptPubKeyBinary)):
-            if chr(scriptPubKeyBinary[i]).encode() == b'\x00':
-                j = i+1
-                while j < len(scriptPubKeyBinary)-1:
-                    chain += chr(scriptPubKeyBinary[j])
-                    j += 1
-                    if chr(scriptPubKeyBinary[j]).encode() == b'\x00':
-                        break
-                break
-    if chr(scriptPubKeyBinary[-4])+chr(scriptPubKeyBinary[-3])+chr(scriptPubKeyBinary[-2]) == "KMD":
-        chain = "KMD"
-    return str(chain)
+def lil_endian(hex_str):
+    return ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])

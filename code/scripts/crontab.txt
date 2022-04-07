@@ -1,14 +1,14 @@
 
-0-59/15 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_api_populate_nn_ltc_txids.py
-1-59/5 * * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_import_notarised.py
-2-59/5 * * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_update_ntx_tables.py
-3-59/5 * * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_update_mined_tables.py
-4-59/5 * * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_import_nn_ltc_txids.py
+0-59/15 * * * * /usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_api_populate_nn_ltc_txids.py
+1-59/5 * * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_import_notarised.py
+2-59/5 * * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_update_ntx_tables.py
+3-59/5 * * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_update_mined_tables.py
+4-59/5 * * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_import_nn_ltc_txids.py
 
-24 */1 * * *    /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_update_balances_table.py
-12 5 * * *      /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_update_coins_table.py
-12 6 * * *      /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_update_addresses_table.py
-12 7 * * *      /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_update_epochs.py
-12 8 * * *      /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_update_social_coins.py
-12 9 * * *      /usr/bin/python3 /home/username/kmd_ntx_stats_docker/scripts/cron_update_social_notaries.py
+24 */1 * * */usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_update_balances_table.py
+12 5 * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_update_coins_table.py
+12 6 * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_update_addresses_table.py
+12 7 * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_update_epochs.py
+12 8 * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_update_social_coins.py
+12 9 * * *  /usr/bin/python3 /home/username/kmd_ntx_stats_docker/code/scripts/cron_update_social_notaries.py
 

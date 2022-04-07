@@ -19,10 +19,18 @@ def run_updates():
         if season not in EXCLUDED_SEASONS:
             if season.find("Testnet") == -1:
                 if has_season_started(season):
-                    update_mined_table(season)
-                    update_mined_count_daily_table(season)
+                    if RESCAN_SEASON:
+                        update_mined_table(season, "KMD", SEASONS_INFO[season]["start_block"])
+                        update_mined_count_daily_table(season, True)
+                    else:
+                        update_mined_table(season)
+                        update_mined_count_daily_table(season)
                     update_mined_count_season_table(season)
 
 if __name__ == "__main__":
-    
+
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "rescan":
+            RESCAN_SEASON = True
+
     run_updates()

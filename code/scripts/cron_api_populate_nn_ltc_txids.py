@@ -10,9 +10,9 @@ import datetime
 import dateutil.parser as dp
 
 from lib_helper import *
-from lib_notarisation import *
-from lib_table_update import update_nn_ltc_tx_notary_from_addr
-from lib_table_select import get_existing_nn_ltc_txids, get_existing_notarised_txids
+from lib_ntx import *
+from lib_update import update_nn_ltc_tx_notary_from_addr
+from lib_query import get_existing_nn_ltc_txids, get_existing_notarised_txids
 from lib_api import get_ltc_tx_info
 from models import ltc_tx_row, notarised_row
 
@@ -46,7 +46,7 @@ def get_linked_addresses(addr=None, notary=None):
             if notary in KNOWN_NOTARIES:
 
                 if notary not in linked_addresses:
-                    if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
+                    if addr not in ALL_SEASON_NOTARY_LTC_ADDRESSES:
                         linked_addresses.update({notary:[address]})
 
                 else:
@@ -85,7 +85,7 @@ def detect_replenish(vins, vouts):
     for vin in vins:
         address = vin["addresses"][0]
         if is_notary_ltc_address(address):
-            notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
+            notary = ALL_SEASON_NOTARY_LTC_ADDRESSES[address]
             vin_notaries.append(notary)
         elif is_linked_address(address, "dragonhound_NA"):
             notary = "dragonhound_NA"
@@ -106,7 +106,7 @@ def detect_replenish(vins, vouts):
             address = vout["addresses"][0]
             if is_notary_ltc_address(address):
                 if sats >= 1000000:
-                    notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
+                    notary = ALL_SEASON_NOTARY_LTC_ADDRESSES[address]
                     if notary != "dragonhound_NA":
                         vout_notaries.append(notary)
             elif not is_linked_address(address):
@@ -118,12 +118,12 @@ def detect_replenish(vins, vouts):
 
     if replenish_vin and replenish_vout:
         for addr in vin_non_notary_addresses:
-            if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
+            if addr not in ALL_SEASON_NOTARY_LTC_ADDRESSES:
                 pass
                 #update_nn_ltc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
         for addr in vout_non_notary_addresses:
 
-            if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
+            if addr not in ALL_SEASON_NOTARY_LTC_ADDRESSES:
                 pass
                 #update_nn_ltc_tx_notary_from_addr("dragonhound_NA (linked)", addr)
         return True
@@ -135,7 +135,7 @@ def detect_consolidate(vins, vouts):
     for vin in vins:
         address = vin["addresses"][0]
         if is_notary_ltc_address(address):
-            notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
+            notary = ALL_SEASON_NOTARY_LTC_ADDRESSES[address]
             vin_notaries.append(notary)
         else:
             vin_non_notary_addresses.append(address)
@@ -148,7 +148,7 @@ def detect_consolidate(vins, vouts):
         for vout in vouts:
             address = vout["addresses"][0]
             if is_notary_ltc_address(address):
-                notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
+                notary = ALL_SEASON_NOTARY_LTC_ADDRESSES[address]
                 vout_notaries.append(notary)
             else:
                 vout_non_notary_addresses.append(address)
@@ -156,10 +156,10 @@ def detect_consolidate(vins, vouts):
         if len(list(set(vout_notaries))) == 1 and is_notary_ltc_address(vouts[0]["addresses"][0]):
             if notary == vout_notaries[0]:
                 for addr in vin_non_notary_addresses:
-                    if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
+                    if addr not in ALL_SEASON_NOTARY_LTC_ADDRESSES:
                         update_nn_ltc_tx_notary_from_addr(f"{notary} (linked)", addr)
                 for addr in vout_non_notary_addresses:
-                    if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
+                    if addr not in ALL_SEASON_NOTARY_LTC_ADDRESSES:
                         update_nn_ltc_tx_notary_from_addr(f"{notary} (linked)", addr)
                 return True
 
@@ -171,14 +171,14 @@ def update_notary_linked_vins(vins):
     for vin in vins:
         address = vin["addresses"][0]
         if is_notary_ltc_address(address):
-            notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
+            notary = ALL_SEASON_NOTARY_LTC_ADDRESSES[address]
             vin_notaries.append(notary)
         else:
             vin_non_notary_addresses.append(address)
 
     if len(list(set(vin_notaries))) == 1 and len(vin_non_notary_addresses) > 0:
         for addr in vin_non_notary_addresses:
-            if addr not in ALL_SEASON_NN_LTC_ADDRESSES_DICT:
+            if addr not in ALL_SEASON_NOTARY_LTC_ADDRESSES:
                 update_nn_ltc_tx_notary_from_addr(f"{notary} (linked)", address)
 
 
@@ -186,14 +186,14 @@ def detect_intra_notary(vins, vouts):
     for vin in vins:
         address = vin["addresses"][0]
         if is_notary_ltc_address(address):
-            notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
+            notary = ALL_SEASON_NOTARY_LTC_ADDRESSES[address]
         else:
             return False
 
     for vout in vouts:
         address = vout["addresses"][0]
         if is_notary_ltc_address(address):
-            notary = ALL_SEASON_NN_LTC_ADDRESSES_DICT[address]
+            notary = ALL_SEASON_NOTARY_LTC_ADDRESSES[address]
         else:
             return False
 
@@ -385,8 +385,7 @@ def scan_ltc_transactions(season):
 
 if __name__ == "__main__":
     
-    seasons = get_notarised_seasons()
-    for season in seasons:
+    for season in SEASONS_INFO:
         if season not in EXCLUDED_SEASONS:
             scan_ltc_transactions(season)
 

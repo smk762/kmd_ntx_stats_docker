@@ -31,7 +31,7 @@
 								<td data-data="unscored_ntx_count">{{ item.unscored_ntx_count }}</td>
 								<td data-data="first_ntx_block_time">{{ item.official_start_block_time }}</td>
 								<td data-data="last_ntx_block_time">{{ item.official_end_block_time }}</td>
-								<td data-data="num_sec">{{ item.official_end_block_time|sub:item.official_start_block_time|div:86400|floatformat:-2 }}</td>
+								<td data-data="num_sec">{{ item.ntx_days|floatformat:-2 }}</td>
 							</tr>
 						{% endfor %}
 					</tbody>

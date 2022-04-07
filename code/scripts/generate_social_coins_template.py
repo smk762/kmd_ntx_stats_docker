@@ -3,12 +3,14 @@ import os
 import json
 import requests
 from lib_const import *
+from lib_urls import get_dpow_server_coins_url
+from lib_validate import *
 
 
-url = f"{THIS_SERVER}/api/info/dpow_server_coins"
-dpow_main_chains = requests.get(f"{url}/?season={SEASON}&server=Main").json()['results']
-dpow_3p_chains = requests.get(f"{url}/?season={SEASON}&server=Third_Party").json()['results']
-all_chains = dpow_3p_chains+dpow_main_chains+["KMD", "LTC", "BTC"]
+season = get_season()
+
+dpow_main_coins = SEASONS_INFO[season]["servers"]["Main"]["coins"]
+dpow_3p_coins = SEASONS_INFO[season]["servers"]["Third_Party"]["coins"]
 
 template = {}
 for chain in all_chains:

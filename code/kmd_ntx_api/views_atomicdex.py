@@ -2,55 +2,56 @@
 import math
 import requests
 from django.shortcuts import render
-from .lib_helper import get_or_none
 
-from kmd_ntx_api.lib_info import *
-from kmd_ntx_api.lib_atomicdex import *
-from kmd_ntx_api.forms import *
+from datetime import datetime as dt
+
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_query as query
+import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_atomicdex as dex
+import kmd_ntx_api.forms as forms
+
 
 
 def activation_commands_view(request):
-    season = get_page_season(request)
-    scheme_host = get_current_host(request)
-    url = f"{scheme_host}api/atomicdex/activation_commands/"
-    data = requests.get(url).json()["commands"]
+    context = helper.get_base_context(request)
+
     activation_data = {}
+    url = f"{context['scheme_host']}api/atomicdex/activation_commands/"
+    data = requests.get(url).json()["commands"]
     for protocol in data:
         if len(data[protocol]) != 0:
             activation_data.update({protocol:data[protocol]})
 
-    context = {
-        "season":season,
-        "page_title":"Generate AtomicDEX-API Enable Command",
-        "scheme_host": scheme_host,
-        "sidebar_links":get_sidebar_links(season),
-        "activation_data":activation_data,
-        "eco_data_link":get_eco_data_link()
-    }
+    context.update({
+        "page_title": "Generate AtomicDEX-API Enable Command",
+        "activation_data": activation_data
+    })
+
     return render(request, 'views/atomicdex/activation_commands.html', context)
 
 
 def batch_activation_form_view(request):
-    season = get_page_season(request)
-    context = get_context(request)
-    scheme_host = get_current_host(request)
+    context = helper.get_base_context(request)
     context.update({
         "page_title":"Generate AtomicDEX-API Batch Activation Commands",
-        "sidebar_links":get_sidebar_links(season)
     })
 
     if request.GET:
         try:
             coin = request.GET["coin"]
-            form = EnableCommandForm(request.GET)
+            form = forms.EnableCommandForm(request.GET)
             context.update({
                 "form":form
             })
-            url = f"{scheme_host}api/atomicdex/activation_commands"
+
+            url = f"{context['scheme_host']}api/atomicdex/activation_commands"
             r = requests.get(f'{url}/?coin={coin}')
             command_str = r.json()
             command_str["userpass"] = "'$userpass'"
             form_resp = [command_str]
+
             try:
                 if request.GET['add_to_batch_command'] == "True":
                     if len(request.GET['existing_command']) > 0:
@@ -64,16 +65,19 @@ def batch_activation_form_view(request):
                             if i["coin"] != coin:
                                 i['userpass'] = "'$userpass'"
                                 form_resp.append(i)
+
             except Exception as e:
                 messages.error(request, e)
+
             context.update({
                 "form_resp":form_resp
             })
             return render(request, 'views/atomicdex/batch_activation_form.html', context)
+
         except Exception as e:
             print(e)
         
-    form = EnableCommandForm() 
+    form = forms.EnableCommandForm() 
     context.update({
         "form":form
     })
@@ -82,26 +86,22 @@ def batch_activation_form_view(request):
 
 
 def bestorders_view(request):
-    coin = "KMD"
-    if "coin" in request.GET:
-        coin = request.GET["coin"]
-    season = get_page_season(request)
-    context = {
+    context = helper.get_base_context(request)
+    coin = helper.get_or_none(request, "coin", "KMD")
+    context.update({
         "coin": coin,
-        "season": season,
-        "mm2_coins": get_mm2_coins(),
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link()
-    }
-    bestorders = get_bestorders(request)["result"]
+        "mm2_coins": info.get_mm2_coins_list(),
+        "icons": info.get_icons(request)
+    })
+
     rows = []
-    for coin in bestorders:
+    bestorders = dex.get_bestorders(request)["result"]
+    for _coin in bestorders:
         rows.append({
-            "coin": coin,
-            "price": bestorders[coin][0]["price"],
-            "maxvolume": bestorders[coin][0]["maxvolume"],
-            "min_volume": bestorders[coin][0]["min_volume"],
+            "coin": _coin,
+            "price": bestorders[_coin][0]["price"],
+            "maxvolume": bestorders[_coin][0]["maxvolume"],
+            "min_volume": bestorders[_coin][0]["min_volume"],
         })
 
     context.update({
@@ -112,89 +112,70 @@ def bestorders_view(request):
 
 
 def gui_stats_view(request):
-    swaps_data = get_swaps_data()
-    since = "week"
-    to_time = int(time.time())
-    from_time = int(to_time - 60*60*24*14)
-    if "from_time" in request.GET:
-        from_time = int(request.GET["from_time"])
-    if "to_time" in request.GET:
-        to_time = int(request.GET["to_time"])
-    if "since" in request.GET:
-        since = request.GET["since"]
-    swaps_data = filter_swaps_timespan(swaps_data, from_time, to_time)
-    season = get_page_season(request)
-    context = {
-        "from_time": from_time,
-        "to_time": to_time,
-        "from_time_dt": dt.fromtimestamp(from_time),
-        "to_time_dt": dt.fromtimestamp(to_time),
-        "since_options": list(SINCE_INTERVALS.keys()),
+    context = helper.get_base_context(request)
+    since = helper.get_or_none(request, "since", "week")
+    to_time = helper.get_or_none(request, "to_time", int(time.time()))
+    from_time = helper.get_or_none(request, "from_time", int(to_time - SINCE_INTERVALS[since]))
+    swaps_data = query.filter_swaps_timespan(swaps_data, from_time, to_time)
+
+    context.update({
         "since": since,
-        "season": season,
-        "swaps_counts": get_swaps_counts(swaps_data),
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link()
-    }
+        "since_options": list(SINCE_INTERVALS.keys()),
+        "from_time": from_time,
+        "from_time_dt": dt.fromtimestamp(from_time),
+        "to_time": to_time,
+        "to_time_dt": dt.fromtimestamp(to_time),
+        "swaps_counts": query.get_swaps_counts(swaps_data)
+    })
 
     return render(request, 'views/atomicdex/gui_stats.html', context)
 
 
 def last_200_swaps_view(request):
-    season = get_page_season(request)
-    last_200_swaps = get_last_200_swaps(request)
-    last_200_swaps = format_gui_os_version(last_200_swaps)
-    context = {
+    context = helper.get_base_context(request)
+    last_200_swaps = dex.get_last_200_swaps(request)
+    last_200_swaps = dex.format_gui_os_version(last_200_swaps)
+    print(last_200_swaps)
+
+    context.update({
         "last_200_swaps": last_200_swaps,
-        "season": season,
-        "mm2_coins": get_mm2_coins(),
-        "taker_coin": get_or_none(request, "taker_coin"),
-        "maker_coin": get_or_none(request, "maker_coin"),
+        "mm2_coins": info.get_mm2_coins_list(),
+        "taker_coin": helper.get_or_none(request, "taker_coin"),
+        "maker_coin": helper.get_or_none(request, "maker_coin"),
         "page_title": "Last 200 Swaps",
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link()
-    }
+        "icons": info.get_icons(request)
+    })
 
     return render(request, 'views/atomicdex/last_200_swaps.html', context)
 
 
 def last_200_failed_swaps_view(request):
-    season = get_page_season(request)
+    context = helper.get_base_context(request)
     last_200_failed_swaps = get_last_200_failed_swaps(request)
     last_200_failed_swaps = format_gui_os_version(last_200_failed_swaps)
 
-    context = {
+    context.update({
         "last_200_failed_swaps": last_200_failed_swaps,
-        "season": season,
-        "mm2_coins": get_mm2_coins(),
-        "taker_coin": get_or_none(request, "taker_coin"),
-        "maker_coin": get_or_none(request, "maker_coin"),
+        "mm2_coins": info.get_mm2_coins_list(),
+        "taker_coin": helper.get_or_none(request, "taker_coin"),
+        "maker_coin": helper.get_or_none(request, "maker_coin"),
         "page_title": "Last 200 Failed Swaps",
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link()
-    }
+        "icons": info.get_icons(request)
+    })
 
     return render(request, 'views/atomicdex/last_200_failed_swaps.html', context)
 
 
 def makerbot_config_form_view(request):
-    mm2_coins = list(get_dexstats_explorers().keys())
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"Generate Simple Market Maker Configuration",
-        "scheme_host": get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "mm2_coins":mm2_coins,
-        "eco_data_link":get_eco_data_link()
-    }
+    context = helper.get_base_context(request)
+    context.update({
+        "page_title": "Generate Simple Market Maker Configuration",
+        "mm2_coins": info.get_mm2_coins_list()
+    })
 
     if request.GET: 
         try:
-            form = MakerbotForm(request.GET)
+            form = forms.MakerbotForm(request.GET)
             context.update({
                 "form": form
             })
@@ -272,7 +253,7 @@ def makerbot_config_form_view(request):
         except Exception as e:
             print(e)
         
-    form = MakerbotForm() 
+    form = forms.MakerbotForm() 
     context.update({
         "form": form
     })
@@ -280,15 +261,15 @@ def makerbot_config_form_view(request):
 
 
 def orderbook_view(request):
-    season = get_page_season(request)
-    context = {
-        "season": get_page_season(request),
-        "mm2_coins": get_mm2_coins(),
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link()
-    }
-    orderbook = get_orderbook(request)
+    context = helper.get_base_context(request)
+    context.update({
+        "mm2_coins": info.get_mm2_coins_list(),
+        "base": helper.get_or_none(request, "base", "KMD"),
+        "rel": helper.get_or_none(request, "rel", "BTC"),
+        "icons": info.get_icons(request)
+    })
+
+    orderbook = dex.get_orderbook(request)
 
     if "bids" in orderbook:
         base = orderbook["base"]
@@ -346,102 +327,72 @@ def orderbook_view(request):
 
 
 def seednode_version_stats_hourly_table_view(request):
-    season = get_page_season(request)
-    if 'date' in request.GET:
-        stats_date = request.GET["date"]
-    else:
-        stats_date = "Today"
+    context = helper.get_base_context(request)
+    stats_date = helper.get_or_none(request, "date", "Today")
 
-    date_ts = floor_to_utc_day(time.time())
-    if 'date_ts' in request.GET:
-        try:
-            date_ts = int(request.GET["date_ts"])
-            if date_ts > time.time()*10:
-                date_ts /= 1000
-        except Exception as e:
-            print(e)
-            pass
+    date_ts = helper.floor_to_utc_day(time.time())
+    date_ts = int(helper.get_or_none(request, "date_ts", date_ts))
+    # Normalise if in ms instead of sec
+    if date_ts > time.time()*10: date_ts /= 1000
 
-    start = floor_to_utc_day(date_ts)
-    end = start + 24*60*60
+    start = helper.floor_to_utc_day(date_ts)
+    end = start + SINCE_INTERVALS["day"]
 
-    active_version = " & ".join(get_active_mm2_versions(time.time()))
+    active_version = " & ".join(dex.get_active_mm2_versions(time.time()))
+    version_scores = query.get_nn_seed_version_scores_hourly_table(request, start, end)
 
-
-    version_scores = get_nn_seed_version_scores_hourly_table(request, start, end)
-    context = {
-        "season": season,
-        "date": stats_date,
+    context.update({
+        "date": helper.get_or_none(request, "date", "Today"),
         "date_ts": date_ts,
         "stats_date": stats_date,
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link(),
         "active_version": active_version,
         "headers": version_scores["headers"],
         "scores": version_scores["scores"]
-    }
+    })
 
     return render(request, 'views/atomicdex/seednode_version_stats_hourly_table.html', context)
 
 
 def seednode_version_stats_daily_table_view(request):
-    season = get_page_season(request)
+    context = helper.get_base_context(request)
 
-    end = time.time() + 24 * 60 * 60
-    start = end - 14 * (24 * 60 * 60)
+    start = time.time() + (SINCE_INTERVALS["day"])
+    start = helper.get_or_none(request, "start", start)
+    start = helper.floor_to_utc_day(start)
+    end = start + (SINCE_INTERVALS["day"])
 
-    if "start" in request.GET:
-        start = int(request.GET["start"])
-        
+    prev_ts = start - 1 * (SINCE_INTERVALS["day"])
+    next_ts = end + (SINCE_INTERVALS["day"])
 
-    start = floor_to_utc_day(start)
-    end = start + 14 * (24 * 60 * 60)
+    from_date  = helper.date_hour(start - (SINCE_INTERVALS["day"])).split(" ")[0]
+    to_date = helper.date_hour(end - (SINCE_INTERVALS["day"])).split(" ")[0]
+    active_version = " & ".join(dex.get_active_mm2_versions(time.time()))
 
-
-    prev_ts = start - 15 * (24 * 60 * 60)
-    next_ts = end + (24 * 60 * 60)
-
-    from_date  = date_hour(start - (24 * 60 * 60)).split(" ")[0]
-    to_date = date_hour(end - (24 * 60 * 60)).split(" ")[0]
-    active_version = " & ".join(get_active_mm2_versions(time.time()))
-
-
-    version_scores = get_nn_seed_version_scores_daily_table(request, start, end)
-    context = {
+    version_scores = query.get_nn_seed_version_scores_daily_table(request, start, end)
+    context.update({
         "to_date": to_date,
         "from_date": from_date,
         "prev_ts": prev_ts,
         "next_ts": next_ts,
-        "season": season,
         "active_version": active_version,
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link(),
         "headers": version_scores["headers"],
         "scores": version_scores["scores"]
-    }
+    })
 
     return render(request, 'views/atomicdex/seednode_version_stats_daily_table.html', context)
 
 
 def seednode_version_stats_month_table_view(request):
-    season = get_page_season(request)
+    context = helper.get_base_context(request)
+    start = SEASONS_INFO[context["season"]]["start_time"]
+    end = SEASONS_INFO[context["season"]]["end_time"]
+    version_scores = query.get_nn_seed_version_scores_month_table(request, start, end)
 
-    start = SEASONS_INFO[season]["start_time"]
-    end = SEASONS_INFO[season]["end_time"]
-    active_version = " & ".join(get_active_mm2_versions(time.time()))
-
-    version_scores = get_nn_seed_version_scores_month_table(request, start, end)
-    context = {
-        "season": season,
-        "scheme_host": get_current_host(request),
-        "sidebar_links": get_sidebar_links(season),
-        "eco_data_link": get_eco_data_link(),
-        "active_version": active_version,
+    context.update({
+        "active_version": " & ".join(dex.get_active_mm2_versions(time.time())),
         "headers": version_scores["headers"],
         "scores": version_scores["scores"]
-    }
+    })
 
     return render(request, 'views/atomicdex/seednode_version_stats_month_table.html', context)
 

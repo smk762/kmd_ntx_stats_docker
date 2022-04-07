@@ -14,43 +14,12 @@
 							<th class="py-2 px-4" data-data="chain">Chain</th>
 							<th class="py-2 px-4" data-data="server">Server</th>
 							<th class="py-2 px-4" data-data="epoch">Epoch</th>
-							<th class="py-2 px-4" data-data="epoch_chain_ntx_count">NTX Count</th>
+							<th class="py-2 px-4" data-data="epoch_coin_ntx_count">NTX Count</th>
 							<th class="py-2 px-4" data-data="score_per_ntx">Per NTX</th>
-							<th class="py-2 px-4" data-data="epoch_chain_score">Score</th>
-							<th class="py-2 px-4" data-data="detail">Detail</th>
+							<th class="py-2 px-4" data-data="epoch_coin_score">Score</th>
+							<th class="py-2 px-4" data-data="">Detail</th>
 						</tr>
 					</thead>
-					<tbody>
-						{% for row in scoring_table %}
-						<tr>
-							<td class="pr-2 pl-3 text-left" data-data="chain">
-								{{ row.chain }}
-							</td>
-							<td data-data="server">
-								{{ row.server }}
-							</td>
-							<td data-data="epoch">
-									{{ row.epoch }}
-							</td>
-							<td data-data="epoch_chain_ntx_count">
-								{{ row.epoch_chain_ntx_count }}
-							</td>
-							<td data-data="score_per_ntx">
-								{{ row.score_per_ntx }}
-							</td>
-							<td data-data="epoch_chain_score">
-								{{ row.epoch_chain_score|floatformat:-3 }}
-							</td>
-							<td style='font-size: 1em;' data-data="detail">
-								<span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='{{ notary }} {{ row.chain }} epoch {{ row.epoch }} score detail'>
-									<a href="//{{ request.get_host }}/api/table/notarised/?notary={{ notary }}&chain={{ row.chain }}&season={{ season }}&epoch=Epoch_{{ row.epoch }}&server={{ row.server }}">
-										<i class='fas fa-arrow-right'></i>
-									</a>
-								</span>
-							</td>
-						</tr>
-						{% endfor %}
-					</tbody>
 				</table>
 			</div>
 			<div class="card-footer table_card_footer flex">
@@ -67,7 +36,13 @@
 	    $(document).ready(function() {
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	        $('#epoch_scoring_table').DataTable({
-	        	"paging": false,
+         		ajax: {
+				    url: "//{{ request.get_host }}/api/table/notary_epoch_scores/?notary={{ notary }}&season={{ season }}",
+        			dataSrc: '',
+        			"deferRender": true
+				},
+	        	"paging": true,
+   				"pageLength": 100,
     			deferRender: true,
                 "orderClasses": false,
         		order: [[ 0, 'asc' ],[ 1, 'asc' ],[ 2, 'asc' ]],
@@ -75,10 +50,10 @@
 			        { "data": "chain" },
 			        { "data": "server" },
 			        { "data": "epoch" },
-			        { "data": "epoch_chain_ntx_count" },
+			        { "data": "epoch_coin_ntx_count" },
 			        { "data": "score_per_ntx" },
-			        { "data": "epoch_chain_score" },
-			        { "data": "detail" }
+			        { "data": "epoch_coin_score" },
+			        { "data": null }
 			    ],
         		"columnDefs": [
         			{
@@ -95,7 +70,7 @@
 			            	} else if (icon == "tokel") {
 			            		icon = "tkl"
 			            	}
-				            $(nTd).html("<span class='p-2 mr-auto' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season=Season_4'><img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.chain+"</a></span>");
+				            $(nTd).html("<span class='p-2 mr-auto' style='font-size: 0.9em;'><a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'><img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.chain+"</a></span>");
 				        }
         			},
         			{
@@ -115,6 +90,15 @@
 			            		color = "#000";	
 			            	}
 				            $(nTd).html(oData.server.replace(/_/g, " "));
+				        }
+			        },
+        			{
+			            "data": null,
+			            "targets": 6,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='{{ notary }} "+oData.chain+" epoch "+oData.epoch+" score detail'> \
+				            	<a href='//{{ request.get_host }}/notary_epoch_chain_notarised/?notary={{ notary }}&chain="+oData.chain+"&season={{ season }}&epoch=Epoch_"+oData.epoch+"&server="+oData.server+"'> \
+				            	<i class='fas fa-arrow-right'></i></a></span>");
 				        }
 			        }
         		]

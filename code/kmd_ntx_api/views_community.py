@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-from .lib_helper import *
-from .lib_info import get_sidebar_links
-from .lib_electrum import get_full_electrum_balance
 import requests
 from django.shortcuts import render
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_electrum as lib_electrum
 
 
 def puzzles_view(request):
-    season = get_page_season(request)
+    context = helper.get_base_context(request)
     puzzles = {
         "August 2021": {
             "puzzle_images": [
@@ -20,7 +20,7 @@ def puzzles_view(request):
                 ('https://www.masterofmalt.com/whiskies/american-eagle/american-eagle-12-year-old-whiskey.jpg', 'Word placement hint'),
             ],
             "puzzle_text": "Seed is 24 words and BIP39 compliant",
-            "puzzle_value": get_full_electrum_balance(
+            "puzzle_value": lib_electrum.get_full_electrum_balance(
                 "electrum1.cipig.net",
                 10001,
                 "RUe4FBVXVGzN3KNYUF4EwwV4y3sZhQdJHh",
@@ -29,12 +29,9 @@ def puzzles_view(request):
             "puzzle_winner": None
         }
     }
-    context = {
-        "season":season,
+
+    context.update({
         "page_title":"Cryptopuzzles!",
-        "puzzles": puzzles,
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
+        "puzzles": puzzles
+    })
     return render(request, 'community/cryptopuzzles.html', context)

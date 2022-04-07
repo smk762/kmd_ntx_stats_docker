@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import threading
 from lib_helper import *
-from lib_table_select import *
+from lib_query import *
 
 from models import *
 
@@ -55,19 +55,19 @@ def update_notary_ntx_count_season(season_ntx_dict, season, notary):
 
     if notary in season_ntx_dict["notaries"]:
         season_score = season_ntx_dict["notaries"][notary]["notary_ntx_score"]
-        chain_ntx_counts = season_ntx_dict["notaries"][notary]
+        coin_ntx_counts = season_ntx_dict["notaries"][notary]
     else:
         season_score = 0
-        chain_ntx_counts = {}
+        coin_ntx_counts = {}
 
-    chain_ntx_pct_dict = {}
-    for chain in season_ntx_dict["chains"]:
-        chain_ntx_pct_dict.update({
-            chain: season_ntx_dict["chains"][chain]["chain_ntx_count_pct"]
+    coin_ntx_pct_dict = {}
+    for coin in season_ntx_dict["coins"]:
+        coin_ntx_pct_dict.update({
+            coin: season_ntx_dict["coins"][coin]["coin_ntx_count_pct"]
         })
 
     btc_count = 0
-    if "KMD" in season_ntx_dict["chains"]:
+    if "KMD" in season_ntx_dict["coins"]:
         btc_count = season_ntx_dict["notaries"][notary]["servers"]["KMD"]["epochs"]["KMD"]["notary_server_epoch_ntx_count"]
 
     antara_count = 0
@@ -94,6 +94,6 @@ def update_notary_ntx_count_season(season_ntx_dict, season, notary):
     season_ntx_count_row.third_party_count = third_party_count
     season_ntx_count_row.other_count = other_count
     season_ntx_count_row.total_ntx_count = btc_count+antara_count+third_party_count
-    season_ntx_count_row.chain_ntx_counts = json.dumps(chain_ntx_counts)
-    season_ntx_count_row.chain_ntx_pct = json.dumps(chain_ntx_pct_dict)
+    season_ntx_count_row.chain_ntx_counts = json.dumps(coin_ntx_counts)
+    season_ntx_count_row.chain_ntx_pct = json.dumps(coin_ntx_pct_dict)
     season_ntx_count_row.update()

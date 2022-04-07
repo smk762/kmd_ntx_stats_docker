@@ -48,6 +48,10 @@ api_info_urls = [
           api_info.coin_explorers,
           name='coin_explorers'),
 
+    path('api/info/icons/',
+          api_info.coin_icons,
+          name='coin_icons'),
+
     path('api/info/launch_params/',
           api_info.coin_launch_params,
           name='coin_launch_params'),
@@ -60,6 +64,10 @@ api_info_urls = [
           api_info.notary_mined_count_daily,
           name='notary_mined_count_daily'),
 
+    path('api/info/mined_count_season_by_name/',
+          api_info.mined_count_season_by_name,
+          name='mined_count_season_by_name'),
+
     path('api/info/nn_social/',
           api_info.nn_social_info,
           name='nn_social_info'),
@@ -67,6 +75,14 @@ api_info_urls = [
     path('api/info/notarisation_txid_list/',
           api_info.notarisation_txid_list,
           name='notarisation_txid_list'),
+
+    path('api/info/notarised_chains/',
+          api_info.notarised_chains,
+          name='notarised_chains_info'),
+
+    path('api/info/notarised_servers/',
+          api_info.notarised_servers,
+          name='notarised_servers_info'),
 
     path('api/info/notarised_chain_daily/',
           api_info.notarised_chain_daily_info,
@@ -104,5 +120,8 @@ api_info_urls = [
           api_info.vote2021_info,
           name='vote2021_info'),
 
+    path('api/info/rewards_by_address/',
+          api_info.rewards_by_address,
+          name='rewards_by_address'),
 
 ]

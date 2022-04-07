@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
 import time
-
 from django.http import JsonResponse
 from django.shortcuts import render
-
-from kmd_ntx_api.lib_info import *
-
-from kmd_ntx_api.viewsets_api import *
-from kmd_ntx_api.views_page import *
-from kmd_ntx_api.views_notary import *
-from kmd_ntx_api.lib_testnet import get_api_testnet
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_testnet as testnet
+import kmd_ntx_api.serializers as serializers
 
 logger = logging.getLogger("mylogger")
 
    
-
 # API views (simple)
 # TODO: Deprecate or merge into other url files
 def api_sidebar_links(request):
@@ -22,13 +18,13 @@ def api_sidebar_links(request):
         season = request.GET["season"]
     else:
         season = SEASON
-    resp = get_sidebar_links(season)
+    resp = helper.get_sidebar_links(season)
     return JsonResponse(resp)
 
 
 # TODO: Deprecate after testnet ends
 def api_testnet_totals(request):
-    resp = get_api_testnet(request)
+    resp = testnet.get_api_testnet(request)
     return JsonResponse(resp)
 
 
@@ -46,9 +42,9 @@ def nn_mined_4hrs_api(request):
     mined_4hrs = get_mined_data().filter(
         block_time__gt=str(int(time.time()-4*60*60))
         ).values()
-    serializer = minedSerializer(mined_4hrs, many=True)
+    serializer = serializers.minedSerializer(mined_4hrs, many=True)
     season = SEASON
-    notary_list = get_notary_list(season)
+    notary_list = helper.get_notary_list(season)
     mined_counts_4hr = {}
     for nn in notary_list:
         mined_counts_4hr.update({nn:0})
@@ -64,6 +60,6 @@ def nn_mined_4hrs_api(request):
 
 #TODO: Deprecate once CHMEX migrates to new endpoint
 def split_summary_api(request):
-    resp = get_split_stats()
+    resp = info.get_split_stats()
     return JsonResponse(resp)
 

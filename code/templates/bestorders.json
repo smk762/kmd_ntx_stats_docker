@@ -1,0 +1,3980 @@
+{
+	"result": {
+		"EOS-BEP20": [{
+			"coin": "EOS-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "42073.99017752",
+			"price_rat": [
+				[1, [1938867107, 122]],
+				[1, [12500000]]
+			],
+			"price_fraction": {
+				"numer": "525924877219",
+				"denom": "12500000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "88e26fd3-5409-43ae-a702-312f49961215",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "4744.42681767998907034517886832",
+			"rel_max_volume_fraction": {
+				"numer": "29652667610499931689657367927",
+				"denom": "6250000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1361378679, 707505141, 1607474332]],
+				[1, [775946240, 768377037, 338813]]
+			],
+			"rel_min_volume": "0.04207399017752",
+			"rel_min_volume_fraction": {
+				"numer": "525924877219",
+				"denom": "12500000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [1938867107, 122]],
+				[1, [1645168640, 2910]]
+			]
+		}],
+		"ETC-BEP20": [{
+			"coin": "ETC-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "3243.65730472",
+			"price_rat": [
+				[1, [1891010645, 9]],
+				[1, [12500000]]
+			],
+			"price_fraction": {
+				"numer": "40545716309",
+				"denom": "12500000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "62cacf17-e761-4d89-9e1d-baff0e0c2569",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "365.76741685174447091595598352",
+			"rel_max_volume_fraction": {
+				"numer": "2286046355323402943224724897",
+				"denom": "6250000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1017494945, 1040284646, 123926821]],
+				[1, [775946240, 768377037, 338813]]
+			],
+			"rel_min_volume": "0.00324365730472",
+			"rel_min_volume_fraction": {
+				"numer": "40545716309",
+				"denom": "12500000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [1891010645, 9]],
+				[1, [1645168640, 2910]]
+			]
+		}],
+		"VRSC": [{
+			"coin": "VRSC",
+			"address": "RRz3g2vE2GuzyzKEHg4UVp3mTFxMk4boov",
+			"price": "450",
+			"price_rat": [
+				[1, [450]],
+				[1, [1]]
+			],
+			"price_fraction": {
+				"numer": "450",
+				"denom": "1"
+			},
+			"maxvolume": "0.126723265",
+			"max_volume_rat": [
+				[1, [25344653]],
+				[1, [200000000]]
+			],
+			"max_volume_fraction": {
+				"numer": "25344653",
+				"denom": "200000000"
+			},
+			"min_volume": "0.00525",
+			"min_volume_rat": [
+				[1, [21]],
+				[1, [4000]]
+			],
+			"min_volume_fraction": {
+				"numer": "21",
+				"denom": "4000"
+			},
+			"pubkey": "0202ab3d6f700b7a49548a22eef485e8d00b2942970c61afa37a86cc47c9dc3874",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "c350d20e-8f5a-4452-b5a4-bcdcfd0e8199",
+			"is_mine": false,
+			"base_max_volume": "0.126723265",
+			"base_max_volume_fraction": {
+				"numer": "25344653",
+				"denom": "200000000"
+			},
+			"base_max_volume_rat": [
+				[1, [25344653]],
+				[1, [200000000]]
+			],
+			"base_min_volume": "0.00525",
+			"base_min_volume_fraction": {
+				"numer": "21",
+				"denom": "4000"
+			},
+			"base_min_volume_rat": [
+				[1, [21]],
+				[1, [4000]]
+			],
+			"rel_max_volume": "57.02546925",
+			"rel_max_volume_fraction": {
+				"numer": "228101877",
+				"denom": "4000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [228101877]],
+				[1, [4000000]]
+			],
+			"rel_min_volume": "2.3625",
+			"rel_min_volume_fraction": {
+				"numer": "189",
+				"denom": "80"
+			},
+			"rel_min_volume_rat": [
+				[1, [189]],
+				[1, [80]]
+			]
+		}],
+		"EURS-PLG20": [{
+			"coin": "EURS-PLG20",
+			"address": "0x98298409c949135eed89233d04c2cfef984baff5",
+			"price": "404.1661883209",
+			"price_rat": [
+				[1, [97657673, 941]],
+				[1, [1410065408, 2]]
+			],
+			"price_fraction": {
+				"numer": "4041661883209",
+				"denom": "10000000000"
+			},
+			"maxvolume": "0.478259260267229",
+			"max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"min_volume": "0.0110149847503305",
+			"min_volume_rat": [
+				[1, [1082239477, 5129]],
+				[1, [1233977344, 465661]]
+			],
+			"min_volume_fraction": {
+				"numer": "22029969500661",
+				"denom": "2000000000000000"
+			},
+			"pubkey": "031bb83b58ec130e28e0a6d5d2acf2eb01b0d3f1670e021d47d31db8a858219da8",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "5140af74-f9f0-4d94-9a29-3321b658f3c2",
+			"is_mine": false,
+			"base_max_volume": "0.478259260267229",
+			"base_max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"base_min_volume": "0.0110149847503305",
+			"base_min_volume_fraction": {
+				"numer": "22029969500661",
+				"denom": "2000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1082239477, 5129]],
+				[1, [1233977344, 465661]]
+			],
+			"rel_max_volume": "193.2962222513792028728057861",
+			"rel_max_volume_fraction": {
+				"numer": "1932962222513792028728057861",
+				"denom": "10000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [2327535621, 210853333, 104786092]],
+				[1, [1241513984, 370409800, 542101]]
+			],
+			"rel_min_volume": "4.45188440095391853151505745",
+			"rel_min_volume_fraction": {
+				"numer": "89037688019078370630301149",
+				"denom": "20000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [1395652061, 3174704821, 4826742]],
+				[1, [2483027968, 740819600, 1084202]]
+			]
+		}],
+		"NMC": [{
+			"coin": "NMC",
+			"address": "MzYv2Nn8H5RYSz8E4PMkngpQJT5ruqWV4N",
+			"price": "4000",
+			"price_rat": [
+				[1, [4000]],
+				[1, [1]]
+			],
+			"price_fraction": {
+				"numer": "4000",
+				"denom": "1"
+			},
+			"maxvolume": "0.02364448",
+			"max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"min_volume": "0.00002625",
+			"min_volume_rat": [
+				[1, [21]],
+				[1, [800000]]
+			],
+			"min_volume_fraction": {
+				"numer": "21",
+				"denom": "800000"
+			},
+			"pubkey": "0261eef15cbc141f555aff1aa40fb21de17a0a9e6897eee18c14c6032586b456b3",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "4a5be4d0-ed68-4b22-befa-a2175f0a85b7",
+			"is_mine": false,
+			"base_max_volume": "0.02364448",
+			"base_max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"base_max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"base_min_volume": "0.00002625",
+			"base_min_volume_fraction": {
+				"numer": "21",
+				"denom": "800000"
+			},
+			"base_min_volume_rat": [
+				[1, [21]],
+				[1, [800000]]
+			],
+			"rel_max_volume": "94.57792",
+			"rel_max_volume_fraction": {
+				"numer": "295556",
+				"denom": "3125"
+			},
+			"rel_max_volume_rat": [
+				[1, [295556]],
+				[1, [3125]]
+			],
+			"rel_min_volume": "0.105",
+			"rel_min_volume_fraction": {
+				"numer": "21",
+				"denom": "200"
+			},
+			"rel_min_volume_rat": [
+				[1, [21]],
+				[1, [200]]
+			]
+		}],
+		"UNI-BEP20": [{
+			"coin": "UNI-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "9305.72448389",
+			"price_rat": [
+				[1, [2859512453, 216]],
+				[1, [100000000]]
+			],
+			"price_fraction": {
+				"numer": "930572448389",
+				"denom": "100000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "1c1c46eb-f146-4bf4-aaa4-d070977a0083",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "1049.34969592920551146839575074",
+			"rel_max_volume_fraction": {
+				"numer": "52467484796460275573419787537",
+				"denom": "50000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [954844433, 251772099, 2844268050]],
+				[1, [1912602624, 1852049001, 2710505]]
+			],
+			"rel_min_volume": "0.00930572448389",
+			"rel_min_volume_fraction": {
+				"numer": "930572448389",
+				"denom": "100000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2859512453, 216]],
+				[1, [276447232, 23283]]
+			]
+		}],
+		"RVN": [{
+			"coin": "RVN",
+			"address": "RB8yufv3YTfdzYnwz5paNnnDynGJG6WsqD",
+			"price": "6205.6881752835",
+			"price_rat": [
+				[1, [3215832423, 2889]],
+				[1, [2000000000]]
+			],
+			"price_fraction": {
+				"numer": "12411376350567",
+				"denom": "2000000000"
+			},
+			"maxvolume": "1.77925349209984",
+			"max_volume_rat": [
+				[1, [2767354095, 323]],
+				[1, [3860919424, 181]]
+			],
+			"max_volume_fraction": {
+				"numer": "1390041790703",
+				"denom": "781250000000"
+			},
+			"min_volume": "0.0110472424587474",
+			"min_volume_rat": [
+				[1, [2932867177, 12860]],
+				[1, [937459712, 1164153]]
+			],
+			"min_volume_fraction": {
+				"numer": "55236212293737",
+				"denom": "5000000000000000"
+			},
+			"pubkey": "0315d9c51c657ab1be4ae9d3ab6e76a619d3bccfe830d5363fa168424c0d044732",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "508f816b-1a91-4b5f-b301-65020c6daa44",
+			"is_mine": false,
+			"base_max_volume": "1.77925349209984",
+			"base_max_volume_fraction": {
+				"numer": "1390041790703",
+				"denom": "781250000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2767354095, 323]],
+				[1, [3860919424, 181]]
+			],
+			"base_min_volume": "0.0110472424587474",
+			"base_min_volume_fraction": {
+				"numer": "55236212293737",
+				"denom": "5000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [2932867177, 12860]],
+				[1, [937459712, 1164153]]
+			],
+			"rel_max_volume": "11041.49235675585137240230464",
+			"rel_max_volume_fraction": {
+				"numer": "17252331807431017769378601",
+				"denom": "1562500000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [3616711465, 3355670291, 935250]],
+				[1, [735707136, 3020627845, 84]]
+			],
+			"rel_min_volume": "68.5557418957385587290498879",
+			"rel_min_volume_fraction": {
+				"numer": "685557418957385587290498879",
+				"denom": "10000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [66021183, 643633619, 37164142]],
+				[1, [1241513984, 370409800, 542101]]
+			]
+		}, {
+			"coin": "RVN",
+			"address": "RJTx3AXkCR9nFaPX3fXZRL8JyN2oCqj7Xf",
+			"price": "1706637.13751814",
+			"price_rat": [
+				[1, [3741606275, 19867]],
+				[1, [50000000]]
+			],
+			"price_fraction": {
+				"numer": "85331856875907",
+				"denom": "50000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "ab2f461c-852e-4cd9-bb24-9cb79f465405",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "192447.04315246725447460319756124",
+			"rel_max_volume_fraction": {
+				"numer": "4811176078811681361865079939031",
+				"denom": "25000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1646419927, 3847309417, 3116340082, 60]],
+				[1, [3103784960, 3073508148, 1355252]]
+			],
+			"rel_min_volume": "1.70663713751814",
+			"rel_min_volume_fraction": {
+				"numer": "85331856875907",
+				"denom": "50000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [3741606275, 19867]],
+				[1, [2285707264, 11641]]
+			]
+		}],
+		"BCH": [{
+			"coin": "BCH",
+			"address": "bitcoincash:qqfykzzxygl00qfshrj5fwd0cwcfnzprscfu3xe658",
+			"price": "1.1793541473",
+			"price_rat": [
+				[1, [3203606881, 2]],
+				[1, [1410065408, 2]]
+			],
+			"price_fraction": {
+				"numer": "11793541473",
+				"denom": "10000000000"
+			},
+			"maxvolume": "0.13455449920123",
+			"max_volume_rat": [
+				[1, [3612349051, 3132]],
+				[1, [276447232, 23283]]
+			],
+			"max_volume_fraction": {
+				"numer": "13455449920123",
+				"denom": "100000000000000"
+			},
+			"min_volume": "0.0110516075432397",
+			"min_volume_rat": [
+				[1, [2271939021, 25731]],
+				[1, [1874919424, 2328306]]
+			],
+			"min_volume_fraction": {
+				"numer": "110516075432397",
+				"denom": "10000000000000000"
+			},
+			"pubkey": "02dbd8c73e2e80e4f3cf88d2f04a9d2d0df4269496608b14a3e17556fdcb01e0c1",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "f35d8250-8632-4a5b-8c6c-57f37f2f121e",
+			"is_mine": false,
+			"base_max_volume": "0.13455449920123",
+			"base_max_volume_fraction": {
+				"numer": "13455449920123",
+				"denom": "100000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [3612349051, 3132]],
+				[1, [276447232, 23283]]
+			],
+			"base_min_volume": "0.0110516075432397",
+			"base_min_volume_fraction": {
+				"numer": "110516075432397",
+				"denom": "10000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [2271939021, 25731]],
+				[1, [1874919424, 2328306]]
+			],
+			"rel_max_volume": "0.158687406670845137761179",
+			"rel_max_volume_fraction": {
+				"numer": "158687406670845137761179",
+				"denom": "1000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1024308123, 1982354744, 8602]],
+				[1, [2701131776, 466537709, 54210]]
+			],
+			"rel_min_volume": "0.01303375919045170427300781",
+			"rel_min_volume_fraction": {
+				"numer": "1303375919045170427300781",
+				"denom": "100000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [3887565741, 644888064, 70656]],
+				[1, [3825205248, 3704098002, 5421010]]
+			]
+		}, {
+			"coin": "BCH",
+			"address": "bitcoincash:qq4e50zjljaz6cr6f5809ar9qsj5ur9kgvggjg395k",
+			"price": "78",
+			"price_rat": [
+				[1, [78]],
+				[1, [1]]
+			],
+			"price_fraction": {
+				"numer": "78",
+				"denom": "1"
+			},
+			"maxvolume": "0.02364448",
+			"max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"min_volume": "0.000105",
+			"min_volume_rat": [
+				[1, [21]],
+				[1, [200000]]
+			],
+			"min_volume_fraction": {
+				"numer": "21",
+				"denom": "200000"
+			},
+			"pubkey": "0261eef15cbc141f555aff1aa40fb21de17a0a9e6897eee18c14c6032586b456b3",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "7bdee6f4-68db-4b22-b4d6-7b9493702207",
+			"is_mine": false,
+			"base_max_volume": "0.02364448",
+			"base_max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"base_max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"base_min_volume": "0.000105",
+			"base_min_volume_fraction": {
+				"numer": "21",
+				"denom": "200000"
+			},
+			"base_min_volume_rat": [
+				[1, [21]],
+				[1, [200000]]
+			],
+			"rel_max_volume": "1.84426944",
+			"rel_max_volume_fraction": {
+				"numer": "2881671",
+				"denom": "1562500"
+			},
+			"rel_max_volume_rat": [
+				[1, [2881671]],
+				[1, [1562500]]
+			],
+			"rel_min_volume": "0.00819",
+			"rel_min_volume_fraction": {
+				"numer": "819",
+				"denom": "100000"
+			},
+			"rel_min_volume_rat": [
+				[1, [819]],
+				[1, [100000]]
+			]
+		}, {
+			"coin": "BCH",
+			"address": "bitcoincash:qpjvrl9cgsakr3cp7yplekrx2n7wst2f9qer5nxgu8",
+			"price": "293.2363756",
+			"price_rat": [
+				[1, [733090939]],
+				[1, [2500000]]
+			],
+			"price_fraction": {
+				"numer": "733090939",
+				"denom": "2500000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "da60d5e3-a56b-43fb-8a31-ecec3eb65a79",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "33.0664745237131405456453496",
+			"rel_max_volume_fraction": {
+				"numer": "41333093154641425682056687",
+				"denom": "1250000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [3687499247, 2017304899, 2240671]],
+				[1, [155189248, 2730655785, 67762]]
+			],
+			"rel_min_volume": "0.0002932363756",
+			"rel_min_volume_fraction": {
+				"numer": "733090939",
+				"denom": "2500000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [733090939]],
+				[1, [329033728, 582]]
+			]
+		}],
+		"DOGE": [{
+			"coin": "DOGE",
+			"address": "DP1GH73GKRdRz8Qxc8mxe2hFtu5NRwTBXV",
+			"price": "3047.5152206346",
+			"price_rat": [
+				[1, [3327104261, 3547]],
+				[1, [705032704, 1]]
+			],
+			"price_fraction": {
+				"numer": "15237576103173",
+				"denom": "5000000000"
+			},
+			"maxvolume": "0.478259260267229",
+			"max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"min_volume": "0.0109753014423291",
+			"min_volume_rat": [
+				[1, [3715108603, 25553]],
+				[1, [1874919424, 2328306]]
+			],
+			"min_volume_fraction": {
+				"numer": "109753014423291",
+				"denom": "10000000000000000"
+			},
+			"pubkey": "031bb83b58ec130e28e0a6d5d2acf2eb01b0d3f1670e021d47d31db8a858219da8",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "cb517272-7629-406a-ba2a-23758490a5b3",
+			"is_mine": false,
+			"base_max_volume": "0.478259260267229",
+			"base_max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"base_min_volume": "0.0109753014423291",
+			"base_min_volume_fraction": {
+				"numer": "109753014423291",
+				"denom": "10000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [3715108603, 25553]],
+				[1, [1874919424, 2328306]]
+			],
+			"rel_max_volume": "1457.5023750738249712909635234",
+			"rel_max_volume_fraction": {
+				"numer": "7287511875369124856454817617",
+				"denom": "5000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1173202769, 1565326128, 395056810]],
+				[1, [620756992, 2332688548, 271050]]
+			],
+			"rel_min_volume": "33.44739819655081079420404686",
+			"rel_min_volume_fraction": {
+				"numer": "1672369909827540539710202343",
+				"denom": "50000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [1297965543, 2026023391, 90659354]],
+				[1, [1912602624, 1852049001, 2710505]]
+			]
+		}, {
+			"coin": "DOGE",
+			"address": "D97eMzDnf7EGTT4KXA2k7vq6TMR7JDpe1D",
+			"price": "600000",
+			"price_rat": [
+				[1, [600000]],
+				[1, [1]]
+			],
+			"price_fraction": {
+				"numer": "600000",
+				"denom": "1"
+			},
+			"maxvolume": "0.02364448",
+			"max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"min_volume": "0.0175",
+			"min_volume_rat": [
+				[1, [7]],
+				[1, [400]]
+			],
+			"min_volume_fraction": {
+				"numer": "7",
+				"denom": "400"
+			},
+			"pubkey": "0261eef15cbc141f555aff1aa40fb21de17a0a9e6897eee18c14c6032586b456b3",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "9ac4b786-15d7-4414-9c22-05c98682cee2",
+			"is_mine": false,
+			"base_max_volume": "0.02364448",
+			"base_max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"base_max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"base_min_volume": "0.0175",
+			"base_min_volume_fraction": {
+				"numer": "7",
+				"denom": "400"
+			},
+			"base_min_volume_rat": [
+				[1, [7]],
+				[1, [400]]
+			],
+			"rel_max_volume": "14186.688",
+			"rel_max_volume_fraction": {
+				"numer": "1773336",
+				"denom": "125"
+			},
+			"rel_max_volume_rat": [
+				[1, [1773336]],
+				[1, [125]]
+			],
+			"rel_min_volume": "10500",
+			"rel_min_volume_fraction": {
+				"numer": "10500",
+				"denom": "1"
+			},
+			"rel_min_volume_rat": [
+				[1, [10500]],
+				[1, [1]]
+			]
+		}],
+		"ECA": [{
+			"coin": "ECA",
+			"address": "ESLfTEUy2Ye8AsdBPLXxKwn4yk5KyQDVCH",
+			"price": "16542443110.50032234",
+			"price_rat": [
+				[1, [3656157749, 192579383]],
+				[1, [50000000]]
+			],
+			"price_fraction": {
+				"numer": "827122155525016117",
+				"denom": "50000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "33533c29-1a31-462f-9d98-b6d05c285954",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "1865390242.10109923806133381345955844",
+			"rel_max_volume_fraction": {
+				"numer": "46634756052527480951533345336488961",
+				"denom": "25000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [3147330561, 382187464, 1606273643, 588613]],
+				[1, [3103784960, 3073508148, 1355252]]
+			],
+			"rel_min_volume": "16542.44311050032234",
+			"rel_min_volume_fraction": {
+				"numer": "827122155525016117",
+				"denom": "50000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [3656157749, 192579383]],
+				[1, [2285707264, 11641]]
+			]
+		}],
+		"KMD": [{
+			"coin": "KMD",
+			"address": "RB8yufv3YTfdzYnwz5paNnnDynGJG6WsqD",
+			"price": "760.8644371817",
+			"price_rat": [
+				[1, [2257290601, 1771]],
+				[1, [1410065408, 2]]
+			],
+			"price_fraction": {
+				"numer": "7608644371817",
+				"denom": "10000000000"
+			},
+			"maxvolume": "1.77843900205997",
+			"max_volume_rat": [
+				[1, [2189380525, 41407]],
+				[1, [276447232, 23283]]
+			],
+			"max_volume_fraction": {
+				"numer": "177843900205997",
+				"denom": "100000000000000"
+			},
+			"min_volume": "0.0110881329028333",
+			"min_volume_rat": [
+				[1, [2453314797, 25816]],
+				[1, [1874919424, 2328306]]
+			],
+			"min_volume_fraction": {
+				"numer": "110881329028333",
+				"denom": "10000000000000000"
+			},
+			"pubkey": "0315d9c51c657ab1be4ae9d3ab6e76a619d3bccfe830d5363fa168424c0d044732",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "c5cc60bf-ee30-4d41-8795-f5f88bd3c7fc",
+			"is_mine": false,
+			"base_max_volume": "1.77843900205997",
+			"base_max_volume_fraction": {
+				"numer": "177843900205997",
+				"denom": "100000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2189380525, 41407]],
+				[1, [276447232, 23283]]
+			],
+			"base_min_volume": "0.0110881329028333",
+			"base_min_volume_fraction": {
+				"numer": "110881329028333",
+				"denom": "10000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [2453314797, 25816]],
+				[1, [1874919424, 2328306]]
+			],
+			"rel_max_volume": "1353.150990364343280961186549",
+			"rel_max_volume_fraction": {
+				"numer": "1353150990364343280961186549",
+				"denom": "1000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1299573493, 741726434, 73354462]],
+				[1, [2701131776, 466537709, 54210]]
+			],
+			"rel_min_volume": "8.43656600051014825779691061",
+			"rel_min_volume_fraction": {
+				"numer": "843656600051014825779691061",
+				"denom": "100000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2957016629, 3995832402, 45734715]],
+				[1, [3825205248, 3704098002, 5421010]]
+			]
+		}, {
+			"coin": "KMD",
+			"address": "RAwv8JhfvmFx2V3QpY7ehiYpBJ1eqxxdxR",
+			"price": "761.9674794576",
+			"price_rat": [
+				[1, [3783272101, 110]],
+				[1, [625000000]]
+			],
+			"price_fraction": {
+				"numer": "476229674661",
+				"denom": "625000000"
+			},
+			"maxvolume": "0.13455449920123",
+			"max_volume_rat": [
+				[1, [3612349051, 3132]],
+				[1, [276447232, 23283]]
+			],
+			"max_volume_fraction": {
+				"numer": "13455449920123",
+				"denom": "100000000000000"
+			},
+			"min_volume": "0.011071578357367",
+			"min_volume_rat": [
+				[1, [3447635575, 2577]],
+				[1, [2764472320, 232830]]
+			],
+			"min_volume_fraction": {
+				"numer": "11071578357367",
+				"denom": "1000000000000000"
+			},
+			"pubkey": "02dbd8c73e2e80e4f3cf88d2f04a9d2d0df4269496608b14a3e17556fdcb01e0c1",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "e4ac3c87-126d-4766-8b1a-3fdabf43d9fd",
+			"is_mine": false,
+			"base_max_volume": "0.13455449920123",
+			"base_max_volume_fraction": {
+				"numer": "13455449920123",
+				"denom": "100000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [3612349051, 3132]],
+				[1, [276447232, 23283]]
+			],
+			"base_min_volume": "0.011071578357367",
+			"base_min_volume_fraction": {
+				"numer": "11071578357367",
+				"denom": "1000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [3447635575, 2577]],
+				[1, [2764472320, 232830]]
+			],
+			"rel_max_volume": "102.526152606040875633652848",
+			"rel_max_volume_fraction": {
+				"numer": "6407884537877554727103303",
+				"denom": "62500000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [31075143, 501867598, 347372]],
+				[1, [3658481664, 566029518, 3388]]
+			],
+			"rel_min_volume": "8.4361826545802483241241392",
+			"rel_min_volume_fraction": {
+				"numer": "5272614159112655202577587",
+				"denom": "625000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [360082611, 4236123618, 285828]],
+				[1, [2225078272, 1365327892, 33881]]
+			]
+		}, {
+			"coin": "KMD",
+			"address": "RT9MpMyucqXiX8bZLimXBnrrn2ofmdGNKd",
+			"price": "764.1300191183",
+			"price_rat": [
+				[1, [553371599, 1779]],
+				[1, [1410065408, 2]]
+			],
+			"price_fraction": {
+				"numer": "7641300191183",
+				"denom": "10000000000"
+			},
+			"maxvolume": "0.478259260267229",
+			"max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"min_volume": "0.0110504687519215",
+			"min_volume_rat": [
+				[1, [3330765923, 5145]],
+				[1, [1233977344, 465661]]
+			],
+			"min_volume_fraction": {
+				"numer": "22100937503843",
+				"denom": "2000000000000000"
+			},
+			"pubkey": "031bb83b58ec130e28e0a6d5d2acf2eb01b0d3f1670e021d47d31db8a858219da8",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "f052e2bd-eb80-42c0-8f11-06e8858cec2c",
+			"is_mine": false,
+			"base_max_volume": "0.478259260267229",
+			"base_max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"base_min_volume": "0.0110504687519215",
+			"base_min_volume_fraction": {
+				"numer": "22100937503843",
+				"denom": "2000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [3330765923, 5145]],
+				[1, [1233977344, 465661]]
+			],
+			"rel_max_volume": "365.4522576915017113369641907",
+			"rel_max_volume_fraction": {
+				"numer": "3654522576915017113369641907",
+				"denom": "10000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [252511155, 3712695472, 198112065]],
+				[1, [1241513984, 370409800, 542101]]
+			],
+			"rel_min_volume": "8.44399489867195253486081345",
+			"rel_min_volume_fraction": {
+				"numer": "168879897973439050697216269",
+				"denom": "20000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [1343295757, 2635377535, 9154997]],
+				[1, [2483027968, 740819600, 1084202]]
+			]
+		}],
+		"NEAR-BEP20": [{
+			"coin": "NEAR-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "8226.91160879",
+			"price_rat": [
+				[1, [2352407343, 191]],
+				[1, [100000000]]
+			],
+			"price_fraction": {
+				"numer": "822691160879",
+				"denom": "100000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "6f5fa073-4016-47f2-a8b7-3db64565dce2",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "927.69855910364219523806773414",
+			"rel_max_volume_fraction": {
+				"numer": "46384927955182109761903386707",
+				"denom": "50000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [3687702611, 4207360754, 2514531982]],
+				[1, [1912602624, 1852049001, 2710505]]
+			],
+			"rel_min_volume": "0.00822691160879",
+			"rel_min_volume_fraction": {
+				"numer": "822691160879",
+				"denom": "100000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2352407343, 191]],
+				[1, [276447232, 23283]]
+			]
+		}],
+		"USDC-BEP20": [{
+			"coin": "USDC-BEP20",
+			"address": "0xadb681c3a1ec9bbc4105b8e8eb5fc7178125b450",
+			"price": "445.9289631878",
+			"price_rat": [
+				[1, [556789315, 519]],
+				[1, [705032704, 1]]
+			],
+			"price_fraction": {
+				"numer": "2229644815939",
+				"denom": "5000000000"
+			},
+			"maxvolume": "0.116161040328087",
+			"max_volume_rat": [
+				[1, [3649807767, 27045]],
+				[1, [2764472320, 232830]]
+			],
+			"max_volume_fraction": {
+				"numer": "116161040328087",
+				"denom": "1000000000000000"
+			},
+			"min_volume": "0.0109940555776374",
+			"min_volume_rat": [
+				[1, [3286433979, 12798]],
+				[1, [937459712, 1164153]]
+			],
+			"min_volume_fraction": {
+				"numer": "54970277888187",
+				"denom": "5000000000000000"
+			},
+			"pubkey": "03de96cb66dcfaceaa8b3d4993ce8914cd5fe84e3fd53cefdae45add8032792a12",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "6e9f4b96-b694-49c5-a7dc-536a7b5c548b",
+			"is_mine": false,
+			"base_max_volume": "0.116161040328087",
+			"base_max_volume_fraction": {
+				"numer": "116161040328087",
+				"denom": "1000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [3649807767, 27045]],
+				[1, [2764472320, 232830]]
+			],
+			"base_min_volume": "0.0109940555776374",
+			"base_min_volume_fraction": {
+				"numer": "54970277888187",
+				"denom": "5000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [3286433979, 12798]],
+				[1, [937459712, 1164153]]
+			],
+			"rel_max_volume": "51.7995722763200590573957386",
+			"rel_max_volume_fraction": {
+				"numer": "258997861381600295286978693",
+				"denom": "5000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [2704783493, 854490308, 14040302]],
+				[1, [620756992, 2332688548, 271050]]
+			],
+			"rel_min_volume": "4.90256780496489540949650372",
+			"rel_min_volume_fraction": {
+				"numer": "122564195124122385237412593",
+				"denom": "25000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2355890929, 1422173356, 6644218]],
+				[1, [3103784960, 3073508148, 1355252]]
+			]
+		}, {
+			"coin": "USDC-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "87200.3382903",
+			"price_rat": [
+				[1, [125021815, 203]],
+				[1, [10000000]]
+			],
+			"price_fraction": {
+				"numer": "872003382903",
+				"denom": "10000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "14539358-5f6d-4a8a-a0e4-2adaef9277f1",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "9833.0493910775659745799409398",
+			"rel_max_volume_fraction": {
+				"numer": "49165246955387829872899704699",
+				"denom": "5000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [2084882299, 4255843933, 2665253377]],
+				[1, [620756992, 2332688548, 271050]]
+			],
+			"rel_min_volume": "0.0872003382903",
+			"rel_min_volume_fraction": {
+				"numer": "872003382903",
+				"denom": "10000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [125021815, 203]],
+				[1, [1316134912, 2328]]
+			]
+		}],
+		"QTUM": [{
+			"coin": "QTUM",
+			"address": "QWL6FixRvZMJUbefiG9mNs2saBWgLDMvVJ",
+			"price": "52.6316704414",
+			"price_rat": [
+				[1, [1165347151, 61]],
+				[1, [705032704, 1]]
+			],
+			"price_fraction": {
+				"numer": "263158352207",
+				"denom": "5000000000"
+			},
+			"maxvolume": "0.116161040328087",
+			"max_volume_rat": [
+				[1, [3649807767, 27045]],
+				[1, [2764472320, 232830]]
+			],
+			"max_volume_fraction": {
+				"numer": "116161040328087",
+				"denom": "1000000000000000"
+			},
+			"min_volume": "0.0110091746089154",
+			"min_volume_rat": [
+				[1, [1572179041, 12816]],
+				[1, [937459712, 1164153]]
+			],
+			"min_volume_fraction": {
+				"numer": "55045873044577",
+				"denom": "5000000000000000"
+			},
+			"pubkey": "03de96cb66dcfaceaa8b3d4993ce8914cd5fe84e3fd53cefdae45add8032792a12",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "9c8f4da0-20e1-4334-8628-5a3f7e4c9e80",
+			"is_mine": false,
+			"base_max_volume": "0.116161040328087",
+			"base_max_volume_fraction": {
+				"numer": "116161040328087",
+				"denom": "1000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [3649807767, 27045]],
+				[1, [2764472320, 232830]]
+			],
+			"base_min_volume": "0.0110091746089154",
+			"base_min_volume_fraction": {
+				"numer": "55045873044577",
+				"denom": "5000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1572179041, 12816]],
+				[1, [937459712, 1164153]]
+			],
+			"rel_max_volume": "6.1137495926780499161076018",
+			"rel_max_volume_fraction": {
+				"numer": "30568747963390249580538009",
+				"denom": "5000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [673097881, 633952108, 1657135]],
+				[1, [620756992, 2332688548, 271050]]
+			],
+			"rel_min_volume": "0.57943124984826406309325756",
+			"rel_min_volume_fraction": {
+				"numer": "14485781246206601577331439",
+				"denom": "25000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [3281222383, 3328017036, 785275]],
+				[1, [3103784960, 3073508148, 1355252]]
+			]
+		}],
+		"USDC-PLG20": [{
+			"coin": "USDC-PLG20",
+			"address": "0x4e623b150b847da59f064f7c7fcc9f787dae2229",
+			"price": "443.2060965906",
+			"price_rat": [
+				[1, [4122325513, 515]],
+				[1, [705032704, 1]]
+			],
+			"price_fraction": {
+				"numer": "2216030482953",
+				"denom": "5000000000"
+			},
+			"maxvolume": "1.77884615384615",
+			"max_volume_rat": [
+				[1, [1708964155, 8283]],
+				[1, [2632269824, 4656]]
+			],
+			"max_volume_fraction": {
+				"numer": "35576923076923",
+				"denom": "20000000000000"
+			},
+			"min_volume": "0.0110639442693906",
+			"min_volume_rat": [
+				[1, [542574473, 12880]],
+				[1, [937459712, 1164153]]
+			],
+			"min_volume_fraction": {
+				"numer": "55319721346953",
+				"denom": "5000000000000000"
+			},
+			"pubkey": "0315d9c51c657ab1be4ae9d3ab6e76a619d3bccfe830d5363fa168424c0d044732",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "282f2639-59e2-4aac-ab58-fad428fdb505",
+			"is_mine": false,
+			"base_max_volume": "1.77884615384615",
+			"base_max_volume_fraction": {
+				"numer": "35576923076923",
+				"denom": "20000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [1708964155, 8283]],
+				[1, [2632269824, 4656]]
+			],
+			"base_min_volume": "0.0110639442693906",
+			"base_min_volume_fraction": {
+				"numer": "55319721346953",
+				"denom": "5000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [542574473, 12880]],
+				[1, [937459712, 1164153]]
+			],
+			"rel_max_volume": "788.39546028135406459193619",
+			"rel_max_volume_fraction": {
+				"numer": "78839546028135406459193619",
+				"denom": "100000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [2068089107, 1520735247, 4273900]],
+				[1, [4135583744, 46653770, 5421]]
+			],
+			"rel_min_volume": "4.90360755253254561059968836",
+			"rel_min_volume_fraction": {
+				"numer": "122590188813313640264992209",
+				"denom": "25000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [388597201, 1940638631, 6645627]],
+				[1, [3103784960, 3073508148, 1355252]]
+			]
+		}],
+		"MATIC-BEP20": [{
+			"coin": "MATIC-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "54554.71158831",
+			"price_rat": [
+				[1, [862692911, 1270]],
+				[1, [100000000]]
+			],
+			"price_fraction": {
+				"numer": "5455471158831",
+				"denom": "100000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "43f11167-8897-4e09-836c-435136fd934a",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "6151.80151914062416346323873446",
+			"rel_max_volume_fraction": {
+				"numer": "307590075957031208173161936723",
+				"denom": "50000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1260123987, 1630919407, 3789589541, 3]],
+				[1, [1912602624, 1852049001, 2710505]]
+			],
+			"rel_min_volume": "0.05455471158831",
+			"rel_min_volume_fraction": {
+				"numer": "5455471158831",
+				"denom": "100000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [862692911, 1270]],
+				[1, [276447232, 23283]]
+			]
+		}, {
+			"coin": "MATIC-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "60616.30741478",
+			"price_rat": [
+				[1, [2863427059, 705]],
+				[1, [50000000]]
+			],
+			"price_fraction": {
+				"numer": "3030815370739",
+				"denom": "50000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "e5196f99-8c83-4556-9357-82bc1ceb989d",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "6835.33064665387580992432120348",
+			"rel_max_volume_fraction": {
+				"numer": "170883266166346895248108030087",
+				"denom": "25000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [634914951, 4074206096, 673665828, 2]],
+				[1, [3103784960, 3073508148, 1355252]]
+			],
+			"rel_min_volume": "0.06061630741478",
+			"rel_min_volume_fraction": {
+				"numer": "3030815370739",
+				"denom": "50000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2863427059, 705]],
+				[1, [2285707264, 11641]]
+			]
+		}],
+		"COMP-BEP20": [{
+			"coin": "COMP-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "757.23685435",
+			"price_rat": [
+				[1, [2259835199, 3]],
+				[1, [20000000]]
+			],
+			"price_fraction": {
+				"numer": "15144737087",
+				"denom": "20000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "6179b252-2139-479f-8cc6-dcab174bae90",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "85.3889736617688335271591971",
+			"rel_max_volume_fraction": {
+				"numer": "853889736617688335271591971",
+				"denom": "10000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [2078539811, 1611465905, 46289455]],
+				[1, [1241513984, 370409800, 542101]]
+			],
+			"rel_min_volume": "0.00075723685435",
+			"rel_min_volume_fraction": {
+				"numer": "15144737087",
+				"denom": "20000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2259835199, 3]],
+				[1, [2632269824, 4656]]
+			]
+		}],
+		"DASH": [{
+			"coin": "DASH",
+			"address": "XtZ1a6kWyiwjc4pwjS6cwoDSr6vm6hWmiy",
+			"price": "3.4248897076",
+			"price_rat": [
+				[1, [4267256973, 1]],
+				[1, [2500000000]]
+			],
+			"price_fraction": {
+				"numer": "8562224269",
+				"denom": "2500000000"
+			},
+			"maxvolume": "0.478259260267229",
+			"max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"min_volume": "0.0109321207943116",
+			"min_volume_rat": [
+				[1, [1425081331, 6363]],
+				[1, [2616213504, 582076]]
+			],
+			"min_volume_fraction": {
+				"numer": "27330301985779",
+				"denom": "2500000000000000"
+			},
+			"pubkey": "031bb83b58ec130e28e0a6d5d2acf2eb01b0d3f1670e021d47d31db8a858219da8",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "b4be3747-79ab-4812-88ec-17f9f5648228",
+			"is_mine": false,
+			"base_max_volume": "0.478259260267229",
+			"base_max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"base_min_volume": "0.0109321207943116",
+			"base_min_volume_fraction": {
+				"numer": "27330301985779",
+				"denom": "2500000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1425081331, 6363]],
+				[1, [2616213504, 582076]]
+			],
+			"rel_max_volume": "1.6379852180536222276722404",
+			"rel_max_volume_fraction": {
+				"numer": "4094963045134055569180601",
+				"denom": "2500000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [627394489, 1681432924, 221988]],
+				[1, [310378496, 1166344274, 135525]]
+			],
+			"rel_min_volume": "0.03744130799067773546728816",
+			"rel_min_volume_fraction": {
+				"numer": "234008174941735846670551",
+				"denom": "6250000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2934436055, 2613842191, 12685]],
+				[1, [775946240, 768377037, 338813]]
+			]
+		}, {
+			"coin": "DASH",
+			"address": "XefPeyw3KQYa5PUJeTMQRhMHQZGVy4YMWa",
+			"price": "300",
+			"price_rat": [
+				[1, [300]],
+				[1, [1]]
+			],
+			"price_fraction": {
+				"numer": "300",
+				"denom": "1"
+			},
+			"maxvolume": "0.02364448",
+			"max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"min_volume": "0.000035",
+			"min_volume_rat": [
+				[1, [7]],
+				[1, [200000]]
+			],
+			"min_volume_fraction": {
+				"numer": "7",
+				"denom": "200000"
+			},
+			"pubkey": "0261eef15cbc141f555aff1aa40fb21de17a0a9e6897eee18c14c6032586b456b3",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "1065fefb-5852-42ba-b31a-52ae06dcdae0",
+			"is_mine": false,
+			"base_max_volume": "0.02364448",
+			"base_max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"base_max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"base_min_volume": "0.000035",
+			"base_min_volume_fraction": {
+				"numer": "7",
+				"denom": "200000"
+			},
+			"base_min_volume_rat": [
+				[1, [7]],
+				[1, [200000]]
+			],
+			"rel_max_volume": "7.093344",
+			"rel_max_volume_fraction": {
+				"numer": "221667",
+				"denom": "31250"
+			},
+			"rel_max_volume_rat": [
+				[1, [221667]],
+				[1, [31250]]
+			],
+			"rel_min_volume": "0.0105",
+			"rel_min_volume_fraction": {
+				"numer": "21",
+				"denom": "2000"
+			},
+			"rel_min_volume_rat": [
+				[1, [21]],
+				[1, [2000]]
+			]
+		}, {
+			"coin": "DASH",
+			"address": "XjsbnuJMZJZoLWcuSNrfBLUu3S9tVAXbLQ",
+			"price": "921.04937793",
+			"price_rat": [
+				[1, [1910624577, 21]],
+				[1, [100000000]]
+			],
+			"price_fraction": {
+				"numer": "92104937793",
+				"denom": "100000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "e1a86171-bc6c-467e-94ea-9a64c218e749",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "103.86111111927200185096446138",
+			"rel_max_volume_fraction": {
+				"numer": "5193055555963600092548223069",
+				"denom": "50000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1762316381, 3353006723, 281516105]],
+				[1, [1912602624, 1852049001, 2710505]]
+			],
+			"rel_min_volume": "0.00092104937793",
+			"rel_min_volume_fraction": {
+				"numer": "92104937793",
+				"denom": "100000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [1910624577, 21]],
+				[1, [276447232, 23283]]
+			]
+		}],
+		"DAI-BEP20": [{
+			"coin": "DAI-BEP20",
+			"address": "0x4e623b150b847da59f064f7c7fcc9f787dae2229",
+			"price": "442.8002302018",
+			"price_rat": [
+				[1, [2092993569, 515]],
+				[1, [705032704, 1]]
+			],
+			"price_fraction": {
+				"numer": "2214001151009",
+				"denom": "5000000000"
+			},
+			"maxvolume": "1.78047662694775",
+			"max_volume_rat": [
+				[1, [850731023, 1658]],
+				[1, [1385447424, 931]]
+			],
+			"max_volume_fraction": {
+				"numer": "7121906507791",
+				"denom": "4000000000000"
+			},
+			"min_volume": "0.0110740853732122",
+			"min_volume_rat": [
+				[1, [4003453325, 12891]],
+				[1, [937459712, 1164153]]
+			],
+			"min_volume_fraction": {
+				"numer": "55370426866061",
+				"denom": "5000000000000000"
+			},
+			"pubkey": "0315d9c51c657ab1be4ae9d3ab6e76a619d3bccfe830d5363fa168424c0d044732",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "70892d3e-e112-4ca6-8969-1e18c49d54c7",
+			"is_mine": false,
+			"base_max_volume": "1.78047662694775",
+			"base_max_volume_fraction": {
+				"numer": "7121906507791",
+				"denom": "4000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [850731023, 1658]],
+				[1, [1385447424, 931]]
+			],
+			"base_min_volume": "0.0110740853732122",
+			"base_min_volume_fraction": {
+				"numer": "55370426866061",
+				"denom": "5000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [4003453325, 12891]],
+				[1, [937459712, 1164153]]
+			],
+			"rel_max_volume": "788.39546028138808130055595",
+			"rel_max_volume_fraction": {
+				"numer": "15767909205627761626011119",
+				"denom": "20000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [3860944367, 304147207, 854780]],
+				[1, [1686110208, 868324213, 1084]]
+			],
+			"rel_min_volume": "4.90360755253274842712022196",
+			"rel_min_volume_fraction": {
+				"numer": "122590188813318710678005549",
+				"denom": "25000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2740201261, 1940639811, 6645627]],
+				[1, [3103784960, 3073508148, 1355252]]
+			]
+		}],
+		"FIRO": [{
+			"coin": "FIRO",
+			"address": "aASZtL7LxtUL6zzkJL9R1sZkgHhKP9bEkK",
+			"price": "98.1141833196",
+			"price_rat": [
+				[1, [472322427, 57]],
+				[1, [2500000000]]
+			],
+			"price_fraction": {
+				"numer": "245285458299",
+				"denom": "2500000000"
+			},
+			"maxvolume": "0.116161040328087",
+			"max_volume_rat": [
+				[1, [3649807767, 27045]],
+				[1, [2764472320, 232830]]
+			],
+			"max_volume_fraction": {
+				"numer": "116161040328087",
+				"denom": "1000000000000000"
+			},
+			"min_volume": "0.0109940555776374",
+			"min_volume_rat": [
+				[1, [3286433979, 12798]],
+				[1, [937459712, 1164153]]
+			],
+			"min_volume_fraction": {
+				"numer": "54970277888187",
+				"denom": "5000000000000000"
+			},
+			"pubkey": "03de96cb66dcfaceaa8b3d4993ce8914cd5fe84e3fd53cefdae45add8032792a12",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "990c7b2f-b702-4e5a-8e14-039a30d35e69",
+			"is_mine": false,
+			"base_max_volume": "0.116161040328087",
+			"base_max_volume_fraction": {
+				"numer": "116161040328087",
+				"denom": "1000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [3649807767, 27045]],
+				[1, [2764472320, 232830]]
+			],
+			"base_min_volume": "0.0109940555776374",
+			"base_min_volume_fraction": {
+				"numer": "54970277888187",
+				"denom": "5000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [3286433979, 12798]],
+				[1, [937459712, 1164153]]
+			],
+			"rel_max_volume": "11.3970456053453764467776052",
+			"rel_max_volume_fraction": {
+				"numer": "28492614013363441116944013",
+				"denom": "2500000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [2316867213, 3009285923, 1544587]],
+				[1, [310378496, 1166344274, 135525]]
+			],
+			"rel_min_volume": "1.07867278437018673385711304",
+			"rel_min_volume_fraction": {
+				"numer": "13483409804627334173213913",
+				"denom": "12500000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [3248145625, 473023926, 730937]],
+				[1, [1551892480, 1536754074, 677626]]
+			]
+		}],
+		"DODO-BEP20": [{
+			"coin": "DODO-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "223582.05458385",
+			"price_rat": [
+				[1, [580136541, 1041]],
+				[1, [20000000]]
+			],
+			"price_fraction": {
+				"numer": "4471641091677",
+				"denom": "20000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "862f0111-932f-4f85-83da-6e6f36f88ad2",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "25211.9823017493223329008610441",
+			"rel_max_volume_fraction": {
+				"numer": "252119823017493223329008610441",
+				"denom": "10000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [830631049, 478252920, 782541104, 3]],
+				[1, [1241513984, 370409800, 542101]]
+			],
+			"rel_min_volume": "0.22358205458385",
+			"rel_min_volume_fraction": {
+				"numer": "4471641091677",
+				"denom": "20000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [580136541, 1041]],
+				[1, [2632269824, 4656]]
+			]
+		}],
+		"LTC": [{
+			"coin": "LTC",
+			"address": "LM5k6NLb2J78BM7uh3pkZHWnRjAyjbz38N",
+			"price": "3.4013584538",
+			"price_rat": [
+				[1, [4121890381, 3]],
+				[1, [705032704, 1]]
+			],
+			"price_fraction": {
+				"numer": "17006792269",
+				"denom": "5000000000"
+			},
+			"maxvolume": "1.78047662694775",
+			"max_volume_rat": [
+				[1, [850731023, 1658]],
+				[1, [1385447424, 931]]
+			],
+			"max_volume_fraction": {
+				"numer": "7121906507791",
+				"denom": "4000000000000"
+			},
+			"min_volume": "0.0110634835063256",
+			"min_volume_rat": [
+				[1, [3854657083, 3219]],
+				[1, [1308106752, 291038]]
+			],
+			"min_volume_fraction": {
+				"numer": "13829354382907",
+				"denom": "1250000000000000"
+			},
+			"pubkey": "0315d9c51c657ab1be4ae9d3ab6e76a619d3bccfe830d5363fa168424c0d044732",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "a674597e-ad05-4eb2-9d1e-234cd4bd3a5f",
+			"is_mine": false,
+			"base_max_volume": "1.78047662694775",
+			"base_max_volume_fraction": {
+				"numer": "7121906507791",
+				"denom": "4000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [850731023, 1658]],
+				[1, [1385447424, 931]]
+			],
+			"base_min_volume": "0.0110634835063256",
+			"base_min_volume_fraction": {
+				"numer": "13829354382907",
+				"denom": "1250000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [3854657083, 3219]],
+				[1, [1308106752, 291038]]
+			],
+			"rel_max_volume": "6.05603922686203835338895",
+			"rel_max_volume_fraction": {
+				"numer": "121120784537240767067779",
+				"denom": "20000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1836873347, 4169925427, 6565]],
+				[1, [1686110208, 868324213, 1084]]
+			],
+			"rel_min_volume": "0.03763087315271744533535728",
+			"rel_min_volume_fraction": {
+				"numer": "235192957204484033345983",
+				"denom": "6250000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [135788991, 3589552073, 12749]],
+				[1, [775946240, 768377037, 338813]]
+			]
+		}, {
+			"coin": "LTC",
+			"address": "LLtgK18DQbhSDHNNXW7ptDHNdEvLPMVD5X",
+			"price": "3.4083146816",
+			"price_rat": [
+				[1, [532549169]],
+				[1, [156250000]]
+			],
+			"price_fraction": {
+				"numer": "532549169",
+				"denom": "156250000"
+			},
+			"maxvolume": "0.13455449920123",
+			"max_volume_rat": [
+				[1, [3612349051, 3132]],
+				[1, [276447232, 23283]]
+			],
+			"max_volume_fraction": {
+				"numer": "13455449920123",
+				"denom": "100000000000000"
+			},
+			"min_volume": "0.0110434100988415",
+			"min_volume_rat": [
+				[1, [2098361651, 5142]],
+				[1, [1233977344, 465661]]
+			],
+			"min_volume_fraction": {
+				"numer": "22086820197683",
+				"denom": "2000000000000000"
+			},
+			"pubkey": "02dbd8c73e2e80e4f3cf88d2f04a9d2d0df4269496608b14a3e17556fdcb01e0c1",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "114c3c4d-062a-41a9-b6cb-d41303307457",
+			"is_mine": false,
+			"base_max_volume": "0.13455449920123",
+			"base_max_volume_fraction": {
+				"numer": "13455449920123",
+				"denom": "100000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [3612349051, 3132]],
+				[1, [276447232, 23283]]
+			],
+			"base_min_volume": "0.0110434100988415",
+			"base_min_volume_fraction": {
+				"numer": "22086820197683",
+				"denom": "2000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [2098361651, 5142]],
+				[1, [1233977344, 465661]]
+			],
+			"rel_max_volume": "0.458604075102887681778368",
+			"rel_max_volume_fraction": {
+				"numer": "7165688673482620027787",
+				"denom": "15625000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [866141067, 1944595222, 388]],
+				[1, [3062104064, 141507379, 847]]
+			],
+			"rel_min_volume": "0.0376394167748111916013664",
+			"rel_min_volume_fraction": {
+				"numer": "11762317742128497375427",
+				"denom": "312500000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [466303171, 2733843209, 637]],
+				[1, [1112539136, 2830147594, 16940]]
+			]
+		}, {
+			"coin": "LTC",
+			"address": "Ld6814QT6fyChvvX3gmhNHbRDyiMBvPr9s",
+			"price": "3.415272344",
+			"price_rat": [
+				[1, [426909043]],
+				[1, [125000000]]
+			],
+			"price_fraction": {
+				"numer": "426909043",
+				"denom": "125000000"
+			},
+			"maxvolume": "0.478259260267229",
+			"max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"min_volume": "0.0110233848994978",
+			"min_volume_rat": [
+				[1, [3904155217, 12832]],
+				[1, [937459712, 1164153]]
+			],
+			"min_volume_fraction": {
+				"numer": "55116924497489",
+				"denom": "5000000000000000"
+			},
+			"pubkey": "031bb83b58ec130e28e0a6d5d2acf2eb01b0d3f1670e021d47d31db8a858219da8",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "372927bb-a384-422f-bec4-c52a7a711688",
+			"is_mine": false,
+			"base_max_volume": "0.478259260267229",
+			"base_max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"base_min_volume": "0.0110233848994978",
+			"base_min_volume_fraction": {
+				"numer": "55116924497489",
+				"denom": "5000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [3904155217, 12832]],
+				[1, [937459712, 1164153]]
+			],
+			"rel_max_volume": "1.633385624852565253214776",
+			"rel_max_volume_fraction": {
+				"numer": "204173203106570656651847",
+				"denom": "125000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [429759047, 1080264047, 11068]],
+				[1, [3021996032, 1132059037, 6776]]
+			],
+			"rel_min_volume": "0.0376478615845220558288432",
+			"rel_min_volume_fraction": {
+				"numer": "23529913490326284893027",
+				"denom": "625000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2314959715, 2401600672, 1275]],
+				[1, [2225078272, 1365327892, 33881]]
+			]
+		}],
+		"ZEC": [{
+			"coin": "ZEC",
+			"address": "t1KjPqVStuxefXBUeTLeaR5YwUAznLvoyBH",
+			"price": "2.2634537355",
+			"price_rat": [
+				[1, [231940175, 1]],
+				[1, [2000000000]]
+			],
+			"price_fraction": {
+				"numer": "4526907471",
+				"denom": "2000000000"
+			},
+			"maxvolume": "1.77925349209984",
+			"max_volume_rat": [
+				[1, [2767354095, 323]],
+				[1, [3860919424, 181]]
+			],
+			"max_volume_fraction": {
+				"numer": "1390041790703",
+				"denom": "781250000000"
+			},
+			"min_volume": "0.010988754409251",
+			"min_volume_rat": [
+				[1, [2228066083, 2558]],
+				[1, [2764472320, 232830]]
+			],
+			"min_volume_fraction": {
+				"numer": "10988754409251",
+				"denom": "1000000000000000"
+			},
+			"pubkey": "0315d9c51c657ab1be4ae9d3ab6e76a619d3bccfe830d5363fa168424c0d044732",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "5b17b2d0-7159-4249-a5ba-11caaf7226c2",
+			"is_mine": false,
+			"base_max_volume": "1.77925349209984",
+			"base_max_volume_fraction": {
+				"numer": "1390041790703",
+				"denom": "781250000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2767354095, 323]],
+				[1, [3860919424, 181]]
+			],
+			"base_min_volume": "0.010988754409251",
+			"base_min_volume_fraction": {
+				"numer": "10988754409251",
+				"denom": "1000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [2228066083, 2558]],
+				[1, [2764472320, 232830]]
+			],
+			"rel_max_volume": "4.02725796309480258695232",
+			"rel_max_volume_fraction": {
+				"numer": "6292590567335629042113",
+				"denom": "1562500000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [99496385, 524064107, 341]],
+				[1, [735707136, 3020627845, 84]]
+			],
+			"rel_min_volume": "0.0248725372161112717071105",
+			"rel_min_volume_fraction": {
+				"numer": "49745074432222543414221",
+				"denom": "2000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [120521677, 2945868648, 2696]],
+				[1, [1107296256, 933075419, 108420]]
+			]
+		}, {
+			"coin": "ZEC",
+			"address": "t1Mr9q4hHL27aX5vcizrJhymQpsstnp8izZ",
+			"price": "300",
+			"price_rat": [
+				[1, [300]],
+				[1, [1]]
+			],
+			"price_fraction": {
+				"numer": "300",
+				"denom": "1"
+			},
+			"maxvolume": "0.02364448",
+			"max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"min_volume": "0.000035",
+			"min_volume_rat": [
+				[1, [7]],
+				[1, [200000]]
+			],
+			"min_volume_fraction": {
+				"numer": "7",
+				"denom": "200000"
+			},
+			"pubkey": "0261eef15cbc141f555aff1aa40fb21de17a0a9e6897eee18c14c6032586b456b3",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "f717ec24-d62e-4437-9f46-d15832a4a43d",
+			"is_mine": false,
+			"base_max_volume": "0.02364448",
+			"base_max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"base_max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"base_min_volume": "0.000035",
+			"base_min_volume_fraction": {
+				"numer": "7",
+				"denom": "200000"
+			},
+			"base_min_volume_rat": [
+				[1, [7]],
+				[1, [200000]]
+			],
+			"rel_max_volume": "7.093344",
+			"rel_max_volume_fraction": {
+				"numer": "221667",
+				"denom": "31250"
+			},
+			"rel_max_volume_rat": [
+				[1, [221667]],
+				[1, [31250]]
+			],
+			"rel_min_volume": "0.0105",
+			"rel_min_volume_fraction": {
+				"numer": "21",
+				"denom": "2000"
+			},
+			"rel_min_volume_rat": [
+				[1, [21]],
+				[1, [2000]]
+			]
+		}],
+		"BAL-BEP20": [{
+			"coin": "BAL-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "7550.4331851",
+			"price_rat": [
+				[1, [2489887819, 17]],
+				[1, [10000000]]
+			],
+			"price_fraction": {
+				"numer": "75504331851",
+				"denom": "10000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "d0ced714-42f5-4d71-9933-1fbc3f1ff4dc",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "851.4162202668672366743744766",
+			"rel_max_volume_fraction": {
+				"numer": "4257081101334336183371872383",
+				"denom": "5000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [2172958847, 3975780603, 230776828]],
+				[1, [620756992, 2332688548, 271050]]
+			],
+			"rel_min_volume": "0.0075504331851",
+			"rel_min_volume_fraction": {
+				"numer": "75504331851",
+				"denom": "10000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2489887819, 17]],
+				[1, [1316134912, 2328]]
+			]
+		}],
+		"PAX-BEP20": [{
+			"coin": "PAX-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "87287.5385413",
+			"price_rat": [
+				[1, [997024325, 203]],
+				[1, [10000000]]
+			],
+			"price_fraction": {
+				"numer": "872875385413",
+				"denom": "10000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "30f9b67b-f1bb-4870-a19b-8dee0b417d73",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "9842.8824306254497171028401058",
+			"rel_max_volume_fraction": {
+				"numer": "49214412153127248585514200529",
+				"denom": "5000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1677897169, 3010251272, 2667918628]],
+				[1, [620756992, 2332688548, 271050]]
+			],
+			"rel_min_volume": "0.0872875385413",
+			"rel_min_volume_fraction": {
+				"numer": "872875385413",
+				"denom": "10000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [997024325, 203]],
+				[1, [1316134912, 2328]]
+			]
+		}],
+		"DOT-BEP20": [{
+			"coin": "DOT-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "4764.60774878",
+			"price_rat": [
+				[1, [2007186159, 55]],
+				[1, [50000000]]
+			],
+			"price_fraction": {
+				"numer": "238230387439",
+				"denom": "50000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "1dcf62e9-c0bf-4f52-abfc-ede4dc5bf4ac",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "537.27570605166110674603164748",
+			"rel_max_volume_fraction": {
+				"numer": "13431892651291527668650791187",
+				"denom": "25000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [4092383507, 2818004566, 728144359]],
+				[1, [3103784960, 3073508148, 1355252]]
+			],
+			"rel_min_volume": "0.00476460774878",
+			"rel_min_volume_fraction": {
+				"numer": "238230387439",
+				"denom": "50000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [2007186159, 55]],
+				[1, [2285707264, 11641]]
+			]
+		}],
+		"ETH": [{
+			"coin": "ETH",
+			"address": "0xe5e6d27100474d34cc0f87ee387756395019019c",
+			"price": "9",
+			"price_rat": [
+				[1, [9]],
+				[1, [1]]
+			],
+			"price_fraction": {
+				"numer": "9",
+				"denom": "1"
+			},
+			"maxvolume": "0.02364448",
+			"max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"min_volume": "0.00000105",
+			"min_volume_rat": [
+				[1, [21]],
+				[1, [20000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "21",
+				"denom": "20000000"
+			},
+			"pubkey": "0261eef15cbc141f555aff1aa40fb21de17a0a9e6897eee18c14c6032586b456b3",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "796c8211-7ca7-47e9-b7c8-2b399e74bbfb",
+			"is_mine": false,
+			"base_max_volume": "0.02364448",
+			"base_max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"base_max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"base_min_volume": "0.00000105",
+			"base_min_volume_fraction": {
+				"numer": "21",
+				"denom": "20000000"
+			},
+			"base_min_volume_rat": [
+				[1, [21]],
+				[1, [20000000]]
+			],
+			"rel_max_volume": "0.21280032",
+			"rel_max_volume_fraction": {
+				"numer": "665001",
+				"denom": "3125000"
+			},
+			"rel_max_volume_rat": [
+				[1, [665001]],
+				[1, [3125000]]
+			],
+			"rel_min_volume": "0.00000945",
+			"rel_min_volume_fraction": {
+				"numer": "189",
+				"denom": "20000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [189]],
+				[1, [20000000]]
+			]
+		}],
+		"AUR": [{
+			"coin": "AUR",
+			"address": "AQYdS3aaZdTbmqkam38XZzBHuwe7YiMBTv",
+			"price": "4166.666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666667",
+			"price_rat": [
+				[1, [12500]],
+				[1, [3]]
+			],
+			"price_fraction": {
+				"numer": "12500",
+				"denom": "3"
+			},
+			"maxvolume": "0.15264",
+			"max_volume_rat": [
+				[1, [477]],
+				[1, [3125]]
+			],
+			"max_volume_fraction": {
+				"numer": "477",
+				"denom": "3125"
+			},
+			"min_volume": "0.00000126",
+			"min_volume_rat": [
+				[1, [63]],
+				[1, [50000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "63",
+				"denom": "50000000"
+			},
+			"pubkey": "02bcea4fe635d2f561840f4347d6c84b2fb03b35405c9747c0fee470621e38f930",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "6758050e-b833-40eb-ac8b-2dcbb8857282",
+			"is_mine": false,
+			"base_max_volume": "0.15264",
+			"base_max_volume_fraction": {
+				"numer": "477",
+				"denom": "3125"
+			},
+			"base_max_volume_rat": [
+				[1, [477]],
+				[1, [3125]]
+			],
+			"base_min_volume": "0.00000126",
+			"base_min_volume_fraction": {
+				"numer": "63",
+				"denom": "50000000"
+			},
+			"base_min_volume_rat": [
+				[1, [63]],
+				[1, [50000000]]
+			],
+			"rel_max_volume": "636",
+			"rel_max_volume_fraction": {
+				"numer": "636",
+				"denom": "1"
+			},
+			"rel_max_volume_rat": [
+				[1, [636]],
+				[1, [1]]
+			],
+			"rel_min_volume": "0.00525",
+			"rel_min_volume_fraction": {
+				"numer": "21",
+				"denom": "4000"
+			},
+			"rel_min_volume_rat": [
+				[1, [21]],
+				[1, [4000]]
+			]
+		}],
+		"DAI-ERC20": [{
+			"coin": "DAI-ERC20",
+			"address": "0xe5e6d27100474d34cc0f87ee387756395019019c",
+			"price": "40205",
+			"price_rat": [
+				[1, [40205]],
+				[1, [1]]
+			],
+			"price_fraction": {
+				"numer": "40205",
+				"denom": "1"
+			},
+			"maxvolume": "0.02364448",
+			"max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"min_volume": "0.00000105",
+			"min_volume_rat": [
+				[1, [21]],
+				[1, [20000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "21",
+				"denom": "20000000"
+			},
+			"pubkey": "0261eef15cbc141f555aff1aa40fb21de17a0a9e6897eee18c14c6032586b456b3",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "28c00cfc-af7c-4ebf-8b03-971abbdeaedf",
+			"is_mine": false,
+			"base_max_volume": "0.02364448",
+			"base_max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"base_max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"base_min_volume": "0.00000105",
+			"base_min_volume_fraction": {
+				"numer": "21",
+				"denom": "20000000"
+			},
+			"base_min_volume_rat": [
+				[1, [21]],
+				[1, [20000000]]
+			],
+			"rel_max_volume": "950.6263184",
+			"rel_max_volume_fraction": {
+				"numer": "594141449",
+				"denom": "625000"
+			},
+			"rel_max_volume_rat": [
+				[1, [594141449]],
+				[1, [625000]]
+			],
+			"rel_min_volume": "0.04221525",
+			"rel_min_volume_fraction": {
+				"numer": "168861",
+				"denom": "4000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [168861]],
+				[1, [4000000]]
+			]
+		}],
+		"USDT-BEP20": [{
+			"coin": "USDT-BEP20",
+			"address": "0x98298409c949135eed89233d04c2cfef984baff5",
+			"price": "445.1118659984",
+			"price_rat": [
+				[1, [3317009305, 64]],
+				[1, [625000000]]
+			],
+			"price_fraction": {
+				"numer": "278194916249",
+				"denom": "625000000"
+			},
+			"maxvolume": "0.478259260267229",
+			"max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"min_volume": "0.0110208618084244",
+			"min_volume_rat": [
+				[1, [4234284517, 6414]],
+				[1, [2616213504, 582076]]
+			],
+			"min_volume_fraction": {
+				"numer": "27552154521061",
+				"denom": "2500000000000000"
+			},
+			"pubkey": "031bb83b58ec130e28e0a6d5d2acf2eb01b0d3f1670e021d47d31db8a858219da8",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "b515b485-9d51-402d-a930-985d56614dd4",
+			"is_mine": false,
+			"base_max_volume": "0.478259260267229",
+			"base_max_volume_fraction": {
+				"numer": "478259260267229",
+				"denom": "1000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [1766955741, 111353]],
+				[1, [2764472320, 232830]]
+			],
+			"base_min_volume": "0.0110208618084244",
+			"base_min_volume_fraction": {
+				"numer": "27552154521061",
+				"denom": "2500000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [4234284517, 6414]],
+				[1, [2616213504, 582076]]
+			],
+			"rel_max_volume": "212.8788717685607440228864336",
+			"rel_max_volume_fraction": {
+				"numer": "133049294855350465014304021",
+				"denom": "625000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [3491532053, 3120258397, 7212616]],
+				[1, [2225078272, 1365327892, 33881]]
+			],
+			"rel_min_volume": "4.90551636445828582503692096",
+			"rel_min_volume_fraction": {
+				"numer": "7664869319466071601620189",
+				"denom": "1562500000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [537830621, 1711111235, 415513]],
+				[1, [1267728384, 1265836083, 84703]]
+			]
+		}, {
+			"coin": "USDT-BEP20",
+			"address": "0xe5e6d27100474d34cc0f87ee387756395019019c",
+			"price": "4025",
+			"price_rat": [
+				[1, [4025]],
+				[1, [1]]
+			],
+			"price_fraction": {
+				"numer": "4025",
+				"denom": "1"
+			},
+			"maxvolume": "0.02364448",
+			"max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"min_volume": "0.00000105",
+			"min_volume_rat": [
+				[1, [21]],
+				[1, [20000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "21",
+				"denom": "20000000"
+			},
+			"pubkey": "0261eef15cbc141f555aff1aa40fb21de17a0a9e6897eee18c14c6032586b456b3",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "6251a2c2-54c5-4b76-8019-50b82be2e6bc",
+			"is_mine": false,
+			"base_max_volume": "0.02364448",
+			"base_max_volume_fraction": {
+				"numer": "73889",
+				"denom": "3125000"
+			},
+			"base_max_volume_rat": [
+				[1, [73889]],
+				[1, [3125000]]
+			],
+			"base_min_volume": "0.00000105",
+			"base_min_volume_fraction": {
+				"numer": "21",
+				"denom": "20000000"
+			},
+			"base_min_volume_rat": [
+				[1, [21]],
+				[1, [20000000]]
+			],
+			"rel_max_volume": "95.169032",
+			"rel_max_volume_fraction": {
+				"numer": "11896129",
+				"denom": "125000"
+			},
+			"rel_max_volume_rat": [
+				[1, [11896129]],
+				[1, [125000]]
+			],
+			"rel_min_volume": "0.00422625",
+			"rel_min_volume_fraction": {
+				"numer": "3381",
+				"denom": "800000"
+			},
+			"rel_min_volume_rat": [
+				[1, [3381]],
+				[1, [800000]]
+			]
+		}],
+		"BTC": [{
+			"coin": "BTC",
+			"address": "1ABkxeeTbbMDBa2KaVYSKoo7D6aCV7uKHE",
+			"price": "2.1497786",
+			"price_rat": [
+				[1, [10748893]],
+				[1, [5000000]]
+			],
+			"price_fraction": {
+				"numer": "10748893",
+				"denom": "5000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.003614325679863033337479496725848885089841344592415237550508689592500362595478436709715130665083371841",
+			"min_volume_rat": [
+				[1, [38850]],
+				[1, [10748893]]
+			],
+			"min_volume_fraction": {
+				"numer": "38850",
+				"denom": "10748893"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "b15ba8d6-a31d-4a91-bf64-9635bc8d8079",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.003614325679863033337479496725848885089841344592415237550508689592500362595478436709715130665083371841",
+			"base_min_volume_fraction": {
+				"numer": "38850",
+				"denom": "10748893"
+			},
+			"base_min_volume_rat": [
+				[1, [38850]],
+				[1, [10748893]]
+			],
+			"rel_max_volume": "0.2424173984659074543677476",
+			"rel_max_volume_fraction": {
+				"numer": "606043496164768635919369",
+				"denom": "2500000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [2368183305, 2936718796, 32853]],
+				[1, [310378496, 1166344274, 135525]]
+			],
+			"rel_min_volume": "0.00777",
+			"rel_min_volume_fraction": {
+				"numer": "777",
+				"denom": "100000"
+			},
+			"rel_min_volume_rat": [
+				[1, [777]],
+				[1, [100000]]
+			]
+		}],
+		"DGB": [{
+			"coin": "DGB",
+			"address": "D6opb3m2dMMfVUrp5x869xPDJAHMXQ91sf",
+			"price": "12688.4904960761",
+			"price_rat": [
+				[1, [2981102329, 29542]],
+				[1, [1410065408, 2]]
+			],
+			"price_fraction": {
+				"numer": "126884904960761",
+				"denom": "10000000000"
+			},
+			"maxvolume": "0.13455449920123",
+			"max_volume_rat": [
+				[1, [3612349051, 3132]],
+				[1, [276447232, 23283]]
+			],
+			"max_volume_fraction": {
+				"numer": "13455449920123",
+				"denom": "100000000000000"
+			},
+			"min_volume": "0.0109031312067275",
+			"min_volume_rat": [
+				[1, [1860677251, 1015]],
+				[1, [1105788928, 93132]]
+			],
+			"min_volume_fraction": {
+				"numer": "4361252482691",
+				"denom": "400000000000000"
+			},
+			"pubkey": "02dbd8c73e2e80e4f3cf88d2f04a9d2d0df4269496608b14a3e17556fdcb01e0c1",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "f1f4cd44-c16f-472c-bf67-20278b360d2f",
+			"is_mine": false,
+			"base_max_volume": "0.13455449920123",
+			"base_max_volume_fraction": {
+				"numer": "13455449920123",
+				"denom": "100000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [3612349051, 3132]],
+				[1, [276447232, 23283]]
+			],
+			"base_min_volume": "0.0109031312067275",
+			"base_min_volume_fraction": {
+				"numer": "4361252482691",
+				"denom": "400000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1860677251, 1015]],
+				[1, [1105788928, 93132]]
+			],
+			"rel_max_volume": "1707.293484319086043899293603",
+			"rel_max_volume_fraction": {
+				"numer": "1707293484319086043899293603",
+				"denom": "1000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [3432443811, 1024156337, 92552565]],
+				[1, [2701131776, 466537709, 54210]]
+			],
+			"rel_min_volume": "138.34427669403262329667196275",
+			"rel_min_volume_fraction": {
+				"numer": "553377106776130493186687851",
+				"denom": "4000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [1002816363, 294296235, 29998633]],
+				[1, [2214592512, 1866150838, 216840]]
+			]
+		}, {
+			"coin": "DGB",
+			"address": "DEKrVub6u1FViaCvK5XzsZxi6EJVrngN4m",
+			"price": "4442263.42313042",
+			"price_rat": [
+				[1, [3232411177, 51714]],
+				[1, [50000000]]
+			],
+			"price_fraction": {
+				"numer": "222113171156521",
+				"denom": "50000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "979d417d-dbdd-45e3-b86e-65e675c91eb1",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "500926.90583836543639833906829972",
+			"rel_max_volume_fraction": {
+				"numer": "12523172645959135909958476707493",
+				"denom": "25000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [959264421, 4281658110, 277716689, 158]],
+				[1, [3103784960, 3073508148, 1355252]]
+			],
+			"rel_min_volume": "4.44226342313042",
+			"rel_min_volume_fraction": {
+				"numer": "222113171156521",
+				"denom": "50000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [3232411177, 51714]],
+				[1, [2285707264, 11641]]
+			]
+		}],
+		"PAXG-BEP20": [{
+			"coin": "PAXG-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "45.03443433",
+			"price_rat": [
+				[1, [208476137, 1]],
+				[1, [100000000]]
+			],
+			"price_fraction": {
+				"numer": "4503443433",
+				"denom": "100000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "80015f5a-f8de-4a10-b4a6-0da71e057b57",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "5.07825801766858782461682378",
+			"rel_max_volume_fraction": {
+				"numer": "253912900883429391230841189",
+				"denom": "50000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [2063872357, 4028660147, 13764645]],
+				[1, [1912602624, 1852049001, 2710505]]
+			],
+			"rel_min_volume": "0.00004503443433",
+			"rel_min_volume_fraction": {
+				"numer": "4503443433",
+				"denom": "100000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [208476137, 1]],
+				[1, [276447232, 23283]]
+			]
+		}],
+		"BUSD-BEP20": [{
+			"coin": "BUSD-BEP20",
+			"address": "0xf2ed2ac92489106c942c9e32c6a912ba61af93e3",
+			"price": "443.9780299934",
+			"price_rat": [
+				[1, [3687025231, 516]],
+				[1, [705032704, 1]]
+			],
+			"price_fraction": {
+				"numer": "2219890149967",
+				"denom": "5000000000"
+			},
+			"maxvolume": "0.13455449920123",
+			"max_volume_rat": [
+				[1, [3612349051, 3132]],
+				[1, [276447232, 23283]]
+			],
+			"max_volume_fraction": {
+				"numer": "13455449920123",
+				"denom": "100000000000000"
+			},
+			"min_volume": "0.011044015415319",
+			"min_volume_rat": [
+				[1, [1654497303, 2571]],
+				[1, [2764472320, 232830]]
+			],
+			"min_volume_fraction": {
+				"numer": "11044015415319",
+				"denom": "1000000000000000"
+			},
+			"pubkey": "02dbd8c73e2e80e4f3cf88d2f04a9d2d0df4269496608b14a3e17556fdcb01e0c1",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "319f4cdb-0e7e-45e4-8bd4-aa2512fb8068",
+			"is_mine": false,
+			"base_max_volume": "0.13455449920123",
+			"base_max_volume_fraction": {
+				"numer": "13455449920123",
+				"denom": "100000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [3612349051, 3132]],
+				[1, [276447232, 23283]]
+			],
+			"base_min_volume": "0.011044015415319",
+			"base_min_volume_fraction": {
+				"numer": "11044015415319",
+				"denom": "1000000000000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1654497303, 2571]],
+				[1, [2764472320, 232830]]
+			],
+			"rel_max_volume": "59.739241482110609282171882",
+			"rel_max_volume_fraction": {
+				"numer": "29869620741055304641085941",
+				"denom": "500000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [3898409461, 1653298320, 1619235]],
+				[1, [3498049536, 233268854, 27105]]
+			],
+			"rel_min_volume": "4.9033002073100709398288946",
+			"rel_min_volume_fraction": {
+				"numer": "24516501036550354699144473",
+				"denom": "5000000000000000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [91606297, 791470349, 1329042]],
+				[1, [620756992, 2332688548, 271050]]
+			]
+		}],
+		"AAVE-BEP20": [{
+			"coin": "AAVE-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "573.87017639",
+			"price_rat": [
+				[1, [1552442791, 13]],
+				[1, [100000000]]
+			],
+			"price_fraction": {
+				"numer": "57387017639",
+				"denom": "100000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "12161f58-eab3-47bb-b6cd-6dd545427cf1",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "64.71183368261049125683695574",
+			"rel_max_volume_fraction": {
+				"numer": "3235591684130524562841847787",
+				"denom": "50000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [2956380139, 2836900367, 175401776]],
+				[1, [1912602624, 1852049001, 2710505]]
+			],
+			"rel_min_volume": "0.00057387017639",
+			"rel_min_volume_fraction": {
+				"numer": "57387017639",
+				"denom": "100000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [1552442791, 13]],
+				[1, [276447232, 23283]]
+			]
+		}],
+		"MKR-BEP20": [{
+			"coin": "MKR-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "42.40201675",
+			"price_rat": [
+				[1, [169608067]],
+				[1, [4000000]]
+			],
+			"price_fraction": {
+				"numer": "169608067",
+				"denom": "4000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "05c95059-1d49-4d52-aa6f-23a8f6e9aa0b",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "4.7814163701521785471541555",
+			"rel_max_volume_fraction": {
+				"numer": "9562832740304357094308311",
+				"denom": "2000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [1602730455, 865898369, 518402]],
+				[1, [1107296256, 933075419, 108420]]
+			],
+			"rel_min_volume": "0.00004240201675",
+			"rel_min_volume_fraction": {
+				"numer": "169608067",
+				"denom": "4000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [169608067]],
+				[1, [1385447424, 931]]
+			]
+		}],
+		"YFI-BEP20": [{
+			"coin": "YFI-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "4.49811016",
+			"price_rat": [
+				[1, [56226377]],
+				[1, [12500000]]
+			],
+			"price_fraction": {
+				"numer": "56226377",
+				"denom": "12500000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "61ff76e8-a1a8-41ca-846a-e5278c05ed3e",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "0.50722440115473599658648656",
+			"rel_max_volume_fraction": {
+				"numer": "3170152507217099978665541",
+				"denom": "6250000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [4175130181, 1339049501, 171854]],
+				[1, [775946240, 768377037, 338813]]
+			],
+			"rel_min_volume": "0.00000449811016",
+			"rel_min_volume_fraction": {
+				"numer": "56226377",
+				"denom": "12500000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [56226377]],
+				[1, [1645168640, 2910]]
+			]
+		}],
+		"ADA-BEP20": [{
+			"coin": "ADA-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "104409.07651372",
+			"price_rat": [
+				[1, [3181764171, 607]],
+				[1, [25000000]]
+			],
+			"price_fraction": {
+				"numer": "2610226912843",
+				"denom": "25000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "27441b7e-44a1-4e6e-ade3-7bd45e3f310b",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "11773.57366227567841263033717752",
+			"rel_max_volume_fraction": {
+				"numer": "147169670778445980157879214719",
+				"denom": "12500000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [350970495, 422536775, 3683116543, 1]],
+				[1, [1551892480, 1536754074, 677626]]
+			],
+			"rel_min_volume": "0.10440907651372",
+			"rel_min_volume_fraction": {
+				"numer": "2610226912843",
+				"denom": "25000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [3181764171, 607]],
+				[1, [3290337280, 5820]]
+			]
+		}],
+		"BNT-BEP20": [{
+			"coin": "BNT-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "37557.7329334",
+			"price_rat": [
+				[1, [3105070939, 43]],
+				[1, [5000000]]
+			],
+			"price_fraction": {
+				"numer": "187788664667",
+				"denom": "5000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "0543b427-2ed2-4104-8977-a5f03b73b975",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "4235.1560807202020877983024444",
+			"rel_max_volume_fraction": {
+				"numer": "10587890201800505219495756111",
+				"denom": "2500000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [564658511, 4043731833, 573970677]],
+				[1, [310378496, 1166344274, 135525]]
+			],
+			"rel_min_volume": "0.0375577329334",
+			"rel_min_volume_fraction": {
+				"numer": "187788664667",
+				"denom": "5000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [3105070939, 43]],
+				[1, [658067456, 1164]]
+			]
+		}],
+		"EGLD-BEP20": [{
+			"coin": "EGLD-BEP20",
+			"address": "0x3c40322e197f28de7b118d2be82aebd02682128e",
+			"price": "555.97186661",
+			"price_rat": [
+				[1, [4057579109, 12]],
+				[1, [100000000]]
+			],
+			"price_fraction": {
+				"numer": "55597186661",
+				"denom": "100000000"
+			},
+			"maxvolume": "0.112763890414532666",
+			"max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"min_volume": "0.000001",
+			"min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"pubkey": "0241d274857c130f3197d5ecc140611c5d3efaf980136ca986952b71094fa47abc",
+			"age": 1648543972,
+			"zcredits": 0,
+			"uuid": "53b944c8-eebf-436e-ba3f-adec5c48ee92",
+			"is_mine": false,
+			"base_max_volume": "0.112763890414532666",
+			"base_max_volume_fraction": {
+				"numer": "56381945207266333",
+				"denom": "500000000000000000"
+			},
+			"base_max_volume_rat": [
+				[1, [2547194909, 13127444]],
+				[1, [3551657984, 116415321]]
+			],
+			"base_min_volume": "0.000001",
+			"base_min_volume_fraction": {
+				"numer": "1",
+				"denom": "1000000"
+			},
+			"base_min_volume_rat": [
+				[1, [1]],
+				[1, [1000000]]
+			],
+			"rel_max_volume": "62.69355063997321298683968226",
+			"rel_max_volume_fraction": {
+				"numer": "3134677531998660649341984113",
+				"denom": "50000000000000000000000000"
+			},
+			"rel_max_volume_rat": [
+				[1, [3065814385, 2197830804, 169931209]],
+				[1, [1912602624, 1852049001, 2710505]]
+			],
+			"rel_min_volume": "0.00055597186661",
+			"rel_min_volume_fraction": {
+				"numer": "55597186661",
+				"denom": "100000000000000"
+			},
+			"rel_min_volume_rat": [
+				[1, [4057579109, 12]],
+				[1, [276447232, 23283]]
+			]
+		}]
+	},
+	"original_tickers": {
+		"FTC": ["FTC-segwit"],
+		"LTFN": ["LTFN-segwit"],
+		"DGB": ["DGB-segwit"],
+		"BTC": ["BTC-segwit"],
+		"NMC": ["NMC-segwit"],
+		"VTC": ["VTC-segwit"],
+		"PPC": ["PPC-segwit"],
+		"tQTUM": ["tQTUM-segwit"],
+		"tBTC-TEST": ["tBTC-TEST-segwit"],
+		"LBC": ["LBC-segwit"],
+		"SYS": ["SYS-segwit"],
+		"FJC": ["FJC-segwit"],
+		"WCN": ["WCN-segwit"],
+		"LCC": ["LCC-segwit"],
+		"GRS": ["GRS-segwit"],
+		"LTC": ["LTC-segwit"],
+		"CDN": ["CDN-segwit"],
+		"PIC": ["PIC-segwit"],
+		"QTUM": ["QTUM-segwit"],
+		"RIC": ["RIC-segwit"],
+		"GLEEC-OLD": ["GLEEC-OLD-segwit"],
+		"BTE": ["BTE-segwit"],
+		"WHIVE": ["WHIVE-segwit"],
+		"XMY": ["XMY-segwit"],
+		"VIA": ["VIA-segwit"],
+		"BTX": ["BTX-segwit"],
+		"MONA": ["MONA-segwit"],
+		"BSTY": ["BSTY-segwit"],
+		"XEP": ["XEP-segwit"]
+	}
+}

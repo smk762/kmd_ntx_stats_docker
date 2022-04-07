@@ -32,6 +32,18 @@ api_table_urls = [
           api_table.notary_ntx_table,
           name='notary_ntx_table'),
     
+    path('api/table/notary_epoch_chain_notarised/',
+          api_table.notary_epoch_chain_notarised_table,
+          name='notary_epoch_chain_notarised'), 
+
+    path('api/table/notary_chain_notarised/',
+          api_table.notary_chain_notarised_table,
+          name='notary_chain_notarised'),
+    
+    path('api/table/chain_notarised_24hrs/',
+          api_table.chain_notarised_24hrs_table,
+          name='chain_notarised_24hrs'),
+    
     path('api/table/notarised/',
           api_table.notarised_table,
           name='notarised_table'),

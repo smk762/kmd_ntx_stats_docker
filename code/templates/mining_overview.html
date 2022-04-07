@@ -15,24 +15,11 @@
 							<th data-data="blocks_mined">Blocks Mined</th>
 							<th data-data="sum_value_mined">Sum Mined</th>
 							<th data-data="max_value_mined">Biggest Block</th>
+							<th data-data="max_value_txid">Biggest Block TXID</th>
 							<th data-data="last_mined_block">Last Block</th>
 							<th data-data="last_mined_blocktime">Last Mined</th>
 						</tr>
 					</thead>
-
-					<tbody>
-					{% for row in mined_season %}
-						<tr>
-							<td class="px-4" data-data="name">{{ row.name }}</td>
-							<td style="font-size: 0.1em" data-data="address">{{ row.address }}</td>
-							<td data-data="blocks_mined">{{ row.blocks_mined }}</td>
-							<td data-data="sum_value_mined">{{ row.sum_value_mined }}</td>
-							<td data-data="max_value_mined">{{ row.max_value_mined }}</td>
-							<td data-data="last_mined_block">{{ row.last_mined_block }}</td>
-							<td data-data="last_mined_blocktime">{{ row.last_mined_blocktime }}</td>
-						</tr>
-					{% endfor %}
-					</tbody>
 				</table>
 			</div>
 		</div>
@@ -44,18 +31,37 @@
 	    	$('#mined_overview_tbl').css('visibility', 'visible');
 
 	        $('#mined_overview_tbl').DataTable({
-
-  				"pageLength": 50,
+         		ajax: {
+				    url: "//{{ request.get_host }}/api/table/mined_count_season/?season={{ season }}",
+        			dataSrc: 'results',
+        			"deferRender": true
+				},
+	        	"paging": true,
+   				"pageLength": 100,
     			deferRender: true,
                 "orderClasses": false,
     			"paging": true,
         		order: [[ 5, 'desc' ], [ 0, 'asc' ]],
+	        	"columns": [
+			        { "data": "name" },
+			        { "data": "address" },
+			        { "data": "blocks_mined" },
+			        { "data": "sum_value_mined" },
+			        { "data": "max_value_mined" },
+			        { "data": "max_value_txid" },
+			        { "data": "last_mined_block" },
+			        { "data": "last_mined_blocktime" }
+			    ],
         		"columnDefs": [
         			{
 			            "data": 'name',
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            	$(nTd).html("<a href='https://komodod.com/a/"+oData.address+"'>"+oData.name+"</a>");
+			            	if (oData.name == oData.address) {
+				            	$(nTd).html("<span style='font-size: 0.9em;'><a href='https://komodod.com/a/"+oData.address+"'>"+oData.name+"</a></span>");
+			            	} else {
+			            		$(nTd).html("<a href='https://komodod.com/a/"+oData.address+"'>"+oData.name+"</a>");
+			            	}
 				        }
 			        },
 		            {
@@ -81,19 +87,24 @@
 			            "data": 'max_value_mined',
 			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(oData.max_value_mined);
+				            $(nTd).html("<a href='https://komodod.com/t/"+oData.max_value_txid+"'>"+oData.max_value_mined+"</a>");
 				        }
 			        },
         			{
-			            "data": 'last_mined_block',
+			            "data": 'max_value_txid',
 			            "targets": 5,
+		                "visible": false
+			        },
+        			{
+			            "data": 'last_mined_block',
+			            "targets": 6,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            $(nTd).html("<a href='https://komodod.com/b/"+oData.last_mined_block+"'>"+oData.last_mined_block+"</a>");
 				        }
 			        },
         			{
 			            "data": 'last_mined_blocktime',
-			            "targets": 6,
+			            "targets": 7,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	var time_now = Date.now()/1000;
 			            	totalSeconds = time_now-oData.last_mined_blocktime
@@ -110,7 +121,7 @@
 						    } else {
 						    	timesince = days+" days, "+hours+" hrs"
 						    }
-				            $(nTd).html(timesince);
+				            $(nTd).html("<span style='font-size: 0.9em; white-space: nowrap;'>" + timesince + "</span>");
 				        }
 			        }
 			    ]

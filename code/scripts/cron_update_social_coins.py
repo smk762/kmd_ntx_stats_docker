@@ -11,23 +11,27 @@ from models import coin_social_row
 from lib_validate import *
 
 
+season = get_season()
+
+dpow_main_coins = SEASONS_INFO[season]["servers"]["Main"]["coins"]
+dpow_3p_coins = SEASONS_INFO[season]["servers"]["Third_Party"]["coins"]
+all_coins = dpow_3p_coins + dpow_main_coins + ["KMD", "LTC", "BTC"]
+
+
 @print_runtime
 def generate_social_coins_template(season):
-    dpow_main_chains = requests.get(get_dpow_server_coins_url(season, "Main")).json()['results']
-    dpow_3p_chains = requests.get(get_dpow_server_coins_url(season, "Third_Party")).json()['results']
-    all_chains = dpow_3p_chains+dpow_main_chains+["KMD", "LTC", "BTC"]
 
-    translated_chains_main = []
-    for chain in dpow_main_chains:
-        translated_chain = handle_translate_chains(chain)
-        translated_chains_main.append(translated_chain)
+    translated_coins_main = []
+    for coin in dpow_main_coins:
+        translated_coin = handle_translate_coins(coin)
+        translated_coins_main.append(translated_coin)
 
-    translated_chains_3p = []
-    for chain in dpow_3p_chains:
-        translated_chain = handle_translate_chains(chain)
-        translated_chains_3p.append(translated_chain)
+    translated_coins_3p = []
+    for coin in dpow_3p_coins:
+        translated_coin = handle_translate_coins(coin)
+        translated_coins_3p.append(translated_coin)
 
-    all_chains = list(set(translated_chains_main + translated_chains_3p + ["KMD", "LTC", "BTC"]))
+    all_coins = list(set(translated_coins_main + translated_coins_3p + ["KMD", "LTC", "BTC"]))
 
     try:
         url = get_notary_nodes_repo_coin_social_url(season)
@@ -36,35 +40,35 @@ def generate_social_coins_template(season):
         logger.error(f"Error getting info from {url} {e}")
         repo_info = {}
     template = {}
-    for chain in all_chains:
+    for coin in all_coins:
         template.update({
-            chain: {
+            coin: {
                     "discord": "",
-                    "email":"",
+                    "email": "",
                     "explorers":[],
                     "github": "",
-                    "linkedin":"",
+                    "linkedin": "",
                     "mining_pools":[],
-                    "reddit":"",
+                    "reddit": "",
                     "telegram": "",
                     "twitter": "",
                     "website": "",
                     "youtube": ""
             }
         })
-    for chain in all_chains:
-        if chain in repo_info:
-            print(f"{chain} repo_info[chain]: {repo_info[chain]}")
-            for item in repo_info[chain]:
-                print(f"{chain} {item}: {repo_info[chain][item]}")
-                template[chain].update({item:repo_info[chain][item]})
+    for coin in all_coins:
+        if coin in repo_info:
+            print(f"{coin} repo_info[coin]: {repo_info[coin]}")
+            for item in repo_info[coin]:
+                print(f"{coin} {item}: {repo_info[coin][item]}")
+                template[coin].update({item:repo_info[coin][item]})
 
-        elif chain in TRANSLATE_COINS:
-            print(f"{chain} repo_info[chain]: {repo_info[chain]}")
+        elif coin in TRANSLATE_COINS:
+            print(f"{coin} repo_info[coin]: {repo_info[coin]}")
             
-            for item in repo_info[chain]:
-                print(f"{chain} {item}: {repo_info[chain][item]}")
-                template[handle_translate_chains(chain)].update({item:repo_info[chain][item]})
+            for item in repo_info[coin]:
+                print(f"{coin} {item}: {repo_info[coin][item]}")
+                template[handle_translate_coins(coin)].update({item:repo_info[coin][item]})
                 
 
     with open(f"{os.path.dirname(os.path.abspath(__file__))}/social_coins_{season.lower()}.json", 'w+') as j:
@@ -75,48 +79,45 @@ def generate_social_coins_template(season):
 def populate_coins_social(season):
     try:
         with open(f"{os.path.dirname(os.path.abspath(__file__))}/social_coins_{season.lower()}.json", 'r') as j:
-            chain_social = json.load(j)
+            coin_social = json.load(j)
 
-        dpow_main_chains = requests.get(get_dpow_server_coins_url(season, "Main")).json()['results']
-        dpow_3p_chains = requests.get(get_dpow_server_coins_url(season, "Third_Party")).json()['results']
-        all_chains = dpow_3p_chains+dpow_main_chains+["KMD", "LTC", "BTC"]
 
         coin_info = requests.get(get_coins_info_url()).json()['results']
 
-        for chain in all_chains:
+        for coin in all_coins:
 
-            coin_social = coin_social_row()
-            coin_social.chain = chain
-            coin_social.season = season
-            coin_social.icon = ""
-            coin_social.explorers = []
+            row = coin_social_row()
+            row.chain = coin
+            row.season = season
+            row.icon = ""
+            row.explorers = []
 
-            if chain in coin_info:
+            if coin in coin_info:
 
-                if "coins_info" in coin_info[chain]:
-                    if "icon" in coin_info[chain]["coins_info"]:
-                        coin_social.icon = coin_info[chain]["coins_info"]["icon"]
+                if "coins_info" in coin_info[coin]:
+                    if "icon" in coin_info[coin]["coins_info"]:
+                        row.icon = coin_info[coin]["coins_info"]["icon"]
                         
-                if "explorers" in coin_info[chain]:
-                    coin_social.explorers = coin_info[chain]["explorers"]
+                if "explorers" in coin_info[coin]:
+                    row.explorers = coin_info[coin]["explorers"]
                     
             else:
-                logger.info(f"{chain} not in coin_info")
+                logger.info(f"{coin} not in coin_info")
 
-            if chain in chain_social:
-                print(f"chain_social[chain]: {chain_social[chain]}")
-                coin_social.discord = chain_social[chain]["discord"]
-                coin_social.email = chain_social[chain]["email"]
-                coin_social.github = chain_social[chain]["github"]
-                coin_social.linkedin = chain_social[chain]["linkedin"]
-                coin_social.mining_pools = chain_social[chain]["mining_pools"]
-                coin_social.reddit = chain_social[chain]["reddit"]
-                coin_social.telegram = chain_social[chain]["telegram"]
-                coin_social.twitter = chain_social[chain]["twitter"]
-                coin_social.website = chain_social[chain]["website"]
-                coin_social.youtube = chain_social[chain]["youtube"]
+            if coin in coin_social:
+                print(f"coin_social[coin]: {coin_social[coin]}")
+                row.discord = coin_social[coin]["discord"]
+                row.email = coin_social[coin]["email"]
+                row.github = coin_social[coin]["github"]
+                row.linkedin = coin_social[coin]["linkedin"]
+                row.mining_pools = coin_social[coin]["mining_pools"]
+                row.reddit = coin_social[coin]["reddit"]
+                row.telegram = coin_social[coin]["telegram"]
+                row.twitter = coin_social[coin]["twitter"]
+                row.website = coin_social[coin]["website"]
+                row.youtube = coin_social[coin]["youtube"]
 
-            coin_social.update()
+            row.update()
     except Exception as e:
         logger.info(f"Error in [populate_coins_social]: {e}")
         print(f"social_coins_{season}.json does not exist!")

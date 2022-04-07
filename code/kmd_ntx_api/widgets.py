@@ -1,6 +1,7 @@
 from django import forms 
 from django.template import loader
 from django.utils.safestring import mark_safe
+from kmd_ntx_api.lib_const import *
 
 
 class ToggleWidget(forms.widgets.CheckboxInput): 

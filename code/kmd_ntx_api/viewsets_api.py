@@ -4,12 +4,20 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.filters import OrderingFilter
 from rest_framework import permissions, viewsets
+from rest_framework.pagination import PageNumberPagination
 
+from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.models import *
 from kmd_ntx_api.lib_query import *
 from kmd_ntx_api.serializers import *
-from kmd_ntx_api.filters import minedFilter, notarisedFilter, notarisedTenureFilter
+from kmd_ntx_api.filters import *
 
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 200
+    page_size_query_param = 'page_size'
+    max_page_size = 2000
+    
 ## Source data endpoints
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -36,11 +44,12 @@ class addressesViewSet(viewsets.ModelViewSet):
     """
     queryset = addresses.objects.all()
     serializer_class = addressesSerializer
+    pagination_class = StandardResultsSetPagination
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['chain', 'notary', 'season']
-    ordering_fields = ['chain', 'notary', 'season']
-    ordering = ['-season', 'notary', 'chain']
+    filterset_fields = ['chain', 'notary', 'season', 'server']
+    ordering_fields = ['chain', 'notary', 'season', 'server']
+    ordering = ['-season', 'server', 'notary', 'chain']
 
 
 class balancesViewSet(viewsets.ModelViewSet):
@@ -261,3 +270,15 @@ class scoringEpochsViewSet(viewsets.ModelViewSet):
     filterset_fields = ['season','server']
     ordering_fields = ['season','server', 'epoch']
     ordering = ['-season', 'epoch', 'server']
+
+
+class rewardsTxViewSet(viewsets.ModelViewSet):
+    """
+    """
+    queryset = rewards_tx.objects.all()
+    serializer_class = rewardsTxSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = rewardsFilter
+    ordering_fields = ['block_height','rewards_value']
+    ordering = ['-block_height']

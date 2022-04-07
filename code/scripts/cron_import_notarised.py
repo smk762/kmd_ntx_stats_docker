@@ -3,8 +3,8 @@ import random
 from lib_const import *
 from decorators import *
 from lib_helper import get_season_notaries
-from lib_notarisation import import_ntx
-from lib_table_select import get_notarised_servers, get_notarised_chains
+from lib_ntx import import_ntx
+from lib_query import get_notarised_servers, get_notarised_coins
 
 
 @print_runtime
@@ -18,15 +18,15 @@ def import_notarised():
             while len(servers) > 0:
                 server = random.choice(servers)
                 servers.remove(server)
-                chains = get_notarised_chains(season, server)
+                coins = get_notarised_coins(season, server)
 
                 i = 0
-                while len(chains) > 0:
+                while len(coins) > 0:
                     i += 1
-                    chain = random.choice(chains)
-                    chains.remove(chain)
-                    logger.info(f">>> Importing {chain} for {season} {server} ({i} processed, {len(chains)} remaining)")
-                    import_ntx(season, server, chain)
+                    coin = random.choice(coins)
+                    coins.remove(coin)
+                    logger.info(f">>> Importing {coin} for {season} {server} ({i} processed, {len(coins)} remaining)")
+                    import_ntx(season, server, coin)
 
 if __name__ == "__main__":
 

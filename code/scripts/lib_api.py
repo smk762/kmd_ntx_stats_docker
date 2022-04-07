@@ -4,6 +4,45 @@ import sys
 import json
 import time
 from lib_const import *
+from lib_github import *
+from lib_urls import get_dpow_active_coins_url
+
+
+def api_sleep_or_exit(resp, exit=None):
+    if 'error' in resp:
+        if exit:
+            return True
+        elif resp['error'] == 'API calls limits have been reached. To extend your limits please upgrade your plan on BlockCypher accounts page.':
+            logger.warning("API limit exceeded, sleeping for 10 min...")
+            time.sleep(600)
+            return False
+        elif resp['error'] == 'Limits reached.':
+            logger.warning("API limit exceeded, sleeping for 10 min...")
+            time.sleep(600)
+            return False            
+        else:
+            logger.warning(resp['error'])
+            return True
+    else:
+        return True
+
+
+def get_ac_block_info():
+    ac_block_info = {}
+    dpow_coins = requests.get(get_dpow_active_coins_url()).json()["results"]
+    for coin in dpow_coins:
+        if coin not in RETIRED_DPOW_COINS:
+            try:
+                url = f'http://{coin.lower()}.explorer.dexstats.info/insight-api-komodo/sync'
+                r = requests.get(url)
+                ac_block_info.update({coin:{"height":r.json()['blockChainHeight']}})
+                url = f'http://{coin.lower()}.explorer.dexstats.info/insight-api-komodo/block-index/'+str(r.json()['blockChainHeight'])
+                r = requests.get(url) 
+                ac_block_info[coin].update({"hash":r.json()['blockHash']})
+            except Exception as e:
+                logger.warning(f"{coin} failed in ac_block_info")
+                logger.warning(e)
+    return ac_block_info
 
 
 def get_btc_address_txids(address, before=None):
@@ -18,7 +57,8 @@ def get_btc_address_txids(address, before=None):
         return r.json()
     except Exception as e:
         logger.warning(e)
-        return {"error":str(e)}
+        return {"err":str(e)}
+
 
 def get_btc_tx_info(tx_hash, wait=True, exit_script=False):
     exit_loop = False
@@ -37,6 +77,7 @@ def get_btc_tx_info(tx_hash, wait=True, exit_script=False):
         except Exception as e:
             logger.warning(e)
             print("err in get_btc_tx_info")
+            return {"err":str(e)}
         if exit_script:
             logger.warning("Exiting script to avoid API rate limits...")
             sys.exit()
@@ -44,6 +85,7 @@ def get_btc_tx_info(tx_hash, wait=True, exit_script=False):
             exit_loop = api_sleep_or_exit(resp)
         else:
             return resp
+
 
 def get_btc_block_info(block):
     exit_loop = False
@@ -58,13 +100,24 @@ def get_btc_block_info(block):
             url = 'https://api.blockcypher.com/v1/btc/main/blocks/'+str(block)
             headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
             r = requests.get(url, headers=headers)
-            resp = r.json()
+            return r.json()
         except Exception as e:
             logger.warning(e)
+            return {"err":str(e)}
         exit_loop = api_sleep_or_exit(resp)
 
-## LTC
 
+def get_dexstats_balance(coin, addr):
+    try:
+        url = f'http://{coin.lower()}.explorer.dexstats.info/insight-api-komodo/addr/{addr}'
+        r = requests.get(url)
+        balance = r.json()['balance']
+        return balance
+    except:
+        return -1
+
+
+## LTC
 def get_ltc_address_txids(address, before=None):
     logger.info(f"getting LTC TXIDs for {address} before block {before}")
     try:
@@ -76,7 +129,8 @@ def get_ltc_address_txids(address, before=None):
         return r.json()
     except Exception as e:
         logger.warning(e)
-        return {"error":str(e)}
+        return {"err":str(e)}
+
 
 def get_ltc_tx_info(tx_hash, wait=True, exit_script=False):
     exit_loop = False
@@ -95,6 +149,7 @@ def get_ltc_tx_info(tx_hash, wait=True, exit_script=False):
         except Exception as e:
             logger.warning(e)
             print("err in get_ltc_tx_info")
+            return {"err":str(e)}
         if exit_script:
             logger.warning("Exiting script to avoid API rate limits...")
             sys.exit()
@@ -102,6 +157,7 @@ def get_ltc_tx_info(tx_hash, wait=True, exit_script=False):
             exit_loop = api_sleep_or_exit(resp)
         else:
             return resp
+
 
 def get_ltc_block_info(block):
     exit_loop = False
@@ -116,56 +172,16 @@ def get_ltc_block_info(block):
             url = 'https://api.blockcypher.com/v1/ltc/main/blocks/'+str(block)
             headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
             r = requests.get(url, headers=headers)
-            resp = r.json()
+            return r.json()
         except Exception as e:
             logger.warning(e)
+            return {"err":str(e)}
         exit_loop = api_sleep_or_exit(resp)
 
-def api_sleep_or_exit(resp, exit=None):
-    if 'error' in resp:
-        if exit:
-            return True
-        elif resp['error'] == 'API calls limits have been reached. To extend your limits please upgrade your plan on BlockCypher accounts page.':
-            logger.warning("API limit exceeded, sleeping for 10 min...")
-            time.sleep(600)
-            return False
-        elif resp['error'] == 'Limits reached.':
-            logger.warning("API limit exceeded, sleeping for 10 min...")
-            time.sleep(600)
-            return False            
-        else:
-            logger.warning(resp['error'])
-            return True
-    else:
-        #print(resp)
-        return True
 
-
-def get_dexstats_balance(chain, addr):
-    url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/addr/'+addr
-    r = requests.get(url)
-    balance = r.json()['balance']
-    return balance
-
-
-def get_ac_block_info():
-    ac_block_info = {}
-    for chain in ANTARA_COINS:
-        if chain not in RETIRED_DPOW_CHAINS:
-            try:
-                url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/sync'
-                r = requests.get(url)
-                ac_block_info.update({chain:{"height":r.json()['blockChainHeight']}})
-                url = 'http://'+chain.lower()+'.explorer.dexstats.info/insight-api-komodo/block-index/'+str(r.json()['blockChainHeight'])
-                r = requests.get(url) 
-                ac_block_info[chain].update({"hash":r.json()['blockHash']})
-            except Exception as e:
-                logger.warning(chain+" failed in ac_block_info")
-                logger.warning(e)
-    return ac_block_info
 
 # TODO: refactor to use ELECTRUMS const for non-Dexstats urls
-# Might need to expand ELECTRUMS to include endpoints formsat
+# Might need to expand ELECTRUMS to include endpoints format
 # http://kmd.explorer.dexstats.info/insight-api-komodo/block-index/8888
 # http://explorer.chips.cash/api/getblockcount
 # http://chips.komodochainz.info/ext/getbalance/RSAzPFzgTZHNcxLNLdGyVPbjbMA8PRY7Ss

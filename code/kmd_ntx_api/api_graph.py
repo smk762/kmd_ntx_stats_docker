@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from django.http import JsonResponse
+from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_graph as lib_graph
 import kmd_ntx_api.lib_stats as lib_stats
 

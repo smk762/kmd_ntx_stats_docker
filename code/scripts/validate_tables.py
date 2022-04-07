@@ -3,42 +3,42 @@ from models import *
 from lib_const import *
 from lib_helper import *
 from lib_validate import *
-from lib_table_select import *
+from lib_query import *
 
 tables = ["addresses", "balances", "chain_sync", "coins", "coin_social",
-		  "funding_transactions", "last_notarised", "mined", "mined_count_daily",
-		  "mined_count_season", "nn_btc_tx", "nn_ltc_tx", "nn_social", 
-		  "notarised", "notarised_chain_daily", "notarised_chain_season",
-		  "notarised_count_daily", "notarised_count_season", "notarised_tenure",
-		  "scoring_epochs", "vote2021"]
+          "funding_transactions", "last_notarised", "mined", "mined_count_daily",
+          "mined_count_season", "nn_btc_tx", "nn_ltc_tx", "nn_social", 
+          "notarised", "notarised_chain_daily", "notarised_chain_season",
+          "notarised_count_daily", "notarised_count_season", "notarised_tenure",
+          "scoring_epochs", "vote2021"]
 
-def validate_addresses_table():
-	# Should be valid seasons, servers, notaries
-	table = "addresses"
-	check_distinct_columns = ["season", "server", "notary"]
-	season_values = get_distinct_col_vals_from_table(table, "season")
-	print(f"DISTINCT [season] values: {season_values}")
-	# Extra seasons? Seasons Missing?
+for season in SEASONS_INFO:
+    if season not in EXCLUDED_SEASONS:
+        epochs = get_epochs(season)
+        for epoch_data in epochs:
+            server = epoch_data["server"]
+            epoch = epoch_data["epoch"]
+            score_per_ntx = epoch_data["score_per_ntx"]
+            epoch_start = epoch_data["epoch_start"]
+            epoch_end = epoch_data["epoch_end"]
+            epoch_coins = epoch_data["epoch_coins"]
+            epoch_coins.sort()
 
-	for season in season_values:
-		conditions = f"WHERE season = '{season}'"
-		server_values = get_distinct_col_vals_from_table(table, "server", conditions)
-		print(f"\nDISTINCT [{season}] [server] values: {server_values}")
-		# Extra servers? Servers Missing?
+            notarised_coins = get_notarised_coins(season, server, epoch)
+            notarised_coins.sort()
+            for coin in notarised_coins:
+                if coin not in epoch_coins:
+                    logger.warning(f"Invalid coin {coin} in notarised for {season} {server} {epoch}")
 
-		for server in server_values:
-			conditions = f"WHERE season = '{season}' AND server = '{server}'"
-			notary_values = get_distinct_col_vals_from_table(table, "notary", conditions)
-			print(f"DISTINCT [{season}] [{server}] [notary] values: {notary_values}")
-			# Extra notaries? Notaries Missing?
+            epoch_scores = get_notarised_server_epoch_scores(season, server, epoch)
+            if len(epoch_scores) > 1:
+                logger.warning(f"Invalid epoch scores {epoch_scores} in notarised for {season} {server} {epoch}")
+            elif epoch_scores[0] != score_per_ntx:
+                logger.warning(f"Mismatched epoch score {epoch_scores[0]} vs {score_per_ntx} in notarised for {season} {server} {epoch}")
 
-		for notary in notary_values:
-			conditions = f"WHERE season = '{season}' AND server = '{server}' and notary = '{notary}'"
-			chain_values = get_distinct_col_vals_from_table(table, "chain", conditions)
-			print(f"DISTINCT [{season}] [{server}] [{notary}] [chain] values: {chain_values}")
-			# Extra chains? Chains Missing?
 
-	# Are address values valid for chain? Do they match pubkey?
-	# Is notary_id correct?
+        unofficial_scores = get_notarised_coin_epoch_scores(season, None, "Unofficial")
+        if len(unofficial_scores) > 0:
+            logger.warning(f"Mismatched epoch score {unofficial_scores[0]} vs 0 in notarised for {season} unofficial epoch")
 
-validate_addresses_table()
+

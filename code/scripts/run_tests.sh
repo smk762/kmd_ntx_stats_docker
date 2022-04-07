@@ -1,2 +1,4 @@
 #!/bin/bash
-py.test -vv --full-trace
+clear
+#py.test -vv --full-trace
+py.test -vv

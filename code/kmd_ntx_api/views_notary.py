@@ -5,92 +5,58 @@ from datetime import datetime as dt
 
 from django.shortcuts import render
 
-from kmd_ntx_api.lib_info import *
-from kmd_ntx_api.lib_stats import *
-from kmd_ntx_api.lib_graph import *
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_stats as stats
+import kmd_ntx_api.lib_graph as graph
+import kmd_ntx_api.lib_query as query
+
 from kmd_ntx_api.api_table import notary_ntx_table
 
 def notary_mining_view(request, notary=None):
+    context = helper.get_base_context(request)
     if not notary:
         return render(request, 'dash_index.html', context)
-    season = get_page_season(request)
 
-    start = int(time.time())
-    notary_mining = get_mined_data(None, notary).values()
-    end = int(time.time())
+    notary_mining = query.get_mined_data(None, notary).values().order_by('block_height')
+    notary_list = helper.get_notary_list(season)
+    explorers = info.get_explorers(request)
 
-    start = end
-    notary_list = get_notary_list(season)
-    end = int(time.time())
-
-    start = end
-    sidebar_links = get_sidebar_links(season)
-    end = int(time.time())
-
-    start = end
-    eco_data_link = get_eco_data_link()
-    end = int(time.time())
-
-    start = end
-    explorers = get_explorers(request)
-    end = int(time.time())
-
-    context = {
-        "season":season,
-        "season_clean":season.replace("_"," "),
+    context.update({
         "page_title": f"{notary} Notary KMD Mining",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":sidebar_links,
-        "eco_data_link":eco_data_link,
         "notary_mining":notary_mining,
         "explorers":explorers
-    }
+    })
+
     return render(request, 'notary_mining.html', context)
 
 def notary_chain_ntx_detail_view(request):
-    # Populate sidebar
-    season = get_page_season(request)
-
-    notary = None
-    if 'notary' in request.GET:
-        notary = request.GET["notary"]
-    chain = None
-    if 'chain' in request.GET:
-        chain = request.GET["chain"]
-    server = None
-    if 'server' in request.GET:
-        server = request.GET["server"]
+    context = helper.get_base_context(request)
+    notary = helper.get_or_none(request, "notary")
+    chain = helper.get_or_none(request, "chain")
+    server = helper.get_or_none(request, "server")
 
     url = f"{THIS_SERVER}/api/table/notary_ntx"
     chain_ntx_table = requests.get(f"{url}/?season={season}&server={server}&notary={notary}&chain={chain}").json()['results']
 
-    context = {
+    context.update({
         "page_title":"Notary Profile Index",
         "notary":notary,
-        "season":season,
         "chain":chain,
-        "season_clean":season.replace("_"," "),
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link(),
         "chain_ntx": chain_ntx_table
-    }
+    })
 
     return render(request, 'notary/notary_chain_ntx_detail.html', context)
 
 def notary_profile_view(request, notary=None):
-    # Populate sidebar
-    season = get_page_season(request)
+    context = helper.get_base_context(request)
     
-    context = {
+    context.update({
         "page_title":"Notary Profile Index",
-        "season":season,
-        "season_clean":season.replace("_"," "),
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
-    notary_list = get_notary_list(season)
+    })
+    season = helper.get_page_season(request)
+    notary_list = helper.get_notary_list(season)
 
     if notary:
         if notary in notary_list:
@@ -102,16 +68,14 @@ def notary_profile_view(request, notary=None):
             notary_balances_tbl = requests.get(f"{url}/?season={season}&notary={notary}").json()['results']
 
             notarised_count_season_data = notary_profile_summary_table['ntx_season_data'][0]
-            # notary_balances_list, notary_balances_graph = get_notary_balances_graph(notary, season)
-            url = f"http://116.203.120.91:8762/api/graph/balances/?season={season}&notary={notary}"
+            url = f"{THIS_SERVER}/api/graph/balances/?season={season}&notary={notary}"
             notary_balances_graph = requests.get(url).json()["results"]
-            notarised_data_24hr = get_notarised_data_24hr(season, None, None, notary)
-            season_stats_sorted = get_season_stats_sorted(season)
+            notarised_data_24hr = info.get_notarised_data_24hr(season, None, None, notary)
+            season_stats_sorted = stats.get_season_stats_sorted(season)
             main_notarised_24hr = notarised_data_24hr.filter(server='Main').count()
             third_notarised_24hr = notarised_data_24hr.filter(server='Third_Party').count()
             ltc_notarised_24hr = notarised_data_24hr.filter(server='KMD').count()
-            region = get_notary_region(notary)
-
+            region = helper.get_notary_region(notary)
 
             ntx_score = 0
             seed_score = 0
@@ -127,15 +91,15 @@ def notary_profile_view(request, notary=None):
                         last_ntx_time = item["last_block_time"]
                         last_ntx_chain = item["chain"]
 
-            seed_score_data = get_seed_stat_season(season, notary).values()
+            seed_score_data = info.get_seed_stat_season(season, notary).values()
             for item in seed_score_data:
                 seed_score += item["score"]
             season_score = ntx_score + seed_score
-            rank = get_region_rank(season_stats_sorted[region], notary)
+            rank = info.get_region_rank(season_stats_sorted[region], notary)
             context.update({
                 "page_title":f"{notary} Notary Profile",
                 "notary_name": notary,
-                "nn_social": get_nn_social(season, notary), # Social Media Links
+                "nn_social": info.get_nn_social(season, notary), # Social Media Links
                 "season_btc_count": notarised_count_season_data['btc_count'],
                 "season_main_count": notarised_count_season_data['antara_count'],
                 "season_third_party_count": notarised_count_season_data['third_party_count'],
@@ -145,11 +109,12 @@ def notary_profile_view(request, notary=None):
                 "seed_score":seed_score,
                 "ntx_score":ntx_score,
                 "season_score":season_score,
-                "last_ltc_ntx_time":get_time_since(last_ltc_ntx_time)[1],
-                "last_ntx_time":get_time_since(last_ntx_time)[1],
+                "last_ltc_ntx_time": helper.get_time_since(last_ltc_ntx_time)[1],
+                "last_ntx_time": helper.get_time_since(last_ntx_time)[1],
                 "last_ntx_chain":last_ntx_chain,
-                "mining_summary": get_nn_mining_summary(notary), #  Mining Summary
-                "explorers": get_explorers(request), # For hyperlinking addresses
+                "mining_summary": info.get_nn_mining_summary(notary), #  Mining Summary
+                "explorers": info.get_explorers(request), # For hyperlinking addresses
+                "icons": info.get_icons(request), # For hyperlinking addresses
                 "rank": rank,
                 "ntx_summary_data":notary_profile_summary_table['ntx_summary_data'],
                 "notary_balances_graph_data": notary_balances_graph, # Balances in graph format
@@ -159,25 +124,15 @@ def notary_profile_view(request, notary=None):
             return render(request, 'notary_profile.html', context)
 
     context.update({
-        "nn_social":get_nn_social(season),
-        "nn_info":get_nn_info(season)
+        "nn_social": info.get_nn_social(season),
+        "nn_regions": helper.get_regions_info(season)
     })
 
     return render(request, 'notary_profile_index.html', context)
 
 def vote2021_view(request):
-    # Populate sidebar
+    context = helper.get_base_context(request)
     season = get_page_season(request)
-
-    context = {
-        "season":season,
-        "season_clean":season.replace("_"," "),
-        "page_title":"Notary VOTE 2021",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
-
 
     if "max_locktime" in request.GET:
         params = f'?max_locktime={request.GET["max_locktime"]}'
@@ -185,30 +140,24 @@ def vote2021_view(request):
         params = f'?max_block={request.GET["max_block"]}'
     else:
         params = f'?max_locktime=1619179199'
+
     url = f"{THIS_SERVER}/api/info/vote2021_stats"
     vote2021_table = requests.get(f"{url}/{params}").json()
+
     if 'results' in vote2021_table:
         vote2021_table = vote2021_table["results"]
 
     context.update({
+        "page_title":"Notary VOTE 2021",
         "params": params,
         "vote2021_table": vote2021_table
     })
 
     return render(request, 'vote2021.html', context)
 
+
 def vote2021_detail_view(request):
-    # Populate sidebar
-    season = get_page_season(request)
-    
-    context = {
-        "season":season,
-        "season_clean":season.replace("_"," "),
-        "page_title":"Notary VOTE 2021",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
+    context = helper.get_base_context(request)
 
     candidate = None
     if "candidate" in request.GET:
@@ -221,8 +170,10 @@ def vote2021_detail_view(request):
         params += f'&max_block={request.GET["max_block"]}'
     else:
         params += f'&max_locktime=1619179199'
+
     url = f"{THIS_SERVER}/api/table/vote2021"
     vote2021_detail_table = requests.get(f"{url}/{params}").json()
+
     if 'results' in vote2021_detail_table:
         vote2021_detail_table = vote2021_detail_table["results"]
 
@@ -232,7 +183,9 @@ def vote2021_detail_view(request):
         item.update({"lock_time_human":date_time.strftime("%m/%d/%Y, %H:%M:%S")})
 
     candidate = request.GET["candidate"].replace(".", "-")
+
     context.update({
+        "page_title":"Notary VOTE 2021",
         "candidate": candidate,
         "params": params,
         "vote2021_detail_table": vote2021_detail_table
@@ -240,9 +193,11 @@ def vote2021_detail_view(request):
 
     return render(request, 'vote2021_detail.html', context)
 
+
 def s5_address_confirmation(request):
     # Populate sidebar
-    season = get_page_season(request)
+    context = helper.get_base_context(request)
+
     addr_confirmed_in_PR = [
         "alien_AR",
         "alien_EU",
@@ -324,9 +279,11 @@ def s5_address_confirmation(request):
         "dragonhound_DEV",
         "dragonhound_NA",
     ]
+
     kmd_addresses = requests.get(f"{THIS_SERVER}/api/table/addresses/?season=Season_5&chain=KMD").json()["results"]
     ltc_addresses = requests.get(f"{THIS_SERVER}/api/table/addresses/?season=Season_5&chain=LTC&server=Main").json()["results"]
     addresses = kmd_addresses + ltc_addresses
+
     for item in addresses:
         if item["notary"] in pub_confirmed_in_PR:
             item.update({"confirmed":"Pubkey (PR)"})
@@ -336,16 +293,12 @@ def s5_address_confirmation(request):
             item.update({"confirmed":"Pubkey (DM)"})
         elif item["notary"] in addr_confirmed_in_DM:
             item.update({"confirmed":"Address (DM)"})
-    context = {
-        "season":season,
-        "season_clean":season.replace("_"," "),
+
+    context.update({
         "page_title":"Address Confirmation",
-        "explorers": get_explorers(request), # For hyperlinking addresses
+        "explorers": info.get_explorers(request),
         "addresses":addresses,
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
+    })
 
     return render(request, 's5_address_confirmation.html', context)
 

@@ -5,47 +5,54 @@ import math
 import random
 import logging
 import requests
-from .lib_const import *
 import string
 import itertools
 from datetime import datetime, timezone
-
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_struct as struct
 
 logger = logging.getLogger("mylogger")
 
 
-def get_active_mm2_versions(ts):
-    data = requests.get(VERSION_TIMESPANS_URL).json()
-    active_versions = []
-    for version in data:
-        if int(ts) > data[version]["start"] and int(ts) < data[version]["end"]:
-            active_versions.append(version)
-    return active_versions
-
-
-def is_mm2_version_valid(version, timestamp):
-    active_versions = get_active_mm2_versions(timestamp)
-    if version in active_versions:
+def append_unique(list_, item):
+    if item not in list_:
+        list_.append(item)
         return True
     return False
 
 
-def get_active_coins():
-    return requests.get(f"{THIS_SERVER}/api/info/coins/?dpow_active=1")
+def update_unique(dict_, key, val):
+    if key not in dict_:
+        dict_.update({key:val})
+        return True
+    return False
+
+
+def get_or_none(request, key, default=None):
+    val = request.GET[key] if key in request.GET else None
+    if default and not val:
+        return default
+    return val
+    
 
 def floor_to_utc_day(ts):
-    return math.floor(ts/(24*60*60))*(24*60*60)
+    return math.floor(int(ts) / (SINCE_INTERVALS['day'])) * (SINCE_INTERVALS['day'])
+
 
 def date_hour(timestamp):
+    if timestamp > time.time() * 10: timestamp /= 1000
     date, hour = datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%x %H").split(" ")
     return f"{date} {hour}:00"
 
-def get_notary_list(season):
-    return requests.get(f"{THIS_SERVER}/api/info/notary_nodes/?season={season}").json()["results"]
+
+def get_notary_list(season, testnet=False):
+    if testnet:
+        return TESTNET_INFO[season]["notaries"]
+    return SEASONS_INFO[season]["notaries"]
+
 
 def get_sidebar_links(season):
-    notary_list = get_notary_list(season)
-    region_notaries = get_regions_info(notary_list)
+    region_notaries = get_regions_info(season)
     coins_dict = get_dpow_server_coins_dict(season)
     coins_dict["Main"] += ["KMD", "LTC"]
     coins_dict["Main"].sort()
@@ -56,31 +63,17 @@ def get_sidebar_links(season):
     }
     return sidebar_links
 
-def get_context(request):
-    mm2_coins = list(get_dexstats_explorers().keys())
-    season = get_page_season(request)
-    scheme_host = get_current_host(request)
-    return {
-        "season":season,
-        "scheme_host": scheme_host,
-        "mm2_coins":mm2_coins,
-        "eco_data_link":get_eco_data_link()
-    }
 
 def get_base_context(request):
     season = get_page_season(request)
-    scheme_host = get_current_host(request)
     return {
-        "season":season,
-        "scheme_host": scheme_host,
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
+        "season": season,
+        "season_clean":season.replace("_"," "),
+        "scheme_host": get_current_host(request),
+        "sidebar_links": get_sidebar_links(season),
+        "eco_data_link": get_eco_data_link()
     }
 
-
-def get_or_none(request, key):
-    return request.GET[key] if key in request.GET else None
-    
 
 def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
@@ -204,68 +197,17 @@ def items_row_to_dict(items_row, top_key):
     return nested_json
 
 
-def get_low_nn_balances():
-    url = "http://138.201.207.24/nn_balances_report"
-    r = requests.get(url)
-    return r.json()
 
+def get_regions_info(season):
+    return SEASONS_INFO[season]["regions"]
 
-def get_notary_funding():
-    url = "http://138.201.207.24/nn_funding"
-    r = requests.get(url)
-    return r.json()
-
-
-def get_bot_balance_deltas():
-    url = "http://138.201.207.24/nn_balances_deltas"
-    r = requests.get(url)
-    return r.json()
-
-
-def get_regions_info(notary_list):
-    notary_list.sort()
-    regions_info = {
-        'AR':{ 
-            "name": "Asia and Russia",
-            "nodes": []
-            },
-        'EU':{ 
-            "name": "Europe",
-            "nodes": []
-            },
-        'NA':{ 
-            "name": "North America",
-            "nodes": []
-            },
-        'SH':{ 
-            "name": "Southern Hemisphere",
-            "nodes": []
-            },
-        'DEV':{ 
-            "name": "Developers",
-            "nodes": []
-            }
-    }
-    for notary in notary_list:
-        try:
-            region = notary.split('_')[-1]
-            regions_info[region]['nodes'].append(notary)
-        except:
-            pass
-
-    return regions_info
-
-def get_mm2_coins():
-    r = requests.get(f"{THIS_SERVER}/api/info/coins/?mm2_compatible=1")
-    coins = list(r.json()["results"].keys())
-    coins.sort()
-    return coins
 
 def get_page_season(request):
     if "season" in request.GET:
         if request.GET["season"] in SEASONS_INFO:
             return request.GET["season"]
     return SEASON
+
 
 def day_hr_min_sec(seconds, granularity=2):
     result = []
@@ -282,6 +224,7 @@ def day_hr_min_sec(seconds, granularity=2):
 def sort_dict(item: dict):
     return {k: sort_dict(v) if isinstance(v, dict) else v for k, v in sorted(item.items())}
     
+
 def get_eco_data_link():
     item = random.choice(ECO_DATA)
     ad = random.choice(item['ads'])
@@ -291,6 +234,7 @@ def get_eco_data_link():
     link = ad['data']['string1']+" <a href="+ad['data']['link']+"> " \
           +ad['data']['anchorText']+"</a> "+ad['data']['string2']
     return link
+
 
 def get_dpow_server_coins_dict(season=None):
     if not season:
@@ -305,6 +249,7 @@ def get_dpow_server_coins_dict(season=None):
     }
     
     return chains_dict
+
 
 def get_chain_server(chain, season):
     if chain in ["KMD", "BTC", "LTC"]:
@@ -330,6 +275,7 @@ def get_third_party_chains(coins_dict):
 
 def get_notary_region(notary):
     return notary.split("_")[-1]
+
 
 def get_time_since(timestamp):
     if timestamp == 0:
@@ -361,16 +307,16 @@ def prepare_regional_graph_data(graph_data):
 
     for label in labels:
         if label.endswith("_AR"):
-            bg_color.append(RED)
+            bg_color.append(COLORS["AR_REGION"])
         elif label.endswith("_EU"):
-            bg_color.append(MAIN_COLOR)
+            bg_color.append(COLORS["EU_REGION"])
         elif label.endswith("_NA"):
-            bg_color.append(THIRD_PARTY_COLOR)
+            bg_color.append(COLORS["NA_REGION"])
         elif label.endswith("_SH"):
-            bg_color.append(LT_BLUE)
+            bg_color.append(COLORS["SH_REGION"])
         else:
-            bg_color.append(OTHER_COIN_COLOR)
-        border_color.append(BLACK)
+            bg_color.append(COLORS["DEV_REGION"])
+        border_color.append(COLORS["BLACK"])
 
     chartdata = []
     for label in labels:
@@ -402,12 +348,12 @@ def prepare_coins_graph_data(graph_data, coins_dict):
 
     for label in labels:
         if label in third_chains:
-            bg_color.append(THIRD_PARTY_COLOR)
+            bg_color.append(COLORS["THIRD_PARTY_COLOR"])
         elif label in main_chains:
-            bg_color.append(MAIN_COLOR)
+            bg_color.append(COLORS["MAIN_COLOR"])
         else:
-            bg_color.append(OTHER_COIN_COLOR)
-        border_color.append(BLACK)
+            bg_color.append(COLORS["OTHER_COIN_COLOR"])
+        border_color.append(COLORS["BLACK"])
 
     chartdata = []
     for label in labels:
@@ -422,10 +368,31 @@ def prepare_coins_graph_data(graph_data, coins_dict):
     } 
     return data
 
-def is_hex(s):
+
+def is_hex(str_):
     hex_digits = set(string.hexdigits)
-    return all(c in hex_digits for c in s)
+    return all(i in hex_digits for i in str_)
+
 
 def safe_div(x,y):
     if y==0: return 0
     return float(x/y)
+
+
+# DEPRECATE
+def get_low_nn_balances():
+    url = "http://138.201.207.24/nn_balances_report"
+    r = requests.get(url)
+    return r.json()
+
+
+def get_notary_funding():
+    url = "http://138.201.207.24/nn_funding"
+    r = requests.get(url)
+    return r.json()
+
+
+def get_bot_balance_deltas():
+    url = "http://138.201.207.24/nn_balances_deltas"
+    r = requests.get(url)
+    return r.json()

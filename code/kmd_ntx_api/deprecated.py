@@ -1,3 +1,4 @@
+"""
 # Deprecated by get_dpow_coins_list() so season removed coins are included.
 def get_active_dpow_coins():
     dpow_chains = coins.objects.filter(dpow_active=1).values('chain', 'dpow')
@@ -52,26 +53,7 @@ def get_chain_sync_data(request):
         logger.error(f"[get_chain_sync_data] Exception: {e}")
         messages.error(request, 'Sync Node API not Responding!')
     return context
-def get_nn_social(notary_name=None, season=None):
-    season = SEASON
-    nn_social_info = {}
-    nn_social_data = get_nn_social_data(season, notary_name).values()
-    for item in nn_social_data:
-        nn_social_info.update(items_row_to_dict(item,'notary'))
-    for notary in nn_social_info:
-        for item in nn_social_info[notary]:
-            if item in ['twitter', 'youtube', 'discord', 'telegram', 'github', 'keybase']:   
-                if nn_social_info[notary][item].endswith('/'):
-                   nn_social_info[notary][item] = nn_social_info[notary][item][:-1]
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://", "")
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("https://", "")
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("t.me/", "")
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("twitter.com/", "")
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("github.com/", "")
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("www.youtube.com/", "")
-                nn_social_info[notary][item] = nn_social_info[notary][item].replace("keybase.io/", "")
 
-    return nn_social_info
     
 # TODO: Deprecated? use notarised table values
 def get_ntx_score(btc_ntx, main_ntx, third_party_ntx, season=None):
@@ -96,7 +78,7 @@ def get_nn_ntx_summary(notary):
     week_ago = now - 24*60*60*7
 
     today = datetime.date.today()
-    delta = datetime.timedelta(days=1)
+    delta = dt.timedelta(days=1)
     week_ago = today-delta*7
 
     ntx_summary = {
@@ -1106,3 +1088,20 @@ def get_sum_from_table(cursor, table, col):
     return cursor.fetchone()[0]
 
 
+
+# TODO: Awaiting delegation to crons / db table
+def chain_sync(request):
+    season = helper.get_page_season(request)
+    context = get_chain_sync_data(request)
+
+    context.update({
+        "season": season,
+        "season_clean": season.replace("_"," "),
+        "page_title": "Chain Sync",
+        "scheme_host": get_current_host(request),
+        "sidebar_links": get_sidebar_links(season),
+        "explorers": get_explorers(request),
+        "eco_data_link": get_eco_data_link()
+        })
+    return render(request, 'chain_sync.html', context)
+"""
