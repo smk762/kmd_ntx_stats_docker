@@ -1,10 +1,9 @@
 from django import forms
 
-from kmd_ntx_api.lib_info import *
-from kmd_ntx_api.lib_atomicdex import *
-from kmd_ntx_api.widgets import *
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_info as info
 
-mm2_coins = get_mm2_coins_list()
+mm2_coins = info.get_mm2_coins_list()
 TF_CHOICES = [(True,True), (False,False)]
 COIN_CHOICES = [(i,i) for i in mm2_coins]
 
@@ -20,11 +19,11 @@ class MakerbotForm(forms.Form):
     MAX_CHOICES = [
         ("percentage","Max. balance percentage to trade"),
         ("usd","Max. USD value to trade")
-        ]
+    ]
     MIN_CHOICES = [
         ("percentage","Min. balance percentage to trade"),
         ("usd","Min. USD value to trade")
-        ]
+    ]
 
     base = forms.ChoiceField(
         label='Coin to Sell',
@@ -156,8 +155,6 @@ class EnableCommandForm(forms.Form):
         super(EnableCommandForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
-
-    mm2_coins = get_mm2_coins_list
 
     coin = forms.ChoiceField(
         label='Coin to Enable',

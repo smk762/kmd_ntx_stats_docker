@@ -72,7 +72,9 @@
 			            	} else if (icon == "pirate") {
 			            		icon = "arrr"
 			            	}
-				            $(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'><img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.chain+"</a>");
+			            	if (icon != 'mil') {
+				            	$(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.chain+"/?season={{ season }}'><img height='16' class='mr-2' src='https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/"+icon+".png' />"+oData.chain+"</a>");
+				        	}
 				        }
 			        },
         			{
@@ -90,9 +92,9 @@
 			            "data": 'ac_ntx_height',
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	
-			            	$(nTd).html("<a href='"+explorers[oData.chain][0]+'block-index/'+oData.ac_ntx_height+"'>"+oData.ac_ntx_height+"</a>");
-				            
+			            	if (explorers.hasOwnProperty(oData.chain)) {
+			            		$(nTd).html("<a href='"+explorers[oData.chain][0]+'block-index/'+oData.ac_ntx_height+"'>"+oData.ac_ntx_height+"</a>");
+			            	}				            
 				        }
 			        },
 

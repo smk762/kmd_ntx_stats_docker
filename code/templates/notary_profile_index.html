@@ -3,7 +3,7 @@
 {% block content %}
 	<h2 class="m-auto kmd_ui_light3">{{ season_clean }} Notary Node Profiles</h2>
     {% include "anchors/regions.html" %}
-	{% for region, info in nn_info.regions_info.items %}
+	{% for region, info in nn_regions.items %}
 			<a id="{{region}}" class="section-anchor">
 				<div class="text-uppercase notary_region_title">{{ info.name }}</div>
 			</a>

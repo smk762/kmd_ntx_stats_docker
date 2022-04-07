@@ -1,298 +1,88 @@
 #!/usr/bin/env python3
-import requests 
+import sys
 import time
-from lib_urls import get_scoring_epochs_url
+import json
+import requests
 
-def get_scoring_epochs_repo():
-    scoring_epochs = requests.get(get_scoring_epochs_url()).json()
-    for season in scoring_epochs:
-        if "GLEEC" in scoring_epochs[season]["Servers"]["dPoW-3P"]:
-            scoring_epochs[season]["Servers"]["dPoW-3P"].update({
-                "GLEEC-OLD": scoring_epochs[season]["Servers"]["dPoW-3P"]["GLEEC"]
-            })
-            del scoring_epochs[season]["Servers"]["dPoW-3P"]["GLEEC"]
-    return scoring_epochs
+from lib_urls import *
+from lib_crypto import * 
+from notary_pubkeys import NOTARY_PUBKEYS
+from notary_candidates import CANDIDATE_ADDRESSES
 
 
-def get_partial_season_dpow_chains(scoring_epochs):
-    partial_season_dpow_chains = {}
-    for season in scoring_epochs:
-        partial_season_dpow_chains.update({
-            season:{
-                "Servers":{
-                    "Main":{},
-                    "Third_Party":{}
-                }
-            }
-        })
-
-        for server in scoring_epochs[season]["Servers"]:
-            if server.lower() == "dpow-3p":
-                epoch_server = "Third_Party"
-            elif server.lower() == "dpow-mainnet":
-                epoch_server = "Main"
-            for item in scoring_epochs[season]["Servers"][server]:
-                partial_season_dpow_chains[season]["Servers"][epoch_server].update({
-                        item:scoring_epochs[season]["Servers"][server][item]
-                    })
-
-    partial_season_dpow_chains.update({
-        "Season_5_Testnet": {
-            "Servers": {
-                "Main": {
-                    "LTC": {
-                        "start_time":1616508400,
-                        "start_time_comment": "LTC Block 2022000"
-                    },
-                    "RICK": {
-                        "start_time":1616442129,
-                        "start_time_comment": "KMD Block 2316959"
-                    },
-                    "MORTY": {
-                        "start_time":1616442129,
-                        "start_time_comment": "KMD Block 2316959"
-                    }
-                }
-            }
-        }
-    })
-
-    return partial_season_dpow_chains
+# Notarisation Addresses
+NTX_ADDR = 'RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA'
+BTC_NTX_ADDR = '1P3rU1Nk1pmc2BiWC8dEy9bZa1ZbMp5jfg'
+LTC_NTX_ADDR = 'LhGojDga6V1fGzQfNGcYFAfKnDvsWeuAsP'
 
 
-def get_scoring_epochs_source(partial_season_dpow_chains):
-    scoring_epochs = {}
-    for season in SEASONS_INFO:
-        season_start = SEASONS_INFO[season]["start_time"]
-        season_end = SEASONS_INFO[season]["end_time"]
-
-        scoring_epochs.update({season:{
-            "Main":{},
-            "Third_Party":{},
-            "KMD": {
-                f"KMD": {
-                    "start":season_start,
-                    "end":season_end-1,
-                    "start_event":"Season start",
-                    "end_event": "Season end"
-                }
-            },
-            "BTC": {
-                f"BTC": {
-                    "start":season_start,
-                    "end":season_end-1,
-                    "start_event":"Season start",
-                    "end_event": "Season end"
-                }
-            },
-            "LTC": {
-                f"LTC": {
-                    "start":season_start,
-                    "end":season_end-1,
-                    "start_event":"Season start",
-                    "end_event": "Season end"
-                }
-            }
-        }})
-
-        if season not in partial_season_dpow_chains:
-            scoring_epochs[season]["Main"].update({
-                f"Epoch_0": {
-                    "start":season_start,
-                    "end":season_end-1,
-                    "start_event":"Season start",
-                    "end_event": "Season end"
-                }
-            })
-            scoring_epochs[season]["Third_Party"].update({
-                f"Epoch_0": {
-                    "start":season_start,
-                    "end":season_end-1,
-                    "start_event":"Season start",
-                    "end_event": "Season end"
-                }
-            })
-
-        else:
-            for server in partial_season_dpow_chains[season]["Servers"]:
-                epoch_event_times = [season_start, season_end]
-
-                for chain in partial_season_dpow_chains[season]["Servers"][server]:
-
-                    if "start_time" in partial_season_dpow_chains[season]["Servers"][server][chain]:
-                        epoch_event_times.append(partial_season_dpow_chains[season]["Servers"][server][chain]["start_time"])
-                    if "end_time" in partial_season_dpow_chains[season]["Servers"][server][chain]:
-                        epoch_event_times.append(partial_season_dpow_chains[season]["Servers"][server][chain]["end_time"])
-
-                epoch_event_times = list(set(epoch_event_times))
-                epoch_event_times.sort()
-                num_epochs = len(epoch_event_times)
-
-                for epoch in range(0,num_epochs-1):
-
-                    epoch_start_time = epoch_event_times[epoch]
-                    epoch_end_time = epoch_event_times[epoch+1]
-
-                    epoch_start_events = []
-                    epoch_end_events = []
-
-                    if epoch_start_time == season_start:
-                        epoch_start_events.append("Season start")
-                    if epoch_end_time == season_end:
-                        epoch_end_events.append("Season end")
-
-                    for chain in partial_season_dpow_chains[season]["Servers"][server]:
-                        if "start_time" in partial_season_dpow_chains[season]["Servers"][server][chain]:
-
-                            if epoch_start_time == partial_season_dpow_chains[season]["Servers"][server][chain]["start_time"]:
-                                epoch_start_events.append(f"{chain} start")
-
-                            elif epoch_end_time == partial_season_dpow_chains[season]["Servers"][server][chain]["start_time"]:
-                                epoch_end_events.append(f"{chain} start")
-
-                        if "end_time" in partial_season_dpow_chains[season]["Servers"][server][chain]:
-
-                            if epoch_start_time == partial_season_dpow_chains[season]["Servers"][server][chain]["end_time"]:
-                                epoch_start_events.append(f"{chain} end")
-
-                            elif epoch_end_time == partial_season_dpow_chains[season]["Servers"][server][chain]["end_time"]:
-                                epoch_end_events.append(f"{chain} end")
-
-                    if server == "dPoW-Mainnet":
-                        score_server = "Main"
-                    elif server == "dPoW-3P":
-                        score_server = "Third_Party"
-                    else:
-                        score_server = server
-                    scoring_epochs[season][score_server].update({
-                        f"Epoch_{epoch}": {
-                            "start":epoch_start_time,
-                            "end":epoch_end_time-1,
-                            "start_event":epoch_start_events,
-                            "end_event":epoch_end_events
-                        }
-                    })
-
-    return scoring_epochs
+# SPECIAL CASE BTC TXIDS
+S4_INIT_BTC_FUNDING_TX = "13fee57ec60ef4ca42dbed5eb77d576bf7545e7042b334b27afdc33051635611"
 
 
-def get_scoring_epochs_all(scoring_epochs):
-    all_scoring_epochs = []
-    for season in scoring_epochs:
-        for server in scoring_epochs[season]:
-            for epoch in scoring_epochs[season][server]:
-                all_scoring_epochs.append(epoch)
-
-    return list(set(all_scoring_epochs))
+# OP_RETURN data sometimes has extra info. Not used yet, but here for future reference
+noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'GLEEC-OLD', 'AYA', 'MCL', 'VRSC']
 
 
 OTHER_LAUNCH_PARAMS = {
-    "BTC":"~/bitcoin/src/bitcoind",
-    "SFUSD":"~/sfusd-core/src/smartusdd",
-    "LTC":"~/litecoin/src/litecoind",
-    "KMD":"~/komodo/src/komodod", 
-    "AYA":"~/AYAv2/src/aryacoind",
-    "CHIPS":"~/chips/src/chipsd",
-    "MIL":"~/mil-1/src/mild",
-    "EMC2":"~/einsteinium/src/einsteiniumd",
+    "BTC": "~/bitcoin/src/bitcoind",
+    "SFUSD": "~/sfusd-core/src/smartusdd",
+    "LTC": "~/litecoin/src/litecoind",
+    "KMD": "~/komodo/src/komodod", 
+    "AYA": "~/AYAv2/src/aryacoind",
+    "CHIPS": "~/chips/src/chipsd",
+    "MIL": "~/mil-1/src/mild",
+    "EMC2": "~/einsteinium/src/einsteiniumd",
     "TOKEL": "~/tokelkomodo/src/komodod -ac_name=TOKEL -ac_supply=100000000 -ac_eras=2 -ac_cbmaturity=1 -ac_reward=100000000,4250000000 -ac_end=80640,0 -ac_decay=0,77700000 -ac_halving=0,525600 -ac_cc=555 -ac_ccenable=236,245,246,247 -ac_adaptivepow=6 -addnode=135.125.204.169 -addnode=192.99.71.125 -addnode=144.76.140.197 -addnode=135.181.92.123 ",
-    "VRSC":"~/VerusCoin/src/verusd",
-    "GLEEC":"~/komodo/src/komodod -ac_name=GLEEC -ac_supply=210000000 -ac_public=1 -ac_staked=100 -addnode=95.217.161.126",
-    "VOTE2021":"~/komodo/src/komodod  -ac_name=VOTE2021 -ac_public=1 -ac_supply=129848152 -addnode=77.74.197.115",
-    "GLEEC-OLD":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",
-    "MCL":"~/marmara/src/komodod -ac_name=MCL -ac_supply=2000000 -ac_cc=2 -addnode=5.189.149.242 -addnode=161.97.146.150 -addnode=149.202.158.145 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000 -daemon"
+    "VRSC": "~/VerusCoin/src/verusd",
+    "GLEEC": "~/komodo/src/komodod -ac_name=GLEEC -ac_supply=210000000 -ac_public=1 -ac_staked=100 -addnode=95.217.161.126",
+    "VOTE2021": "~/komodo/src/komodod  -ac_name=VOTE2021 -ac_public=1 -ac_supply=129848152 -addnode=77.74.197.115",
+    "GLEEC-OLD": "~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",
+    "MCL": "~/marmara/src/komodod -ac_name=MCL -ac_supply=2000000 -ac_cc=2 -addnode=5.189.149.242 -addnode=161.97.146.150 -addnode=149.202.158.145 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000 -daemon"
 }
+
 
 OTHER_CONF_FILE = {
-    "BTC":"~/.bitcoin/bitcoin.conf",
-    "SFUSD":"~/.smartusd/smartusd.conf",
-    "LTC":"~/.litecoin/litecoin.conf",
-    "KMD":"~/.komodo/komodo.conf",
-    "MCL":"~/.komodo/MCL/MCL.conf", 
-    "MIL":"~/.mil/mil.conf", 
-    "TOKEL":"~/.komodo/TOKEL/TOKEL.conf", 
-    "VOTE2021":"~/.komodo/VOTE2021/VOTE2021.conf",
-    "AYA":"~/.aryacoin/aryacoin.conf",
-    "CHIPS":"~/.chips/chips.conf",
-    "EMC2":"~/.einsteinium/einsteinium.conf",
-    "VRSC":"~/.komodo/VRSC/VRSC.conf",   
-    "GLEEC":"~/.komodo/GLEEC/GLEEC.conf",
-    "GLEEC-OLD":"~/.gleecbtc/gleecbtc.conf",   
+    "BTC": "~/.bitcoin/bitcoin.conf",
+    "SFUSD": "~/.smartusd/smartusd.conf",
+    "LTC": "~/.litecoin/litecoin.conf",
+    "KMD": "~/.komodo/komodo.conf",
+    "MCL": "~/.komodo/MCL/MCL.conf", 
+    "MIL": "~/.mil/mil.conf", 
+    "TOKEL": "~/.komodo/TOKEL/TOKEL.conf", 
+    "VOTE2021": "~/.komodo/VOTE2021/VOTE2021.conf",
+    "AYA": "~/.aryacoin/aryacoin.conf",
+    "CHIPS": "~/.chips/chips.conf",
+    "EMC2": "~/.einsteinium/einsteinium.conf",
+    "VRSC": "~/.komodo/VRSC/VRSC.conf",   
+    "GLEEC": "~/.komodo/GLEEC/GLEEC.conf",
+    "GLEEC-OLD": "~/.gleecbtc/gleecbtc.conf",   
 }
+
 
 OTHER_CLI = {
-    "BTC":"~/bitcoin/src/bitcoin-cli",
-    "SFUSD":"~/sfusd-core/src/smartusd-cli",
-    "LTC":"~/litecoin/src/litecoin-cli",
-    "KMD":"~/komodo/src/komodo-cli",
-    "MIL":"~/mil-1/src/mil-cli",
-    "MCL":"~/komodo/src/komodo-cli -ac_name=MCL",
-    "TOKEL":"~/komodo/src/komodo-cli -ac_name=TOKEL", 
-    "GLEEC":"~/komodo/src/komodo-cli -ac_name=GLEEC",
-    "VOTE2021":"~/komodo/src/komodo-cli -ac_name=VOTE2021",
-    "AYA":"~/AYAv2/src/aryacoin-cli",
-    "CHIPS":"~/chips/src/chips-cli",
-    "EMC2":"~/einsteinium/src/einsteinium-cli",
-    "VRSC":"~/VerusCoin/src/verus",   
-    "GLEEC-OLD":"~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
+    "BTC": "~/bitcoin/src/bitcoin-cli",
+    "SFUSD": "~/sfusd-core/src/smartusd-cli",
+    "LTC": "~/litecoin/src/litecoin-cli",
+    "KMD": "~/komodo/src/komodo-cli",
+    "MIL": "~/mil-1/src/mil-cli",
+    "MCL": "~/komodo/src/komodo-cli -ac_name=MCL",
+    "TOKEL": "~/komodo/src/komodo-cli -ac_name=TOKEL", 
+    "GLEEC": "~/komodo/src/komodo-cli -ac_name=GLEEC",
+    "VOTE2021": "~/komodo/src/komodo-cli -ac_name=VOTE2021",
+    "AYA": "~/AYAv2/src/aryacoin-cli",
+    "CHIPS": "~/chips/src/chips-cli",
+    "EMC2": "~/einsteinium/src/einsteinium-cli",
+    "VRSC": "~/VerusCoin/src/verus",   
+    "GLEEC-OLD": "~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
 }
 
-# Some coins are named differently between dpow and coins repo...
-TRANSLATE_COINS = {'COQUI': 'COQUICASH', 'OURC': 'OUR',
-                   'WLC': 'WLC21', 'GleecBTC': 'GLEEC-OLD',
-                   'ARRR': "PIRATE", 'TKL':'TOKEL'}
-
-SEASONS_INFO = {
-    "Season_1": {
-            "start_block":1,
-            "end_block":813999,
-            "start_time":1473793441,
-            "end_time":1530921600,
-            "notaries":[]
-        },
-    "Season_2": {
-            "start_block":814000,
-            "end_block":1443999,
-            "start_time":1530921600,
-            "end_time":1563148799,
-            "notaries":[]
-        },
-    "Season_3": {
-            "start_block":1444000,
-            "end_block":1921999,
-            "start_time":1563148800,
-            "end_time":1592146799,
-            "notaries":[]
-        },
-    "Season_4": {
-            "start_block":1922000, # https://github.com/KomodoPlatform/komodo/blob/master/src/komodo_globals.h#L47 (block_time 1592172139)
-            "end_block":2436999,
-            "start_time":1592146800, # https://github.com/KomodoPlatform/komodo/blob/master/src/komodo_globals.h#L48
-            "end_time":1617364800, # April 2nd 2021 12pm
-            "post_season_end_time":1623682799,
-            "notaries":[]
-        },
-    "Season_5": {
-            "start_block":2437000,
-            "end_block":3436999,
-            "start_time":1623682800,
-            "end_time":1773682799,
-            "notaries":[]
-        },
-    "Season_6": {
-            "start_block":3437000,
-            "end_block":4437000,
-            "start_time":1773682800,
-            "end_time":2773682800,
-            "notaries":[]
-        }
-}
-
-# set at post season to use "post_season_end_time" for aggreagates (e.g. mining)
-POSTSEASON = True
+# Rescan full season
 RESCAN_SEASON = False
+RESCAN_CHUNK_SIZE = 100000
 
-DPOW_EXCLUDED_CHAINS = {
+
+DPOW_EXCLUDED_COINS = {
     "Season_1": [],
     "Season_2": [
         "TXSCLCC",
@@ -327,6 +117,11 @@ DPOW_EXCLUDED_CHAINS = {
         "K64"
     ],
     "Season_5": [
+        "AXO",
+        "BTCH",
+        "COQUICASH",
+        "BLUR",
+        "LABS",
         "BTC",
         "ARYA"
     ],
@@ -335,12 +130,18 @@ DPOW_EXCLUDED_CHAINS = {
         "LABS",
         ],
     "Season_6": [
+        "BLUR",
+        "LABS",
+        "BTC",
+        "ARYA"
     ]
 }
 
+
 VALID_SERVERS = ["Main", "Third_Party", "KMD", "BTC", "LTC"]
 
-NEXT_SEASON_CHAINS = {
+
+NEXT_SEASON_COINS = {
     "LTC": ["LTC"],
     "KMD": ["KMD"],
     "Main": [
@@ -348,6 +149,7 @@ NEXT_SEASON_CHAINS = {
         "BET",
         "BOTS",
         "BTCH",
+        "CLC",
         "CCL",
         "COQUICASH",
         "CRYPTO",
@@ -362,7 +164,6 @@ NEXT_SEASON_CHAINS = {
         "MORTY",
         "MSHARK",
         "NINJA",
-        "OOT",
         "PANGEA",
         "PIRATE",
         "REVS",
@@ -375,7 +176,7 @@ NEXT_SEASON_CHAINS = {
         "AYA",
         "CHIPS",
         "EMC2",
-        "GLEEC-OLD",
+        "MIL",
         "MCL",
         "SFUSD",
         "VRSC",
@@ -383,21 +184,397 @@ NEXT_SEASON_CHAINS = {
     ]
 }
 
+
 EXCLUDE_DECODE_OPRET_COINS = ['D']
+
 
 EXCLUDED_SERVERS = ["Unofficial"]
 EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_4", "Season_5_Testnet"]
+
+
+RETIRED_DPOW_COINS = ["HUSH3", "GLEEC-OLD", "AXO", "BTCH", "COQUICASH", "OOT"]
+
+
+SCORING_EPOCHS_REPO_DATA = requests.get(get_scoring_epochs_repo_url('smk762-epochs')).json()
+for season in SCORING_EPOCHS_REPO_DATA:
+    servers = list(SCORING_EPOCHS_REPO_DATA[season]["Servers"].keys())[:]
+    for server in servers:
+
+        if server == "dPoW-Mainnet":
+            SCORING_EPOCHS_REPO_DATA[season]["Servers"].update({
+                "Main": SCORING_EPOCHS_REPO_DATA[season]["Servers"]["dPoW-Mainnet"]
+            })
+            del SCORING_EPOCHS_REPO_DATA[season]["Servers"]["dPoW-Mainnet"]
+
+        elif server == "dPoW-3P":
+            SCORING_EPOCHS_REPO_DATA[season]["Servers"].update({
+                "Third_Party": SCORING_EPOCHS_REPO_DATA[season]["Servers"]["dPoW-3P"]
+            })
+            del SCORING_EPOCHS_REPO_DATA[season]["Servers"]["dPoW-3P"]
+
+
+SEASONS_INFO = {
+    "Season_1": {
+        "start_block": 1,
+        "end_block": 813999,
+        "start_time": 1473793441,
+        "end_time": 1530921600,
+        "notaries": [],
+        "coins": [],
+        "servers": {}
+    },
+    "Season_2": {
+        "start_block": 814000,
+        "end_block": 1443999,
+        "start_time": 1530921600,
+        "end_time": 1563148799,
+        "notaries": [],
+        "coins": [],
+        "servers": {}
+    },
+    "Season_3": {
+        "start_block": 1444000,
+        "end_block": 1921999,
+        "start_time": 1563148800,
+        "end_time": 1592146799,
+        "notaries": [],
+        "coins": [],
+        "servers": {}
+    },
+    "Season_4": {
+        "start_block": 1922000,
+        "end_block": 2436999,
+        "start_time": 1592146800,
+        "end_time": 1617364800,
+        "post_season_end_time": 1623682799,
+        "notaries": [],
+        "coins": [],
+        "servers": {}
+    },
+    "Season_5": {
+        "start_block": 2437000,
+        "end_block": 3436999,
+        "start_time": 1623682800,
+        "end_time": 1751328000,
+        "notaries": [],
+        "coins": [],
+        "servers": {}
+    },
+    "Season_6": {
+        "start_block": 3437000,
+        "end_block": 4437000,
+        "start_time": 1751328000,
+        "end_time": 2773682800,
+        "notaries": [],
+        "coins": [],
+        "servers": {}
+    }
+}
+NOW = time.time()
+DPOW_COINS_ACTIVE = requests.get(get_dpow_active_coins_url()).json()["results"]
+
 for season in SEASONS_INFO:
-    if  SEASONS_INFO[season]["start_time"] > time.time():
+    if NOW >= SEASONS_INFO[season]["start_time"] and NOW <= SEASONS_INFO[season]["end_time"]:
+        CURRENT_SEASON = season
+        CURRENT_DPOW_COINS = {season: {}}
+        for coin in DPOW_COINS_ACTIVE:
+            if DPOW_COINS_ACTIVE[coin]["dpow"]["server"] not in CURRENT_DPOW_COINS[season]:
+                CURRENT_DPOW_COINS[season].update({
+                    server: []
+                })
+            CURRENT_DPOW_COINS[season][server].append(coin)
+
+    elif SEASONS_INFO[season]["start_time"] > NOW:
         EXCLUDED_SEASONS.append(season)
 
-RETIRED_SMARTCHAINS = ["HUSH3", "AXO", "BTCH", "COQUICASH", "OOT"]
-RETIRED_DPOW_CHAINS = ["HUSH3", "GLEEC-OLD", "AXO", "BTCH", "COQUICASH", "OOT"]
+for season in SEASONS_INFO:
+    if season in NOTARY_PUBKEYS:
+        SEASONS_INFO[season]["notaries"] = list(NOTARY_PUBKEYS[season]["Main"].keys())
+        SEASONS_INFO[season]["notaries"].sort()
 
-SCORING_EPOCHS_REPO = get_scoring_epochs_repo()
-PARTIAL_SEASON_DPOW_CHAINS = get_partial_season_dpow_chains(SCORING_EPOCHS_REPO)
-SCORING_EPOCHS = get_scoring_epochs_source(PARTIAL_SEASON_DPOW_CHAINS)
-ALL_SCORING_EPOCHS = get_scoring_epochs_all(SCORING_EPOCHS)
+    if NOW - SEASONS_INFO[season]["start_time"] < 48 * 60 * 60:
+
+        for coin in DPOW_COINS_ACTIVE:
+            epoch = "Epoch_0"
+            SEASONS_INFO[season]["coins"].append(coin)
+
+            if "server" in DPOW_COINS_ACTIVE[coin]:
+                server = DPOW_COINS_ACTIVE[coin]["server"]
+                if coin in ["KMD", "LTC", "BTC"]:
+                    SEASONS_INFO[season]["servers"].update({
+                        coin: {
+                            "coins": [coin],
+                            "addresses": {
+                                coin: {}
+                            },
+                            "epochs": {
+                                coin: {
+                                    "coins": [coin],
+                                    "start_time": SEASONS_INFO[season]["start_time"],
+                                    "end_time": SEASONS_INFO[season]["end_time"],
+                                    "start_event": [
+                                        "Season start"
+                                    ],
+                                    "end_event": [
+                                        "Season end"
+                                    ]
+                                }
+                            }
+                        }
+                    })
+                if server not in SEASONS_INFO[season]["servers"]:
+                    SEASONS_INFO[season]["servers"].update({
+                        server:{
+                            "coins": [],
+                            "addresses": {},
+                            "epochs": {}
+                        }
+                    })
+
+                if epoch not in SEASONS_INFO[season]["servers"][server]["epochs"]:
+                    SEASONS_INFO[season]["servers"][server]["epochs"].update({
+                        epoch: {
+                            "coins":[]
+                        }
+                    })
+
+                SEASONS_INFO[season]["servers"][server]["addresses"].update({coin:{}})
+
+                if server in ["Main", "Third_Party"] and coin not in ["KMD", "LTC", "BTC"]:
+                    SEASONS_INFO[season]["servers"][server]["coins"].append(coin)
+                    SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["coins"].append(coin)
+
+                SEASONS_INFO[season]["servers"][server]["coins"].sort()
+                SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["coins"].sort()
+        SEASONS_INFO[season]["coins"].sort()
+
+    else:
+        servers = requests.get(get_notarised_servers_url(season)).json()["results"]
+        for server in servers:
+            coins = requests.get(get_notarised_coins_url(season, server)).json()["results"]
+            if server in SCORING_EPOCHS_REPO_DATA[season]["Servers"]:
+                coins = coins + list(SCORING_EPOCHS_REPO_DATA[season]["Servers"][server].keys())
+            if season == CURRENT_SEASON:
+                if server in CURRENT_DPOW_COINS[season]:
+                    coins += CURRENT_DPOW_COINS[season][server]
+            coins = list(set(coins))
+            coins.sort()
+            for coin in coins + ["KMD", "LTC", "BTC"]:
+                if season in DPOW_EXCLUDED_COINS:
+                    if coin not in DPOW_EXCLUDED_COINS[season]:
+
+                        if coin in ["KMD", "LTC", "BTC"]:
+                            SEASONS_INFO[season]["servers"].update({
+                                coin:{
+                                    "coins": [coin],
+                                    "addresses": {
+                                        coin: {}
+                                    },
+                                    "epochs": {
+                                        coin: {
+                                            "coins": [coin],
+                                            "start_time": SEASONS_INFO[season]["start_time"],
+                                            "end_time": SEASONS_INFO[season]["end_time"],
+                                            "start_event": [
+                                                "Season start"
+                                            ],
+                                            "end_event": [
+                                                "Season end"
+                                            ]
+                                        }
+                                    }
+                                }
+                            })
+
+                        if server not in SEASONS_INFO[season]["servers"]:
+                            SEASONS_INFO[season]["servers"].update({
+                                server: {
+                                    "coins": [],
+                                    "addresses": {},
+                                    "epochs": {}
+                                }
+                            })
+
+                        SEASONS_INFO[season]["coins"].append(coin)
+
+                        if server in ["Main", "Third_Party"] and coin not in ["KMD", "LTC", "BTC"]:
+                            SEASONS_INFO[season]["servers"][server]["coins"].append(coin)
+
+                        SEASONS_INFO[season]["servers"][server]["addresses"].update({coin:{}})
+
+                SEASONS_INFO[season]["servers"][server]["coins"] = list(set(SEASONS_INFO[season]["servers"][server]["coins"]))
+                SEASONS_INFO[season]["servers"][server]["coins"].sort()
+
+        SEASONS_INFO[season]["coins"] = list(set(SEASONS_INFO[season]["coins"]))
+        SEASONS_INFO[season]["coins"].sort()
+
+print(json.dumps(SEASONS_INFO["Season_5"], indent=4))
+
+NOTARY_LTC_ADDRESSES = {}
+ALL_SEASON_NOTARY_LTC_ADDRESSES = {}
+
+NOTARY_BTC_ADDRESSES = {}
+ALL_SEASON_NOTARY_BTC_ADDRESSES = {}
+
+for season in SEASONS_INFO:
+
+
+    if season not in NOTARY_LTC_ADDRESSES:
+        NOTARY_LTC_ADDRESSES.update({season: {}})
+
+    if season not in NOTARY_BTC_ADDRESSES:
+        NOTARY_BTC_ADDRESSES.update({season: {}})
+
+    for notary in SEASONS_INFO[season]["notaries"]:
+
+        for server in SEASONS_INFO[season]["servers"]:
+
+            for coin in SEASONS_INFO[season]["servers"][server]["coins"]:
+
+                if server in ["KMD", "LTC", "BTC"]:
+                    pubkey = NOTARY_PUBKEYS[season]["Main"][notary]
+                    address = get_addr_from_pubkey(coin, pubkey)
+                    SEASONS_INFO[season]["servers"]["Main"]["addresses"][coin].update({
+                        address: notary
+                    })
+                    SEASONS_INFO[season]["servers"][server]["addresses"][coin].update({
+                        address: notary
+                    })
+
+                    if coin == "LTC":
+                        NOTARY_LTC_ADDRESSES[season].update({address: notary})
+                        ALL_SEASON_NOTARY_LTC_ADDRESSES.update({address: notary})
+
+                    if coin == "BTC":
+                        NOTARY_BTC_ADDRESSES[season].update({address: notary})
+                        ALL_SEASON_NOTARY_BTC_ADDRESSES.update({address: notary})
+
+                    pubkey = NOTARY_PUBKEYS[season]["Third_Party"][notary]
+                    address = get_addr_from_pubkey(coin, pubkey)
+
+                    SEASONS_INFO[season]["servers"]["Third_Party"]["addresses"][coin].update({
+                        address: notary
+                    })
+                    SEASONS_INFO[season]["servers"][server]["addresses"][coin].update({
+                        address: notary
+                    })
+
+                else:
+                    pubkey = NOTARY_PUBKEYS[season][server][notary]
+                    address = get_addr_from_pubkey(coin, pubkey)
+                    
+                    SEASONS_INFO[season]["servers"][server]["addresses"][coin].update({
+                        address: notary
+                    })
 
 
 
+for season in SCORING_EPOCHS_REPO_DATA:
+    for server in SCORING_EPOCHS_REPO_DATA[season]["Servers"]:
+
+        epoch_times = []
+        epoch_times.append(SCORING_EPOCHS_REPO_DATA[season]["season_start"])
+        epoch_times.append(SCORING_EPOCHS_REPO_DATA[season]["season_end"])
+
+        for coin in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server]:
+            if "start_time" in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]:
+                epoch_times.append(SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]["start_time"])
+            if "end_time" in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]:
+                epoch_times.append(SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]["end_time"])
+
+        epoch_times.sort()
+
+        for i in range(len(epoch_times)-1):
+            epoch = f"Epoch_{i}"
+            epoch_start = epoch_times[i]
+            epoch_end = epoch_times[i+1]
+            SEASONS_INFO[season]["servers"][server]["epochs"].update({
+                epoch: {
+                    "start_time": epoch_start,
+                    "end_time": epoch_end - 1,
+                    "start_event": [],
+                    "end_event": [],
+                    "coins": []
+                }
+            })
+
+            if SCORING_EPOCHS_REPO_DATA[season]["season_start"] == epoch_start:
+                SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["start_event"].append("Season start")
+
+            if SCORING_EPOCHS_REPO_DATA[season]["season_end"] == epoch_end:
+                SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["end_event"].append("Season end")
+
+
+            for coin in SEASONS_INFO[season]["servers"][server]["coins"]:
+                if season in DPOW_EXCLUDED_COINS:
+                    if coin not in DPOW_EXCLUDED_COINS[season]:
+                        if coin in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server]:
+
+                            partial_coin_info = SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]
+                            in_epoch = False
+
+                            if "start_time" in partial_coin_info and "end_time" in partial_coin_info:
+                                coin_start = partial_coin_info["start_time"]
+                                coin_end = partial_coin_info["end_time"]
+
+                                if epoch_start == coin_start:
+                                    SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["start_event"].append(f"{coin} start")
+
+                                if epoch_start == coin_end:
+                                    SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["start_event"].append(f"{coin} end")
+
+                                if epoch_end == coin_start:
+                                    SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["end_event"].append(f"{coin} start")
+
+                                if epoch_end == coin_end:
+                                    SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["end_event"].append(f"{coin} end")
+
+                                if epoch_start >= coin_start and epoch_end <= coin_end:
+                                    in_epoch = True
+
+                            elif "start_time" in partial_coin_info:
+                                coin_start = partial_coin_info["start_time"]
+
+                                if epoch_start == coin_start:
+                                    SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["start_event"].append(f"{coin} start")
+
+                                if epoch_end == coin_start:
+                                    SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["end_event"].append(f"{coin} start")
+
+                                if epoch_start >= coin_start:
+                                    in_epoch = True
+
+                            elif "end_time" in partial_coin_info:
+                                coin_end = partial_coin_info["end_time"]
+
+                                if epoch_start == coin_end:
+                                    SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["start_event"].append(f"{coin} end")
+
+                                if epoch_end == coin_end:
+                                    SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["end_event"].append(f"{coin} end")
+
+                                if epoch_end <= coin_end:
+                                    in_epoch = True
+
+                            if in_epoch:
+                                SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["coins"].append(coin)
+
+                        else:
+                            SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["coins"].append(coin)
+
+            num_coins = len(SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["coins"])
+            SEASONS_INFO[season]["servers"][server]["epochs"][epoch].update({"num_coins": num_coins})
+
+
+
+NOW = time.time()
+POSTSEASON = False
+
+for _season in SEASONS_INFO:
+    if SEASONS_INFO[_season]["start_time"] < NOW:
+        if "post_season_end_time" in SEASONS_INFO[_season]:
+            if SEASONS_INFO[_season]["post_season_end_time"] > NOW:
+                POSTSEASON = True
+                SEASON = _season
+        elif SEASONS_INFO[_season]["end_time"] > NOW:
+                SEASON = _season

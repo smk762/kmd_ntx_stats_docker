@@ -3,52 +3,48 @@ import time
 from decimal import *
 from datetime import datetime as dt
 import datetime
-from lib_rpc import *
 from lib_const import *
-from lib_helper import *
 from decorators import *
 from models import mined_row, daily_mined_count_row, season_mined_count_row
-from lib_table_select import select_from_table, get_mined_date_aggregates, get_max_value_mined_txid
+from lib_query import *
+import lib_helper
 
 
-def get_mined_row(block_height, chain="KMD"):
+def get_mined_row(block_height, coin="KMD"):
     row = mined_row()
-    blockinfo = RPC[chain].getblock(str(block_height), 2)
+    blockinfo = RPC[coin].getblock(str(block_height), 2)
 
     for tx in blockinfo['tx']:
         if len(tx['vin']) > 0:
             if 'coinbase' in tx['vin'][0]:
+                
                 if 'addresses' in tx['vout'][0]['scriptPubKey']:
                     address = tx['vout'][0]['scriptPubKey']['addresses'][0]
-                    name = get_name_from_address(address)
                 else:
                     address = "N/A"
-                    name = "non-standard"
 
                 row.block_height = block_height
                 row.block_time = blockinfo['time']
-                row.block_datetime = dt.utcfromtimestamp(blockinfo['time'])
                 row.address = address
-                row.name = name
                 row.txid = tx['txid']
                 row.diff = blockinfo['difficulty']
-                row.season = get_season_from_block(block_height)
                 row.value = Decimal(tx['vout'][0]['value'])
                 break
     return row
 
 
-def update_mined_row(block_height, chain="KMD"):
-    row = get_mined_row(block_height, chain)
+def update_mined_row(block_height, coin="KMD"):
+    row = get_mined_row(block_height, coin)
     if row.address not in ['', 'N/A']:
         row.update()
 
 
 @print_runtime
-def update_mined_table(season, chain="KMD"):
+def update_mined_table(season, coin="KMD", start_block=None):
 
-    tip = int(RPC[chain].getblockcount())
-    start_block = tip-10   
+    tip = int(RPC[coin].getblockcount())
+    if not start_block:
+        start_block = tip-10   
 
     all_blocks = [*range(start_block,tip,1)] 
     recorded_blocks = [block[0] for block in select_from_table('mined', 'block_height')]
@@ -67,16 +63,16 @@ def update_mined_table(season, chain="KMD"):
 
 
 @print_runtime
-def update_mined_count_daily_table(season):
+def update_mined_count_daily_table(season, rescan=None):
 
-    season_notaries = get_season_notaries(season)
+    season_notaries = SEASONS_INFO[season]["notaries"]
     season_start_dt = dt.fromtimestamp(SEASONS_INFO[season]["start_time"])
     start = season_start_dt.date()
     end = datetime.date.today()
     delta = datetime.timedelta(days=1)
     now = int(time.time())
 
-    if not RESCAN_SEASON:
+    if not rescan:
         start = end - datetime.timedelta(days=5)
 
     logger.info(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
@@ -112,11 +108,11 @@ def update_mined_count_daily_table(season):
 
 @print_runtime
 def update_mined_count_season_table(season):
-    season_notaries = get_season_notaries(season)
+    season_notaries = SEASONS_INFO[season]["notaries"]
 
     for item in get_season_mined_counts(season):
 
-        if item[1] in KNOWN_ADDRESSES or row.blocks_mined > 25:
+        if item[1] in KNOWN_ADDRESSES or int(item[2]) > 25:
             row = season_mined_count_row()
             row.season = season
             row.name = item[0]
@@ -133,7 +129,7 @@ def update_mined_count_season_table(season):
 
     for remaining_notary in season_notaries:
         row = daily_mined_count_row()
-        row.address = get_address_from_notary(season, remaining_notary, "KMD")
+        row.address = lib_helper.get_address_from_notary(season, remaining_notary, "KMD")
         row.blocks_mined = 0
         row.season = season
         row.sum_value_mined = 0

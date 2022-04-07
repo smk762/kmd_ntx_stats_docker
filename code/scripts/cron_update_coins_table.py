@@ -12,7 +12,9 @@ def update_coins_tables():
     coins_data = parse_electrum_explorer(coins_data)
     coins_data = get_dpow_tenure(coins_data)
 
-    remove_old_coins(coins_data)
+    # TODO: update timestamp column, use that to delete stale coins
+    # remove_old_coins(coins_data)
+
     update_coins(coins_data)
 
 if __name__ == "__main__":

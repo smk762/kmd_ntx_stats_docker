@@ -15,11 +15,6 @@ frontend_page_urls = [
           views_page.chains_last_ntx,
           name='chains_last_ntx'),
 
-    # TODO: Awaiting delegation to crons / db table
-    path('chain_sync/',
-          views_page.chain_sync,
-          name='chain_sync'),
-
     path('coin_profile/',
           views_page.coin_profile_view,
           name='coin_profile'),        
@@ -99,6 +94,18 @@ frontend_page_urls = [
     path('notary_epoch_scores/',
           views_page.notary_epoch_scores_view,
           name='notary_epoch_scores_view'),
+    
+    path('notary_epoch_chain_notarised/',
+          views_page.notary_epoch_chain_notarised_view,
+          name='notary_epoch_chain_notarised_view'),
+    
+    path('notary_chain_notarised/',
+          views_page.notary_chain_notarised_view,
+          name='notary_chain_notarised_view'),
+    
+    path('chain_notarised_24hrs/',
+          views_page.chain_notarised_24hrs_view,
+          name='chain_notarised_24hrs'),
     
 
     path('vote2021/',

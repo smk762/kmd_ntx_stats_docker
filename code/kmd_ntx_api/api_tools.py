@@ -4,16 +4,19 @@ import math
 from rest_framework.response import Response
 from django.http import JsonResponse, HttpResponse
 from rest_framework import permissions, viewsets, authentication
-from kmd_ntx_api.serializers import *
-from kmd_ntx_api.lib_info import get_all_coins
-from kmd_ntx_api.lib_base58 import *
-from kmd_ntx_api.lib_electrum import *
-from kmd_ntx_api.lib_helper import *
+
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.serializers as serializers
+import kmd_ntx_api.lib_electrum as electrum
+import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_atomicdex as dex
+import kmd_ntx_api.lib_base58 as b58
+import kmd_ntx_api.lib_info as info
 
 
 def addr_from_base58_tool(request):
     missing_params = []
-    for x in addrFromBase58Serializer.Meta.fields:
+    for x in serializers.addrFromBase58Serializer.Meta.fields:
         if x not in request.GET:
             example_params = "?pubkey=03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828&pubtype=60&wiftype=188&p2shtype=85"
             error = f"You need to specify params like '{example_params}'"
@@ -22,7 +25,7 @@ def addr_from_base58_tool(request):
                 "note":f"Parameter values for some coins available at /api/info/base_58/"
                 })
 
-    resp = calc_addr_tool(request.GET["pubkey"], request.GET["pubtype"],
+    resp = b58.calc_addr_tool(request.GET["pubkey"], request.GET["pubtype"],
                          request.GET["p2shtype"], request.GET["wiftype"])
     return JsonResponse(resp)
 
@@ -31,12 +34,13 @@ def address_from_pubkey_tool(request):
     resp = get_address_from_pubkey(request)
     return JsonResponse(resp)
 
+
 def address_conversion_tool(request):
     if "address" in request.GET:
         address = request.GET["address"]
     else:
         return JsonResponse({"error": "You need to specify an address, like ?address=17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem"})
-    resp = convert_addresses(address)
+    resp = b58.convert_addresses(address)
     return JsonResponse(resp)
 
 
@@ -52,7 +56,7 @@ def get_address_from_pubkey(request):
             return {
                 "coin": coin,
                 "pubkey": pubkey,
-                "address": calc_addr_from_pubkey(coin, pubkey)
+                "address": b58.calc_addr_from_pubkey(coin, pubkey)
             }
 
         else:
@@ -67,19 +71,10 @@ def get_address_from_pubkey(request):
 
 
 def get_notary_utxo_count(request):
-    chain = None
-    season = None
-    server = None
-    notary = None
-
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "notary" in request.GET:
-        notary = request.GET["notary"]
+    season = helper.get_or_none(request, "season")
+    server = helper.get_or_none(request, "server")
+    notary = helper.get_or_none(request, "notary")
+    chain = helper.get_or_none(request, "chain")
 
     filters = ["notary", "chain", "season", "server"]
     if not chain or not notary or not server or not season:
@@ -93,7 +88,7 @@ def get_notary_utxo_count(request):
     addr_info = requests.get(f"{endpoint}/{params}").json()["results"]
     if len(addr_info) == 1:
         pubkey = addr_info[0]["pubkey"]
-        resp = get_utxo_count(chain, pubkey, server)
+        resp = electrum.get_utxo_count(chain, pubkey, server)
         min_height = 999999999
         if "utxos" in resp:
             for item in resp["utxos"]:
@@ -196,27 +191,28 @@ def get_kmd_rewards(request):
 
 def decode_op_return_tool(request):
     if 'OP_RETURN' in request.GET:
-        coins_list = get_all_coins() 
-        decoded = decode_opret(request.GET['OP_RETURN'], coins_list)
+        coins_list = info.get_all_coins() 
+        decoded = b58.decode_opret(request.GET['OP_RETURN'], coins_list)
     else:
         decoded = {"error":"You need to include an OP_RETURN, e.g. '?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400'"}
     return JsonResponse(decoded)
 
 
 def validate_opret(OP_RETURN):
-    coins_list = get_all_coins() 
-    decoded = decode_opret(OP_RETURN, coins_list)
+    coins_list = info.get_all_coins() 
+    decoded = b58.decode_opret(OP_RETURN, coins_list)
     if "error" in decoded:
         return False
     return True
+
 
 def scripthash_from_address_tool(request):
     if "address" in request.GET:
         if request.GET["address"] != "":
             try:
                 address = request.GET["address"]
-                scripthash = get_scripthash_from_address(address)
-                p2pkh = address_to_p2pkh(address)
+                scripthash = electrum.get_scripthash_from_address(address)
+                p2pkh = b58.address_to_p2pkh(address)
                 return JsonResponse({
                     "address":f"{address}",
                     "p2pkh_scripthash":f"{scripthash}",
@@ -234,10 +230,10 @@ def scripthashes_from_pubkey_tool(request):
         if request.GET["pubkey"] != "":
             try:
                 pubkey = request.GET["pubkey"]
-                p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
-                p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
-                p2pkh = pubkey_to_p2pkh(pubkey)
-                p2pk = pubkey_to_p2pk(pubkey)
+                p2pkh_scripthash = electrum.get_p2pkh_scripthash_from_pubkey(pubkey)
+                p2pk_scripthash = electrum.get_p2pk_scripthash_from_pubkey(pubkey)
+                p2pkh = b58.pubkey_to_p2pkh(pubkey)
+                p2pk = b58.pubkey_to_p2pk(pubkey)
                 return JsonResponse({
                     "pubkey":f"{pubkey}",
                     "p2pkh_scripthash":f"{p2pkh_scripthash}",
@@ -254,9 +250,10 @@ def scripthashes_from_pubkey_tool(request):
 
 def send_raw_tx_tool(request):
     try:
-        resp = send_raw_tx(request)
+        resp = dex.send_raw_tx(request)
         return JsonResponse({resp})
     except Exception as e:
         return JsonResponse({
             "error":f"{e}"
         })
+

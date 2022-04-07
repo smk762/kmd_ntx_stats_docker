@@ -92,3 +92,7 @@ source_router.register(r'notarised_tenure',
 source_router.register(r'scoring_epochs',
                 viewsets_api.scoringEpochsViewSet,
                 basename='scoringEpochsViewSet')
+
+source_router.register(r'rewards_tx',
+                viewsets_api.rewardsTxViewSet,
+                basename='rewardsTxViewSet')

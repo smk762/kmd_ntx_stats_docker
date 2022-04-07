@@ -52,15 +52,15 @@ frontend_tool_urls = [
 api_tool_urls = [
 
     path('api/tools/addr_from_base58/',
-          views_tool.addr_from_base58_tool,
+          api_tools.addr_from_base58_tool,
           name='addr_from_base58_tool'),
 
     path('api/tools/address_conversion/',
-          views_tool.address_conversion_tool,
+          api_tools.address_conversion_tool,
           name='address_conversion_tool'),
 
     path('api/tools/address_from_pubkey/',
-          views_tool.address_from_pubkey_tool,
+          api_tools.address_from_pubkey_tool,
           name='address_from_pubkey_tool'),
 
     path('api/tools/decode_opreturn/',

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from django_filters.rest_framework import FilterSet, NumberFilter, CharFilter
+from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.models import *
 
 
@@ -66,3 +67,19 @@ class swapsFailedFilter(FilterSet):
                  "taker_version", "taker_pubkey", "maker_coin", 
                  "maker_amount", "maker_error_type", "maker_error_msg",
                  "maker_gui", "maker_version", "maker_pubkey"]
+
+class rewardsFilter(FilterSet):
+    min_block = NumberFilter(field_name="block_height", lookup_expr='gte')
+    max_block = NumberFilter(field_name="block_height", lookup_expr='lte')
+    min_blocktime = NumberFilter(field_name="block_time", lookup_expr='gte')
+    max_blocktime = NumberFilter(field_name="block_time", lookup_expr='lte')
+    min_reward = NumberFilter(field_name="rewards_value", lookup_expr='gte')
+    max_reward = NumberFilter(field_name="rewards_value", lookup_expr='lte')
+    vin_address = CharFilter(field_name="input_addresses", lookup_expr='contains')
+    vout_address = CharFilter(field_name="output_addresses", lookup_expr='contains')
+
+    class Meta:
+        model = rewards_tx
+        fields = [
+            "txid", "block_height", "block_time", "rewards_value"
+        ]

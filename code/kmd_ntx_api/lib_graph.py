@@ -1,14 +1,14 @@
-from kmd_ntx_api.lib_info import *
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_query as query
 
 
 def get_balances_graph_data(request):
 
-    season = get_or_none(request, "season")
-    server = get_or_none(request, "server")
-    chain = get_or_none(request, "chain")
-    notary = get_or_none(request, "notary")
-    if server in ["KMD", "LTC", "BTC"]:
-        server = "Main"
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    chain = helper.get_or_none(request, "chain")
+    notary = helper.get_or_none(request, "notary")
 
     if not season or (not notary and not chain):
         return {
@@ -16,36 +16,35 @@ def get_balances_graph_data(request):
                       filter parameter: ['season'] and either of ['notary', 'chain']"
         }
 
-    data = get_balances_data(season, server, chain, notary).values()
-    notary_list = []
-    chain_list = []
-    balances_dict = {}
-    for item in data:
+    data = query.get_balances_data(season, server, chain, notary).values()
+    if server in ["KMD", "LTC", "BTC"]:
+        server = "Main"
 
-        if item['notary'] not in notary_list:
-            notary_list.append(item['notary'])
-        if item['chain'] not in chain_list:
-            chain_list.append(item['chain'])
-        if item['notary'] not in balances_dict:
-            balances_dict.update({item['notary']: {}})
-        if item['chain'] not in balances_dict[item['notary']]:
-            balances_dict[item['notary']].update(
-                {item['chain']: item['balance']})
-        else:
-            bal = balances_dict[item['notary']
-                                ][item['chain']] + item['balance']
-            balances_dict[item['notary']].update({item['chain']: bal})
+    chartLabel = ""
+    bg_color = []
+    chartdata = []
+    chain_list = []
+    notary_list = []
+    border_color = []
+    balances_dict = {}
+
+    for item in data:
+        helper.append_unique(notary_list, item['notary'])
+        helper.append_unique(chain_list, item['chain'])
+        helper.update_unique(balances_dict, item['chain'], {})
+        helper.update_unique(balances_dict, item['notary'], {})
+        helper.update_unique(balances_dict[item['notary']], item['chain'], 0)
+
+        bal = balances_dict[item['notary']][item['chain']] + item['balance']
+        balances_dict[item['notary']].update({item['chain']: bal})
 
     chain_list.sort()
     notary_list.sort()
-    notary_list = region_sort(notary_list)
+    notary_list = helper.region_sort(notary_list)
 
-    bg_color = []
-    border_color = []
-
-    coins_dict = get_dpow_server_coins_dict(season)
-    main_chains = get_mainnet_chains(coins_dict)
-    third_chains = get_third_party_chains(coins_dict)
+    coins_dict = helper.get_dpow_server_coins_dict(season)
+    main_chains = helper.get_mainnet_chains(coins_dict)
+    third_chains = helper.get_third_party_chains(coins_dict)
 
     if len(chain_list) == 1:
         chain = chain_list[0]
@@ -53,38 +52,30 @@ def get_balances_graph_data(request):
         chartLabel = chain + " Notary Balances"
         for notary in notary_list:
             if notary.endswith("_AR"):
-                bg_color.append(AR_REGION)
+                bg_color.append(COLORS["AR_REGION"])
             elif notary.endswith("_EU"):
-                bg_color.append(EU_REGION)
+                bg_color.append(COLORS["EU_REGION"])
             elif notary.endswith("_NA"):
-                bg_color.append(NA_REGION)
+                bg_color.append(COLORS["NA_REGION"])
             elif notary.endswith("_SH"):
-                bg_color.append(SH_REGION)
+                bg_color.append(COLORS["SH_REGION"])
             else:
-                bg_color.append(DEV_REGION)
-            border_color.append(BLACK)
+                bg_color.append(COLORS["DEV_REGION"])
+            border_color.append(COLORS["BLACK"])
+
     elif len(notary_list) == 1:
         notary = notary_list[0]
         labels = chain_list
         chartLabel = notary + " Notary Balances"
         for chain in chain_list:
             if chain in third_chains:
-                bg_color.append(THIRD_PARTY_COLOR)
+                bg_color.append(COLORS["THIRD_PARTY_COLOR"])
             elif chain in main_chains:
-                bg_color.append(MAIN_COLOR)
+                bg_color.append(COLORS["MAIN_COLOR"])
             else:
-                bg_color.append(OTHER_COIN_COLOR)
-            border_color.append(BLACK)
-    else:
-        return {
-            "labels": [],
-            "chartLabel": "",
-            "chartdata": [],
-            "bg_color": [],
-            "border_color": [],
-        }
+                bg_color.append(COLORS["OTHER_COIN_COLOR"])
+            border_color.append(COLORS["BLACK"])
 
-    chartdata = []
     for notary in notary_list:
         for chain in chain_list:
             chartdata.append(balances_dict[notary][chain])
@@ -99,21 +90,21 @@ def get_balances_graph_data(request):
 
 
 def get_daily_ntx_graph_data(request):
-    ntx_dict = {}
+    labels = []
     bg_color = []
-    border_color = []
-    third_chains = []
+    chartdata = []
+    chain_list = []
     main_chains = []
     notary_list = []
-    chain_list = []
-    labels = []
-    chartdata = []
+    border_color = []
+    third_chains = []
+    ntx_dict = {}
     filter_kwargs = {}
 
-    notarised_date = get_or_none(request, "notarised_date")
-    season = get_or_none(request, "season")
-    chain = get_or_none(request, "chain")
-    notary = get_or_none(request, "notary")
+    notarised_date = helper.get_or_none(request, "notarised_date")
+    season = helper.get_or_none(request, "season", SEASON)
+    chain = helper.get_or_none(request, "chain")
+    notary = helper.get_or_none(request, "notary")
 
     if not notarised_date or not season or (not chain and not notary):
         return {
@@ -123,27 +114,23 @@ def get_daily_ntx_graph_data(request):
                       ['notary', 'chain']"
         }
 
-    coins_dict = get_dpow_server_coins_dict(season)
-    main_chains = get_mainnet_chains(coins_dict)
-    third_chains = get_third_party_chains(coins_dict)
+    coins_dict = helper.get_dpow_server_coins_dict(season)
+    main_chains = helper.get_mainnet_chains(coins_dict)
+    third_chains = helper.get_third_party_chains(coins_dict)
 
-    data = get_notarised_count_daily_data(notarised_date, notary)
+    data = query.get_notarised_count_daily_data(notarised_date, notary)
     data = data.values('notary', 'notarised_date', 'chain_ntx_counts')
 
     for item in data:
-        if item['notary'] not in notary_list:
-            notary_list.append(item['notary'])
+        helper.append_unique(notary_list, item['notary'])
         chain_list += list(item['chain_ntx_counts'].keys())
         ntx_dict.update({item['notary']: item['chain_ntx_counts']})
 
-    if 'chain' in request.GET:
-        chain_list = [request.GET['chain']]
-    else:
-        chain_list = list(set(chain_list))
-        chain_list.sort()
-
+    chain_list = helper.get_or_none(request, "chain", list(set(chain_list)))
+    
+    chain_list.sort()
     notary_list.sort()
-    notary_list = region_sort(notary_list)
+    notary_list = helper.region_sort(notary_list)
 
     if len(chain_list) == 1:
         chain = chain_list[0]
@@ -151,16 +138,16 @@ def get_daily_ntx_graph_data(request):
         chartLabel = chain + " Notarisations"
         for notary in notary_list:
             if notary.endswith("_AR"):
-                bg_color.append(RED)
+                bg_color.append(COLORS["AR_REGION"])
             elif notary.endswith("_EU"):
-                bg_color.append(MAIN_COLOR)
+                bg_color.append(COLORS["EU_REGION"])
             elif notary.endswith("_NA"):
-                bg_color.append(THIRD_PARTY_COLOR)
+                bg_color.append(COLORS["NA_REGION"])
             elif notary.endswith("_SH"):
-                bg_color.append(LT_BLUE)
+                bg_color.append(COLORS["SH_REGION"])
             else:
-                bg_color.append(OTHER_COIN_COLOR)
-            border_color.append(BLACK)
+                bg_color.append(COLORS["DEV_REGION"])
+            border_color.append(COLORS["BLACK"])
 
     elif len(notary_list) == 1:
         notary = notary_list[0]
@@ -168,14 +155,13 @@ def get_daily_ntx_graph_data(request):
         chartLabel = notary + " Notarisations"
         for chain in chain_list:
             if chain in third_chains:
-                bg_color.append(LT_BLUE)
+                bg_color.append(COLORS["THIRD_PARTY_COLOR"])
             elif chain in main_chains:
-                bg_color.append(MAIN_COLOR)
+                bg_color.append(COLORS["MAIN_COLOR"])
             else:
-                bg_color.append(THIRD_PARTY_COLOR)
-            border_color.append(BLACK)
+                bg_color.append(COLORS["THIRD_PARTY_COLOR"])
+            border_color.append(COLORS["LT_BLUE"])
 
-    chartdata = []
     for notary in notary_list:
         for chain in chain_list:
             if chain in ntx_dict[notary]:
@@ -191,87 +177,3 @@ def get_daily_ntx_graph_data(request):
         "border_color": border_color,
     }
 
-
-def is_3p_chain(third_chains, server, chain):
-    if (server == 'Third_Party'
-        and chain in third_chains
-            or chain == "KMD_3P"):
-        return True
-    return False
-
-
-def is_main_chain(main_chains, server, chain):
-    if chain in main_chains and server == 'Main':
-        return True
-    return False
-
-
-# TODO: Deprecate later (used in notary_profile_view)
-def get_notary_balances_graph(notary, season=None):
-    if not season:
-        season = SEASON
-
-    notary_balances = get_notary_balances(notary, season)
-    main_chains, third_chains = get_dpow_server_coins_dict_lists(season)
-
-    for chain in RETIRED_CHAINS:
-        if chain in third_chains:
-            third_chains.remove(chain)
-
-    main_chains += ["KMD", "BTC", "LTC"]
-    main_chains.sort()
-    balances_graph_dict = {}
-    notary_balances_list = []
-    for item in notary_balances:
-
-        chain = item['chain']
-        if item['server'] == 'Third_Party':
-            if item['chain'] == "KMD":
-                chain = "KMD_3P"
-        if item['server'] in ["LTC", "BTC", "KMD"]:
-            item.update({"server": "Main"})
-
-        if is_main_chain(main_chains, item["server"], chain):
-            notary_balances_list.append(item)
-            balances_graph_dict.update({chain: float(item['balance'])})
-
-        elif is_3p_chain(third_chains, item["server"], chain):
-            balances_graph_dict.update({chain: float(item['balance'])})
-            notary_balances_list.append(item)
-
-    labels = list(main_chains+third_chains)
-    bg_color, border_color = get_bar_colors(main_chains, third_chains, labels)
-
-    chartdata = []
-    for label in labels:
-        if label in balances_graph_dict:
-            chartdata.append(balances_graph_dict[label])
-
-    notary_balances_graph = {
-        "labels": labels,
-        "chartLabel": f"BALANCES",
-        "chartdata": chartdata,
-        "bg_color": bg_color,
-        "border_color": border_color,
-    }
-
-    return notary_balances_list, notary_balances_graph
-
-
-def get_bar_colors(main_chains, third_chains, labels):
-    bg_color = []
-    border_color = []
-
-    for label in labels:
-        border_color.append(BLACK)
-
-        if label in ['KMD', 'KMD_3P', 'BTC', 'LTC']:
-            bg_color.append(OTHER_COIN_COLOR)
-
-        elif label in third_chains:
-            bg_color.append(THIRD_PARTY_COLOR)
-
-        elif label in main_chains:
-            bg_color.append(MAIN_COLOR)
-
-    return bg_color, border_color

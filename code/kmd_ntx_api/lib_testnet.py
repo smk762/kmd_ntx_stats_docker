@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-
-from kmd_ntx_api.lib_info import *
-
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_query as query
 
 def get_api_testnet(request):
     season = "Season_5_Testnet"
 
     # Prepare ntx data
-    ntx_data = get_notarised_data(season).order_by(
+    ntx_data = query.get_notarised_data(season).order_by(
         'chain', '-block_height').values()
 
     # Prepare 24hr ntx data
-    ntx_data_24hr = get_notarised_data_24hr(
+    ntx_data_24hr = info.get_notarised_data_24hr(
         season).order_by('chain', '-block_height').values()
 
     ntx_dict = {}
@@ -44,8 +44,8 @@ def get_api_testnet(request):
             ntx_dict_24hr[chain].append(item)
 
     testnet_chains = list(ntx_dict.keys())
-    testnet_stats_dict = get_testnet_stats_dict(season, testnet_chains)
-    last_ntx = get_last_nn_chain_ntx(season)
+    testnet_stats_dict = info.get_testnet_stats_dict(season, testnet_chains)
+    last_ntx = info.get_last_nn_chain_ntx(season)
 
     for chain in testnet_chains:
 

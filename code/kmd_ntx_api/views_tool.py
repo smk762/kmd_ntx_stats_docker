@@ -2,29 +2,28 @@
 import requests
 from django.shortcuts import render
 
-from kmd_ntx_api.forms import *
-from kmd_ntx_api.lib_info import *
-from kmd_ntx_api.api_tools import *
-from kmd_ntx_api.lib_base58 import *
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_base58 as b58
+import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_table as table
+import kmd_ntx_api.lib_atomicdex as dex
+import kmd_ntx_api.api_tools as api_tools
 
 
 def convert_addresses_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
+    context = helper.get_base_context(request)
+    context.update({
         "page_title":"Address Conversion",
-        "explorers":get_explorers(request),
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
+        "explorers": info.get_explorers(request)
+    })
     if "address" in request.GET:
         address = request.GET["address"]
         if address == "":
             messages.error(request, f"No address input!")
         else:
             address_rows = []
-            addresses = convert_addresses(address)["results"]
+            addresses = b58.convert_addresses(address)["results"]
             for item in addresses:
                 for chain in item:
                     address_rows.append({
@@ -39,25 +38,17 @@ def convert_addresses_view(request):
 
 
 def create_raw_transaction_view(request):
-    season = get_page_season(request)
-    chain = "KMD"
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
-    if "coin" in request.GET:
-        chain = request.GET["coin"]
-    context = {
+    chain = helper.get_or_none(request, "chain", "KMD")
+    context = helper.get_base_context(request)
+    context.update({
         "chain":chain,
-        "season":season,
         "now":int(time.time()),
         "locktime":int(time.time())-30*60,
         "20_min_ago":int(time.time()-30*60),
         "reqget":request.GET,
         "page_title":"Create Raw Transaction from Address",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "mm2_coins":list(get_dexstats_explorers().keys()),
-        "eco_data_link":get_eco_data_link()
-    }
+        "mm2_coins":info.get_mm2_coins_list()
+    })
 
     if "address" in request.GET:
         address = request.GET["address"]
@@ -85,7 +76,7 @@ def create_raw_transaction_view(request):
         locktime = request.GET["locktime"]
         expiry_height = request.GET["expiry_height"]
 
-        test_tx = raw_tx()
+        test_tx = b58.raw_tx()
         tx_inputs = []
         for vin in inputs.split(","):
             elements = vin.split("|")
@@ -117,15 +108,6 @@ def create_raw_transaction_view(request):
 
 
 def daemon_cli_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "season_clean":season.replace("_"," "),
-        "page_title":"Daemon CLIs",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
 
     url = f"{THIS_SERVER}/api/info/daemon_cli"
     daemon_cli = requests.get(url).json()["results"]
@@ -134,22 +116,20 @@ def daemon_cli_view(request):
     for chain in daemon_cli:
         daemon_cli_rows.append({"chain":chain, "daemon_cli":daemon_cli[chain]})
 
+    context = helper.get_base_context(request)
     context.update({
         "daemon_cli_rows": daemon_cli_rows,
+        "page_title":"Daemon CLIs"
     })
 
     return render(request, 'views/tools/tool_daemon_cli.html', context)
 
 
 def decode_opret_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"Decode OP_RETURN Tool",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
+    context = helper.get_base_context(request)
+    context.update({
+        "page_title":"Decode OP_RETURN Tool"
+    })
 
     if "OP_RETURN" in request.GET:
         OP_RETURN = request.GET["OP_RETURN"].replace("OP_RETURN ", "")
@@ -157,7 +137,7 @@ def decode_opret_view(request):
         if OP_RETURN == "":
             messages.error(request, f"No OP_RETURN input!")
 
-        elif validate_opret(OP_RETURN):
+        elif api_tools.validate_opret(OP_RETURN):
 
             url = f"{THIS_SERVER}/api/tools/decode_opreturn/?OP_RETURN={OP_RETURN}"
             decoded = requests.get(url).json()
@@ -179,14 +159,10 @@ def decode_opret_view(request):
 
 
 def kmd_rewards_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"KMD Rewards Tool",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
+    context = helper.get_base_context(request)
+    context.update({
+        "page_title":"KMD Rewards Tool"
+    })
     if "address" in request.GET:
         address = request.GET["address"]
         url = f"{THIS_SERVER}/api/tools/kmd_rewards"
@@ -214,15 +190,6 @@ def kmd_rewards_view(request):
 
 
 def launch_params_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "season_clean":season.replace("_"," "),
-        "page_title":"Launch Parameters",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
 
     url = f"{THIS_SERVER}/api/info/launch_params"
     launch_params = requests.get(url).json()["results"]
@@ -231,28 +198,26 @@ def launch_params_view(request):
     for chain in launch_params:
         launch_param_rows.append({"chain":chain, "launch_params":launch_params[chain]})
 
+    context = helper.get_base_context(request)
     context.update({
         "launch_param_rows": launch_param_rows,
+        "page_title":"Launch Parameters"
     })
 
     return render(request, 'views/tools/tool_launch_params.html', context)
 
 
 def pubkey_addresses_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"Pubkey Addresses",
-        "explorers":get_explorers(request),
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
+    context = helper.get_base_context(request)
+    context.update({
+        "page_title": "Pubkey Addresses",
+        "explorers": info.get_explorers(request)
+    })
     if "pubkey" in request.GET:
         pubkey = request.GET["pubkey"]
         if pubkey == "":
             messages.error(request, f"No pubkey input!")
-        elif validate_pubkey(pubkey):
+        elif b58.validate_pubkey(pubkey):
             base_58_coins = requests.get(f"{THIS_SERVER}/api/info/base_58/").json()["results"]
             base_58_coins_list = list(base_58_coins.keys())
             address_rows = []
@@ -261,7 +226,7 @@ def pubkey_addresses_view(request):
                 pubtype = base_58_coins[coin]["pubtype"]
                 p2shtype = base_58_coins[coin]["p2shtype"]
                 wiftype = base_58_coins[coin]["wiftype"]
-                address_row = calc_addr_tool(pubkey, pubtype, p2shtype, wiftype)
+                address_row = b58.calc_addr_tool(pubkey, pubtype, p2shtype, wiftype)
                 address_row.update({"coin":coin})
                 address_rows.append(address_row)
             context.update({
@@ -275,14 +240,10 @@ def pubkey_addresses_view(request):
 
 
 def scripthashes_from_pubkey_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"Get Scripthashes from Pubkey",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
+    context = helper.get_base_context(request)
+    context.update({
+        "page_title":"Get Scripthashes from Pubkey"
+    })
     if "pubkey" in request.GET:
         pubkey = request.GET["pubkey"]
         url = f"{THIS_SERVER}/api/tools/scripthashes_from_pubkey/?pubkey={pubkey}"
@@ -305,14 +266,10 @@ def scripthashes_from_pubkey_view(request):
 
 
 def scripthash_from_address_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
-        "page_title":"Get Scripthash from Address",
-        "scheme_host":get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "eco_data_link":get_eco_data_link()
-    }
+    context = helper.get_base_context(request)
+    context.update({
+        "page_title":"Get Scripthash from Address"
+    })
     if "address" in request.GET:
         address = request.GET["address"]
         url = f"{THIS_SERVER}/api/tools/scripthash_from_address/?address={address}"
@@ -335,17 +292,14 @@ def scripthash_from_address_view(request):
 
 
 def send_raw_tx_view(request):
-    season = get_page_season(request)
-    context = {
-        "season":season,
+    context = helper.get_base_context(request)
+    context.update({
         "page_title":"Get Scripthashes from Pubkey",
-        "scheme_host": get_current_host(request),
-        "sidebar_links":get_sidebar_links(season),
-        "mm2_coins":list(get_dexstats_explorers().keys()),
-        "eco_data_link":get_eco_data_link()
-    }
+        "mm2_coins":info.get_mm2_coins_list()
+    })
+
     if "coin" in request.GET or "tx_hex" in request.GET:
-        mm2_resp = send_raw_tx(request)
+        mm2_resp = dex.send_raw_tx(request)
 
         if "error" in mm2_resp:
             messages.error(request, f"{mm2_resp['error']}")

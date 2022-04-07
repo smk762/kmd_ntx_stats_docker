@@ -11,7 +11,7 @@
 			<div class="card text-center" style="width: 18rem;">
 			  <div class="card-body">
 			    <h1 class="card-title">{{ coins_list|length }}</h1>
-			    <a href="//{{ request.get_host }}/coin_profile/?season=Season_4">
+			    <a href="//{{ request.get_host }}/coin_profile/?season={{ season }}">
 			    	<p class="card-text">Coins secured by dPoW</p>
 				</a>
 				<!--<span style="font-style: italic; font-size: 0.8em">{{ server_chains.main|length }} * Antara, {{ server_chains.third_party|length }} * Third Party</span>-->
@@ -21,7 +21,7 @@
 			<div class="card text-center" style="width: 18rem;">
 			  <div class="card-body">
 			    <h1 class="card-title">{{ ntx_24hr }}</h1>
-			    <a href="//{{ request.get_host }}/chains_last_ntx/?season=Season_4">
+			    <a href="//{{ request.get_host }}/chains_last_ntx/?season={{ season }}">
 			    	<p class="card-text">Notarised last 24hrs</p>
 				</a>
 			  </div>
@@ -31,7 +31,7 @@
 			<div class="card text-center" style="width: 18rem;">
 			  <div class="card-body">
 			    <h1 class="card-title">{{ notaries_list|length }}</h1>
-			    <a href="//{{ request.get_host }}/notary_profile/?season=Season_4">
+			    <a href="//{{ request.get_host }}/notary_profile/?season={{ season }}">
 			    	<p class="card-text">Notary Nodes</p>
 				</a>
 			  </div>
@@ -46,7 +46,7 @@
 			<div class="card text-center" style="width: 18rem;">
 			  <div class="card-body">
 			    <h1 class="card-title">{{ mined_24hr|floatformat:-2 }} KMD</h1>
-				<a href="//{{ request.get_host }}/mining_24hrs/?season=Season_4">
+				<a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
 			    	<p class="card-text">KMD Mined last 24hrs</p>
 			    </a>
 			  </div>
@@ -56,7 +56,7 @@
 			  <div class="card-body">
 			    <h1 class="card-title">{{ biggest_block.value|floatformat:-2 }} KMD</h1>
 			    <p class="card-text">
-				    <a href="//{{ request.get_host }}/mining_overview/?season=Season_4">
+				    <a href="//{{ request.get_host }}/mining_overview/?season={{ season }}">
 				    	Season Largest KMD Block Mined
 					</a>
 			    </p>
@@ -86,7 +86,7 @@
 		    		<a href="https://www.dexstats.info" class="btn btn-dark4 kmd_teal_bg m-2">DEXSTATS</a>
 			    	<a href="https://komodod.com/" class="btn btn-dark4 kmd_teal_bg m-2">KOMODOD EXPLORER</a>
 			    	<a href="https://notarystats.info/" class="btn btn-dark4 kmd_teal_bg m-2">NOTARYSTATS</a>
-			    	<a href="https://komodostats.com/" class="btn btn-dark4 kmd_teal_bg m-2">KOMODOSTATS</a>
+			    	<a href="https://komodostats.com/nn" class="btn btn-dark4 kmd_teal_bg m-2">KOMODOSTATS</a>
 			    	<a href="https://dpow.io" class="btn btn-dark4 kmd_teal_bg m-2">DPOW.IO NN STATS</a>
         			<a class="btn btn-dark4 kmd_teal_bg m-2" href="https://ikomodo.com/"> iKomodo</a>
 		    	</p>			    

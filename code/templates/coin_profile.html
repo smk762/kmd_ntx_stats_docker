@@ -9,7 +9,7 @@
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 							    Notarisations in the Last 24hrs
-								<a href="//{{ request.get_host }}/api/table/notarised_24hrs/?season={{ season }}&chain={{ chain }}">
+								<a href="//{{ request.get_host }}/chain_notarised_24hrs/?season={{ season }}&chain={{ chain }}">
    					    		{% include "components/badges/stats_badge.html" with stat_val=chain_ntx_summary.num_chain_ntx_24hr stat_label="" %}
    					    		</a>
 							</div>

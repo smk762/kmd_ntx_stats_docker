@@ -4,27 +4,33 @@ import time
 import logging
 import datetime
 import random
-from datetime import datetime as dt
-from .models import *
-from .lib_helper import *
-
 from dotenv import load_dotenv
+from datetime import datetime as dt
 from django.db.models import Count, Min, Max, Sum
-from kmd_ntx_api.serializers import *
+
+from kmd_ntx_api.lib_const import *
+from kmd_ntx_api.models import *
+import kmd_ntx_api.lib_helper as helper
+
 
 load_dotenv()
 
 
 def get_timespan_season(start, end):
-    season = get_season()
+    season = SEASON
     if not start:
-        start = time.time() - 60*60*24
+        start = time.time() - SINCE_INTERVALS['day']
     if not end:
         end = time.time()
     else:
-        season = get_season((end+start)/2)
+        season = helper.get_season((end+start)/2)
     return int(float(start)), int(float(end)), season
 
+
+def get_mm2_version_stats_data(start, end, notary):
+    return mm2_version_stats.objects.filter(
+        timestamp__range=(start, end), name=notary
+    )
 
 def get_nn_seed_version_scores(start, end, notary=None):
     '''
@@ -52,13 +58,13 @@ def get_nn_seed_version_scores(start, end, notary=None):
         data = data.filter(name=notary)
 
     data = data.order_by("-timestamp")
-    date_hour_notary_scores = {}
+    helper.date_hour_notary_scores = {}
 
     for i in data.values():
-        i["date"], i["hour"] = date_hour(i["timestamp"]).split(" ")
+        i["date"], i["hour"] = helper.date_hour(i["timestamp"]).split(" ")
 
-        if i["date"] not in date_hour_notary_scores:
-            date_hour_notary_scores.update({
+        if i["date"] not in helper.date_hour_notary_scores:
+            helper.date_hour_notary_scores.update({
                 i["date"]: {
                         i["hour"]: {
                             i["name"]: {
@@ -69,8 +75,8 @@ def get_nn_seed_version_scores(start, end, notary=None):
                     }
                 })
 
-        elif i["hour"] not in date_hour_notary_scores[i["date"]]:
-            date_hour_notary_scores[i["date"]].update({
+        elif i["hour"] not in helper.date_hour_notary_scores[i["date"]]:
+            helper.date_hour_notary_scores[i["date"]].update({
                 i["hour"]: {
                     i["name"]: {
                         "versions": [],
@@ -79,18 +85,17 @@ def get_nn_seed_version_scores(start, end, notary=None):
                 }
             })
 
-        elif i["name"] not in date_hour_notary_scores[i["date"]][i["hour"]]:
-            date_hour_notary_scores[i["date"]][i["hour"]].update({
+        elif i["name"] not in helper.date_hour_notary_scores[i["date"]][i["hour"]]:
+            helper.date_hour_notary_scores[i["date"]][i["hour"]].update({
                 i["name"]: {
                     "versions": [],
                     "score": i["score"]
                 }
             })
-        if i["version"] not in date_hour_notary_scores[i["date"]][i["hour"]][i["name"]]["versions"]:
-            date_hour_notary_scores[i["date"]][i["hour"]][i["name"]]["versions"].append(i["version"])
+        if i["version"] not in helper.date_hour_notary_scores[i["date"]][i["hour"]][i["name"]]["versions"]:
+            helper.date_hour_notary_scores[i["date"]][i["hour"]][i["name"]]["versions"].append(i["version"])
 
-    return date_hour_notary_scores
-
+    return helper.date_hour_notary_scores
 
 
 def get_nn_seed_version_scores_daily(start, end, notary=None):
@@ -109,8 +114,8 @@ def get_nn_seed_version_scores_daily(start, end, notary=None):
     '''
 
     start, end, season = get_timespan_season(start, end)
-    start = floor_to_utc_day(start)
-    end = floor_to_utc_day(end)
+    start = helper.floor_to_utc_day(start)
+    end = helper.floor_to_utc_day(end)
     data = mm2_version_stats.objects.filter(
         timestamp__range=(start, end)
     )
@@ -122,7 +127,7 @@ def get_nn_seed_version_scores_daily(start, end, notary=None):
     date_notary_scores = {}
 
     for i in data.values():
-        i["date"], i["hour"] = date_hour(i["timestamp"]).split(" ")
+        i["date"], i["hour"] = helper.date_hour(i["timestamp"]).split(" ")
         score = round(i["score"],2)
         if i["date"] not in date_notary_scores:
             date_notary_scores.update({
@@ -150,6 +155,7 @@ def get_nn_seed_version_scores_daily(start, end, notary=None):
 
     return date_notary_scores
 
+
 def get_nn_seed_version_scores_month(start, end, notary=None):
     '''
     {
@@ -166,8 +172,8 @@ def get_nn_seed_version_scores_month(start, end, notary=None):
     '''
 
     start, end, season = get_timespan_season(start, end)
-    start = floor_to_utc_day(start)
-    end = floor_to_utc_day(end)
+    start = helper.floor_to_utc_day(start)
+    end = helper.floor_to_utc_day(end)
     data = mm2_version_stats.objects.filter(
         timestamp__range=(start, end)
     )
@@ -179,7 +185,7 @@ def get_nn_seed_version_scores_month(start, end, notary=None):
     date_notary_scores = {}
 
     for i in data.values():
-        i["date"], i["hour"] = date_hour(i["timestamp"]).split(" ")
+        i["date"], i["hour"] = helper.date_hour(i["timestamp"]).split(" ")
         score = i["score"]
         month_day_year = i["date"].split("/")
         month_year = month_day_year[0]+"/"+month_day_year[2]
@@ -216,16 +222,15 @@ def get_nn_seed_version_scores_hourly_table(request, start=None, end=None):
     # Month view: click on day, goes to day view
     # TODO: Incorporate these scores into overall NN score, and profile stats.
     if not start:
-        start = get_or_none(request, "start")
+        start = helper.get_or_none(request, "start")
     if not end:
-        end = get_or_none(request, "end")
+        end = helper.get_or_none(request, "end")
 
     if not start:
         start = time.time()
-        end = time.time() + 24 * 60 * 60
-    season = get_season()
-    notary_list = get_notary_list(season)
-    date_hour_notary_scores = get_nn_seed_version_scores(start, end)
+        end = time.time() + SINCE_INTERVALS["day"]
+    notary_list = helper.get_notary_list(SEASON)
+    helper.date_hour_notary_scores = get_nn_seed_version_scores(start, end)
     
     table_headers = ["Total"]
     table_data = []
@@ -234,12 +239,12 @@ def get_nn_seed_version_scores_hourly_table(request, start=None, end=None):
     for notary in notary_list:
         notary_scores.update({notary:[]})
 
-    for date in date_hour_notary_scores:
-        for hour in date_hour_notary_scores[date]:
+    for date in helper.date_hour_notary_scores:
+        for hour in helper.date_hour_notary_scores[date]:
             table_headers.append(f"{hour.split(':')[0]}")
             for notary in notary_list:
-                if notary in date_hour_notary_scores[date][hour]:
-                    score = round(date_hour_notary_scores[date][hour][notary]["score"],2)
+                if notary in helper.date_hour_notary_scores[date][hour]:
+                    score = round(helper.date_hour_notary_scores[date][hour][notary]["score"],2)
                 else:
                     score = 0
                 notary_scores[notary].append(score)
@@ -257,21 +262,21 @@ def get_nn_seed_version_scores_hourly_table(request, start=None, end=None):
         "scores": notary_scores
         }
 
+
 def get_nn_seed_version_scores_daily_table(request, start=None, end=None):
     # TODO: Views for day (by hour), month (by day), season (by month)
     # Season view: click on month, goes to month view
     # Month view: click on day, goes to day view
     # TODO: Incorporate these scores into overall NN score, and profile stats.
     if not start:
-        start = get_or_none(request, "start")
+        start = helper.get_or_none(request, "start")
     if not end:
-        end = get_or_none(request, "end")
+        end = helper.get_or_none(request, "end")
 
     if not start:
-        end = time.time() + 24 * 60 * 60
-        start = end - 14 * (24 * 60 * 60)
-    season = get_season()
-    notary_list = get_notary_list(season)
+        end = time.time() + SINCE_INTERVALS["day"]
+        start = end - 14 * (SINCE_INTERVALS["day"])
+    notary_list = helper.get_notary_list(SEASON)
     date_notary_scores = get_nn_seed_version_scores_daily(start, end)
     
     table_headers = ["Total"]
@@ -303,13 +308,13 @@ def get_nn_seed_version_scores_daily_table(request, start=None, end=None):
         "scores": notary_scores
         }
 
+
 def get_nn_seed_version_scores_month_table(request, start=None, end=None):
     # TODO: Views for day (by hour), month (by day), season (by month)
     # Season view: click on month, goes to month view
     # Month view: click on day, goes to day view
     # TODO: Incorporate these scores into overall NN score, and profile stats.
-    season = get_season()
-    notary_list = get_notary_list(season)
+    notary_list = helper.get_notary_list(SEASON)
     month_notary_scores = get_nn_seed_version_scores_month(start, end)
     
     table_headers = ["Total"]
@@ -342,7 +347,6 @@ def get_nn_seed_version_scores_month_table(request, start=None, end=None):
         }
 
 
-
 def get_nn_mm2_stats_by_hour_chart_data(start, end, notary=None):
     start, end, season = get_timespan_season(start, end)
     stats = get_nn_mm2_stats_by_hour_data(start, end, notary)
@@ -354,7 +358,7 @@ def get_nn_mm2_stats_by_hour_chart_data(start, end, notary=None):
     ]
     colors_dict = {}
 
-    notary_list = get_notary_list(season)
+    notary_list = helper.get_notary_list(season)
 
     for notary in notary_list:
         colors_dict.update({notary:[]})
@@ -407,7 +411,7 @@ def get_nn_mm2_stats_by_hour_data(start, end, notary=None):
     rows = []
     for i in data.values():
         
-        i["date"], i["hour"] = date_hour(i["timestamp"]).split(" ")
+        i["date"], i["hour"] = helper.date_hour(i["timestamp"]).split(" ")
         rows.append(i)
 
         if i["date"] not in ts_dict:
@@ -439,6 +443,7 @@ def get_nn_mm2_stats_by_hour_data(start, end, notary=None):
         "rows":rows
     }
     return resp
+
 
 def get_addresses_data(season=None, server=None, chain=None, notary=None, address=None):
     data = addresses.objects.all()
@@ -480,6 +485,7 @@ def get_balances_data(season=None, server=None, chain=None, notary=None, address
 
     return data.order_by('-season', 'server', 'chain', 'notary')
 
+
 def get_nn_mm2_stats_data(name=None, version=None, limit=None):
     data = mm2_version_stats.objects.all()
     if name:
@@ -489,13 +495,6 @@ def get_nn_mm2_stats_data(name=None, version=None, limit=None):
     data = data.order_by("-timestamp")
     if limit:
         data = data[:limit]
-    return data
-
-# TODO: Awaiting delegation to crons / db table
-def get_chain_sync_data(chain=None):
-    data = chain_sync.objects.all()
-    if chain:
-        data = data.filter(chain=chain)
     return data
 
 
@@ -510,10 +509,12 @@ def get_coins_data(chain=None, mm2_compatible=None, dpow_active=None):
     return data
 
 
-def get_coin_social_data(chain=None):
+def get_coin_social_data(chain=None, season=None):
     data = coin_social.objects.all()
     if chain:
         data = data.filter(chain=chain)
+    if chain:
+        data = data.filter(season=season)
     return data
 
 
@@ -578,8 +579,8 @@ def get_mined_data(season=None, name=None, address=None):
         data = data.filter(name=name)
     if address:
         data = data.filter(address=address)
-    data = data.order_by('block_height')
     return data
+
 
 def get_seed_version_data(season=None, name=None):
     data = mm2_version_stats.objects.all()
@@ -657,6 +658,18 @@ def get_notarised_data(season=None, server=None, epoch=None, chain=None, notary=
     return data
 
 
+def get_notarised_chains_data(season=None, server=None, epoch=None):
+    data = notarised.objects.all()
+    if season:
+        season = season.title()
+        data = data.filter(season=season)
+    if server:
+        data = data.filter(server=server)
+    if epoch:
+        data = data.filter(epoch=epoch)
+    return data
+
+
 # TODO: Is this still in use?
 def get_notarised_btc_data(season=None):
     data = notarised_btc.objects.all()
@@ -722,11 +735,37 @@ def get_notarised_tenure_data(season=None, server=None, chain=None):
     return data
 
 
-def get_rewards_data(notary=None):
-    data = rewards.objects.all()
+def get_rewards_data(season=None, address=None, min_value=None, min_block=None, max_block=None,
+                     min_blocktime=None, max_blocktime=None, exclude_coinbase=True):
+    data = rewards_tx.objects.all()
 
-    if notary:
-        data = data.filter(notary=notary)
+    if address:
+        data = data.filter(input_addresses__contains=[address])
+
+    if season:
+        if season in SEASONS_INFO:
+            data = data.filter(block_time__gte=SEASONS_INFO[season]["start_time"])
+            data = data.filter(block_time__lte=SEASONS_INFO[season]["end_time"])
+
+    if min_value:
+        data = data.filter(rewards_value__gte=min_value)
+
+    if min_block:
+        data = data.filter(block_height__gte=min_block)
+
+    if max_block:
+        data = data.filter(block_height__lte=max_block)
+
+    if min_blocktime:
+        data = data.filter(block_time__gte=min_blocktime)
+
+    if max_blocktime:
+        data = data.filter(block_time__lte=max_blocktime)
+
+    if exclude_coinbase:
+        data = data.exclude(input_addresses__contains=['coinbase'])
+
+    data = data.exclude(block_height=1)
 
     return data
 

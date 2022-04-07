@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField, JSONField
+from kmd_ntx_api.lib_const import *
+
+# TODO: When updating on conflict, make sure all potentially variable fields are included.
 
 
 class addresses(models.Model):
@@ -240,7 +243,7 @@ class mined_count_season(models.Model):
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=['name', 'season'],
+                fields=['address', 'season'],
                 name='unique_name_season_mined'
             )
         ]
@@ -292,7 +295,7 @@ class nn_btc_tx(models.Model):
     class Meta:
         db_table = 'nn_btc_tx'
         indexes = [
-            models.Index(fields=['txid', 'block_time', 'season', 'notary', 'category'])
+            models.Index(fields=['txid', '-block_time'])
         ]
         constraints = [
             models.UniqueConstraint(fields=['txid', 'address', 'input_index', 'output_index'],
@@ -324,10 +327,7 @@ class nn_ltc_tx(models.Model):
         db_table = 'nn_ltc_tx'
         indexes = [
             models.Index(fields=['txid']),
-            models.Index(fields=['-block_time']),
-            models.Index(fields=['season']),
-            models.Index(fields=['notary']),
-            models.Index(fields=['category'])
+            models.Index(fields=['-block_time'])
         ]
         constraints = [
             models.UniqueConstraint(fields=['txid', 'address', 'input_index', 'output_index'],
@@ -664,3 +664,30 @@ class swaps_failed(models.Model):
 # change max_connections to 1000
 # change max_wal_size to 2gb
 # log_rotation_size to 100mb
+
+
+class rewards_tx(models.Model):
+    txid = models.CharField(max_length=64)
+    block_hash = models.CharField(max_length=64)
+    block_height = models.PositiveIntegerField(default=0)
+    block_time = models.PositiveIntegerField(default=0)
+    block_datetime = models.DateTimeField()
+    sum_of_inputs = models.PositiveIntegerField(default=0)
+    input_addresses = ArrayField(models.CharField(max_length=128), default=list)
+    input_utxos = ArrayField(models.CharField(max_length=128), default=list)
+    sum_of_outputs = models.PositiveIntegerField(default=0)
+    output_addresses = ArrayField(models.CharField(max_length=128), default=list)
+    output_utxos = ArrayField(models.CharField(max_length=128), default=list)
+    rewards_value =  models.FloatField(default=0)
+
+    class Meta:
+        db_table = 'rewards_tx'
+        indexes = [
+            models.Index(fields=['txid']),
+            models.Index(fields=['block_hash']),
+            models.Index(fields=['block_time']),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['txid'],
+                                 name='unique_rewards_nn_txid')
+        ]

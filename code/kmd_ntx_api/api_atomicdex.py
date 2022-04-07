@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 from django.http import JsonResponse
-from kmd_ntx_api.lib_atomicdex import *
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_query as query
+import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_atomicdex as dex
+import kmd_ntx_api.serializers as serializers
 
 
 def orderbook_api(request):
@@ -18,12 +22,9 @@ def seednode_version_stats_hourly_api(request):
 def nn_seed_version_scores_table_api(request):
     return JsonResponse(get_nn_seed_version_scores_hourly_table(request), safe=False)
 
-def bestorders_api(request):
-    return JsonResponse(get_orderbook(request))
-
 
 def bestorders_api(request):
-    return JsonResponse(get_orderbook(request))
+    return JsonResponse(get_bestorders(request))
 
 
 def failed_swap_api(request):
@@ -31,24 +32,24 @@ def failed_swap_api(request):
 
 
 def last_200_swaps_api(request):
-    data = get_last_200_swaps(request)
-    data = format_gui_os_version(data)
+    data = dex.get_last_200_swaps(request)
+    data = dex.format_gui_os_version(data)
     return JsonResponse(data, safe=False)
 
 
 def last_200_failed_swaps_api(request):
-    data = get_last_200_failed_swaps(request)
-    data = format_gui_os_version(data)
+    data = dex.get_last_200_failed_swaps(request)
+    data = dex.format_gui_os_version(data)
     return JsonResponse(data, safe=False)
 
 
 def swaps_gui_stats_api(request):
-    resp = get_swaps_gui_stats(request)
+    resp = dex.get_swaps_gui_stats(request)
     return JsonResponse(resp)
 
 
 def swaps_pubkey_stats_api(request):
-    resp = get_swaps_pubkey_stats(request)
+    resp = dex.get_swaps_pubkey_stats(request)
     return JsonResponse(resp)
 
 
@@ -57,8 +58,8 @@ def activation_commands_api(request):
     if "coin" in request.GET:
         selected_coin = request.GET["coin"]
 
-    coin_info = get_coins_data(selected_coin, 1)
-    serializer = coinsSerializer(coin_info, many=True)
+    coin_info = query.get_coins_data(selected_coin, 1)
+    serializer = serializers.coinsSerializer(coin_info, many=True)
     enable_commands = { "commands":{
      }}
     incompatible_coins = []
@@ -94,9 +95,9 @@ def activation_commands_api(request):
                         })
 
         if platform in SWAP_CONTRACTS:
-            resp_json.update(get_contracts(platform))
+            resp_json.update(dex.get_contracts(platform))
         elif coin in SWAP_CONTRACTS:
-            resp_json.update(get_contracts(coin))
+            resp_json.update(dex.get_contracts(coin))
         else:
             other_platforms.append(platform)
 
@@ -104,8 +105,8 @@ def activation_commands_api(request):
             platform = 'UTXO'
             if len(electrums) > 0:
                 resp_json.update({
-                    "userpass":"'$userpass'"
-                    ,"method":"electrum",
+                    "userpass":"'$userpass'",
+                    "method":"electrum",
                     "coin":coin,
                     "servers": []
                 })
@@ -115,8 +116,6 @@ def activation_commands_api(request):
                     })   
                 for electrum in electrums:
                     resp_json["servers"].append({"url":electrum})
-            if coin == "TOKEL":
-                resp_json.update({"coin":"TKL"})
 
         elif protocol == "QRC20" or coin in ['QTUM', 'QTUM-segwit']:
             platform = 'QRC20'
@@ -135,7 +134,6 @@ def activation_commands_api(request):
                 enable_commands["commands"].update({
                     "QTUM": {}
                 })    
-
 
         elif protocol == "tQTUM" or coin in ['tQTUM', 'tQTUM-segwit']:
             platform = 'tQTUM'
@@ -309,7 +307,7 @@ def activation_commands_api(request):
                             platform: {}
                         })    
                     enable_commands["commands"][platform].update({
-                        coin:sort_dict(resp_json)
+                        coin: helper.sort_dict(resp_json)
                     })
                 else:
                     print(f"Unknown platform for {coin}")
@@ -324,19 +322,19 @@ def activation_commands_api(request):
                     '''
             else:
                 invalid_configs.update({
-                        coin:sort_dict(resp_json)
+                        coin: helper.sort_dict(resp_json)
                     })
         else:
             incompatible_coins.append(coin)
 
     if selected_coin is None:
         enable_commands.update({
-            "invalid_configs":invalid_configs,
-            "incompatible_coins":incompatible_coins,
-            "protocols":list(set(protocols)),
-            "platforms":list(set(platforms)),
-            "other_platforms":list(set(other_platforms)),
-            "coins_without_electrum":coins_without_electrum
+            "invalid_configs": invalid_configs,
+            "incompatible_coins": incompatible_coins,
+            "protocols": list(set(protocols)),
+            "platforms": list(set(platforms)),
+            "other_platforms": list(set(other_platforms)),
+            "coins_without_electrum": coins_without_electrum
             })
         return JsonResponse(enable_commands)
     else: 

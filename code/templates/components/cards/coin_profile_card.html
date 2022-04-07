@@ -26,63 +26,63 @@
 								{% for site, link in site_links.items %}
 									{% if site == 'discord' %}
 										{%  if link != '' %}
-											<a href="https://discordapp.com/users/{{ link }}"><i class="social-icon m-1 fab fa-discord"></i></a>
+											<a href="{{ link }}"><i class="social-icon m-1 fab fa-discord"></i></a>
 										{% else %}
 											<i class="social-icon-disabled m-1 fab fa-discord"></i>
 										{% endif %}
 
 									{% elif site == 'email' %}
 										{%  if link != '' %}
-											<a href="https://discordapp.com/users/{{ link }}"><i class="social-icon m-1 far fa-envelope"></i></a>
+											<a href="mailto:{{ link }}"><i class="social-icon m-1 far fa-envelope"></i></a>
 										{% else %}
 											<i class="social-icon-disabled far fa-envelope m-1"></i>
 										{% endif %}
 
 									{% elif site == 'github' %}
 										{%  if link != '' %}
-											<a href="https://github.com/{{ link }}"><i class="social-icon fab fa-github m-1"></i></a>
+											<a href="{{ link }}"><i class="social-icon fab fa-github m-1"></i></a>
 										{% else %}
 											<i class="social-icon-disabled fab fa-github m-1"></i>
 										{% endif %}
 
 									{% elif site == 'linkedin' %}
 										{%  if link != '' %}
-											<a href="https://github.com/{{ link }}"><i class="social-icon fab fa-linkedin m-1"></i></a>
+											<a href="{{ link }}"><i class="social-icon fab fa-linkedin m-1"></i></a>
 										{% else %}
 											<i class="social-icon-disabled fab fa-linkedin m-1"></i>
 										{% endif %}
 
 									{% elif site == 'reddit' %}
 										{%  if link != '' %}
-											<a href="https://github.com/{{ link }}"><i class="social-icon fab fab fa-reddit-square m-1"></i></a>
+											<a href="{{ link }}"><i class="social-icon fab fab fa-reddit-square m-1"></i></a>
 										{% else %}
 											<i class="social-icon-disabled fab fa-reddit-square m-1"></i>
 										{% endif %}
 										
 									{% elif site == 'telegram' %}
 										{%  if link != '' %}
-											<a href="https://t.me/{{ link }}"><i class="social-icon fab fa-telegram-plane "></i></a>
+											<a href="{{ link }}"><i class="social-icon fab fa-telegram-plane "></i></a>
 										{% else %}
 											<i class="social-icon-disabled fab fa-telegram-plane"></i>
 										{% endif %}
 										
 									{% elif site == 'twitter' %}
 										{%  if link != '' %}
-											<a href="https://twitter.com/{{ link }}"><i class="social-icon fab fa-twitter m-1"></i></a>
+											<a href="{{ link }}"><i class="social-icon fab fa-twitter m-1"></i></a>
 										{% else %}
 											<i class="social-icon-disabled fab fa-twitter m-1"></i>
 										{% endif %}
 										
 									{% elif site == 'youtube' %}
 										{%  if link != '' %}
-											<a href="https://www.youtube.com/{{ link }}"><i class="social-icon fab fa-youtube m-1"></i></a>
+											<a href="{{ link }}"><i class="social-icon fab fa-youtube m-1"></i></a>
 										{% else %}
 											<i class="social-icon-disabled fab fa-youtube m-1"></i>
 										{% endif %}
 										
 									{% elif site == 'website' %}
 										{%  if link != '' %}
-											<a href="https://{{ link }}"><i class="social-icon fas fa-desktop m-1"></i></a>
+											<a href="{{ link }}"><i class="social-icon fas fa-desktop m-1"></i></a>
 										{% else %}
 											<i class="social-icon-disabled fas fa-desktop m-1"></i>
 										{% endif %}									
@@ -93,12 +93,12 @@
 					</div>
 	        		<div class="row my-0 mx-auto align-items-center">
 						<h6 class="col-12">
-							{% if season == "Season_4" %}
-							<a class="sml-link" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season4/coin_social.json">
+							{% if season == "Season_5" %}
+							<a class="sml-link" href="http://github.com/KomodoPlatform/NotaryNodes/edit/master/season5/coin_social.json">
 								Update
 							</a>
-							{% elif season == "Season_5" %}
-							<a class="sml-link" href="https://github.com/KomodoPlatform/NotaryNodes/edit/master/season5/coin_social.json">
+							{% elif season == "Season_6" %}
+							<a class="sml-link" href="http://github.com/KomodoPlatform/NotaryNodes/edit/master/season6/coin_social.json">
 								Update
 							</a>
 							{% endif %}

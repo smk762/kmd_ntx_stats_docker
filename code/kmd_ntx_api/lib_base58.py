@@ -6,124 +6,7 @@ from bitcoin.core import x
 from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
 from base58 import b58decode_check
-from .lib_const import *
-
-
-class KMD_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 60,
-                       'SCRIPT_ADDR': 85,
-                       'SECRET_KEY': 188}
-
-
-class BTC_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 0,
-                       'SCRIPT_ADDR': 5,
-                       'SECRET_KEY': 128}
-
-
-class LTC_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 48,
-                       'SCRIPT_ADDR': 5,
-                       'SECRET_KEY': 176}
-
-class MIL_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 50,
-                       'SCRIPT_ADDR': 196,
-                       'SECRET_KEY': 239}
-
-
-class AYA_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 23,
-                       'SCRIPT_ADDR': 5,
-                       'SECRET_KEY': 176}
-
-
-class EMC2_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 33,
-                       'SCRIPT_ADDR': 5,
-                       'SECRET_KEY': 176}
-
-
-class GAME_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 38,
-                       'SCRIPT_ADDR': 5,
-                       'SECRET_KEY': 166}
-
-
-class GLEEC_OLD_CoinParams(CoreMainParams):
-    MESSAGE_START = b'\x24\xe9\x27\x64'
-    DEFAULT_PORT = 7770
-    BASE58_PREFIXES = {'PUBKEY_ADDR': 35,
-                       'SCRIPT_ADDR': 38,
-                       'SECRET_KEY': 65}
-
-
-def sha256(data):
-    d = hashlib.new("sha256")
-    d.update(data)
-    return d.digest()
-
-
-def ripemd160(x):
-    d = hashlib.new("ripemd160")
-    d.update(x)
-    return d.digest()
-
-
-def doubleSha256(hex_str):
-    hexbin = binascii.unhexlify(hex_str)
-    binhash = hashlib.sha256(hexbin).digest()
-    hash2 = hashlib.sha256(binhash).digest()
-    return hash2
-
-
-def get_hex(val, byte_length=2, endian='big'):
-    val = hex(int(val))[2:]
-    pad_len = byte_length - len(val)
-    val = pad_len*"0"+val
-    if endian == 'little':
-        val = lil_endian(val)
-    return val
-
-
-def get_hash160(pubkey):
-    bin_pk = binascii.unhexlify(pubkey)
-    sha_pk = sha256(bin_pk)
-    ripe_pk = ripemd160(sha_pk)
-    return binascii.hexlify(ripe_pk)
-
-
-def address_to_p2pkh(address):
-    decode_58 = bitcoin.base58.decode(address)
-    decode_58 = decode_58[1:-4]
-    pubKeyHash = "76a914"+binascii.hexlify(decode_58).decode('ascii')+"88ac"
-    return pubKeyHash
-
-
-def pubkey_to_p2pkh(pubkey):
-    hash160 = get_hash160(pubkey)
-    p2pkh = "76a914"+hash160.decode('ascii')+"88ac"
-    return p2pkh
-
-
-def pubkey_to_p2pk(pubkey):
-    hash160 = get_hash160(pubkey)
-    p2pk = "21"+pubkey+"ac"
-    return p2pk
+from kmd_ntx_api.lib_const import *
 
 
 class raw_tx():
@@ -199,6 +82,70 @@ class raw_tx():
         return self.raw_tx_str
 
 
+class KMD_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 60,
+                       'SCRIPT_ADDR': 85,
+                       'SECRET_KEY': 188}
+
+
+class BTC_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 0,
+                       'SCRIPT_ADDR': 5,
+                       'SECRET_KEY': 128}
+
+
+class LTC_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 48,
+                       'SCRIPT_ADDR': 5,
+                       'SECRET_KEY': 176}
+
+
+class MIL_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 50,
+                       'SCRIPT_ADDR': 196,
+                       'SECRET_KEY': 239}
+
+
+class AYA_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 23,
+                       'SCRIPT_ADDR': 5,
+                       'SECRET_KEY': 176}
+
+
+class EMC2_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 33,
+                       'SCRIPT_ADDR': 5,
+                       'SECRET_KEY': 176}
+
+
+class GAME_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 38,
+                       'SCRIPT_ADDR': 5,
+                       'SECRET_KEY': 166}
+
+
+class GLEEC_OLD_CoinParams(CoreMainParams):
+    MESSAGE_START = b'\x24\xe9\x27\x64'
+    DEFAULT_PORT = 7770
+    BASE58_PREFIXES = {'PUBKEY_ADDR': 35,
+                       'SCRIPT_ADDR': 38,
+                       'SECRET_KEY': 65}
+
+
 COIN_PARAMS = {
     "KMD": KMD_CoinParams,
     "MCL": KMD_CoinParams,
@@ -220,6 +167,60 @@ COIN_PARAMS = {
     "GLEEC-OLD": GLEEC_OLD_CoinParams,
     "GLEEC": KMD_CoinParams
 }
+
+
+def sha256(data):
+    d = hashlib.new("sha256")
+    d.update(data)
+    return d.digest()
+
+
+def ripemd160(x):
+    d = hashlib.new("ripemd160")
+    d.update(x)
+    return d.digest()
+
+
+def doubleSha256(hex_str):
+    hexbin = binascii.unhexlify(hex_str)
+    binhash = hashlib.sha256(hexbin).digest()
+    hash2 = hashlib.sha256(binhash).digest()
+    return hash2
+
+
+def get_hex(val, byte_length=2, endian='big'):
+    val = hex(int(val))[2:]
+    pad_len = byte_length - len(val)
+    val = pad_len*"0"+val
+    if endian == 'little':
+        val = lil_endian(val)
+    return val
+
+
+def get_hash160(pubkey):
+    bin_pk = binascii.unhexlify(pubkey)
+    sha_pk = sha256(bin_pk)
+    ripe_pk = ripemd160(sha_pk)
+    return binascii.hexlify(ripe_pk)
+
+
+def address_to_p2pkh(address):
+    decode_58 = bitcoin.base58.decode(address)
+    decode_58 = decode_58[1:-4]
+    pubKeyHash = "76a914"+binascii.hexlify(decode_58).decode('ascii')+"88ac"
+    return pubKeyHash
+
+
+def pubkey_to_p2pkh(pubkey):
+    hash160 = get_hash160(pubkey)
+    p2pkh = "76a914"+hash160.decode('ascii')+"88ac"
+    return p2pkh
+
+
+def pubkey_to_p2pk(pubkey):
+    hash160 = get_hash160(pubkey)
+    p2pk = "21"+pubkey+"ac"
+    return p2pk
 
 
 def calc_addr_from_pubkey(coin, pubkey):

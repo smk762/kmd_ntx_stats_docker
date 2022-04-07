@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User, Group
 from kmd_ntx_api.models import *
+from kmd_ntx_api.lib_const import *
 from rest_framework import serializers
 
 
@@ -218,8 +219,16 @@ class mm2statsSerializer(serializers.HyperlinkedModelSerializer):
         model = mm2_version_stats
         fields = ["name", "version", "timestamp", "error", "score"]
 
+class rewardsTxSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = rewards_tx
+        fields = ["txid", "block_height", "block_time", "block_datetime",
+                  "input_addresses", "output_addresses", "rewards_value",
+                  "block_hash"]
+
 
 # Non-Model serializers
 class addrFromBase58Serializer(serializers.Serializer):
     class Meta:
         fields = ["pubkey", "pubtype", "wiftype", "p2shtype"]
+        

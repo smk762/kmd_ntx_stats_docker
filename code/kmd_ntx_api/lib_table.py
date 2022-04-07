@@ -1,33 +1,27 @@
 
-from kmd_ntx_api.lib_info import *
+from datetime import datetime as dt
+from django.db.models import Count, Min, Max, Sum
+from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_query as query
+import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.serializers as serializers
 
 logger = logging.getLogger("mylogger")
 
 
 def get_addresses_table(request):
-    season = None
-    server = None
-    chain = None
-    notary = None
-    address = None
-
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
-    if "notary" in request.GET:
-        notary = request.GET["notary"]
-    if "address" in request.GET:
-        address = request.GET["address"]
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    chain = helper.get_or_none(request, "chain")
+    notary = helper.get_or_none(request, "notary")
+    address = helper.get_or_none(request, "address")
 
     if not season and not chain and not notary and not address:
         return {
             "error": "You need to specify at least one of the following filter parameters: ['season', 'chain', 'notary', 'address']"
         }
 
-    data = get_addresses_data(season, server, chain, notary, address)
+    data = query.get_addresses_data(season, server, chain, notary, address)
     data = data.values()
 
     resp = []
@@ -44,70 +38,50 @@ def get_addresses_table(request):
 
     return resp
 
-def get_balances_table(request):
-    season = None
-    server = None
-    chain = None
-    notary = None
-    address = None
 
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
-    if "notary" in request.GET:
-        notary = request.GET["notary"]
-    if "address" in request.GET:
-        address = request.GET["address"]
+def get_balances_table(request):
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    chain = helper.get_or_none(request, "chain")
+    notary = helper.get_or_none(request, "notary")
+    address = helper.get_or_none(request, "address")
 
     if not season and not chain and not notary and not address:
         return {
             "error": "You need to specify at least one of the following filter parameters: ['season', 'chain', 'notary', 'address']"
         }
-    data = get_balances_data(season, server, chain, notary, address)
+    data = query.get_balances_data(season, server, chain, notary, address)
     data = data.values()
 
-    serializer = balancesSerializer(data, many=True)
+    serializer = serializers.balancesSerializer(data, many=True)
 
     return serializer.data
 
 
 def get_coin_social_table(request):
-    chain = None
+    chain = helper.get_or_none(request, "chain")
 
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
-
-    data = get_coin_social_data(chain)
+    data = query.get_coin_social_data(chain)
     data = data.order_by('chain').values()
 
-    serializer = coinSocialSerializer(data, many=True)
+    serializer = serializers.coinSocialSerializer(data, many=True)
     return serializer.data
 
-def get_last_mined_table(request):
-    name = None
-    address = None
-    season = None
 
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "name" in request.GET:
-        name = request.GET["name"]
-    if "address" in request.GET:
-        address = request.GET["address"]
+def get_last_mined_table(request):
+    season = helper.get_or_none(request, "season", SEASON)
+    name = helper.get_or_none(request, "name")
+    address = helper.get_or_none(request, "address")
 
     if not season and not name and not address:
         return {
             "error": "You need to specify at least one of the following filter parameters: ['season', 'name', 'address']"
         }
 
-    data = get_mined_data(season, name, address)
+    data = query.get_mined_data(season, name, address)
     data = data.order_by('season', 'name')
     data = data.values("season", "name", "address")
     data = data.annotate(Max("block_time"), Max("block_height"))
-
 
     resp = []
     # name num sum max last
@@ -130,46 +104,29 @@ def get_last_mined_table(request):
 
 
 def get_last_notarised_table(request):
-    season = None
-    server = None
-    notary = None
-    chain = None
-
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "notary" in request.GET:
-        notary = request.GET["notary"]
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    chain = helper.get_or_none(request, "chain")
+    notary = helper.get_or_none(request, "notary")
 
     if not notary and not chain:
         return {
             "error": "You need to specify at least one of the following filter parameters: ['notary', 'chain']"
         }
 
-    data = get_last_notarised_data(season, server, notary, chain)
+    data = query.get_last_notarised_data(season, server, notary, chain)
     data = data.order_by('season', 'server', 'notary', 'chain').values()
 
-    serializer = lastNotarisedSerializer(data, many=True)
+    serializer = serializers.lastNotarisedSerializer(data, many=True)
     return serializer.data
+
 
 # TODO: Handle where chain not notarised
 def get_notary_profile_summary_table(request):
-    season = None
-    server = None
-    notary = None
-    chain = None
-
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "notary" in request.GET:
-        notary = request.GET["notary"]
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    chain = helper.get_or_none(request, "chain")
+    notary = helper.get_or_none(request, "notary")
 
     if not notary or not season:
         return {
@@ -182,7 +139,7 @@ def get_notary_profile_summary_table(request):
     ntx_season_data = get_notarised_count_season_table(request)
     for item in ntx_season_data:
         chain_ntx_counts = item['chain_ntx_counts']
-        for chain in chain_ntx_counts["chains"]:
+        for chain in chain_ntx_counts["coins"]:
             if chain not in resp:
                 if chain in season_main_coins:
                     server = "Main"
@@ -198,8 +155,8 @@ def get_notary_profile_summary_table(request):
                         "season": season,
                         "server": server,
                         "chain": chain,
-                        "chain_score": chain_ntx_counts["chains"][chain]["notary_chain_ntx_score"],
-                        "chain_ntx_count": chain_ntx_counts["chains"][chain]["notary_chain_ntx_count"]
+                        "chain_score": chain_ntx_counts["coins"][chain]["notary_coin_ntx_score"],
+                        "chain_ntx_count": chain_ntx_counts["coins"][chain]["notary_coin_ntx_count"]
                     }
                 })
 
@@ -236,7 +193,7 @@ def get_notary_profile_summary_table(request):
             resp[chain].update({
                 "last_block_height": item['block_height'],
                 "last_block_time": item['block_time'],
-                "since_last_block_time": get_time_since(item['block_time'])[1]
+                "since_last_block_time": helper.get_time_since(item['block_time'])[1]
             })
 
     list_resp = []
@@ -251,101 +208,65 @@ def get_notary_profile_summary_table(request):
 
 
 def get_mined_24hrs_table(request):
-    name = None
-    address = None
-
-    if "name" in request.GET:
-        name = request.GET["name"]
-    if "address" in request.GET:
-        address = request.GET["address"]
-
-    data = get_mined_data(None, name, address).filter(block_time__gt=str(int(time.time()-24*60*60)))
+    name = helper.get_or_none(request, "name")
+    address = helper.get_or_none(request, "address")
+    day_ago = int(time.time()) - SINCE_INTERVALS['day']
+    data = query.get_mined_data(None, name, address).filter(block_time__gt=str(day_ago))
     data = data.values()
 
-    serializer = minedSerializer(data, many=True)
+    serializer = serializers.minedSerializer(data, many=True)
 
     return serializer.data
 
-def get_mined_count_season_table(request):
-    name = None
-    address = None
-    season = None
 
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "name" in request.GET:
-        name = request.GET["name"]
-    if "address" in request.GET:
-        address = request.GET["address"]
+def get_mined_count_season_table(request):
+    season = helper.get_or_none(request, "season", SEASON)
+    name = helper.get_or_none(request, "name")
+    address = helper.get_or_none(request, "address")
 
     if not season and not name and not address:
         return {
             "error": "You need to specify at least one of the following filter parameters: ['season', 'name', 'address']"
         }
 
-    data = get_mined_count_season_data(season, name, address)
+    data = query.get_mined_count_season_data(season, name, address).filter(blocks_mined__gte=10)
     data = data.order_by('season', 'name').values()
-
-    serializer = minedCountSeasonSerializer(data, many=True)
-
-    resp = []
-    for item in serializer.data:
-        if item['blocks_mined'] > 5:
-            resp.append(item)
-
-    return resp
+    serializer = serializers.minedCountSeasonSerializer(data, many=True)
+    return serializer.data
 
 
 def get_notarised_24hrs_table(request):
-    season = None
-    server = None
-    epoch = None
-    chain = None
-    notary = None
-    address = None
-
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "epoch" in request.GET:
-        epoch = request.GET["epoch"]
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
-    if "notary" in request.GET:
-        notary = request.GET["notary"]
-    if "address" in request.GET:
-        address = request.GET["address"]
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    epoch = helper.get_or_none(request, "epoch")
+    chain = helper.get_or_none(request, "chain")
+    notary = helper.get_or_none(request, "notary")
+    address = helper.get_or_none(request, "address")
 
     if not season or (not chain and not notary):
         return {
             "error": "You need to specify the following filter parameters: ['season'] and at least one of ['notary','chain']"
         }
-    data = get_notarised_data(season, server, epoch, chain, notary, address).filter(block_time__gt=str(int(time.time()-24*60*60)))
+    day_ago = int(time.time()) - SINCE_INTERVALS['day']
+    data = query.get_notarised_data(season, server, epoch, chain, notary, address).filter(block_time__gt=str(day_ago))
     data = data.values()
 
-    serializer = notarisedSerializer(data, many=True)
+    serializer = serializers.notarisedSerializer(data, many=True)
 
     return serializer.data
 
 
 def get_notarised_chain_season_table(request):
-    season = None
-    server = None
-    chain = None
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    chain = helper.get_or_none(request, "chain")
 
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
     if not season and not chain:
         return {
             "error": "You need to specify at least one of the following filter parameters: ['season', 'chain']"
         }
 
-    data = get_notarised_chain_season_data(season, server, chain)
+    data = query.get_notarised_chain_season_data(season, server, chain)
     data = data.order_by('season', 'server', 'chain').values()
 
     resp = []
@@ -385,19 +306,15 @@ def get_notarised_chain_season_table(request):
 
 
 def get_notarised_count_season_table(request):
-    season = None
-    notary = None
+    season = helper.get_or_none(request, "season", SEASON)
+    notary = helper.get_or_none(request, "notary")
 
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "notary" in request.GET:
-        notary = request.GET["notary"]
     if not season and not notary:
         return {
             "error": "You need to specify at least one of the following filter parameters: ['season', 'notary']"
         }
 
-    data = get_notarised_count_season_data(season, notary)
+    data = query.get_notarised_count_season_data(season, notary)
     data = data.order_by('season', 'notary').values()
 
     resp = []
@@ -424,7 +341,7 @@ def get_notarised_count_season_table(request):
                 "chain_ntx_counts": chain_ntx_counts,
                 "chain_ntx_pct": chain_ntx_pct,
                 "time_stamp": time_stamp,
-                "chains": {}
+                "coins": {}
         })
 
 
@@ -432,110 +349,70 @@ def get_notarised_count_season_table(request):
 
 
 def get_notary_ntx_table(request):
-    season = None
-    server = None
-    epoch = None
-    chain = None
-    notary = None
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    epoch = helper.get_or_none(request, "epoch")
+    chain = helper.get_or_none(request, "chain")
+    notary = helper.get_or_none(request, "notary")
 
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "epoch" in request.GET:
-        epoch = request.GET["epoch"]
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
-    if "notary" in request.GET:
-        notary = request.GET["notary"]
     if not season or not chain or not notary:
         return {
             "error": "You need to specify all of the following filter parameters: ['season', 'chain', 'notary']"
         }
-    data = get_notarised_data(season, server, epoch, chain, notary).order_by('-block_time')
+    data = query.get_notarised_data(season, server, epoch, chain, notary).order_by('-block_time')
     data = data.values('txid', 'chain', 'block_height', 'block_time', 'ac_ntx_height', 'score_value')
 
-    serializer = notary_ntxSerializer(data, many=True)
+    serializer = serializers.notary_ntxSerializer(data, many=True)
 
     return serializer.data
 
-def get_notarised_table(request):
-    season = None
-    server = None
-    epoch = None
-    chain = None
-    notary = None
-    address = None
 
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "epoch" in request.GET:
-        epoch = request.GET["epoch"]
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
-    if "notary" in request.GET:
-        notary = request.GET["notary"]
-    if "address" in request.GET:
-        address = request.GET["address"]
+def get_notarised_table(request):
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    epoch = helper.get_or_none(request, "epoch")
+    chain = helper.get_or_none(request, "chain")
+    notary = helper.get_or_none(request, "notary")
+    address = helper.get_or_none(request, "address")
+
     if not season or not server or not chain or not notary:
         return {
             "error": "You need to specify all of the following filter parameters: ['season', 'server', 'chain', 'notary']"
         }
-    data = get_notarised_data(season, server, epoch, chain, notary, address).order_by('-block_time')
+    data = query.get_notarised_data(season, server, epoch, chain, notary, address).order_by('-block_time')
     data = data.values()
 
-    serializer = notarisedSerializer(data, many=True)
+    serializer = serializers.notarisedSerializer(data, many=True)
 
     return serializer.data
 
 
 def get_notarised_tenure_table(request):
-    season = None
-    server = None
-    chain = None
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    chain = helper.get_or_none(request, "chain")
 
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
-
-
-    data = get_notarised_tenure_data(season, server, chain)
+    data = query.get_notarised_tenure_data(season, server, chain)
     data = data.order_by('season', 'server', 'chain').values()
 
-    serializer = notarisedTenureSerializer(data, many=True)
+    serializer = serializers.notarisedTenureSerializer(data, many=True)
 
     return serializer.data
 
 
 def get_scoring_epochs_table(request):
-    season = None
-    server = None
-    chain = None
-    epoch = None
-    timestamp = None
-
-    if "season" in request.GET:
-        season = request.GET["season"]
-    if "server" in request.GET:
-        server = request.GET["server"]
-    if "chain" in request.GET:
-        chain = request.GET["chain"]
-    if "epoch" in request.GET:
-        epoch = request.GET["epoch"]
-    if "timestamp" in request.GET:
-        timestamp = request.GET["timestamp"]
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server")
+    epoch = helper.get_or_none(request, "epoch")
+    chain = helper.get_or_none(request, "chain")
+    timestamp = helper.get_or_none(request, "timestamp")
 
     if not season and not chain and not timestamp:
         return {
             "error": "You need to specify at least one of the following filter parameters: ['season', 'chain', 'timestamp']"
         }
 
-    data = get_scoring_epochs_data(season, server, chain, epoch, timestamp)
+    data = query.get_scoring_epochs_data(season, server, chain, epoch, timestamp)
     data = data.order_by('season', 'server', 'epoch').values()
 
     resp = []
@@ -565,7 +442,6 @@ def get_scoring_epochs_table(request):
     return resp
 
 
-
 # UPDATE PENDING
 def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None):
 
@@ -576,10 +452,10 @@ def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None)
     if not season:
         season = SEASON
 
-    notary_epoch_scores = get_notarised_count_season_data(season, notary).values()
+    notary_epoch_scores = query.get_notarised_count_season_data(season, notary).values()
 
     epoch_chains_dict = {}
-    epoch_chains_queryset = get_scoring_epochs_data(season).values()
+    epoch_chains_queryset = query.get_scoring_epochs_data(season).values()
     for item in epoch_chains_queryset:
         if item["season"] not in epoch_chains_dict:
             epoch_chains_dict.update({item["season"]:{}})
@@ -607,12 +483,12 @@ def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None)
                     else:
                         server_epoch_chains = epoch_chains_dict[season][server][epoch]
 
-                    for chain in chain_ntx["servers"][server]["epochs"][epoch]["chains"]:
+                    for chain in chain_ntx["servers"][server]["epochs"][epoch]["coins"]:
                         if not selected_chain or chain == selected_chain:
-                            chain_stats = chain_ntx["servers"][server]["epochs"][epoch]["chains"][chain]
+                            chain_stats = chain_ntx["servers"][server]["epochs"][epoch]["coins"][chain]
                             score_per_ntx = chain_ntx["servers"][server]["epochs"][epoch]["score_per_ntx"]
-                            epoch_chain_ntx_count = chain_stats["notary_server_epoch_chain_ntx_count"]
-                            epoch_chain_score = chain_stats["notary_server_epoch_chain_ntx_score"]
+                            epoch_coin_ntx_count = chain_stats["notary_server_epoch_coin_ntx_count"]
+                            epoch_coin_score = chain_stats["notary_server_epoch_coin_ntx_score"]
                             if epoch.find("_") > -1:
                                 epoch_id = epoch.split("_")[1]
                             else:
@@ -624,42 +500,27 @@ def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None)
                                 "epoch": epoch_id,
                                 "chain": chain,
                                 "score_per_ntx": score_per_ntx,
-                                "epoch_chain_ntx_count": epoch_chain_ntx_count,
-                                "epoch_chain_score": epoch_chain_score
+                                "epoch_coin_ntx_count": epoch_coin_ntx_count,
+                                "epoch_coin_score": epoch_coin_score
                             }
                             if chain in server_epoch_chains:
                                 server_epoch_chains.remove(chain)
-                            total += chain_stats["notary_server_epoch_chain_ntx_score"]
+                            total += chain_stats["notary_server_epoch_coin_ntx_score"]
                             rows.append(row)
 
     return rows, total
 
 
 def get_vote2021_table(request):
-    candidate = None
-    block = None
-    txid = None
-    mined_by = None
-    max_block = None
-    max_blocktime = None
-    max_locktime = None
+    candidate = helper.get_or_none(request, "candidate")
+    block = helper.get_or_none(request, "block")
+    txid = helper.get_or_none(request, "txid")
+    mined_by = helper.get_or_none(request, "mined_by")
+    max_block = helper.get_or_none(request, "max_block")
+    max_blocktime = helper.get_or_none(request, "max_blocktime")
+    max_locktime = helper.get_or_none(request, "max_locktime")
 
-    if "candidate" in request.GET:
-        candidate = request.GET["candidate"]
-    if "block" in request.GET:
-        block = request.GET["block"]
-    if "txid" in request.GET:
-        txid = request.GET["txid"]
-    if "mined_by" in request.GET:
-        mined_by = request.GET["mined_by"]
-    if "max_block" in request.GET:
-        max_block = request.GET["max_block"]
-    if "max_blocktime" in request.GET:
-        max_blocktime = request.GET["max_blocktime"]
-    if "max_locktime" in request.GET:
-        max_locktime = request.GET["max_locktime"]
-
-    data = get_vote2021_data(candidate, block, txid, max_block, max_blocktime, max_locktime, mined_by)
+    data = query.get_vote2021_data(candidate, block, txid, max_block, max_blocktime, max_locktime, mined_by)
 
     if "order_by" in request.GET:
         order_by = request.GET["order_by"]
@@ -667,7 +528,7 @@ def get_vote2021_table(request):
     else:
         data = data.values().order_by(f'-block_time')
 
-    serializer = vote2021Serializer(data, many=True)
+    serializer = serializers.vote2021Serializer(data, many=True)
     resp = {}
     for item in serializer.data:
         if item["candidate"] in DISQUALIFIED:
@@ -675,3 +536,4 @@ def get_vote2021_table(request):
         item.update({"lag": item["block_time"]-item["lock_time"]})
 
     return serializer.data
+

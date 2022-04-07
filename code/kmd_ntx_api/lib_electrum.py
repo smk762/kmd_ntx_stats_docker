@@ -3,11 +3,14 @@ import json
 import time
 import codecs
 import random
+import ssl
 import socket
 import requests
 from kmd_ntx_api.lib_const import *
-from kmd_ntx_api.lib_base58 import *
+import kmd_ntx_api.lib_base58
 import kmd_ntx_api.lib_dexstats as dexstats
+
+socket.setdefaulttimeout(5)
 
 
 def get_utxo_count(chain, pubkey, server):
@@ -15,10 +18,10 @@ def get_utxo_count(chain, pubkey, server):
         endpoint = f"{THIS_SERVER}/api/info/electrums"
         electrums_info = requests.get(f"{endpoint}").json()["results"]
 
-        block_tip = dexstats.get_blocktip(chain)
+        block_tip = dexstats.get_sync(chain)["height"]
 
         if chain in ["PIRATE", "NINJA", "MESH", "AXO"]:
-            address = calc_addr_from_pubkey("KMD", pubkey)
+            address = lib_base58.calc_addr_from_pubkey("KMD", pubkey)
             resp = dexstats.get_utxos(chain, address)
             utxos = []
             utxo_count = 0
@@ -98,8 +101,23 @@ def get_utxo_count(chain, pubkey, server):
         }
         logger.error(e)
 
-def get_balance(coin, address):
-    sh = get_scripthash_from_address(address)
+
+
+def get_from_electrum(url, port, method, params=[]):
+    params = [params] if not isinstance(params, list) else params
+    with socket.create_connection((url, port)) as sock:
+        sock.send(json.dumps({"id": 0, "method": method, "params": params}).encode() + b'\n')
+        return json.loads(sock.recv(99999)[:-1].decode())
+
+
+def get_from_electrum_ssl(url, port, method, params=[]):
+    params = [params] if not isinstance(params, list) else params
+    context = ssl.create_default_context()
+    with socket.create_connection((url, port)) as sock:
+        with context.wrap_socket(sock, server_hostname=url) as ssock:
+            ssock.send(json.dumps({"id": 0, "method": method, "params": params}).encode() + b'\n')
+            return json.loads(ssock.recv(99999)[:-1].decode())
+
 
 def get_scripthash_from_address(address):
     # remove address prefix
@@ -111,28 +129,12 @@ def get_scripthash_from_address(address):
     return script_hash
 
 
-def get_from_electrum(url, port, method, params=[]):
-    params = [params] if type(params) is not list else params
-    socket.setdefaulttimeout(20)
-
-    s = socket.create_connection((url, port))
-    s.send(json.dumps({"id": 0, "method": 'server.version',
-                       "params": ['ElectrumX 1.16.0', '1.4']}).encode() + b'\n')
-    #print(json.loads(s.recv(999999)[:-1].decode()))
-    time.sleep(0.1)
-    s.send(json.dumps({"id": 0, "method": method,
-                       "params": params}).encode() + b'\n')
-    time.sleep(0.1)
-
-    return json.loads(s.recv(999999)[:-1].decode())
-
-
 def get_p2pk_scripthash_from_pubkey(pubkey):
     scriptpubkey = '21' + pubkey + 'ac'
     scripthex = codecs.decode(scriptpubkey, 'hex')
     s = hashlib.new('sha256', scripthex).digest()
     sha256_scripthash = codecs.encode(s, 'hex').decode("utf-8")
-    script_hash = lil_endian(sha256_scripthash)
+    script_hash = lib_base58.lil_endian(sha256_scripthash)
     return script_hash
 
 
@@ -164,7 +166,6 @@ def get_full_electrum_balance(url, port, address=None, pubkey=None):
         return -1
     p2pk_resp = get_from_electrum(
         url, port, 'blockchain.scripthash.get_balance', p2pk_scripthash)
-    #print(p2pk_resp)
     p2pk_confirmed_balance = p2pk_resp['result']['confirmed']
     p2pk_unconfirmed_balance = p2pk_resp['result']['unconfirmed']
 
