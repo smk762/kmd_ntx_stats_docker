@@ -14,7 +14,6 @@ def get_ext_swaps(days_since=1):
     ext_cursor.execute("SELECT * FROM swaps WHERE started_at >= now() - INTERVAL "+str(days_since)+" DAY ORDER BY started_at;")
     result = ext_cursor.fetchall()
     for x in result:
-        print(x)
         row = swaps_row()
         row.uuid = x[1]
         row.started_at = x[2]
@@ -36,7 +35,6 @@ def get_ext_swaps_failed(days_since=1):
     ext_cursor.execute("SELECT * FROM swaps_failed WHERE started_at >= now() - INTERVAL "+str(days_since)+" DAY ORDER BY started_at;")
     result = ext_cursor.fetchall()
     for x in result:
-        print(x)
         row = swaps_failed_row()
         row.uuid = x[0]
         row.started_at = x[1]

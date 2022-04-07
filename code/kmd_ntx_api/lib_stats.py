@@ -60,7 +60,6 @@ def get_top_coin_notarisers(top_region_notarisers, chain, season):
         if chain in top_region_notarisers[region]:
             if chain == "LTC":
                 chain = "KMD"
-            print(top_region_notarisers[region][chain])
             if "top_notary" in top_region_notarisers[region][chain]:
                 notary = top_region_notarisers[region][chain]["top_notary"]
                 top_coin_notarisers.update({
@@ -70,7 +69,6 @@ def get_top_coin_notarisers(top_region_notarisers, chain, season):
                         "top_ntx_count": top_region_notarisers[region][chain]["top_ntx_count"]
                     }
                 })
-    print(top_coin_notarisers)
     return top_coin_notarisers
 
 
@@ -86,7 +84,6 @@ def get_daily_stats_sorted(season=None, coins_dict=None):
     mined_last_24hrs = info.get_mined_data_24hr().values('name').annotate(mined_24hrs=Sum('value'), blocks_24hrs=Count('value'))
     nn_mined_last_24hrs = {}
     for item in mined_last_24hrs:
-        print(item)
         nn_mined_last_24hrs.update({item['name']:item['blocks_24hrs']})
 
     daily_stats = {}

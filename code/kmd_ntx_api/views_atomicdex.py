@@ -135,7 +135,6 @@ def last_200_swaps_view(request):
     context = helper.get_base_context(request)
     last_200_swaps = dex.get_last_200_swaps(request)
     last_200_swaps = dex.format_gui_os_version(last_200_swaps)
-    print(last_200_swaps)
 
     context.update({
         "last_200_swaps": last_200_swaps,

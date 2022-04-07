@@ -352,63 +352,63 @@ for season in SEASONS_INFO:
         servers = requests.get(get_notarised_servers_url(season)).json()["results"]
         for server in servers:
             coins = requests.get(get_notarised_coins_url(season, server)).json()["results"]
-            if server in SCORING_EPOCHS_REPO_DATA[season]["Servers"]:
-                coins = coins + list(SCORING_EPOCHS_REPO_DATA[season]["Servers"][server].keys())
-            if season == CURRENT_SEASON:
-                if server in CURRENT_DPOW_COINS[season]:
-                    coins += CURRENT_DPOW_COINS[season][server]
-            coins = list(set(coins))
-            coins.sort()
-            for coin in coins + ["KMD", "LTC", "BTC"]:
-                if season in DPOW_EXCLUDED_COINS:
-                    if coin not in DPOW_EXCLUDED_COINS[season]:
+            if season in SCORING_EPOCHS_REPO_DATA:
+                if server in SCORING_EPOCHS_REPO_DATA[season]["Servers"]:
+                    coins = coins + list(SCORING_EPOCHS_REPO_DATA[season]["Servers"][server].keys())
+                if season == CURRENT_SEASON:
+                    if server in CURRENT_DPOW_COINS[season]:
+                        coins += CURRENT_DPOW_COINS[season][server]
+                coins = list(set(coins))
+                coins.sort()
+                for coin in coins + ["KMD", "LTC", "BTC"]:
+                    if season in DPOW_EXCLUDED_COINS:
+                        if coin not in DPOW_EXCLUDED_COINS[season]:
 
-                        if coin in ["KMD", "LTC", "BTC"]:
-                            SEASONS_INFO[season]["servers"].update({
-                                coin:{
-                                    "coins": [coin],
-                                    "addresses": {
-                                        coin: {}
-                                    },
-                                    "epochs": {
-                                        coin: {
-                                            "coins": [coin],
-                                            "start_time": SEASONS_INFO[season]["start_time"],
-                                            "end_time": SEASONS_INFO[season]["end_time"],
-                                            "start_event": [
-                                                "Season start"
-                                            ],
-                                            "end_event": [
-                                                "Season end"
-                                            ]
+                            if coin in ["KMD", "LTC", "BTC"]:
+                                SEASONS_INFO[season]["servers"].update({
+                                    coin:{
+                                        "coins": [coin],
+                                        "addresses": {
+                                            coin: {}
+                                        },
+                                        "epochs": {
+                                            coin: {
+                                                "coins": [coin],
+                                                "start_time": SEASONS_INFO[season]["start_time"],
+                                                "end_time": SEASONS_INFO[season]["end_time"],
+                                                "start_event": [
+                                                    "Season start"
+                                                ],
+                                                "end_event": [
+                                                    "Season end"
+                                                ]
+                                            }
                                         }
                                     }
-                                }
-                            })
+                                })
 
-                        if server not in SEASONS_INFO[season]["servers"]:
-                            SEASONS_INFO[season]["servers"].update({
-                                server: {
-                                    "coins": [],
-                                    "addresses": {},
-                                    "epochs": {}
-                                }
-                            })
+                            if server not in SEASONS_INFO[season]["servers"]:
+                                SEASONS_INFO[season]["servers"].update({
+                                    server: {
+                                        "coins": [],
+                                        "addresses": {},
+                                        "epochs": {}
+                                    }
+                                })
 
-                        SEASONS_INFO[season]["coins"].append(coin)
+                            SEASONS_INFO[season]["coins"].append(coin)
 
-                        if server in ["Main", "Third_Party"] and coin not in ["KMD", "LTC", "BTC"]:
-                            SEASONS_INFO[season]["servers"][server]["coins"].append(coin)
+                            if server in ["Main", "Third_Party"] and coin not in ["KMD", "LTC", "BTC"]:
+                                SEASONS_INFO[season]["servers"][server]["coins"].append(coin)
 
-                        SEASONS_INFO[season]["servers"][server]["addresses"].update({coin:{}})
+                            SEASONS_INFO[season]["servers"][server]["addresses"].update({coin:{}})
 
-                SEASONS_INFO[season]["servers"][server]["coins"] = list(set(SEASONS_INFO[season]["servers"][server]["coins"]))
-                SEASONS_INFO[season]["servers"][server]["coins"].sort()
+                    SEASONS_INFO[season]["servers"][server]["coins"] = list(set(SEASONS_INFO[season]["servers"][server]["coins"]))
+                    SEASONS_INFO[season]["servers"][server]["coins"].sort()
 
         SEASONS_INFO[season]["coins"] = list(set(SEASONS_INFO[season]["coins"]))
         SEASONS_INFO[season]["coins"].sort()
 
-print(json.dumps(SEASONS_INFO["Season_5"], indent=4))
 
 NOTARY_LTC_ADDRESSES = {}
 ALL_SEASON_NOTARY_LTC_ADDRESSES = {}

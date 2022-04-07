@@ -165,15 +165,12 @@ def update_epochs(season):
                     epoch_row.score_per_ntx = lib_validate.calc_epoch_score(server, num_coins)
                 else:
                     epoch_row.score_per_ntx = 0
-                print(epoch_row)
                 epoch_row.update()
 
 
 
 @print_runtime
 def get_dpow_scoring_window(season, server, coin):
-    print(server)
-    print(coin)
     official_start = None
     official_end = None
 
