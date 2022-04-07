@@ -104,9 +104,14 @@ def get_max_value_mined_txid(max_value, season=None):
     sql += ";"
     CURSOR.execute(sql)
     results = CURSOR.fetchone()
-    if len(results) > 0:
-        return results[0]
-    else:
+    try:
+        if len(results) > 0:
+            return results[0]
+        else:
+            return ''
+    except Exception as e:
+        print(sql)
+        print(e)
         return ''
 
 
