@@ -11,6 +11,7 @@
             <button class="c-header-toggler c-class-toggler mfs-3 d-md-down-none" type="button" data-target="#sidebar" data-class="c-sidebar-lg-show">
                 <i class="cil-menu"></i>
             </button>
+
             <ul class="c-header-nav d-md-down-none">
                 <li class="c-header-nav-item px-1">
                     <button class="btn btn-secondary dropdown-toggle" id="docsDropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> Docs
@@ -18,10 +19,8 @@
                     <div class="dropdown-menu" aria-labelledby="docsDropdownMenuButton" data-popper-placement="bottom-start">
                         <a class="dropdown-item" href="https://developers.komodoplatform.com/"> Developer Docs</a>
                         <a class="dropdown-item" href="https://docs.komodoplatform.com/notary/setup-Komodo-Notary-Node.html#nn-repo-quick-reference"> NN Setup Guide</a>
-                        <a class="dropdown-item" href="https://smk762.github.io/developer-docs/resources/notary-api.html">API Guide</a>
                         <a class="dropdown-item" href="https://github.com/komodoplatform/dpow"> dPoW Guide</a>
                         <a class="dropdown-item" href="https://github.com/KomodoPlatform/dPoW/blob/dev/doc/bible.md"> Notary Node Bible</a>
-                        <a class="dropdown-item" href="https://github.com/KomodoPlatform/kips"> Komodo Improvement Proposals</a>
                     </div>
                 </li>
                 <li class="c-header-nav-item px-1">
@@ -37,9 +36,9 @@
                     </div>
                 </li>
                 <li class="c-header-nav-item px-1">
-                    <button class="btn btn-secondary dropdown-toggle kmd_dkteal_bg" id="statsDropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> Resources
+                    <button class="btn btn-secondary dropdown-toggle" id="statsDropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> Resources
                     </button>
-                    <div class="dropdown-menu kmd_blue_bg" aria-labelledby="statsDropdownMenuButton" data-popper-placement="bottom-start">
+                    <div class="dropdown-menu" aria-labelledby="statsDropdownMenuButton" data-popper-placement="bottom-start">
                         <a class="dropdown-item" href="https://www.dexstats.info/"> DexStats</a>
                         <a class="dropdown-item" href="https://komodod.com/"> Komodod</a>
                         <a class="dropdown-item" href="https://notarystats.info/"> Notary Stats</a>
@@ -49,6 +48,7 @@
                     </div>
                 </li>
             </ul>
+
             <!--
             <ul class="c-header-nav mfs-auto">
                 <li class="c-header-nav-item dropdown d-md-down-none mx-2">
@@ -62,15 +62,15 @@
                             <strong>Notary Node Network Health</strong>
                         </div>
 
-                        <span data-toggle="tooltip" data-placement="left" data-html="true" title="{{ nn_health.ntx_chains_tooltip }}">
+                        <span data-toggle="tooltip" data-placement="left" data-html="true" title="{{ nn_health.ntx_coins_tooltip }}">
                             <a class="dropdown-item d-block" href="#">
                                 <div class="mb-1">
-                                    <i class="fas fa-link"></i> Chain Notarisation
+                                    <i class="fas fa-link"></i> Coin Notarisation
                                 </div>
                                 <span class="progress progress-xs">
-                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ nn_health.ntx_chains_pct }}%" aria-valuenow="{{ nn_health.ntx_chains_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ nn_health.ntx_coins_pct }}%" aria-valuenow="{{ nn_health.ntx_coins_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </span>
-                                <small class="text-uppercase text-muted">Chains notarised 24hrs</small>
+                                <small class="text-uppercase text-muted">Coins notarised 24hrs</small>
                             </a>
                         </span>
 
@@ -118,7 +118,7 @@
                                 <span class="progress progress-xs">
                                     <div class="progress-bar kmd_ltblue" role="progressbar" style="width: {{ nn_health.sync_pct }}%" aria-valuenow="{{ nn_health.sync_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </span>
-                                <small class="text-uppercase text-muted">Chain tips matching</small>
+                                <small class="text-uppercase text-muted">Coin tips matching</small>
                             </a>
                         </span>
                     </div>

@@ -4,34 +4,26 @@
 	<div class="row col-12 m-auto">
 		<div class="card table_card">
 			<div class="card-header table_card_title flex">
-				{{ season_clean }} dPoW Chain Command Line Interface (CLI)
+				{{ season_clean }} dPoW Coin Command Line Interface (CLI)
 			</div>
 			<div class="card-body table_card_body">
 				{% for item in daemon_cli_rows %}
 				    <div class="input-group mb-1 ">
 					    <div class="input-group-prepend prepend-label-left p-0 col-2 text-left">
 					        <span class="input-group-text col-12">
-						      	<a class="" href='//{{ request.get_host }}/coin_profile/{{ item.chain }}'>
-			                        {% if item.chain == 'WLC21' %}
-			                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/wlc.png" />
-			                        {% elif item.chain == 'GLEEC-OLD' %}
-			                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/gleec.png" />
-			                        {% elif item.chain == 'TOKEL' %}
-			                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/tkl.png" />
-			                        {% elif item.chain == 'PIRATE' %}
-			                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/arrr.png" />
-			                        {% elif item.chain == 'COQUICASH' %}
-			                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/coqui.png" />
-			                        {% else %}
-			                            <img height="16px" class="mr-2" src="https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/{{ item.chain|lower }}.png" />
-			                        {% endif %}
-			                        {{ item.chain }}
+						      	<a class="" href='//{{ request.get_host }}/coin_profile/{{ item.coin }}'>
+									{% for coin, icon in coin_icons.items %}
+										{% if coin == item.coin %}
+			                        		<img height="16px" class="mr-2" src="{{ icon }}" />
+			                        	{% endif %}
+									{% endfor %}
+			                        {{ item.coin }}
 								</a>
 							</span>
 					    </div>
-					    <input type="text" class="form-control col-10" placeholder="{{ item.daemon_cli }}" value="{{ item.daemon_cli }}" readonly id="{{ item.chain }}_cli">
+					    <input type="text" class="form-control col-10" placeholder="{{ item.daemon_cli }}" value="{{ item.daemon_cli }}" readonly id="{{ item.coin }}_cli">
 					    <div class="input-group-append p-0">
-							<button class="append-btn" data-clipboard-target="#{{ item.chain }}_cli">
+							<button class="append-btn" data-clipboard-target="#{{ item.coin }}_cli">
 							    <i class="cil-copy"></i>
 							</button>
 					    </div>
@@ -40,9 +32,4 @@
 		    </div>
 	    </div>
 	</div>
-    <!-- jquery -->
-  
-  	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-  	
 {% endblock %}

@@ -18,9 +18,13 @@ frontend_tool_urls = [
           views_tool.daemon_cli_view,
           name='daemon_cli_view'),
 
-    path('tools/decode_opret/',
-          views_tool.decode_opret_view,
-          name='decode_opret_view'),
+    path('tools/decode_opreturn/',
+          views_tool.decode_op_return_view,
+          name='decode_op_return_view'),
+
+    path('tools/faucet/',
+          views_tool.faucet_view,
+          name='faucet_view'),
 
     path('tools/kmd_rewards/',
           views_tool.kmd_rewards_view,
@@ -68,13 +72,17 @@ api_tool_urls = [
           name='decode_op_return_tool'),
 
     path('api/tools/kmd_rewards/',
-          api_tools.get_kmd_rewards,
-          name='get_kmd_rewards'),
+          api_tools.kmd_rewards_tool,
+          name='kmd_rewards_tool'),
 
-    path('api/tools/notary_utxos/',
-          api_tools.get_notary_utxo_count,
-          name='get_notary_utxo_count'),
+    path('api/tools/pubkey_utxos/',
+          api_tools.pubkey_utxos_tool,
+          name='pubkey_utxos_tool'),
 
+    path('api/tools/send_raw_tx/',
+          api_tools.send_raw_tx_tool,
+          name='send_raw_tx_tool'),
+    
     path('api/tools/scripthash_from_address/',
           api_tools.scripthash_from_address_tool,
           name='scripthash_from_address_tool'),
@@ -83,8 +91,4 @@ api_tool_urls = [
           api_tools.scripthashes_from_pubkey_tool,
           name='scripthashes_from_pubkey_tool'),
 
-    path('api/tools/send_raw_tx/',
-          api_tools.send_raw_tx_tool,
-          name='send_raw_tx_tool'),
-    
 ]

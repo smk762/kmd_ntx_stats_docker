@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row col-12 m-auto" id="mining_season">
+    <div class="card table_card">
+        <div class="card-header table_card_title">
+            Source: Notarised Table
+        </div>
+        <div class="card-body table_card_body">
+			<table id="ntx_tbl" class="table table-striped table-bordered m-auto" style="width:99%; visibility: hidden;" data-ajax="{% url 'notarisedViewSet-list' %}?format=datatables">
+				<thead>
+					<tr>
+						<th data-data="coin">Coin</th>
+						<th data-data="block_height">NTX Height</th>
+						<th data-data="block_hash">NTX Hash</th>
+						<th data-data="ac_ntx_height">SC Height</th>
+						<th data-data="ac_ntx_blockhash">SC Hash</th>
+						<th data-data="notaries">Notaries</th>
+						<th data-data="txid">Txid</th>
+						<th data-data="opret">Op Return</th>
+						<th data-data="block_time">Time</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#ntx_tbl').css('visibility', 'visible');
+        $('#ntx_tbl').DataTable({
+        	"paging": false,
+			deferRender: true,
+            "orderClasses": false,
+    		order: [[ 1, 'desc' ], [ 0, 'asc' ]],
+    		"columnDefs": [
+				{ className: "text-left text-nowrap", "targets": [ 0 ] },
+				{ className: "fw-14pct", "targets": [ 4, 5, 6 ] },
+				{ className: "text-right text-nowrap", "targets": [ 8 ] },
+    			{
+		            "data": "coin",
+		            "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_coin_icon(oData.coin));
+			        }
+		        },
+        		{
+		            "data": 'block_height',
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+	            		$(nTd).html(get_block_url("KMD", oData.block_height))
+			        }
+		        },
+        		{
+		            "data": 'block_hash',
+		            "targets": 2,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+	            		$(nTd).html(get_block_url("KMD", oData.block_hash))
+			        },
+			        visible:false
+		        },
+        		{
+		            "data": 'ac_ntx_height',
+		            "targets": 3,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+	            		$(nTd).html(get_block_url(oData.coin, oData.ac_ntx_height))
+			        }
+		        },
+        		{
+		            "data": 'ac_ntx_blockhash',
+		            "targets": 4,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+	            		$(nTd).html(get_block_url(oData.coin, oData.ac_ntx_blockhash))
+			        },
+			        visible:false
+		        },
+        		{
+		            "data": 'notaries',
+		            "targets": 5,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(get_notaries_symbol('{{ season }}', oData.notaries, oData.txid));
+			        }
+		        },
+    			{
+		            "data": 'txid',
+		            "targets": 6,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(get_txid_url("KMD", oData.txid));
+			        }
+		        },
+    			{
+		            "data": 'opret',
+		            "targets": 7,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	let op_return = (oData.opret.split(" ").length > 1) ? oData.opret.split(" ")[1] : oData.opret
+						let icon = "<i class='fas fa-arrow-right'></i>"
+						let tooltip = "Decode OP_RETURN: "+op_return
+						let url = "{% url 'decode_op_return_view' %}?OP_RETURN="+op_return+"&season={{ season }}"
+			            $(nTd).html(get_detail_link_icon(icon, tooltip, url));
+			        } 
+		        },
+    			{
+		            "data": 'block_time',
+		            "targets": 8,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+	            		$(nTd).html(get_time_since(oData.block_time));
+			        }
+		        }
+		    ]
+        });
+    });
+</script>
+{% endblock %}

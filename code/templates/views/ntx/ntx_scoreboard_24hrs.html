@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+	{% include "components/region_leaders/region_ntx_leaders_24hr.html" %}
+
+	{% for region, region_data in daily_stats_sorted.items %}
+		<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
+			<div class="card table_card m-auto">
+				<div  class="card-header table_card_title flex">
+					<a id="{{region}}_table" class="section-anchor"></a>
+					<h4>{{ season }} {{ region }} Notarisation rankings (24hrs)</h4>
+					{% for reg, stats in region_score_stats.items %}
+						{% if reg == region %}
+							<h6>Average: {{ stats.average_score|floatformat:-2 }}</h6>
+						{% endif %}
+					{% endfor%}
+				</div>
+				<div class="card-body table_card_body">
+					<table id="{{ region }}_notarisations" class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th class="py-2 px-4">Rank</th>
+								<th class="py-2 px-4">Notary</th>
+								<th class="py-2 px-4">LTC</th>
+								<th class="py-2 px-4">Main</th>
+								<th class="py-2 px-4">3P</th>
+								<th class="py-2 px-4">Seed</th>
+								<th class="py-2 px-4">Mined</th>
+								<th class="py-2 px-4">Score</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in region_data %}
+							<tr>
+								<td data-data="rank" class="px-2">
+						  			{{ item.rank }}
+							  	</td>
+								<td data-data="notary" class="px-4">
+									{{ item.notary }}
+								</td>
+								<td data-data="btc" class="px-4">
+									{{ item.btc }}
+								</td>
+								<td data-data="main" class="px-4">
+									{{ item.main }}
+								</td>
+								<td data-data="third_party" class="px-4">
+									{{ item.third_party }}
+								</td>
+								<td data-data="seed" class="px-4">
+									{{ item.seed }}
+								</td>
+								<td data-data="mining" class="px-4">
+									{{ item.mining }}
+								</td>
+								<td data-data="score" class="px-4">
+									{{ item.score|floatformat:-3 }}
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>	
+		</div>
+	{% endfor %}
+  
+  	<script>
+	    $(document).ready(function() {
+		        AR_table = $('#AR_notarisations').DataTable({    
+		        	"paging": false,
+	    			deferRender: true,
+	                "orderClasses": false,
+	        		order: [[ 0, 'asc' ]],
+		        	"columns": [
+				        { "data": "rank" },
+				        { "data": "notary" },
+				        { "data": "btc" },
+				        { "data": "main" },
+				        { "data": "third_party" },	
+				        { "data": "seed" },	
+				        { "data": "mining" },
+				        { "data": "score" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            	$(nTd).html(get_notary_url('{{ season }}', oData.notary));
+					        }
+				        },
+	        			{
+				            "targets": 7,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html(oData.score);
+					        }
+				        }
+	        		]
+		        });
+		        var max_AR = AR_table.column(6).data()[0]
+				console.log(max_AR)
+			    AR_table.rows().every( function (index) {
+			    	var row = AR_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_AR/3)
+				    if (d.score < max_AR/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        EU_table = $('#EU_notarisations').DataTable({
+	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
+	    			deferRender: true,
+	                "orderClasses": false,
+		        	"columns": [
+				        { "data": "rank" },
+				        { "data": "notary" },
+				        { "data": "btc" },
+				        { "data": "main" },
+				        { "data": "third_party" },	
+				        { "data": "seed" },	
+				        { "data": "mining" },
+				        { "data": "score" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            	$(nTd).html(get_notary_url('{{ season }}', oData.notary));
+					        }
+				        },
+	        			{
+				            "targets": 7,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html(oData.score);
+					        }
+				        }
+	        		]
+		        });
+		        var max_EU = EU_table.column(6).data()[0]
+				console.log(max_EU)
+			    EU_table.rows().every( function (index) {
+			    	var row = EU_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_EU/3)
+				    if (d.score < max_EU/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        NA_table = $('#NA_notarisations').DataTable({
+	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
+	    			deferRender: true,
+	                "orderClasses": false,
+		        	"columns": [
+				        { "data": "rank" },
+				        { "data": "notary" },
+				        { "data": "btc" },
+				        { "data": "main" },
+				        { "data": "third_party" },	
+				        { "data": "seed" },	
+				        { "data": "mining" },
+				        { "data": "score" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            	$(nTd).html(get_notary_url('{{ season }}', oData.notary));
+					        }
+				        },
+	        			{
+				            "targets": 7,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html(oData.score);
+					        }
+				        }
+	        		]
+		        });
+		        var max_NA = NA_table.column(6).data()[0]
+				console.log(max_NA)
+			    NA_table.rows().every( function (index) {
+			    	var row = NA_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_NA/3)
+				    if (d.score < max_NA/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        SH_table = $('#SH_notarisations').DataTable({
+	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
+	    			deferRender: true,
+	                "orderClasses": false,
+		        	"columns": [
+				        { "data": "rank" },
+				        { "data": "notary" },
+				        { "data": "btc" },
+				        { "data": "main" },
+				        { "data": "third_party" },	
+				        { "data": "seed" },	
+				        { "data": "mining" },
+				        { "data": "score" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            	$(nTd).html(get_notary_url('{{ season }}', oData.notary));
+					        }
+				        },
+	        			{
+				            "targets": 7,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html(oData.score);
+					        }
+				        }
+	        		]
+		        });
+		        var max_SH = SH_table.column(6).data()[0]
+				console.log(max_SH)
+			    SH_table.rows().every( function (index) {
+			    	var row = SH_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_SH/3)
+				    if (d.score < max_SH/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+		        DEV_table = $('#DEV_notarisations').DataTable({
+	        		order: [[ 0, 'asc' ]],
+		        	"paging": false,
+	    			deferRender: true,
+	                "orderClasses": false,
+		        	"columns": [
+				        { "data": "rank" },
+				        { "data": "notary" },
+				        { "data": "btc" },
+				        { "data": "main" },
+				        { "data": "third_party" },	
+				        { "data": "seed" },	
+				        { "data": "mining" },
+				        { "data": "score" }
+				    ],
+	        		"columnDefs": [
+	        			{
+				            "targets": 1,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            	$(nTd).html(get_notary_url('{{ season }}', oData.notary));
+					        }
+				        },
+	        			{
+				            "targets": 7,
+				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					            $(nTd).html(oData.score);
+					        }
+				        }
+	        		]
+		        });
+		        var max_DEV = DEV_table.column(6).data()[0]
+				console.log(max_DEV)
+			    DEV_table.rows().every( function (index) {
+			    	var row = DEV_table.row(index);
+				    var d = row.data();
+				    console.log(d)
+				    console.log(d.score)
+				    console.log(max_DEV/3)
+				    if (d.score < max_DEV/3) {
+				    	row
+				    	.nodes()
+					    .to$()    // Convert to a jQuery object
+						.addClass( 'kmd_secondary_purple' );
+				    }
+				} );
+	    });
+	    /*
+	    $.ajax({ 
+	      method: "GET", 
+	      url: '//{{ request.get_host }}/api/graph_json/balances/?coin={{ coin }}', 
+	      success: function(data) { 
+	      	//document.getElementById('graph_title').innerHTML = data.chartLabel;
+	        //drawLineGraph(data, 'myChartline'); 
+	        drawBarGraph(data, 'myChartBar'); 
+	        console.log("drawing"); 
+	      }, 
+	      error: function(error_data) { 
+	        console.log(error_data); 
+	      } 
+	    }) 
+	   */
+
+  </script> 
+
+{% endblock %}

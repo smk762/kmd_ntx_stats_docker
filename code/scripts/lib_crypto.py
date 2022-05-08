@@ -87,6 +87,7 @@ COIN_PARAMS = {
     "KMD": KMD_CoinParams,
     "MIL": MIL_CoinParams,
     "VOTE2021": KMD_CoinParams,
+    "VOTE2022": KMD_CoinParams,
     "WLC21": KMD_CoinParams,
     "MCL": KMD_CoinParams,
     "RFOX": KMD_CoinParams,
@@ -157,6 +158,11 @@ def get_opret_ticker(scriptPubKey_asm):
                 break
     if chr(scriptPubKeyBinary[-4])+chr(scriptPubKeyBinary[-3])+chr(scriptPubKeyBinary[-2]) == "KMD":
         coin = "KMD"
+
+    # some decodes have a null char error, this gets rid of that so populate script doesnt error out 
+    if coin.find('\x00') != -1:
+        coin = coin.replace('\x00','')
+
     return str(coin)
     
 

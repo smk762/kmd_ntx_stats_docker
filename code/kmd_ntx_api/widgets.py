@@ -26,6 +26,7 @@ class Select2Mixin():
         js = ("https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js",
               'customselect2.js')
 
+
 def update_attrs(self, options, attrs):
     attrs = self.fix_class(attrs)
     multiple = options.pop('multiple', False)

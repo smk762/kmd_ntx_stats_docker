@@ -8,16 +8,21 @@ from kmd_ntx_api import api_graph
 from kmd_ntx_stats.urls_atomicdex import frontend_atomicdex_urls, api_atomicdex_urls
 
 from kmd_ntx_stats.urls_source import source_router
-from kmd_ntx_stats.urls_status import api_status_urls
+from kmd_ntx_stats.urls_csv import api_csv_urls
 from kmd_ntx_stats.urls_graph import api_graph_urls
 from kmd_ntx_stats.urls_info import api_info_urls
-from kmd_ntx_stats.urls_docs import doc_urls
+from kmd_ntx_stats.urls_status import api_status_urls
 from kmd_ntx_stats.urls_table import api_table_urls
-from kmd_ntx_stats.urls_community import frontend_community_urls
 from kmd_ntx_stats.urls_wallet import api_wallet_urls
+from kmd_ntx_stats.urls_docs import doc_urls
+from kmd_ntx_stats.urls_community import frontend_community_urls
 
 from kmd_ntx_stats.urls_page import frontend_page_urls
+from kmd_ntx_stats.urls_coin import frontend_coin_urls
+from kmd_ntx_stats.urls_ntx import frontend_ntx_urls
 from kmd_ntx_stats.urls_tool import frontend_tool_urls, api_tool_urls
+from kmd_ntx_stats.urls_mining import frontend_mining_urls, api_mining_urls
+from kmd_ntx_stats.urls_testnet import frontend_testnet_urls, api_testnet_urls
 
 handler400 = 'kmd_ntx_api.views_error.error_400'
 handler403 = 'kmd_ntx_api.views_error.error_403'
@@ -50,13 +55,9 @@ urlpatterns = [
     # API views (simple)
     # TODO: Deprecate or merge into other url files
 
-    path('api/info/chain_sync/',
-          views_api.api_chain_sync,
-          name='api_chain_sync'),
-
-    path('api/info/nn_mined_4hrs_count/',
-          views_api.nn_mined_4hrs_api,
-          name='nn_mined_4hrs_api'),
+    path('api/info/coin_sync/',
+          views_api.api_coin_sync,
+          name='api_coin_sync'),
 
     path('api/info/sidebar_links/',
           views_api.api_sidebar_links,
@@ -66,22 +67,18 @@ urlpatterns = [
           views_api.split_summary_api,
           name='split_summary_api'),
     
-    path('api/testnet/totals/',
-          views_api.api_testnet_totals,
-          name='api_testnet_totals'),
-
 ]
 
-urlpatterns += frontend_atomicdex_urls
-urlpatterns += api_atomicdex_urls
+url_lists = [
+    frontend_atomicdex_urls, api_atomicdex_urls,
+    frontend_mining_urls, api_mining_urls,
+    frontend_testnet_urls, api_testnet_urls,
+    frontend_coin_urls, frontend_ntx_urls,
+    frontend_page_urls, frontend_tool_urls,
+    api_csv_urls, api_graph_urls, api_info_urls,
+    api_status_urls, api_table_urls, api_tool_urls,
+    api_wallet_urls, doc_urls, frontend_community_urls
+]
 
-urlpatterns += frontend_page_urls
-urlpatterns += frontend_tool_urls
-urlpatterns += api_graph_urls
-urlpatterns += api_info_urls
-urlpatterns += api_status_urls
-urlpatterns += api_table_urls
-urlpatterns += api_tool_urls
-urlpatterns += api_wallet_urls
-urlpatterns += doc_urls
-urlpatterns += frontend_community_urls
+for i in url_lists:
+  urlpatterns += i

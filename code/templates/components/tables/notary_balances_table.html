@@ -1,0 +1,93 @@
+<div class="row" id="addresses">
+	<div class="card-deck d-flex justify-content-between col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title">
+				{{ notary_clean }} {{ season_clean }} Addresses & Balances
+			</div>
+			<div class="card-body table_card_body">
+				<table id="balances_table" class="table table-striped table-bordered" style="width:99%; visibility: hidden;">
+					<thead>
+						<tr>
+							<th data-data="coin">Coin</th>
+							<th data-data="server">Server</th>
+							<th data-data="address">Address</th>
+							<th data-data="balance">Balance</th>
+							<th data-data="update">Since Updated</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in notary_balances %}
+							{% if item.coin == "BTC" or item.coin == "LTC" %}
+								{% if item.server != "Third_Party" %}
+									<tr>
+										<td data-data="coin" class="px-2 text-left">{{ item.coin }}</td>
+										<td data-data="server">{{ item.server }}</td>
+										<td data-data="address">{{ item.address }}</td>
+										<td data-data="balance">{{ item.balance|floatformat:-4 }}</td>
+										<td data-data="update">{{ item.update_time }}</td>
+									</tr>
+								{% endif %}
+							{% else %}
+								<tr>
+									<td data-data="coin" class="px-2 text-left">{{ item.coin }}</td>
+									<td data-data="server">{{ item.server }}</td>
+									<td data-data="address">{{ item.address }}</td>
+									<td data-data="balance">{{ item.balance|floatformat:-4 }}</td>
+									<td data-data="update">{{ item.update_time }}</td>
+								</tr>
+							{% endif %}
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>	
+	</div>
+</div>
+<script>  
+    $(document).ready(function() {
+    	$('#balances_table').css('visibility', 'visible');
+        var balTable = $('#balances_table').DataTable({
+			deferRender: true,
+            "orderClasses": false,
+			"paging": false,
+    		order: [ 0, 'asc' ],
+    		"columnDefs": [
+    			{
+		            "targets": 0,
+		            "data": "coin",
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				        $(nTd).html(get_coin_icon(oData.coin));
+			        }
+    			},
+    			{
+		            "data": "server",
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				        $(nTd).html(get_server_styled(oData.server));
+		        	}
+		        },
+    			{
+		            "data": "address",
+		            "targets": 2,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(get_address_url(oData.coin, oData.address));
+		            }
+		        },
+    			{
+		            "data": "balance",
+		            "targets": 3,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(oData.balance);
+			        }
+		        },
+    			{
+		            "data": 'update_time',
+		            "targets": 4,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(get_time_since(oData.update_time));
+			        }
+		        }		
+    		]
+        });
+    });
+</script>

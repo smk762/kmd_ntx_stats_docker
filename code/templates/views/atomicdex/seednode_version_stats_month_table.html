@@ -46,20 +46,6 @@
 	
 	<script>
 
-		function getOffset() {
-			var d = new Date();
-			return d.getTimezoneOffset()*60*1000;
-		}
-
-		function local_date_str(date_str) {
-		  var d = Date.parse(date_str);
-		  var offset = getOffset()
-		  var x = new Date(d-offset)
-		  var ds = x.toLocaleDateString();
-		  var ts = x.toLocaleTimeString();
-		  return ds+" "+ts;
-		}
-
 		{% autoescape off %}
 
 		$('#start').val(local_date_str('{{start_str}}'))

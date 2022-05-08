@@ -3,11 +3,22 @@ import requests
 # Grabs data from Dexstats explorer APIs
 # e.g. https://kmd.explorer.dexstats.info/insight-api-komodo
 
+DEXSTATS_COINS = ["BET", "BOTS", "CCL", "CHIPS", "CLC", "CRYPTO", "DEX",
+                  "DP", "GLEEC", "HODL", "ILN", "JUMBLR", "KMD", "KOIN",
+                  "LABS", "MCL", "MESH", "MGW", "MORTY", "MSHARK", "NINJA",
+                  "PANGEA", "PIRATE", "REVS", "RICK", "SOULJA", "SPACE",
+                  "SUPERNET", "THC", "TOKEL", "VRSC", "WSB", "ZILLA"]
 
-def get_utxos(coin, address):
+def get_base_endpoint(coin):
+    if coin == "MIL":
+        return f"https://mil.kmdexplorer.io/api"
+    return f"https://{coin.lower()}.explorer.dexstats.info/insight-api-komodo"
+
+
+def get_dexstats_utxos(coin, address):
     try:
-        subdomain = f"https://{coin.lower()}.explorer.dexstats.info"
-        endpoint = f"insight-api-komodo/addr/{address}/utxo"
+        subdomain = get_base_endpoint(coin)
+        endpoint = f"addr/{address}/utxo"
         return requests.get(f"{subdomain}/{endpoint}").json()
     except Exception as e:
         return f"{e}"
@@ -15,17 +26,17 @@ def get_utxos(coin, address):
 
 def get_sync(coin):
     try:
-        subdomain = f"https://{coin.lower()}.explorer.dexstats.info"
-        endpoint = "/insight-api-komodo/sync"
-        return requests.get(f"{subdomain}/{endpoint}").json()
+        subdomain = get_base_endpoint(coin)
+        url = f"{subdomain}/sync"
+        return requests.get(f"{url}").json()
     except Exception as e:
         return f"{e}"
 
 
 def get_block_info(coin, block_height):
     try:
-        subdomain = f"https://{coin.lower()}.explorer.dexstats.info"
-        endpoint = f"/insight-api-komodo/block-index/{block_height}"
+        subdomain = get_base_endpoint(coin)
+        endpoint = f"block-index/{block_height}"
         return requests.get(f"{subdomain}/{endpoint}").json()
     except Exception as e:
         return f"{e}"
@@ -33,8 +44,8 @@ def get_block_info(coin, block_height):
 
 def get_balance(coin, addr):
     try:
-        subdomain = f"https://{coin.lower()}.explorer.dexstats.info"
-        endpoint = f"/insight-api-komodo/addr/{addr}"
+        subdomain = get_base_endpoint(coin)
+        endpoint = f"addr/{addr}"
         return requests.get(f"{subdomain}/{endpoint}").json()
     except Exception as e:
         return f"{e}"

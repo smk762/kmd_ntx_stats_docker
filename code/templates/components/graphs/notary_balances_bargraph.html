@@ -1,0 +1,38 @@
+<div class="row" id="balances">
+	<div class="card-deck d-flex justify-content-between col-12 m-auto">
+		<div class="card graph_card">
+			<div class="card-header d-flex justify-content-between">
+				<h4 class="my-auto">
+					{{ notary_clean }} {{ season_clean }} Wallet Balances
+				</h4>
+				<div>
+				    <span class="badge graph_legend">
+				    	MAIN<i class="fa fa-circle main_server" aria-hidden="true" style="font-size: 1.2em;"></i>
+				    </span>
+				    <span class="badge graph_legend">
+				    	3RD PARTY<i class="fa fa-circle third_party_server" aria-hidden="true" style="font-size: 1.2em;"></i>
+				    </span>
+				    <span class="badge graph_legend">
+				    	BTC / LTC / KMD<i class="fa fa-circle master_server" aria-hidden="true" style="font-size: 1.2em;"></i>
+				    </span>
+				</div>
+			</div>
+			<div class="card-body">
+				<span id="graph_title"></span>
+			    <canvas id="balances_graph"></canvas> 
+			</div>	
+		</div>	
+	</div>	
+</div>	
+<script>
+	$.ajax({ 
+		method: "GET", 
+		url: '/api/graph/balances/?season={{ season }}&server={{ server }}&notary={{ notary }}', 
+		success: function(data) { 
+			drawBarGraph(data['results'], 'balances_graph', "Balance", 5); 
+		}, 
+		error: function(error_data) { 
+			console.log(error_data); 
+		} 
+    })
+</script>

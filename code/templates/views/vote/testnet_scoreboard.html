@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+	{% include 'components/tables/testnet_scoreboard_table.html' with testnet_ntx_counts=testnet_ntx_counts  %}
+{% endblock %}

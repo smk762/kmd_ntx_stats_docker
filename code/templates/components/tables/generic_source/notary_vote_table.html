@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row col-12 m-auto" id="mining_season">
+    <div class="card table_card">
+        <div class="card-header table_card_title">
+            Source: Notary Vote Table
+        </div>
+        <div class="card-body table_card_body">
+            <table id="notary_vote_tbl" class="table table-striped table-bordered m-auto" style="width:99%; visibility: hidden;" data-ajax="{% url 'notaryVoteViewSet-list' %}?format=datatables">
+                <thead>
+                    <tr>
+                        <th data-data="candidate">Candidate</th>
+                        <th data-data="votes">Votes</th>
+                        <th data-data="year">Year</th>
+                        <th data-data="txid">Txid</th>
+                        <th data-data="block_height">Block Height</th>
+                        <th data-data="block_hash">Block Hash</th>
+                        <th data-data="mined_by">Mined By</th>
+                        <th data-data="difficulty">Diff</th>
+                        <th data-data="candidate_address">Address</th>
+                        <th data-data="notes">Notes</th>
+                        <th data-data="lock_time">Locktime</th>
+                        <th data-data="block_time">Block Time</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>          
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#notary_vote_tbl').css('visibility', 'visible');
+        $('#notary_vote_tbl').DataTable({
+            "paging": false,
+            deferRender: true,
+            "orderClasses": false,
+            order: [ 4, 'desc' ],
+            "columnDefs": [
+                { className: "text-left text-nowrap", "targets": [ 0 ] },
+                { className: "text-right text-nowrap", "targets": [ 1, 11 ] },
+                {
+                    "data": "candidate",
+                    "targets": 0,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html(get_address_url(oData.year, oData.address, oData.candidate));
+                    }                    
+                },
+                {
+                    "data": "votes",
+                    "targets": 1
+                },
+                {
+                    "data": "year",
+                    "targets": 2,
+                },
+                {
+                    "data": "txid",
+                    "targets": 3,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html(get_txid_url(oData.year, oData.txid));
+                    }
+                },
+                {
+                    "data": "block_height",
+                    "targets": 4,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html(get_block_url(oData.year, oData.block_height))
+                    }
+                },
+                {
+                    "data": "block_hash",
+                    "targets": 5,
+                    "visible": false
+                },
+                {
+                    "data": "mined_by",
+                    "targets": 6,
+                    "visible": false
+                },
+                {
+                    "data": "difficulty",
+                    "targets": 7,
+                    "visible": false
+                },
+                {
+                    "data": "candidate_address",
+                    "targets": 8,
+                    "visible": false
+                },
+                {
+                    "data": "notes",
+                    "targets": 9,
+                    "visible": false
+                },
+                {
+                    "data": "lock_time",
+                    "targets": 10,
+                    "visible": false
+                },
+                {
+                    "data": "block_time",
+                    "targets": 11,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html(get_time_since(oData.block_time));
+                    }
+                }
+            ]
+        });
+    });
+</script>
+{% endblock %}

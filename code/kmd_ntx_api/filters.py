@@ -18,6 +18,7 @@ class minedFilter(FilterSet):
                   'block_height', 'block_time', 'block_datetime', 
                   'value', 'address', 'name', 'txid', 'season']
 
+
 class notarisedFilter(FilterSet):
     min_block = NumberFilter(field_name="block_height", lookup_expr='gte')
     max_block = NumberFilter(field_name="block_height", lookup_expr='lte')
@@ -26,15 +27,17 @@ class notarisedFilter(FilterSet):
     min_blocktime = NumberFilter(field_name="block_time", lookup_expr='gte')
     max_blocktime = NumberFilter(field_name="block_time", lookup_expr='lte')
     notary = CharFilter(field_name="notaries", lookup_expr='contains')
+    exclude_epoch = CharFilter(field_name="epoch", lookup_expr='contains', exclude=True)
 
     class Meta:
         model = notarised
         fields = ['min_block', 'max_block', 'min_ac_block',
                   'max_ac_block', 'min_blocktime', 'max_blocktime', 
-                  'txid', 'chain', 'block_height', 'block_time',
+                  'txid', 'coin', 'block_height', 'block_time',
                   'block_datetime', 'block_hash', 'ac_ntx_blockhash',
                   'ac_ntx_height', 'opret', 'season', 'server', 'epoch',
-                  'scored']
+                  'scored', 'exclude_epoch']
+
 
 class notarisedTenureFilter(FilterSet):
     gte_official_start = NumberFilter(field_name="official_start_block_time", lookup_expr='gte')
@@ -45,7 +48,8 @@ class notarisedTenureFilter(FilterSet):
     class Meta:
         model = notarised
         fields = ['gte_official_start', 'lte_official_start',
-                  'gte_official_end', 'lte_official_end', 'season', 'chain']
+                  'gte_official_end', 'lte_official_end', 'season', 'coin']
+
 
 class swapsFilter(FilterSet):
     from_time = NumberFilter(field_name="time_stamp", lookup_expr='gte')
@@ -67,6 +71,7 @@ class swapsFailedFilter(FilterSet):
                  "taker_version", "taker_pubkey", "maker_coin", 
                  "maker_amount", "maker_error_type", "maker_error_msg",
                  "maker_gui", "maker_version", "maker_pubkey"]
+
 
 class rewardsFilter(FilterSet):
     min_block = NumberFilter(field_name="block_height", lookup_expr='gte')

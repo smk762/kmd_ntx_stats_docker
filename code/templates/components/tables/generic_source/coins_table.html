@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row col-12 m-auto" id="mining_season">
+    <div class="card table_card">
+        <div class="card-header table_card_title">
+            Source: Coins Table
+        </div>
+        <div class="card-body table_card_body">
+			<table id="coins_tbl" class="table table-striped table-bordered m-auto" style="width:99%; visibility: hidden;"  data-ajax="{% url 'coinsViewSet-list' %}?format=datatables">
+				<thead>
+					<tr>
+						<th data-data="coin">Coin</th>
+						<th data-data="coins_info">Coins Info</th>
+						<th data-data="electrums">Electrum</th>
+						<th data-data="electrums_ssl">Electrum SSL</th>
+						<th data-data="dpow">dPoW</th>
+						<th data-data="dpow_tenure">dPoW Tenure</th>
+						<th data-data="dpow_active">dPoW Active</th>
+						<th data-data="mm2_compatible">MM2 Active</th>
+					</tr>
+				</thead>
+			</table>
+		</div>			
+	</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+    	$('#coins_tbl').css('visibility', 'visible');
+        $('#coins_tbl').DataTable({
+        	"paging": true,
+			deferRender: true,
+            "orderClasses": false,
+    		order: [ 0, 'asc' ],
+    		"columnDefs": [
+				{ className: "text-left text-nowrap", "targets": [ 0 ] },
+				{ className: "text-right text-nowrap", "targets": [ 5 ] },
+    			{
+		            "data": "coin",
+		            "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_coin_icon(oData.coin));
+			        }
+		        },
+    			{
+		            "data": "coins_info",
+		            "targets": 1,
+		            "visible": false
+		        },
+    			{
+		            "data": "electrums",
+		            "targets": 2,
+		            "visible": false
+		        },
+    			{
+		            "data": "electrums_ssl",
+		            "targets": 3,
+		            "visible": false
+		        },
+    			{
+		            "data": "dpow",
+		            "targets": 4,
+		            "visible": false
+		        },
+    			{
+		            "data": "dpow_tenure",
+		            "targets": 5,
+		            "visible": false
+		        },
+    			{
+		            "data": "dpow_active",
+		            "targets": 6
+		        },
+    			{
+		            "data": "mm2_compatible",
+		            "targets": 7
+		        },
+	        ]
+        });
+    });
+</script>
+{% endblock %}

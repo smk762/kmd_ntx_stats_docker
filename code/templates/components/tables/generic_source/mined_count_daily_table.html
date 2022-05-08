@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row col-12 m-auto" id="addresses">
+	<div class="card table_card">
+		<div class="card-header table_card_title flex">
+			Source: Notary Mined Count By Date
+		</div>
+		<div class="card-body table_card_body">
+			<table id="mining_daily_tbl" class="table table-striped table-bordered" style="width:99%; visibility: hidden;" data-ajax="{% url 'minedCountDailyViewSet-list'%}?format=datatables">
+				<thead>
+					<tr>
+						<th data-data="notary">NOTARY</th>
+						<th data-data="blocks_mined">BLOCKS MINED</th>
+						<th data-data="sum_value_mined">SUM MINED</th>
+						<th data-data="mined_date">DATE</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#mining_daily_tbl').DataTable({
+        	"paging": false,
+			deferRender: true,
+            "orderClasses": false,
+    		order: [[ 3, 'desc' ], [ 0, 'asc' ]],
+    		"columnDefs": [
+    			{ className: "text-right text-nowrap", "targets": [ 1, 2, 3 ] },
+    			{ className: "text-left text-nowrap", "targets": [ 0 ] },
+		        {
+		            "data": "notary",
+	                "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(get_notary_url('{{ season }}', oData.notary));
+			        }
+	            }
+    		]
+        });
+    });
+</script>
+{% endblock %}

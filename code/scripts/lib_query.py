@@ -11,23 +11,11 @@ def get_mined_date_aggregates(day):
            DATE_TRUNC('day', block_datetime) = '"+str(day)+"' \
            GROUP BY name;"
     CURSOR.execute(sql)
-    try:
-        results = CURSOR.fetchall()
-        return results
-    except:
-        return ()
-
-    CURSOR.execute(sql)
-    try:
-        results = CURSOR.fetchall()
-        return results
-    except:
-        return ()
-
+    return helper.get_results_or_none(CURSOR)
 
 def get_epochs(season=None, server=None, epoch=None):
     sql = "SELECT season, server, epoch, epoch_start, epoch_end, \
-                    start_event, end_event, epoch_chains,  score_per_ntx \
+                    start_event, end_event, epoch_coins,  score_per_ntx \
                     FROM scoring_epochs"
     conditions = []
     if season:
@@ -72,11 +60,7 @@ def select_from_table(table, cols, conditions=None):
         sql = sql+" WHERE "+conditions
     sql = sql+";"
     CURSOR.execute(sql)
-    results = CURSOR.fetchall()
-    if len(results) > 0:
-        return results
-    else:
-        return ()
+    return helper.get_results_or_none(CURSOR)
 
 
 def get_season_mined_counts(season):
@@ -117,7 +101,7 @@ def get_max_value_mined_txid(max_value, season=None):
 
 def get_all_coins():
     coins = []
-    CURSOR.execute("SELECT DISTINCT chain FROM coins;")
+    CURSOR.execute("SELECT DISTINCT coin FROM coins;")
     try:
         results = CURSOR.fetchall()
         for result in results:
@@ -131,42 +115,34 @@ def get_all_coins():
     return coins
 
 
-def get_notary_last_ntx(coin=None):
-    # Get coin and time of last ntx
-    sql = "SELECT notary, chain, block_height from last_notarised"
-    if coin:
-        sql += f" WHERE chain='{coin}'"
-    sql += ";"
+@print_runtime
+def get_notary_last_ntx(season):
+    sql = f"SELECT notary, coin, kmd_ntx_blockheight from notary_last_ntx \
+           WHERE season='{season}';"
     CURSOR.execute(sql)
     last_ntx = CURSOR.fetchall()
     notary_last_ntx = {}
     for item in last_ntx:
-        notary = item[0]
-        coin = item[1]
-        block_height = item[2]
-        if notary not in notary_last_ntx:
-            notary_last_ntx.update({notary:{}})
-        notary_last_ntx[notary].update({coin:block_height})
+        if item[0] not in notary_last_ntx:
+            notary_last_ntx.update({item[0]: {}})
+        notary_last_ntx[item[0]].update({
+                item[1]: item[2]
+        })
     return notary_last_ntx
 
 
-def get_season_last_ntx(season):
-    # Get coin and time of last ntx
-    sql = "SELECT notary, chain, block_height from last_notarised"
-    if season:
-        sql += f" WHERE season='{season}'"
-    sql += ";"
+@print_runtime
+def get_coin_last_ntx(season):
+    sql = f"SELECT coin, kmd_ntx_blockheight from coin_last_ntx \
+           WHERE season='{season}';"
     CURSOR.execute(sql)
     last_ntx = CURSOR.fetchall()
-    season_last_ntx = {}
+    coin_last_ntx = {}
     for item in last_ntx:
-        notary = item[0]
-        coin = item[1]
-        block_height = item[2]
-        if notary not in season_last_ntx:
-            season_last_ntx.update({notary:{}})
-        season_last_ntx[notary].update({coin:block_height})
-    return season_last_ntx
+        coin = item[0]
+        block_height = item[1]
+        coin_last_ntx.update({coin: block_height})
+    return coin_last_ntx
 
 
 def get_existing_nn_btc_txids(address=None, category=None, season=None, notary=None):

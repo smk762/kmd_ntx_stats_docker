@@ -5,15 +5,15 @@ from lib_query import *
 import lib_validate
 from models import ntx_tenure_row, scoring_epoch_row
 from decorators import print_runtime
+from lib_helper import get_season_coins
 
 @print_runtime
 def preseason_populate_ntx_tenure(season):
     now = int(time.time())
-    print(season)
     s_start = SEASONS_INFO[season]["start_time"]
     if now < SEASONS_INFO[season]["start_time"] and s_start - now < 604800:
         row = ntx_tenure_row()
-        row.chain = coin
+        row.coin = coin
         row.first_ntx_block = 0
         row.last_ntx_block = 0
         row.first_ntx_block_time = SEASONS_INFO[season]["start_block"]
@@ -64,7 +64,7 @@ def get_ntx_tenure(season, server, coin):
                 unscored_ntx_count = len(scoring_window[3])
 
             row = ntx_tenure_row()
-            row.chain = coin
+            row.coin = coin
             row.first_ntx_block = min_blk
             row.last_ntx_block = max_blk
             row.first_ntx_block_time = min_blk_time
@@ -139,10 +139,10 @@ def update_epochs(season):
                 epoch_row.epoch = epoch
                 epoch_row.epoch_start = epoch_start
                 epoch_row.epoch_end = epoch_end
-                epoch_row.epoch_chains = active_coins
+                epoch_row.epoch_coins = active_coins
 
                 if epoch_row.server in ["KMD", "BTC", "LTC"]:
-                    epoch_row.epoch_chains = [epoch_row.server]
+                    epoch_row.epoch_coins = [epoch_row.server]
                     epoch_row.start_event = "Season start"
 
                 elif isinstance(SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["start_event"], list):
@@ -161,7 +161,7 @@ def update_epochs(season):
                 else:
                     epoch_row.end_event = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["end_event"]
 
-                if len(epoch_row.epoch_chains) != 0:
+                if len(epoch_row.epoch_coins) != 0:
                     epoch_row.score_per_ntx = lib_validate.calc_epoch_score(server, num_coins)
                 else:
                     epoch_row.score_per_ntx = 0
@@ -201,7 +201,10 @@ def update_notarised_epoch_scoring():
                 epoch_start = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]['start_time']
                 epoch_end = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]['end_time']
                 epoch_coins = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]['coins']
-                score_per_ntx = lib_validate.calc_epoch_score(server, len(epoch_coins))
+                if season.find("Testnet") != -1:
+                    score_per_ntx = 1
+                else:
+                    score_per_ntx = lib_validate.calc_epoch_score(server, len(epoch_coins))
                 logger.info(f">>> Updating notarised table epochs and score value for {season} {server} {epoch} {score_per_ntx}...")
 
                 for coin in epoch_coins:
@@ -212,7 +215,6 @@ def update_notarised_epoch_scoring():
 
 @print_runtime
 def update_ntx_tenure(season, server, coin):
-    print(season)
     row = get_ntx_tenure(season, server, coin)
     if row is not None:
         row.update()
@@ -261,7 +263,7 @@ def delete_invalid_season_servers(season):
 
 def delete_invalid_season_server_coins(season, server):
     all_notarised_coins = get_notarised_coins()
-    season_server_coins = get_notarised_coins(season, server)
+    season_server_coins = get_season_coins(season, server)
 
     for coin in all_notarised_coins:
         if coin not in season_server_coins or coin in DPOW_EXCLUDED_COINS[season]:

@@ -17,13 +17,13 @@ def def_data_dir():
     return(ac_dir)
 
 # fucntion to define rpc_connection
-def def_credentials(chain):
+def def_credentials(coin):
     rpcport = '';
     ac_dir = def_data_dir()
-    if chain == 'KMD':
+    if coin == 'KMD':
         coin_config_file = str(ac_dir + '/komodo.conf')
     else:
-        coin_config_file = str(ac_dir + '/' + chain + '/' + chain + '.conf')
+        coin_config_file = str(ac_dir + '/' + coin + '/' + coin + '.conf')
     with open(coin_config_file, 'r') as f:
         for line in f:
             l = line.rstrip()
@@ -34,7 +34,7 @@ def def_credentials(chain):
             elif re.search('rpcport', l):
                 rpcport = l.replace('rpcport=', '')
     if len(rpcport) == 0:
-        if chain == 'KMD':
+        if coin == 'KMD':
             rpcport = 7771
         else:
             print("rpcport not in conf file, exiting")

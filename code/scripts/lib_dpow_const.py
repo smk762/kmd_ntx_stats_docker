@@ -134,6 +134,10 @@ DPOW_EXCLUDED_COINS = {
         "LABS",
         "BTC",
         "ARYA"
+    ],
+    "VOTE2022_Testnet": [
+        "BLUR",
+        "LABS",
     ]
 }
 
@@ -246,16 +250,17 @@ SEASONS_INFO = {
         "end_block": 2436999,
         "start_time": 1592146800,
         "end_time": 1617364800,
-        "post_season_end_time": 1623682799,
         "notaries": [],
         "coins": [],
         "servers": {}
     },
     "Season_5": {
         "start_block": 2437000,
-        "end_block": 3436999,
+        "end_block": 2893460,
+        "post_season_end_block": 3436999,
         "start_time": 1623682800,
-        "end_time": 1751328000,
+        "end_time": 1651622400,
+        "post_season_end_time": 1751328000,
         "notaries": [],
         "coins": [],
         "servers": {}
@@ -268,31 +273,71 @@ SEASONS_INFO = {
         "notaries": [],
         "coins": [],
         "servers": {}
+    },
+    "VOTE2022_Testnet": {
+        "start_block": 2893460,
+        "end_block": 2923160,
+        "start_time": 1651622400,
+        "end_time": 1653436800,
+        "notaries": [],
+        "coins": ["RICK", "MORTY"],
+        "servers": {
+            "Main": {
+                "coins": ["RICK", "MORTY"],
+                "addresses": {},
+                "epochs": {
+                    "Epoch_0": {
+                        "start_event": "testnet start",
+                        "end_event": "testnet end",
+                        "start_block": 2893460,
+                        "end_block": 2923160,
+                        "start_time": 1651622400,
+                        "end_time": 1653436800,
+                        "coins": ["RICK", "MORTY"]
+                    }
+                }
+            }                        
+        }    
     }
 }
 NOW = time.time()
 DPOW_COINS_ACTIVE = requests.get(get_dpow_active_coins_url()).json()["results"]
 
+# Get current dpow coins
 for season in SEASONS_INFO:
-    if NOW >= SEASONS_INFO[season]["start_time"] and NOW <= SEASONS_INFO[season]["end_time"]:
-        CURRENT_SEASON = season
-        CURRENT_DPOW_COINS = {season: {}}
-        for coin in DPOW_COINS_ACTIVE:
-            if DPOW_COINS_ACTIVE[coin]["dpow"]["server"] not in CURRENT_DPOW_COINS[season]:
-                CURRENT_DPOW_COINS[season].update({
-                    server: []
-                })
-            CURRENT_DPOW_COINS[season][server].append(coin)
+    if season.find("Testnet") == -1:
 
-    elif SEASONS_INFO[season]["start_time"] > NOW:
-        EXCLUDED_SEASONS.append(season)
+        end_time = SEASONS_INFO[season]["end_time"]
+        if 'post_season_end_time' in SEASONS_INFO[season]:
+            end_time = SEASONS_INFO[season]["post_season_end_time"]
 
+        if NOW >= SEASONS_INFO[season]["start_time"] and NOW <= end_time:
+            CURRENT_SEASON = season
+            CURRENT_DPOW_COINS = {season: {}}
+            for coin in DPOW_COINS_ACTIVE:
+                if DPOW_COINS_ACTIVE[coin]["dpow"]["server"] not in CURRENT_DPOW_COINS[season]:
+                    CURRENT_DPOW_COINS[season].update({
+                        DPOW_COINS_ACTIVE[coin]["dpow"]["server"]: []
+                    })
+                CURRENT_DPOW_COINS[season][DPOW_COINS_ACTIVE[coin]["dpow"]["server"]].append(coin)
+
+        elif SEASONS_INFO[season]["start_time"] > NOW:
+            EXCLUDED_SEASONS.append(season)
+
+# Get notaries for each season
 for season in SEASONS_INFO:
     if season in NOTARY_PUBKEYS:
         SEASONS_INFO[season]["notaries"] = list(NOTARY_PUBKEYS[season]["Main"].keys())
         SEASONS_INFO[season]["notaries"].sort()
 
-    if NOW - SEASONS_INFO[season]["start_time"] < 48 * 60 * 60:
+
+    if season.find("Testnet") != -1:
+        SEASONS_INFO[season]["servers"]["Main"]["addresses"].update({
+            "RICK": {},
+            "MORTY": {}
+        })
+
+    elif NOW - SEASONS_INFO[season]["start_time"] < 48 * 60 * 60:
 
         for coin in DPOW_COINS_ACTIVE:
             epoch = "Epoch_0"
@@ -324,7 +369,7 @@ for season in SEASONS_INFO:
                     })
                 if server not in SEASONS_INFO[season]["servers"]:
                     SEASONS_INFO[season]["servers"].update({
-                        server:{
+                        server: {
                             "coins": [],
                             "addresses": {},
                             "epochs": {}
@@ -354,11 +399,11 @@ for season in SEASONS_INFO:
             coins = requests.get(get_notarised_coins_url(season, server)).json()["results"]
             if season in SCORING_EPOCHS_REPO_DATA:
                 if server in SCORING_EPOCHS_REPO_DATA[season]["Servers"]:
-                    coins = coins + list(SCORING_EPOCHS_REPO_DATA[season]["Servers"][server].keys())
+                    coins += list(SCORING_EPOCHS_REPO_DATA[season]["Servers"][server].keys())
                 if season == CURRENT_SEASON:
                     if server in CURRENT_DPOW_COINS[season]:
                         coins += CURRENT_DPOW_COINS[season][server]
-                coins = list(set(coins))
+                coins += list(set(coins))
                 coins.sort()
                 for coin in coins + ["KMD", "LTC", "BTC"]:
                     if season in DPOW_EXCLUDED_COINS:
@@ -418,12 +463,12 @@ ALL_SEASON_NOTARY_BTC_ADDRESSES = {}
 
 for season in SEASONS_INFO:
 
+    if season.find("Testnet") == -1:
+        if season not in NOTARY_LTC_ADDRESSES:
+            NOTARY_LTC_ADDRESSES.update({season: {}})
 
-    if season not in NOTARY_LTC_ADDRESSES:
-        NOTARY_LTC_ADDRESSES.update({season: {}})
-
-    if season not in NOTARY_BTC_ADDRESSES:
-        NOTARY_BTC_ADDRESSES.update({season: {}})
+        if season not in NOTARY_BTC_ADDRESSES:
+            NOTARY_BTC_ADDRESSES.update({season: {}})
 
     for notary in SEASONS_INFO[season]["notaries"]:
 
@@ -571,10 +616,11 @@ NOW = time.time()
 POSTSEASON = False
 
 for _season in SEASONS_INFO:
-    if SEASONS_INFO[_season]["start_time"] < NOW:
-        if "post_season_end_time" in SEASONS_INFO[_season]:
-            if SEASONS_INFO[_season]["post_season_end_time"] > NOW:
-                POSTSEASON = True
-                SEASON = _season
-        elif SEASONS_INFO[_season]["end_time"] > NOW:
-                SEASON = _season
+    if season.find("Testnet") == -1:
+        if SEASONS_INFO[_season]["start_time"] < NOW:
+            if "post_season_end_time" in SEASONS_INFO[_season]:
+                if SEASONS_INFO[_season]["post_season_end_time"] > NOW:
+                    POSTSEASON = True
+                    SEASON = _season
+            elif SEASONS_INFO[_season]["end_time"] > NOW:
+                    SEASON = _season

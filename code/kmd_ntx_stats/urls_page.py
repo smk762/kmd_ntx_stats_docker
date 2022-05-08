@@ -1,6 +1,5 @@
 from django.urls import path
 from kmd_ntx_api import views_page
-from kmd_ntx_api import views_notary
 
 frontend_page_urls = [
 
@@ -11,18 +10,6 @@ frontend_page_urls = [
           views_page.dash_view,
           name='index'),
 
-    path('chains_last_ntx/',
-          views_page.chains_last_ntx,
-          name='chains_last_ntx'),
-
-    path('coin_profile/',
-          views_page.coin_profile_view,
-          name='coin_profile'),        
-
-    path('coin_profile/<str:chain>/',
-          views_page.coin_profile_view,
-          name='coin_profile_view'),
-
     path('dash/',
           views_page.dash_view,
           name='dash_index'),
@@ -31,98 +18,21 @@ frontend_page_urls = [
           views_page.dash_view,
           name='dash_view'),
 
-    path('faucet/',
-          views_page.faucet,
-          name='faucet'),
-
-    path('mining_24hrs/',
-          views_page.mining_24hrs,
-          name='mining_24hrs'),
-
-    path('mining_overview/',
-          views_page.mining_overview,
-          name='mining_overview'),
-
-    path('notarised_24hrs/',
-          views_page.notarised_24hrs,
-          name='notarised_24hrs'),
-
-    path('ntx_scoreboard/',
-          views_page.ntx_scoreboard,
-          name='ntx_scoreboard'),
-
-    path('ntx_scoreboard_24hrs/',
-          views_page.ntx_scoreboard_24hrs,
-          name='ntx_scoreboard_24hrs'),
-
-    path('notarised_tenure/',
-          views_page.notarised_tenure_view,
-          name='notarised_tenure_view'),
-
-    path('notary_profile/',
-          views_notary.notary_profile_view,
-          name='notary_profile'),
-
-    path('notary/notary_chain_ntx_detail/',
-          views_notary.notary_chain_ntx_detail_view,
-          name='notary_chain_ntx_detail'),    
-
-    path('s5_address_confirmation/',
-          views_notary.s5_address_confirmation,
-          name='s5_address_confirmation'),
-
-    path('notary_profile/<str:notary>/',
-          views_notary.notary_profile_view,
-          name='notary_profile_view'),
-
-    path('notary_mining/<str:notary>/',
-          views_notary.notary_mining_view,
-          name='notary_mining_view'),
-    
-    path('sitemap/',
-          views_page.sitemap,
-          name='sitemap'),
-
-    path('scoring_epochs/',
-          views_page.scoring_epochs_view,
-          name='scoring_epochs_view'),
-
-    path('testnet_ntx_scoreboard/',
-          views_page.testnet_ntx_scoreboard,
-          name='testnet_ntx_scoreboard'),
-
-    path('notary_epoch_scores/',
-          views_page.notary_epoch_scores_view,
-          name='notary_epoch_scores_view'),
-    
-    path('notary_epoch_chain_notarised/',
-          views_page.notary_epoch_chain_notarised_view,
-          name='notary_epoch_chain_notarised_view'),
-    
-    path('notary_chain_notarised/',
-          views_page.notary_chain_notarised_view,
-          name='notary_chain_notarised_view'),
-    
-    path('chain_notarised_24hrs/',
-          views_page.chain_notarised_24hrs_view,
-          name='chain_notarised_24hrs'),
-    
-
-    path('vote2021/',
-          views_notary.vote2021_view,
-          name='vote2021_view'),
-
-    path('candidate_vote2021_detail/',
-          views_notary.vote2021_detail_view,
-          name='vote2021_detail_view'),
-    
-
     # REVIEW? DEPRECATED?
     path('review/funding/',
           views_page.funding,
           name='funding'),
+    
     path('review/funds_sent/',
           views_page.funds_sent,
           name='funds_sent'),
+
+    path('sitemap/',
+          views_page.sitemap,
+          name='sitemap'),
+
+    path('test_component/',
+          views_page.test_component,
+          name='test_component'),
 
 ]

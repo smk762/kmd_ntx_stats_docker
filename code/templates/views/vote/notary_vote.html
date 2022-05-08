@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+	{% include 'components/anchors/regions.html' with vote='true' %}
+	{% for region, counts in notary_vote_table.items %}
+		{% include "components/tables/vote_tally_table.html" with region=region counts=counts %}
+	{% endfor %}
+{% endblock %}

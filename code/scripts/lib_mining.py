@@ -111,6 +111,9 @@ def update_mined_count_season_table(season):
     season_notaries = SEASONS_INFO[season]["notaries"]
 
     for item in get_season_mined_counts(season):
+        if item[0] in SEASONS_INFO[season]["notaries"]:
+            if item[1] not in SEASONS_INFO[season]["servers"]["KMD"]["addresses"]["KMD"]:
+                continue
 
         if item[1] in KNOWN_ADDRESSES or int(item[2]) > 25:
             row = season_mined_count_row()

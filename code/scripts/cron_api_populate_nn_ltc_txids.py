@@ -243,13 +243,12 @@ def detect_split(txid_data, addresses):
     return False
 
 def scan_ltc_transactions(season):
-    season_ltc_addresses_resp = requests.get(f"http://116.203.120.91:8762/api/table/addresses/?season={season}&server=Main&chain=LTC").json()["results"]
+    season_ltc_addresses_resp = requests.get(f"http://116.203.120.91:8762/api/table/addresses/?season={season}&server=Main&coin=LTC").json()["results"]
     season_ltc_addresses = []
     for item in season_ltc_addresses_resp:
         season_ltc_addresses.append(item["address"])
     season_ltc_addresses += [LTC_NTX_ADDR]
     num_addr = len(season_ltc_addresses)
-    notary_last_ntx = get_notary_last_ntx("LTC")
 
     i = 0
     while len(season_ltc_addresses) > 0:
@@ -262,7 +261,7 @@ def scan_ltc_transactions(season):
         i += 1
 
         existing_nn_ltc_txids = get_existing_nn_ltc_txids(notary_address)
-        existing_notarised_txids = get_existing_notarised_txids("LTC")
+        existing_notarised_txids = get_existing_notarised_txids(None, None, "LTC")
         existing_txids = list(set(existing_nn_ltc_txids)&set(existing_notarised_txids))
         txids = get_new_nn_ltc_txids(existing_txids, notary_address)
 
@@ -352,14 +351,13 @@ def scan_ltc_transactions(season):
                                 opret = vout['data_hex']
 
                                 r = requests.get(get_decode_opret_url(opret))
-                                kmd_ntx_info = r.json()
-
+                                kmd_ntx_info = r.json()['results']
                                 ac_ntx_height = kmd_ntx_info['notarised_block']
                                 ac_ntx_blockhash = kmd_ntx_info['notarised_blockhash']
 
                                 # Update "notarised" table
                                 ntx_row = notarised_row()
-                                ntx_row.chain = "LTC"
+                                ntx_row.coin = "LTC"
                                 ntx_row.block_height = ltc_row.block_height
                                 ntx_row.block_time = int(ltc_row.block_time)
                                 ntx_row.block_datetime = ltc_row.block_datetime

@@ -90,8 +90,7 @@ def bestorders_view(request):
     coin = helper.get_or_none(request, "coin", "KMD")
     context.update({
         "coin": coin,
-        "mm2_coins": info.get_mm2_coins_list(),
-        "icons": info.get_icons(request)
+        "mm2_coins": info.get_mm2_coins_list()
     })
 
     rows = []
@@ -116,6 +115,7 @@ def gui_stats_view(request):
     since = helper.get_or_none(request, "since", "week")
     to_time = helper.get_or_none(request, "to_time", int(time.time()))
     from_time = helper.get_or_none(request, "from_time", int(to_time - SINCE_INTERVALS[since]))
+    swaps_data = query.get_swaps_data()
     swaps_data = query.filter_swaps_timespan(swaps_data, from_time, to_time)
 
     context.update({
@@ -141,8 +141,7 @@ def last_200_swaps_view(request):
         "mm2_coins": info.get_mm2_coins_list(),
         "taker_coin": helper.get_or_none(request, "taker_coin"),
         "maker_coin": helper.get_or_none(request, "maker_coin"),
-        "page_title": "Last 200 Swaps",
-        "icons": info.get_icons(request)
+        "page_title": "Last 200 Swaps"
     })
 
     return render(request, 'views/atomicdex/last_200_swaps.html', context)
@@ -150,16 +149,15 @@ def last_200_swaps_view(request):
 
 def last_200_failed_swaps_view(request):
     context = helper.get_base_context(request)
-    last_200_failed_swaps = get_last_200_failed_swaps(request)
-    last_200_failed_swaps = format_gui_os_version(last_200_failed_swaps)
+    last_200_failed_swaps = dex.get_last_200_failed_swaps(request)
+    last_200_failed_swaps = dex.format_gui_os_version(last_200_failed_swaps)
 
     context.update({
         "last_200_failed_swaps": last_200_failed_swaps,
         "mm2_coins": info.get_mm2_coins_list(),
         "taker_coin": helper.get_or_none(request, "taker_coin"),
         "maker_coin": helper.get_or_none(request, "maker_coin"),
-        "page_title": "Last 200 Failed Swaps",
-        "icons": info.get_icons(request)
+        "page_title": "Last 200 Failed Swaps"
     })
 
     return render(request, 'views/atomicdex/last_200_failed_swaps.html', context)
@@ -264,8 +262,7 @@ def orderbook_view(request):
     context.update({
         "mm2_coins": info.get_mm2_coins_list(),
         "base": helper.get_or_none(request, "base", "KMD"),
-        "rel": helper.get_or_none(request, "rel", "BTC"),
-        "icons": info.get_icons(request)
+        "rel": helper.get_or_none(request, "rel", "BTC")
     })
 
     orderbook = dex.get_orderbook(request)
@@ -338,7 +335,7 @@ def seednode_version_stats_hourly_table_view(request):
     end = start + SINCE_INTERVALS["day"]
 
     active_version = " & ".join(dex.get_active_mm2_versions(time.time()))
-    version_scores = query.get_nn_seed_version_scores_hourly_table(request, start, end)
+    version_scores = dex.get_nn_seed_version_scores_hourly_table(request, start, end)
 
     context.update({
         "date": helper.get_or_none(request, "date", "Today"),

@@ -100,5 +100,21 @@ CANDIDATE_ADDRESSES = {
 		"RGrUUMUTJmRU63xUH8sTHQ8qAkwyiyZATR": "zatjum1_SH"
 	},
 	"VOTE2022": {
+		"RKpigLeT5rgXy31yubpgWcJ91i1TZbZg5h": "dragonhound_NA",
+		"RNjeQcneBWgkPFk1stynJWN9gnNLpgBzud": "nodeone_NA",
+		"RSMDSHtX6f26fsi9dPY4WdCoF9zJygYLoE": "smdmitry_SH",
+		"RSMDNNEUvCRii6ebwJJRt2D1zucW4Sf5M9": "smdmitry_EU",
+		"RQ7tJz8E12s1esbRvuSSFTduWnT4E4D15B": "dudezmobi_AR",
+		"RU2jg8fLkNjMke5bY5ea4z6V9QHFuevB1H": "bitbybit_EU",
+		"RVoteCGxquRNeHWGiHC6vxzpXBodKt3P88": "computergenie_NA",
+		"RSuwnUiuLYsaDRmvkNgvYJb3CsxYKKwWBS": "dappvader_SH",
+		"RKCXF7EYaAJHmiyDKmubhQ88dYc7CbTZxx": "kolo_AR",
+		"RJ3V9y7uErFNvDygbyu2VnNSimvTuHKouM": "vanbogan_EU",
+		"RW6cfSA4vE29ag7Z1xGqchXraXvAPDgD7f": "webworker01_NA",
+		"RY7wLN2xkmaHyM82RACc7LXXrWpa6H8Tha": "nutellalicka_SH",
+		"RHeRFNk2jih5oFedJpgFXx8wPANv5iiFg7": "shadowbit_AR",
+		"RJ4mmFUuzvzvWAuJKZE22zg1T5VJwMZfQF": "goldenman_AR",
+		"RStrobNmEspEAgB8Jtt6ncK8tCWcGm77na": "strob_NA",
+		"RNnC441veEdv1nD6z6Ty3QtF3Y3XnsrVtc": "drkush_SH"
 	}
 }

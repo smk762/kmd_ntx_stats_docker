@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row col-12 m-auto" id="mining_season">
+    <div class="card table_card">
+        <div class="card-header table_card_title">
+            Source: Scoring Epochs Table
+        </div>
+        <div class="card-body table_card_body">
+			<table id="ntx_coin_season_tbl" class="table table-striped table-bordered m-auto" style="width:99%; visibility: hidden;" data-ajax="{% url 'scoringEpochsViewSet-list' %}?format=datatables">
+				<thead>
+					<tr>
+						<th data-data="season">Season</th>
+						<th data-data="server">Server</th>
+						<th data-data="epoch">Epoch</th>
+						<th data-data="epoch_start">Start</th>
+						<th data-data="epoch_end">End</th>
+						<th data-data="start_event">Start Event</th>
+						<th data-data="end_event">End Event</th>
+						<th data-data="epoch_coins">Epoch Coins</th>
+						<th data-data="score_per_ntx">Score per Ntx</th>
+					</tr>
+				</thead>
+			</table>
+		</div>			
+	</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#ntx_coin_season_tbl').DataTable({
+        	"paging": false,
+			deferRender: true,
+            "orderClasses": false,
+    		order: [[ 0, 'desc' ], [ 1, 'desc' ], [ 2, 'asc' ]],
+    		"columnDefs": [
+				{ className: "text-left text-nowrap", "targets": [ 0 ] },
+				{ className: "text-right text-nowrap", "targets": [ 8 ] },
+				{ className: "fixed-width-28", "targets": [ 7 ] },
+    			{
+		            "data": "season",
+		            "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(get_season_styled(oData.season));
+			        }
+		        },
+    			{
+		            "data": "server",
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(get_server_styled(oData.server));
+			        }
+		        },
+    			{
+		            "data": "epoch",
+		            "targets": 2,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(get_epoch_styled(oData.epoch));
+			        }
+		        },
+    			{
+		            "data": "server",
+		            "targets": 7,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(get_epoch_coins(oData.epoch_coins));
+			        }
+		        }
+	        ]
+        });
+    });
+</script>
+{% endblock %}

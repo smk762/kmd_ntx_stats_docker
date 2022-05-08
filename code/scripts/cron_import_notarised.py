@@ -2,9 +2,8 @@
 import random
 from lib_const import *
 from decorators import *
-from lib_helper import get_season_notaries
-from lib_ntx import import_ntx
-from lib_query import get_notarised_servers, get_notarised_coins
+import lib_helper as helper
+import lib_ntx
 
 
 @print_runtime
@@ -12,13 +11,12 @@ def import_notarised():
     for season in SEASONS_INFO:
         if season not in EXCLUDED_SEASONS: 
 
-            season_notaries = get_season_notaries(season)
-            servers = get_notarised_servers(season)
-
+            season_notaries = helper.get_season_notaries(season)
+            servers = helper.get_season_servers(season)
             while len(servers) > 0:
                 server = random.choice(servers)
                 servers.remove(server)
-                coins = get_notarised_coins(season, server)
+                coins = helper.get_season_coins(season, server)
 
                 i = 0
                 while len(coins) > 0:
@@ -26,7 +24,8 @@ def import_notarised():
                     coin = random.choice(coins)
                     coins.remove(coin)
                     logger.info(f">>> Importing {coin} for {season} {server} ({i} processed, {len(coins)} remaining)")
-                    import_ntx(season, server, coin)
+                    ntx_tbl = lib_ntx.notarised(season)
+                    ntx_tbl.import_ntx(server, coin)
 
 if __name__ == "__main__":
 

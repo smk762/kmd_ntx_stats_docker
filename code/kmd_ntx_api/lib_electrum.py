@@ -5,103 +5,18 @@ import codecs
 import random
 import ssl
 import socket
+import hashlib
+import binascii
+from base58 import b58decode_check
 import requests
 from kmd_ntx_api.lib_const import *
-import kmd_ntx_api.lib_base58
+import kmd_ntx_api.lib_base58 as b58
+import kmd_ntx_api.lib_info as info
 import kmd_ntx_api.lib_dexstats as dexstats
 
+# https://electrumx.readthedocs.io/en/latest/
+
 socket.setdefaulttimeout(5)
-
-
-def get_utxo_count(chain, pubkey, server):
-    try:
-        endpoint = f"{THIS_SERVER}/api/info/electrums"
-        electrums_info = requests.get(f"{endpoint}").json()["results"]
-
-        block_tip = dexstats.get_sync(chain)["height"]
-
-        if chain in ["PIRATE", "NINJA", "MESH", "AXO"]:
-            address = lib_base58.calc_addr_from_pubkey("KMD", pubkey)
-            resp = dexstats.get_utxos(chain, address)
-            utxos = []
-            utxo_count = 0
-            dpow_utxo_count = 0
-            for item in resp:
-
-                if item['satoshis'] == 10000:
-                    dpow_utxo_count += 1
-                    item.update({"dpow_utxo": True})
-                else:
-                    item.update({"dpow_utxo": False})
-
-                utxo_count += 1
-                utxos.append(item)
-
-            return {
-                "block_tip": block_tip,
-                "utxo_count": utxo_count,
-                "dpow_utxo_count": dpow_utxo_count,
-                "utxos": utxos,
-            }
-        else:
-            if chain == "GLEEC" and server == "Third_Party":
-                chain = "GLEEC-OLD"
-            if chain in electrums_info:
-                electrum = random.choice(electrums_info[chain]).split(": ")
-                url = electrum[0]
-                port = electrum[1]
-                logger.info(f"{chain} {url}:{port} {pubkey}")
-                p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
-                p2pk_resp = get_from_electrum(
-                    url, port, 'blockchain.scripthash.listunspent',
-                    p2pk_scripthash)
-                p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
-                p2pkh_resp = get_from_electrum(
-                    url, port, 'blockchain.scripthash.listunspent',
-                    p2pkh_scripthash)
-                headers_resp = get_from_electrum(
-                    url, port, 'blockchain.headers.subscribe')
-
-                block_tip = headers_resp['result']['height']
-                resp = p2pk_resp['result'] + p2pkh_resp['result']
-                utxos = []
-                utxo_count = 0
-                dpow_utxo_count = 0
-                for item in resp:
-                    if item["value"] > 0:
-                        utxos.append(item)
-
-                if chain in ["AYA", "EMC2", "SFUSD"]:
-                    utxo_size = 100000
-                else:
-                    utxo_size = 10000
-
-                for item in utxos:
-                    utxo_count += 1
-                    if item['value'] == utxo_size:
-                        dpow_utxo_count += 1
-                        item.update({"dpow_utxo": True})
-                    else:
-                        item.update({"dpow_utxo": False})
-
-                return {
-                    "block_tip": block_tip,
-                    "utxo_count": utxo_count,
-                    "dpow_utxo_count": dpow_utxo_count,
-                    "utxos": utxos,
-                }
-
-            else:
-                return {"error": f"{chain} not in electrums"}
-                logger.info(f"{chain} not in electrums")
-    except Exception as e:
-        return {
-            "error": f"{e}",
-            "resp": []
-        }
-        logger.error(e)
-
-
 
 def get_from_electrum(url, port, method, params=[]):
     params = [params] if not isinstance(params, list) else params
@@ -119,7 +34,7 @@ def get_from_electrum_ssl(url, port, method, params=[]):
             return json.loads(ssock.recv(99999)[:-1].decode())
 
 
-def get_scripthash_from_address(address):
+def get_p2pkh_scripthash_from_address(address):
     # remove address prefix
     addr_stripped = binascii.hexlify(b58decode_check(address)[1:])
     # Add OP_DUP OP_HASH160 BTYES_PUSHED <ADDRESS> OP_EQUALVERIFY OP_CHECKSIG
@@ -134,7 +49,7 @@ def get_p2pk_scripthash_from_pubkey(pubkey):
     scripthex = codecs.decode(scriptpubkey, 'hex')
     s = hashlib.new('sha256', scripthex).digest()
     sha256_scripthash = codecs.encode(s, 'hex').decode("utf-8")
-    script_hash = lib_base58.lil_endian(sha256_scripthash)
+    script_hash = b58.lil_endian(sha256_scripthash)
     return script_hash
 
 
@@ -146,7 +61,7 @@ def get_p2pkh_scripthash_from_pubkey(pubkey):
     h = codecs.decode(scriptpubkey, 'hex')
     s = hashlib.new('sha256', h).digest()
     sha256_scripthash = codecs.encode(s, 'hex').decode("utf-8")
-    script_hash = lil_endian(sha256_scripthash)
+    script_hash = b58.lil_endian(sha256_scripthash)
     return script_hash
 
 
@@ -159,7 +74,7 @@ def get_full_electrum_balance(url, port, address=None, pubkey=None):
         p2pkh_confirmed_balance = p2pkh_resp['result']['confirmed']
         p2pkh_unconfirmed_balance = p2pkh_resp['result']['unconfirmed']
     elif address:
-        p2pk_scripthash = get_scripthash_from_address(address)
+        p2pk_scripthash = get_p2pkh_scripthash_from_address(address)
         p2pkh_confirmed_balance = 0
         p2pkh_unconfirmed_balance = 0
     else:
@@ -175,3 +90,25 @@ def get_full_electrum_balance(url, port, address=None, pubkey=None):
     total = total_confirmed + total_unconfirmed
     return total/100000000
     # NINJA returns "1", TODO: check electrum version etc.
+
+
+def broadcast_raw_tx(url, port, raw_tx, ssl):
+    if ssl:
+        return get_from_electrum_ssl(url, port, 'blockchain.transaction.broadcast', raw_tx)
+    return get_from_electrum(url, port, 'blockchain.transaction.broadcast', raw_tx)
+
+def get_coin_electrum(coin):
+    url = None
+    port = None
+    ssl = True
+    coin_electrums = info.get_coin_electrums_ssl(coin)
+    if len(coin_electrums) == 0:
+        ssl = False
+        coin_electrums = info.get_coin_electrums(coin)
+
+    if len(coin_electrums) != 0:
+        electrum_ = random.choice(coin_electrums).split(":")
+        url = electrum_[0]
+        port = electrum_[1]
+
+    return url, port, ssl

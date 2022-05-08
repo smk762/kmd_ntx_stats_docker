@@ -308,7 +308,7 @@ ENDPOINTS = {
 		"description": "",
 		"sidebar": "False"
 	},
-	"source/notarised_chain_season/": {
+	"source/last_coin_notarisation/": {
 		"category": "source",
 		"filters": [],
 		"example": "",
@@ -322,7 +322,7 @@ ENDPOINTS = {
 		"description": "",
 		"sidebar": "False"
 	},
-	"source/notarised_count_season/": {
+	"source/notary_ntx_season/": {
 		"category": "source",
 		"filters": [],
 		"example": "",
@@ -399,14 +399,14 @@ ENDPOINTS = {
 		"description": "",
 		"sidebar": "False"
 	},
-	"table/notarised_chain_season/": {
+	"table/last_coin_notarisation/": {
 		"category": "table",
 		"filters": [],
 		"example": "",
 		"description": "",
 		"sidebar": "False"
 	},
-	"table/notarised_count_season/": {
+	"table/notary_ntx_season/": {
 		"category": "table",
 		"filters": [],
 		"example": "",

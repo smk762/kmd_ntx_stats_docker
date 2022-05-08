@@ -8,90 +8,24 @@
 			</div>
 			<div class="card-body table_card_body">
 				<form>
-				  <div class="input-group mb-3 ">
-				    <div class="input-group-prepend prepend-label-left p-0" >
-				      <span class="input-group-text">
-				      	Enter Address
-				      </span>
-				    </div>
-				    <input type="text" class="form-control m-auto " id="opret_id" name="address" placeholder="{{ address }}">
-				    <div class="input-group-append p-0  ">
-						<button class="append-btn">
-						    Get Scripthashes
-						</button>
-				    </div>
-				  </div>
+					{% include "components/form/text_input_line.html" with prepend_text="Enter Address" input_id="address" placeholder_text=address append_btn_text="Get Scripthashes" %}
 				</form>
 				{% if resp_rows %}
 					{% for item in resp_rows %}
-					<div class="input-group mb-1 ">
-					    <div class="input-group-prepend prepend-label-left p-0 col-2 " >
-					      <span class="input-group-text col-12">
-					      	{% if item.key|lower == 'p2pk' %}
-					      	<a href="https://komodoplatform.com/en/blog/p2pk-pay-to-pubkey/" data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey Explanation">
-					      		{{ item.key|lower }}
-					      	</a>				      	
-					      	<a href="https://learnmeabitcoin.com/technical/p2pk">
-					      		<i data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey Technical Info" class="fas fa-info-circle  ml-1 py-0"></i>
-					      	</a>
-					      	{% elif item.key|lower == 'p2pkh' %}
-					      	<a href="https://komodoplatform.com/en/blog/p2pkh-pay-to-pubkey-hash/" data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey Hash Explanation" >
-					      		{{ item.key|lower }} 
-					      	</a>
-					      	<a href="https://learnmeabitcoin.com/technical/p2pkh">
-					      		<i data-toggle="tooltip" data-placement="top" title="" data-original-title="Pay to Pubkey Hash Technical Info" class="fas fa-info-circle  ml-1 py-0"></i>
-					      	</a>
-					      	{% elif item.key|lower == 'p2pkh scripthash' or item.key|lower == 'p2pk scripthash' %}
-					      	<a href="https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-basics.html#script-hashes">
-					      		{{ item.key|lower }} <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Used to Query Electrum Servers" class="fas fa-info-circle  ml-1 py-0"></i>
-					      	</a>
-					      	{% elif item.key|lower == 'pubkey' %}
-					      	<a href="https://learnmeabitcoin.com/beginners/public_keys">
-					      		{{ item.key }}
-					      	</a>
-					      	{% elif item.key|lower == 'address' %}
-					      	<a href="https://learnmeabitcoin.com/technical/address">
-					      		{{ item.key }}
-					      	</a>
-					      	{% else %}
-					      		{{ item.key }}
-					      	{% endif %}
-					    </div>
-					    <input type="text" class="form-control col-10" placeholder="{{ item.value }}" value="{{ item.value }}" readonly id="x_{{ item.value }}">
-					    <div class="input-group-append p-0">
-							<button class="append-btn" data-clipboard-target="#x_{{ item.value }}">
-							    <i class="cil-copy"></i>
-							</button>
-					    </div>
-					</div>
+
+						{% if item.key|lower == 'address' %}
+							{% include "components/form/readonly_copyable_input_line.html" with prepend_href="https://learnmeabitcoin.com/technical/address" prepend_text=item.key|lower input_value=item.value input_id=item.value|slugify %}
+
+						{% elif item.key|lower == 'p2pkh' %}
+							{% include "components/form/readonly_copyable_input_line.html" with prepend_href="https://komodoplatform.com/en/blog/p2pkh-pay-to-pubkey-hash/" prepend_text=item.key|lower prepend_tooltip="Pay to Pubkey Hash" input_value=item.value input_id=item.value|slugify %}
+
+						{% elif item.key|lower == 'p2pkh scripthash' or item.key|lower == 'p2pk scripthash' %}
+							{% include "components/form/readonly_copyable_input_line.html" with prepend_href="https://electrumx-spesmilo.readthedocs.io/en/latest/protocol-basics.html#script-hashes" prepend_text=item.key|lower prepend_tooltip="Used to Query Electrum Servers" input_value=item.value input_id=item.value|slugify %}
+
+						{% endif %}
 					{% endfor %}
 				{% endif %}
 			</div>	
 		</div>	
-	</div>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
-    <!-- jquery -->  
-  	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-  	
-  	<!--
-  	<script>
-	    $(document).ready(function() {
-	        $('#opret_table').DataTable({ 
-	        	"paging": true,
-    			deferRender: true,
-                "orderClasses": false,
-	        	sDom: 'lrtip',
-        		order: [[ 0, 'asc' ]],
-	        	"columns": [
-			        { "data": "key" },
-			        { "data": "value" }
-			    ]
-	        });
-	        $('#opret_table_length').css({'display':'none'});
-	        $('#opret_table_paginate').css({'display':'none'});
-	        $('#opret_table_info').css({'display':'none'});
-	    });
-    </script> 
--->
+	</div>  	
 {% endblock %}

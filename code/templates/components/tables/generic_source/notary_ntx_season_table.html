@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row col-12 m-auto" id="mining_season">
+    <div class="card table_card">
+        <div class="card-header table_card_title">
+            Source: Notary NTX Season Table
+        </div>
+        <div class="card-body table_card_body">
+			<table id="notary_ntx_season_tbl" class="table table-striped table-bordered m-auto"  style="width:99%; visibility: hidden;" data-ajax="{% url 'notaryNtxSeasonViewSet-list' %}?format=datatables">
+				<thead>
+					<tr>
+						<th data-data="notary">Notary</th>
+						<th data-data="season">Season</th>
+						<th data-data="notary_data">Data</th>
+						<th data-data="time_stamp">Time</th>
+					</tr>
+				</thead>
+			</table>
+		</div>			
+	</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+    	$('#notary_ntx_season_tbl').css('visibility', 'visible');
+        $('#notary_ntx_season_tbl').DataTable({
+        	"paging": false,
+			deferRender: true,
+            "orderClasses": false,
+    		order: [[ 3, 'desc' ], [ 2, 'desc' ], [ 0, 'asc' ]],
+    		"columnDefs": [
+				{ className: "text-left text-nowrap", "targets": [ 0 ] },
+				{ className: "text-right text-nowrap", "targets": [ 3 ] },
+    			{
+		            "data": "notary",
+		            "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_notary_url(oData.season, oData.notary));
+			        }
+		        },
+    			{
+		            "data": "season",
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(get_season_styled(oData.season));
+			        }
+		        },
+    			{
+		            "data": 'notary_data',
+		            "targets": 2,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+						let icon = "<i class='fas fa-arrow-right'></i>"
+		            	let tooltip = "Link to notary data"
+		            	let url = "http://116.203.120.91:8762/api/source/notary_ntx_season/?notary="+oData.notary
+			            $(nTd).html(get_detail_link_icon(icon, tooltip, url));
+			        }
+		        },
+    			{
+		            "data": 'time_stamp',
+		            "targets": 3,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+	            		$(nTd).html(get_time_since(oData.time_stamp));
+			        }
+		        }
+	        ]
+        });
+    });
+</script>
+{% endblock %}

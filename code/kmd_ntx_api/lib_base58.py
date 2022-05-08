@@ -7,6 +7,9 @@ from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
 from base58 import b58decode_check
 from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_dexstats as dexstats
+import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_helper as helper
 
 
 class raw_tx():
@@ -159,6 +162,7 @@ COIN_PARAMS = {
     "TKL": KMD_CoinParams,
     "TOKEL": KMD_CoinParams,
     "VOTE2021": KMD_CoinParams,
+    "VOTE2022": KMD_CoinParams,
     "WLC21": KMD_CoinParams,
     "LTC": LTC_CoinParams,
     "AYA": AYA_CoinParams,
@@ -167,6 +171,9 @@ COIN_PARAMS = {
     "GLEEC-OLD": GLEEC_OLD_CoinParams,
     "GLEEC": KMD_CoinParams
 }
+
+for _coin in dexstats.DEXSTATS_COINS:
+    COIN_PARAMS.update({_coin: KMD_CoinParams})
 
 
 def sha256(data):
@@ -263,30 +270,28 @@ def lil_endian(hex_str):
 
 def validate_pubkey(pubkey):
     resp = calc_addr_from_pubkey("KMD", pubkey)
-    if "error" in resp:
-        return False
-    return True
+    return not helper.has_error(resp)
 
 
 def get_ticker(x):
-    chain = ''
-    while len(chain) < 1:
+    coin = ''
+    while len(coin) < 1:
         for i in range(len(x)):
             if chr(x[i]).encode() == b'\x00':
                 j = i+1
                 while j < len(x)-1:
-                    chain += chr(x[j])
+                    coin += chr(x[j])
                     j += 1
                     if chr(x[j]).encode() == b'\x00':
                         break
                 break
     if chr(x[-4])+chr(x[-3])+chr(x[-2]) == "KMD":
-        chain = "KMD"
-    return chain
+        coin = "KMD"
+    return coin
 
 
-def decode_opret(op_return, coins_list):
-
+def decode_opret(op_return):
+    op_return = op_return.replace("OP_RETURN ", "")
     ac_ntx_blockhash = lil_endian(op_return[:64])
 
     try:
@@ -295,30 +300,30 @@ def decode_opret(op_return, coins_list):
     except Exception as e:
         logger.error(f"[decode_opret] Exception: {e}")
         err = {"error": f"{op_return} is invalid and can not be decoded. {e}"}
-        logger.error(err)
         return err
 
     x = binascii.unhexlify(op_return[70:])
-    chain = get_ticker(x)
+    coin = get_ticker(x)
 
+    coins_list = info.get_all_coins() 
     for x in coins_list:
         if len(x) > 2 and x not in EXCLUDE_DECODE_OPRET_COINS:
-            if chain.endswith(x):
-                chain = x
+            if coin.endswith(x):
+                coin = x
 
-    if chain == "KMD":
+    if coin == "KMD":
         btc_txid = lil_endian(op_return[72:136])
 
-    elif chain not in noMoM:
+    elif coin not in noMoM:
         # not sure about this bit, need another source to validate the data
         try:
-            start = 72+len(chain)*2+4
-            end = 72+len(chain)*2+4+64
+            start = 72+len(coin)*2+4
+            end = 72+len(coin)*2+4+64
             MoM_hash = lil_endian(op_return[start:end])
             MoM_depth = int(lil_endian(op_return[end:]), 16)
         except Exception as e:
             logger.error(f"[decode_opret] Exception: {e}")
-    resp = {"chain": chain, "notarised_block": ac_ntx_height,
+    resp = {"coin": coin, "notarised_block": ac_ntx_height,
             "notarised_blockhash": ac_ntx_blockhash}
     return resp
 
@@ -332,8 +337,8 @@ def convert_addresses(address):
     try:
         endpoint = f"{THIS_SERVER}/api/info/base_58/"
         base58_coins = requests.get(endpoint).json()["results"]
-    except:
-        return {"Error": f"cant get base58_coins from {endpoint}"}
+    except Exception as e:
+        return {"Error": f"cant get base58_coins from {endpoint} - {e}"}
 
     for coin in base58_coins:
         decoded_bytes = bitcoin.base58.decode(address)

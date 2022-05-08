@@ -1,0 +1,40 @@
+
+			<div class="card text-center kmd_ui_light3 col-4 px-0 m-auto shadow-none" style="border:none !important;">
+				<div class="card-body p-0" style="background-color: #101721 !important;">
+					<ul class="list-group">
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+								{% if coin != 'KMD' %}
+							    	Last Notarisation Block (KMD)
+							        <script>
+							            var url = get_block_url('KMD', {{ coin_ntx_summary.last_ntx_block }}, 'badge stat_badge');
+						            	document.write(url);
+							        </script>
+							    {% else %}
+							    	Last Notarisation Block (LTC)
+							        <script>
+							            var url = get_block_url('LTC', {{ coin_ntx_summary.last_ntx_block }}, 'badge stat_badge');
+						            	document.write(url);
+							        </script>
+							    {% endif %}
+							</div>
+					    </li>
+
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+							    Last Notarisation Block ({{ coin }})
+						        <script>
+						            var url = get_block_url('{{ coin }}', {{ coin_ntx_summary.last_ntx_ac_block }}, 'badge stat_badge');
+						            document.write(url);
+						        </script>
+							</div>
+					    </li>
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+							    Blocks Since Last Notarisation
+							    {% include "components/badges/stats_badge.html" with stat_val=coin_ntx_summary.ntx_block_lag stat_label="" %}
+							</div>
+					    </li>
+					</ul> 
+				</div>
+			</div>
