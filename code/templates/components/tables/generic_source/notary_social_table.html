@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row col-12 m-auto" id="mining_season">
+    <div class="card table_card">
+        <div class="card-header table_card_title">
+            Source: Notary Social Table
+        </div>
+        <div class="card-body table_card_body">
+			<table id="notary_social_tbl" class="table table-striped table-bordered m-auto" style="width:99%; visibility: hidden;"  data-ajax="{% url 'nnSocialViewSet-list' %}?format=datatables">
+				<thead>
+					<tr>
+						<th data-data="notary">Notary</th>
+						<th data-data="twitter">Twitter</th>
+						<th data-data="youtube">Youtube</th>
+						<th data-data="discord">Discord</th>
+						<th data-data="email">Email</th>
+						<th data-data="telegram">Telegram</th>
+						<th data-data="github">Github</th>
+						<th data-data="keybase">Keybase</th>
+						<th data-data="website">Website</th>
+						<th data-data="icon">Icon</th>
+						<th data-data="season">Season</th>
+					</tr>
+				</thead>
+			</table>
+		</div>			
+	</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+    	$('#notary_social_tbl').css('visibility', 'visible');
+        $('#notary_social_tbl').DataTable({
+        	"paging": true,
+			deferRender: true,
+            "orderClasses": false,
+    		order: [ 0, 'asc' ],
+    		"columnDefs": [
+				{ className: "text-left text-nowrap", "targets": [ 0 ] },
+    			{
+		            "data": "notary",
+		            "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(get_notary_url('{{ season }}', oData.notary));
+			        }
+		        },
+    			{
+		            "data": "twitter",
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_social_icon('twitter', oData.twitter));
+			        }
+		        },
+    			{
+		            "data": "youtube",
+		            "targets": 2,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_social_icon('youtube', oData.youtube));
+			        }
+		        },
+    			{
+		            "data": "discord",
+		            "targets": 3,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_social_icon('discord', oData.discord));
+			        }
+		        },
+    			{
+		            "data": "email",
+		            "targets": 4,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_social_icon('email', oData.email));
+			        }
+		        },
+    			{
+		            "data": "telegram",
+		            "targets": 5,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_social_icon('telegram', oData.telegram));
+			        }
+		        },
+    			{
+		            "data": "github",
+		            "targets": 6,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_social_icon('github', oData.github));
+			        }
+		        },
+    			{
+		            "data": "keybase",
+		            "targets": 7,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_social_icon('keybase', oData.keybase));
+			        }
+		        },
+    			{
+		            "data": "website",
+		            "targets": 8,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_social_icon('website', oData.website));
+			        }
+		        },
+    			{
+		            "data": "icon",
+		            "targets": 9,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_coin_icon_only(oData.coin));
+			        },
+		            "visible": false
+		        },
+    			{
+		            "data": "season",
+		            "targets": 10,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			        	$(nTd).html(get_season_styled(oData.season));
+			        },
+		            "visible": false
+		        },
+	        ]
+        });
+    });
+</script>
+{% endblock %}

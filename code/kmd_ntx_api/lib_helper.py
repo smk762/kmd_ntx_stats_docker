@@ -8,11 +8,68 @@ import requests
 import string
 import itertools
 from datetime import datetime, timezone
+from django.http import JsonResponse
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_struct as struct
 
-logger = logging.getLogger("mylogger")
 
+def keys_to_list(_dict):
+    _list = list(_dict.keys())
+    _list.sort()
+    return _list
+
+
+def has_error(_dict):
+    if "error" in _dict:
+        return True
+    return False
+
+
+def qset_values_to_list(qset_vals):
+    table_data = []
+    for item in qset_vals:
+        table_data.append([v for k, v in item.items()])
+    return table_data
+
+
+def json_resp(resp, filters=None, params=None):
+
+    data = {}
+    if filters:
+        data.update({"filters": filters})
+
+    if params:
+        data.update({"params": params})
+
+    if has_error(resp):
+        data.update({"error": resp["error"]})
+
+    if "next" in resp:
+        data.update({"next": resp["next"]})
+
+    if "previous" in resp:
+        data.update({"previous": resp["previous"]})
+
+    if "count" in resp:
+        data.update({"count": resp["count"]})
+    else:
+        data.update({"count": len(resp)})
+
+    if "results" in resp:
+        data.update({"results": resp["results"]})
+    else:
+        data.update({"results": resp})
+
+    return JsonResponse(data)
+
+
+def get_chart_json(data, axis_labels, chart_label, total):
+    return {
+        "chartdata": data,
+        "labels": axis_labels,
+        "chartLabel": chart_label,
+        "total": total
+    }
 
 def append_unique(list_, item):
     if item not in list_:
@@ -35,6 +92,14 @@ def get_or_none(request, key, default=None):
     return val
     
 
+def get_notary_clean(notary):
+    notary_split = notary.split('_')
+    if len(notary_split) == 1:
+        return notary.title()
+    notary_clean = notary_split[0].title() + " " + notary_split[1]
+    return notary_clean
+
+
 def floor_to_utc_day(ts):
     return math.floor(int(ts) / (SINCE_INTERVALS['day'])) * (SINCE_INTERVALS['day'])
 
@@ -45,9 +110,7 @@ def date_hour(timestamp):
     return f"{date} {hour}:00"
 
 
-def get_notary_list(season, testnet=False):
-    if testnet:
-        return TESTNET_INFO[season]["notaries"]
+def get_notary_list(season):
     return SEASONS_INFO[season]["notaries"]
 
 
@@ -58,7 +121,7 @@ def get_sidebar_links(season):
     coins_dict["Main"].sort()
     sidebar_links = {
         "server": os.getenv("SERVER"),
-        "chains_menu": coins_dict,
+        "coins_menu": coins_dict,
         "notaries_menu": region_notaries,
     }
     return sidebar_links
@@ -68,12 +131,36 @@ def get_base_context(request):
     season = get_page_season(request)
     return {
         "season": season,
-        "season_clean":season.replace("_"," "),
+        "season_clean": season.replace("_"," "),
+        "explorers": get_explorers(), 
+        "coin_icons": get_coin_icons(),
+        "dpow_coins": get_dpow_server_coins_list(season),
+        "notary_icons": get_notary_icons(season),
+        "notaries": get_notary_list(season),
         "scheme_host": get_current_host(request),
         "sidebar_links": get_sidebar_links(season),
         "eco_data_link": get_eco_data_link()
     }
 
+
+def get_coin_icons(season=None):
+    url = f"{THIS_SERVER}/api/info/coin_icons"
+    icons = requests.get(url).json()
+    return icons["results"]
+
+
+def get_notary_icons(season=None):
+    if not season:
+        season = SEASON
+    url = f"{THIS_SERVER}/api/info/notary_icons/?season={season}"
+    icons = requests.get(url).json()
+    return icons["results"]
+
+
+def get_explorers():
+    url = f"{THIS_SERVER}/api/info/explorers"
+    explorers = requests.get(url).json()
+    return explorers["results"]
 
 def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=None):
     if not filter_kwargs:
@@ -108,7 +195,7 @@ def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=N
         if 'to_date' in request.GET:
             filter_kwargs.update({'mined_date__lte':request.GET['to_date']})   
 
-    if table in ['daily_notarised_chain', 'daily_notarised_count']:
+    if table in ['daily_notarised_coin', 'daily_notarised_count']:
 
         if 'from_date' in request.GET:
             filter_kwargs.update({'notarised_date__gte':request.GET['from_date']}) 
@@ -240,34 +327,43 @@ def get_dpow_server_coins_dict(season=None):
     if not season:
         season = SEASON
     url = f"{THIS_SERVER}/api/info/dpow_server_coins"
-    dpow_main_chains = requests.get(f"{url}/?season={season}&server=Main").json()['results']
-    dpow_3p_chains = requests.get(f"{url}/?season={season}&server=Third_Party").json()['results']
-
-    chains_dict = {
-        "Main": dpow_main_chains,
-        "Third_Party": dpow_3p_chains
+    dpow_main_coins = requests.get(f"{url}/?season={season}&server=Main")
+    dpow_3p_coins = requests.get(f"{url}/?season={season}&server=Third_Party")
+    coins_dict = {
+        "Main": dpow_main_coins.json()['results'],
+        "Third_Party": dpow_3p_coins.json()['results']
     }
     
-    return chains_dict
+    return coins_dict
+
+def get_dpow_server_coins_list(season=None):
+    if not season:
+        season = SEASON
+    url = f"{THIS_SERVER}/api/info/dpow_server_coins"
+    dpow_main_coins = requests.get(f"{url}/?season={season}&server=Main")
+    dpow_3p_coins = requests.get(f"{url}/?season={season}&server=Third_Party")
+    coins_list = dpow_main_coins.json()['results'] + dpow_3p_coins.json()['results']
+    
+    return coins_list
 
 
-def get_chain_server(chain, season):
-    if chain in ["KMD", "BTC", "LTC"]:
-        return chain
+def get_coin_server(season, coin):
+    if coin in ["KMD", "BTC", "LTC"]:
+        return coin
     coins_dict = get_dpow_server_coins_dict(season)
     for server in coins_dict:
-        if chain in coins_dict[server]:
+        if coin in coins_dict[server]:
             return server
     return "Unofficial"
 
 
-def get_mainnet_chains(coins_dict):
+def get_mainnet_coins(coins_dict):
     if "Main" in coins_dict:
         return coins_dict["Main"]
     return []
 
 
-def get_third_party_chains(coins_dict):
+def get_third_party_coins(coins_dict):
     if "Third_Party" in coins_dict:
         return coins_dict["Third_Party"]
     return []
@@ -343,13 +439,13 @@ def prepare_coins_graph_data(graph_data, coins_dict):
         
     if not season:
         season = SEASON
-    main_chains = get_mainnet_chains(coins_dict)
-    third_chains = get_third_party_chains(coins_dict)
+    main_coins = get_mainnet_coins(coins_dict)
+    third_coins = get_third_party_coins(coins_dict)
 
     for label in labels:
-        if label in third_chains:
+        if label in third_coins:
             bg_color.append(COLORS["THIRD_PARTY_COLOR"])
-        elif label in main_chains:
+        elif label in main_coins:
             bg_color.append(COLORS["MAIN_COLOR"])
         else:
             bg_color.append(COLORS["OTHER_COIN_COLOR"])

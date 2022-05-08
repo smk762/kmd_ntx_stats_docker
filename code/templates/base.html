@@ -10,7 +10,6 @@
         <title>Komodo Notary Stats - {{ page_title }}</title>
         <link rel="icon" type="image/png" href="{% static 'img/brand/favicon.png' %}" />
 
-
         <!--
             PLUGINS:
             - Bootstrap 4 (https://getbootstrap.com)
@@ -20,15 +19,14 @@
 
         -->
 
-        <!-- Bootstrap -->        
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
         <!-- Google Fonts -->
         <link href='https://fonts.googleapis.com/css?family=Rubik' rel='stylesheet'>
 
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
         <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/v4-shims.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
         <!-- Core UI -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.5.2/css/perfect-scrollbar.min.css" integrity="sha512-ygIxOy3hmN2fzGeNqys7ymuBgwSCet0LVfqQbWY10AszPMn2rB9JY0eoG0m1pySicu+nvORrBmhHVSt7+GI9VA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -42,25 +40,37 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha512-f0tzWhCwVFS3WeYaofoLWkTP62ObhewQ1EZn65oSYDZUg1+CyywGKkWzm8BxaJj5HGKI72PnMH9jYyIFz+GH7g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
         <!-- Datatables -->
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4-4.1.1/jq-3.3.1/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/b-print-1.6.2/sp-1.1.0/datatables.min.css"/>
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.3/css/select.dataTables.min.css"/>
+            <!-- Bootstrap -->
+            <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.css"/>
+            <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.css"/>
+            <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/datetime/1.1.2/css/dataTables.dateTime.css"/>
+            <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/4.0.2/css/fixedColumns.bootstrap5.css"/>
+            <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.2.2/css/fixedHeader.bootstrap5.css"/>
+            <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/searchpanes/2.0.0/css/searchPanes.bootstrap5.css"/>
+            <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.4/css/select.bootstrap5.css"/>
+             
+        <!-- Data Tables -->     
+            <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap5.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/datetime/1.1.2/js/dataTables.dateTime.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/fixedcolumns/4.0.2/js/dataTables.fixedColumns.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/fixedheader/3.2.2/js/dataTables.fixedHeader.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/searchpanes/2.0.0/js/dataTables.searchPanes.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/searchpanes/2.0.0/js/searchPanes.bootstrap5.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.js"></script>
 
-
-        <!-- jquery -->
-        <link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
-
-        <link href="{% static 'css/style.css' %}" rel="stylesheet">
-
-        <!-- Komodo Pallet
-        <link href="{% static 'css/kmd.css' %}" rel="stylesheet">
-        -->
 
         <!-- Komodo Pallet -->
 
+        <link href="{% static 'css/style.css' %}" rel="stylesheet">
         {% include "css/kmd.css" %}
         {% include "css/jquery-ui.css" %}
+
+        {% include "js/custom.js" %}
     </head>
     <body class="c-app">
         {% include "base_sidebar.html" %}
@@ -75,12 +85,12 @@
 
                             {% if messages %}
                                 {% for message in messages %}
-                                    {% include "components/messages.html" %}
+                                    {% include "components/messages/messages.html" %}
                                 {% endfor %}
                             {% endif %}
 
                             {% if sidebar_links.server == 'dev' %}
-                                    {% include "components/dev_msg.html" %}
+                                    {% include "components/messages/dev_msg.html" %}
                             {% endif %}
 
                             {% block content %}
@@ -94,6 +104,8 @@
             {% include "base_footer.html" %}        
         </div> 
 
+        <!-- Font Awesome -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js" integrity="sha512-6PM0qYu5KExuNcKt5bURAoT6KCThUmHRewN3zUFNaoI6Di7XJPTMoT6K0nsagZKk2OB4L7E3q1uQKHNHd4stIQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
         <!-- ChartJS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
@@ -106,13 +118,6 @@
         <!--[if IE]><!-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/svgxuse/1.2.6/svgxuse.min.js"></script>
         <!--<![endif]-->
-
-        <!-- Data Tables-->     
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.11.2/b-2.0.0/b-html5-2.0.0/date-1.1.1/sp-1.4.0/datatables.min.css"/>
- 
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.11.2/b-2.0.0/b-html5-2.0.0/date-1.1.1/sp-1.4.0/datatables.min.js"></script>
 
         <!-- Select2JS -->
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -127,22 +132,17 @@
             Chart.defaults.global.defaultFontColor = 'white';
             Chart.defaults.global.defaultFontSize = 14;
 
+            // init bootstrap tooltips
             $(function () {
-                $('[data-toggle="tooltip"]').tooltip()
+                $('[data-toggle="tooltip"]').tooltip({
+                    delay: {
+                        show: 10,
+                        hide: 10
+                    }
+                })
             })
 
-            function setTooltip(mdi, message) {
-              $(mdi).tooltip('hide')
-                .attr('data-original-title', message)
-                .tooltip('show');
-            }
-
-            function hideTooltip(mdi) {
-              setTimeout(function() {
-                $(mdi).tooltip('hide');
-              }, 1000);
-            }
-
+            // init clipboard buttons
             var btns = document.querySelectorAll('button');
             var clipboard = new ClipboardJS(btns);
 
@@ -155,13 +155,26 @@
                 console.log(e);
             });
 
+            // init clipboard tooltips
+            function setTooltip(mdi, message) {
+              $(mdi).tooltip('hide')
+                .attr('data-original-title', message)
+                .tooltip('show');
+            }
+
+            function hideTooltip(mdi) {
+              setTimeout(function() {
+                $(mdi).tooltip('hide');
+              }, 1000);
+            }
+
+            // Custom DataTables search filter input styling
             function update_dt_search(id) {
                 filter_div = '<div class="col-6 input-group-prepend px-0 ml-auto"><span class="input-group-text col-4">Search: </span><input type="search" class="col-8 ml-0 mr-3 form-control form-control-sm" placeholder="" aria-controls="'+id+'"></div>'
                 $("#"+id+"_filter").html(filter_div)
                 $("#"+id+"_filter").on("keyup", 'input', function() {
                     $("#"+id).DataTable().search(this.value.trim(), false, false).draw();
                 });
-
             }
 
             function update_dt_length(id) {
@@ -172,13 +185,9 @@
                 $("#tbl_select").on("change", function() {
                     $("#"+id).DataTable().page.len(parseInt(this.value)).draw();
                 });
-                
-
-
             }
             
             $(document).ready(function() {
-                // Custom DataTables search filter input styling
                 var dt_ids = [];
                 $(".dataTable").each(function(){
                     dt_ids.push($(this).attr("id"));
@@ -189,11 +198,17 @@
                     update_dt_search(dt_ids[i]);
                     update_dt_length(dt_ids[i]);
                 }
+
+                Chart.defaults.global.defaultFontColor = 'white';
+                Chart.defaults.global.defaultFontSize = 16;
             })
+
+        // Init Select2 dropdowns
         $('#since').select2();
         $('#id_base').select2();
         $('#id_rel').select2();
         $('#id_coin').select2();
+
         /*
         $( "#pct_slider" ).slider({
             min: 0,
@@ -201,12 +216,13 @@
         });
         */
 
+        // Init Datetime picker
         $('.dt_picker').datetimepicker({
             theme:'dark', 
             maxDate:new Date(),
         });
 
         </script>
-        {% include "plugins/statcounter.js" %}
+        {% include "js/statcounter.js" %}
     </body>
 </html>

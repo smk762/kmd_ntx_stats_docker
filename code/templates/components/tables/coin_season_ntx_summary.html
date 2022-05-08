@@ -1,0 +1,120 @@
+
+	<div class="row my-3" id="ntx">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card table_card">
+				<div class="card-header table_card_title flex">
+					{{ coin }} {{ season_clean }} Notarisations Summary
+				</div>
+				<div class="card-body table_card_body"  style="width:99%; visibility: hidden;">
+					<table id="ntx_table" class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th data-data="notary">Notary</th>
+								<th data-data="ntx_server">Server</th>
+								<th data-data="ntx_count">Notarisations</th>
+								<th data-data="ntx_pct">Participation</th>
+								<th data-data="ntx_score">Score</th>
+								<th data-data="ntx_block">Last ntx block</th>
+								<th data-data="ntx_time">Since last ntx</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for notary, data in coin_ntx_summary_table.items %}
+								<tr class="py-0">
+									<td data-data="notary">{{ notary }}</td>
+									<td data-data="ntx_server">{{ data.server }}</td>
+									<td data-data="ntx_count">{{ data.notary_ntx_count }}</td>
+									<td data-data="ntx_pct">{{ data.coin_ntx_count_pct }}</td>
+									<td data-data="ntx_score">{{ data.notary_ntx_score|floatformat:-3 }}</td>
+									<td data-data="ntx_block">{{ data.last_ntx_blockheight }}</td>
+									<td data-data="ntx_time">{{ data.since_last_block_time }}</td>
+								</tr>
+								<!-- {{ data }} -->
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>	
+		</div>
+	</div>
+  	<script>
+	    $(document).ready(function() {
+    		$('#ntx_table').css('visibility', 'visible');
+	        var ntxTable = $('#ntx_table').DataTable({
+        		order: [ 5, 'desc' ], 
+    			deferRender: true,
+                "orderClasses": false,
+		        "paging": false,
+	        	"columns": [
+			        { "data": "notary" },
+			        { "data": "ntx_server" },
+			        { "data": "ntx_count" },
+			        { "data": "ntx_pct" },
+			        { "data": "ntx_score" },
+			        { "data": "ntx_block" },
+			        { "data": "ntx_time" }
+			    ], 
+        		"columnDefs": [
+        			{ className: "text-right", "targets": [ 2, 3, 4 ] },
+        			{ className: "text-left text-nowrap", "targets": [ 0 ] },
+        			{ className: "fw-14pct text-nowrap", "targets": [ 1, 6 ] },
+        			{
+			            "targets": 0,
+			            "data": "notary",
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	$(nTd).html(get_notary_url('{{ season }}', oData.notary))
+
+				        }
+        			},
+        			{
+			            "data": "ntx_server",
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+
+				            $(nTd).html(get_server_styled(oData.ntx_server));
+			        	}
+			        },
+        			{
+			            "data": "ntx_count",
+			            "targets": 2,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	$(nTd).html("<a href='{% url 'notary_coin_notarised_view' %}?season={{ season }}&server="+oData.ntx_server+"&notary="+oData.notary+"&coin={{ coin }}'>"+oData.ntx_count+"</a>")
+			            }			            
+			        },
+        			{
+			            "data": "ntx_pct",
+			            "targets": 3,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	$(nTd).html(parseFloat(oData.ntx_pct).toFixed(3) + ' %')
+			            }			            
+			        },
+        			{
+			            "data": "ntx_score",
+			            "targets": 4,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+
+			            	$(nTd).html("<a href='{% url 'notary_epoch_scores_view' %}?notary="+oData.notary+"&server="+oData.ntx_server+"&coin={{ coin }}&season={{ season }}'>"+parseFloat(oData.ntx_score).toFixed(3)+"</a>")
+			            }			            
+			        },
+        			{
+			            "data": 'ntx_block',
+			            "targets": 5,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	let ntx_coin = "KMD"
+			            	if ('{{ coin }}' == "LTC") {
+			            		ntx_coin = "LTC"
+			            	}
+			            	$(nTd).html(get_block_url(ntx_coin, oData.ntx_block))
+				        }
+			        },
+        			{
+			            "data": 'ntx_time',
+			            "targets": 6,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	$(nTd).html(oData.ntx_time);
+				        }
+			        }
+        		]
+	        });
+	    });
+	</script>

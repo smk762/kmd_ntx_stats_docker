@@ -4,12 +4,23 @@
             		<div class="card-header notary_card_header notary_card_name">
             			<a href="//{{ request.get_host }}/notary_profile/{{ node }}/?season={{ season }}">
             				{{ node }}
+							{% for nn, site_links in nn_social.items %}
+								{% if node == nn %}
+		            				{% include "components/cards/card_img.html" with img_size=96 img_src=site_links.icon alt_text=nn profile_page="notary_profile" profile_name=node  %}
+								{% endif %}
+							{% endfor %}
 						</a>
-						{% for nn, site_links in nn_social.items %}
-							{% if node == nn %}
-	            				{% include "components/cards/card_img.html" with img_src=site_links.icon alt_text=nn profile_page="notary_profile" profile_name=node  %}
+	            		<div class="row m-auto justify-content-around col-11">
+						{% for notary, seasons in notary_seasons.items %}
+							{% if notary == node %} 
+								{% for season in seasons %}
+									<a href="/notary_profile/{{ notary }}?season={{ season }}">
+										<span class="badge">{{ season|cut:"eason_" }}</span>
+									</a>
+								{% endfor %}		
 							{% endif %}
 						{% endfor %}
+						</div>
 					</div>
 					<div class="card-body notary_card_body">
 						<p class="card-text notary_card_text">
@@ -39,7 +50,11 @@
 
 										{% elif site == 'keybase' %}
 											{%  if link != '' %}
-												<a href="{{ link }}"><i class="fab fa-keybase mr-2 social-icon"></i></a>
+												{% if 'keybase.io' in link %}
+													<a href="{{ link }}"><i class="fab fa-keybase mr-2 social-icon"></i></a>
+												{% else %}
+													<a href="https://keybase.io/{{ link }}"><i class="fab fa-keybase mr-2 social-icon"></i></a>
+												{% endif %}
 											{% else %}
 												<i class="fab fa-keybase mr-2 social-icon-disabled"></i>
 											{% endif %}

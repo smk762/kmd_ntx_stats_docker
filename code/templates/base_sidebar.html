@@ -1,319 +1,48 @@
 {% load static %}
 
     <!-- Sidebar -->
-    <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show " id="sidebar" style="border-right: 1px solid #000 !important;    ">
+    <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show " id="sidebar" style="border-right: 1px solid #000 !important;">
+
       <div class="c-sidebar-brand d-md-down-none ">
-        <a href="{{ scheme_host }}?season={{ season }}">
-            <img class="c-sidebar-brand-full" height="46" alt="Komodo Logo" src="{{ scheme_host }}static/img/brand/KMD_Horiz_Light.png" />
+        <a href="/">
+            <img class="c-sidebar-brand-full" height="46" alt="Komodo Logo" src="{% static '/img/brand/KMD_Horiz_Light.png' %}" />
             <img class="c-sidebar-brand-minimized" width="46" height="46" alt="Komodo Logo" src="{% static 'img/brand/KMD_Mark_Color.png' %}" />
         </a>
       </div>
+
       <ul class="c-sidebar-nav">
-        <!-- TODO: Review
-        <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown" href="#">
-                <i class="cib-bitcoin"></i>  
-                <span style="padding-left: 12px;">Funding</span>
-            </a>
-            <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}funding"> Funding Overview
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}funds_sent"> Funds Sent
-                    </a>
-                </li>
-            </ul>
-        </li>
-        -->
-        <!-- TODO: Awaiting delegation to crons / db table
-        <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown" href="#">
-                <i class="cil-check-circle"></i>  
-                <span style="padding-left: 12px;">SYNC</span>
-            </a>
-            <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}chain_sync"> Block Hash Comparison
-                    </a>
-                </li>
-            </ul>
-        </li>
-        -->
-        <li class="c-sidebar-nav-dropdown" style="margin-top: 1em;">
-                <span style="padding-left: 12px;">NOTARISATION</span>
-            <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notary_profile/?season={{ season }}" title="">
-                         {{ season_clean }} Notary Profiles
-                    </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}coin_profile/?season={{ season }}">
-                         {{ season_clean }} dPoW Coin Profiles
-                    </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}ntx_scoreboard/?season={{ season }}">
-                         {{ season_clean }} Scoreboard
-                    </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}ntx_scoreboard_24hrs/?season={{ season }}">
-                         24hr Scoreboard
-                    </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}chains_last_ntx/?season={{ season }}">
-                         Last Chain Notarisation
-                    </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notarised_24hrs/?season={{ season }}">
-                         Last 200 Notarisations
-                    </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}notarised_tenure/?season={{ season }}">
-                         Chain dPoW Tenure
-                    </a>
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}scoring_epochs/?season={{ season }}">
-                         dPoW Scoring Epochs
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="c-sidebar-nav-dropdown" style="margin-top: 1em;">
-                <span style="padding-left: 12px;">MINING</span>
-            <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}mining_overview/?season={{ season }}"> Mining Overview
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}mining_24hrs/?season={{ season }}"> Mining last 24hrs
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <!-- TODO: Review
-        <li class="c-sidebar-nav-dropdown" style="margin-top: 1em;">
-                <span style="padding-left: 12px;">COMMUNITY</span>
-            <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}community/cryptopuzzles/"> Cryptopuzzles! 
-                    </a>
-                </li>
-            </ul>
-        </li>
-        -->
-        <li class="c-sidebar-nav-dropdown" style="margin-top: 1em;">
-                <span style="padding-left: 12px;">ATOMICDEX</span>
-            <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/activation_commands/?season={{ season }}"> Activation Commands List
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/batch_activation_form/?season={{ season }}"> Activation Commands Form
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/bestorders/?season={{ season }}"> Best Orders
-                    </a>
-                </li>
-                <!--
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/gui_stats/?season={{ season }}"> GUI Stats
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/last_200_swaps/?season={{ season }}"> Last 200 Failed Swaps
-                    </a>
-                </li>
-                -->
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/last_200_swaps/?season={{ season }}"> Last 200 Swaps
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/makerbot_config_form/?season={{ season }}"> Makerbot Config Form
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/orderbook/?season={{ season }}"> Orderbook
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/seednode_version_stats_hourly/?season={{ season }}"> Seed Node Hourly
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/seednode_version_stats_daily/?season={{ season }}"> Seed Node Daily
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}atomicdex/seednode_version_stats_month/?season={{ season }}"> Seed Node Monthly
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="c-sidebar-nav-dropdown" style="margin-top: 1em;">
-                <span style="padding-left: 12px;">TOOLS </span>
-            <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}tools/pubkey_addresses/?season={{ season }}"> Address from Pubkey
-                    </a>
-                </li>
-                <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}tools/convert_addresses/?season={{ season }}"> Address Conversion</a></li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}tools/decode_opret/?season={{ season }}"> Decode OP_RETURN
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}tools/daemon_clis/?season={{ season }}"> Daemon CLIs
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}tools/launch_params/?season={{ season }}"> Launch Params
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}tools/kmd_rewards/"> KMD Rewards
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}tools/scripthash_from_address/"> Scripthash from Address
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}tools/scripthashes_from_pubkey/"> Scripthashes from Pubkey
-                    </a>
-                </li>
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}faucet/?season={{ season }}"> RICK / MORTY Faucet
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <!-- TESTNET COMPLETE, leavong here for next season -->
-        <!--
-        <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown" href="#">
-                <i class="cil-audio"></i>
-                <span style="padding-left: 12px;">TESTNET</span>
-            </a>
-            <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}testnet_ntx_scoreboard"> Leaderboard
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown" href="#">
-                <i class="cil-address-book"></i>
-                <span style="padding-left: 12px;">Season 5 Transition</span>
-            </a>
-            <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}s5_address_confirmation/?season={{ season }}"> Address Confirmation
-                    </a>
-                </li>
-            </ul>
-        </li>
-        <li class="c-sidebar-nav-dropdown">
-            <a class="c-sidebar-nav-dropdown" href="#">
-                <i class="cil-badge"></i>
-                <span style="padding-left: 12px;">VOTE 2021</span>
-            </a>
-            <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-                <li class="c-sidebar-nav">
-                    <a class="c-sidebar-nav-link" href="{{ scheme_host }}vote2021/?season={{ season }}"> Vote Tally Results
-                    </a>
-                </li>
-            </ul>
-        </li>
-        -->
+
+        {% include "components/sidebar/ntx_views.html" %}
+        {% include "components/sidebar/mining_views.html" %}
+        {% include "components/sidebar/testnet_views.html" %} 
+        {% include "components/sidebar/atomicdex_views.html" %}
+        {% include "components/sidebar/tools_views.html" %}
+
+        
+        <!-- TODO: review
+        {% include "components/sidebar/community_views.html" %} -->
+
         <li class="c-sidebar-nav-dropdown" style="margin-top: 1em;">
             <span style="padding-left: 12px;">API</span>
           <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
-            <li class="c-sidebar-nav" style="margin-top: 0.5em;">Documentation</li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="https://app.swaggerhub.com/apis-docs/smk762/Komodo-NTX-Stats-API/0.1"> Draft API Docs</a></li>
             
-            <li class="c-sidebar-nav" style="margin-top: 0.5em;">Info v2</li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/balances"> Balances</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/base_58"> Base 58 Params</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/chain_sync"> Chain Syn Status</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/coins"> Coins</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/mined_count_daily"> Daily Mined</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/notarised_chain_daily"> Daily NTX (chain)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/notarised_count_daily"> Daily NTX (notary)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/daemon_cli"> Deamon CLI</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/dpow_server_coins"> dPoW Server Coins</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/electrums"> Electrums</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/electrums_ssl"> Electrums SSL</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/explorers"> Explorers</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/launch_params"> Launch Params</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/btc_txid_list"> Notary BTC Tx List</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/notary_btc_txid"> Notary BTC Tx Info</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/notary_btc_transactions"> BTC Transactions</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/ltc_txid_list"> Notary LTC Tx List</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/notary_ltc_txid"> Notary LTC Tx Info</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/notary_ltc_transactions"> LTC Transactions</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/notarisation_txid_list"> Notarised Tx List</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/notarised_txid"> Notarised Tx Info</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/notary_nodes"> Notary Nodes</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/nn_social"> Notary Social</a></li>
+            {% include "components/sidebar/atomicdex_api.html" %}
+            {% include "components/sidebar/info_api.html" %}
+            {% include "components/sidebar/mining_api.html" %}
+            {% include "components/sidebar/tables_api.html" %}
+            {% include "components/sidebar/source_api.html" %}
+            {% include "components/sidebar/tools_api.html" %}
+            {% include "components/sidebar/wallet_api.html" %}
 
-            <li class="c-sidebar-nav" style="margin-top: 0.5em;">Wallet v2</li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/wallet/chain_addresses"> Chain Addresses</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/wallet/chain_balances"> Chain Balances</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/wallet/notary_addresses"> Notary Addresses</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/wallet/notary_balances"> Notary Balances</a></li>
-
-            <li class="c-sidebar-nav" style="margin-top: 0.5em;">Table v2</li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/addresses"> Addresses</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/balances"> Balances</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/last_mined"> Last Mined</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/last_notarised"> Last Notarised</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/mined_24hrs"> Mined (24hrs)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/mined_count_season"> Mined (season)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/notarised"> Notarised</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/notarised_24hrs"> Notarised (24hrs)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/notarised_tenure"> Notarised Tenure</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/notary_profile_summary"> Notary Summary</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/notary_epoch_scores"> Notary Epoch Scores</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/scoring_epochs"> Scoring Epochs</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/notarised_chain_season"> Season NTX (chain)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/notarised_count_season"> Season NTX (notary)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/table/split_stats"> Split Stats</a></li>
-
-            <li class="c-sidebar-nav" style="margin-top: 0.5em;">Source v2 (paginated)</li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/addresses"> Addresses</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/balances"> Balances</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/coins"> Coins</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/last_notarised"> Last Notarised</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/mined"> Mined</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/mined_count_daily"> Mined Count (by date)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/mined_count_season"> Mined Count (season)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/nn_btc_tx"> Notary BTC Tx</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/nn_ltc_tx"> Notary LTC Tx</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/nn_social"> Notary Social</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/notarised"> Notarisations</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/notarised_chain_daily"> Daily NTX (chain)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/notarised_count_daily"> Daily NTX (notary)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/notarised_chain_season"> Season NTX (chain)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/notarised_count_season"> Season NTX (notary)</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/notarised_tenure"> Notarised Tenure</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/source/scoring_epochs"> Scoring Epochs</a></li>
-
-            <li class="c-sidebar-nav" style="margin-top: 0.5em;">Tools v2</li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/tools/addr_from_base58"> Address From Base 58</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/tools/address_from_pubkey"> Address From Pubkey</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/tools/address_conversion"> Address Conversion</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/tools/decode_opreturn"> Decode OP_RETURN</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/tools/kmd_rewards"> KMD Rewards</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/tools/notary_utxos"> Notary UTXOs</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/tools/scripthash_from_address/"> Scripthash from Address</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/tools/scripthashes_from_pubkey/"> Scripthashes from Pubkey</a></li>
-
+            <!-- TODO: review
+            <li class="c-sidebar-nav" style="margin-top: 0.5em;">Documentation</li>
+            <li class="c-sidebar-nav"><a href="https://app.swaggerhub.com/apis-docs/smk762/Komodo-NTX-Stats-API/0.1"> Draft API Docs</a></li>
             <li class="c-sidebar-nav" style="margin-top: 0.5em;">Other</li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/sidebar_links"> Sidebar Links</a></li>
+            <li class="c-sidebar-nav"><a href="{% url 'api_sidebar_links' %}"> Sidebar Links</a></li>
 
             <li class="c-sidebar-nav" style="margin-top: 0.5em;">Deprecate in S5</li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/info/split_summary_api"> BTC Split Summary API</a></li>
-            <li class="c-sidebar-nav"><a class="c-sidebar-nav-link" href="{{ scheme_host }}api/testnet/totals"> Testnet Stats</a></li>
-
+            <li class="c-sidebar-nav"><a href="{% url 'split_summary_api' %}"> BTC Split Summary API</a></li>
+            <li class="c-sidebar-nav"><a href="{% url 'api_testnet_totals' %}"> Testnet Stats</a></li> -->
 
           </ul>
         </li>

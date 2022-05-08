@@ -675,5 +675,13 @@ NOTARY_PUBKEYS = {
     "Season_6": {
         "Main": {},
         "Third_Party": {}
+    },
+    "VOTE2022_Testnet": {
+        "Main": {
+            "Alright0": "02a67a4da7504fefaf1e7362da9b24b66a023cae853964cd53d19a83094d575321",
+            "Alright1": "027d4b25be212946f7939ff98512ef3472d8cfc3f70d8d609d20bdab569ec4bb79",
+            "Dragonhound": "0378b7ceaa5d8370543f14f125df44cb2bd77c490931524da884270f69eedff40d",
+            "Strob": "03cd7d3f5d7bd1c2bde405aa2916c91c3320c854b1b558d5e43aeed1a7a526ec83"
+        }
     }
 }

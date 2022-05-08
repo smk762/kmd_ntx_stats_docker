@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_wallet as wallet
 
-# Season > Server > Notary > Chain
+# Season > Server > Notary > Coin
 
 
 def notary_addresses_wallet(request):
@@ -16,7 +16,7 @@ def notary_addresses_wallet(request):
         notary_id = item["notary_id"]
         address = item["address"]
         pubkey = item["pubkey"]
-        chain = item["chain"]
+        coin = item["coin"]
 
         if season not in resp:
             resp.update({season: {}})
@@ -30,15 +30,15 @@ def notary_addresses_wallet(request):
             }})
 
         resp[season][server][notary]["addresses"].update({
-            chain: address
+            coin: address
         })
 
     return JsonResponse(resp)
 
-# Season > Server > Chain > Notary
+# Season > Server > Coin > Notary
 
 
-def chain_addresses_wallet(request):
+def coin_addresses_wallet(request):
     data = wallet.get_source_addresses(request).values()
     resp = {}
     for item in data:
@@ -47,22 +47,22 @@ def chain_addresses_wallet(request):
         notary = item["notary"]
         address = item["address"]
         pubkey = item["pubkey"]
-        chain = item["chain"]
+        coin = item["coin"]
 
         if season not in resp:
             resp.update({season: {}})
         if server not in resp[season]:
             resp[season].update({server: {}})
-        if chain not in resp[season][server]:
-            resp[season][server].update({chain: {}})
+        if coin not in resp[season][server]:
+            resp[season][server].update({coin: {}})
 
-        resp[season][server][chain].update({
+        resp[season][server][coin].update({
             notary: address
         })
 
     return JsonResponse(resp)
 
-# Season > Server > Notary > Chain
+# Season > Server > Notary > Coin
 
 
 def notary_balances_wallet(request):
@@ -73,7 +73,7 @@ def notary_balances_wallet(request):
         server = item["server"]
         notary = item["notary"]
         address = item["address"]
-        chain = item["chain"]
+        coin = item["coin"]
         balance = item["balance"]
 
         if season not in resp:
@@ -84,19 +84,19 @@ def notary_balances_wallet(request):
             resp[season][server].update({notary: {}})
         if notary not in resp[season][server][notary]:
             resp[season][server][notary].update({
-                chain: {}
+                coin: {}
             })
 
-        resp[season][server][notary][chain].update({
+        resp[season][server][notary][coin].update({
             address: balance
         })
 
     return JsonResponse(resp)
 
-# Season > Server > Chain > Notary
+# Season > Server > Coin > Notary
 
 
-def chain_balances_wallet(request):
+def coin_balances_wallet(request):
     data = wallet.get_source_balances(request).values()
     resp = {}
     for item in data:
@@ -104,21 +104,21 @@ def chain_balances_wallet(request):
         server = item["server"]
         notary = item["notary"]
         address = item["address"]
-        chain = item["chain"]
+        coin = item["coin"]
         balance = item["balance"]
 
         if season not in resp:
             resp.update({season: {}})
         if server not in resp[season]:
             resp[season].update({server: {}})
-        if chain not in resp[season][server]:
-            resp[season][server].update({chain: {}})
+        if coin not in resp[season][server]:
+            resp[season][server].update({coin: {}})
         if notary not in resp[season][server]:
-            resp[season][server][chain].update({
+            resp[season][server][coin].update({
                 notary: {}
             })
 
-        resp[season][server][chain][notary].update({
+        resp[season][server][coin][notary].update({
             address: balance
         })
 

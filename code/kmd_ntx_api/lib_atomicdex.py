@@ -1,7 +1,9 @@
 import copy
 import json
 import requests
+from django.db.models import Count
 from kmd_ntx_api.lib_const import *
+from kmd_ntx_api.lib_const_mm2 import *
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_struct as struct
 import kmd_ntx_api.lib_helper as helper
@@ -370,3 +372,268 @@ def is_mm2_version_valid(version, timestamp):
     if version in active_versions:
         return True
     return False
+
+def get_activation_commands(request):
+    protocols = []
+    platforms = []
+    other_platforms = []
+    incompatible_coins = []
+    coins_without_electrum = []
+    enable_commands = {"commands":{}}
+    invalid_configs = {}
+    resp_json = {}
+
+    selected_coin = helper.get_or_none(request, "coin")
+    coin_info = query.get_coins_data(selected_coin, 1)
+    serializer = serializers.coinsSerializer(coin_info, many=True)
+
+    for item in serializer.data:
+        protocol = None
+        platform = None
+        coin = item["coin"]
+        electrums = item["electrums"]
+        compatible = item["mm2_compatible"] == 1
+        
+        if coin == "TOKEL":
+            coin = "TKL"
+
+        resp_json = {} 
+        if "protocol" in item["coins_info"]:
+            protocol = item["coins_info"]["protocol"]["type"]
+            protocols.append(protocol)
+
+            if "protocol_data" in item["coins_info"]["protocol"]:
+                if "platform" in item["coins_info"]["protocol"]["protocol_data"]:
+                    platform = item["coins_info"]["protocol"]["protocol_data"]["platform"]
+                    platforms.append(platform)
+
+                    if platform not in enable_commands["commands"]:
+                        enable_commands["commands"].update({platform: {}})
+
+        if platform in SWAP_CONTRACTS:
+            resp_json.update(get_contracts(platform))
+        elif coin in SWAP_CONTRACTS:
+            resp_json.update(get_contracts(coin))
+        else:
+            other_platforms.append(platform)
+
+        if protocol == "UTXO":
+            platform = 'UTXO'
+            if len(electrums) > 0:
+                resp_json.update({
+                    "userpass":"'$userpass'",
+                    "method":"electrum",
+                    "coin":coin,
+                    "servers": []
+                })
+                if "UTXO" not in enable_commands["commands"]:
+                    enable_commands["commands"].update({
+                        "UTXO": {}
+                    })   
+                for electrum in electrums:
+                    resp_json["servers"].append({"url":electrum})
+
+        elif protocol == "QRC20" or coin in ['QTUM', 'QTUM-segwit']:
+            platform = 'QRC20'
+
+            resp_json.update({
+                "userpass":"'$userpass'"
+                ,"method":"electrum",
+                "coin":coin,
+                "servers": [
+                    {"url":"electrum1.cipig.net:10050"},
+                    {"url":"electrum2.cipig.net:10050"},
+                    {"url":"electrum3.cipig.net:10050"}
+                ]
+            })
+            if "QTUM" not in enable_commands["commands"]:
+                enable_commands["commands"].update({
+                    "QTUM": {}
+                })    
+
+        elif protocol == "tQTUM" or coin in ['tQTUM', 'tQTUM-segwit']:
+            platform = 'tQTUM'
+            resp_json.update({
+                "userpass":"'$userpass'",
+                "method":"electrum",
+                "coin":coin,
+                "servers": [
+                    {"url":"electrum1.cipig.net:10071"},
+                    {"url":"electrum2.cipig.net:10071"},
+                    {"url":"electrum3.cipig.net:10071"}
+                ]
+            })
+            if "QRC20" not in enable_commands["commands"]:
+                enable_commands["commands"].update({
+                    "QRC20": {}
+                })    
+
+        else:
+
+            resp_json.update({
+                "userpass":"'$userpass'",
+                "method":"enable",
+                "coin":coin,
+            })
+
+            if platform == 'BNB' or coin == 'BNB':
+                platform = 'BNB'
+                resp_json.update(PLATFORM_URLS["BNB"])
+
+            elif platform == 'ETHR' or coin == 'ETHR':
+                platform = 'ETHR'
+                resp_json.update(PLATFORM_URLS["ETHR"])
+
+            elif platform == 'ETH' or coin == 'ETH':
+                platform = 'ETH'
+                resp_json.update(PLATFORM_URLS["ETH"])
+
+            elif platform == 'ETH-ARB20' or coin == 'ETH-ARB20':
+                platform = 'ETH-ARB20'
+                resp_json.update(PLATFORM_URLS["ETH-ARB20"])
+
+            elif platform == 'ONE' or coin == 'ONE':
+                platform = 'ONE'
+                resp_json.update(PLATFORM_URLS["ONE"])
+
+            elif platform == 'MATIC' or coin == 'MATIC':
+                platform = 'MATIC'
+                resp_json.update(PLATFORM_URLS["MATIC"])
+
+            elif platform == 'MATICTEST' or coin == 'MATICTEST':
+                platform = 'MATICTEST'
+                resp_json.update(PLATFORM_URLS["MATICTEST"])
+
+            elif platform == 'AVAX' or coin == 'AVAX':
+                platform = 'AVAX'
+                resp_json.update(PLATFORM_URLS["AVAX"])
+
+            elif platform == 'AVAXT' or coin == 'AVAXT':
+                platform = 'AVAXT'
+                resp_json.update(PLATFORM_URLS["AVAXT"])
+
+            elif platform == 'BNBT' or coin == 'BNBT':
+                platform = 'BNBT'
+                resp_json.update(PLATFORM_URLS["BNBT"])
+
+            elif platform == 'MOVR' or coin == 'MOVR':
+                platform = 'MOVR'
+                resp_json.update(PLATFORM_URLS["MOVR"])
+                
+            elif platform == 'FTM' or coin == 'FTM':
+                platform = 'FTM'
+                resp_json.update(PLATFORM_URLS["FTM"])
+
+            elif platform == 'FTMT' or coin == 'FTMT':
+                platform = 'FTMT'
+                resp_json.update(PLATFORM_URLS["FTMT"])
+
+            elif platform == 'KCS' or coin == 'KCS':
+                platform = 'KCS'
+                resp_json.update(PLATFORM_URLS["KCS"])
+
+            elif platform == 'HT' or coin == 'HT':
+                platform = 'HT'
+                resp_json.update(PLATFORM_URLS["HT"])
+
+            elif coin == 'UBQ':
+                platform = 'Ubiq'
+                resp_json.update(PLATFORM_URLS["UBQ"])
+
+            elif platform == 'ETC' or coin == 'ETC':
+                platform = 'ETC'
+                resp_json.update(PLATFORM_URLS["ETC"])
+
+            elif platform == 'OPT20' or coin == 'ETHK-OPT20':
+                platform = 'OPT20'
+                resp_json.update(PLATFORM_URLS["OPT20"])
+
+        if compatible and len(resp_json) > 0:
+            is_valid_enable = (resp_json['method'] == 'enable' and 'urls' in resp_json)
+            is_valid_electrum = (resp_json['method'] == 'electrum' and 'servers' in resp_json)
+            if is_valid_enable or is_valid_electrum:
+                if platform:
+                    if platform not in enable_commands["commands"]:
+                        enable_commands["commands"].update({
+                            platform: {}
+                        })    
+                    enable_commands["commands"][platform].update({
+                        coin: helper.sort_dict(resp_json)
+                    })
+                else:
+                    print(f"Unknown platform for {coin}")
+                    '''
+                    if "Unknown" not in enable_commands["commands"]:
+                        enable_commands["commands"].update({
+                            "Unknown": {}
+                        })    
+                    enable_commands["commands"]["Unknown"].update({
+                        coin:sort_dict(resp_json)
+                    })
+                    '''
+            else:
+                invalid_configs.update({
+                        coin: helper.sort_dict(resp_json)
+                    })
+        else:
+            incompatible_coins.append(coin)
+
+    if selected_coin is None:
+        enable_commands.update({
+            "invalid_configs": invalid_configs,
+            "incompatible_coins": incompatible_coins,
+            "protocols": list(set(protocols)),
+            "platforms": list(set(platforms)),
+            "other_platforms": list(set(other_platforms)),
+            "coins_without_electrum": coins_without_electrum
+            })
+        return enable_commands
+    else: 
+        return resp_json
+
+
+def get_nn_seed_version_scores_hourly_table(request, start=None, end=None):
+    # TODO: Views for day (by hour), month (by day), season (by month)
+    # Season view: click on month, goes to month view
+    # Month view: click on day, goes to day view
+    # TODO: Incorporate these scores into overall NN score, and profile stats.
+    if not start:
+        start = helper.get_or_none(request, "start")
+    if not end:
+        end = helper.get_or_none(request, "end")
+
+    if not start:
+        start = time.time()
+        end = time.time() + SINCE_INTERVALS["day"]
+    notary_list = helper.get_notary_list(SEASON)
+    helper.date_hour_notary_scores = query.get_nn_seed_version_scores(start, end)
+    
+    table_headers = ["Total"]
+    table_data = []
+    notary_scores = {}
+
+    for notary in notary_list:
+        notary_scores.update({notary:[]})
+
+    for date in helper.date_hour_notary_scores:
+        for hour in helper.date_hour_notary_scores[date]:
+            table_headers.append(f"{hour.split(':')[0]}")
+            for notary in notary_list:
+                if notary in helper.date_hour_notary_scores[date][hour]:
+                    score = round(helper.date_hour_notary_scores[date][hour][notary]["score"],2)
+                else:
+                    score = 0
+                notary_scores[notary].append(score)
+
+    table_headers.append("Notary")
+    table_headers.reverse()
+    # Get total for timespan
+    for notary in notary_scores:
+        notary_scores[notary].reverse()
+        total = round(sum(notary_scores[notary]),2)
+        notary_scores[notary].append(total)
+
+    return {
+        "headers": table_headers,
+        "scores": notary_scores
+        }

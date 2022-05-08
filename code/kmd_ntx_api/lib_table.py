@@ -1,56 +1,55 @@
-
+import time
 from datetime import datetime as dt
-from django.db.models import Count, Min, Max, Sum
+from django.db.models import Max
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_info as info
 import kmd_ntx_api.serializers as serializers
-
-logger = logging.getLogger("mylogger")
 
 
 def get_addresses_table(request):
     season = helper.get_or_none(request, "season", SEASON)
     server = helper.get_or_none(request, "server")
-    chain = helper.get_or_none(request, "chain")
+    coin = helper.get_or_none(request, "coin")
     notary = helper.get_or_none(request, "notary")
     address = helper.get_or_none(request, "address")
 
-    if not season and not chain and not notary and not address:
+    if not season and not coin and not notary and not address:
         return {
-            "error": "You need to specify at least one of the following filter parameters: ['season', 'chain', 'notary', 'address']"
+            "error": "You need to specify at least one of the following filter parameters: ['season', 'coin', 'notary', 'address']"
         }
 
-    data = query.get_addresses_data(season, server, chain, notary, address)
+    data = query.get_addresses_data(season, server, coin, notary, address)
     data = data.values()
 
     resp = []
     for item in data:
 
         resp.append({
-                "season": item['season'],
-                "server": item['server'],
-                "chain": item['chain'],
-                "notary": item['notary'],
-                "address": item['address'],
-                "pubkey": item['pubkey']
+            "season": item['season'],
+            "server": item['server'],
+            "coin": item['coin'],
+            "notary": item['notary'],
+            "address": item['address'],
+            "pubkey": item['pubkey']
         })
 
     return resp
 
 
-def get_balances_table(request):
+def get_balances_table(request, notary=None, coin=None):
     season = helper.get_or_none(request, "season", SEASON)
     server = helper.get_or_none(request, "server")
-    chain = helper.get_or_none(request, "chain")
-    notary = helper.get_or_none(request, "notary")
+    coin = helper.get_or_none(request, "coin", coin)
+    notary = helper.get_or_none(request, "notary", notary)
     address = helper.get_or_none(request, "address")
 
-    if not season and not chain and not notary and not address:
+    if not season and not coin and not notary and not address:
         return {
-            "error": "You need to specify at least one of the following filter parameters: ['season', 'chain', 'notary', 'address']"
+            "error": "You need to specify at least one of the following filter parameters: ['season', 'coin', 'notary', 'address']"
         }
-    data = query.get_balances_data(season, server, chain, notary, address)
+    data = query.get_balances_data(season, server, coin, notary, address)
     data = data.values()
 
     serializer = serializers.balancesSerializer(data, many=True)
@@ -59,10 +58,11 @@ def get_balances_table(request):
 
 
 def get_coin_social_table(request):
-    chain = helper.get_or_none(request, "chain")
+    coin = helper.get_or_none(request, "coin")
+    season = helper.get_or_none(request, "season")
 
-    data = query.get_coin_social_data(chain)
-    data = data.order_by('chain').values()
+    data = query.get_coin_social_data(coin, season)
+    data = data.order_by('coin').values()
 
     serializer = serializers.coinSocialSerializer(data, many=True)
     return serializer.data
@@ -93,116 +93,172 @@ def get_last_mined_table(request):
         last_mined_blocktime = item['block_time__max']
         if name != address:
             resp.append({
-                    "name": name,
-                    "address": address,
-                    "last_mined_block": last_mined_block,
-                    "last_mined_blocktime": last_mined_blocktime,
-                    "season": season
+                "name": name,
+                "address": address,
+                "last_mined_block": last_mined_block,
+                "last_mined_blocktime": last_mined_blocktime,
+                "season": season
             })
 
     return resp
 
 
-def get_last_notarised_table(request):
+def get_notary_last_ntx_table(request, notary=None):
     season = helper.get_or_none(request, "season", SEASON)
     server = helper.get_or_none(request, "server")
-    chain = helper.get_or_none(request, "chain")
-    notary = helper.get_or_none(request, "notary")
+    coin = helper.get_or_none(request, "coin")
+    notary = helper.get_or_none(request, "notary", notary)
 
-    if not notary and not chain:
+    if not notary and not coin:
         return {
-            "error": "You need to specify at least one of the following filter parameters: ['notary', 'chain']"
+            "error": "You need to specify at least one of the following filter parameters: ['notary', 'coin']"
         }
 
-    data = query.get_last_notarised_data(season, server, notary, chain)
-    data = data.order_by('season', 'server', 'notary', 'chain').values()
+    data = query.get_notary_last_ntx_data(season, server, notary, coin)
+    data = data.order_by('season', 'server', 'notary', 'coin').values()
 
-    serializer = serializers.lastNotarisedSerializer(data, many=True)
-    return serializer.data
+    return data
 
 
-# TODO: Handle where chain not notarised
-def get_notary_profile_summary_table(request):
+# 
+def get_notary_ntx_24hr_table_data(request, notary=None):
     season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
-    chain = helper.get_or_none(request, "chain")
-    notary = helper.get_or_none(request, "notary")
+    notary = helper.get_or_none(request, "notary", notary)
 
     if not notary or not season:
         return {
             "error": "You need to specify at least both of the following filter parameters: ['notary', 'season']"
         }
-    season_main_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Main').json()["results"]
-    season_3P_coins = requests.get(f'{THIS_SERVER}/api/info/dpow_server_coins/?season={SEASON}&server=Third_Party').json()["results"]
+    min_blocktime = int(time.time() - SINCE_INTERVALS['day'])
+    data = query.get_notarised_data(season=season, notary=notary, min_blocktime=min_blocktime)
+    data = list(data.order_by('coin').values())
+    return data
 
-    resp = {}
-    ntx_season_data = get_notarised_count_season_table(request)
+
+# TODO: Handle where coin not notarised
+def get_notary_ntx_season_table_data(request, notary=None):
+    season = helper.get_or_none(request, "season", SEASON)
+    notary = helper.get_or_none(request, "notary", notary)
+
+    if not notary or not season:
+        return {
+            "error": "You need to specify at least both of the following filter parameters: ['notary', 'season']"
+        }
+
+    ntx_season_data = get_notary_ntx_season_table(request, notary)
+
+
+    notary_summary = {}
     for item in ntx_season_data:
-        chain_ntx_counts = item['chain_ntx_counts']
-        for chain in chain_ntx_counts["coins"]:
-            if chain not in resp:
-                if chain in season_main_coins:
-                    server = "Main"
-                elif chain in season_3P_coins:
-                    server = "Third_Party"
-                elif chain in ["KMD", "BTC", "LTC"]:
-                    server = chain
-                else:
-                    server = "Unknown"
-                    logger.warning(f"Can't assign {chain} NTX % for {notary}")
-                resp.update({
-                    chain:{
+        notary = item["notary"]
+
+        for server in item["server_data"]:
+            for coin in item["server_data"][server]["coins"]:
+                if notary not in notary_summary:
+                    notary_summary.update({notary: {}})
+
+                notary_summary[notary].update({
+                    coin: {
                         "season": season,
                         "server": server,
-                        "chain": chain,
-                        "chain_score": chain_ntx_counts["coins"][chain]["notary_coin_ntx_score"],
-                        "chain_ntx_count": chain_ntx_counts["coins"][chain]["notary_coin_ntx_count"]
+                        "notary": notary,
+                        "coin": coin,
+                        "coin_ntx_count": item["server_data"][server]["coins"][coin]["ntx_count"],
+                        "coin_ntx_score": item["server_data"][server]["coins"][coin]["ntx_score"]
                     }
                 })
 
-        chain_ntx_pct = item['chain_ntx_pct']
-        for chain in chain_ntx_pct:
-            if chain not in resp:
-                if chain in season_main_coins:
-                    server = "Main"
-                elif chain in season_3P_coins:
-                    server = "Third_Party"
-                elif chain in ["KMD", "BTC", "LTC"]:
-                    server = chain
-                else:
-                    server = "Unknown"
-                    logger.warning(f"Can't assign {chain} NTX % for {notary}")
-                resp.update({
-                    chain: {
-                        "season": season,
-                        "server": server,
-                        "chain": chain,
-                        "chain_score": 0,
-                        "chain_ntx_count": 0,
-                        "last_block_height": 0,
-                        "last_block_time": 0
-                    }
-            })
-            resp[chain].update({"ntx_pct": chain_ntx_pct[chain]})
+        for coin in item["coin_data"]:
+            if coin in notary_summary[notary]:
+                notary_summary[notary][coin].update({
+                    "coin_ntx_count_pct": item["coin_data"][coin]["pct_of_coin_ntx_count"],
+                    "coin_ntx_score_pct": item["coin_data"][coin]["pct_of_coin_ntx_score"]
+                })
 
-    last_ntx = get_last_notarised_table(request)
-    for item in last_ntx:
-        chain = item['chain']
-        # filter out post season chains e.g. etomic
-        if chain in resp:
-            resp[chain].update({
-                "last_block_height": item['block_height'],
-                "last_block_time": item['block_time'],
-                "since_last_block_time": helper.get_time_since(item['block_time'])[1]
-            })
+    for notary in notary_summary:
+        last_ntx = get_notary_last_ntx_table(request, notary)
+        for item in last_ntx:
+            coin = item['coin']
+            if coin in notary_summary[notary]:
+                notary_summary[notary][coin].update({
+                    "last_ntx_blockheight": item['kmd_ntx_blockheight'],
+                    "last_ntx_blocktime": item['kmd_ntx_blocktime'],
+                    "last_ntx_blockhash": item['kmd_ntx_blockhash'],
+                    "last_ntx_txid": item['kmd_ntx_txid'],
+                    "opret": item['opret'],
+                    "since_last_block_time": helper.get_time_since(item['kmd_ntx_blocktime'])[1]
+                })
 
-    list_resp = []
-    for chain in resp:
-        list_resp.append(resp[chain])
+    notary_ntx_summary_table = []
+    for coin in notary_summary:
+        notary_ntx_summary_table.append(notary_summary[coin])
 
     api_resp = {
         "ntx_season_data": ntx_season_data,
-        "ntx_summary_data": list_resp,
+        "notary_ntx_summary_table": notary_ntx_summary_table,
+    }
+    return api_resp
+
+
+# TODO: Handle where coin not notarised
+def get_coin_ntx_season_table_data(request, coin=None):
+    season = helper.get_or_none(request, "season", SEASON)
+    coin = helper.get_or_none(request, "coin", coin)
+
+    if not coin or not season:
+        return {
+            "error": "You need to specify at least both of the following filter parameters: ['coin', 'season']"
+        }
+
+    ntx_season_data = get_coin_ntx_season_table(request, coin)
+
+    coin_summary = {}
+    for item in ntx_season_data:
+        coin = item["coin"]
+        server = item["server"]
+        for notary in item["notary_data"]:
+            if coin not in coin_summary:
+                coin_summary.update({coin: {}})
+
+            coin_summary[coin].update({
+                notary: {
+                    "season": season,
+                    "server": server,
+                    "notary": notary,
+                    "coin": coin,
+                    "notary_ntx_count": item["notary_data"][notary]["ntx_count"],
+                    "notary_ntx_score": item["notary_data"][notary]["ntx_score"]
+                }
+            })
+
+        for notary in item["notary_data"]:
+            if notary in coin_summary[coin]:
+                coin_summary[coin][notary].update({
+                    "coin_ntx_count_pct": item["notary_data"][notary]["pct_of_coin_ntx_count"],
+                    "coin_ntx_score_pct": item["notary_data"][notary]["pct_of_coin_ntx_score"]
+                })
+
+    for coin in coin_summary:
+        last_ntx = get_coin_last_ntx_table(request, coin)
+        for item in last_ntx:
+            notary = item['notary']
+            if notary in coin_summary[coin]:
+                coin_summary[coin][notary].update({
+                    "last_ntx_blockheight": item['kmd_ntx_height'],
+                    "last_ntx_blocktime": item['kmd_ntx_blocktime'],
+                    "last_ntx_blockhash": item['kmd_ntx_blockhash'],
+                    "last_ntx_txid": item['kmd_ntx_txid'],
+                    "opret": item['opret'],
+                    "since_last_block_time": helper.get_time_since(item['kmd_ntx_blocktime'])[1]
+                })
+
+    coin_ntx_summary_table = []
+    for coin in coin_summary:
+        coin_ntx_summary_table.append(coin_summary[coin])
+
+    api_resp = {
+        "ntx_season_data": ntx_season_data,
+        "coin_ntx_summary_table": coin_ntx_summary_table,
     }
     return api_resp
 
@@ -211,7 +267,8 @@ def get_mined_24hrs_table(request):
     name = helper.get_or_none(request, "name")
     address = helper.get_or_none(request, "address")
     day_ago = int(time.time()) - SINCE_INTERVALS['day']
-    data = query.get_mined_data(None, name, address).filter(block_time__gt=str(day_ago))
+    data = query.get_mined_data(None, name, address).filter(
+        block_time__gt=str(day_ago))
     data = data.values()
 
     serializer = serializers.minedSerializer(data, many=True)
@@ -229,7 +286,8 @@ def get_mined_count_season_table(request):
             "error": "You need to specify at least one of the following filter parameters: ['season', 'name', 'address']"
         }
 
-    data = query.get_mined_count_season_data(season, name, address).filter(blocks_mined__gte=10)
+    data = query.get_mined_count_season_data(
+        season, name, address).filter(blocks_mined__gte=10)
     data = data.order_by('season', 'name').values()
     serializer = serializers.minedCountSeasonSerializer(data, many=True)
     return serializer.data
@@ -239,16 +297,17 @@ def get_notarised_24hrs_table(request):
     season = helper.get_or_none(request, "season", SEASON)
     server = helper.get_or_none(request, "server")
     epoch = helper.get_or_none(request, "epoch")
-    chain = helper.get_or_none(request, "chain")
+    coin = helper.get_or_none(request, "coin")
     notary = helper.get_or_none(request, "notary")
     address = helper.get_or_none(request, "address")
 
-    if not season or (not chain and not notary):
+    if not season or (not coin and not notary):
         return {
-            "error": "You need to specify the following filter parameters: ['season'] and at least one of ['notary','chain']"
+            "error": "You need to specify the following filter parameters: ['season'] and at least one of ['notary','coin']"
         }
     day_ago = int(time.time()) - SINCE_INTERVALS['day']
-    data = query.get_notarised_data(season, server, epoch, chain, notary, address).filter(block_time__gt=str(day_ago))
+    data = query.get_notarised_data(
+        season, server, epoch, coin, notary, address).filter(block_time__gt=str(day_ago))
     data = data.values()
 
     serializer = serializers.notarisedSerializer(data, many=True)
@@ -256,94 +315,113 @@ def get_notarised_24hrs_table(request):
     return serializer.data
 
 
-def get_notarised_chain_season_table(request):
+def get_coin_last_ntx_table(request, coin=None):
     season = helper.get_or_none(request, "season", SEASON)
     server = helper.get_or_none(request, "server")
-    chain = helper.get_or_none(request, "chain")
+    coin = helper.get_or_none(request, "coin", coin)
 
-    if not season and not chain:
+    if not season and not coin:
         return {
-            "error": "You need to specify at least one of the following filter parameters: ['season', 'chain']"
+            "error": "You need to specify at least one of the following filter parameters: ['season', 'coin']"
         }
 
-    data = query.get_notarised_chain_season_data(season, server, chain)
-    data = data.order_by('season', 'server', 'chain').values()
+    data = query.get_notary_last_ntx_data(season, server, None, coin)
+    data = data.order_by('season', 'server', 'notary').values()
 
     resp = []
     for item in data:
-        season = item['season']
-        server = item['server']
-        chain = item['chain']
-        ntx_lag = item['ntx_lag']
-        ntx_count = item['ntx_count']
-        block_height = item['block_height']
-        kmd_ntx_txid = item['kmd_ntx_txid']
-        kmd_ntx_blockhash = item['kmd_ntx_blockhash']
-        kmd_ntx_blocktime = item['kmd_ntx_blocktime']
-        opret = item['opret']
-        ac_ntx_blockhash = item['ac_ntx_blockhash']
-        ac_ntx_height = item['ac_ntx_height']
-        ac_block_height = item['ac_block_height']
-
         resp.append({
-            "season": season,
-            "server": server,
-            "chain": chain,
-            "ntx_count": ntx_count,
-            "kmd_ntx_height": block_height,
-            "kmd_ntx_blockhash": kmd_ntx_blockhash,
-            "kmd_ntx_txid": kmd_ntx_txid,
-            "kmd_ntx_blocktime": kmd_ntx_blocktime,
-            "ac_ntx_blockhash": ac_ntx_blockhash,
-            "ac_ntx_height": ac_ntx_height,
-            "ac_block_height": ac_block_height,
-            "opret": opret,
-            "ntx_lag": ntx_lag
+            "season": item['season'],
+            "server": item['server'],
+            "notary": item['notary'],
+            "kmd_ntx_height": item['kmd_ntx_blockheight'],
+            "kmd_ntx_blockhash": item['kmd_ntx_blockhash'],
+            "kmd_ntx_txid": item['kmd_ntx_txid'],
+            "kmd_ntx_blocktime": item['kmd_ntx_blocktime'],
+            "ac_ntx_blockhash": item['ac_ntx_blockhash'],
+            "ac_ntx_blockheight": item['ac_ntx_height'],
+            "opret": item['opret']
         })
-
 
     return resp
 
 
-def get_notarised_count_season_table(request):
+def get_notary_ntx_season_table(request, notary=None):
     season = helper.get_or_none(request, "season", SEASON)
-    notary = helper.get_or_none(request, "notary")
-
-    if not season and not notary:
-        return {
-            "error": "You need to specify at least one of the following filter parameters: ['season', 'notary']"
-        }
-
-    data = query.get_notarised_count_season_data(season, notary)
-    data = data.order_by('season', 'notary').values()
+    notary = helper.get_or_none(request, "notary", notary)
+    data = query.get_notary_ntx_season_data(season, notary)
+    data = data.order_by('notary').values()
 
     resp = []
     for item in data:
-        season = item['season']
-        notary = item['notary']
-        btc_count = item['btc_count']
-        antara_count = item['antara_count']
-        third_party_count = item['third_party_count']
-        other_count = item['other_count']
-        total_ntx_count = item['total_ntx_count']
-        chain_ntx_counts = item['chain_ntx_counts']
-        chain_ntx_pct = item['chain_ntx_pct']
-        time_stamp = item['time_stamp']
-
         resp.append({
-                "season": season,
-                "notary": notary,
-                "btc_count": btc_count,
-                "antara_count": antara_count,
-                "third_party_count": third_party_count,
-                "other_count": other_count,
-                "total_ntx_count": total_ntx_count,
-                "chain_ntx_counts": chain_ntx_counts,
-                "chain_ntx_pct": chain_ntx_pct,
-                "time_stamp": time_stamp,
-                "coins": {}
+            "season": item['season'],
+            "notary": item['notary'],
+            "master_server_count": item["notary_data"]["servers"]["KMD"]['ntx_count'],
+            "main_server_count": item["notary_data"]["servers"]["Main"]['ntx_count'],
+            "third_party_server_count": item["notary_data"]["servers"]["Third_Party"]['ntx_count'],
+            "total_ntx_count": item["notary_data"]['ntx_count'],
+            "total_ntx_score": float(item["notary_data"]['ntx_score']),
+            "coin_data": item["notary_data"]['coins'],
+            "server_data": item["notary_data"]['servers'],
+            "time_stamp": item['time_stamp']
         })
 
+    return resp
+
+
+def get_server_ntx_season_table(request, server=None):
+    season = helper.get_or_none(request, "season", SEASON)
+    server = helper.get_or_none(request, "server", server)
+    data = query.get_notary_ntx_season_data(season, notary)
+    data = data.order_by('server').values()
+
+    resp = []
+    for item in data:
+        resp.append({
+            "season": item['season'],
+            "server": item['server'],
+            "master_server_count": item["server_data"]["servers"]["KMD"]['ntx_count'],
+            "main_server_count": item["server_data"]["servers"]["Main"]['ntx_count'],
+            "third_party_server_count": item["server_data"]["servers"]["Third_Party"]['ntx_count'],
+            "total_ntx_count": item["server_data"]['ntx_count'],
+            "total_ntx_score": float(item["server_data"]['ntx_score']),
+            "coins_data": item["server_data"]['coins'],
+            "notary_data": item["server_data"]['notaries'],
+            "time_stamp": item['time_stamp']
+        })
+
+    return resp
+
+
+def get_coin_ntx_season_table(request, coin=None):
+    season = helper.get_or_none(request, "season", SEASON)
+    coin = helper.get_or_none(request, "coin", coin)
+    data = query.get_coin_ntx_season_data(season, coin)
+    data = data.order_by('coin').values()
+    resp = []
+    for item in data:
+        coin_data = item["coin_data"]
+        print(coin_data)
+        print(item['season'])
+        print(item['coin'])
+        if item['coin'] in ["KMD", "LTC", "BTC"]:
+            server = item['coin']
+        elif len(list(coin_data['servers'].keys())) > 0:
+            server = list(coin_data['servers'].keys())[0]
+
+            resp.append({
+                "season": item['season'],
+                "server": server,
+                "coin": item['coin'],
+                "total_ntx_count": coin_data['ntx_count'],
+                "total_ntx_score": float(item["coin_data"]['ntx_score']),
+                "pct_of_season_ntx_count": coin_data['pct_of_season_ntx_count'],
+                "pct_of_season_ntx_score": coin_data['pct_of_season_ntx_score'],
+                "notary_data": item["coin_data"]['notaries'],
+                "server_data": item["coin_data"]['servers'],
+                "time_stamp": item['time_stamp']
+            })
 
     return resp
 
@@ -352,15 +430,17 @@ def get_notary_ntx_table(request):
     season = helper.get_or_none(request, "season", SEASON)
     server = helper.get_or_none(request, "server")
     epoch = helper.get_or_none(request, "epoch")
-    chain = helper.get_or_none(request, "chain")
+    coin = helper.get_or_none(request, "coin")
     notary = helper.get_or_none(request, "notary")
 
-    if not season or not chain or not notary:
+    if not season or not coin or not notary:
         return {
-            "error": "You need to specify all of the following filter parameters: ['season', 'chain', 'notary']"
+            "error": "You need to specify all of the following filter parameters: ['season', 'coin', 'notary']"
         }
-    data = query.get_notarised_data(season, server, epoch, chain, notary).order_by('-block_time')
-    data = data.values('txid', 'chain', 'block_height', 'block_time', 'ac_ntx_height', 'score_value')
+    data = query.get_notarised_data(
+        season, server, epoch, coin, notary).order_by('-block_time')
+    data = data.values('txid', 'coin', 'block_height',
+                       'block_time', 'ac_ntx_height', 'score_value')
 
     serializer = serializers.notary_ntxSerializer(data, many=True)
 
@@ -371,15 +451,16 @@ def get_notarised_table(request):
     season = helper.get_or_none(request, "season", SEASON)
     server = helper.get_or_none(request, "server")
     epoch = helper.get_or_none(request, "epoch")
-    chain = helper.get_or_none(request, "chain")
+    coin = helper.get_or_none(request, "coin")
     notary = helper.get_or_none(request, "notary")
     address = helper.get_or_none(request, "address")
 
-    if not season or not server or not chain or not notary:
+    if not season or not server or not coin or not notary:
         return {
-            "error": "You need to specify all of the following filter parameters: ['season', 'server', 'chain', 'notary']"
+            "error": "You need to specify all of the following filter parameters: ['season', 'server', 'coin', 'notary']"
         }
-    data = query.get_notarised_data(season, server, epoch, chain, notary, address).order_by('-block_time')
+    data = query.get_notarised_data(
+        season, server, epoch, coin, notary, address).order_by('-block_time')
     data = data.values()
 
     serializer = serializers.notarisedSerializer(data, many=True)
@@ -390,10 +471,10 @@ def get_notarised_table(request):
 def get_notarised_tenure_table(request):
     season = helper.get_or_none(request, "season", SEASON)
     server = helper.get_or_none(request, "server")
-    chain = helper.get_or_none(request, "chain")
+    coin = helper.get_or_none(request, "coin")
 
-    data = query.get_notarised_tenure_data(season, server, chain)
-    data = data.order_by('season', 'server', 'chain').values()
+    data = query.get_notarised_tenure_data(season, server, coin)
+    data = data.order_by('season', 'server', 'coin').values()
 
     serializer = serializers.notarisedTenureSerializer(data, many=True)
 
@@ -404,91 +485,91 @@ def get_scoring_epochs_table(request):
     season = helper.get_or_none(request, "season", SEASON)
     server = helper.get_or_none(request, "server")
     epoch = helper.get_or_none(request, "epoch")
-    chain = helper.get_or_none(request, "chain")
+    coin = helper.get_or_none(request, "coin")
     timestamp = helper.get_or_none(request, "timestamp")
 
-    if not season and not chain and not timestamp:
+    if not season and not coin and not timestamp:
         return {
-            "error": "You need to specify at least one of the following filter parameters: ['season', 'chain', 'timestamp']"
+            "error": "You need to specify at least one of the following filter parameters: ['season', 'coin', 'timestamp']"
         }
 
-    data = query.get_scoring_epochs_data(season, server, chain, epoch, timestamp)
+    data = query.get_scoring_epochs_data(
+        season, server, coin, epoch, timestamp)
     data = data.order_by('season', 'server', 'epoch').values()
 
     resp = []
-    
+
     for item in data:
         if item['epoch'].find("_") > -1:
             epoch_id = item['epoch'].split("_")[1]
         else:
             epoch_id = epoch
-            
+
         if epoch_id not in ["Unofficial", None]:
+            
+            if item['epoch_end'] > time.time():
+                duration = time.time() - item['epoch_start']
+            else:
+                duration = item['epoch_end'] - item['epoch_start']
+
             resp.append({
-                    "season": item['season'],
-                    "server": item['server'],
-                    "epoch": epoch_id,
-                    "epoch_start": dt.fromtimestamp(item['epoch_start']),
-                    "epoch_end": dt.fromtimestamp(item['epoch_end']),
-                    "epoch_start_timestamp": item['epoch_start'],
-                    "epoch_end_timestamp": item['epoch_end'],
-                    "duration": item['epoch_end']-item['epoch_start'],
-                    "start_event": item['start_event'],
-                    "end_event": item['end_event'],
-                    "epoch_chains": item['epoch_chains'],
-                    "num_epoch_chains": len(item['epoch_chains']),
-                    "score_per_ntx": item['score_per_ntx']
+                "season": item['season'],
+                "server": item['server'],
+                "epoch": epoch_id,
+                "epoch_start": dt.fromtimestamp(item['epoch_start']),
+                "epoch_end": dt.fromtimestamp(item['epoch_end']),
+                "epoch_start_timestamp": item['epoch_start'],
+                "epoch_end_timestamp": item['epoch_end'],
+                "duration": duration,
+                "start_event": item['start_event'],
+                "end_event": item['end_event'],
+                "epoch_coins": item['epoch_coins'],
+                "num_epoch_coins": len(item['epoch_coins']),
+                "score_per_ntx": item['score_per_ntx']
             })
     return resp
 
 
 # UPDATE PENDING
-def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None):
+def get_notary_epoch_scores_table(request, notary=None):
+    season = helper.get_or_none(request, "season", SEASON)
+    notary = helper.get_or_none(request, "notary", notary)
 
-    if not notary:
-        notary_list = get_notary_list(season)
-        notary = random.choice(notary_list)
+    epoch_coins_dict = info.get_epoch_coins_dict(season)
 
-    if not season:
-        season = SEASON
+    notary_ntx_season_data = query.get_notary_ntx_season_data(
+        season, notary).values()
 
-    notary_epoch_scores = query.get_notarised_count_season_data(season, notary).values()
-
-    epoch_chains_dict = {}
-    epoch_chains_queryset = query.get_scoring_epochs_data(season).values()
-    for item in epoch_chains_queryset:
-        if item["season"] not in epoch_chains_dict:
-            epoch_chains_dict.update({item["season"]:{}})
-        if item["server"] not in epoch_chains_dict[item["season"]]:
-            epoch_chains_dict[item["season"]].update({item["server"]:{}})
-        if item["epoch"] not in epoch_chains_dict[season][item["server"]]:
-            epoch_chains_dict[item["season"]][item["server"]].update({item["epoch"]:item["epoch_chains"]})
     rows = []
-    total = 0
+    totals = {
+        "counts": {},
+        "scores": {}
+    }
 
-    for item in notary_epoch_scores:
+    total_scores = {}
+    for item in notary_ntx_season_data:
         notary = item["notary"]
-        chain_ntx = item["chain_ntx_counts"]
+        totals["counts"].update({
+            notary: item["notary_data"]["ntx_count"]
+        })
+        totals["scores"].update({
+            notary: item["notary_data"]["ntx_score"]
+        })
+        '''
+        ['id', 'season', 'notary', 'master_server_count', 'main_server_count',
+        'third_party_server_count', 'other_server_count', 'total_ntx_count',
+        'total_ntx_score', 'coin_ntx_counts', 'coin_ntx_scores', 'coin_ntx_count_pct',
+        'coin_ntx_score_pct', 'coin_last_ntx', 'server_ntx_counts', 'server_ntx_scores',
+        'server_ntx_count_pct', 'server_ntx_score_pct', 'time_stamp']
+        '''
+        server_data = item["notary_data"]["servers"]
+        for server in server_data:
+            if server not in ['Unofficial', 'LTC']:
+                for epoch in server_data[server]['epochs']:
+                    if epoch != 'Unofficial':
 
-        for server in chain_ntx["servers"]:
+                        for coin in server_data[server]['epochs'][epoch]["coins"]:
 
-            for epoch in chain_ntx["servers"][server]["epochs"]:
-                if epoch != "Unofficial": 
-                    if server == "BTC": 
-                        server_epoch_chains = ["BTC"]
-                    elif server == "KMD": 
-                        server_epoch_chains = ["KMD"]
-                    elif server == "LTC": 
-                        server_epoch_chains = ["LTC"]
-                    else:
-                        server_epoch_chains = epoch_chains_dict[season][server][epoch]
-
-                    for chain in chain_ntx["servers"][server]["epochs"][epoch]["coins"]:
-                        if not selected_chain or chain == selected_chain:
-                            chain_stats = chain_ntx["servers"][server]["epochs"][epoch]["coins"][chain]
-                            score_per_ntx = chain_ntx["servers"][server]["epochs"][epoch]["score_per_ntx"]
-                            epoch_coin_ntx_count = chain_stats["notary_server_epoch_coin_ntx_count"]
-                            epoch_coin_score = chain_stats["notary_server_epoch_coin_ntx_score"]
                             if epoch.find("_") > -1:
                                 epoch_id = epoch.split("_")[1]
                             else:
@@ -498,42 +579,90 @@ def get_notary_epoch_scores_table(notary=None, season=None, selected_chain=None)
                                 "season": season.replace("_", " "),
                                 "server": server,
                                 "epoch": epoch_id,
-                                "chain": chain,
-                                "score_per_ntx": score_per_ntx,
-                                "epoch_coin_ntx_count": epoch_coin_ntx_count,
-                                "epoch_coin_score": epoch_coin_score
+                                "coin": coin,
+                                "score_per_ntx": server_data[server]['epochs'][epoch]["score_per_ntx"],
+                                "epoch_coin_count": server_data[server]['epochs'][epoch]["coins"][coin]["ntx_count"],
+                                "epoch_coin_score": server_data[server]['epochs'][epoch]["coins"][coin]["ntx_score"],
+                                "epoch_coin_count_self_pct": server_data[server]['epochs'][epoch]["coins"][coin]["pct_of_notary_ntx_count"],
+                                "epoch_coin_score_self_pct": server_data[server]['epochs'][epoch]["coins"][coin]["pct_of_notary_ntx_score"],
                             }
-                            if chain in server_epoch_chains:
-                                server_epoch_chains.remove(chain)
-                            total += chain_stats["notary_server_epoch_coin_ntx_score"]
+
                             rows.append(row)
+    return rows, totals
 
-    return rows, total
+
+def get_split_stats_table(request):
+    season = helper.get_or_none(request, "season", SEASON)
+    notary = helper.get_or_none(request, "notary")
+
+    category = "Split"
+
+    if not season:
+        return {
+            "error": "You need to specify the following filter parameter: ['season']"
+        }
+    data = query.get_nn_btc_tx_data(season, notary, category)
+    data = data.order_by('-block_height', 'address').values()
+    split_summary = {}
+    for item in data:
+        notary = item["notary"]
+        if notary != 'non-NN':
+            if notary not in split_summary:
+                split_summary.update({
+                    notary: {
+                        "split_count": 0,
+                        "last_split_block": 0,
+                        "last_split_time": 0,
+                        "sum_split_utxos": 0,
+                        "average_split_utxos": 0,
+                        "sum_fees": 0,
+                        "txids": []
+                    }
+                })
+
+            fees = int(item["fees"])/100000000
+            num_outputs = int(item["num_outputs"])
+            split_summary[notary].update({
+                "split_count": split_summary[notary]["split_count"]+1,
+                "sum_split_utxos": split_summary[notary]["sum_split_utxos"]+num_outputs,
+                "sum_fees": split_summary[notary]["sum_fees"]+fees
+            })
+
+            split_summary[notary]["txids"].append(item["txid"])
+
+            if item["block_height"] > split_summary[notary]["last_split_time"]:
+                split_summary[notary].update({
+                    "last_split_block": int(item["block_height"]),
+                    "last_split_time": int(item["block_time"])
+                })
+
+    for notary in split_summary:
+        split_summary[notary].update({
+            "average_split_utxos": split_summary[notary]["sum_split_utxos"]/split_summary[notary]["split_count"]
+        })
+
+    resp = []
+    for notary in split_summary:
+        row = {
+            "notary": notary,
+            "season": season
+        }
+        row.update(split_summary[notary])
+        resp.append(row)
+    return resp
 
 
-def get_vote2021_table(request):
-    candidate = helper.get_or_none(request, "candidate")
-    block = helper.get_or_none(request, "block")
-    txid = helper.get_or_none(request, "txid")
-    mined_by = helper.get_or_none(request, "mined_by")
-    max_block = helper.get_or_none(request, "max_block")
-    max_blocktime = helper.get_or_none(request, "max_blocktime")
-    max_locktime = helper.get_or_none(request, "max_locktime")
+def tablize_notarised(resp):
+    table_resp = []
 
-    data = query.get_vote2021_data(candidate, block, txid, max_block, max_blocktime, max_locktime, mined_by)
-
-    if "order_by" in request.GET:
-        order_by = request.GET["order_by"]
-        data = data.values().order_by(f'-{order_by}')
-    else:
-        data = data.values().order_by(f'-block_time')
-
-    serializer = serializers.vote2021Serializer(data, many=True)
-    resp = {}
-    for item in serializer.data:
-        if item["candidate"] in DISQUALIFIED:
-            item.update({"votes": -1})    
-        item.update({"lag": item["block_time"]-item["lock_time"]})
-
-    return serializer.data
-
+    for i in resp:
+        table_resp.append({
+            "coin": i["coin"],
+            "block_height": i["block_height"],
+            "ac_ntx_height": i["ac_ntx_height"],
+            "txid": i["txid"],
+            "notaries": i["notaries"],
+            "opret": i["opret"],
+            "block_time": i["block_time"]
+        })
+    return table_resp

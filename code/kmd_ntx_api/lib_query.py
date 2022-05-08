@@ -33,22 +33,6 @@ def get_mm2_version_stats_data(start, end, notary):
     )
 
 def get_nn_seed_version_scores(start, end, notary=None):
-    '''
-    {
-    "12/03/21": {
-      "12:00": {
-            "notary": {
-                "versions": [],
-                "score": 0
-            },
-            "notary": {
-                "versions": [],
-                "score": 1
-            },
-        }    
-    }
-    '''
-
     start, end, season = get_timespan_season(start, end)
     data = mm2_version_stats.objects.filter(
         timestamp__range=(start, end-1)
@@ -99,20 +83,6 @@ def get_nn_seed_version_scores(start, end, notary=None):
 
 
 def get_nn_seed_version_scores_daily(start, end, notary=None):
-    '''
-    {
-    "12/03/21": {
-        "notary": {
-            "versions": [],
-            "score": 0
-        },
-        "notary": {
-            "versions": [],
-            "score": 1
-        }
-    }
-    '''
-
     start, end, season = get_timespan_season(start, end)
     start = helper.floor_to_utc_day(start)
     end = helper.floor_to_utc_day(end)
@@ -157,20 +127,6 @@ def get_nn_seed_version_scores_daily(start, end, notary=None):
 
 
 def get_nn_seed_version_scores_month(start, end, notary=None):
-    '''
-    {
-    "12/21": {
-        "notary": {
-            "versions": [],
-            "score": 0
-        },
-        "notary": {
-            "versions": [],
-            "score": 1
-        }
-    }
-    '''
-
     start, end, season = get_timespan_season(start, end)
     start = helper.floor_to_utc_day(start)
     end = helper.floor_to_utc_day(end)
@@ -216,51 +172,6 @@ def get_nn_seed_version_scores_month(start, end, notary=None):
     return date_notary_scores
 
 
-def get_nn_seed_version_scores_hourly_table(request, start=None, end=None):
-    # TODO: Views for day (by hour), month (by day), season (by month)
-    # Season view: click on month, goes to month view
-    # Month view: click on day, goes to day view
-    # TODO: Incorporate these scores into overall NN score, and profile stats.
-    if not start:
-        start = helper.get_or_none(request, "start")
-    if not end:
-        end = helper.get_or_none(request, "end")
-
-    if not start:
-        start = time.time()
-        end = time.time() + SINCE_INTERVALS["day"]
-    notary_list = helper.get_notary_list(SEASON)
-    helper.date_hour_notary_scores = get_nn_seed_version_scores(start, end)
-    
-    table_headers = ["Total"]
-    table_data = []
-    notary_scores = {}
-
-    for notary in notary_list:
-        notary_scores.update({notary:[]})
-
-    for date in helper.date_hour_notary_scores:
-        for hour in helper.date_hour_notary_scores[date]:
-            table_headers.append(f"{hour.split(':')[0]}")
-            for notary in notary_list:
-                if notary in helper.date_hour_notary_scores[date][hour]:
-                    score = round(helper.date_hour_notary_scores[date][hour][notary]["score"],2)
-                else:
-                    score = 0
-                notary_scores[notary].append(score)
-
-    table_headers.append("Notary")
-    table_headers.reverse()
-    # Get total for timespan
-    for notary in notary_scores:
-        notary_scores[notary].reverse()
-        total = round(sum(notary_scores[notary]),2)
-        notary_scores[notary].append(total)
-
-    return {
-        "headers": table_headers,
-        "scores": notary_scores
-        }
 
 
 def get_nn_seed_version_scores_daily_table(request, start=None, end=None):
@@ -445,10 +356,9 @@ def get_nn_mm2_stats_by_hour_data(start, end, notary=None):
     return resp
 
 
-def get_addresses_data(season=None, server=None, chain=None, notary=None, address=None):
+def get_addresses_data(season=None, server=None, coin=None, notary=None, address=None):
     data = addresses.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
 
     if server:
@@ -457,19 +367,18 @@ def get_addresses_data(season=None, server=None, chain=None, notary=None, addres
     if notary:
         data = data.filter(notary=notary)
 
-    if chain:
-        data = data.filter(chain=chain)
+    if coin:
+        data = data.filter(coin=coin)
 
     if address:
         data = data.filter(address=address)
 
-    return data.order_by('-season', 'server', 'chain', 'notary')
+    return data.order_by('-season', 'server', 'coin', 'notary')
 
 
-def get_balances_data(season=None, server=None, chain=None, notary=None, address=None):
+def get_balances_data(season=None, server=None, coin=None, notary=None, address=None):
     data = balances.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
 
     if server:
@@ -478,12 +387,13 @@ def get_balances_data(season=None, server=None, chain=None, notary=None, address
     if notary:
         data = data.filter(notary=notary)
 
-    if chain:
-        data = data.filter(chain=chain)
+    if coin:
+        data = data.filter(coin=coin)
+
     if address:
         data = data.filter(address=address)
 
-    return data.order_by('-season', 'server', 'chain', 'notary')
+    return data.order_by('-season', 'server', 'coin', 'notary')
 
 
 def get_nn_mm2_stats_data(name=None, version=None, limit=None):
@@ -498,10 +408,10 @@ def get_nn_mm2_stats_data(name=None, version=None, limit=None):
     return data
 
 
-def get_coins_data(chain=None, mm2_compatible=None, dpow_active=None):
+def get_coins_data(coin=None, mm2_compatible=None, dpow_active=None):
     data = coins.objects.all()
-    if chain:
-        data = data.filter(chain=chain)
+    if coin:
+        data = data.filter(coin=coin)
     if mm2_compatible:
         data = data.filter(mm2_compatible=mm2_compatible)
     if dpow_active:
@@ -509,40 +419,38 @@ def get_coins_data(chain=None, mm2_compatible=None, dpow_active=None):
     return data
 
 
-def get_coin_social_data(chain=None, season=None):
+def get_coin_social_data(coin=None, season=None):
     data = coin_social.objects.all()
-    if chain:
-        data = data.filter(chain=chain)
-    if chain:
+    if coin:
+        data = data.filter(coin=coin)
+    if season:
         data = data.filter(season=season)
     return data
 
 
-def get_funding_transactions_data(season=None, notary=None, category=None, chain=None):
+def get_funding_transactions_data(season=None, notary=None, category=None, coin=None):
     data = funding_transactions.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
     if category:
         data = data.filter(category=category)
     if address:
-        data = data.filter(chain=chain)
+        data = data.filter(coin=coin)
     return data
 
 
-def get_last_notarised_data(season=None, server=None, notary=None, chain=None):
-    data = last_notarised.objects.all()
+def get_notary_last_ntx_data(season=None, server=None, notary=None, coin=None):
+    data = notary_last_ntx.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if server:
         data = data.filter(server=server)
     if notary:
         data = data.filter(notary=notary)
-    if chain:
-        data = data.filter(chain=chain)
+    if coin:
+        data = data.filter(coin=coin)
     return data
 
 
@@ -551,7 +459,6 @@ def get_mined_count_daily_data(season=None, notary=None, mined_date=None):
     if mined_date:
         data = data.filter(mined_date=mined_date)
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
@@ -561,7 +468,6 @@ def get_mined_count_daily_data(season=None, notary=None, mined_date=None):
 def get_mined_count_season_data(season=None, name=None, address=None):
     data = mined_count_season.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if name:
         data = data.filter(name=name)
@@ -570,22 +476,29 @@ def get_mined_count_season_data(season=None, name=None, address=None):
     return data
 
 
-def get_mined_data(season=None, name=None, address=None):
+def get_mined_data(season=None, name=None, address=None, min_block=None,
+                   max_block=None, min_blocktime=None, max_blocktime=None):
     data = mined.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if name:
         data = data.filter(name=name)
     if address:
         data = data.filter(address=address)
+    if min_block:
+        data = data.filter(block_height__gte=min_block)
+    if max_block:
+        data = data.filter(block_height__lte=max_block)
+    if min_blocktime:
+        data = data.filter(block_time__gte=min_blocktime)
+    if max_blocktime:
+        data = data.filter(block_time__lte=max_blocktime)
     return data
 
 
 def get_seed_version_data(season=None, name=None):
     data = mm2_version_stats.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if name:
         data = data.filter(name=name)
@@ -598,7 +511,6 @@ def get_nn_btc_tx_data(season=None, notary=None, category=None, address=None, tx
     else:
         data = nn_btc_tx.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
@@ -615,7 +527,6 @@ def get_nn_ltc_tx_data(season=None, notary=None, category=None, address=None, tx
     else:
         data = nn_ltc_tx.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
@@ -629,39 +540,43 @@ def get_nn_ltc_tx_data(season=None, notary=None, category=None, address=None, tx
 def get_nn_social_data(season=None, notary=None):
     data = nn_social.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
     return data
 
 
-def get_notarised_data(season=None, server=None, epoch=None, chain=None, notary=None, address=None, txid=None):
+def get_notarised_data(season=None, server=None, epoch=None, coin=None,
+                        notary=None, address=None, txid=None, exclude_epoch=None,
+                        min_blocktime=None, max_blocktime=None):
     if txid:
         data = notarised.objects.filter(txid=txid)
     else:
-        data = notarised.objects.exclude(season="Season_1").exclude(
-            season="Season_2").exclude(season="Season_3")
+        data = notarised.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if server:
         data = data.filter(server=server)
-    if chain:
-        data = data.filter(chain=chain)
+    if coin:
+        data = data.filter(coin=coin)
     if epoch:
         data = data.filter(epoch=epoch)
+    if min_blocktime:
+        data = data.filter(block_time__gte=min_blocktime)
+    if max_blocktime:
+        data = data.filter(block_time__lte=max_blocktime)
     if notary:
         data = data.filter(notaries__contains=[notary])
     if address:
         data = data.filter(notary_addresses__contains=[address])
+    if exclude_epoch:
+        data = data.exclude(epoch=exclude_epoch)
     return data
 
 
-def get_notarised_chains_data(season=None, server=None, epoch=None):
+def get_notarised_coins_data(season=None, server=None, epoch=None):
     data = notarised.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if server:
         data = data.filter(server=server)
@@ -674,29 +589,27 @@ def get_notarised_chains_data(season=None, server=None, epoch=None):
 def get_notarised_btc_data(season=None):
     data = notarised_btc.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     return data
 
 
-def get_notarised_chain_daily_data(notarised_date=None, chain=None):
-    data = notarised_chain_daily.objects.all()
+def get_notarised_coin_daily_data(notarised_date=None, coin=None):
+    data = notarised_coin_daily.objects.all()
     if notarised_date:
         data = data.filter(notarised_date=notarised_date)
-    if chain:
-        data = data.filter(chain=chain)
+    if coin:
+        data = data.filter(coin=coin)
     return data
 
 
-def get_notarised_chain_season_data(season=None, server=None, chain=None):
-    data = notarised_chain_season.objects.all()
+def get_coin_last_ntx_data(season=None, server=None, coin=None):
+    data = coin_last_ntx.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if server:
         data = data.filter(server=server)
-    if chain:
-        data = data.filter(chain=chain)
+    if coin:
+        data = data.filter(coin=coin)
     return data
 
 
@@ -709,28 +622,43 @@ def get_notarised_count_daily_data(notarised_date=None, notary=None):
     return data
 
 
-def get_notarised_count_season_data(season=None, notary=None):
-    data = notarised_count_season.objects.all()
+def get_notary_ntx_season_data(season=None, notary=None):
+    data = notary_ntx_season.objects.all()
     if season:
-        season = season.title()
         data = data.filter(season=season)
     if notary:
         data = data.filter(notary=notary)
     return data
 
 
-def get_notarised_tenure_data(season=None, server=None, chain=None):
+def get_coin_ntx_season_data(season=None, coin=None):
+    data = coin_ntx_season.objects.all()
+    if season:
+        data = data.filter(season=season)
+    if coin:
+        data = data.filter(coin=coin)
+    return data
+
+def get_server_ntx_season_data(season=None, server=None):
+    data = coin_ntx_season.objects.all()
+    if season:
+        data = data.filter(season=season)
+    if server:
+        data = data.filter(server=server)
+    return data
+
+
+def get_notarised_tenure_data(season=None, server=None, coin=None):
     data = notarised_tenure.objects.all()
 
     if season:
-        season = season.title()
         data = data.filter(season=season)
 
     if server:
         data = data.filter(server=server)
 
-    if chain:
-        data = data.filter(chain=chain)
+    if coin:
+        data = data.filter(coin=coin)
 
     return data
 
@@ -770,18 +698,17 @@ def get_rewards_data(season=None, address=None, min_value=None, min_block=None, 
     return data
 
 
-def get_scoring_epochs_data(season=None, server=None, chain=None, epoch=None, timestamp=None):
+def get_scoring_epochs_data(season=None, server=None, coin=None, epoch=None, timestamp=None):
     data = scoring_epochs.objects.all()
 
     if season:
-        season = season.title()
         data = data.filter(season=season)
 
     if server:
         data = data.filter(server=server)
 
-    if chain:
-        data = data.filter(epoch_chains__contains=[chain])
+    if coin:
+        data = data.filter(epoch_coins__contains=[coin])
 
     if epoch:
         data = data.filter(epoch=epoch)
@@ -793,10 +720,13 @@ def get_scoring_epochs_data(season=None, server=None, chain=None, epoch=None, ti
     return data
 
 
-def get_vote2021_data(candidate=None, block=None, txid=None,
+def get_notary_vote_data(year=None, candidate=None, block=None, txid=None,
                       max_block=None, max_blocktime=None,
                       max_locktime=None, mined_by=None):
-    data = vote2021.objects.all()
+    data = notary_vote.objects.all()
+
+    if year:
+        data = data.filter(year=year)
 
     if candidate:
         data = data.filter(candidate=candidate)
@@ -820,6 +750,7 @@ def get_vote2021_data(candidate=None, block=None, txid=None,
         data = data.filter(lock_time__lte=max_locktime)
 
     return data
+
 
 
 def get_swaps_failed_data(uuid=None):
@@ -945,3 +876,4 @@ def filter_swaps_timespan(data, from_time=None, to_time=None):
     if to_time:
         data = data.filter(time_stamp__lte=to_time)
     return data
+

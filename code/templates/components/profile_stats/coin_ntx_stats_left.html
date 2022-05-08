@@ -1,0 +1,31 @@
+
+			<div class="card text-center kmd_ui_light3 col-4 px-0 m-auto shadow-none" style="border:none !important;">
+				<div class="card-body p-0" style="background-color: #101721 !important;">
+					<ul class="list-group">
+					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+							    Notarisations in the Last 24hrs
+								<a href="#ntx_24hr">
+   					    		{% include "components/badges/stats_badge.html" with stat_val=coin_ntx_summary.ntx_24hr_count stat_label="" %}
+   					    		</a>
+							</div>
+					  	</li>
+					 	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+						    	Notarisations This Season
+								<a href="{% url 'notarisedViewSet-list' %}?season={{ season }}&server={{ server }}&coin={{ coin }}&exclude_epoch=Unofficial">
+	   					    		{% include "components/badges/stats_badge.html" with stat_val=coin_ntx_summary.ntx_season_count stat_label="" %}
+	   					    	</a>
+							</div>									    
+					  	</li>
+					  	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
+					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+							    Time Since Last Notarisation
+							    <a href="//{{ request.get_host }}/coins_last_ntx/?season={{ season }}">
+   					    			{% include "components/badges/stats_badge.html" with stat_val=coin_ntx_summary.time_since_ntx stat_label="" %}
+   					    		</a>
+							</div>
+					  	</li>
+					</ul> 
+				</div>
+			</div>

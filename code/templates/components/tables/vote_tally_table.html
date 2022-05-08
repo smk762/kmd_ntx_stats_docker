@@ -1,0 +1,83 @@
+<div class="row" id="{{ region }}">
+	<div class="card-deck d-flex justify-content-between col-12 m-auto">
+		<div class="card table_card">
+			<div class="card-header table_card_title">
+				<h2>{{ year }} Komodo Notary Node Election Vote Tally {{ region }} Region</h2>
+				<h6>
+					The election ends with the first notarised block confirmed after 25th May 2022 (0000hrs GMT)
+				</h6>
+			</div>
+			<div class="card-body table_card_body">
+				<table id="{{ region }}_table" class="table table-striped table-bordered" style="width:99%; visibility: hidden;">
+					<thead>
+						<tr>
+							<th data-data="rank">Rank</th>
+							<th data-data="candidate">Candidate</th>
+							<th data-data="num_votes">Num Votes</th>
+							<th data-data="sum_votes">Sum Votes</th>
+							<th data-data="detail">Detail</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in counts %}
+							<tr>
+								<td data-data="rank">{{ item.region_rank }}</td>
+								<td data-data="candidate">{{ item.candidate }}</td>
+								<td data-data="num_votes">{{ item.num_votes }}</td>
+								<td data-data="sum_votes">{{ item.sum_votes }}</td>
+								<td data-data="detail" class="px-2">
+									<a href="//{{ request.get_host }}/candidate_notary_vote_detail/?candidate={{ item.candidate }}&year={{ year }}">
+										<span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='{{ item.candidate }} votes detail'>
+											<i class='fas fa-arrow-right'></i>
+										</span>
+									</a>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>	
+	</div>
+</div>
+<script>
+    $(document).ready(function() {
+		$('#{{ region }}_table').css('visibility', 'visible');
+        {{ region }}_table = $('#{{ region }}_table').DataTable({
+        	"paging": true,
+			deferRender: true,
+            "orderClasses": false,
+            "pageLength": 50,
+    		order: [[ 0, 'asc' ]],
+        	"columns": [
+		        { "data": "rank" },
+		        { "data": "candidate" },
+		        { "data": "num_votes" },
+		        { "data": "sum_votes" },
+		        { "data": "detail" },
+		    ],
+    		"columnDefs": [
+		    ]
+        });
+	    {{ region }}_table.rows().every( function (index) {
+	    	var row = {{ region }}_table.row(index);
+		    var d = row.data();
+		    if (d.rank <= 11) {
+		    	row
+		    	.nodes()
+			    .to$()    
+				.addClass( 'kmd_green' );
+		    } else if (d.sum_votes == "DISQUALIFIED") {
+		    	row
+		    	.nodes()
+			    .to$()    
+				.addClass( 'kmd_red' );			    	
+		    } else {
+		    	row
+		    	.nodes()
+			    .to$()    
+				.addClass( 'kmd_gray' );			    	
+		    }
+		});
+    });
+</script> 

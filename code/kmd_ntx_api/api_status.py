@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 import requests
 from django.http import JsonResponse
-from kmd_ntx_api.lib_const import *
+
 
 def faucet_balance_status(request):
     resp = requests.get(f"https://faucet.komodo.live/rm_faucet_balances").json()
     return JsonResponse(resp)
 
+
 def faucet_pending_tx_status(request):
     resp = requests.get(f"https://faucet.komodo.live/show_pending_tx").json()
     return JsonResponse(resp)
 
+
 def faucet_show_db_status(request):
     resp = requests.get(f"https://faucet.komodo.live/show_faucet_db").json()
     return JsonResponse(resp)
+
 
 def faucet_address_payments_status(request):
     if "address" in request.GET:

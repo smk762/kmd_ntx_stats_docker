@@ -1,0 +1,6 @@
+
+	<div class="d-flex justify-content-around align-items-center">
+		{% for protocol in activation_data %}
+			{% include "components/buttons/anchor_button.html" with btn_text=protocol btn_url="#"|add:protocol width_pct="15" %}
+		{% endfor %}
+	</div>

@@ -1,28 +1,25 @@
 {% load static %}
 
+        	<div class="card coin_card shadow-none">
         		<div class="my-auto">
 	        		<div class="row my-0 mx-auto align-items-center">
-	        			<h3 class="col-12" style="margin-top: 0.75rem;">
-	        				{{ chain }}
-	        			</h3>
+	        			<h4 class="col-12" style="margin-top: 0.75rem;">
+	        				{{ coin }}
+	        			</h4>
 					</div>
 	        		<div class="row my-0 mx-auto">
 	            		<div class="p-1 m-auto">
-							{% for coin, site_links in coin_social.items %}
-		            			{% if coin == "NINJA" %}
-		            				<img class="card-img-top auto-width" height='128' src="/static/img/coins/icon/ninja.png" alt="{{ alt_text }}"  style="border-radius: 50%; margin:0 !important">
-								{% elif chain == coin and site_links.icon != '' %}
-									<img class="card-img-top auto-width" height='128' src="{{ site_links.icon }}" alt="" style="border-radius: 50%; margin:0 !important">
-								{% else %}
-									<img class="card-img-top auto-width" height='128' src="{% static 'img/notary/icon/' %}blank.png" alt="" style="border-radius: 50%; margin:0 !important">
+							{% for coin_, site_links in coin_social.items %}
+								{% if coin_ == coin %}
+									{% include "components/cards/card_img.html" with img_size=128 img_src=site_links.icon alt_text=coin profile_page="coin_profile" profile_name=coin %}
 								{% endif %}
 							{% endfor %}
 						</div>
 					</div>
 
 					<div class="justify-content-md-center" style="font-size: 1.6rem;">
-						{% for coin, site_links in coin_social.items %}
-							{% if chain == coin %}
+						{% for coin_, site_links in coin_social.items %}
+							{% if coin == coin_ %}
 								{% for site, link in site_links.items %}
 									{% if site == 'discord' %}
 										{%  if link != '' %}
@@ -61,9 +58,9 @@
 										
 									{% elif site == 'telegram' %}
 										{%  if link != '' %}
-											<a href="{{ link }}"><i class="social-icon fab fa-telegram-plane "></i></a>
+											<a href="{{ link }}"><i class="social-icon fab fa-telegram-plane m-1"></i></a>
 										{% else %}
-											<i class="social-icon-disabled fab fa-telegram-plane"></i>
+											<i class="social-icon-disabled fab fa-telegram-plane m-1"></i>
 										{% endif %}
 										
 									{% elif site == 'twitter' %}
@@ -105,3 +102,4 @@
 						</h6>
 					</div>
 				</div>
+			</div>

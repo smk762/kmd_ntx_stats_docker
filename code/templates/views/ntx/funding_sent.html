@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+	<!-- Awaiting review -->
+	<div class="row my-3">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card">
+				<div class="card-header flex">
+					Notary Funding 
+					<h5>Reference only - still in testing</h5>
+				</div>
+				<div class="card-body">
+					<table id="totals_table" class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th>Coin</th>
+								<th>notary</th>
+								<th>Received</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for notary, notary_coins in funding_totals.items %}
+								{% for coin, value in notary_coins.items %}
+									<tr>
+										<td>{{ coin }}</td>
+										<td>{{ notary }}</td>
+										<td>{{ value }}</td>
+									</tr>
+								{% endfor %}
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>	
+		</div>
+	</div>
+	<!-- Table to large and loads slow
+	<div class="row my-3">
+		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+			<div class="card">
+				<div class="card-header flex">
+					Notary Funding Transactions
+				</div>
+				<div class="card-body">
+					<table id="table_id" class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th>Coin</th>
+								<th>notary</th>
+								<th>txid</th>
+								<th>amount</th>
+								<th>fee</th>
+								<th>block</th>
+								<th>time</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in funding_data %}
+								{% if item.notary != 'unknown' and item.notary != 'funding bot' %}
+									<tr>
+										<td>{{ item.coin }}</td>
+										<td>{{ item.notary }}</td>
+										<td>{{ item.txid }}</td>
+										<td>{{ item.amount }}</td>
+										<td>{{ item.fee }}</td>
+										<td>{{ item.block_height }}</td>
+										<td>{{ item.time }}</td>
+									</tr>
+								{% endif %}
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>	
+		</div>
+	</div> -->
+  
+  	<script>  
+	    $(document).ready(function() {
+
+	    /*  $('#table_id').DataTable({
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
+	        	"columns": [
+			        { "data": "coin" },
+			        { "data": "notary" },
+			        { "data": "txid" },
+			        { "data": "amount" },
+			        { "data": "fee" },
+			        { "data": "block_height" },
+			        { "data": "block_time" }
+			    ],
+        		order: [[ 0, 'asc' ], [ 0, 'asc' ], [ 1, 'asc' ]],
+        		"columnDefs": [
+        			{
+			            "targets": 0,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.coin+"'>"+oData.coin+"</a>");
+				        }
+        			},
+        			{
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+				        }
+        			},
+        			{
+			            "targets": 2,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='"+explorers[oData.coin][0]+'tx/'+oData.txid+"'>"+oData.txid.slice(0, 3)+"..."+oData.txid.slice(-3)+"</a>");
+				        }
+			        },
+        		]
+	        }); */
+	        $('#totals_table').DataTable({
+    			deferRender: true,
+                "orderClasses": false,
+    			"paging": true,
+	        	"columns": [
+			        { "data": "coin" },
+			        { "data": "notary" },
+			        { "data": "amount" }
+			    ],
+        		order: [[ 0, 'asc' ], [ 1, 'asc' ], [ 2, 'desc' ]],
+        		"columnDefs": [
+        			{
+			            "targets": 0,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='//{{ request.get_host }}/coin_profile/"+oData.coin+"'>"+oData.coin+"</a>");
+				        }
+        			},
+        			{
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html("<a href='//{{ request.get_host }}/notary_profile/"+oData.notary+"'>"+oData.notary+"</a>");
+				        }
+        			}
+        		]
+	        });
+	       	/*
+	       	var coins_data = JSON.parse(document.getElementById('low_coin-data').textContent);
+   	        drawCoinsBarGraph(coins_data, 'CoinsBarGraph'); 
+
+	       	var notary_data = JSON.parse(document.getElementById('low_notary-data').textContent);
+   	        drawNotaryBarGraph(notary_data, 'NotaryBarGraph'); 
+			*/
+	    });
+
+		Chart.defaults.global.defaultFontColor = 'white';
+		Chart.defaults.global.defaultFontSize = 14;
+/*
+	    function drawNotaryBarGraph(data, id) { 
+          {% autoescape off %}
+			var labels = {{ notary_balance_graph_data.labels }}; 
+			var chartLabel = ''; 
+			var chartdata = {{ notary_balance_graph_data.chartdata }}; 
+			var bg_color = {{ notary_balance_graph_data.bg_color }}; 
+			var border_color = {{ notary_balance_graph_data.border_color }};
+          {% endautoescape %}
+
+			var ctx = document.getElementById(id).getContext('2d'); 
+			var myChart = new Chart(ctx, { 
+				type: 'bar', 
+				data: { 
+				  labels: labels, 
+				  datasets: [{ 
+				    label: chartLabel, 
+				    data: chartdata, 
+				    backgroundColor: bg_color,
+				    borderColor: border_color, 
+				    borderWidth: 1 
+				  }] 
+				}, 
+				options: { 
+	    			responsive: true,
+					tooltips: {
+						position: 'nearest',
+						mode: 'index',
+						intersect: true,
+					},
+				    legend: {
+				    	display: false,
+				        labels: {
+				            fontColor: '#B7BBBF'
+				        }
+				    },
+					scales: { 
+						yAxes: [{
+						    scaleLabel: {
+						        display: true,
+						        labelString: 'Number of Notaries with a low balance',
+				            	fontColor: '#B7BBBF'
+						    },
+						    position: 'left',
+						    ticks: {
+							    fontColor: '#41EAD4',
+								callback: function (value, index, values) {
+									return Number(value.toString());//pass tick values as a string into Number function
+								}
+						    }
+						}],
+						xAxes: [{
+							position: 'nearest',
+							padding: 0,
+							ticks: {
+							    fontColor: '#41EAD4'
+							}
+						}]
+				  	} 
+				} 
+			}); 
+	    } 
+	    function drawCoinsBarGraph(data, id) { 
+          {% autoescape off %}
+
+			var labels = {{ coin_balance_graph_data.labels }}; 
+			//var chartLabel = {{ coin_balance_graph_data.chartLabel }};
+			var chartLabel = ''; 
+			var chartdata = {{ coin_balance_graph_data.chartdata }}; 
+			var bg_color = {{ coin_balance_graph_data.bg_color }}; 
+			var border_color = {{ coin_balance_graph_data.border_color }};
+          {% endautoescape %}
+			var ctx = document.getElementById(id).getContext('2d'); 
+			var myChart = new Chart(ctx, { 
+				type: 'bar', 
+				data: { 
+				  labels: labels, 
+				  datasets: [{ 
+				    label: chartLabel, 
+				    data: chartdata, 
+				    backgroundColor: bg_color,
+				    borderColor: border_color, 
+				    borderWidth: 1 
+				  }] 
+				}, 
+				options: { 
+	    			responsive: true,
+					tooltips: {
+						position: 'nearest',
+						mode: 'index',
+						intersect: true,
+					},
+				    legend: {
+				    	display: false,
+				        labels: {
+				            fontColor: '#B7BBBF'
+				        }
+				    },
+					scales: { 
+						yAxes: [{
+						    scaleLabel: {
+						        display: true,
+						        labelString: 'Number of coins with a low balance',
+				            	fontColor: '#B7BBBF'
+						    },
+						    position: 'left',
+						    ticks: {
+							    fontColor: '#41EAD4',
+								callback: function (value, index, values) {
+									return Number(value.toString());//pass tick values as a string into Number function
+								}
+						    }
+						}],
+						xAxes: [{
+							position: 'nearest',
+							padding: 0,
+							ticks: {
+							    fontColor: '#41EAD4'
+							}
+						}]
+				  	} 
+				} 
+			}); 
+	    } 
+	    */
+  </script> 
+
+{% endblock %}

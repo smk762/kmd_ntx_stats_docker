@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row col-12 m-auto" id="rewards">
+	<div class="card table_card">
+		<div class="card-header table_card_title">
+			Rewards
+		</div>
+		<div class="card-body table_card_body">
+			<table id="rewards_tbl" class="table table-striped table-bordered m-auto" data-ajax="{% url 'rewardsTxViewSet-list' %}?format=datatables" style="width:99%; visibility: hidden;">
+				<thead>
+					<tr>
+						<th data-data="block_height">Notary</th>
+						<th data-data="txid">Txid</th>
+						<th data-data="input_addresses">Input Addresses</th>
+						<th data-data="output_addresses">Output Addresses</th>
+						<th data-data="rewards_value">Rewards Value</th>
+						<th data-data="block_time">Block time</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+    	$('#rewards_tbl').css('visibility', 'visible');
+        $('#rewards_tbl').DataTable({
+        	"paging": false,
+			deferRender: true,
+            "orderClasses": false,
+    		order: [ 0, 'asc' ],
+        	"columns": [
+		        { "data": "block_height" },
+		        { "data": "txid" },
+		        { "data": "input_addresses" },
+		        { "data": "output_addresses" },
+		        { "data": "rewards_value" },
+		        { "data": "block_time" }
+		    ],
+    		"columnDefs": [
+				{ className: "text-left text-nowrap", "targets": [ 0 ] },
+				{ className: "text-right text-nowrap", "targets": [ 4, 5 ] },
+    			{
+		            "targets": 0,
+		            "data": "block_height",
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+	            		$(nTd).html(get_block_url("KMD", oData.block_height))
+			        }
+		        },
+    			{
+		            "data": "txid",
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(get_txid_url("KMD", oData.txid));
+		            }
+		        },
+    			{
+		            "data": "input_addresses",
+		            "targets": 2,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html();
+		            },
+		           "visible":false
+		        },
+    			{
+		            "data": "output_addresses",
+		            "targets": 3,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html();
+		            },
+		           "visible":false
+		        },
+    			{
+		            "data": "rewards_value",
+		            "targets": 4,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(parseFloat(oData.rewards_value).toFixed(6));
+		            }
+		        },
+    			{
+		            "data": 'block_time',
+		            "targets": 5,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+	            		$(nTd).html(get_time_since(oData.block_time));
+			        }
+		        }
+		    ]
+        });
+    });
+</script>
+{% endblock %}

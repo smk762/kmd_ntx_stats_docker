@@ -8,7 +8,7 @@ def error_400(request,  exception):
     context.update({
         "error":"400 - Bad Request"
     })
-    return render(request,'error/generic_error.html', context)
+    return render(request,'views/error/generic_error.html', context)
 
 
 def error_403(request, exception):
@@ -16,7 +16,7 @@ def error_403(request, exception):
     context.update({
         "error":"403 - Verboten"
     })
-    return render(request,'error/generic_error.html', context)
+    return render(request,'views/error/generic_error.html', context)
 
 
 def error_404(request, exception):
@@ -24,7 +24,7 @@ def error_404(request, exception):
     context.update({
         "error":"404 - Not Found"
     })
-    return render(request,'error/generic_error.html', context)
+    return render(request,'views/error/generic_error.html', context)
 
 
 def error_500(request):
@@ -32,7 +32,7 @@ def error_500(request):
     context.update({
         "error":"500 - Internal Server Error"
     })
-    return render(request,'error/generic_error.html', context)
+    return render(request,'views/error/generic_error.html', context)
     
 
 def error_502(request, exception):
@@ -40,5 +40,5 @@ def error_502(request, exception):
     context.update({
         "error":"502 - Naughty Gateway"
     })
-    return render(request,'error/generic_error.html', context)
+    return render(request,'views/error/generic_error.html', context)
 

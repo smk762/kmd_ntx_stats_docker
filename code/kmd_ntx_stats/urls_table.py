@@ -16,9 +16,13 @@ api_table_urls = [
           api_table.last_mined_table,
           name='last_mined_table'),
 
-    path('api/table/last_notarised/',
-          api_table.last_notarised_table,
-          name='last_notarised_table'),
+    path('api/table/coin_last_ntx/',
+          api_table.coin_last_ntx_table,
+          name='coin_last_ntx_table'),
+
+    path('api/table/notary_last_ntx/',
+          api_table.notary_last_ntx_table,
+          name='notary_last_ntx_table'),
 
     path('api/table/mined_24hrs/',
           api_table.mined_24hrs_table,
@@ -32,17 +36,17 @@ api_table_urls = [
           api_table.notary_ntx_table,
           name='notary_ntx_table'),
     
-    path('api/table/notary_epoch_chain_notarised/',
-          api_table.notary_epoch_chain_notarised_table,
-          name='notary_epoch_chain_notarised'), 
+    path('api/table/notary_epoch_coin_notarised/',
+          api_table.notary_epoch_coin_notarised_table,
+          name='notary_epoch_coin_notarised_table'), 
 
-    path('api/table/notary_chain_notarised/',
-          api_table.notary_chain_notarised_table,
-          name='notary_chain_notarised'),
+    path('api/table/notary_coin_notarised/',
+          api_table.notary_coin_notarised_table,
+          name='notary_coin_notarised_table'),
     
-    path('api/table/chain_notarised_24hrs/',
-          api_table.chain_notarised_24hrs_table,
-          name='chain_notarised_24hrs'),
+    path('api/table/coin_notarised_24hrs/',
+          api_table.coin_notarised_24hrs_table,
+          name='coin_notarised_24hrs_table'),
     
     path('api/table/notarised/',
           api_table.notarised_table,
@@ -52,13 +56,13 @@ api_table_urls = [
           api_table.notarised_24hrs_table,
           name='notarised_24hrs_table'),
 
-    path('api/table/notarised_chain_season/',
-          api_table.notarised_chain_season_table,
-          name='notarised_chain_season_table'),
+    path('api/table/coin_ntx_season/',
+          api_table.coin_ntx_season_table,
+          name='coin_ntx_season_table'),
 
-    path('api/table/notarised_count_season/',
-          api_table.notarised_count_season_table,
-          name='notarised_count_season_table'),
+    path('api/table/notary_ntx_season/',
+          api_table.notary_ntx_season_table,
+          name='notary_ntx_season_table'),
 
     path('api/table/notary_profile_summary/',
           api_table.notary_profile_summary_table,
@@ -80,7 +84,4 @@ api_table_urls = [
           api_table.split_stats_table,
           name='split_stats_table'),
 
-    path('api/table/vote2021/',
-          api_table.vote2021_table,
-          name='vote2021_table'),
 ]

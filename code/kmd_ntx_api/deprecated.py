@@ -107,7 +107,7 @@ def get_nn_ntx_summary(notary):
 
 
     # season ntx stats
-    ntx_season = get_notarised_count_season_data(season, notary).values()
+    ntx_season = get_notary_ntx_season_data(season, notary).values()
 
     if len(ntx_season) > 0:
         chains_ntx_season = ntx_season[0]['chain_ntx_counts']
@@ -115,9 +115,9 @@ def get_nn_ntx_summary(notary):
         season_max_ntx = chains_ntx_season[season_max_chain]
 
         ntx_summary['season'].update({
-            "btc_ntx":ntx_season[0]['btc_count'],
-            "main_ntx":ntx_season[0]['antara_count'],
-            "third_party_ntx":ntx_season[0]['third_party_count'],
+            "btc_ntx":ntx_season[0]['master_server_count'],
+            "main_ntx":ntx_season[0]['main_server_count'],
+            "third_party_ntx":ntx_season[0]['third_party_server_count'],
             "most_ntx":season_max_chain+" ("+str(season_max_ntx)+")",
             "score":ntx_season[0]["season_score"]
         })
@@ -571,24 +571,24 @@ def get_notarised_tenure_data_api(request):
 
     return resp
 
-def get_notarised_count_season_data_api(request):
+def get_notary_ntx_season_data_api(request):
     resp = {}
-    data = notarised_count_season.objects.all()
+    data = notary_ntx_season.objects.all()
     data = apply_filters_api(request, notarisedCountSeasonSerializer, data)
     # default filter if none set.
-    if len(data) == notarised_count_season.objects.count() or len(data) == 0:
+    if len(data) == notary_ntx_season.objects.count() or len(data) == 0:
         season = SEASON
-        data = notarised_count_season.objects.filter(season=season)
+        data = notary_ntx_season.objects.filter(season=season)
 
     data = data.order_by('season', 'notary').values()
 
     for item in data:
         season = item['season']
         notary = item['notary']
-        btc_count = item['btc_count']
-        antara_count = item['antara_count']
-        third_party_count = item['third_party_count']
-        other_count = item['other_count']
+        master_server_count = item['master_server_count']
+        main_server_count = item['main_server_count']
+        third_party_server_count = item['third_party_server_count']
+        other_server_count = item['other_server_count']
         total_ntx_count = item['total_ntx_count']
         chain_ntx_counts = item['chain_ntx_counts']
         chain_ntx_pct = item['chain_ntx_pct']
@@ -599,10 +599,10 @@ def get_notarised_count_season_data_api(request):
 
         resp[season].update({
             notary:{
-                "btc_count":btc_count,
-                "antara_count":antara_count,
-                "third_party_count":third_party_count,
-                "other_count":other_count,
+                "master_server_count":master_server_count,
+                "main_server_count":main_server_count,
+                "third_party_server_count":third_party_server_count,
+                "other_server_count":other_server_count,
                 "total_ntx_count":total_ntx_count,
                 "time_stamp":time_stamp,
                 "chains":{}
@@ -624,7 +624,7 @@ def get_notarised_count_season_data_api(request):
 
     return resp
 
-class notarised_count_season_filter(viewsets.ViewSet):
+class notary_ntx_season_filter(viewsets.ViewSet):
     """
     API endpoint showing notary mined blocks
     """
@@ -639,13 +639,13 @@ class notarised_count_season_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_notarised_count_season_data_api(request)
+        resp = get_notary_ntx_season_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
-def get_notarised_chain_season_data_api(request):
+def get_last_coin_notarisation_data_api(request):
     resp = {}
-    data = notarised_chain_season.objects.all()
+    data = last_coin_notarisation.objects.all()
     data = apply_filters_api(request, notarisedChainSeasonSerializer, data) \
             .order_by('-season', 'chain') \
             .values()
@@ -706,7 +706,7 @@ class last_ntx_filter(viewsets.ViewSet):
 
 
 
-class notarised_chain_season_filter(viewsets.ViewSet):
+class last_coin_notarisation_filter(viewsets.ViewSet):
     """
     API endpoint showing notary mined blocks
     """
@@ -721,7 +721,7 @@ class notarised_chain_season_filter(viewsets.ViewSet):
         """
         """
         filters = self.serializer_class.Meta.fields
-        resp = get_notarised_chain_season_data_api(request)
+        resp = get_last_coin_notarisation_data_api(request)
         api_resp = wrap_api(resp, filters)
         return Response(api_resp)
 
@@ -847,12 +847,12 @@ def update_season_mined_count_tbl(conn, cursor, row_data):
         return 0
 
 def update_season_notarised_chain_tbl(conn, cursor, row_data):
-    sql = "INSERT INTO notarised_chain_season \
+    sql = "INSERT INTO last_coin_notarisation \
          (chain, ntx_count, block_height, kmd_ntx_blockhash,\
           kmd_ntx_txid, lastnotarization, opret, ac_ntx_block_hash, \
           ac_ntx_height, ac_block_height, ntx_lag, season) \
           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_notarised_chain_season DO UPDATE \
+          ON CONFLICT ON CONSTRAINT unique_last_coin_notarisation DO UPDATE \
           SET ntx_count="+str(row_data[1])+", block_height="+str(row_data[2])+", \
           kmd_ntx_blockhash='"+str(row_data[3])+"', kmd_ntx_txid='"+str(row_data[4])+"', \
           lastnotarization="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
@@ -863,19 +863,19 @@ def update_season_notarised_chain_tbl(conn, cursor, row_data):
     conn.commit()
 
 def update_season_notarised_count_tbl(conn, cursor, row_data): 
-    conf = "btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
+    conf = "master_server_count="+str(row_data[1])+", main_server_count="+str(row_data[2])+", \
+        third_party_server_count="+str(row_data[3])+", other_server_count="+str(row_data[4])+", \
         total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
         chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
-    sql = "INSERT INTO notarised_count_season \
-        (notary, btc_count, antara_count, \
-        third_party_count, other_count, \
+    sql = "INSERT INTO notary_ntx_season \
+        (notary, master_server_count, main_server_count, \
+        third_party_server_count, other_server_count, \
         total_ntx_count, chain_ntx_counts, \
         chain_ntx_pct, time_stamp, season) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_notary_season DO UPDATE SET \
-        btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
+        master_server_count="+str(row_data[1])+", main_server_count="+str(row_data[2])+", \
+        third_party_server_count="+str(row_data[3])+", other_server_count="+str(row_data[4])+", \
         total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
         chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+";"
     cursor.execute(sql, row_data)
@@ -910,14 +910,14 @@ def update_daily_notarised_chain_tbl(conn, cursor, row_data):
 
 def update_daily_notarised_count_tbl(conn, cursor, row_data): 
     sql = "INSERT INTO notarised_count_daily \
-        (notary, btc_count, antara_count, \
-        third_party_count, other_count, \
+        (notary, master_server_count, main_server_count, \
+        third_party_server_count, other_server_count, \
         total_ntx_count, chain_ntx_counts, \
         chain_ntx_pct, time_stamp, season, notarised_date) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_notary_date DO UPDATE SET \
-        btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
+        master_server_count="+str(row_data[1])+", main_server_count="+str(row_data[2])+", \
+        third_party_server_count="+str(row_data[3])+", other_server_count="+str(row_data[4])+", \
         total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
         chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+",  \
         season='"+str(row_data[9])+"', notarised_date='"+str(row_data[10])+"';"
