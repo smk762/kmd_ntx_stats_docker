@@ -29,39 +29,43 @@ def get_season_from_block(block):
     for season in SEASONS_INFO:
         if season.find("Testnet") == -1:
             start_block = SEASONS_INFO[season]['start_block']
-            end_block = SEASONS_INFO[season]['end_block']
+            if 'post_season_end_block' in SEASONS_INFO[season]:
+                end_block = SEASONS_INFO[season]['post_season_end_block']
+            else:
+                end_block = SEASONS_INFO[season]['end_block']
             if block >= start_block and block <= end_block:
                 return season
     return None
 
 
-def get_coin_epoch_at(season, server, coin, timestamp):
+def get_coin_epoch_at(season, server, coin, timestamp, testnet):
+    if testnet:
+        return "Epoch_0"
     if season in DPOW_EXCLUDED_COINS: 
         if coin not in DPOW_EXCLUDED_COINS[season]:
-            if int(timestamp) >= SEASONS_INFO[season]["start_time"]:
-                if int(timestamp) <= SEASONS_INFO[season]["end_time"]:
-                    if coin in ["KMD", "BTC", "LTC"]:
-                            if int(timestamp) <= SEASONS_INFO[season]["end_time"]:
-                                return f"{coin}"
+            if coin in ["KMD", "BTC", "LTC"]:
+                if int(timestamp) >= SEASONS_INFO[season]["start_time"]:
+                    if int(timestamp) <= SEASONS_INFO[season]["end_time"]:
+                        return f"{coin}"
 
-            epochs = lib_query.get_epochs(season, server)
+            epochs = SEASONS_INFO[season]["servers"][server]["epochs"]
             for epoch in epochs:
-                if coin in epoch["epoch_coins"]:
-                    if int(timestamp) >= epoch["epoch_start"]:
-                        if int(timestamp) <= epoch["epoch_end"]:
-                            return epoch["epoch"]
+                if coin in epochs[epoch]["coins"]:
+                    if int(timestamp) >= epochs[epoch]["start_time"]:
+                        if int(timestamp) <= epochs[epoch]["end_time"]:
+                            return epoch
 
     return "Unofficial"
 
 
-def validate_season_server_epoch(season, server, notary_addresses, block_time, coin):
+def validate_season_server_epoch(season, server, notary_addresses, block_time, coin, testnet=False):
     if season in DPOW_EXCLUDED_COINS:
         if coin in DPOW_EXCLUDED_COINS[season]:
             season = "Unofficial"
             server = "Unofficial"
             epoch = "Unofficial"
-    season, server = get_season_server_from_addresses(notary_addresses, coin)
-    epoch = get_coin_epoch_at(season, server, coin, block_time)
+    season, server, testnet = get_season_server_from_kmd_addresses(notary_addresses, coin, testnet)
+    epoch = get_coin_epoch_at(season, server, coin, block_time, testnet)
     return season, server, epoch
 
 
@@ -94,14 +98,21 @@ def get_scored(score_value):
         return False
 
 
-def get_coin_epoch_score_at(season, server, coin, timestamp):
-    if season in DPOW_EXCLUDED_COINS: 
+def get_coin_epoch_score_at(season, server, coin, timestamp, testnet=False):
+    if season in DPOW_EXCLUDED_COINS:
+        season_start = SEASONS_INFO[season]["start_time"]
+        season_end = SEASONS_INFO[season]["end_time"]
+
         if coin not in DPOW_EXCLUDED_COINS[season]:
+
+            if testnet and int(timestamp) >= season_start and int(timestamp) <= season_end:
+                return 1
+
             if coin in ["BTC", "LTC"]:
                 return 0
+
             if coin in ["KMD"]:
-                season_start = SEASONS_INFO[season]["start_time"]
-                season_end = SEASONS_INFO[season]["end_time"]
+
                 if int(timestamp) >= season_start and int(timestamp) <= season_end:
                     return 0.0325
                 return 0
@@ -126,37 +137,47 @@ def calc_epoch_score(server, num_coins):
     else:
         return 0
 
+def get_epoch_scores_dict(season):
+    epoch_scores_dict = {}
+    if season in SEASONS_INFO:
+        for server in SEASONS_INFO[season]["servers"]:
+            if server != "Unofficial":
+                epoch_scores_dict.update({server:{}})
+                for epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:
+                    epoch_coins = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]['coins']
+                    score_per_ntx = calc_epoch_score(server, len(epoch_coins))
+                    epoch_scores_dict[server].update({epoch:score_per_ntx})
+                    
+    return epoch_scores_dict
 
-def get_season_server_from_addresses(address_list, coin):
 
-    if len(address_list) == 13:
+def get_season_server_from_kmd_addresses(address_list, coin, testnet=False):
 
-        for address in address_list:
-            if address not in KNOWN_ADDRESSES:
-                return "Unofficial", "Unofficial"
+    if not set(address_list).issubset(set(KNOWN_ADDRESSES.keys())):
+        return "Unofficial", "Unofficial", testnet
 
-        tx_coin = "KMD"
-        if coin in ["BTC", "KMD", "LTC"]:
-            tx_coin = coin
+    for season in SEASONS_INFO:
+        if len(address_list) == 13:
+            if "KMD" in SEASONS_INFO[season]["servers"]:
+                server_addresses = SEASONS_INFO[season]["servers"]["KMD"]["addresses"]["KMD"]
+                if set(address_list).issubset(set(server_addresses)):
+                    for server in SEASONS_INFO[season]["servers"]:
+                        if server != "Unofficial":
+                            if coin in SEASONS_INFO[season]["servers"][server]["coins"]:
+                                return season, server, testnet
+        else:
+            if "Main" in SEASONS_INFO[season]["servers"]:
+                if "RICK" in SEASONS_INFO[season]["servers"]["Main"]["addresses"]:
+                    server_addresses = SEASONS_INFO[season]["servers"]["Main"]["addresses"]["RICK"]
+                    if set(address_list).issubset(set(server_addresses)):
+                        for server in SEASONS_INFO[season]["servers"]:
+                            if coin in SEASONS_INFO[season]["servers"][server]["coins"]:
+                                if season.find("Testnet") != -1:
+                                    testnet = True
+                                return season, server, True
 
-        for season in SEASONS_INFO:
-            notary_seasons = []
-            for server in SEASONS_INFO[season]["servers"]:
-                if server != "Unofficial":
-                    if coin == "OOT":
-                        print(SEASONS_INFO[season]["servers"][server]["addresses"].keys())
-                    if coin in SEASONS_INFO[season]["servers"][server]["addresses"]:
-                        for address in address_list:
-                            if address in SEASONS_INFO[season]["servers"][server]["addresses"][tx_coin]:
-                                notary_seasons.append(season)
-                                if len(notary_seasons) == 13:
-                                    if len(set(notary_seasons)) == 1:
-                                        if coin in ["BTC", "KMD", "LTC"]:
-                                            return notary_seasons[0], coin
-                                        else:
-                                            return notary_seasons[0], server
 
-    return "Unofficial", "Unofficial"
+    return "Unofficial", "Unofficial", testnet
 
 
 def get_balance(coin, pubkey, addr):
@@ -189,26 +210,29 @@ def get_server_active_scoring_dpow_coins_at_time(season, server, timestamp):
     for item in tenure:
         if timestamp >= item["official_start_block_time"]:
             if timestamp <= item["official_end_block_time"]:
-                coin = item["chain"]
+                coin = item["coin"]
                 if coin not in ["BTC", "LTC", "KMD"] and coin not in DPOW_EXCLUDED_COINS[season]:
                     server_active_scoring_dpow_coins.append(coin)
     server_active_scoring_dpow_coins = list(set(server_active_scoring_dpow_coins))
     return server_active_scoring_dpow_coins, len(server_active_scoring_dpow_coins)
 
 
-def get_coin_server(coin, season):
+def get_coin_server(season, coin):
+    if season.find("Testnet") != -1:
+        return "Main"
+
     if coin in ["KMD", "LTC", "BTC"]:
         return coin
     else:
-        dpow_main_coins = SEASONS_INFO[season]["servers"]["Main"]["coins"]
-        dpow_3p_coins = SEASONS_INFO[season]["servers"]["Third_Party"]["coins"]
+        if "Main" in SEASONS_INFO[season]["servers"]:
+            if coin in SEASONS_INFO[season]["servers"]["Main"]["coins"]:
+                return "Main"
 
-    if coin in dpow_main_coins:
-        return "Main"
-    elif coin in dpow_3p_coins:
-        return "Third_Party"
-    else:
-        return "Unofficial"
+        if "Third_Party" in SEASONS_INFO[season]["servers"]:
+            if coin in SEASONS_INFO[season]["servers"]["Third_Party"]["coins"]:
+                return "Third_Party"
+
+    return "Unofficial"
 
  
 def get_season(time_stamp=None):
@@ -224,7 +248,7 @@ def get_season(time_stamp=None):
     for season in SEASONS_INFO:
 
         if season.find("Testnet") == -1:
-            if is_postseason(time_stamp):
+            if 'post_season_end_time' in SEASONS_INFO[season]:
                 end_time = SEASONS_INFO[season]['post_season_end_time']
             else:
                 end_time = SEASONS_INFO[season]['end_time']

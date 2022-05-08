@@ -9,7 +9,7 @@ from lib_validate import *
 from lib_urls import *
 from models import coins_row
 from lib_crypto import SMARTCHAIN_BASE_58
-from lib_query import get_notarised_coins
+from lib_helper import get_season_coins
 from decorators import print_runtime
 
 '''
@@ -98,7 +98,7 @@ def get_coins_repo_icons(icons, coins_data):
 def get_dpow_tenure(coins_data):
 
     now = int(time.time())
-    notarised_coins = get_notarised_coins()
+    notarised_coins = get_season_coins()
 
     for coin in notarised_coins:
         coin = handle_translate_coins(coin)
@@ -130,7 +130,7 @@ def get_dpow_tenure(coins_data):
                     if season in SCORING_EPOCHS_REPO_DATA:
                         if server in SCORING_EPOCHS_REPO_DATA[season]["Servers"]:
                             if coin in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server]:
-                                print(coin)
+
                                 if "start_time" in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]:
                                     start_time = SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]["start_time"]
                                     coins_data[coin]["dpow_tenure"][season][server].update({"start_time":start_time})
@@ -285,7 +285,7 @@ def remove_old_coins(coins_data):
         if coin not in coins_data:
             logger.info(f"[remove_old_coins] Removing {coin}")
             coin_data = coins_row()
-            coin_data.chain = coin
+            coin_data.coin = coin
             coin_data.delete()
 
 
@@ -294,7 +294,7 @@ def update_coins(coins_data):
         coin = handle_translate_coins(coin)
         logger.info(f"[update_coins] Updating {coin}")
         coin_data = coins_row()
-        coin_data.chain = coin
+        coin_data.coin = coin
         coin_data.coins_info = json.dumps(coins_data[coin]['coins_info'])
         coin_data.electrums = json.dumps(coins_data[coin]['electrums'])
         coin_data.electrums_ssl = json.dumps(coins_data[coin]['electrums_ssl'])

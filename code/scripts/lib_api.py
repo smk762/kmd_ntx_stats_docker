@@ -109,7 +109,10 @@ def get_btc_block_info(block):
 
 def get_dexstats_balance(coin, addr):
     try:
-        url = f'http://{coin.lower()}.explorer.dexstats.info/insight-api-komodo/addr/{addr}'
+        if coin == "MIL":
+            url = f'http://{coin.lower()}.kmdexplorer.io/api/addr/{addr}'
+        else:
+            url = f'http://{coin.lower()}.explorer.dexstats.info/insight-api-komodo/addr/{addr}'
         r = requests.get(url)
         balance = r.json()['balance']
         return balance

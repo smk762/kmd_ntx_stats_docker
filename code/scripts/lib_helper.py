@@ -25,6 +25,14 @@ def get_dpow_coin_src(src):
         return src
 
 
+def get_results_or_none(cursor):
+    try:
+        results = cursor.fetchall()
+        return results
+    except:
+        return ()
+
+
 def get_dpow_coin_server(server):
     if server.lower() == "dpow-3p":
         return "Third_Party"
@@ -73,28 +81,22 @@ def is_notary_ltc_address(addr):
     return False
 
 
-def decode_opret_coin(coin):
-    """Gets rid of extra data by matching to known coins"""
-    # TODO: This could potentially misidentify - be vigilant.
-    for x in KNOWN_COINS:
-        if len(x) > 2 and x not in EXCLUDE_DECODE_OPRET_COINS:
-            if coin.endswith(x):
-                coin = x
 
-    # some decodes have a null char error, this gets rid of that so populate script doesnt error out 
-    if coin.find('\x00') != -1:
-        coin = coin.replace('\x00','')
+def is_postseason(timestamp=None, block=None):
+    if block:
+        for season in SEASONS_INFO:
+            if "post_season_end_block" in SEASONS_INFO[season]:
+                if block >= SEASONS_INFO[season]["end_block"]:
+                    if block <= SEASONS_INFO[season]["post_season_end_block"]:
+                        return True
+        
 
-    return coin
-
-
-def is_postseason(timestamp=None):
     if not timestamp:
         timestamp = int(time.time())
     for season in SEASONS_INFO:
         if "post_season_end_time" in SEASONS_INFO[season]:
-            if timestamp >= SEASONS_INFO[season]["post_season_end_time"]:
-                if timestamp <= SEASONS_INFO[season]["end_time"]:
+            if timestamp >= SEASONS_INFO[season]["end_time"]:
+                if timestamp <= SEASONS_INFO[season]["post_season_end_time"]:
                     return True
     return False
 
@@ -127,5 +129,42 @@ def has_season_started(season):
 def get_season_notaries(season):
     if season in SEASONS_INFO:
         notaries = SEASONS_INFO[season]["notaries"]
+        notaries.sort()
         return notaries
+    return []
+
+
+def get_season_coins(season=None, server=None, epoch=None):
+    coins = []
+    if not season:
+        for season in SEASONS_INFO:
+            coins += SEASONS_INFO[season]["coins"]
+        coins = list(set(coins))
+
+    if season in SEASONS_INFO:
+        coins = SEASONS_INFO[season]["coins"]
+
+        if server in SEASONS_INFO[season]["servers"]:
+            coins = SEASONS_INFO[season]["servers"][server]["coins"]
+
+            if epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:
+                coins = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["coins"]
+    coins.sort()
+    return coins
+
+    
+def get_season_servers(season):
+    if season in SEASONS_INFO:
+        servers = list(SEASONS_INFO[season]["servers"].keys())
+        servers.sort()
+        return servers
+    return []
+
+
+def get_season_server_epochs(season, server):
+    if season in SEASONS_INFO:
+        if server in SEASONS_INFO[season]["servers"]:
+            epochs = list(SEASONS_INFO[season]["servers"][server]["epochs"].keys())
+            epochs.sort()
+            return epochs
     return []

@@ -152,12 +152,7 @@ def update_mm2_version_stats_row(row_data):
 def get_version_stats_from_pgsql_db():
     sql = f"SELECT * FROM mm2_version_stats;"
     CURSOR.execute(sql)
-    try:
-        results = CURSOR.fetchall()
-        return results
-    except:
-        return ()
-
+    return helper.get_results_or_none(CURSOR)
 
 def get_pgsql_latest():
     sql = f"SELECT MAX(timestamp) FROM mm2_version_stats;"

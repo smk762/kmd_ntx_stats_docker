@@ -17,6 +17,7 @@ def get_api_server(local=True):
 
 def get_ntxid_list_url(season, server, coin, local=True):
     api_server = get_api_server(local)
+    #return f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&coin={coin}"
     return f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&chain={coin}"
 
 
@@ -42,7 +43,7 @@ def get_notary_btc_txid_url(txid, local=True):
 
 def get_notarised_coins_url(season=None, server=None, epoch=None, local=True):
     api_server = get_api_server(local)
-    url = f"{api_server}/api/info/notarised_chains/?"
+    url = f"{api_server}/api/info/notarised_coins/?"
     params = []
     if season:
         params.append(f"season={season}")
@@ -85,7 +86,7 @@ def get_source_addresses_url(season=None, server=None, coin=None, notary=None, l
     if server:
         params.append(f"server={server}")
     if coin:
-        params.append(f"chain={coin}")
+        params.append(f"coin={coin}")
     if notary:
         params.append(f"notary={notary}")
     params_string = "&".join(params)
@@ -100,7 +101,7 @@ def get_notarised_tenure_table_url(season=None, server=None, coin=None, local=Tr
     if server:
         url += f"&server={server}"
     if coin:
-        url += f"&chain={coin}"
+        url += f"&coin={coin}"
     return url
 
 

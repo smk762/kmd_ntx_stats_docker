@@ -6,76 +6,76 @@ from decorators import *
 from lib_urls import *
 from models import addresses_row, rewards_tx_row
 from lib_helper import get_pubkeys
+from lib_rpc import RPC
 from lib_threads import update_notary_balances_thread
 
 
 @print_runtime
 def get_balances(season):
     dpow_main_coins = SEASONS_INFO[season]["servers"]["Main"]["coins"]
-    dpow_3p_coins = SEASONS_INFO[season]["servers"]["Third_Party"]["coins"]
+    if "Third_Party" in SEASONS_INFO[season]["servers"]:
+        dpow_3p_coins = SEASONS_INFO[season]["servers"]["Third_Party"]["coins"]
+    else:
+        dpow_3p_coins = []
 
     if len(dpow_main_coins + dpow_3p_coins) > 0:
         thread_list = {}
 
-        for pubkey_season in NOTARY_PUBKEYS:
+        if season in NOTARY_PUBKEYS:
+            address_data = requests.get(get_notary_addresses_url(season)).json()
 
-            if pubkey_season.find(season) != -1:
-                address_data = requests.get(get_notary_addresses_url(season)).json()
+            for server in address_data[season]:
+                if season in SEASONS_INFO:
+                    if server in SEASONS_INFO[season]["servers"]:
 
-                if pubkey_season.find("Third_Party") != -1:
-                    coins = dpow_3p_coins
-                    server = "Third_Party"
+                        coins = SEASONS_INFO[season]["servers"][server]["coins"]
+                        coins += ["BTC", "KMD", "LTC"]
+                        coins.sort()
+                        
+                        for notary in SEASONS_INFO[season]["notaries"]:
+                            thread_list.update({notary:[]})
 
-                else:
-                    coins = dpow_main_coins
-                    server = "Main"
+                            for coin in coins:
+                                if coin not in RETIRED_DPOW_COINS:
+                                    address = address_data[season][server][notary]["addresses"][coin]
+                                    pubkey = address_data[season][server][notary]["pubkey"]
+                                    thread_list[notary].append(
+                                                            update_notary_balances_thread(
+                                                                season, server, notary,
+                                                                coin, pubkey, address
+                                                            )
+                                                        )
 
-                coins += ["BTC", "KMD", "LTC"]
-                coins.sort()
-                
-                for notary in SEASONS_INFO[pubkey_season]["notaries"]:
-                    thread_list.update({notary:[]})
-
-                    for coin in coins:
-                        if coin not in RETIRED_DPOW_COINS:
-                            address = address_data[season][server][notary]["addresses"][coin]
-                            pubkey = address_data[season][server][notary]["pubkey"]
-                            thread_list[notary].append(
-                                                    update_notary_balances_thread(
-                                                        season, server, notary,
-                                                        coin, pubkey, address
-                                                    )
-                                                )
-
-                    for thread in thread_list[notary]:
-                        thread.start()
-                        time.sleep(0.2)
-                    time.sleep(1) # 2 sec sleep = 8 min runtime.
+                            for thread in thread_list[notary]:
+                                thread.start()
+                                time.sleep(0.2)
+                            time.sleep(1) # 2 sec sleep = 8 min runtime.
 
 
 def populate_addresses(season, server):
-    coins = SEASONS_INFO[season]["servers"][server]["coins"]
-    coins += ["BTC", "KMD", "LTC"]
-    coins.sort()
+    if server in SEASONS_INFO[season]["servers"]:
+        coins = SEASONS_INFO[season]["servers"][server]["coins"]
+        coins += ["BTC", "KMD", "LTC"]
+        coins.sort()
 
-    if len(coins) > 0:
-        i = 0
-        pubkeys = get_pubkeys(season, server)
+        if len(coins) > 0:
+            i = 0
+            pubkeys = get_pubkeys(season, server)
 
-        for notary in pubkeys:
-            pubkey = pubkeys[notary]
+            for notary in pubkeys:
+                pubkey = pubkeys[notary]
 
-            for coin in coins:
-                row = addresses_row()
-                row.season = season
-                row.server = server
-                row.chain = coin
-                row.notary_id = i
-                row.notary = notary
-                row.pubkey = pubkey
-                row.update()
+                for coin in coins:
+                    row = addresses_row()
+                    row.season = season
+                    row.server = server
+                    row.coin = coin
+                    row.notary_id = i
+                    row.notary = notary
+                    row.pubkey = pubkey
+                    row.update()
 
-            i += 1
+                i += 1
 
 @print_runtime
 def delete_stale_balances():

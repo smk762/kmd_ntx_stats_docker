@@ -16,10 +16,13 @@ def get_notarised_conditions_filter(sql, **kwargs):
                 conditions.append(f"'{v}' = ANY (notaries)")
             elif k == "include_coins":
                 v = str(v)[1:-1]
-                conditions.append(f"'chain' IN ({v})")
+                conditions.append(f"'coin' IN ({v})")
             elif k == "exclude_coins":
                 v = str(v)[1:-1]
-                conditions.append(f"'chain' NOT IN ({v})")
+                conditions.append(f"'coin' NOT IN ({v})")
+            elif k == "exclude_server_unofficial":
+                if v:
+                    conditions.append(f"server != 'Unofficial'")
             elif k == "group_by":
                 group_by_condition = v
             elif k == "lowest_blocktime":
@@ -37,5 +40,20 @@ def get_notarised_conditions_filter(sql, **kwargs):
         sql += " WHERE " + " AND ".join(conditions)
     if group_by_condition:
         sql += f" GROUP BY {group_by_condition}"
+    sql += ";"
+    return sql
+
+
+def simple_filter(sql, **kwargs):
+    conditions = []
+    for k, v in kwargs.items():
+        if v:
+            if isinstance(k, str):
+                conditions.append(f"{k} = '{v}'")
+            elif isinstance(k, int) or isinstance(k, float):
+                conditions.append(f"{k} = {v}")
+    if len(conditions) > 0:
+        sql += " WHERE "
+        sql += " AND ".join(conditions)    
     sql += ";"
     return sql

@@ -5,10 +5,10 @@ from lib_helper import *
 from lib_validate import *
 from lib_query import *
 
-tables = ["addresses", "balances", "chain_sync", "coins", "coin_social",
-          "funding_transactions", "last_notarised", "mined", "mined_count_daily",
+tables = ["addresses", "balances", "coin_sync", "coins", "coin_social",
+          "funding_transactions", "notary_last_ntx", "mined", "mined_count_daily",
           "mined_count_season", "nn_btc_tx", "nn_ltc_tx", "nn_social", 
-          "notarised", "notarised_chain_daily", "notarised_chain_season",
+          "notarised", "notarised_coin_daily", "notarised_coin_season",
           "notarised_count_daily", "notarised_count_season", "notarised_tenure",
           "scoring_epochs", "vote2021"]
 

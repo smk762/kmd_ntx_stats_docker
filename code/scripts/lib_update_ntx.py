@@ -5,9 +5,8 @@ from psycopg2.extras import execute_values
 from lib_const import *
 
 
-
 def update_ntx_row(row_data):
-    sql = f"INSERT INTO notarised (chain, block_height, \
+    sql = f"INSERT INTO notarised (coin, block_height, \
                                 block_time, block_datetime, block_hash, \
                                 notaries, notary_addresses, ac_ntx_blockhash, ac_ntx_height, \
                                 txid, opret, season, server, scored, score_value, epoch) \
@@ -41,7 +40,6 @@ def update_ntx_row_epoch_scores(row_data):
         CONN.rollback()
 
 
-
 def update_server_notarised_tbl(old_server, server):
     sql = f"UPDATE notarised SET \
           server='{server}' \
@@ -58,7 +56,7 @@ def update_coin_server_season_notarised_tbl(server, season, coin):
     sql = f"UPDATE notarised SET \
           server='{server}' \
           WHERE season='{season}'\
-          AND chain='{coin}';"
+          AND coin='{coin}';"
     try:
         CURSOR.execute(sql)
         CONN.commit()
@@ -71,7 +69,7 @@ def update_unofficial_coin_notarised_tbl(season, coin):
     sql = f"UPDATE notarised SET \
           season='Unofficial', server='Unofficial', epoch='Unofficial' \
           WHERE season='{season}'\
-          AND chain='{coin}';"
+          AND coin='{coin}';"
     try:
         CURSOR.execute(sql)
         CONN.commit()
@@ -84,7 +82,7 @@ def update_coin_score_notarised_tbl(coin, score_value, scored, min_time=None, ma
     sql = f"UPDATE notarised SET scored={scored}, score_value={score_value}"
     conditions = []
     if coin:
-        conditions.append(f"chain = '{coin}'")
+        conditions.append(f"coin = '{coin}'")
     if min_time:
         conditions.append(f"block_time >= {min_time}")
     if max_time:
@@ -131,7 +129,6 @@ def update_season_server_addresses_notarised_tbl(txid, season, server, addresses
               season='{season}', server='{server}' \
               WHERE txid='{txid}';"
 
-    print(sql)
     try:
         CURSOR.execute(sql)
         CONN.commit()
@@ -147,27 +144,26 @@ def delete_txid_from_notarised_tbl(txid):
 
 
 def delete_from_notarised_tbl_where(
-        season=None, server=None, epoch=None, chain=None,
+        season=None, server=None, epoch=None, coin=None,
         include_coins=None, exclude_coins=None
     ):
     sql = f"DELETE FROM notarised"
     sql = get_notarised_conditions_filter(
         sql, season=season, server=server, epoch=epoch,
-        chain=chain, include_coins=include_coins,
+        coin=coin, include_coins=include_coins,
         exclude_coins=exclude_coins
     )
     CURSOR.execute()
     CONN.commit()
 
 
-
 def update_season_notarised_coin_row(row_data):
-    sql = "INSERT INTO notarised_chain_season \
-         (chain, ntx_count, block_height, kmd_ntx_blockhash,\
+    sql = "INSERT INTO coin_last_ntx \
+         (coin, ntx_count, block_height, kmd_ntx_blockhash,\
           kmd_ntx_txid, kmd_ntx_blocktime, opret, ac_ntx_blockhash, \
           ac_ntx_height, ac_block_height, ntx_lag, season, server) \
           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_notarised_chain_season_server DO UPDATE \
+          ON CONFLICT ON CONSTRAINT unique_coin_last_ntx_server DO UPDATE \
           SET ntx_count="+str(row_data[1])+", block_height="+str(row_data[2])+", \
           kmd_ntx_blockhash='"+str(row_data[3])+"', kmd_ntx_txid='"+str(row_data[4])+"', \
           kmd_ntx_blocktime="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
@@ -177,60 +173,87 @@ def update_season_notarised_coin_row(row_data):
     CURSOR.execute(sql, row_data)
     CONN.commit()
 
-def update_season_notarised_count_row(row_data): 
-    sql = "INSERT INTO notarised_count_season \
-        (notary, btc_count, antara_count, \
-        third_party_count, other_count, \
-        total_ntx_count, chain_ntx_counts, season_score, \
-        chain_ntx_pct, time_stamp, season) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-        ON CONFLICT ON CONSTRAINT unique_notary_season DO UPDATE SET \
-        btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
-        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
-        season_score='"+str(row_data[7])+"', chain_ntx_pct='"+str(row_data[8])+"', \
-        time_stamp="+str(row_data[9])+";"
+
+def update_coin_ntx_season_row(row_data): 
+    sql = f"INSERT INTO coin_ntx_season \
+            (season, coin, coin_data, time_stamp) \
+            VALUES (%s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_coin_season DO UPDATE SET \
+            coin_data='{row_data[2]}',\
+            time_stamp={row_data[3]};"
     CURSOR.execute(sql, row_data)
     CONN.commit()
 
 
+def update_notary_ntx_season_row(row_data): 
+    sql = f"INSERT INTO notary_ntx_season \
+            (season, notary, notary_data, time_stamp) \
+            VALUES (%s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_notary_season DO UPDATE SET \
+            notary_data='{row_data[2]}',\
+            time_stamp={row_data[3]};"
+    CURSOR.execute(sql, row_data)
+    CONN.commit()
+
+
+def update_server_ntx_season_row(row_data): 
+    sql = f"INSERT INTO server_ntx_season \
+            (season, server, server_data, time_stamp) \
+            VALUES (%s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_server_season DO UPDATE SET \
+            server_data='{row_data[2]}',\
+            time_stamp={row_data[3]};"
+    CURSOR.execute(sql, row_data)
+    CONN.commit()
+
+
+
 def update_daily_notarised_coin_row(row_data):
-    sql = f"INSERT INTO notarised_chain_daily \
-          (season, server, chain, ntx_count, notarised_date) \
+    sql = f"INSERT INTO notarised_coin_daily \
+          (season, server, coin, ntx_count, notarised_date) \
           VALUES (%s, %s, %s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_notarised_chain_daily DO UPDATE \
+          ON CONFLICT ON CONSTRAINT unique_notarised_coin_daily DO UPDATE \
           SET ntx_count={row_data[3]};"
     CURSOR.execute(sql, row_data)
     CONN.commit()
 
+
 def update_daily_notarised_count_row(row_data): 
     sql = "INSERT INTO notarised_count_daily \
-        (notary, btc_count, antara_count, \
-        third_party_count, other_count, \
-        total_ntx_count, chain_ntx_counts, \
-        chain_ntx_pct, time_stamp, season, notarised_date) \
+        (notary, master_server_count, main_server_count, \
+        third_party_server_count, other_server_count, \
+        total_ntx_count, coin_ntx_counts, \
+        coin_ntx_pct, time_stamp, season, notarised_date) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_notary_date DO UPDATE SET \
-        btc_count="+str(row_data[1])+", antara_count="+str(row_data[2])+", \
-        third_party_count="+str(row_data[3])+", other_count="+str(row_data[4])+", \
-        total_ntx_count="+str(row_data[5])+", chain_ntx_counts='"+str(row_data[6])+"', \
-        chain_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+",  \
+        master_server_count="+str(row_data[1])+", main_server_count="+str(row_data[2])+", \
+        third_party_server_count="+str(row_data[3])+", other_server_count="+str(row_data[4])+", \
+        total_ntx_count="+str(row_data[5])+", coin_ntx_counts='"+str(row_data[6])+"', \
+        coin_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+",  \
         season='"+str(row_data[9])+"', notarised_date='"+str(row_data[10])+"';"
     CURSOR.execute(sql, row_data)
     CONN.commit()
 
 
-def update_last_ntx_row(row_data):
+
+def update_coin_last_ntx_row(row_data):
     try:
-        sql = "INSERT INTO last_notarised \
-            (notary, chain, txid, block_height, \
-            block_time, season, server) VALUES (%s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_season_server_chain DO UPDATE SET \
-            txid='"+str(row_data[2])+"', \
-            block_height='"+str(row_data[3])+"', \
-            block_time='"+str(row_data[4])+"', \
-            season='"+str(row_data[5])+"', \
-            server='"+str(row_data[6])+"';"
+        sql = F"INSERT INTO coin_last_ntx \
+                    (season, server, coin,\
+                     notaries, opret, kmd_ntx_blockhash,\
+                     kmd_ntx_blockheight, kmd_ntx_blocktime,\
+                     kmd_ntx_txid, ac_ntx_blockhash,\
+                     ac_ntx_height) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                ON CONFLICT ON CONSTRAINT unique_coin_last_ntx_season DO UPDATE SET \
+                    server='{row_data[1]}', \
+                    notaries=ARRAY{row_data[3]}::text[], \
+                    opret='{row_data[4]}', \
+                    kmd_ntx_blockhash='{row_data[5]}', \
+                    kmd_ntx_blockheight={row_data[6]}, \
+                    kmd_ntx_blocktime={row_data[7]}, \
+                    kmd_ntx_txid='{row_data[8]}', \
+                    ac_ntx_blockhash='{row_data[9]}', \
+                    ac_ntx_height={row_data[10]};"
         CURSOR.execute(sql, row_data)
         CONN.commit()
         
@@ -242,14 +265,45 @@ def update_last_ntx_row(row_data):
         CONN.rollback()
         return 0
 
+
+def update_notary_last_ntx_row(row_data):
+    try:
+        sql = F"INSERT INTO notary_last_ntx \
+                    (season, server, coin, notary,\
+                     notaries, opret, kmd_ntx_blockhash,\
+                     kmd_ntx_blockheight, kmd_ntx_blocktime,\
+                     kmd_ntx_txid, ac_ntx_blockhash,\
+                     ac_ntx_height) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                ON CONFLICT ON CONSTRAINT unique_notary_last_ntx_notary_season_coin DO UPDATE SET \
+                    server='{row_data[1]}', \
+                    notaries=ARRAY{row_data[4]}::text[], \
+                    opret='{row_data[5]}', \
+                    kmd_ntx_blockhash='{row_data[6]}', \
+                    kmd_ntx_blockheight={row_data[7]}, \
+                    kmd_ntx_blocktime={row_data[8]}, \
+                    kmd_ntx_txid='{row_data[9]}', \
+                    ac_ntx_blockhash='{row_data[10]}', \
+                    ac_ntx_height={row_data[11]};"
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
+        
+        return 1
+    except Exception as e:
+        logger.debug(e)
+        if str(e).find('Duplicate') == -1:
+            logger.debug(row_data)
+        CONN.rollback()
+        return 0
+
+
 def update_notarised_tenure_row(row_data):
     try:
-        sql = "INSERT INTO notarised_tenure (chain, first_ntx_block, \
+        sql = "INSERT INTO notarised_tenure (coin, first_ntx_block, \
             last_ntx_block, first_ntx_block_time, last_ntx_block_time, \
             official_start_block_time, official_end_block_time, \
             unscored_ntx_count, scored_ntx_count, season, server) \
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_season_server_tenure DO UPDATE SET \
+            ON CONFLICT ON CONSTRAINT unique_coin_season_server_tenure DO UPDATE SET \
             first_ntx_block='"+str(row_data[1])+"', last_ntx_block="+str(row_data[2])+", \
             first_ntx_block_time="+str(row_data[3])+", last_ntx_block_time="+str(row_data[4])+", \
             official_start_block_time="+str(row_data[5])+", official_end_block_time="+str(row_data[6])+", \
@@ -274,7 +328,7 @@ def update_notarised_epoch(actual_epoch, season=None, server=None, coin=None, tx
     if server:
         conditions.append(f"server = '{server}'")
     if coin:
-        conditions.append(f"chain = '{coin}'")
+        conditions.append(f"coin = '{coin}'")
     if txid:
         conditions.append(f"txid = '{txid}'") 
     if len(conditions) > 0:
@@ -294,7 +348,7 @@ def update_notarised_epoch_scores(coin, season, server, epoch, epoch_start, epoc
     sql = f"UPDATE notarised SET epoch='{epoch}', score_value={score_per_ntx}, scored={scored}"
     conditions = []
     if coin:
-        conditions.append(f"chain = '{coin}'")
+        conditions.append(f"coin = '{coin}'")
     if season:
         conditions.append(f"season = '{season}'")
     if server:

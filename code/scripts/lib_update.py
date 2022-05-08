@@ -11,13 +11,13 @@ def update_addresses_row(row_data):
     try:
         sql = f"INSERT INTO addresses \
                     (season, server, notary, notary_id, \
-                    address, pubkey, chain) \
+                    address, pubkey, coin) \
                 VALUES (%s, %s, %s, %s, %s, %s, %s) \
-                ON CONFLICT ON CONSTRAINT unique_season_chain_address \
+                ON CONFLICT ON CONSTRAINT unique_season_coin_address \
                 DO UPDATE SET \
                     server='{row_data[1]}', notary='{row_data[2]}', \
                     notary_id='{row_data[3]}', address='{row_data[4]}', \
-                    pubkey='{row_data[5]}', chain='{row_data[6]}';"
+                    pubkey='{row_data[5]}', coin='{row_data[6]}';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
     except Exception as e:
@@ -30,7 +30,7 @@ def update_addresses_row(row_data):
 def delete_addresses_row(season, coin, address):
     CURSOR.execute(f"DELETE FROM addresses WHERE \
         season = '{season}', \
-        chain = '{coin}', \
+        coin = '{coin}', \
         address = '{address}' \
         ;")
     CONN.commit()
@@ -42,9 +42,9 @@ def update_balances_row(row_data):
     try:
         sql = f"INSERT INTO balances \
                 (season, server, notary, \
-                address, chain, balance, update_time) \
+                address, coin, balance, update_time) \
             VALUES (%s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_address_season_balance DO UPDATE SET \
+            ON CONFLICT ON CONSTRAINT unique_coin_address_season_balance DO UPDATE SET \
                 balance={row_data[5]}, \
                 server='{row_data[1]}', \
                 update_time={row_data[6]};"
@@ -59,7 +59,7 @@ def update_balances_row(row_data):
 
 def delete_balances_row(coin, address, season):
     try:
-        sql = f"DELETE FROM balances WHERE chain='{coin}' and address='{address}' and season={season};"
+        sql = f"DELETE FROM balances WHERE coin='{coin}' and address='{address}' and season={season};"
         CURSOR.execute(sql)
         CONN.commit()
     except Exception as e:
@@ -96,9 +96,9 @@ def update_rewards_row(row_data):
 def update_coins_row(row_data):
     try:
         sql = "INSERT INTO coins \
-            (chain, coins_info, electrums, electrums_ssl, explorers, dpow, dpow_tenure, dpow_active, mm2_compatible) \
+            (coin, coins_info, electrums, electrums_ssl, explorers, dpow, dpow_tenure, dpow_active, mm2_compatible) \
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_coin DO UPDATE SET \
+            ON CONFLICT ON CONSTRAINT unique_coin_coin DO UPDATE SET \
             coins_info='"+str(row_data[1])+"', \
             electrums='"+str(row_data[2])+"', \
             electrums_ssl='"+str(row_data[3])+"', \
@@ -196,10 +196,10 @@ def update_table(table, update_str, condition):
 
 def update_sync_tbl(row_data):
     try:
-        sql = "INSERT INTO chain_sync \
-            (chain, block_height, sync_hash, explorer_hash) \
+        sql = "INSERT INTO coin_sync \
+            (coin, block_height, sync_hash, explorer_hash) \
             VALUES (%s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_sync DO UPDATE SET \
+            ON CONFLICT ON CONSTRAINT unique_coin_sync DO UPDATE SET \
             block_height='"+str(row_data[1])+"', \
             sync_hash='"+str(row_data[2])+"', \
             explorer_hash='"+str(row_data[3])+"';"
@@ -238,10 +238,10 @@ def update_nn_social_row(row_data):
 def update_coin_social_row(row_data):
     try:
         sql = f"INSERT INTO  coin_social \
-            (chain, discord, email, explorers, github, icon, linkedin, \
+            (coin, discord, email, explorers, github, icon, linkedin, \
              mining_pools, reddit, telegram, twitter, youtube, website, season) \
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_chain_season_social \
+            ON CONFLICT ON CONSTRAINT unique_coin_season_social \
             DO UPDATE SET \
                 discord='{row_data[1]}', email='{row_data[2]}', \
                 explorers=ARRAY{row_data[3]}::VARCHAR[], github='{row_data[4]}', \
@@ -250,7 +250,6 @@ def update_coin_social_row(row_data):
                 telegram='{row_data[9]}', twitter='{row_data[10]}', \
                 youtube='{row_data[11]}', website='{row_data[12]}', \
                 season='{row_data[13]}';"
-        print(row_data)
         #print(sql)
         CURSOR.execute(sql, row_data)
         CONN.commit()
@@ -283,11 +282,11 @@ def update_btc_address_deltas_tbl(row_data):
 def update_funding_row(row_data):
     try:
         sql = "INSERT INTO  funding_transactions \
-            (chain, txid, vout, amount, \
+            (coin, txid, vout, amount, \
             block_hash, block_height, block_time, \
             category, fee, address, notary, season) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_category_vout_txid_funding DO UPDATE SET \
-            chain='"+str(row_data[0])+"', \
+            coin='"+str(row_data[0])+"', \
             amount='"+str(row_data[3])+"', \
             block_hash='"+str(row_data[4])+"', \
             block_height='"+str(row_data[5])+"', \
@@ -422,14 +421,14 @@ def update_nn_ltc_tx_row(row_data):
 def update_scoring_epoch_row(row_data):
     sql = f"INSERT INTO scoring_epochs \
                 (season, server, epoch, epoch_start, epoch_end, \
-                start_event, end_event, epoch_chains, score_per_ntx) \
+                start_event, end_event, epoch_coins, score_per_ntx) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_scoring_epoch DO UPDATE SET \
             epoch_start={row_data[3]}, \
             epoch_end={row_data[4]}, \
             start_event='{row_data[5]}', \
             end_event='{row_data[6]}', \
-            epoch_chains=ARRAY{row_data[7]}, \
+            epoch_coins=ARRAY{row_data[7]}, \
             score_per_ntx={row_data[8]};"
     try:
         CURSOR.execute(sql, row_data)
@@ -441,13 +440,13 @@ def update_scoring_epoch_row(row_data):
         CONN.rollback()
 
 
-def update_vote2021_row(row_data):
-    sql = f"INSERT INTO vote2021 \
+def update_notary_vote_row(row_data):
+    sql = f"INSERT INTO notary_vote \
                 (txid, block_hash, block_time, \
                 lock_time, block_height, votes, \
                 candidate, candidate_address, \
-                mined_by, difficulty, notes) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                mined_by, difficulty, notes, year) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_vote_txid_candidate DO UPDATE SET \
             txid='{row_data[0]}', \
             block_hash='{row_data[1]}', \
@@ -459,7 +458,8 @@ def update_vote2021_row(row_data):
             candidate_address='{row_data[7]}', \
             mined_by='{row_data[8]}', \
             difficulty='{row_data[9]}', \
-            notes='{row_data[10]}';"
+            notes='{row_data[10]}', \
+            year='{row_data[11]}';"
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()

@@ -58,16 +58,12 @@ def generate_social_coins_template(season):
         })
     for coin in all_coins:
         if coin in repo_info:
-            print(f"{coin} repo_info[coin]: {repo_info[coin]}")
             for item in repo_info[coin]:
-                print(f"{coin} {item}: {repo_info[coin][item]}")
                 template[coin].update({item:repo_info[coin][item]})
 
         elif coin in TRANSLATE_COINS:
-            print(f"{coin} repo_info[coin]: {repo_info[coin]}")
             
             for item in repo_info[coin]:
-                print(f"{coin} {item}: {repo_info[coin][item]}")
                 template[handle_translate_coins(coin)].update({item:repo_info[coin][item]})
                 
 
@@ -87,7 +83,7 @@ def populate_coins_social(season):
         for coin in all_coins:
 
             row = coin_social_row()
-            row.chain = coin
+            row.coin = coin
             row.season = season
             row.icon = ""
             row.explorers = []
@@ -105,7 +101,6 @@ def populate_coins_social(season):
                 logger.info(f"{coin} not in coin_info")
 
             if coin in coin_social:
-                print(f"coin_social[coin]: {coin_social[coin]}")
                 row.discord = coin_social[coin]["discord"]
                 row.email = coin_social[coin]["email"]
                 row.github = coin_social[coin]["github"]
@@ -120,7 +115,6 @@ def populate_coins_social(season):
             row.update()
     except Exception as e:
         logger.info(f"Error in [populate_coins_social]: {e}")
-        print(f"social_coins_{season}.json does not exist!")
 
 
 if __name__ == "__main__":
