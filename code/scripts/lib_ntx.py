@@ -1393,17 +1393,8 @@ class last_notarisations():
             else:
                 logger.info(f"no new ntx for {row.coin}")
                 return None
-        else:
-            row.server = ""
-            row.notaries = '[]'
-            row.opret = ""
-            row.kmd_ntx_blockhash = ""
-            row.kmd_ntx_blockheight = 0
-            row.kmd_ntx_blocktime = 0
-            row.kmd_ntx_txid = ""
-            row.ac_ntx_blockhash = ""
-            row.ac_ntx_height = 0
-            return row
+                
+        return None
 
 
     @print_runtime
