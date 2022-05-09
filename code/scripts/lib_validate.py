@@ -229,7 +229,7 @@ def get_season_server_from_kmd_addresses(address_list, coin, testnet=False):
                 server_addresses = SEASONS_INFO[season]["servers"]["Main"]["addresses"]["KMD"]
                 if set(address_list).issubset(set(server_addresses.keys())):
                     if coin in SEASONS_INFO[season]["servers"]["Main"]["coins"]:
-                        return season, server, testnet
+                        return season, "Main", testnet
 
     return "Unofficial", "Unofficial", False
 
