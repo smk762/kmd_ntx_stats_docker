@@ -145,9 +145,13 @@ SEASONS_INFO = {
         }    
     }
 }
+NOW = time.time()
+print(f"getting dpow coins {NOW}")
 
 _coins_url = f"{THIS_SERVER}/api/info/dpow_server_coins"
 
+NOW = time.time()
+print(f"building regions info {NOW}")
 for _season in SEASONS_INFO:
     if _season in NOTARY_PUBKEYS:
         SEASONS_INFO[_season].update({
@@ -165,6 +169,7 @@ for _season in SEASONS_INFO:
             SEASONS_INFO[_season]["regions"][_region]['nodes'].append(_notary)
 
 NOW = time.time()
+print(f"building seasons info {NOW}")
 POSTSEASON = False
 
 for _season in SEASONS_INFO:
@@ -178,6 +183,9 @@ for _season in SEASONS_INFO:
                     SEASON = _season
 
 
+NOW = time.time()
+print(f"building ecodata info {NOW}")
+POSTSEASON = False
 # Links to ecosystem sites
 _url = "https://raw.githubusercontent.com/"
 _url += "gcharang/data/master/info/ecosystem.json"
