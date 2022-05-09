@@ -1132,7 +1132,7 @@ class notary_vote_row():
             if i in ['', None]:
                 return False
 
-        if self.candidate_address not in CANDIDATE_ADDRESSES["VOTE2021"]:
+        if self.candidate_address not in CANDIDATE_ADDRESSES[self.year]:
             return False
 
         return True
