@@ -19,7 +19,6 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-
 # How many pages back to go with verbose API responses
 API_PAGE_BREAK = int(os.getenv("API_PAGE_BREAK"))
 
@@ -84,3 +83,5 @@ KNOWN_NOTARIES = list(set(KNOWN_NOTARIES))
 KNOWN_NOTARIES.sort()
 
 CLEAN_UP = False
+
+print(f"{int(time.time()) - NOW} sec to complete const")

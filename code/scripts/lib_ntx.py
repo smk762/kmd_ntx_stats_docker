@@ -218,9 +218,9 @@ class notarised():
 
     @print_runtime
     def import_ntx(self, server, coin):
-        existing_txids = query.get_existing_notarised_txids(season, server, coin)
+        existing_txids = query.get_existing_notarised_txids(self.season, server, coin)
 
-        import_txids_url = urls.get_ntxid_list_url(season, server, coin, False)
+        import_txids_url = urls.get_ntxid_list_url(self.season, server, coin, False)
         import_txids = requests.get(import_txids_url).json()["results"]
 
         new_txids = list(set(import_txids)-set(existing_txids))
@@ -233,7 +233,7 @@ class notarised():
             r = requests.get(txid_url)
 
             for txid_info in r.json()["results"]:
-                ntx_row = get_import_row(txid_info)
+                ntx_row = self.get_import_row(txid_info)
                 ntx_row.update()
 
 
@@ -572,92 +572,93 @@ class ntx_season_stats():
 
                 if len({server, epoch}.intersection({"Unofficial", "LTC", "BTC"})) == 0:
 
-                    # Global Season Score and Count Totals
-                    self.season_ntx_dict["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["ntx_score"] += float(server_epoch_coin_score)
+                    if coin != 'KMD' or (coin == server and server == epoch):
+                        # Global Season Score and Count Totals
+                        self.season_ntx_dict["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["ntx_score"] += float(server_epoch_coin_score)
+
+                        print(f"[add_scores_counts]: {coin}, {server}, {epoch}")
+                        # Global Coin Score and Count Totals
+                        self.season_ntx_dict["coins"][coin]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
+
+                        # Global Coin Notary Score and Count Totals
+                        self.season_ntx_dict["coins"][coin]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["coins"][coin]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
+
+                        # Global Coin Server Score and Count Totals
+                        self.season_ntx_dict["coins"][coin]["servers"][server]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["coins"][coin]["servers"][server]["ntx_score"] += float(server_epoch_coin_score)
+
+                        # Global Coin Server Notary Score and Count Totals
+                        self.season_ntx_dict["coins"][coin]["servers"][server]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["coins"][coin]["servers"][server]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
+
+                        # Global Coin Server Epoch Score and Count Totals
+                        self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["ntx_score"] += float(server_epoch_coin_score)
+
+                        # Global Coin Server Epoch Notary Score and Count Totals
+                        self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
 
 
-                    # Global Coin Score and Count Totals
-                    self.season_ntx_dict["coins"][coin]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
+                        # Global Notary Score and Count Totals
+                        self.season_ntx_dict["notaries"][notary]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Coin Notary Score and Count Totals
-                    self.season_ntx_dict["coins"][coin]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["coins"][coin]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
+                        # Notary Coin Score and Count Totals
+                        self.season_ntx_dict["notaries"][notary]["coins"][coin]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["notaries"][notary]["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Coin Server Score and Count Totals
-                    self.season_ntx_dict["coins"][coin]["servers"][server]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["coins"][coin]["servers"][server]["ntx_score"] += float(server_epoch_coin_score)
+                        # Notary Server Score and Count Totals
+                        self.season_ntx_dict["notaries"][notary]["servers"][server]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["notaries"][notary]["servers"][server]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Coin Server Notary Score and Count Totals
-                    self.season_ntx_dict["coins"][coin]["servers"][server]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["coins"][coin]["servers"][server]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
+                        # Notary Server Coin Score and Count Totals
+                        self.season_ntx_dict["notaries"][notary]["servers"][server]["coins"][coin]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["notaries"][notary]["servers"][server]["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Coin Server Epoch Score and Count Totals
-                    self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["ntx_score"] += float(server_epoch_coin_score)
+                        # Notary Server Epoch Score and Count Totals
+                        self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Coin Server Epoch Notary Score and Count Totals
-                    self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
-
-
-                    # Global Notary Score and Count Totals
-                    self.season_ntx_dict["notaries"][notary]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
-
-                    # Notary Coin Score and Count Totals
-                    self.season_ntx_dict["notaries"][notary]["coins"][coin]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["notaries"][notary]["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
-
-                    # Notary Server Score and Count Totals
-                    self.season_ntx_dict["notaries"][notary]["servers"][server]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["notaries"][notary]["servers"][server]["ntx_score"] += float(server_epoch_coin_score)
-
-                    # Notary Server Coin Score and Count Totals
-                    self.season_ntx_dict["notaries"][notary]["servers"][server]["coins"][coin]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["notaries"][notary]["servers"][server]["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
-
-                    # Notary Server Epoch Score and Count Totals
-                    self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["ntx_score"] += float(server_epoch_coin_score)
-
-                    # Notary Server Epoch Coin Score and Count Totals
-                    self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["coins"][coin]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
+                        # Notary Server Epoch Coin Score and Count Totals
+                        self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["coins"][coin]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
 
 
-                    # Global Server Score and Count Totals
-                    self.season_ntx_dict["servers"][server]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["servers"][server]["ntx_score"] += float(server_epoch_coin_score)
+                        # Global Server Score and Count Totals
+                        self.season_ntx_dict["servers"][server]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["servers"][server]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Server Epoch Coin Score and Count Totals
-                    self.season_ntx_dict["servers"][server]["coins"][coin]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["servers"][server]["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
+                        # Global Server Epoch Coin Score and Count Totals
+                        self.season_ntx_dict["servers"][server]["coins"][coin]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["servers"][server]["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Server Notary Score and Count Totals
-                    self.season_ntx_dict["servers"][server]["coins"][coin]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["servers"][server]["coins"][coin]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
+                        # Global Server Notary Score and Count Totals
+                        self.season_ntx_dict["servers"][server]["coins"][coin]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["servers"][server]["coins"][coin]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Server Epoch Score and Count Totals
-                    self.season_ntx_dict["servers"][server]["epochs"][epoch]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["servers"][server]["epochs"][epoch]["ntx_score"] += float(server_epoch_coin_score)
+                        # Global Server Epoch Score and Count Totals
+                        self.season_ntx_dict["servers"][server]["epochs"][epoch]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["servers"][server]["epochs"][epoch]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Server Epoch Coin Score and Count Totals
-                    self.season_ntx_dict["servers"][server]["epochs"][epoch]["coins"][coin]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["servers"][server]["epochs"][epoch]["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
+                        # Global Server Epoch Coin Score and Count Totals
+                        self.season_ntx_dict["servers"][server]["epochs"][epoch]["coins"][coin]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["servers"][server]["epochs"][epoch]["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Server Epoch Coin Notary Score and Count Totals
-                    self.season_ntx_dict["servers"][server]["epochs"][epoch]["coins"][coin]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["servers"][server]["epochs"][epoch]["coins"][coin]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
+                        # Global Server Epoch Coin Notary Score and Count Totals
+                        self.season_ntx_dict["servers"][server]["epochs"][epoch]["coins"][coin]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["servers"][server]["epochs"][epoch]["coins"][coin]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Server Epoch Notary Score and Count Totals
-                    self.season_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
+                        # Global Server Epoch Notary Score and Count Totals
+                        self.season_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
 
-                    # Global Server Notary Score and Count Totals
-                    self.season_ntx_dict["servers"][server]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
-                    self.season_ntx_dict["servers"][server]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
+                        # Global Server Notary Score and Count Totals
+                        self.season_ntx_dict["servers"][server]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
+                        self.season_ntx_dict["servers"][server]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
 
         # Div by 13 for non-notary related ntx_counts
         self.season_ntx_dict["ntx_count"] = round(self.season_ntx_dict["ntx_count"] / 13)
@@ -1393,7 +1394,7 @@ class last_notarisations():
             else:
                 logger.info(f"no new ntx for {row.coin}")
                 return None
-                
+
         return None
 
 
@@ -1526,7 +1527,7 @@ def import_nn_ltc_txids(season):
     if season not in NOTARY_LTC_ADDRESSES:
         logger.warning(f"{season} not in NOTARY_LTC_ADDRESSES")
         return
-        
+
     num_addr = len(NOTARY_LTC_ADDRESSES[season])
 
     i = 0

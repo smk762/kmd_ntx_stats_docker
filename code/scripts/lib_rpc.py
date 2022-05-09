@@ -56,5 +56,5 @@ for coin in lib_crypto.COIN_PARAMS:
     try:
         RPC[coin] = def_credentials(coin)
     except:
-        print(f"{coin} RPC failed")
+        #print(f"{coin} RPC failed")
         pass

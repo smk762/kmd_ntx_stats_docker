@@ -98,7 +98,6 @@ def update_tenure(season):
                 season_server_coins = SEASONS_INFO[season]["servers"][server]["coins"]
 
             for coin in season_server_coins:
-                print(f"{season} {server} {coin}")
                 update_ntx_tenure(season, server, coin)
 
 
