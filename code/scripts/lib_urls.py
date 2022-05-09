@@ -17,8 +17,8 @@ def get_api_server(local=True):
 
 def get_ntxid_list_url(season, server, coin, local=True):
     api_server = get_api_server(local)
-    #return f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&coin={coin}"
-    return f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&chain={coin}"
+    return f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&coin={coin}"
+    
 
 
 def get_notarised_txid_url(txid, local=True):
@@ -63,6 +63,13 @@ def get_notarised_servers_url(season=None, local=True):
         params.append(f"season={season}")
     params_string = "&".join(params)
     return url + params_string
+
+
+def get_season_scoring_epochs_url(season=None, local=True):
+    api_server = get_api_server(local)
+    if season:
+        return f"{api_server}/api/source/scoring_epochs/?season={season}"
+    return f"{api_server}/api/source/scoring_epochs/"
 
 
 def get_notary_ltc_txid_url(txid, local=True):

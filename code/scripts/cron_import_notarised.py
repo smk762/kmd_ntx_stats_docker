@@ -10,7 +10,6 @@ import lib_ntx
 def import_notarised():
     for season in SEASONS_INFO:
         if season not in EXCLUDED_SEASONS: 
-
             season_notaries = helper.get_season_notaries(season)
             servers = helper.get_season_servers(season)
             while len(servers) > 0:

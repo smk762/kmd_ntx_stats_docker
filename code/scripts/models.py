@@ -67,7 +67,7 @@ class balance_row():
     def update(self):
         self.update_time = int(time.time())
         self.server, self.coin = lib_validate.handle_dual_server_coins(
-                                    self.server, self.coin, self.address
+                                    self.server, self.coin
                                 )
         self.balance = lib_validate.get_balance(self.coin, self.pubkey, self.address)
         row_data = (self.season, self.server, self.notary,
@@ -349,6 +349,7 @@ class notarised_row():
             if len(notary) > 20:
                 return False
 
+
         return True
 
     def update(self):
@@ -358,33 +359,23 @@ class notarised_row():
         else:
             testnet = False            
 
-        self.season, self.server, testnet = lib_validate.get_season_server_from_kmd_addresses(
-            self.notary_addresses, self.coin, testnet
+        self.server, self.coin = lib_validate.handle_dual_server_coins(
+            self.server, self.coin
         )
-        
+
+        self.season, self.server, self.epoch, testnet = lib_validate.validate_season_server_epoch(
+            self.season, self.notary_addresses,
+            self.block_time, self.coin, testnet
+        )
+
         if self.season == "Unofficial":
             logger.warning(f"[notarised] Unofficial {self.block_datetime} {self.txid} {self.season} {self.server} {self.epoch} | {self.scored} {self.score_value} {self.coin}")
             return
 
-        self.server, self.coin = lib_validate.handle_dual_server_coins(
-            self.server, self.coin, self.notary_addresses[0]
-        )
-
-        self.server = lib_validate.get_coin_server(self.season, self.coin)
-
-        self.season, self.server, self.epoch = lib_validate.validate_season_server_epoch(
-            self.season, self.server, self.notary_addresses,
-            self.block_time, self.coin, testnet
-        )
-
-        self.season, self.server = lib_validate.check_excluded_coins(
-            self.season, self.server, self.coin
-        )
-
         self.score_value = lib_validate.get_coin_epoch_score_at(
             self.season, self.server, self.coin, int(self.block_time), testnet
-        )            
-
+        )
+      
         self.scored = lib_validate.get_scored(self.score_value)
 
         # Sort lists for slightly simpler aggregation

@@ -39,27 +39,30 @@ def get_season_from_block(block):
 
 
 def get_coin_epoch_at(season, server, coin, timestamp, testnet):
+    if testnet:
+        return "Epoch_0"
+
     if season in DPOW_EXCLUDED_COINS: 
         if coin not in DPOW_EXCLUDED_COINS[season]:
             if coin in ["KMD", "BTC", "LTC"]:
                 if int(timestamp) >= SEASONS_INFO[season]["start_time"]:
                     if int(timestamp) <= SEASONS_INFO[season]["end_time"]:
                         return f"{coin}"
-                        
-            if testnet:
-                return "Epoch_0"
+                else:
+                    return "Unofficial"
+
 
             epochs = SEASONS_INFO[season]["servers"][server]["epochs"]
             for epoch in epochs:
                 if coin in epochs[epoch]["coins"]:
                     if int(timestamp) >= epochs[epoch]["start_time"]:
-                        if int(timestamp) <= epochs[epoch]["end_time"]:
+                        if int(timestamp) <= epochs[epoch]['end_time']:
                             return epoch
 
     return "Unofficial"
 
 
-def validate_season_server_epoch(season, server, notary_addresses, block_time, coin, testnet=False):
+def validate_season_server_epoch(season, notary_addresses, block_time, coin, testnet=False):
     if season in DPOW_EXCLUDED_COINS:
         if coin in DPOW_EXCLUDED_COINS[season]:
             season = "Unofficial"
@@ -67,7 +70,7 @@ def validate_season_server_epoch(season, server, notary_addresses, block_time, c
             epoch = "Unofficial"
     season, server, testnet = get_season_server_from_kmd_addresses(notary_addresses, coin, testnet)
     epoch = get_coin_epoch_at(season, server, coin, block_time, testnet)
-    return season, server, epoch
+    return season, server, epoch, testnet
 
 
 def get_server_from_kmd_address(season, address):
@@ -79,7 +82,7 @@ def get_server_from_kmd_address(season, address):
     return "Unofficial"
 
 
-def handle_dual_server_coins(server, coin, addr=None):
+def handle_dual_server_coins(server, coin):
     coin = handle_translate_coins(coin)
 
     if coin in ["GLEEC-OLD"]:
@@ -101,42 +104,74 @@ def get_scored(score_value):
 
 def get_coin_epoch_score_at(season, server, coin, timestamp, testnet=False):
     if season in DPOW_EXCLUDED_COINS:
+        if coin in DPOW_EXCLUDED_COINS[season]:
+            return 0
+
+    if season in SEASONS_INFO:
         season_start = SEASONS_INFO[season]["start_time"]
         season_end = SEASONS_INFO[season]["end_time"]
 
-        if coin not in DPOW_EXCLUDED_COINS[season]:
+        if testnet and int(timestamp) >= season_start and int(timestamp) <= season_end:
+            return 1
 
-            if testnet and int(timestamp) >= season_start and int(timestamp) <= season_end:
-                return 1
+        if coin in ["BTC", "LTC"]:
+            return 0
 
-            if coin in ["BTC", "LTC"]:
-                return 0
+        if coin in ["KMD"]:
+            if int(timestamp) >= season_start and int(timestamp) <= season_end:
+                return 0.0325
+            return 0
 
-            if coin in ["KMD"]:
+        if server in SEASONS_INFO[season]["servers"]:
+            epoch = get_epoch_at_timestamp(season, server, coin, timestamp)
+            return get_epoch_score(season, server, epoch)
 
-                if int(timestamp) >= season_start and int(timestamp) <= season_end:
-                    return 0.0325
-                return 0
-
-            active_coins, num_coins = get_server_active_scoring_dpow_coins_at_time(
-                                            season, server, timestamp
-                                        )
-            if coin in active_coins:
-                return calc_epoch_score(server, num_coins)
     return 0
 
 
 def calc_epoch_score(server, num_coins):
+    if num_coins == 0:
+        print("zero num coins")
+        print(server, num_coins)
+        return 0
     if server == "Main":
         return round(0.8698/num_coins, 8)
     elif server == "Third_Party":
         return round(0.0977/num_coins, 8)
     elif server == "KMD":
-        return round(0.0325/num_coins, 8)
+        return 0.0325
     elif server == "Testnet":
-        return round(0.0977/num_coins, 8)
+        return 1
     else:
         return 0
+
+
+def get_epoch_coins(season, server, epoch):
+    try:
+        return SEASONS_INFO[season]["servers"][server]["epochs"][epoch]['coins']
+    except:
+        return []
+
+
+def get_epoch_score(season, server, epoch):
+    try:
+        return SEASONS_INFO[season]["servers"][server]["epochs"][epoch]['score_per_ntx']
+    except:
+        return 0
+
+def get_epoch_at_timestamp(season, server, coin, timestamp):
+    epochs = SEASONS_INFO[season]["servers"][server]["epochs"]
+
+    for epoch in epochs:
+        if coin in epochs[epoch]["coins"]:
+            start = epochs[epoch]['start_time']
+            end = epochs[epoch]['end_time']
+            if timestamp >= start and timestamp <= end:
+                return epoch
+
+    return "Unofficial"
+
+
 
 def get_epoch_scores_dict(season):
     epoch_scores_dict = {}
@@ -154,31 +189,47 @@ def get_epoch_scores_dict(season):
 
 def get_season_server_from_kmd_addresses(address_list, coin, testnet=False):
 
-    if not set(address_list).issubset(set(KNOWN_ADDRESSES.keys())):
+    ntx_coin = "KMD"
+
+    if coin in ["BTC"]:
+        ntx_coin = "BTC"
+        if not set(address_list).issubset(set(ALL_SEASON_NOTARY_BTC_ADDRESSES.keys())):
+            return "Unofficial", "Unofficial", False
+
+
+    if coin in ["LTC"]:
+        ntx_coin = "LTC"
+        if not set(address_list).issubset(set(ALL_SEASON_NOTARY_LTC_ADDRESSES.keys())):
+            return "Unofficial", "Unofficial", False
+
+    elif not set(address_list).issubset(set(KNOWN_ADDRESSES.keys())):
         return "Unofficial", "Unofficial", False
 
     for season in SEASONS_INFO:
-        if len(address_list) == 13:
-            if "KMD" in SEASONS_INFO[season]["servers"]:
-                server_addresses = SEASONS_INFO[season]["servers"]["KMD"]["addresses"]["KMD"]
-                if set(address_list).issubset(set(server_addresses)):
-                    for server in SEASONS_INFO[season]["servers"]:
-                        if server != "Unofficial":
-                            if coin in SEASONS_INFO[season]["servers"][server]["coins"]:
-                                if season.find("Testnet") == -1:
-                                    return season, server, False
-                                else:
-                                    return season, server, True
+        if season.find("Testnet") == -1:
+            testnet = False
         else:
-            if "Main" in SEASONS_INFO[season]["servers"]:
-                if "RICK" in SEASONS_INFO[season]["servers"]["Main"]["addresses"]:
-                    server_addresses = SEASONS_INFO[season]["servers"]["Main"]["addresses"]["RICK"]
-                    if set(address_list).issubset(set(server_addresses)):
-                        for server in SEASONS_INFO[season]["servers"]:
-                            if coin in SEASONS_INFO[season]["servers"][server]["coins"]:
-                                if season.find("Testnet") != -1:
-                                    return season, server, True
+            testnet = True
 
+        if len(address_list) == 13:
+            for server in SEASONS_INFO[season]["servers"]:
+                if server not in ["KMD", "LTC", "BTC"] and coin not in ["KMD", "LTC", "BTC"]:
+                    if ntx_coin in SEASONS_INFO[season]["servers"][server]["addresses"]:
+                        server_addresses = SEASONS_INFO[season]["servers"][server]["addresses"][ntx_coin]
+                        if set(address_list).issubset(set(server_addresses.keys())):
+                            return season, server, testnet
+
+                elif coin == server:
+                    if ntx_coin in SEASONS_INFO[season]["servers"][server]["addresses"]:
+                        server_addresses = SEASONS_INFO[season]["servers"][server]["addresses"][ntx_coin]
+                        if set(address_list).issubset(set(server_addresses.keys())):
+                            return season, server, testnet
+        else:
+            if testnet:
+                server_addresses = SEASONS_INFO[season]["servers"]["Main"]["addresses"]["KMD"]
+                if set(address_list).issubset(set(server_addresses.keys())):
+                    if coin in SEASONS_INFO[season]["servers"]["Main"]["coins"]:
+                        return season, server, testnet
 
     return "Unofficial", "Unofficial", False
 
