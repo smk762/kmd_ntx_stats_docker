@@ -13,6 +13,7 @@
 						<tr>
 							<th data-data="rank">Rank</th>
 							<th data-data="candidate">Candidate</th>
+							<th data-data="candidate_address">Candidate Address</th>
 							<th data-data="num_votes">Num Votes</th>
 							<th data-data="sum_votes">Sum Votes</th>
 							<th data-data="detail">Detail</th>
@@ -23,6 +24,7 @@
 							<tr>
 								<td data-data="rank">{{ item.region_rank }}</td>
 								<td data-data="candidate">{{ item.candidate }}</td>
+								<td data-data="candidate_address">{{ item.candidate_address }}</th>
 								<td data-data="num_votes">{{ item.num_votes }}</td>
 								<td data-data="sum_votes">{{ item.sum_votes }}</td>
 								<td data-data="detail" class="px-2">
@@ -52,11 +54,22 @@
         	"columns": [
 		        { "data": "rank" },
 		        { "data": "candidate" },
+		        { "data": "candidate_address" },
 		        { "data": "num_votes" },
 		        { "data": "sum_votes" },
 		        { "data": "detail" },
 		    ],
     		"columnDefs": [
+    			{
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/a/"+oData.candidate_address+"'>"+oData.candidate+"</a>");
+		            }
+		        },
+	            {
+	                "targets": [ 2 ],
+	                "visible": false
+	            }
 		    ]
         });
 	    {{ region }}_table.rows().every( function (index) {

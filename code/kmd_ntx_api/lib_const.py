@@ -199,6 +199,7 @@ VOTE_PERIODS = {
         "max_block": 20492
     },
     "VOTE2022": {
-        "max_block": 20492
+        "max_block": 20492,
+        "max_blocktime": 1653523199
     }
 }

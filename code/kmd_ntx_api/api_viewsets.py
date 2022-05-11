@@ -348,6 +348,6 @@ class notaryVoteViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.notaryVoteSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['year', 'candidate']
+    filterset_fields = ['year', 'candidate', 'txid', 'block_height']
     ordering_fields = ['candidate', 'votes', 'block_time']
     ordering = ['-block_time', 'candidate']

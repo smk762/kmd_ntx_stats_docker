@@ -445,8 +445,8 @@ def update_notary_vote_row(row_data):
                 (txid, block_hash, block_time, \
                 lock_time, block_height, votes, \
                 candidate, candidate_address, \
-                mined_by, difficulty, notes, year) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+                mined_by, difficulty, notes, year, valid) \
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_vote_txid_candidate DO UPDATE SET \
             txid='{row_data[0]}', \
             block_hash='{row_data[1]}', \
@@ -459,10 +459,13 @@ def update_notary_vote_row(row_data):
             mined_by='{row_data[8]}', \
             difficulty='{row_data[9]}', \
             notes='{row_data[10]}', \
-            year='{row_data[11]}';"
+            year='{row_data[11]}', \
+            valid='{row_data[12]}';"
+    print(sql)
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()
+        print("commited")
     except Exception as e:
         logger.debug(e)
         if str(e).find('duplicate') == -1:

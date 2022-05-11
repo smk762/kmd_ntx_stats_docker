@@ -12,20 +12,26 @@
 					<thead>
 						<tr>
 							<th data-data="block_height">BLOCK</th>
+							<th data-data="candidate">Candidate</th>
+							<th data-data="candidate_address">Candidate Address</th>
 							<th data-data="votes">Votes</th>
 							<th data-data="txid">TXID</th>
 							<th data-data="block_time">Timestamp</th>
-							<th data-data="block_time_human">Blocktime</th>
+							<th data-data="block_time_human">Timestamp</th>
+							<th data-data="valid">Valid</th>
 						</tr>
 					</thead>
 					<tbody>
 						{% for item in table_data %}
 							<tr>
 								<td data-data="block_height">{{ item.block_height }}</td>
+								<td data-data="candidate">{{ item.candidate }}</th>
+								<td data-data="candidate_address">{{ item.candidate_address }}</th>
 								<td data-data="votes">{{ item.votes }}</td>
 								<td data-data="txid">{{ item.txid }}</td>
 								<td data-data="block_time">{{ item.block_time }}</td>
 								<td data-data="block_time_human">{{ item.block_time_human }}</td>
+								<td data-data="valid">{{ item.valid }}</td>
 							</tr>
 						{% endfor %}
 					</tbody>
@@ -45,13 +51,16 @@
     		order: [[ 0, 'desc' ]],
         	"columns": [
 		        { "data": "block_height" },
+		        { "data": "candidate" },
+		        { "data": "candidate_address" },
 		        { "data": "votes" },
 		        { "data": "txid" },
 		        { "data": "block_time" },
 		        { "data": "block_time_human" },
+		        { "data": "valid" },
 		    ],
 	        "columnDefs": [
-					{ "orderData":[ 3 ],   "targets": [ 4 ] },
+					{ "orderData":[ 5 ],  "targets": [ 6 ] },
     			{
 		            "targets": 0,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
@@ -59,13 +68,31 @@
 			        }
 		        },
     			{
-		            "targets": 2,
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/a/"+oData.candidate_address+"'>"+oData.candidate+"</a>");
+		            }
+		        },
+    			{
+		            "targets": 4,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/t/"+oData.txid+"'><span class='' style='' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
 		            }
 		        },
+    			{
+		            "targets": 7,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	if (oData.valid == 'True') {
+		            		$(nTd).html('<i class="bi bi-bookmark-check-fill"></i>');
+		            	}
+		            	else if (oData.valid == 'False') {
+		            		$(nTd).html('<i class="bi bi-alarm-fill"></i>');
+		            	}
+		            	
+		            }
+		        },
 	            {
-	                "targets": [ 3 ],
+	                "targets": [ 2, 5 ],
 	                "visible": false
 	            }
 				]

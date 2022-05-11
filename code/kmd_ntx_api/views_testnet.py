@@ -38,10 +38,9 @@ def testnet_ntx_scoreboard_view(request):
 def notary_vote_view(request):
     context = helper.get_base_context(request)
     year = helper.get_or_none(request, "year", VOTE_YEAR)
-    max_block = helper.get_or_none(request, "max_block", VOTE_PERIODS[year]["max_block"])
 
     url = f"{THIS_SERVER}/api/info/notary_vote_stats"
-    params = f'?year={year}&max_block={max_block}'
+    params = f'?year={year}'
     notary_vote_table = requests.get(f"{url}/{params}").json()
 
     if 'results' in notary_vote_table:
@@ -65,6 +64,9 @@ def notary_vote_detail_view(request):
 
     url = f"{THIS_SERVER}/api/table/notary_vote"
     params = f'?year={year}&max_block={max_block}'
+    if candidate:
+        params += f'&candidate={candidate}'
+        candidate = request.GET["candidate"].replace(".", "-")
     notary_vote_detail_table = requests.get(f"{url}/{params}").json()
 
     if 'results' in notary_vote_detail_table:
@@ -74,8 +76,6 @@ def notary_vote_detail_view(request):
         date_time = datetime.fromtimestamp(item["block_time"])
 
         item.update({"block_time_human":date_time.strftime("%m/%d/%Y, %H:%M:%S")})
-
-    candidate = request.GET["candidate"].replace(".", "-")
 
     context.update({
         "candidate": candidate,
