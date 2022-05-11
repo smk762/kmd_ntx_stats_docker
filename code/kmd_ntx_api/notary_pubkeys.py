@@ -682,8 +682,9 @@ NOTARY_PUBKEYS = {
             "Alright1": "027d4b25be212946f7939ff98512ef3472d8cfc3f70d8d609d20bdab569ec4bb79",
             "Dragonhound": "0378b7ceaa5d8370543f14f125df44cb2bd77c490931524da884270f69eedff40d",
             "Strob": "03cd7d3f5d7bd1c2bde405aa2916c91c3320c854b1b558d5e43aeed1a7a526ec83",
-            "gcharang": "03aabfdfbd09d997d8921e025a55de50a9dd681f04e67e0bb425091df4229c16eb",
+            "Gcharang": "03aabfdfbd09d997d8921e025a55de50a9dd681f04e67e0bb425091df4229c16eb",
             "Artist": "0330b2fafebdb99eed48f2a30a3175a5a7bb8256b360e9f979e5cf78d3de758799",
+            "Dimxy": "02aa104373478f67b00ef19e6170e7d96fe53bf3e65025b9941f7e190e2088aa16",
             "Fatswallop": "0255ca1b0b0bc3fd3d0f6bdb9e2f0e120b80321d71bc66805357c5459dba9afbd7"
         }
     }
