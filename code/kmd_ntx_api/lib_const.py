@@ -6,7 +6,7 @@ import requests
 from dotenv import load_dotenv
 from django.contrib import messages
 import kmd_ntx_api.lib_struct as struct
-from kmd_ntx_api.notary_pubkeys import NOTARY_PUBKEYS
+from kmd_ntx_api.notary_pubkeys import get_notary_pubkeys
 
 load_dotenv()
 OTHER_SERVER = os.getenv("OTHER_SERVER") # IP / domain of the remote server
@@ -153,11 +153,12 @@ _coins_url = f"{THIS_SERVER}/api/info/dpow_server_coins"
 NOW = time.time()
 print(f"building regions info {NOW}")
 for _season in SEASONS_INFO:
-    if _season in NOTARY_PUBKEYS:
+    pubkeys = get_notary_pubkeys()
+    if _season in pubkeys:
         SEASONS_INFO[_season].update({
             "regions": struct.default_regions_info()
         })
-        _notaries = list(NOTARY_PUBKEYS[_season]["Main"].keys())
+        _notaries = list(pubkeys[_season]["Main"].keys())
         _notaries.sort()
         SEASONS_INFO[_season].update({
             "notaries": _notaries
