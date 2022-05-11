@@ -1135,6 +1135,9 @@ class notary_vote_row():
         if self.candidate_address not in CANDIDATE_ADDRESSES[self.year]:
             return False
 
+        if self.candidate.find("_") == -1:
+            return False
+
         return True
 
     def update(self):

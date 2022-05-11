@@ -218,6 +218,7 @@ def get_notary_vote_stats_info(request):
     resp = {}
     region_scores = {}
     for item in data:
+        print(item)
         region = item["candidate"].split("_")[1]
         if region not in resp:
             resp.update({region:[]})

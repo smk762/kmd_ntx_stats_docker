@@ -102,7 +102,7 @@ CANDIDATE_ADDRESSES = {
 	"VOTE2022": {
 		"RYWMq77hJT2j3YexQXrNbcUzL8VhwnHPVD": "alien_SH",
 		"RArnomd78pGmGXKuMVZzZ5hxcRzZHBimf6": "arnomad_SH",
-		"RAhjfR4ZThUKfgFf1evmJmTtAZmGfHp2BM": "artem.pikulin",
+		"RAhjfR4ZThUKfgFf1evmJmTtAZmGfHp2BM": "artem.pikulin_AR",
 		"RU2jg8fLkNjMke5bY5ea4z6V9QHFuevB1H": "bitbybit_EU",
 		"RVt3U6hdBAwBhcBCgXEHdyD1B2E5a5ceq3": "ca333_EU",
 		"RTMSZ28BvFvy9eGE8FTSstX1APXMXimXdN": "cipi_EU",

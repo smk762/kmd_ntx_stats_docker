@@ -3,7 +3,7 @@ from django.db.models import Count, Min, Max, Sum
 from datetime import datetime, timezone
 import datetime as dt
 from kmd_ntx_api.endpoints import ENDPOINTS
-from kmd_ntx_api.notary_pubkeys import NOTARY_PUBKEYS
+from kmd_ntx_api.notary_pubkeys import get_notary_pubkeys
 from kmd_ntx_api.pages import PAGES
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_helper as helper
@@ -1068,9 +1068,10 @@ def get_rewards_by_address_info(request):
 
 def get_notary_seasons():
     ntx_seasons = {}
-    for season in NOTARY_PUBKEYS:
-        for server in NOTARY_PUBKEYS[season]:
-            for notary in NOTARY_PUBKEYS[season][server]:
+    pubkeys = get_notary_pubkeys()
+    for season in pubkeys:
+        for server in pubkeys[season]:
+            for notary in pubkeys[season][server]:
                 if notary not in ntx_seasons:
                     ntx_seasons.update({notary:[]})
                 season = season.replace(".5", "")
