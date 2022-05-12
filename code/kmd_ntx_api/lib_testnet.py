@@ -283,6 +283,19 @@ def get_notary_candidates_info(request):
             props.update({notary:item["proposal_url"]})
     return props
 
+def translate_notary(notary):
+    notary = notary.lower().split("_")[0]
+    if notary == "shadowbit":
+        return "decker"
+    if notary == "kolo2":
+        return "kolo"
+    if notary == "phit":
+        return "phm87"
+    if notary == "cipi2":
+        return "cipi"
+    if notary == "vanbogan":
+        return "van"
+    return notary
 
 def get_vote_aggregates(request):
     candidate = helper.get_or_none(request, "candidate")
