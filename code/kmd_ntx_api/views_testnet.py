@@ -37,38 +37,13 @@ def testnet_ntx_scoreboard_view(request):
 
 def notary_vote_view(request):
     context = helper.get_base_context(request)
-    year = helper.get_or_none(request, "year", VOTE_YEAR)
-
-    proposals = testnet.get_notary_candidates_info(request)
-    notary_vote_table = testnet.get_notary_vote_stats_info(request)
-
-    for region in notary_vote_table:
-        for item in notary_vote_table[region]:
-            notary = translate_notary(item["candidate"])
-            item.update({
-                "proposal": proposals[notary]
-            })
-
     context.update({
-        "year": year,
-        "notary_vote_table": notary_vote_table
+        "regions": ["AR", "EU", "NA", "SH"],
+        "year": helper.get_or_none(request, "year", VOTE_YEAR)
     })
 
     return render(request, 'views/vote/notary_vote.html', context)
 
-def translate_notary(notary):
-    notary = notary.lower().split("_")[0]
-    if notary == "shadowbit":
-        return "decker"
-    if notary == "kolo2":
-        return "kolo"
-    if notary == "phit":
-        return "phm87"
-    if notary == "cipi2":
-        return "cipi"
-    if notary == "vanbogan":
-        return "van"
-    return notary
 
 def notary_vote_detail_view(request):
     context = helper.get_base_context(request)
@@ -80,7 +55,7 @@ def notary_vote_detail_view(request):
     notary_vote_detail_table = testnet.get_notary_vote_table(request)
 
     for item in notary_vote_detail_table:
-        notary = translate_notary(item["candidate"])
+        notary = testnet.translate_notary(item["candidate"])
         item.update({
             "proposal": proposals[notary]
         })

@@ -11,34 +11,14 @@
 				<table id="{{ region }}_table" class="table table-striped table-bordered" style="width:99%; visibility: hidden;">
 					<thead>
 						<tr>
-							<th data-data="rank">Rank</th>
+							<th data-data="region_rank">Rank</th>
 							<th data-data="candidate">Candidate</th>
 							<th data-data="candidate_address">Candidate Address</th>
 							<th data-data="num_votes">Num Votes</th>
 							<th data-data="sum_votes">Sum Votes</th>
-							<th data-data="detail">Detail</th>
 							<th data-data="proposal">Proposal</td>
 						</tr>
 					</thead>
-					<tbody>
-						{% for item in counts %}
-							<tr>
-								<td data-data="rank">{{ item.region_rank }}</td>
-								<td data-data="candidate">{{ item.candidate }}</td>
-								<td data-data="candidate_address">{{ item.candidate_address }}</th>
-								<td data-data="num_votes">{{ item.num_votes }}</td>
-								<td data-data="sum_votes">{{ item.sum_votes }}</td>
-								<td data-data="detail" class="px-2">
-									<a href="//{{ request.get_host }}/candidate_notary_vote_detail/?candidate={{ item.candidate }}&year={{ year }}">
-										<span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='{{ item.candidate }} votes detail'>
-											<i class='fas fa-arrow-right'></i>
-										</span>
-									</a>
-								</td>
-								<td data-data="proposal">{{ item.proposal }}</td>
-							</tr>
-						{% endfor %}
-					</tbody>
 				</table>
 			</div>
 		</div>	
@@ -48,18 +28,34 @@
     $(document).ready(function() {
 		$('#{{ region }}_table').css('visibility', 'visible');
         {{ region }}_table = $('#{{ region }}_table').DataTable({
+
+    		ajax: {
+			    url: "{% url 'notary_vote_stats_info' %}",
+    			dataSrc: 'results.{{ region }}',
+    			"deferRender": true
+			},
+			"rowCallback": function( row, data ) {
+				if (data.region_rank <= 11) {
+					$(row).addClass( 'kmd_green' );
+				}
+				else {
+					$(row).addClass( 'kmd_gray' );	
+				}
+				$('td:eq(1)', row).addClass( 'text-left' );
+				$('td:eq(4)', row).addClass( 'text-right' );
+			},
+    			 
         	"paging": true,
 			deferRender: true,
             "orderClasses": false,
             "pageLength": 50,
     		order: [[ 0, 'asc' ]],
         	"columns": [
-		        { "data": "rank" },
+		        { "data": "region_rank" },
 		        { "data": "candidate" },
 		        { "data": "candidate_address" },
 		        { "data": "num_votes" },
 		        { "data": "sum_votes" },
-		        { "data": "detail" },
 		        { "data": "proposal" },
 		    ],
     		"columnDefs": [
@@ -70,36 +66,26 @@
 		            }
 		        },
     			{
-		            "targets": 4,
+		            "targets": 2,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/a/"+oData.candidate_address+"'>"+oData.sum_votes+"</a>");
+		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/a/"+oData.candidate_address+"'>"+oData.candidate_address+"</a>");
+		            }
+		        },
+    			{
+		            "targets": 3,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            		$(nTd).html('<a href="{% url "notary_vote_detail_view" %}?candidate='+oData.candidate+'&year={{ year }}">'+oData.num_votes+'</a>');
 		            }
 		        },
 	            {
-	                "targets": [ 2, 6 ],
+	                "targets": [ 5 ],
 	                "visible": false
 	            }
 		    ]
         });
-	    {{ region }}_table.rows().every( function (index) {
-	    	var row = {{ region }}_table.row(index);
-		    var d = row.data();
-		    if (d.rank <= 11) {
-		    	row
-		    	.nodes()
-			    .to$()    
-				.addClass( 'kmd_green' );
-		    } else if (d.sum_votes == "DISQUALIFIED") {
-		    	row
-		    	.nodes()
-			    .to$()    
-				.addClass( 'kmd_red' );			    	
-		    } else {
-		    	row
-		    	.nodes()
-			    .to$()    
-				.addClass( 'kmd_gray' );			    	
-		    }
-		});
+		setInterval( function () {
+	 	    {{ region }}_table.ajax.reload();
+		}, 30000 );
+
     });
 </script> 

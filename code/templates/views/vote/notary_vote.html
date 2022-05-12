@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 	{% include 'components/anchors/regions.html' with vote='true' %}
-	{% for region, counts in notary_vote_table.items %}
-		{% include "components/tables/vote_tally_table.html" with region=region counts=counts %}
+	{% for region in regions %}
+		{% include "components/tables/vote_tally_table.html" with region=region %}
 	{% endfor %}
 {% endblock %}
