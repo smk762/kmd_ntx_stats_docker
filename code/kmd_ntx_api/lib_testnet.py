@@ -206,14 +206,15 @@ def get_notary_vote_stats_info(request):
     max_blocktime = helper.get_or_none(request, "max_blocktime")
     max_locktime = helper.get_or_none(request, "max_locktime")
     year = helper.get_or_none(request, "year", VOTE_YEAR)
+    valid = helper.get_or_none(request, "valid", "true")
 
-    if not max_block and not max_blocktime and not max_locktime:
-        return {
-            "error": "You need to specify one of the following filter parameters: ['max_block', 'max_blocktime', 'max_locktime']"
-        }
+    print(f"valid: {valid}")
+    if valid is not None:
+        valid = (valid == "true")
+    print(f"valid: {valid}")
 
-    data = query.get_notary_vote_data(year, candidate, block, txid, max_block, max_blocktime, max_locktime)
-    data = data.values('candidate').annotate(num_votes=Count('votes'), sum_votes=Sum('votes'))
+    data = query.get_notary_vote_data(year, candidate, block, txid, max_block, max_blocktime, max_locktime, None, valid)
+    data = data.values('candidate', 'candidate_address').annotate(num_votes=Count('votes'), sum_votes=Sum('votes'))
 
     resp = {}
     region_scores = {}

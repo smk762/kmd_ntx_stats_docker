@@ -1107,7 +1107,8 @@ class ntx_tenure_row():
 class notary_vote_row():
     def __init__(self, txid='', block_hash='', block_time=0, \
             lock_time=0, block_height=0, votes=0, candidate='', 
-            candidate_address='', mined_by='', difficulty='', notes='', year=''):
+            candidate_address='', mined_by='', difficulty='',\
+            notes='', year='', valid=True):
         self.txid = txid
         self.block_hash = block_hash
         self.block_time = block_time
@@ -1120,6 +1121,7 @@ class notary_vote_row():
         self.difficulty = difficulty
         self.notes = notes
         self.year = year
+        self.valid = valid
 
     def validated(self):
         for i in [self.block_time, self.lock_time, self.block_time,
@@ -1147,11 +1149,11 @@ class notary_vote_row():
         row_data = (self.txid, self.block_hash, self.block_time, \
                     self.lock_time, self.block_height, self.votes, \
                     self.candidate, self.candidate_address, self.mined_by,
-                    self.difficulty, self.notes, self.year)
+                    self.difficulty, self.notes, self.year, self.valid)
         if self.validated():
             logger.info(f"Updating [notary_vote_row] {self.txid} | \
                           {self.block_height} | {self.candidate} | \
-                          {self.votes}")
+                          {self.votes} | {self.valid}")
             update_notary_vote_row(row_data)
         else:
             logger.warning(f"[notary_vote_row] Row data invalid!")

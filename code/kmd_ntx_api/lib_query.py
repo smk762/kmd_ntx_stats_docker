@@ -722,11 +722,15 @@ def get_scoring_epochs_data(season=None, server=None, coin=None, epoch=None, tim
 
 def get_notary_vote_data(year=None, candidate=None, block=None, txid=None,
                       max_block=None, max_blocktime=None,
-                      max_locktime=None, mined_by=None):
+                      max_locktime=None, mined_by=None, valid=None):
     data = notary_vote.objects.all()
 
     if year:
         data = data.filter(year=year)
+
+    if valid is not None:
+        print(valid)
+        data = data.filter(valid=valid)
 
     if candidate:
         data = data.filter(candidate=candidate)

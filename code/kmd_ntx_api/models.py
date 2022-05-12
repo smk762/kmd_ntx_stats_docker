@@ -578,6 +578,7 @@ class notary_vote(models.Model):
     candidate_address = models.CharField(max_length=42)
     notes = models.CharField(max_length=512)
     year = models.CharField(max_length=16, default='VOTE202x')
+    valid = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'notary_vote'

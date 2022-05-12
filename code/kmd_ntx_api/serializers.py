@@ -192,7 +192,7 @@ class notaryVoteSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["txid", "block_hash", "block_time", "lock_time",
                   "block_height", "votes", "candidate",
                   "candidate_address", "mined_by", "difficulty",
-                  "notes", 'year']
+                  "notes", 'year', 'valid']
 
 
 class swapsSerializer(serializers.HyperlinkedModelSerializer):
