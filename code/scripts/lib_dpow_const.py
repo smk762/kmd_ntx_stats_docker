@@ -257,7 +257,7 @@ SEASONS_INFO = {
         "servers": {}
     },
     "VOTE2022_Testnet": {
-        "start_block": 2893460,
+        "start_block": 2903777,
         "end_block": 2923160,
         "start_time": 1651622400,
         "end_time": 1653436800,
@@ -274,7 +274,7 @@ SEASONS_INFO = {
                     "Epoch_0": {
                         "start_event": "testnet start",
                         "end_event": "testnet end",
-                        "start_block": 2893460,
+                        "start_block": 2903777,
                         "end_block": 2923160,
                         "start_time": 1651622400,
                         "end_time": 1653436800,
