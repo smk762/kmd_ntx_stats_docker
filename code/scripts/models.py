@@ -349,6 +349,8 @@ class notarised_row():
             if len(notary) > 20:
                 return False
 
+        if self.season.find('Testnet') != -1 and self.block_height < 2903777:
+            return False
 
         return True
 
