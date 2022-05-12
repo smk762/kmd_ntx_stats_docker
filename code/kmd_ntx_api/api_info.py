@@ -168,7 +168,13 @@ def notary_ltc_txid(request):
 
 def notary_nodes_info(request):
     resp = info.get_notary_nodes_info(request)
-    filters = ['season']
+    filters = ['year']
+    return helper.json_resp(resp, filters)
+
+
+def notary_candidates_info(request):
+    resp = info.get_notary_candidates_info(request)
+    filters = ['year']
     return helper.json_resp(resp, filters)
 
 

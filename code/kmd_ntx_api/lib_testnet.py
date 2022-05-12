@@ -208,10 +208,8 @@ def get_notary_vote_stats_info(request):
     year = helper.get_or_none(request, "year", VOTE_YEAR)
     valid = helper.get_or_none(request, "valid", "true")
 
-    print(f"valid: {valid}")
     if valid is not None:
         valid = (valid == "true")
-    print(f"valid: {valid}")
 
     data = query.get_notary_vote_data(year, candidate, block, txid, max_block, max_blocktime, max_locktime, None, valid)
     data = data.values('candidate', 'candidate_address').annotate(num_votes=Count('votes'), sum_votes=Sum('votes'))
@@ -219,7 +217,7 @@ def get_notary_vote_stats_info(request):
     resp = {}
     region_scores = {}
     for item in data:
-        print(item)
+        print(f"item: {item}")
         region = item["candidate"].split("_")[1]
         if region not in resp:
             resp.update({region:[]})
@@ -273,6 +271,17 @@ def get_notary_vote_table(request):
         item.update({"lag": item["block_time"]-item["lock_time"]})
 
     return serializer.data
+
+
+def get_notary_candidates_info(request):
+    year = helper.get_or_none(request, "year", VOTE_YEAR)
+    data = query.get_notary_candidates_data(year).values()
+    props = {}
+    for item in data:
+        notary = item['name']
+        if notary not in props:
+            props.update({notary:item["proposal_url"]})
+    return props
 
 
 def get_vote_aggregates(request):

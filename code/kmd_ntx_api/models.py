@@ -588,6 +588,20 @@ class notary_vote(models.Model):
         ]
 
 
+class notary_candidates(models.Model):
+    name = models.CharField(max_length=64, default="")
+    year = models.CharField(max_length=12, default="")
+    season = models.CharField(max_length=12, default="")
+    proposal_url = models.CharField(max_length=256, default="")
+
+    class Meta:
+        db_table = 'notary_candidates'
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'year'],
+                                 name='unique_name_year_candidate')
+        ]
+
+
 class rewards_tx(models.Model):
     txid = models.CharField(max_length=64)
     block_hash = models.CharField(max_length=64)

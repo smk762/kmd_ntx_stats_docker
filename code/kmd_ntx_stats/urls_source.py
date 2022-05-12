@@ -112,3 +112,7 @@ source_router.register(r'rewards_tx',
 source_router.register(r'notary_vote',
                 api_viewsets.notaryVoteViewSet,
                 basename='notaryVoteViewSet')
+
+source_router.register(r'notary_candidates',
+                api_viewsets.notaryCandidatesViewSet,
+                basename='notaryCandidatesSerializer')

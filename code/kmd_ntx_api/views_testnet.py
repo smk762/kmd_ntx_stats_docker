@@ -39,21 +39,36 @@ def notary_vote_view(request):
     context = helper.get_base_context(request)
     year = helper.get_or_none(request, "year", VOTE_YEAR)
 
-    url = f"{THIS_SERVER}/api/info/notary_vote_stats"
-    params = f'?year={year}'
-    notary_vote_table = requests.get(f"{url}/{params}").json()
+    proposals = testnet.get_notary_candidates_info(request)
+    notary_vote_table = testnet.get_notary_vote_stats_info(request)
 
-    if 'results' in notary_vote_table:
-        notary_vote_table = notary_vote_table["results"]
+    for region in notary_vote_table:
+        for item in notary_vote_table[region]:
+            notary = translate_notary(item["candidate"])
+            item.update({
+                "proposal": proposals[notary]
+            })
 
     context.update({
-        "params": params,
         "year": year,
         "notary_vote_table": notary_vote_table
     })
 
     return render(request, 'views/vote/notary_vote.html', context)
 
+def translate_notary(notary):
+    notary = notary.lower().split("_")[0]
+    if notary == "shadowbit":
+        return "decker"
+    if notary == "kolo2":
+        return "kolo"
+    if notary == "phit":
+        return "phm87"
+    if notary == "cipi2":
+        return "cipi"
+    if notary == "vanbogan":
+        return "van"
+    return notary
 
 def notary_vote_detail_view(request):
     context = helper.get_base_context(request)
@@ -61,13 +76,17 @@ def notary_vote_detail_view(request):
     candidate = helper.get_or_none(request, "candidate")
     max_block = helper.get_or_none(request, "max_block", VOTE_PERIODS[year]["max_block"])
 
+    proposals = testnet.get_notary_candidates_info(request)
+    notary_vote_detail_table = testnet.get_notary_vote_table(request)
 
-    url = f"{THIS_SERVER}/api/table/notary_vote"
-    params = f'?year={year}&max_block={max_block}'
+    for item in notary_vote_detail_table:
+        notary = translate_notary(item["candidate"])
+        item.update({
+            "proposal": proposals[notary]
+        })
+
     if candidate:
-        params += f'&candidate={candidate}'
         candidate = request.GET["candidate"].replace(".", "-")
-    notary_vote_detail_table = requests.get(f"{url}/{params}").json()
 
     if 'results' in notary_vote_detail_table:
         notary_vote_detail_table = notary_vote_detail_table["results"]
@@ -79,7 +98,6 @@ def notary_vote_detail_view(request):
 
     context.update({
         "candidate": candidate,
-        "params": params,
         "year": year,
         "notary_vote_detail_table": notary_vote_detail_table
     })

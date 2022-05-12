@@ -13,6 +13,7 @@
 						<tr>
 							<th data-data="block_height">BLOCK</th>
 							<th data-data="candidate">Candidate</th>
+							<th data-data="proposal">Proposal</td>
 							<th data-data="candidate_address">Candidate Address</th>
 							<th data-data="votes">Votes</th>
 							<th data-data="txid">TXID</th>
@@ -26,6 +27,7 @@
 							<tr>
 								<td data-data="block_height">{{ item.block_height }}</td>
 								<td data-data="candidate">{{ item.candidate }}</th>
+								<td data-data="proposal">{{ item.proposal }}</td>
 								<td data-data="candidate_address">{{ item.candidate_address }}</th>
 								<td data-data="votes">{{ item.votes }}</td>
 								<td data-data="txid">{{ item.txid }}</td>
@@ -52,6 +54,7 @@
         	"columns": [
 		        { "data": "block_height" },
 		        { "data": "candidate" },
+		        { "data": "proposal" },
 		        { "data": "candidate_address" },
 		        { "data": "votes" },
 		        { "data": "txid" },
@@ -60,7 +63,7 @@
 		        { "data": "valid" },
 		    ],
 	        "columnDefs": [
-					{ "orderData":[ 5 ],  "targets": [ 6 ] },
+					{ "orderData":[ 6 ],  "targets": [ 7 ] },
     			{
 		            "targets": 0,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
@@ -70,17 +73,23 @@
     			{
 		            "targets": 1,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/a/"+oData.candidate_address+"'>"+oData.candidate+"</a>");
+		            		$(nTd).html("<a href='"+oData.proposal+"'>"+oData.candidate+"</a>");
 		            }
 		        },
     			{
 		            "targets": 4,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/a/"+oData.candidate_address+"'>"+oData.votes+"</a>");
+		            }
+		        },
+    			{
+		            "targets": 5,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/t/"+oData.txid+"'><span class='' style='' data-toggle='tooltip' data-placement='top' title='View "+oData.txid+" on block explorer'><i class='fa fa-search'></i></span></a>");
 		            }
 		        },
     			{
-		            "targets": 7,
+		            "targets": 8,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 		            	if (oData.valid == 'True') {
 		            		$(nTd).html('<i class="bi bi-bookmark-check-fill"></i>');
@@ -92,7 +101,7 @@
 		            }
 		        },
 	            {
-	                "targets": [ 2, 5 ],
+	                "targets": [ 2, 3, 6 ],
 	                "visible": false
 	            }
 				]

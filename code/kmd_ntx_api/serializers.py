@@ -195,6 +195,13 @@ class notaryVoteSerializer(serializers.HyperlinkedModelSerializer):
                   "notes", 'year', 'valid']
 
 
+
+class notaryCandidatesSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = notary_candidates
+        fields = ["year", "season", "name", "proposal_url"]
+
+
 class swapsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = swaps

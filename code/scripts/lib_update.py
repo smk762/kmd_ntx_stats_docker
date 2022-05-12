@@ -461,11 +461,9 @@ def update_notary_vote_row(row_data):
             notes='{row_data[10]}', \
             year='{row_data[11]}', \
             valid='{row_data[12]}';"
-    print(sql)
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()
-        print("commited")
     except Exception as e:
         logger.debug(e)
         if str(e).find('duplicate') == -1:
@@ -552,3 +550,19 @@ def update_rewards_tx_row(row_data):
         if str(e).find('duplicate') == -1:
             logger.debug(row_data)
         CONN.rollback()
+
+def update_notary_candidates_row(row_data):
+    sql = f"INSERT INTO notary_candidates (year, season, name,\
+                       proposal_url) \
+                VALUES (%s, %s, %s, %s)\
+                ON CONFLICT ON CONSTRAINT unique_name_year_candidate \
+                DO UPDATE SET proposal_url='{row_data[3]}';"
+    try:
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
+    except Exception as e:
+        logger.error(f"Exception in [update_notary_candidates_row]: {e}")
+        logger.error(f"[update_notary_candidates_row] sql: {sql}")
+        logger.error(f"[update_notary_candidates_row] row_data: {row_data}")
+        CONN.rollback()
+
