@@ -350,6 +350,7 @@ class notarised_row():
                 return False
 
         if self.season.find('Testnet') != -1 and self.block_height < 2903777:
+            logger.warning("Testnet block below 2903777")
             return False
 
         return True
@@ -731,7 +732,6 @@ class mined_row():
                             if self.address == SEASONS_INFO[season]["servers"]["Main"]["addresses"]["KMD"]:
                                 self.season = season
                                 return True
-                return False
         return True
 
     def update(self):

@@ -134,6 +134,7 @@ CANDIDATE_ADDRESSES = {
 		"RSjgbcDFEXv5Lc198MX5wBECj6U7YagtzE": "madmax_NA",
 		"RGaUZVeoTw5qdbNGiZNyUy1F1DunjVg2QQ": "madmax_EU",
 		"RRLnxMuSFXpowBbSGxMxEnNny7FBaJMqyf": "madmax_AR",
+		"RYa7pC7dNLejeu5q2Kst7Mef1VBTEoqiMD": "marmarachain_EU",
 		"RMetaSHqEPvuAC1K1TWFx5WwNcMiqPFm8e": "metaphilibert_SH",
 		"RKPfsdqTYXLPpW2XXbx5kExoT7JUs2pijG": "mcrypt_SH",
 		"RT6ftBsPBPCwErGSti35hLJuzWLEyH3RK4": "mcrypt_AR",
