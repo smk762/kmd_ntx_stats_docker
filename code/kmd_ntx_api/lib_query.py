@@ -729,7 +729,6 @@ def get_notary_vote_data(year=None, candidate=None, block=None, txid=None,
         data = data.filter(year=year)
 
     if valid is not None:
-        print(valid)
         data = data.filter(valid=valid)
 
     if candidate:
@@ -755,6 +754,21 @@ def get_notary_vote_data(year=None, candidate=None, block=None, txid=None,
 
     return data
 
+
+
+def get_notary_candidates_data(year=None, season=None, name=None):
+    data = notary_candidates.objects.all()
+
+    if year:
+        data = data.filter(year=year)
+
+    if season:
+        data = data.filter(season=season)
+
+    if name:
+        data = data.filter(name=name)
+
+    return data
 
 
 def get_swaps_failed_data(uuid=None):

@@ -17,6 +17,7 @@
 							<th data-data="num_votes">Num Votes</th>
 							<th data-data="sum_votes">Sum Votes</th>
 							<th data-data="detail">Detail</th>
+							<th data-data="proposal">Proposal</td>
 						</tr>
 					</thead>
 					<tbody>
@@ -34,6 +35,7 @@
 										</span>
 									</a>
 								</td>
+								<td data-data="proposal">{{ item.proposal }}</td>
 							</tr>
 						{% endfor %}
 					</tbody>
@@ -58,16 +60,23 @@
 		        { "data": "num_votes" },
 		        { "data": "sum_votes" },
 		        { "data": "detail" },
+		        { "data": "proposal" },
 		    ],
     		"columnDefs": [
     			{
 		            "targets": 1,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/a/"+oData.candidate_address+"'>"+oData.candidate+"</a>");
+		            		$(nTd).html("<a href='"+oData.proposal+"'>"+oData.candidate+"</a>");
+		            }
+		        },
+    			{
+		            "targets": 4,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/a/"+oData.candidate_address+"'>"+oData.sum_votes+"</a>");
 		            }
 		        },
 	            {
-	                "targets": [ 2 ],
+	                "targets": [ 2, 6 ],
 	                "visible": false
 	            }
 		    ]

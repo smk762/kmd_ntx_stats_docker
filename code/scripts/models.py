@@ -1303,3 +1303,24 @@ class rewards_tx_row():
 
     def delete(self):
         delete_rewards_tx_transaction(self.txid)
+
+
+
+class notary_candidates_row():
+    def __init__(self='', year='', season='', name='', proposal_url=''):
+        self.name = name
+        self.year = year
+        self.season = season
+        self.proposal_url = proposal_url
+
+    def validated(self):
+        return True
+
+    def update(self):
+        row_data = (self.year, self.season, self.name, self.proposal_url)
+        update_notary_candidates_row(row_data)
+
+    def delete(self):
+        pass
+
+        

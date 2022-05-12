@@ -15,3 +15,6 @@ if __name__ == "__main__":
         if year in ["VOTE2022"]:
             vote = lib_vote.notary_vote(year, RESCAN_SEASON)
             vote.update_table()
+
+            proposals = lib_vote.notary_candidates(year)
+            proposals.update_table()

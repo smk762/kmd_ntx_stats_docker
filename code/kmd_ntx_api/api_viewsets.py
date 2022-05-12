@@ -351,3 +351,15 @@ class notaryVoteViewSet(viewsets.ModelViewSet):
     filterset_fields = ['year', 'candidate', 'txid', 'block_height']
     ordering_fields = ['candidate', 'votes', 'block_time']
     ordering = ['-block_time', 'candidate']
+
+
+class notaryCandidatesViewSet(viewsets.ModelViewSet):
+    """
+    """
+    queryset = notary_candidates.objects.all()
+    serializer_class = serializers.notaryCandidatesSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['year', 'name', 'season']
+    ordering_fields = ['year', 'name', 'season']
+    ordering = ['year', 'name', 'season']

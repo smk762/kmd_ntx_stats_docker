@@ -689,3 +689,4 @@ def get_notary_pubkeys():
             NOTARY_PUBKEYS["VOTE2022_Testnet"]["Main"].update({k:v})
     return NOTARY_PUBKEYS
 
+

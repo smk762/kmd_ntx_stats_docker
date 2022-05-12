@@ -5,6 +5,7 @@ from lib_const import *
 from decorators import *
 from lib_rpc import RPC
 import lib_query_ntx as query
+import lib_github as git
 from notary_candidates import CANDIDATE_ADDRESSES
 
 # Notarised table
@@ -154,12 +155,10 @@ class notary_vote():
             season="Season_5", coin="VOTE2022", lowest_blocktime=end_time,
             highest_blocktime=row.block_time
         )
-        
+
         if row.block_time < end_time:
             row.notes = "before timestamp"
             return True
-
-        tip = int(RPC[self.year].getblockcount())
 
         if len(last_notarised_blocks) == 0:
             row.notes = "block after timestamp but before notarisation"
@@ -178,5 +177,33 @@ class notary_vote():
             row.notes = "more than one ntx since timestamp"
             return False
 
-
         return False
+
+# Notarised table
+class notary_candidates():
+    def __init__(self, year):
+        self.year = year
+        if self.year == "VOTE2022":
+            self.season = "season6"
+        self.base_url = f"https://github.com/KomodoPlatform/NotaryNodes/blob/master/{self.season}/candidates"
+
+
+    @print_runtime
+    def update_table(self):
+        candidate_tree = git.get_github_folder_contents("KomodoPlatform", "NotaryNodes", f"{self.season}/candidates")
+        for item in candidate_tree:
+            if item["type"] == "dir":
+                name = item["name"]
+                proposal = f"{self.base_url}/{name}/README.md"
+                r = requests.get(proposal)
+                if r.status_code != 200:
+                    proposal = f"{self.base_url}/{name}/readme.md"
+                    r = requests.get(proposal)
+                if r.status_code != 200:
+                    logger.warning(f'URL: {f"{self.base_url}/{name}/readme.md"} failed')
+                else:
+                    row = notary_candidates_row(self.year, self.season, name.lower(), proposal)
+                    row.update()
+        
+
+
