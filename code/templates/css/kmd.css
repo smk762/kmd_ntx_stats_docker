@@ -9,16 +9,25 @@
                 background-color:#101721 !important;
                 color: #8ba7ca;
             }
+
             .badge i:hover {
                 color:#289689;
             }
+
             i { 
                 color:#52a197;
             }
+
             h6 {
                 font-style: italic;
-                font-size: 1.1rem;
+                font-size: 1rem;
             }
+
+            .countdown_timer {
+                font-style: italic;
+                font-size: 0.8rem;
+            }
+
             textarea {
                 font-size: 1rem;
                 color: #252525;

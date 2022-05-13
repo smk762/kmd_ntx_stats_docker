@@ -10,10 +10,19 @@
 	var dpow_coins = JSON.parse(document.getElementById('dpow_coins-data').textContent);
 	var notaries = JSON.parse(document.getElementById('notaries-data').textContent);
 
-	function get_time_since(timestamp) {
-		var time_now = Date.now() / 1000;
+	function pad(num, size) {
+	    num = num.toString();
+	    while (num.length < size) num = "0" + num;
+	    return num;
+	}
 
-		totalSeconds = time_now - timestamp
+	function get_time_since(timestamp, until=false, format='text') {
+
+		var time_now = Date.now() / 1000;
+		until ? totalSeconds = timestamp - time_now : totalSeconds = time_now - timestamp
+		
+		if (totalSeconds < 0) return 0
+
 		days = Math.floor(totalSeconds / 86400);
 
 	    totalSeconds %= 86400;
@@ -21,8 +30,17 @@
 
 	    totalSeconds %= 3600;
 	    minutes = Math.floor(totalSeconds / 60);
+
 	    totalSeconds %= 60;
 	    seconds = Math.floor(totalSeconds);
+
+	    if (format == 'numeric') {
+	    	response = pad(hours, 2) + ":" + pad(minutes, 2) + ":" + pad(seconds, 2)
+	    	if (days != 0) {
+	    		response = days + " days, " + response
+	    	}
+	    	return response
+	    }
 
 	    if (days > 400) return "Never"
 	    if ((days == 0) && (hours == 0) && (minutes == 0)) {
@@ -449,5 +467,20 @@
 	function get_link(url, text) {
 		return "<a href='"+url+"'>"+text+"</a>"
 	}
+
+
+	function getVal(item) {
+	    return item[this];
+	}
+	function getSum(total, num) {
+	    return total + num;
+	}
+	function getAverage(data, key) {
+		let totals = data.map(getVal, key)
+		let sum = totals.reduce(getSum, 0)
+		return sum / totals.length
+	}
+
+
 
 </script>

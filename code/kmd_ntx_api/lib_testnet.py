@@ -44,14 +44,8 @@ def get_api_testnet(request):
             ntx_dict_24hr[coin].append(item)
 
     testnet_coins = list(ntx_dict.keys())
-    logger.info(testnet_coins)
     testnet_stats_dict = get_testnet_stats_dict(season, testnet_coins)
-    logger.info(testnet_stats_dict)
-    logger.info(season)
-    logger.info(season)
-    logger.info(season)
     last_ntx = info.get_last_nn_coin_ntx(season)
-    logger.info(last_ntx)
 
     for coin in testnet_coins:
 
@@ -217,7 +211,6 @@ def get_notary_vote_stats_info(request):
     resp = {}
     region_scores = {}
     for item in data:
-        print(f"item: {item}")
         region = item["candidate"].split("_")[1]
         if region not in resp:
             resp.update({region:[]})
@@ -297,6 +290,12 @@ def translate_notary(notary):
         return "van"
     return notary
 
+def translate_testnet_name(name, candidates):
+    for candidate in candidates:
+        if candidate.lower().find(name.lower()) > -1:
+            return candidate
+    return name
+
 def get_vote_aggregates(request):
     candidate = helper.get_or_none(request, "candidate")
     year = helper.get_or_none(request, "year", VOTE_YEAR)
@@ -310,3 +309,18 @@ def get_vote_aggregates(request):
         resp[candidate]["votes"] += item["votes"]
 
     return resp
+
+def is_election_over(year):
+    end_time = VOTE_PERIODS[year]["max_blocktime"]
+    print(time.time(), end_time)
+    if time.time() < end_time:
+        return "before timestamp"
+    
+    last_notarised_blocks = query.get_notarised_data(
+        season="Season_5", coin=year, min_blocktime=end_time)
+    print(last_notarised_blocks.count())
+    if last_notarised_blocks.count() == 0:
+        return "Waiting for notarised block..."
+
+    else:
+        return "Election complete!"

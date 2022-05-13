@@ -11,35 +11,24 @@ import kmd_ntx_api.lib_testnet as testnet
 def testnet_ntx_scoreboard_view(request):
     context = helper.get_base_context(request)
     year = helper.get_or_none(request, "year", VOTE_YEAR)
-    season = f"{year}_Testnet"
  
     testnet_ntx_counts = testnet.get_api_testnet(request)
-    num_notaries = len(testnet_ntx_counts)
-
-    combined_total = 0
-    combined_total_24hr = 0
-
-    for notary in testnet_ntx_counts:
-        combined_total += testnet_ntx_counts[notary]["Total"]
-        combined_total_24hr += testnet_ntx_counts[notary]["24hr_Total"]
-    average_score = combined_total / num_notaries
-    average_score_24hr = combined_total_24hr / num_notaries
 
     context = helper.get_base_context(request)
     context.update({
-        "average_score": average_score,
         "year": year,
-        "average_score_24hr": average_score_24hr,
-        "testnet_ntx_counts": testnet_ntx_counts
+        "season": f"{year}_Testnet"
     })
     return render(request, 'views/vote/testnet_scoreboard.html', context)
 
 
 def notary_vote_view(request):
     context = helper.get_base_context(request)
+    year = helper.get_or_none(request, "year", VOTE_YEAR)
     context.update({
         "regions": ["AR", "EU", "NA", "SH"],
-        "year": helper.get_or_none(request, "year", VOTE_YEAR)
+        "end_timestamp": VOTE_PERIODS[year]["max_blocktime"],
+        "year": year
     })
 
     return render(request, 'views/vote/notary_vote.html', context)
