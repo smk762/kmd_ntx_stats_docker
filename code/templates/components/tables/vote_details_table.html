@@ -46,9 +46,9 @@
     $(document).ready(function() {
 		$('#{{ candidate }}_votes_table').css('visibility', 'visible');
         $('#{{ candidate }}_votes_table').DataTable({
-            "pageLength": 50,
-        	"paging": true,
-			deferRender: true,
+        	"paging": false,
+        	"searching": false,
+        	"info": false,
             "orderClasses": false,
     		order: [[ 0, 'desc' ]],
         	"columns": [
