@@ -3,34 +3,25 @@
 		<div class="card table_card">
 			<div class="card-header table_card_title">
 				<h4>{{ year }} Testnet Notarisation rankings</h4>
-				<h6>Average: {{ average_score|floatformat:-2 }}</h6>
+				<h6>Average: <span id="average"></span></h6>
+				<div class="countdown_timer">
+					Updating in <span class="countdown">30</span> seconds...
+				</div>
 			</div>
 			<div class="card-body table_card_body">
 				<table id="{{ season }}_table" class="table table-striped table-bordered" style="width:99%; visibility: hidden;">
 					<thead>
 						<tr>
-							<th>RANK</th>
-							<th>NOTARY</th>
-							<th>RICK</th>
-							<th>MORTY</th>
-							<th>TOTAL</th>
-							<th>LAST RICK</th>
-							<th>LAST MORTY</th>
+							<th data-data="Rank">Rank</th>
+							<th data-data="name">Candidate</th>
+							<th data-data="proposal">Proposal</th>
+							<th data-data="RICK">Rick</th>
+							<th data-data="MORTY">Morty</th>
+							<th data-data="Total">Total</th>
+							<th data-data="Last_RICK">Last Rick</th>
+							<th data-data="Last_MORTY">Last Morty</th>
 						</tr>
 					</thead>
-					<tbody>
-						{% for notary, notary_data in testnet_ntx_counts.items %}
-						<tr>
-							<td data-data="rank">{{ notary_data.Rank }}</td>
-							<td data-data="notary">{{ notary }}</th>
-							<td data-data="rick" style="font-size: 0.9em">{{ notary_data.RICK }}</th>
-							<td data-data="morty" style="font-size: 0.9em">{{ notary_data.MORTY }}</th>
-							<td data-data="total" style="font-size: 0.9em">{{ notary_data.Total }}</th>
-							<td data-data="last_rick" style="font-size: 0.9em">{{ notary_data.Last_RICK }}</th>
-							<td data-data="last_morty" style="font-size: 0.9em">{{ notary_data.Last_MORTY }}</th>
-						</tr>
-						{% endfor %}
-					</tbody>
 				</table>
 			</div>
 		</div>
@@ -42,71 +33,132 @@
 		<div class="card table_card">
 			<div class="card-header table_card_title">
 				<h4>{{ year }} Testnet Notarisation rankings (24hrs)</h4>
+				<h6>Average: <span id="average_24hr"></span></h6>
+				<div class="countdown_timer">
+					Updating in <span class="countdown">30</span> seconds...
+				</div>
 			</div>
 			<div class="card-body table_card_body">
 				<table id="{{ season }}_table_24hr" class="table table-striped table-bordered" style="width:99%; visibility: hidden;">
 					<thead>
 						<tr>
-							<th style="font-size: 0.9em">24hr RANK</th>
-							<th style="font-size: 0.9em">NOTARY</th>
-							<th style="font-size: 0.9em">RICK 24hr</th>
-							<th style="font-size: 0.9em">MORTY 24hr</th>
-							<th style="font-size: 0.9em">TOTAL 24hr</th>
+							<th data-data="24hr_Rank">24hr Rank</th>
+							<th data-data="name">Candidate</th>
+							<th data-data="proposal">Proposal</th>
+							<th data-data="24hr_RICK">Rick 24hr</th>
+							<th data-data="24hr_MORTY">Morty 24hr</th>
+							<th data-data="24hr_Total">Total 24hr</th>
 						</tr>
 					</thead>
-					<tbody>
-						{% for notary, notary_data in testnet_ntx_counts.items %}
-						<tr>
-							<td data-data="rank_24hr">{{ notary_data.24hr_Rank }}</td>
-							<td data-data="notary" style="font-size: 0.9em">{{ notary }}</th>
-							<td data-data="rick_24hr" style="font-size: 0.9em">{{ notary_data.24hr_RICK }}</th>
-							<td data-data="morty_24hr" style="font-size: 0.9em">{{ notary_data.24hr_MORTY }}</th>
-							<td data-data="total_24hr" style="font-size: 0.9em">{{ notary_data.24hr_Total }}</th>
-						</tr>
-						{% endfor %}
-					</tbody>
 				</table>				
 			</div>
 		</div>
 	</div>
 </div>
+
 <script>
     $(document).ready(function() {
-        Testnet_table = $('#{{ season }}_table').DataTable({   
-					"paging": false,
-					deferRender: true,
-					"orderClasses": false,
+        Testnet_table = $('#{{ season }}_table').DataTable({    
+    		ajax: {
+			    url: "{% url 'api_testnet_totals' %}",
+    			dataSrc: 'results',
+    			"deferRender": true
+			},
+        	"paging": false,
+        	"searching": false,
+        	"info": false,
+			"orderClasses": false,
     		order: [[ 0, 'asc' ]],
         	"columns": [
-		        { "data": "rank" },
-		        { "data": "notary" },
-		        { "data": "rick" },
-		        { "data": "morty" },
-		        { "data": "total" },
-		        { "data": "last_rick" },
-		        { "data": "last_morty" }
+		        { "data": "Rank" },
+		        { "data": "name" },
+		        { "data": "proposal" },
+		        { "data": "RICK" },
+		        { "data": "MORTY" },
+		        { "data": "Total" },
+		        { "data": "Last_RICK" },
+		        { "data": "Last_MORTY" }
 		    ],			    
 	        "columnDefs": [
-	            {},
+				{ className: "text-right text-nowrap", "targets": [ 6,7 ] },
+    			{
+		            "data": 'Rank',
+		            "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				        $(nTd).html(oData.Rank);
+			        }
+		        },
+    			{
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+oData.name+"</a>") : $(nTd).html(oData.name);
+		            }
+		        },
+	            {
+	                "targets": [ 2 ],
+	                "visible": false
+	            }
 	        ]
         });
+
         Testnet_table_24hr = $('#{{ season }}_table_24hr').DataTable({   
-					"paging": false,
-					deferRender: true,
-					"orderClasses": false,
+    		ajax: {
+			    url: "{% url 'api_testnet_totals' %}",
+    			dataSrc: 'results',
+    			"deferRender": true
+			},
+			"paging": false,
+			deferRender: true,
+			"orderClasses": false,
     		order: [[ 0, 'asc' ]],
         	"columns": [
-		        { "data": "rank_24hr" },
-		        { "data": "notary" },
-		        { "data": "rick_24hr" },
-		        { "data": "morty_24hr" },
-		        { "data": "total_24hr" }
+		        { "data": "24hr_Rank" },
+		        { "data": "name" },
+		        { "data": "proposal" },
+		        { "data": "24hr_RICK" },
+		        { "data": "24hr_MORTY" },
+		        { "data": "24hr_Total" }
 		    ],			    
 	        "columnDefs": [
-	            {},
+    			{
+		            "data": 'Rank',
+		            "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				        $(nTd).html(oData.Rank);
+			        }
+		        },
+    			{
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+oData.name+"</a>") : $(nTd).html(oData.name);
+		            }
+		        },
+	            {
+	                "targets": [ 2 ],
+	                "visible": false
+	            }
 	        ]
         });
         $('#{{ season }}_table').css('visibility', 'visible');
         $('#{{ season }}_table_24hr').css('visibility', 'visible');
+
+	    Testnet_table.on('xhr.dt', function (e, settings, json, xhr) {
+	    	console.log("get average")
+	    	let average = getAverage(json.results, 'Total')
+	    	let average_24hr = getAverage(json.results, '24hr_Total')
+	        $('#average').html(average);
+	        $('#average_24hr').html(average_24hr);
+	    })
+
+	    timer_increment = 30
+		setInterval( function () {
+			timer_increment -= 1
+			$('.countdown').html(timer_increment)
+			if (timer_increment == 0) {
+	 	    	Testnet_table.ajax.reload();
+	 	    	Testnet_table_24hr.ajax.reload();
+	 	    	timer_increment = 30
+	 	    }
+		}, 1000 );
     });
 </script> 

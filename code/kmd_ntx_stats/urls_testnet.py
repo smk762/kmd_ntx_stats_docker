@@ -38,4 +38,12 @@ api_testnet_urls = [
     path('api/table/notary_vote_totals/',
           api_testnet.vote_aggregates_api,
           name='vote_aggregates_api'),
+    
+    path('api/table/testnet_ntx_scoreboard/',
+          api_testnet.api_testnet_totals,
+          name='api_testnet_totals'),
+
+    path('api/info/is_election_over/',
+          api_testnet.is_election_over_api,
+          name='is_election_over_api'),
 ]

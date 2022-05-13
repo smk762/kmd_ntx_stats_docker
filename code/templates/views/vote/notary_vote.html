@@ -5,4 +5,51 @@
 	{% for region in regions %}
 		{% include "components/tables/vote_tally_table.html" with region=region %}
 	{% endfor %}
+	<script>
+		function detect_final_ntx() {
+			$.getJSON('{% url "is_election_over_api" %}', function(resp) {
+
+	            if (resp.results != "before timestamp") {
+	                $('.vote_countdown').html(resp.results)
+
+					if (resp.results != "Election complete!") {
+						setTimeout(detect_final_ntx, 10000);
+
+						if (timer_increment == 0) {
+				 	    	AR_table.ajax.reload();
+				 	    	EU_table.ajax.reload();
+				 	    	NA_table.ajax.reload();
+				 	    	SH_table.ajax.reload();
+				 	    	timer_increment = 30
+				 	    }
+					}
+		        }
+	        })		    
+		}    
+
+
+        timer_increment = 30
+		countdown = setInterval( function () {
+			timer_increment -= 1
+			$('.countdown').html(timer_increment)
+			let time_until = get_time_since({{ end_timestamp }} , true, 'numeric')
+			if (time_until != 0) {
+				$('.vote_countdown').html("Overtime begins in " + time_until)
+			}
+			else {
+				doStuff()
+				clearInterval(countdown)
+			}
+
+
+			if (timer_increment == 0) {
+	 	    	AR_table.ajax.reload();
+	 	    	EU_table.ajax.reload();
+	 	    	NA_table.ajax.reload();
+	 	    	SH_table.ajax.reload();
+
+	 	    	timer_increment = 30
+	 	    }
+		}, 1000 );
+	</script>
 {% endblock %}
