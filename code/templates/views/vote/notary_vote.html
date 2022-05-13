@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+	<h1>{{ year }} Komodo Notary Node Election Votes</h1>
+	<h6>
+		The election ends with the first notarised block confirmed after 23:59:59 25th May 2022 UTC (inclusive)
+	</h6>
+	<div class="countdown_timer mt-1 mb-3">
+		<span class="vote_countdown mx-2"></span><span class="countdown mx-2"></span>
+	</div>
 	{% include 'components/anchors/regions.html' with vote='true' %}
 	{% for region in regions %}
 		{% include "components/tables/vote_tally_table.html" with region=region %}
@@ -31,13 +38,13 @@
         timer_increment = 30
 		countdown = setInterval( function () {
 			timer_increment -= 1
-			$('.countdown').html(timer_increment)
+			$('.countdown').html("Updating in " + timer_increment + " seconds...")
 			let time_until = get_time_since({{ end_timestamp }} , true, 'numeric')
 			if (time_until != 0) {
 				$('.vote_countdown').html("Overtime begins in " + time_until)
 			}
 			else {
-				doStuff()
+				detect_final_ntx()
 				clearInterval(countdown)
 			}
 

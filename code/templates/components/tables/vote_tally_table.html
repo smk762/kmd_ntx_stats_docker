@@ -1,14 +1,11 @@
 <div class="row" id="{{ region }}">
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card">
-			<div class="card-header table_card_title">
-				<h2>{{ year }} {{ region }} Region</h2>
-				<div class="countdown_timer">
-					Updating in <span class="countdown">30</span> seconds...
-				</div>
+		<div class="card table_card floating-card m-0">
+			<div class="card-header table_card_title floating-card">
+				<h2>{{ region }} Region</h2>
 			</div>
-			<div class="card-body table_card_body">
-				<table id="{{ region }}_table" class="table table-striped table-bordered" style="width:99%; visibility: hidden;">
+			<div class="card-body table_card_body floating-card">
+				<table id="{{ region }}_table" class="table table-striped table-bordered" style="width:99%; visibility: hidden; font-size: 1.2em;">
 					<thead>
 						<tr>
 							<th data-data="region_rank">Rank</th>
@@ -20,12 +17,6 @@
 						</tr>
 					</thead>
 				</table>
-				<h6>
-					The election ends with the first notarised block confirmed after 23:59:59 25th May 2022 UTC (inclusive)
-				</h6>
-				<div class="countdown_timer">
-					<span class="vote_countdown"></span>
-				</div>
 			</div>
 		</div>	
 	</div>
@@ -53,7 +44,6 @@
         	"paging": false,
         	"searching": false,
         	"info": false,
-			deferRender: true,
             "orderClasses": false,
             "pageLength": 50,
     		order: [[ 0, 'asc' ]],

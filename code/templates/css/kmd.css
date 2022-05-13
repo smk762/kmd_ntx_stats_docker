@@ -888,10 +888,10 @@
                 background-color: #131a22 !important; 
             }
             tr.odd td {
-                background-color: #182331 !important;
+                background-color: #1a2330 !important;
             }
             tr.even td {
-                background-color: #1a2939 !important;       
+                background-color: #1a212a !important;       
             }
             tr.odd:hover td {
                 background-color: #1a293977 !important;
@@ -994,4 +994,8 @@
 
             .fixed-width-28 { width: 200px; }
 
+            .floating-card {
+                background-color: #00000000 !important;
+                border: none !important;
+            }
         </style>
