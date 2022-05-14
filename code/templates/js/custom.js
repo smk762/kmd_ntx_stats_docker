@@ -16,6 +16,20 @@
 	    return num;
 	}
 
+	function show_region(region) {
+		const regions = ["#AR", "#EU", "#NA", "#SH"];
+		regions.forEach(function (i) {
+			if (i == region) {
+				$(i).fadeTo(1000, 1)
+				$(i+"_btn").css('background-color', '#062e60')
+			}
+			else {
+				$(i).css('display', 'none')	
+				$(i+"_btn").css('background-color', '#182331')
+			}
+		});
+	}
+
 	function get_time_since(timestamp, until=false, format='text') {
 
 		var time_now = Date.now() / 1000;
