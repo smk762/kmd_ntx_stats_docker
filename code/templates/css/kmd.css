@@ -894,10 +894,10 @@
                 background-color: #1a212a !important;       
             }
             tr.odd:hover td {
-                background-color: #1a293977 !important;
+                background-color: #071220 !important;
             }
             tr.even:hover td {
-                background-color: #1a293977 !important; 
+                background-color: #071220 !important; 
             }
             tr.selected td {
                 background-color: #193823 !important;
