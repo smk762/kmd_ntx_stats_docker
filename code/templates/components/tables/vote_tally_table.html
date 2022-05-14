@@ -1,11 +1,15 @@
+{% if region == 'AR' %}
 <div class="row" id="{{ region }}">
+{% else %}
+<div class="row" id="{{ region }}" style="display: none;">
+{% endif %}
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
 		<div class="card table_card floating-card m-0">
 			<div class="card-header table_card_title floating-card">
 				<h2>{{ region }} Region</h2>
 			</div>
 			<div class="card-body table_card_body floating-card">
-				<table id="{{ region }}_table" class="table table-striped table-bordered" style="width:99%; visibility: hidden; font-size: 1.2em;">
+				<table id="{{ region }}_table" class="table table-striped table-bordered" style="width:99%; font-size: 1.2em;">
 					<thead>
 						<tr>
 							<th data-data="region_rank">Rank</th>
@@ -23,8 +27,8 @@
 </div>
 <script>
     $(document).ready(function() {
-		$('#{{ region }}_table').css('visibility', 'visible');
-        {{ region }}_table = $('#{{ region }}_table').DataTable({
+    	{{ region }}_table = $('#{{ region }}_table').DataTable({	
+        
     		ajax: {
 			    url: "{% url 'notary_vote_stats_info' %}",
     			dataSrc: 'results.{{ region }}',
@@ -40,7 +44,7 @@
 				$('td:eq(1)', row).addClass( 'text-left' );
 				$('td:eq(4)', row).addClass( 'text-right' );
 			},
-    			 
+    		"caption": '{{ region }} Region',
         	"paging": false,
         	"searching": false,
         	"info": false,

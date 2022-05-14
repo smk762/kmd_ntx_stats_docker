@@ -696,7 +696,7 @@
                 color:  #aeaeae;
             }
             .btn-dark4 {
-                background-color:#182331 !important;
+                background-color:#182331 ;
                 border: solid 1px #303030 !important;
                 color: #41EAD4 !important;
                 border: solid #838383aa 1px !important;
@@ -930,7 +930,6 @@
                 padding-bottom: 0.2rem !important;
                 background-color: #00000000 !important;
             }
-
             /* END TABLES */
 
             /* DATATABLES */
