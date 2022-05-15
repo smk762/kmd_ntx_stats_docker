@@ -113,6 +113,45 @@ def get_notarised_tenure_table_url(season=None, server=None, coin=None, local=Tr
 
 
 
+def get_notarised_source_url(
+        local=True, season=None, server=None, coin=None,
+        min_blocktime=None, max_blocktime=None,
+        min_block=None, max_block=None
+    ):
+    api_server = get_api_server(local)
+    url = f'{api_server}/api/source/notarised/?'
+    if season:
+        url += f"&season={season}"
+    if server:
+        url += f"&server={server}"
+    if coin:
+        url += f"&coin={coin}"
+    if min_blocktime:
+        url += f"&min_blocktime={min_blocktime}"
+    if max_blocktime:
+        url += f"&max_blocktime={max_blocktime}"
+    if min_block:
+        url += f"&min_block={min_block}"
+    if max_block:
+        url += f"&max_block={max_block}"
+    return url
+
+
+def get_utxos_url(local=True, coin=None, pubkey=None):
+    api_server = get_api_server(local)
+    url = f'{api_server}/api/tools/pubkey_utxos/?'
+    url += f"&coin={coin}"
+    url += f"&pubkey={pubkey}"
+    return url
+
+
+def get_proposals_url(local=True, year=None):
+    api_server = get_api_server(local)
+    url = f'{api_server}/api/testnet/proposals/?'
+    url += f"&year={year}"
+    return url
+
+
 def get_dpow_active_coins_url(local=True):
     api_server = get_api_server(local)
     return f'{api_server}/api/info/coins/?dpow_active=1'

@@ -276,6 +276,7 @@ def get_notary_candidates_info(request):
             props.update({notary:item["proposal_url"]})
     return props
 
+
 def translate_notary(notary):
     notary = notary.lower().split("_")[0]
     if notary == "shadowbit":
@@ -290,11 +291,14 @@ def translate_notary(notary):
         return "van"
     return notary
 
+
 def translate_testnet_name(name, candidates):
     for candidate in candidates:
         if candidate.lower().find(name.lower()) > -1:
             return candidate
     return name
+
+    
 
 def get_vote_aggregates(request):
     candidate = helper.get_or_none(request, "candidate")

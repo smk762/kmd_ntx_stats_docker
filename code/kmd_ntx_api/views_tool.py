@@ -63,14 +63,15 @@ def create_raw_transaction_view(request):
 
     # Step one: get UTXOs for selection and show form for destination and amount
     if address:
-        rewards_resp = tools.get_kmd_rewards(request)
+        rewards_resp = tools.get_kmd_rewards(request)["results"]
         utxos = dexstats.get_dexstats_utxos(coin, address)
 
-        if helper.has_error(resp):
-            messages.error(request, resp["error"])
+        if helper.has_error(rewards_resp):
+            messages.error(request, rewards_resp["error"])
 
         else:
             for utxo in utxos:
+
                 if utxo["txid"] in rewards_resp["utxos"]:
                     txid = utxo["txid"]
                     rewards = rewards_resp["utxos"][txid]["kmd_rewards"]

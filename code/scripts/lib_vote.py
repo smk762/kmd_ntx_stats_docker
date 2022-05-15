@@ -206,4 +206,44 @@ class notary_candidates():
                     row.update()
         
 
+def translate_testnet_name(name, candidates):
+    if name == "decker":
+        return "shadowbit"
+    if name == "metaphilbert":
+        return "metaphilibert"
+    if name == "xenbug":
+        return "xen"
+    for candidate in candidates:
+        if candidate.lower().find(name.lower()) > -1:
+            return candidate
+    return name
 
+
+def get_proposal_nodes(year=None):
+    if not year:
+        year = "VOTE2022"
+
+    resp = {}
+    for address, notary in CANDIDATE_ADDRESSES[year].items():
+        name, region = notary.split('_')
+        if name not in resp:
+            resp.update({name:{}})
+        resp[name].update({
+            region:address
+        })
+    return resp
+
+
+def translate_notary(notary):
+    notary = notary.lower().split("_")[0]
+    if notary == "shadowbit":
+        return "decker"
+    if notary == "kolo2":
+        return "kolo"
+    if notary == "phit":
+        return "phm87"
+    if notary == "cipi2":
+        return "cipi"
+    if notary == "vanbogan":
+        return "van"
+    return notary

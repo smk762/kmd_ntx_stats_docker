@@ -78,11 +78,42 @@
 		            		$(nTd).html('<a href="{% url "notary_vote_detail_view" %}?candidate='+oData.candidate+'&year={{ year }}">'+oData.num_votes+'</a>');
 		            }
 		        },
+    			{
+		            "targets": 4,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+
+		            	if (vote_data.{{ region }}.length > 0) {
+		            		let candidate_data = vote_data.{{ region }}.filter(checkCandidate, oData.candidate)
+			            	if (oData.sum_votes > candidate_data[0].sum_votes) { 
+			            		
+							    setTimeout( function () {
+							    	$(nTd).addClass('highlight_update');
+							    }, 300);
+							    setTimeout( function () {
+							    	$(nTd).removeClass('highlight_update');
+							    	$(nTd).addClass('highlight_fadeout');
+							    }, 2300);
+			            	}
+		            	}
+		            }
+		        },
 	            {
 	                "targets": [ 5 ],
 	                "visible": false
 	            }
 		    ]
         });
+
+		function checkCandidate(data) {
+		    return data.candidate == this;
+		}
+
+		{{ region }}_table.on( 'xhr', function () {
+			json = {{ region }}_table.ajax.json();
+		    setTimeout( function () {
+		    	vote_data.{{ region }} = json.results.{{ region }}	
+		    }, 300);
+		    
+		});
     });
 </script> 

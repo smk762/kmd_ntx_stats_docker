@@ -13,6 +13,12 @@
 		{% include "components/tables/vote_tally_table.html" with region=region %}
 	{% endfor %}
 	<script>
+		const vote_data = {
+			AR: {},
+			EU: {},
+			NA: {},
+			SH: {}
+		}
 		function detect_final_ntx() {
 			$.getJSON('{% url "is_election_over_api" %}', function(resp) {
 
@@ -35,7 +41,7 @@
 		}    
 
 
-        timer_increment = 30
+        timer_increment = 5
 		countdown = setInterval( function () {
 			timer_increment -= 1
 			$('.countdown').html("Updating in " + timer_increment + " seconds...")
@@ -57,9 +63,7 @@
 
 	 	    	timer_increment = 30
 	 	    }
-		}, 1000 );
-
-		$("#AR_btn").css('background-color', '#062e60')
-			
+		}, 1000);
+ 
 	</script>
 {% endblock %}

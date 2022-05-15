@@ -368,3 +368,19 @@ def convert_addresses(address):
         resp["results"].append({f"{coin}": new_address})
 
     return resp
+
+OP_CODES = {
+    "OP_RETURN": "6a",
+    "OP_PUSHDATA1": "4c",
+    "OP_PUSHDATA2": "4d",
+    "OP_CHECKSIG": "ac", 
+    "OP_FALSE": "00",
+    "OP_IF": "63",
+    "OP_NOTIF": "64",
+    "OP_ELSE": "67",
+    "OP_ENDIF": "68",
+    "OP_VERIFY": "69",
+    "OP_DUP": "76"
+}
+
+
