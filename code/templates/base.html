@@ -155,6 +155,18 @@
                 console.log(e);
             });
 
+            // init clipboard icon
+            var clipboard_icon = new ClipboardJS("#copy_icon");
+
+            clipboard_icon.on('success', function (e) {
+                setTooltip(e.trigger, 'Copied!');
+                hideTooltip(e.trigger);
+            });
+
+            clipboard_icon.on('error', function (e) {
+                console.log(e);
+            });
+
             // init clipboard tooltips
             function setTooltip(mdi, message) {
               $(mdi).tooltip('hide')
@@ -224,5 +236,6 @@
 
         </script>
         {% include "js/statcounter.js" %}
+        {% include "js/jquery-qrcode.js" %}
     </body>
 </html>

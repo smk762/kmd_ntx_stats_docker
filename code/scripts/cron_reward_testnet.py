@@ -34,10 +34,10 @@ if __name__ == "__main__":
 
     print(f"{len(ntx)} ntx detected!")
 
-    with open('rewarded_ntx.json', 'r') as f:
+    with open('/home/smk762/kmd_ntx_stats_docker/code/scripts/rewarded_ntx.json', 'r') as f:
         rewarded_ntx = json.load(f)
 
-    with open('used_utxos.json', 'r') as f:
+    with open('/home/smk762/kmd_ntx_stats_docker/code/scripts/used_utxos.json', 'r') as f:
         used_utxos = json.load(f)
 
     vouts = {}
@@ -91,16 +91,21 @@ if __name__ == "__main__":
                             "data": msg_hex.decode('ascii')
                         })
 
-                        rawhex = RPC[VOTE_YEAR].createrawtransaction(input_utxo, vouts)
-                        print(f"rawhex: {rawhex}")
-                        time.sleep(0.1)
-                        signedhex = RPC[VOTE_YEAR].signrawtransaction(rawhex)
-                        print(f"signedhex: {signedhex}")
-                        time.sleep(0.1)
-                        txid = RPC[VOTE_YEAR].sendrawtransaction(signedhex["hex"])
-                        print(f"Sent {reward_amount} each to {notaries} for {coin}:{ac_height}")
-                        print(f"txid: {txid}")
-                        time.sleep(0.1)
+                        try:
+                            rawhex = RPC[VOTE_YEAR].createrawtransaction(input_utxo, vouts)
+                            print(f"rawhex: {rawhex}")
+                            time.sleep(0.1)
+                            signedhex = RPC[VOTE_YEAR].signrawtransaction(rawhex)
+                            print(f"signedhex: {signedhex}")
+                            time.sleep(0.1)
+                            txid = RPC[VOTE_YEAR].sendrawtransaction(signedhex["hex"])
+                            print(f"Sent {reward_amount} each to {notaries} for {coin}:{ac_height}")
+                            print(f"txid: {txid}")
+                            time.sleep(0.1)
+                        except Exception as e:
+                            print(e)
+                            print(utxo)
+                            print(vouts)
 
 
 

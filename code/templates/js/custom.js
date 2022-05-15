@@ -495,6 +495,11 @@
 		return sum / totals.length
 	}
 
-
+function get_qrcode(id, text, title, subtitle) {
+	$(id).html('')
+	jQuery(id).qrcode({foreground:"#070e28", background:"#b1d1d3", "text":text});
+	$('#qrcode-modal-label').html(title)
+	$('#qrcode-modal-subtitle').html(subtitle)
+}
 
 </script>

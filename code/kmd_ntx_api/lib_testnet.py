@@ -289,10 +289,18 @@ def translate_notary(notary):
         return "cipi"
     if notary == "vanbogan":
         return "van"
+    if notary == "metaphilbert":
+        return "metaphilibert"
+    if notary == "xenbug":
+        return "xen"
     return notary
 
 
 def translate_testnet_name(name, candidates):
+    if name == "metaphilbert":
+        name =  "metaphilibert"
+    if name == "xenbug":
+        name = "xen"
     for candidate in candidates:
         if candidate.lower().find(name.lower()) > -1:
             return candidate

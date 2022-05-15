@@ -25,6 +25,8 @@
 		</div>	
 	</div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
 <script>
     $(document).ready(function() {
     	{{ region }}_table = $('#{{ region }}_table').DataTable({	
@@ -36,13 +38,70 @@
 			},
 			"rowCallback": function( row, data ) {
 				if (data.region_rank <= 11) {
-					$(row).addClass( 'kmd_green' );
+					$(row).css('font-weight', 'bold');
 				}
 				else {
 					$(row).addClass( 'kmd_gray' );	
 				}
 				$('td:eq(1)', row).addClass( 'text-left' );
 				$('td:eq(4)', row).addClass( 'text-right' );
+            	if (vote_data.{{ region }}.length > 0) {
+			    	let tr_class = $(row).attr('class').split(" ")
+		            let candidate_data = vote_data.{{ region }}.filter(checkCandidate, data.candidate)
+
+	            	if (data.sum_votes > candidate_data[0].sum_votes) { 
+	            		
+					    setTimeout( function () {
+					    	if (data.region_rank > candidate_data[0].region_rank) { 
+					    		$('td', row).addClass('highlight_rank_down_bg_vote_up');
+					    	}
+					    	else {
+					    		$('td', row).addClass('highlight_update');	
+					    	}
+					    }, 200);
+					    setTimeout( function () {
+					    	if (tr_class.indexOf('odd') > -1) {
+					    		$('td', row).addClass('highlight_fadeout_bg_odd');
+					    	}
+					    	if (tr_class.indexOf('even') > -1) {
+					    		$('td', row).addClass('highlight_fadeout_bg_even');
+					    	}
+					    }, 2200);
+	            	}
+
+	            	if (data.region_rank < candidate_data[0].region_rank) {
+
+	            		console.log(data.candidate + " level up!")
+	            		
+					    setTimeout( function () {
+					    	$('td', row).addClass('highlight_rank_up_bg');
+					    }, 200);
+					    setTimeout( function () {
+					    	if (tr_class.indexOf('odd') > -1) {
+					    		$('td', row).addClass('highlight_fadeout_bg_odd');
+					    	}
+					    	if (tr_class.indexOf('even') > -1) {
+					    		$('td', row).addClass('highlight_fadeout_bg_even');
+					    	}
+					    }, 2200);
+	            	}
+	            	else if (data.region_rank > candidate_data[0].region_rank) { 
+
+	            		console.log(data.candidate + " level down!")
+
+					    setTimeout( function () {
+					    	$('td', row).addClass('highlight_rank_down_bg');
+					    }, 200);
+					    setTimeout( function () {
+					    	if (tr_class.indexOf('odd') > -1) {
+					    		$('td', row).addClass('highlight_fadeout_bg_odd');
+					    	}
+					    	if (tr_class.indexOf('even') > -1) {
+					    		$('td', row).addClass('highlight_fadeout_bg_even');
+					    	}
+					    }, 2200);
+	            	}
+            	}
 			},
     		"caption": '{{ region }} Region',
         	"paging": false,
@@ -61,6 +120,11 @@
 		    ],
     		"columnDefs": [
     			{
+		            "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            }
+		        },
+    			{
 		            "targets": 1,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 		            		$(nTd).html("<a href='"+oData.proposal+"'>"+oData.candidate+"</a>");
@@ -69,7 +133,12 @@
     			{
 		            "targets": 2,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/a/"+oData.candidate_address+"'>"+oData.candidate_address+"</a>");
+		            	let qr_button = "<i class='cil-qr-code' id='qr_icon' onclick='get_qrcode("+'"#qr_code", "'+oData.candidate_address+'", "'+oData.candidate.toUpperCase().replace('.', '-').replace('_', ' ')+'", "'+oData.candidate_address+'")'+"' data-toggle='modal' data-target='#qrcode-modal'></i>"
+		            		$(nTd).html("<a href='https://{{ year }}.komodod.com/a/"
+		            			+oData.candidate_address+"'><span id='"
+		            			+oData.candidate.replace('.', '-')+"_address'>"
+		            			+oData.candidate_address+"</span></a> <i class='cil-copy' id='copy_icon' data-clipboard-target='#"
+		            			+oData.candidate.replace('.', '-')+"_address' data-original-title='Copied!'></i> "+qr_button);
 		            }
 		        },
     			{
@@ -81,20 +150,6 @@
     			{
 		            "targets": 4,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-
-		            	if (vote_data.{{ region }}.length > 0) {
-		            		let candidate_data = vote_data.{{ region }}.filter(checkCandidate, oData.candidate)
-			            	if (oData.sum_votes > candidate_data[0].sum_votes) { 
-			            		
-							    setTimeout( function () {
-							    	$(nTd).addClass('highlight_update');
-							    }, 300);
-							    setTimeout( function () {
-							    	$(nTd).removeClass('highlight_update');
-							    	$(nTd).addClass('highlight_fadeout');
-							    }, 2300);
-			            	}
-		            	}
 		            }
 		        },
 	            {
@@ -106,6 +161,10 @@
 
 		function checkCandidate(data) {
 		    return data.candidate == this;
+		}
+
+		function checkRank(data) {
+		    return data.region_rank == this;
 		}
 
 		{{ region }}_table.on( 'xhr', function () {
