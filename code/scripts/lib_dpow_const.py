@@ -741,5 +741,3 @@ for _season in SEASONS_INFO:
                     SEASON = _season
 
 print(f"{int(time.time()) - NOW} sec to complete dpow const")
-
-print(SEASONS_INFO[_season]["servers"]["KMD"]["addresses"])

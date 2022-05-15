@@ -27,6 +27,10 @@ api_testnet_urls = [
           api_testnet.api_testnet_totals,
           name='api_testnet_totals'),
 
+    path('api/testnet/proposals/',
+          api_testnet.api_testnet_proposals,
+          name='api_testnet_proposals'),
+
     path('api/info/notary_vote_stats/',
           api_testnet.notary_vote_stats_info,
           name='notary_vote_stats_info'),

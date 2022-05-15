@@ -997,4 +997,12 @@
                 background-color: #00000000 !important;
                 border: none !important;
             }
+            .highlight_update {
+                color: #d1c642;
+                transition: color 2s ease-in-out
+            }
+            .highlight_fadeout {
+                color: #8ba7ca;
+                transition: color 2s ease-in-out
+            }
         </style>

@@ -26,6 +26,11 @@ def api_testnet_totals(request):
     return helper.json_resp(tabled)
 
 
+def api_testnet_proposals(request):
+    proposals = testnet.get_notary_candidates_info(request)
+    return helper.json_resp(proposals)
+
+
 def notary_vote_table(request):
     resp = testnet.get_notary_vote_table(request)
 
