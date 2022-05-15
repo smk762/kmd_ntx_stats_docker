@@ -887,16 +887,16 @@
             tr th:hover {
                 background-color: #131a22 !important; 
             }
-            tr.odd td {
-                background-color: #1a2330 !important;
+
+            table.dataTable tbody tr td {
+              background-color: #1a212a;
             }
-            tr.even td {
-                background-color: #1a212a !important;       
+
+            table.dataTable.table-striped tbody tr.odd td {
+              background-color: #181e26;
             }
-            tr.odd:hover td {
-                background-color: #071220 !important;
-            }
-            tr.even:hover td {
+
+            tr.odd:hover td, tr.even:hover td {
                 background-color: #071220 !important; 
             }
             tr.selected td {
@@ -928,7 +928,7 @@
                 vertical-align: middle !important;
                 padding-top: 0.2rem !important;
                 padding-bottom: 0.2rem !important;
-                background-color: #00000000 !important;
+                background-color: #00000000;
             }
             /* END TABLES */
 
@@ -1005,4 +1005,49 @@
                 color: #8ba7ca;
                 transition: color 2s ease-in-out
             }
+            .highlight_rank_up_bg {
+                background-color: #003617 !important;
+                color: #d1c642;
+                transition: color background-color 2s ease-in-out
+            }
+            .highlight_rank_down_bg {
+                background-color: #1e0000 !important;
+                transition: background-color 2s ease-in-out
+            }
+            .highlight_rank_down_bg_vote_up {
+                background-color: #1e0000 !important;
+                color: #d1c642;
+                transition: color background-color 2s ease-in-out
+            }
+            .highlight_fadeout_bg_odd {
+                background-color: #181e26 !important;
+                color: #8ba7ca;
+                transition: color background-color 2s ease-in-out
+            }
+            .highlight_fadeout_bg_even {
+                background-color: #1a212a !important;
+                color: #8ba7ca;
+                transition: color background-color 2s ease-in-out
+            }
+            #copy_icon. #qr_icon {
+                font-size: 0.8em;
+                color: #52a197;
+                cursor: pointer;
+            }
+            #copy_icon:hover, #qr_icon:hover {
+                color: #82f4e6 !important;
+                text-decoration: none;
+            }
+            .modal-content {
+                background-color: #070e28;
+            }
+            .modal-header, .modal-footer {
+                border: none;
+                display: block;
+            }
+            #qr_code canvas {
+                padding: 10px;
+                background-color: #b1d1d3
+            }
+
         </style>
