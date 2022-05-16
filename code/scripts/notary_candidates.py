@@ -131,7 +131,7 @@ CANDIDATE_ADDRESSES = {
 		"RJ4mmFUuzvzvWAuJKZE22zg1T5VJwMZfQF": "goldenman_AR",
 		"RKUz1GrTmY7B6FGUtM4LSywBRM9RQco3zE": "kmdude_SH",
 		"RKCXF7EYaAJHmiyDKmubhQ88dYc7CbTZxx": "kolo_AR",
-		"RPFUCG4nE5EfR41P4rcYmMbKgxmu9Ex8kX": "kolo2_AR",
+		"RPFUCG4nE5EfR41P4rcYmMbKgxmu9Ex8kX": "kolo_EU",
 		"RSjgbcDFEXv5Lc198MX5wBECj6U7YagtzE": "madmax_NA",
 		"RGaUZVeoTw5qdbNGiZNyUy1F1DunjVg2QQ": "madmax_EU",
 		"RRLnxMuSFXpowBbSGxMxEnNny7FBaJMqyf": "madmax_AR",

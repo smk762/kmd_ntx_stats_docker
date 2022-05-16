@@ -1,0 +1,71 @@
+        <style>
+
+            #graph_title {
+                color:#B7BBBF
+            }
+            .graph_container {
+                height: 1000px;
+            }
+            .graph_card_header {
+                background-color:#182331 !important;
+            }
+            .graph_card_body {
+                background-color:#1a2939 !important;
+            }
+            .graph_legend {
+                background-color:#1a2939 !important;
+                font-size: 0.6rem;
+            }
+            .graph_legend .master_server {
+                color: #c58c48;
+            }
+            .graph_legend .main_server {
+                color: #135621;
+            }
+            .graph_legend .third_party_server {
+                color: #2b53ad;
+            }
+            .graph_legend .ar_region {
+                color: #3c819d;
+            }
+            .graph_legend .eu_region {
+                color: #b3ba41;
+            }
+            .graph_legend .na_region {
+                color: #36bf3e;
+            }
+            .graph_legend .sh_region {
+                color: #b93429;
+            }
+            .graph_legend .dev_region {
+                color: #5d38ca;
+            }
+            .graph_legend {
+                margin: 1em;
+                padding: 1em;
+            }
+            .ar_region i {
+                color: #3C819D !important;
+            }
+            .eu_region i {
+                color:  #B3BA41 !important;
+            }
+            .na_region i {
+                color: #13BF3E !important;
+            }
+            .sh_region i {
+                color: #B93429 !important;
+            }
+            .dev_region i {
+                color: #5D38CA !important;
+            }
+            .main_server i {
+                color: #115621 !important;
+            }
+            .third_party_server i {
+                color: #2b53ad !important;
+            }
+            .master_server i {
+                color: #c58c47 !important;
+            }
+        </style>
