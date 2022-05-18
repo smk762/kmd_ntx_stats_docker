@@ -6,7 +6,7 @@
 
  -->
 	<div class="row col-12 m-auto">
-		<div class="card table_card">
+		<div class="card table_card floating-card m-0">
 			<div class="card-header table_card_title">
 				{{ notary }} {{ page_title }}
 			</div>
@@ -38,10 +38,11 @@
 	    $(document).ready(function() {
 	    	$('#notary_mining_tbl').css('visibility', 'visible');
 	        $('#notary_mining_tbl').DataTable({
-    			deferRender: true,
+				deferRender: true,
+	        	"paging": false,
+	        	"searching": false,
+	        	"info": false,
                 "orderClasses": false,
-    			"paging": true,
-  				"pageLength": 50,
 			    buttons: [
 			        {
 			            extend: 'csv',

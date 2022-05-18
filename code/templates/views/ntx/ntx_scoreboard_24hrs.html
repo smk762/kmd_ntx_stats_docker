@@ -5,11 +5,15 @@
 	{% include "components/region_leaders/region_ntx_leaders_24hr.html" %}
 
 	{% for region, region_data in daily_stats_sorted.items %}
-		<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-			<div class="card table_card m-auto">
+		{% if region == 'AR' %}
+		<div class="row" id="{{ region }}">
+		{% else %}
+		<div class="row" id="{{ region }}" style="display: none;">
+		{% endif %}
+			<div class="card table_card floating-card m-auto">
 				<div  class="card-header table_card_title flex">
 					<a id="{{region}}_table" class="section-anchor"></a>
-					<h4>{{ season }} {{ region }} Notarisation rankings (24hrs)</h4>
+					<h4>{{ season_clean }} {{ region }} Notarisation Rankings (24hrs)</h4>
 					{% for reg, stats in region_score_stats.items %}
 						{% if reg == region %}
 							<h6>Average: {{ stats.average_score|floatformat:-2 }}</h6>
@@ -17,7 +21,7 @@
 					{% endfor%}
 				</div>
 				<div class="card-body table_card_body">
-					<table id="{{ region }}_notarisations" class="table table-striped table-bordered">
+					<table id="{{ region }}_notarisations" class="table table-striped table-bordered" style="font-size:1.2em;">
 						<thead>
 							<tr>
 								<th class="py-2 px-4">Rank</th>
@@ -68,8 +72,10 @@
   
   	<script>
 	    $(document).ready(function() {
-		        AR_table = $('#AR_notarisations').DataTable({    
+		        AR_table = $('#AR_notarisations').DataTable({
 		        	"paging": false,
+		        	"searching": false,
+		        	"info": false,
 	    			deferRender: true,
 	                "orderClasses": false,
 	        		order: [[ 0, 'asc' ]],
@@ -84,6 +90,8 @@
 				        { "data": "score" }
 				    ],
 	        		"columnDefs": [
+        				{ className: "text-left text-nowrap", "targets": [ 1 ] },
+        				{ className: "text-right text-nowrap", "targets": [ 2,3,4,5,6,7 ] },
 	        			{
 				            "targets": 1,
 				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
@@ -116,6 +124,8 @@
 		        EU_table = $('#EU_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
+		        	"searching": false,
+		        	"info": false,
 	    			deferRender: true,
 	                "orderClasses": false,
 		        	"columns": [
@@ -161,6 +171,8 @@
 		        NA_table = $('#NA_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
+		        	"searching": false,
+		        	"info": false,
 	    			deferRender: true,
 	                "orderClasses": false,
 		        	"columns": [
@@ -206,6 +218,8 @@
 		        SH_table = $('#SH_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
+		        	"searching": false,
+		        	"info": false,
 	    			deferRender: true,
 	                "orderClasses": false,
 		        	"columns": [
@@ -251,6 +265,8 @@
 		        DEV_table = $('#DEV_notarisations').DataTable({
 	        		order: [[ 0, 'asc' ]],
 		        	"paging": false,
+		        	"searching": false,
+		        	"info": false,
 	    			deferRender: true,
 	                "orderClasses": false,
 		        	"columns": [

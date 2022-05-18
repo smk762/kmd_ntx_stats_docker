@@ -17,15 +17,15 @@
 	}
 
 	function show_region(region) {
-		const regions = ["#AR", "#EU", "#NA", "#SH"];
+		const regions = ["#AR", "#EU", "#NA", "#SH", "#DEV"];
 		regions.forEach(function (i) {
 			if (i == region) {
 				$(i).fadeTo(1000, 1)
-				$(i+"_btn").css('background-color', '#062e60')
+				$(i+"_btn").addClass('btn-selected')
 			}
 			else {
 				$(i).css('display', 'none')	
-				$(i+"_btn").css('background-color', '#182331')
+				$(i+"_btn").removeClass('btn-selected')
 			}
 		});
 	}
@@ -305,7 +305,7 @@
 
 	function get_epoch_styled(epoch) {
     	if (epoch != "Unofficial") {
-        	return "<span class='badge p-2' data-toggle='tooltip' data-placement='top' title='"+epoch+"'>"+epoch.replace('Epoch_','')+"</span>";
+        	return "<span class='' data-toggle='tooltip' data-placement='top' title='"+epoch+"'>"+epoch.replace('Epoch_','')+"</span>";
         }
         else {	
         	return "<span data-toggle='tooltip' data-placement='top' title='"+epoch+"'><i class='bi bi-exclamation-triangle-fill'></i>";

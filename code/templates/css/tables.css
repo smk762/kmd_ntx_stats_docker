@@ -78,6 +78,10 @@
                 text-align:right;
             }
 
+            .table th {
+              padding: 0.5em;
+            }
+
             table.dataTable tbody tr td {
               background-color: #1a212a;
             }
@@ -118,6 +122,8 @@
 
             .fixed-width-28 { width: 200px; }
 
+            .fixed-width-240 { width: 240px; }
+
             .highlight_update {
                 color: #d1c642;
                 transition: color 2s ease-in-out
@@ -156,6 +162,6 @@
                 border: solid #303030 1px !important;
                 background-color:#11253e !important;                
             }
-            
+
             /* END TABLES */
         </style>

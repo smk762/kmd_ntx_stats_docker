@@ -4,12 +4,17 @@
 
 	{% include "components/region_leaders/region_ntx_leaders.html" %}
 
+
 	{% for region, region_data in season_stats_sorted.items %}
-		<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-			<div class="card table_card m-auto">
+		{% if region == 'AR' %}
+		<div class="row" id="{{ region }}">
+		{% else %}
+		<div class="row" id="{{ region }}" style="display: none;">
+		{% endif %}
+			<div class="card table_card floating-card m-auto">
 				<div class="card-header table_card_title flex">
 					<a id="{{region}}_table" class="section-anchor"></a>
-					<h4>{{ season }} {{ region }} Notarisation rankings</h4>
+					<h4>{{ season_clean }} {{ region }} Notarisation Rankings</h4>
 					{% for reg, stats in region_score_stats.items %}
 						{% if reg == region %}
 							<h6>Average: {{ stats.average_score|floatformat:-2 }}</h6>
@@ -17,7 +22,7 @@
 					{% endfor%}
 				</div>
 				<div class="card-body table_card_body">
-					<table id="{{ region }}_notarisations" class="table table-striped table-bordered">
+					<table id="{{ region }}_notarisations" class="table table-striped table-bordered" style="font-size: 1.1em;">
 						<thead>
 							<tr>
 								<th class="py-2 px-4">Rank</th>
@@ -66,7 +71,7 @@
 								</td>
 								<td data-data="detail" class="px-2">
 									<a href="//{{ request.get_host }}/notary_epoch_scores/?notary={{ item.notary }}&season={{ season }}">
-										<span class='badge p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='{{ item.notary }} score detail'>
+										<span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='{{ item.notary }} score detail'>
 											<i class='fas fa-arrow-right'></i>
 										</span>
 									</a>
@@ -76,15 +81,16 @@
 						</tbody>
 					</table>
 				</div>
-			</div>	
+			</div>
 		</div>
-	{% endfor %}
   	<script>
 	    $(document).ready(function() {
-	        AR_table = $('#AR_notarisations').DataTable({    
+	        {{ region }}_table = $('#{{ region }}_notarisations').DataTable({    
     			deferRender: true,
                 "orderClasses": false,
-    			"paging": false,
+	        	"paging": false,
+	        	"searching": false,
+	        	"info": false,
         		order: [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "rank" },
@@ -98,6 +104,8 @@
 			        { "data": "detail" }
 			    ],
         		"columnDefs": [
+        			{ className: "text-left text-nowrap", "targets": [ 1 ] },
+        			{ className: "text-right text-nowrap", "targets": [ 2, 3, 4, 5, 6, 7 ] },
         			{
 			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
@@ -112,137 +120,7 @@
 			        }
         		]
 	        });
-	        EU_table = $('#EU_notarisations').DataTable({
-        		order: [[ 0, 'asc' ]],
-    			deferRender: true,
-                "orderClasses": false,
-	        	"paging": false,
-	        	"columns": [
-			        { "data": "rank" },
-			        { "data": "notary" },
-			        { "data": "master" },
-			        { "data": "main" },
-			        { "data": "third_party" },
-			        { "data": "seed" },	
-			        { "data": "mining" },
-			        { "data": "score" },
-			        { "data": "detail" }
-			    ],
-        		"columnDefs": [
-        			{
-			            "targets": 1,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(get_notary_url('{{ season }}', oData.notary));
-				        }
-			        },
-        			{
-			            "targets": 7,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(""+oData.score);
-				        }
-			        }
-        		]
-	        });
-	        NA_table = $('#NA_notarisations').DataTable({
-        		order: [[ 0, 'asc' ]],
-    			deferRender: true,
-                "orderClasses": false,
-    			"paging": false,
-	        	"columns": [
-			        { "data": "rank" },
-			        { "data": "notary" },
-			        { "data": "master" },
-			        { "data": "main" },
-			        { "data": "third_party" },
-			        { "data": "seed" },	
-			        { "data": "mining" },
-			        { "data": "score" },
-			        { "data": "detail" }
-			    ],
-        		"columnDefs": [
-        			{
-			            "targets": 1,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(get_notary_url('{{ season }}', oData.notary));
-				        }
-			        },
-        			{
-			            "targets": 7,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(""+oData.score);
-				        }
-			        }
-        		]
-	        });
-
-	        SH_table = $('#SH_notarisations').DataTable({
-        		order: [[ 0, 'asc' ]],
-	        	"paging": false,
-    			deferRender: true,
-                "orderClasses": false,
-	        	"columns": [
-			        { "data": "rank" },
-			        { "data": "notary" },
-			        { "data": "master" },
-			        { "data": "main" },
-			        { "data": "third_party" },
-			        { "data": "seed" },	
-			        { "data": "mining" },
-			        { "data": "score" },
-			        { "data": "detail" }
-			    ],
-        		"columnDefs": [
-        			{
-			            "targets": 1,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(get_notary_url('{{ season }}', oData.notary));
-				        }
-			        },
-        			{
-			            "targets": 7,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(""+oData.score);
-				        }
-			        }
-        		]
-	        });
-
-	        DEV_table = $('#DEV_notarisations').DataTable({
-        		order: [[ 0, 'asc' ]],
-    			deferRender: true,
-                "orderClasses": false,
-	        	"paging": false,
-	        	"columns": [
-			        { "data": "rank" },
-			        { "data": "notary" },
-			        { "data": "master" },
-			        { "data": "main" },
-			        { "data": "third_party" },
-			        { "data": "seed" },	
-			        { "data": "mining" },
-			        { "data": "score" },
-			        { "data": "detail" }
-			    ],
-        		"columnDefs": [
-        			{
-			            "targets": 1,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(get_notary_url('{{ season }}', oData.notary));
-				        }
-			        },
-        			{
-			            "targets": 7,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(""+oData.score);
-				        }
-			        }
-        		]
-	        });
-	        highlight_notaries(AR_table)
-	        highlight_notaries(EU_table)
-	        highlight_notaries(NA_table)
-	        highlight_notaries(SH_table)
-	        highlight_notaries(DEV_table)
+	        highlight_notaries({{ region }}_table)
 	    });
 	    /*
 	    $.ajax({ 
@@ -260,5 +138,6 @@
 	    }) 
 	   */
   </script> 
+	{% endfor %}
 
 {% endblock %}

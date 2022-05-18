@@ -1,11 +1,5 @@
 {% load static %}
 <div class="leader-badge">
-	<span class='badge stat_badge my-1 p-2 mx-auto' style="background-color: transparent;">
-		<a href="{% url 'ntx_scoreboard_24hrs_view' %}?season={{ season }}#{{ region }}_table">
-			<div>{{ region_name }}</div>
-			<div class="py-2" style="font-size: 1.1rem;">{{ item.notary }}</div>
-		</a>
-	</span>
 	<div class="">
 			{% for nn, site_links in nn_social.items %}
 				{% if item.notary == nn %}
@@ -16,9 +10,16 @@
 					{% endif %}
 				{% endif %}
 			{% endfor %}
-
 	</div>
 	<div class="">
 		<a class="badge stat_badge my-1 p-2 mx-auto" style="font-size: 1.3em" href="{% url 'notary_profile_index_view' %}{{ item.notary }}/?season={{ season }}"> {{ item.notary }} <br /><span style="font-size: 1.3em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
+	</div>
+
+		{% if region == 'AR' %}
+		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button btn-selected py-1 px-4 m-0" onclick="show_region('#{{ region }}')">{{ region_name }}
+		{% else %}
+		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0" onclick="show_region('#{{ region }}')">{{ region_name }}
+		{% endif %}
+
 	</div>
 </div>

@@ -2,12 +2,12 @@
 {% load static %}
 {% block content %}
 {% load mathfilters %}
-	<div class="row col-12 m-auto">
-		<div class="card table_card">
-			<div class="card-header table_card_title flex">
+	<div class="card-deck d-flex justify-content-between col-12 m-auto">
+		<div class="card table_card floating-card m-0">
+			<div class="card-header table_card_title floating-card">
 				{{ season_clean }} Scoring Epochs
 			</div>
-			<div class="card-body table_card_body flex">
+			<div class="card-body table_card_body p-0 m-auto" style="font-size: 1.1em">
 				<table id="epochs_tbl" class="table table-striped table-bordered">
 					<thead>
 						<tr>
@@ -60,7 +60,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="card-footer table_card_footer flex">
+			<div class="card-footer table_card_body flex">
 				<i>Note: Score for KMD to LTC/BTC notarisations are 0.0325 each</i>
 			</div>
 		</div>
@@ -70,6 +70,8 @@
 	    $(document).ready(function() {
 	        $('#epochs_tbl').DataTable({
 	        	"paging": false,
+	        	"searching": false,
+	        	"info": false,
     			deferRender: true,
                 "orderClasses": false,
         		order: [[ 0, 'desc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
@@ -85,8 +87,8 @@
 			        { "data": "score_per_ntx" }
 			    ],
         		"columnDefs": [
-        			{ className: "text-nowrap", "targets": [ 0 ] },
-        			{ className: "fixed-width-28", "targets": [ 7 ] },
+    				{ className: "text-nowrap text-left text-nowrap", "targets": [ 3,4 ] },
+        			{ className: "fixed-width-240", "targets": [ 7 ] },
         			{
 			            "targets": 0,
 			            "visible": false,
