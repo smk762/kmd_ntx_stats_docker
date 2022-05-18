@@ -14,7 +14,6 @@ import kmd_ntx_api.lib_mining as mining
 import kmd_ntx_api.lib_table as table
 
 
-
 def notary_coin_ntx_detail_view(request):
     context = helper.get_base_context(request)
     notary = helper.get_or_none(request, "notary")
@@ -135,8 +134,9 @@ def ntx_scoreboard(request):
     season_stats_sorted = stats.get_season_stats_sorted(season)
     context = helper.get_base_context(request)
     context.update({
-        "page_title":f"Notarisation Scoreboard",
-        "season_stats_sorted":season_stats_sorted,
+        "page_title": f"Notarisation Scoreboard",
+        "anchored": True,
+        "season_stats_sorted": season_stats_sorted,
         "region_score_stats": stats.get_region_score_stats(season_stats_sorted),
         "nn_social": info.get_nn_social_info(request)
     })
@@ -148,6 +148,7 @@ def ntx_scoreboard_24hrs(request):
     context = helper.get_base_context(request)
     context.update({
         "page_title": f"Last 24hrs Notarisation Scoreboard",
+        "anchored": True,
         "daily_stats_sorted": stats.get_daily_stats_sorted(season),
         "nn_social": info.get_nn_social_info(request)
     })
