@@ -181,15 +181,16 @@
                 border: solid 1px #303030;
                 background-color:#0d0f1c;
                 display: inline-block;
-                margin-bottom: 0.75rem;
-                padding: 0.25em 0.4rem;
                 font-size: 75%;
                 font-weight: 700;
                 line-height: 1;
                 text-align: center;
                 white-space: nowrap;
                 vertical-align: baseline;
-                border-radius: 0.25rem;
+                border-top-right-radius: 2em !important;
+                border-top-left-radius: 2em !important;
+                border-bottom-right-radius: 0em !important;
+                border-bottom-left-radius: 0em !important;
                 transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
             }
 
@@ -300,7 +301,9 @@
                 background-color: #00000000 !important;
                 border: none !important;
             }
-
+            .card-img-top {
+                margin-top: 1.5em;
+            }
             .card {
                 background: transparent;
                 border: solid 1px #3a3a3a;
@@ -659,15 +662,35 @@
             .append-btn2:focus {
                 outline: #11253e !important;
             }
+            .badge-footer-button {
+                line-height: 1rem;
+                border-radius: 0em !important;
+                padding: 1em !important;
+                border-top-left-radius: 0em !important;
+                border-bottom-right-radius: 0em !important;
+                border-bottom-left-radius: 0em !important;
+                border-top: solid 1px #0d0f1c !important;
+                border-left: solid 1px #182331 !important;
+                border-right: solid 1px #182331 !important;
+                border-bottom: solid 1px #182331 !important;
+                background-color:#182331;
+                color: #41EAD4 !important;
+                border-radius: 0.5em;
+            }
+            .badge-footer-button:hover {
+                background-color: #11253e !important;
+                color: #41EAD4 !important;
+                border: solid #3cddd4aa 1px !important;
+                text-decoration: none;                
+            }
             .btn {
                 color:  #aeaeae;
             }
             .btn-dark4 {
-                background-color:#182331 ;
+                background-color:#182331;
                 border: solid 1px #303030 !important;
                 color: #41EAD4 !important;
-                border: solid #838383aa 1px !important;
-                border-radius: 0.5em !important;
+                border-radius: 0.5em;
             }
             .btn-dark4:hover {
                 background-color: #11253e !important;
@@ -696,6 +719,10 @@
             }
             .std-btn:focus {
                 outline: #11253e !important;
+            }
+
+            .btn-selected {
+                background-color:  #062e60 !important;
             }
             /* END BUTTONS */
 
@@ -861,6 +888,18 @@
             }
             .faucet-img:hover {
                 filter: grayscale(0%);
+            }
+
+            .visually-hidden {
+                visibility: hidden;
+            }
+
+            #loading-spinner {
+                margin-top: 5em;
+            }
+            .spinner-border {
+                width: 5em;
+                height: 5em;
             }
 
         </style>
