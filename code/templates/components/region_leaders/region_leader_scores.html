@@ -15,11 +15,16 @@
 		<a class="badge stat_badge my-1 p-2 mx-auto" style="font-size: 1.3em" href="{% url 'notary_profile_index_view' %}{{ item.notary }}/?season={{ season }}"> {{ item.notary }} <br /><span style="font-size: 1.3em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
 	</div>
 
-		{% if region == 'AR' %}
-		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button btn-selected py-1 px-4 m-0" onclick="show_region('#{{ region }}')">{{ region_name }}
-		{% else %}
-		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0" onclick="show_region('#{{ region }}')">{{ region_name }}
-		{% endif %}
 	
-	</div>
+	{% if anchored %}
+
+		{% if region == 'AR' %}
+		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button btn-selected py-1 px-4 m-0" onclick="show_region('#{{ region }}')">{{ region_name }}</div></a>
+		{% else %}
+		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0" onclick="show_region('#{{ region }}')">{{ region_name }}</div></a>
+		{% endif %}
+
+	{% else %}
+		<a href="{% url 'ntx_scoreboard_view' %}"><div id="{{ region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0">{{ region_name }}</div></a>
+	{% endif %}
 </div>
