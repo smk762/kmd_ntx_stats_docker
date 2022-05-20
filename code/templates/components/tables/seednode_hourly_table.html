@@ -74,7 +74,7 @@
 	            }
 	        });
 			var maxDate = new Date()
-			var utc_max = new Date(maxDate.getTime())
+			var utc_max = new Date(maxDate.getTime() + getOffset())
 	        $( ".date_picker" ).datepicker({
 	            maxDate: utc_max,
 	            dateFormat: "D d M yy",
