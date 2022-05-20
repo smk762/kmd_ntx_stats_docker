@@ -658,9 +658,6 @@ def get_testnet_nn_seed_version_scores_hourly_table(request):
     else:
         start = int(start)
         end = start + SINCE_INTERVALS['day']
-    # Fri 20 May 2022
-    date = dt.utcfromtimestamp(end).strftime('%a %-d %B %Y')
-    print(date)
 
     date_hour_notary_scores = query.get_nn_seed_version_scores(int(start), int(end))
 
@@ -690,7 +687,7 @@ def get_testnet_nn_seed_version_scores_hourly_table(request):
         table_data.append(notary_row)
     return {
         "start": start,
-        "date": date,
+        "date": dt.utcfromtimestamp(end).strftime('%a %-d %B %Y'),
         "end": end,
         "headers": table_headers,
         "table_data": table_data,
