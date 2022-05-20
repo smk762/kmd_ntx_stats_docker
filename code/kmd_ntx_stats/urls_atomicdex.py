@@ -41,6 +41,10 @@ frontend_atomicdex_urls = [
          views_atomicdex.seednode_version_stats_hourly_table_view,
          name='seednode_version_stats_hourly_table_view'),
 
+    path('atomicdex/testnet_seednode_version_stats_hourly/',
+         views_atomicdex.testnet_seednode_version_stats_hourly_table_view,
+         name='testnet_seednode_version_stats_hourly_table_view'),
+
     path('atomicdex/seednode_version_stats_daily/',
          views_atomicdex.seednode_version_stats_daily_table_view,
          name='seednode_version_stats_daily_table_view'),
@@ -59,6 +63,10 @@ api_atomicdex_urls = [
     path('api/atomicdex/nn_seed_version_scores_table/',
          api_atomicdex.nn_seed_version_scores_table_api,
          name='nn_seed_version_scores_table_api'),
+
+    path('api/atomicdex/nn_testnet_seed_version_scores_table/',
+         api_atomicdex.nn_testnet_seed_version_scores_table_api,
+         name='nn_testnet_seed_version_scores_table_api'),
 
     path('api/atomicdex/seednode_version_stats_hourly/',
          api_atomicdex.seednode_version_stats_hourly_api,

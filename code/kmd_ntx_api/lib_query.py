@@ -32,6 +32,8 @@ def get_mm2_version_stats_data(start, end, notary):
         timestamp__range=(start, end), name=notary
     )
 
+
+
 def get_nn_seed_version_scores(start, end, notary=None):
     start, end, season = get_timespan_season(start, end)
     data = mm2_version_stats.objects.filter(
@@ -41,45 +43,24 @@ def get_nn_seed_version_scores(start, end, notary=None):
     if notary:
         data = data.filter(name=notary)
 
-    data = data.order_by("-timestamp")
-    helper.date_hour_notary_scores = {}
+    return data.order_by("-timestamp")
 
+    date_hour_notary_scores = {}
     for i in data.values():
+
         i["date"], i["hour"] = helper.date_hour(i["timestamp"]).split(" ")
-
-        if i["date"] not in helper.date_hour_notary_scores:
-            helper.date_hour_notary_scores.update({
-                i["date"]: {
-                        i["hour"]: {
-                            i["name"]: {
-                                "versions": [],
-                                "score": i["score"]
-                            }
-                        }
-                    }
-                })
-
-        elif i["hour"] not in helper.date_hour_notary_scores[i["date"]]:
-            helper.date_hour_notary_scores[i["date"]].update({
-                i["hour"]: {
-                    i["name"]: {
-                        "versions": [],
-                        "score": i["score"]
-                    }
-                }
+        hour = i["hour"].replace(":00", "")
+        if i["date"] not in date_hour_notary_scores:
+            date_hour_notary_scores.update({
+                i["date"]: template
             })
+        date_hour_notary_scores[i["date"]][hour][i["name"]].update({
+            "score": i["score"]
+        })
+        if i["version"] not in date_hour_notary_scores[i["date"]][hour][i["name"]]["versions"]:
+            date_hour_notary_scores[i["date"]][hour][i["name"]]["versions"].append(i["version"])
 
-        elif i["name"] not in helper.date_hour_notary_scores[i["date"]][i["hour"]]:
-            helper.date_hour_notary_scores[i["date"]][i["hour"]].update({
-                i["name"]: {
-                    "versions": [],
-                    "score": i["score"]
-                }
-            })
-        if i["version"] not in helper.date_hour_notary_scores[i["date"]][i["hour"]][i["name"]]["versions"]:
-            helper.date_hour_notary_scores[i["date"]][i["hour"]][i["name"]]["versions"].append(i["version"])
-
-    return helper.date_hour_notary_scores
+    return date_hour_notary_scores
 
 
 def get_nn_seed_version_scores_daily(start, end, notary=None):

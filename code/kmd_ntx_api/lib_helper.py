@@ -99,6 +99,22 @@ def get_notary_clean(notary):
     notary_clean = notary_split[0].title() + " " + notary_split[1]
     return notary_clean
 
+def prepopulate_date_hour_notary_scores(notaries):
+    resp = {}
+    for i in range(24):
+        if i < 10: i = f"0{i}"
+        resp.update({f"{i}": {}})
+
+    for notary in notaries:
+        print(notary)
+        for i in resp.keys():
+            resp[i].update({
+                notary: {
+                    "versions": [],
+                    "score": 0
+                }
+            })
+    return resp
 
 def floor_to_utc_day(ts):
     return math.floor(int(ts) / (SINCE_INTERVALS['day'])) * (SINCE_INTERVALS['day'])

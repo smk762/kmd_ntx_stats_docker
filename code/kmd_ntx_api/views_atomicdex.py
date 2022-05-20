@@ -10,6 +10,7 @@ import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_info as info
 import kmd_ntx_api.lib_atomicdex as dex
+import kmd_ntx_api.api_atomicdex as dex_api
 import kmd_ntx_api.forms as forms
 
 
@@ -320,6 +321,26 @@ def orderbook_view(request):
         })
 
     return render(request, 'views/atomicdex/orderbook.html', context)
+
+def testnet_seednode_version_stats_hourly_table_view(request):
+    context = helper.get_base_context(request)
+    active_version = " & ".join(dex.get_active_mm2_versions(time.time()))
+    version_scores = dex.get_testnet_nn_seed_version_scores_hourly_table(request)
+
+    context.update({
+        "active_version": active_version,
+        "date": version_scores["date"],
+        "end": int(version_scores["end"]),
+        "start": int(version_scores["start"]),
+        "date_ts": int(version_scores["start"]*1000),
+        "table_data": version_scores["table_data"],
+        "headers": version_scores["headers"],
+        "scores": version_scores["scores"]
+    })
+    print(version_scores["date"])
+
+    return render(request, 'views/atomicdex/seednode_version_stats_hourly_table.html', context)
+
 
 
 def seednode_version_stats_hourly_table_view(request):

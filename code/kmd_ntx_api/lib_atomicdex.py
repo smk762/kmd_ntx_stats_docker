@@ -4,6 +4,7 @@ import requests
 from django.db.models import Count
 from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.lib_const_mm2 import *
+from datetime import datetime as dt
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_struct as struct
 import kmd_ntx_api.lib_helper as helper
@@ -603,10 +604,10 @@ def get_nn_seed_version_scores_hourly_table(request, start=None, end=None):
         end = helper.get_or_none(request, "end")
 
     if not start:
-        start = time.time()
-        end = time.time() + SINCE_INTERVALS["day"]
+        end = time.time()
+        start = time.time() - SINCE_INTERVALS["day"]
     notary_list = helper.get_notary_list(SEASON)
-    helper.date_hour_notary_scores = query.get_nn_seed_version_scores(start, end)
+    date_hour_notary_scores = query.get_nn_seed_version_scores(start, end)
     
     table_headers = ["Total"]
     table_data = []
@@ -615,18 +616,17 @@ def get_nn_seed_version_scores_hourly_table(request, start=None, end=None):
     for notary in notary_list:
         notary_scores.update({notary:[]})
 
-    for date in helper.date_hour_notary_scores:
-        for hour in helper.date_hour_notary_scores[date]:
+    for date in date_hour_notary_scores:
+        for hour in date_hour_notary_scores[date]:
             table_headers.append(f"{hour.split(':')[0]}")
             for notary in notary_list:
-                if notary in helper.date_hour_notary_scores[date][hour]:
-                    score = round(helper.date_hour_notary_scores[date][hour][notary]["score"],2)
+                if notary in date_hour_notary_scores[date][hour]:
+                    score = round(date_hour_notary_scores[date][hour][notary]["score"],2)
                 else:
                     score = 0
                 notary_scores[notary].append(score)
 
     table_headers.append("Notary")
-    table_headers.reverse()
     # Get total for timespan
     for notary in notary_scores:
         notary_scores[notary].reverse()
@@ -637,3 +637,62 @@ def get_nn_seed_version_scores_hourly_table(request, start=None, end=None):
         "headers": table_headers,
         "scores": notary_scores
         }
+
+
+def get_testnet_nn_seed_version_scores_hourly_table(request):
+    # TODO: Views for day (by hour), month (by day), season (by month)
+    # Season view: click on month, goes to month view
+    # Month view: click on day, goes to day view
+    # TODO: Incorporate these scores into overall NN score, and profile stats.
+
+    notary_list = helper.get_notary_list("VOTE2022_Testnet")
+    default_scores = helper.prepopulate_date_hour_notary_scores(notary_list)
+    hour_headers = list(default_scores.keys())
+    hour_headers.sort()
+    table_headers = ["Notary"] + hour_headers + ["Total"]
+    print(request.GET)
+    start = helper.get_or_none(request, "start")
+    if not start:
+        end = int(time.time())
+        start = end - SINCE_INTERVALS["day"]
+    else:
+        start = int(start)
+        end = start + SINCE_INTERVALS['day']
+    # Fri 20 May 2022
+    date = dt.utcfromtimestamp(end).strftime('%a %-d %B %Y')
+    print(date)
+
+    date_hour_notary_scores = query.get_nn_seed_version_scores(int(start), int(end))
+
+    scores = date_hour_notary_scores.values()
+    for item in scores:
+        notary = item["name"]
+        if notary in notary_list:
+            score = item["score"]
+            _, hour = helper.date_hour(item["timestamp"]).split(" ")
+            hour = hour.replace(":00", "")
+            default_scores[hour][notary]["score"] = score
+            if item["version"] not in default_scores[hour][notary]["versions"]:
+                default_scores[hour][notary]["versions"].append(item["version"])
+
+    table_data = []
+    for notary in notary_list:
+        notary_row = {"Notary": notary}
+        total = 0
+        for hour in hour_headers:
+            total += default_scores[hour][notary]["score"]
+            notary_row.update({
+                hour: default_scores[hour][notary]["score"]
+            })
+        notary_row.update({
+            "Total": round(total,1)
+        })
+        table_data.append(notary_row)
+    return {
+        "start": start,
+        "date": date,
+        "end": end,
+        "headers": table_headers,
+        "table_data": table_data,
+        "scores": default_scores
+    }
