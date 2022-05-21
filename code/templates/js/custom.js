@@ -17,9 +17,23 @@
 	}
 
 	function show_region(region) {
-		const regions = ["#AR", "#EU", "#NA", "#SH", "#DEV"];
-		regions.forEach(function (i) {
+		const options = ["#AR", "#EU", "#NA", "#SH", "#DEV"];
+		options.forEach(function (i) {
 			if (i == region) {
+				$(i).fadeTo(1000, 1)
+				$(i+"_btn").addClass('btn-selected')
+			}
+			else {
+				$(i).css('display', 'none')	
+				$(i+"_btn").removeClass('btn-selected')
+			}
+		});
+	}
+
+	function show_timespan(timespan) {
+		const options = ["#season", "#month", "#week", "#last_24hrs"];
+		options.forEach(function (i) {
+			if (i == timespan) {
 				$(i).fadeTo(1000, 1)
 				$(i+"_btn").addClass('btn-selected')
 			}

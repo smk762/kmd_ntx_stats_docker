@@ -2,43 +2,43 @@
 {% load static %}
 {% block content %}
 {% load mathfilters %}
-	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-		<div class="card col-12 m-0 p-0">
-			<div class="card-header flex">
-				<h2>{{ season_clean }} MM2 Version Status (last 24hrs)</h2>
-				From <input class="dt_picker" type="text" id="start" value="" /> 
-				to <input class="dt_picker" type="text" id="end" value="" />
-
-
+	<div class="row col-12 m-auto p-0 m-0" id="last_24hrs">
+		<div class="card table_card floating-card m-0">
+			<div class="card-header table_card_title">
+				<span class="mx-1">MM2 Version Daily Stats</span>
 			</div>
-			<div class="card-body flex">
-				<div class="graph_container" style="height:1300px;">
-					<canvas id="myChart"></canvas>
-				</div>
+			<div class="card-header pb-0">
+				{% include 'components/form/date_selection.html' %}
 			</div>
-			<div class="card-footer flex">
-				<h6><i></i></h6>
+			<div class="card-body table_card_body pb-0 px-3" style="overflow-x: auto;">
+				{% include 'components/tables/seednode_version_date_table.html' %}
+			</div>
+			<div class="card-footer">
+				<i>Times are in UTC. The current active mm2 version: <a href="https://github.com/KomodoPlatform/atomicDEX-API/commit/{{ active_version }}">{{ active_version }}</a></i>
 			</div>
 		</div>
 	</div>
-<script>
-	{% autoescape off %}
-	url = "/api/atomicdex/version_stats_by_hour/?chart=1&start={{start}}&end={{end}}"
 
-	$('#start').val(local_date_str('{{start_str}}'))
-	$('#end').val(local_date_str('{{end_str}}'))
-	{% endautoescape %}
+	<div class="row col-12 m-auto p-0 m-0" id="month"  style="display: none;">
+		<div class="card table_card floating-card m-0">
+			<div class="card-header table_card_title">
+				<span class="mx-1">MM2 Version Monthly Stats</span>
+			</div>
+			<div class="card-header pb-0">
+				{% include 'components/form/month_selection.html' %}
+			</div>
+			<div class="card-body table_card_body pb-0 px-3" style="overflow-x: auto;">
+				{% include 'components/tables/seednode_version_month_table.html' %}
+			</div>
+			<div class="card-footer">
+				<i>Times are in UTC. The current active mm2 version: <a href="https://github.com/KomodoPlatform/atomicDEX-API/commit/{{ active_version }}">{{ active_version }}</a></i>
+			</div>
+		</div>
+	</div>
 
-	var myChart;
-	get_versionData(url)
-
-
-	$('#start').on('change', function () {
-	    update_chart()
-	});
+	<div class="mb-3">
+		{% include "components/anchors/timespans.html" with month_btn='true' day_btn='true' %}
+	</div>
 	
-	$('#end').on('change', function () {
-	    update_chart()
-	});
-</script>
+	
 {% endblock %}
