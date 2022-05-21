@@ -252,9 +252,9 @@ def get_notary_vote_table(request):
 
     if "order_by" in request.GET:
         order_by = request.GET["order_by"]
-        data = data.values().order_by(f'-{order_by}')
+        data = data.order_by(f'-{order_by}').values()
     else:
-        data = data.values().order_by(f'-block_time')
+        data = data.order_by(f'-block_time').values()
 
     serializer = serializers.notaryVoteSerializer(data, many=True)
     resp = {}

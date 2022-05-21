@@ -7,19 +7,12 @@ def orderbook_api(request):
     return JsonResponse(dex.get_orderbook(request))
 
 
-def seednode_version_stats_api(request):
-    return JsonResponse(dex.get_nn_mm2_stats(request), safe=False)
+def seednode_version_date_table_api(request):
+    return JsonResponse(dex.get_seednode_version_date_table(request), safe=False)
 
 
-def seednode_version_stats_hourly_api(request):
-    return JsonResponse(dex.get_nn_mm2_stats_by_hour(request), safe=False)
-
-
-def nn_seed_version_scores_table_api(request):
-    return JsonResponse(dex.get_nn_seed_version_scores_hourly_table(request), safe=False)
-
-def nn_testnet_seed_version_scores_table_api(request):
-    return JsonResponse(dex.get_testnet_nn_seed_version_scores_hourly_table(request), safe=False)
+def seednode_version_month_table_api(request):
+    return JsonResponse(dex.get_seednode_version_month_table(request), safe=False)
 
 
 def bestorders_api(request):

@@ -282,7 +282,7 @@ class mined_count_season(models.Model):
         ]
 
 
-class mm2_version_stats(models.Model):
+class seednode_version_stats(models.Model):
     name = models.CharField(max_length=128)
     season = models.CharField(max_length=128, default='')
     version = models.CharField(max_length=128)
@@ -291,7 +291,7 @@ class mm2_version_stats(models.Model):
     score = models.FloatField(default=0)
 
     class Meta:
-        db_table = 'mm2_version_stats'
+        db_table = 'seednode_version_stats'
         indexes = [
             models.Index(fields=['timestamp'])
         ]

@@ -13,14 +13,18 @@
 	</table>
 	<script>
 		$(document).ready(function() {
-			var start = parseInt(Math.floor($('#date_ts').val())/1000) + 86400
-			start = Math.floor(start/86400)*86400
-			var end = start + 86400
-			var url = "{% url 'nn_testnet_seed_version_scores_table_api' %}?start="+start+"&end="+end
+        	var my = $('#date_ts').val().split("-")
+			var params = "?year="+my[1]+"&month="+my[0]+"&season={{ season }}"
+			var endpoint = "{% url 'seednode_version_month_table_api' %}"+params
+			var maxTime = new Date().valueOf()
+			var maxDay = new Date(maxTime).getUTCDate()
+			var maxMonth = new Date(maxTime).getUTCMonth()+1
+			var maxYear = new Date(maxTime).getUTCFullYear()
+			var last_day = daysInMonth(my[0], my[1])
 
 	        seed_table = $('#mm2_version_tbl').DataTable({
 	    		ajax: {
-				    url: url,
+				    url: endpoint,
 	    			dataSrc: 'table_data',
 	    			"deferRender": true
 				},
@@ -51,12 +55,17 @@
 		            	targets: 'hour_cell',
 		            	orderable: true,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-							let maxTime = new Date().valueOf()
-							let maxHour = new Date(maxTime).getUTCHours()
-			            	if (sData == 0.2){
-			            		$(nTd).html('<i class="fas fa-check-circle" style="color: #377c43;"></i>');
+							if (iCol > last_day) {
+								var api= this.api();
+								api.column(iCol).visible(false);
+							}
+			            	if (sData != 0) {
+			            		let opacity = Math.round(sData / 6 * 100) / 100 + 0.2
+			            		let pct = Math.round(sData / 4.8 * 100)
+
+			            		$(nTd).html('<span class="p-0" style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="'+sData+' ('+pct+'%)"><i class="fas fa-check-circle" style="color: #377c43; opacity: '+opacity+'"></i></span>');
 			            	}
-			            	else if ((iCol-1 > maxHour) && (maxTime/1000 < end)) {
+			            	else if ((my[1] >= maxYear) && (my[0] >= maxMonth) && (iCol > maxDay)) {
 			            		$(nTd).html('<i class="fa-solid fa-hourglass" style="color: #373f48;"></i>');
 			            	}
 			            	else {
@@ -69,22 +78,28 @@
 		                targets: '_all'
 		            }
 			    ],
-                // Custom DataTables search filter input styling
+                // Custom DataTables search filter input styling 
 				"initComplete": function (settings, json) {
 	            }
 	        });
+
+            function daysInMonth(month, year) {
+                return new Date(year, month, 0).getDate();
+            }
+
 			var maxDate = new Date()
 			var utc_max = new Date(maxDate.getTime() + getOffset())
 	        $( ".date_picker" ).datepicker({
 	            maxDate: utc_max,
-	            dateFormat: "D d M yy",
+  				changeMonth: true,
+	            dateFormat: "M yy",
 	            altField: "#date_ts",
-	            altFormat: "@",
+	            altFormat: "m-yy",
 	            onSelect : function (dateText, inst) {
-	            	start = parseInt($('#date_ts').val()/1000) + 86400
-					start = Math.floor(start/86400)*86400
-					end = start + 86400
-					let endpoint = "{% url 'nn_testnet_seed_version_scores_table_api' %}?start="+start+"&end="+end
+	            	my = $('#date_ts').val().split("-")
+					params = "?year="+my[1]+"&month="+my[0]+"&season={{ season }}"
+					endpoint = "{% url 'seednode_version_month_table_api' %}"+params
+					last_day = daysInMonth(my[0], my[1])
 			        seed_table.ajax.url(endpoint).load();
 	            }
 	        });

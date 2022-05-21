@@ -171,7 +171,7 @@ class mm2VersionStatsViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing mm2 Version Stats table data
     """
-    queryset = mm2_version_stats.objects.all()
+    queryset = seednode_version_stats.objects.all()
     serializer_class = serializers.mm2VersionStatsSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]

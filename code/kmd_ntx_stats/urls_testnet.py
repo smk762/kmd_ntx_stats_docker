@@ -34,10 +34,6 @@ api_testnet_urls = [
     path('api/info/notary_vote_stats/',
           api_testnet.notary_vote_stats_info,
           name='notary_vote_stats_info'),
-
-    path('api/table/notary_vote/',
-          api_testnet.notary_vote_table,
-          name='notary_vote_table'),
     
     path('api/table/notary_vote_totals/',
           api_testnet.vote_aggregates_api,

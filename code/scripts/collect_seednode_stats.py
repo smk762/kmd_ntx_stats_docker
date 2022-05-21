@@ -106,9 +106,9 @@ def start_stats_collection():
 
 
 def empty_pg_table():
-	rows = CURSOR.execute("DELETE FROM mm2_version_stats;")
+	rows = CURSOR.execute("DELETE FROM seednode_version_stats;")
 	CONN.commit()
-	print('Deleted', CURSOR.rowcount, 'records from mm2_version_stats PgSQL table.')
+	print('Deleted', CURSOR.rowcount, 'records from seednode_version_stats PgSQL table.')
 
 
 def empty_sqlite_table(table):
@@ -143,27 +143,27 @@ def get_registered_nodes_from_db():
         print("---------")
 
 
-def update_mm2_version_stats_row(row_data):
+def update_seednode_version_stats_row(row_data):
     try:
-        sql = f"INSERT INTO mm2_version_stats \
+        sql = f"INSERT INTO seednode_version_stats \
                     (name, season, version, timestamp, error, score) \
                 VALUES (%s, %s, %s, %s, %s, %s);"
         CURSOR.execute(sql, row_data)
         CONN.commit()
     except Exception as e:
-        #logger.error(f"Exception in [update_mm2_version_stats_row]: {e}")
-        #logger.error(f"[update_mm2_version_stats_row] sql: {sql}")
-        #logger.error(f"[update_mm2_version_stats_row] row_data: {row_data}")
+        #logger.error(f"Exception in [update_seednode_version_stats_row]: {e}")
+        #logger.error(f"[update_seednode_version_stats_row] sql: {sql}")
+        #logger.error(f"[update_seednode_version_stats_row] row_data: {row_data}")
         CONN.rollback()
 
 
 def get_version_stats_from_pgsql_db():
-    sql = f"SELECT * FROM mm2_version_stats;"
+    sql = f"SELECT * FROM seednode_version_stats;"
     CURSOR.execute(sql)
     return get_results_or_none(CURSOR)
 
 def get_pgsql_latest():
-    sql = f"SELECT MAX(timestamp) FROM mm2_version_stats;"
+    sql = f"SELECT MAX(timestamp) FROM seednode_version_stats;"
     CURSOR.execute(sql)
     try:
         results = CURSOR.fetchone()[0]
@@ -196,7 +196,7 @@ def migrate_sqlite_to_pgsql(ts):
 			score = get_version_score(row["version"], hr_timestamp)
 			row_data = (row["name"], season, row["version"], hr_timestamp, row["error"], score)
 			print(row_data)
-			update_mm2_version_stats_row(row_data)
+			update_seednode_version_stats_row(row_data)
 
 
 if __name__ == '__main__':

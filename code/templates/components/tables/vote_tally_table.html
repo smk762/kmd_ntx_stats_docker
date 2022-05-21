@@ -68,8 +68,6 @@
 	            	}
 
 	            	if (data.region_rank < candidate_data[0].region_rank) {
-
-	            		console.log(data.candidate + " level up!")
 	            		
 					    setTimeout( function () {
 					    	$('td', row).addClass('highlight_rank_up_bg');
@@ -84,10 +82,6 @@
 					    }, 2200);
 	            	}
 	            	else if (data.region_rank > candidate_data[0].region_rank) { 
-
-	            		console.log(data.candidate + " level down!")
-	            		console.log(data.region_rank + " new rank!")
-	            		console.log(candidate_data[0].region_rank + " old rank!")
 
 					    setTimeout( function () {
 					    	$('td', row).addClass('highlight_rank_down_bg');
