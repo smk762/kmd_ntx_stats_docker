@@ -1,6 +1,6 @@
 <div class="row" id="{{ season }}">
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card">
+		<div class="card table_card floating-card m-0">
 			<div class="card-header table_card_title">
 				<h4>{{ year }} Testnet Notarisation rankings</h4>
 				<h6>Average: <span id="average"></span></h6>
@@ -30,7 +30,7 @@
 
 <div class="row" id="{{ season }}">
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card">
+		<div class="card table_card floating-card m-0">
 			<div class="card-header table_card_title">
 				<h4>{{ year }} Testnet Notarisation rankings (24hrs)</h4>
 				<h6>Average: <span id="average_24hr"></span></h6>
@@ -108,8 +108,9 @@
     			dataSrc: 'results',
     			"deferRender": true
 			},
-			"paging": false,
-			deferRender: true,
+        	"paging": false,
+        	"searching": false,
+        	"info": false,
 			"orderClasses": false,
     		order: [[ 0, 'asc' ]],
         	"columns": [

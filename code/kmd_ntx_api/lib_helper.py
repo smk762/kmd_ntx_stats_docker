@@ -7,7 +7,10 @@ import logging
 import requests
 import string
 import itertools
-from datetime import datetime, timezone
+import datetime
+from datetime import datetime as dt
+from datetime import timezone as tz
+from calendar import monthrange
 from django.http import JsonResponse
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_struct as struct
@@ -23,6 +26,30 @@ def has_error(_dict):
     if "error" in _dict:
         return True
     return False
+
+def get_month_epoch_range(year=None, month=None):
+    if not year or not month:
+        dt_today = datetime.date.today()
+        year = dt_today.year
+        month = dt_today.month
+
+    d = datetime.date(int(year), int(month), 1)
+    ds_time = time.daylight * SINCE_INTERVALS['hour']
+    start = time.mktime(d.timetuple()) - time.timezone + ds_time
+    last_day = monthrange(int(year), int(month))[1]
+    d = datetime.date(int(year), int(month), last_day)
+    end = time.mktime(d.timetuple()) - time.timezone + ds_time + SINCE_INTERVALS['day'] - 1
+    return start, end, last_day
+
+def get_timespan_season(start, end):
+    season = SEASON
+    if not start:
+        start = time.time() - SINCE_INTERVALS['day']
+    if not end:
+        end = time.time()
+    else:
+        season = get_season((end+start)/2)
+    return int(float(start)), int(float(end)), season
 
 
 def qset_values_to_list(qset_vals):
@@ -100,13 +127,51 @@ def get_notary_clean(notary):
     return notary_clean
 
 
+def prepopulate_seednode_version_date(notaries):
+    resp = {}
+    for i in range(24):
+        if i < 10: i = f"0{i}"
+        resp.update({f"{i}": {}})
+
+    for notary in notaries:
+        for i in resp.keys():
+            resp[i].update({
+                notary: {
+                    "versions": [],
+                    "score": 0
+                }
+            })
+    return resp
+
+
+def prepopulate_seednode_version_month(notaries):
+    resp = {}
+    for i in range(31):
+        if i + 1 < 10:
+            x = f"0{i + 1}"
+        else:
+            x = str(i + 1)
+        resp.update({x: {}})
+
+    for notary in notaries:
+        print(notary)
+        for i in resp.keys():
+            resp[i].update({
+                notary: {
+                    "versions": [],
+                    "score": 0
+                }
+            })
+    return resp
+
+
 def floor_to_utc_day(ts):
     return math.floor(int(ts) / (SINCE_INTERVALS['day'])) * (SINCE_INTERVALS['day'])
 
 
 def date_hour(timestamp):
     if timestamp > time.time() * 10: timestamp /= 1000
-    date, hour = datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%x %H").split(" ")
+    date, hour = dt.fromtimestamp(timestamp, tz=tz.utc).strftime("%x %H").split(" ")
     return f"{date} {hour}:00"
 
 

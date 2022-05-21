@@ -10,6 +10,7 @@ import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_info as info
 import kmd_ntx_api.lib_atomicdex as dex
+import kmd_ntx_api.api_atomicdex as dex_api
 import kmd_ntx_api.forms as forms
 
 
@@ -322,67 +323,11 @@ def orderbook_view(request):
     return render(request, 'views/atomicdex/orderbook.html', context)
 
 
-def seednode_version_stats_hourly_table_view(request):
-    context = helper.get_base_context(request)
-    stats_date = helper.get_or_none(request, "date", "Today")
-
-    date_ts = helper.floor_to_utc_day(time.time())
-    date_ts = int(helper.get_or_none(request, "date_ts", date_ts))
-    # Normalise if in ms instead of sec
-    if date_ts > time.time()*10: date_ts /= 1000
-
-    start = helper.floor_to_utc_day(date_ts)
-    end = start + SINCE_INTERVALS["day"]
-
-    active_version = " & ".join(dex.get_active_mm2_versions(time.time()))
-    version_scores = dex.get_nn_seed_version_scores_hourly_table(request, start, end)
-
-    context.update({
-        "date": helper.get_or_none(request, "date", "Today"),
-        "date_ts": date_ts,
-        "stats_date": stats_date,
-        "active_version": active_version,
-        "headers": version_scores["headers"],
-        "scores": version_scores["scores"]
-    })
-
-    return render(request, 'views/atomicdex/seednode_version_stats_hourly_table.html', context)
-
-
-def seednode_version_stats_daily_table_view(request):
-    context = helper.get_base_context(request)
-
-    start = time.time() + (SINCE_INTERVALS["day"])
-    start = helper.get_or_none(request, "start", start)
-    start = helper.floor_to_utc_day(start)
-    end = start + (SINCE_INTERVALS["day"])
-
-    prev_ts = start - 1 * (SINCE_INTERVALS["day"])
-    next_ts = end + (SINCE_INTERVALS["day"])
-
-    from_date  = helper.date_hour(start - (SINCE_INTERVALS["day"])).split(" ")[0]
-    to_date = helper.date_hour(end - (SINCE_INTERVALS["day"])).split(" ")[0]
-    active_version = " & ".join(dex.get_active_mm2_versions(time.time()))
-
-    version_scores = query.get_nn_seed_version_scores_daily_table(request, start, end)
-    context.update({
-        "to_date": to_date,
-        "from_date": from_date,
-        "prev_ts": prev_ts,
-        "next_ts": next_ts,
-        "active_version": active_version,
-        "headers": version_scores["headers"],
-        "scores": version_scores["scores"]
-    })
-
-    return render(request, 'views/atomicdex/seednode_version_stats_daily_table.html', context)
-
-
-def seednode_version_stats_month_table_view(request):
+def seednode_version_month_view(request):
     context = helper.get_base_context(request)
     start = SEASONS_INFO[context["season"]]["start_time"]
     end = SEASONS_INFO[context["season"]]["end_time"]
-    version_scores = query.get_nn_seed_version_scores_month_table(request, start, end)
+    version_scores = dex.get_seednode_version_month_table(request, start, end)
 
     context.update({
         "active_version": " & ".join(dex.get_active_mm2_versions(time.time())),
@@ -390,5 +335,42 @@ def seednode_version_stats_month_table_view(request):
         "scores": version_scores["scores"]
     })
 
-    return render(request, 'views/atomicdex/seednode_version_stats_month_table.html', context)
+    return render(request, 'views/atomicdex/seednode_version_month_table.html', context)
+
+############################################
+
+def seednode_version_date_view(request):
+    context = helper.get_base_context(request)
+    active_version = " & ".join(dex.get_active_mm2_versions(time.time()))
+    version_scores = dex.get_seednode_version_date_table(request)
+
+    context.update({
+        "active_version": active_version,
+        "date": version_scores["date"],
+        "start": int(version_scores["start"]),
+        "end": int(version_scores["end"]),
+        "date_ts": int(version_scores["start"]*1000),
+        "table_data": version_scores["table_data"],
+        "headers": version_scores["headers"],
+        "scores": version_scores["scores"]
+    })
+
+    return render(request, 'views/atomicdex/seednode_version_date.html', context)
+
+
+def seednode_version_month_view(request):
+    context = helper.get_base_context(request)
+    active_version = " & ".join(dex.get_active_mm2_versions(time.time()))
+    version_scores = dex.get_seednode_version_month_table(request)
+
+    context.update({
+        "active_version": active_version,
+        "date": version_scores["date"],
+        "date_ts": version_scores["date_ts"],
+        "table_data": version_scores["table_data"],
+        "headers": version_scores["headers"],
+        "scores": version_scores["scores"]
+    })
+
+    return render(request, 'views/atomicdex/seednode_version_month.html', context)
 

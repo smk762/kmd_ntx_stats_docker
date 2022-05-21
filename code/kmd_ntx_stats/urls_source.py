@@ -53,7 +53,7 @@ source_router.register(r'mined',
                 api_viewsets.minedViewSet,
                 basename='minedViewSet') 
 
-source_router.register(r'mm2_version_stats',
+source_router.register(r'seednode_version_stats',
                 api_viewsets.mm2VersionStatsViewSet,
                 basename='mm2VersionStatsViewSet')
 

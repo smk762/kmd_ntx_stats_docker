@@ -5,9 +5,6 @@
 
             /* TABLES */
 
-            .skinny-table td {
-                padding: 0.25rem !important;
-            }
             .xdsoft_calendar table {
                  min-width: 0;
             }

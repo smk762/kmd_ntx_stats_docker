@@ -35,6 +35,7 @@ INTERVALS = (
 )
 
 SINCE_INTERVALS = {
+    "hour": 60 * 60,
     "day": 24 * 60 * 60,
     "week": 7 * 24 * 60 * 60,
     "fortnight": 14 * 24 * 60 * 60,

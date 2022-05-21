@@ -15,6 +15,7 @@ import logging
 import logging.handlers
 
 from lib_helper import *
+import lib_validate as validate
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -67,18 +68,25 @@ def get_seedinfo_from_csv():
 	return notary_seeds
 
 
+def get_seedinfo_from_json():
+	notary_seeds = []
+	with open('notary_seednodes.json', 'r') as f:
+		return json.load(f)
+
+
 def add_notaries(notary_seeds):
 	# Add to tracking
-	for notary in notary_seeds:
-		params = {
-			"mmrpc": "2.0",
-			"params": {
-				"name":notary["notary"],
-				"address":notary["3P IP Address"],
-				"peer_id":notary["PeerID"]
+	for season in notary_seeds:
+		for notary in notary_seeds[season]:
+			params = {
+				"mmrpc": "2.0",
+				"params": {
+					"name": notary,
+					"address": notary_seeds[season][notary]["IP"],
+					"peer_id": notary_seeds[season][notary]["PeerID"]
+				}
 			}
-		}
-		r = mm2_proxy('add_node_to_version_stat', params)
+			r = mm2_proxy('add_node_to_version_stat', params)
 
 
 def get_local_version():
@@ -98,9 +106,9 @@ def start_stats_collection():
 
 
 def empty_pg_table():
-	rows = CURSOR.execute("DELETE FROM mm2_version_stats;")
+	rows = CURSOR.execute("DELETE FROM seednode_version_stats;")
 	CONN.commit()
-	print('Deleted', CURSOR.rowcount, 'records from mm2_version_stats PgSQL table.')
+	print('Deleted', CURSOR.rowcount, 'records from seednode_version_stats PgSQL table.')
 
 
 def empty_sqlite_table(table):
@@ -135,27 +143,27 @@ def get_registered_nodes_from_db():
         print("---------")
 
 
-def update_mm2_version_stats_row(row_data):
+def update_seednode_version_stats_row(row_data):
     try:
-        sql = f"INSERT INTO mm2_version_stats \
+        sql = f"INSERT INTO seednode_version_stats \
                     (name, season, version, timestamp, error, score) \
                 VALUES (%s, %s, %s, %s, %s, %s);"
         CURSOR.execute(sql, row_data)
         CONN.commit()
     except Exception as e:
-        #logger.error(f"Exception in [update_mm2_version_stats_row]: {e}")
-        #logger.error(f"[update_mm2_version_stats_row] sql: {sql}")
-        #logger.error(f"[update_mm2_version_stats_row] row_data: {row_data}")
+        #logger.error(f"Exception in [update_seednode_version_stats_row]: {e}")
+        #logger.error(f"[update_seednode_version_stats_row] sql: {sql}")
+        #logger.error(f"[update_seednode_version_stats_row] row_data: {row_data}")
         CONN.rollback()
 
 
 def get_version_stats_from_pgsql_db():
-    sql = f"SELECT * FROM mm2_version_stats;"
+    sql = f"SELECT * FROM seednode_version_stats;"
     CURSOR.execute(sql)
-    return helper.get_results_or_none(CURSOR)
+    return get_results_or_none(CURSOR)
 
 def get_pgsql_latest():
-    sql = f"SELECT MAX(timestamp) FROM mm2_version_stats;"
+    sql = f"SELECT MAX(timestamp) FROM seednode_version_stats;"
     CURSOR.execute(sql)
     try:
         results = CURSOR.fetchone()[0]
@@ -184,11 +192,11 @@ def migrate_sqlite_to_pgsql(ts):
 		if row["version"] != '':
 			hr_timestamp = round_ts_to_hour(row["timestamp"])
 
-			season = get_season(hr_timestamp)
+			season = validate.get_season(hr_timestamp)
 			score = get_version_score(row["version"], hr_timestamp)
 			row_data = (row["name"], season, row["version"], hr_timestamp, row["error"], score)
 			print(row_data)
-			update_mm2_version_stats_row(row_data)
+			update_seednode_version_stats_row(row_data)
 
 
 if __name__ == '__main__':
@@ -214,7 +222,7 @@ if __name__ == '__main__':
 
 		# Run manually to register nodes via CSV file
 		elif sys.argv[1] == 'register':
-			notary_seeds = get_seedinfo_from_csv()
+			notary_seeds = get_seedinfo_from_json()
 			add_notaries(notary_seeds)
 
 		# This is what gets cron'd

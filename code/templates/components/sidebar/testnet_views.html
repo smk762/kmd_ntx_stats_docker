@@ -2,11 +2,19 @@
             <span style="padding-left: 12px;">TESTNET & VOTE</span>
             <ul class="c-sidebar-nav-dropdown" style="line-height:1.3 !important;">
                 <li class="c-sidebar-nav">
+                    <a href="{% url 'notary_vote_view' %}"> Vote Results
+                    </a>
+                </li>
+                <li class="c-sidebar-nav">
                     <a href="{% url 'testnet_ntx_scoreboard_view' %}"> Testnet Leaderboard
                     </a>
                 </li>
                 <li class="c-sidebar-nav">
-                    <a href="{% url 'notary_vote_view' %}"> Vote Results
+                    <a href="{% url 'seednode_version_date_view' %}?season=VOTE2022_Testnet"> Testnet Seednodes (date)
+                    </a>
+                </li>
+                <li class="c-sidebar-nav">
+                    <a href="{% url 'seednode_version_month_view' %}?season=VOTE2022_Testnet"> Testnet Seednodes (month)
                     </a>
                 </li>
             </ul>

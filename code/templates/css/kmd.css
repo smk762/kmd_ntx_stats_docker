@@ -901,5 +901,8 @@
                 width: 5em;
                 height: 5em;
             }
+            .col-sm-12 {
+                padding: 0px;
+            }
 
         </style>

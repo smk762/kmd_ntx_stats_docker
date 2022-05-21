@@ -214,7 +214,7 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
     seed_node_score = 0
     start = time.time() - SINCE_INTERVALS["day"]
     end = time.time()
-    seed_data = query.get_mm2_version_stats_data(start, end-1, notary).values()
+    seed_data = query.get_seednode_version_stats_data(start, end-1, notary).values()
     notary_ntx_24hr["score"] = float(notary_ntx_24hr["score"])
     for item in seed_data:
         seed_node_score += round(item["score"], 2)

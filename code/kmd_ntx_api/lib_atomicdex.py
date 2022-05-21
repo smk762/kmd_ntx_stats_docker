@@ -1,9 +1,12 @@
 import copy
 import json
+import time
 import requests
+from datetime import datetime as dt
 from django.db.models import Count
 from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.lib_const_mm2 import *
+
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_struct as struct
 import kmd_ntx_api.lib_helper as helper
@@ -11,33 +14,8 @@ import kmd_ntx_api.serializers as serializers
 
 # https://stats-api.atomicdex.io/
 
-def get_nn_mm2_stats(request):
-    name = helper.get_or_none(request, "name")
-    version = helper.get_or_none(request, "version")
-    limit = helper.get_or_none(request, "limit")
-    data = query.get_nn_mm2_stats_data(name, version, limit)
-    data = data.values()
-    serializer = serializers.mm2statsSerializer(data, many=True)
-    return serializer.data
 
-
-def get_nn_mm2_stats_by_hour(request):
-    notary = helper.get_or_none(request, "notary")
-    start = helper.get_or_none(
-        request, "start", time.time() - SINCE_INTERVALS["day"]
-    )
-    end = helper.get_or_none(request, "end", time.time())
-
-    if request.GET.get("chart"):
-        data = query.get_nn_mm2_stats_by_hour_chart_data(
-            int(start), int(end), notary
-        )
-    else:
-        data = query.get_nn_mm2_stats_by_hour_data(
-            int(start), int(end), notary
-        )
-    return data
-
+#### Standard RPCs # TODO: Confirm TOKEL is handled
 
 def mm2_proxy(params):
     try:
@@ -48,7 +26,6 @@ def mm2_proxy(params):
         return e
 
 
-# TODO: Handle TOKEL
 def get_orderbook(request):
     params = {
         "method": "orderbook",
@@ -59,7 +36,6 @@ def get_orderbook(request):
     return r.json()
 
 
-# TODO: Handle TOKEL
 def get_bestorders(request):
     params = {
         "method": "best_orders",
@@ -80,6 +56,8 @@ def send_raw_tx(request):
     r = mm2_proxy(params)
     return r.json()
 
+
+#### SWAPS
 
 def get_last_200_swaps(request):
     data = query.get_swaps_data()
@@ -338,6 +316,8 @@ def get_swaps_pubkey_stats(request):
     return resp
 
 
+#### ACTIVATION 
+
 def get_contracts(platform):
     if is_testnet(platform):
         contract = SWAP_CONTRACTS[platform]["testnet"]["swap_contract"]
@@ -357,21 +337,6 @@ def is_testnet(coin):
         return True
     return False
 
-
-def get_active_mm2_versions(ts):
-    data = requests.get(VERSION_TIMESPANS_URL).json()
-    active_versions = []
-    for version in data:
-        if int(ts) > data[version]["start"] and int(ts) < data[version]["end"]:
-            active_versions.append(version)
-    return active_versions
-
-
-def is_mm2_version_valid(version, timestamp):
-    active_versions = get_active_mm2_versions(timestamp)
-    if version in active_versions:
-        return True
-    return False
 
 def get_activation_commands(request):
     protocols = []
@@ -592,48 +557,124 @@ def get_activation_commands(request):
         return resp_json
 
 
-def get_nn_seed_version_scores_hourly_table(request, start=None, end=None):
+#### SEEDNODES 
+
+def get_active_mm2_versions(ts):
+    data = requests.get(VERSION_TIMESPANS_URL).json()
+    active_versions = []
+    for version in data:
+        if int(ts) > data[version]["start"] and int(ts) < data[version]["end"]:
+            active_versions.append(version)
+    return active_versions
+
+
+def is_mm2_version_valid(version, timestamp):
+    active_versions = get_active_mm2_versions(timestamp)
+    if version in active_versions:
+        return True
+    return False
+
+
+def get_seednode_version_date_table(request):
+    season =  helper.get_or_none(request, "season", SEASON)
+    notary_list = helper.get_notary_list(season)
+    default_scores = helper.prepopulate_seednode_version_date(notary_list)
+
+    hour_headers = list(default_scores.keys())
+    hour_headers.sort()
+
+    table_headers = ["Notary"] + hour_headers + ["Total"]
+
+    start = int(helper.get_or_none(request, "start", time.time() - SINCE_INTERVALS["day"]))
+    end = int(helper.get_or_none(request, "end", time.time()))
+
+    date_hour_notary_scores = query.get_seednode_version_stats_data(start, end)
+
+    scores = date_hour_notary_scores.values()
+    for item in scores:
+        notary = item["name"]
+        if notary in notary_list:
+            score = item["score"]
+            _, hour = helper.date_hour(item["timestamp"]).split(" ")
+            hour = hour.replace(":00", "")
+            default_scores[hour][notary]["score"] = score
+            if item["version"] not in default_scores[hour][notary]["versions"]:
+                default_scores[hour][notary]["versions"].append(item["version"])
+
+    table_data = []
+    for notary in notary_list:
+        notary_row = {"Notary": notary}
+        total = 0
+        for hour in hour_headers:
+            total += default_scores[hour][notary]["score"]
+            notary_row.update({
+                hour: default_scores[hour][notary]["score"]
+            })
+        notary_row.update({
+            "Total": round(total,1)
+        })
+        table_data.append(notary_row)
+
+    return {
+        "start": start,
+        "date": dt.utcfromtimestamp(end).strftime('%a %-d %B %Y'),
+        "end": end,
+        "headers": table_headers,
+        "table_data": table_data,
+        "scores": default_scores
+    }
+
     # TODO: Views for day (by hour), month (by day), season (by month)
     # Season view: click on month, goes to month view
     # Month view: click on day, goes to day view
     # TODO: Incorporate these scores into overall NN score, and profile stats.
-    if not start:
-        start = helper.get_or_none(request, "start")
-    if not end:
-        end = helper.get_or_none(request, "end")
 
-    if not start:
-        start = time.time()
-        end = time.time() + SINCE_INTERVALS["day"]
-    notary_list = helper.get_notary_list(SEASON)
-    helper.date_hour_notary_scores = query.get_nn_seed_version_scores(start, end)
-    
-    table_headers = ["Total"]
+
+def get_seednode_version_month_table(request):
+    season =  helper.get_or_none(request, "season", SEASON)
+    year = helper.get_or_none(request, "year", None)
+    month = helper.get_or_none(request, "month", None)
+    start, end, last_day = helper.get_month_epoch_range(year, month)
+
+    notary_list = helper.get_notary_list(season)
+    default_scores = helper.prepopulate_seednode_version_month(notary_list)
+
+    day_headers = list(default_scores.keys())
+    print(day_headers)
+    day_headers.sort()
+
+    table_headers = ["Notary"] + day_headers + ["Total"]
+    data = query.get_seednode_version_stats_data(start, end).values()
+
+    for item in data:
+        notary = item["name"]
+        if notary in notary_list:
+            score = item["score"]
+            date, _ = helper.date_hour(item["timestamp"]).split(" ")
+            day = date.split("/")[1]
+            print(day)
+            default_scores[day][notary]["score"] += score
+            if item["version"] not in default_scores[day][notary]["versions"]:
+                default_scores[day][notary]["versions"].append(item["version"])
+
     table_data = []
-    notary_scores = {}
-
     for notary in notary_list:
-        notary_scores.update({notary:[]})
-
-    for date in helper.date_hour_notary_scores:
-        for hour in helper.date_hour_notary_scores[date]:
-            table_headers.append(f"{hour.split(':')[0]}")
-            for notary in notary_list:
-                if notary in helper.date_hour_notary_scores[date][hour]:
-                    score = round(helper.date_hour_notary_scores[date][hour][notary]["score"],2)
-                else:
-                    score = 0
-                notary_scores[notary].append(score)
-
-    table_headers.append("Notary")
-    table_headers.reverse()
-    # Get total for timespan
-    for notary in notary_scores:
-        notary_scores[notary].reverse()
-        total = round(sum(notary_scores[notary]),2)
-        notary_scores[notary].append(total)
+        notary_row = {"Notary": notary}
+        total = 0
+        for day in day_headers:
+            total += default_scores[day][notary]["score"]
+            notary_row.update({
+                day: round(default_scores[day][notary]["score"],1)
+            })
+        notary_row.update({
+            "Total": round(total,1)
+        })
+        table_data.append(notary_row)
 
     return {
+        "date_ts": dt.utcfromtimestamp(end).strftime('%m-%Y'),
+        "date": dt.utcfromtimestamp(end).strftime('%b %Y'),
         "headers": table_headers,
-        "scores": notary_scores
-        }
+        "table_data": table_data,
+        "scores": default_scores
+    }
