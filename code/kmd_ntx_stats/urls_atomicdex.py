@@ -37,13 +37,9 @@ frontend_atomicdex_urls = [
          views_atomicdex.orderbook_view,
          name='orderbook_view'),
 
-    path('atomicdex/seednode_version_date/',
-         views_atomicdex.seednode_version_date_view,
-         name='seednode_version_date_view'),
-
-    path('atomicdex/seednode_version_month/',
-         views_atomicdex.seednode_version_month_view,
-         name='seednode_version_month_view'),
+    path('atomicdex/seednode_version/',
+         views_atomicdex.seednode_version_view,
+         name='seednode_version_view'),
 ]
 
 # AtomicDEX API V2
