@@ -12,7 +12,7 @@ def testnet_ntx_scoreboard_view(request):
     context = helper.get_base_context(request)
     year = helper.get_or_none(request, "year", VOTE_YEAR)
  
-    testnet_ntx_counts = testnet.get_api_testnet(request)
+    testnet_ntx_counts = testnet.get_testnet_scoreboard(request)
 
     context = helper.get_base_context(request)
     context.update({

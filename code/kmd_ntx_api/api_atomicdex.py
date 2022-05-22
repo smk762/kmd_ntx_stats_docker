@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from django.http import JsonResponse
 import kmd_ntx_api.lib_atomicdex as dex
+import kmd_ntx_api.lib_helper as helper
 
 
 def orderbook_api(request):
@@ -14,6 +15,12 @@ def seednode_version_date_table_api(request):
 def seednode_version_month_table_api(request):
     return JsonResponse(dex.get_seednode_version_month_table(request), safe=False)
 
+
+def seednode_version_score_total_api(request):
+    filters = ["season", "start", "end"]
+    resp = dex.get_seednode_version_score_total(request)
+    return helper.json_resp(resp, filters)
+    
 
 def bestorders_api(request):
     return JsonResponse(dex.get_bestorders(request))

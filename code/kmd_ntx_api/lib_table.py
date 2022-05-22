@@ -402,9 +402,6 @@ def get_coin_ntx_season_table(request, coin=None):
     resp = []
     for item in data:
         coin_data = item["coin_data"]
-        print(coin_data)
-        print(item['season'])
-        print(item['coin'])
         if item['coin'] in ["KMD", "LTC", "BTC"]:
             server = item['coin']
         elif len(list(coin_data['servers'].keys())) > 0:

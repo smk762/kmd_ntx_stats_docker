@@ -3,7 +3,8 @@ import json
 import time
 import requests
 from datetime import datetime as dt
-from django.db.models import Count
+from django.db.models import Count, Sum
+
 from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.lib_const_mm2 import *
 
@@ -588,9 +589,9 @@ def get_seednode_version_date_table(request):
     start = int(helper.get_or_none(request, "start", time.time() - SINCE_INTERVALS["day"]))
     end = int(helper.get_or_none(request, "end", time.time()))
 
-    date_hour_notary_scores = query.get_seednode_version_stats_data(start, end)
+    data = query.get_seednode_version_stats_data(start, end)
 
-    scores = date_hour_notary_scores.values()
+    scores = data.values()
     for item in scores:
         notary = item["name"]
         if notary in notary_list:
@@ -640,7 +641,6 @@ def get_seednode_version_month_table(request):
     default_scores = helper.prepopulate_seednode_version_month(notary_list)
 
     day_headers = list(default_scores.keys())
-    print(day_headers)
     day_headers.sort()
 
     table_headers = ["Notary"] + day_headers + ["Total"]
@@ -652,7 +652,6 @@ def get_seednode_version_month_table(request):
             score = item["score"]
             date, _ = helper.date_hour(item["timestamp"]).split(" ")
             day = date.split("/")[1]
-            print(day)
             default_scores[day][notary]["score"] += score
             if item["version"] not in default_scores[day][notary]["versions"]:
                 default_scores[day][notary]["versions"].append(item["version"])
@@ -678,3 +677,28 @@ def get_seednode_version_month_table(request):
         "table_data": table_data,
         "scores": default_scores
     }
+
+def get_seednode_version_score_total(request, season=None, start=None, end=None):
+    season =  helper.get_or_none(request, "season", season)
+    if not season: season = SEASON
+    notary_list = helper.get_notary_list(season)
+    start = helper.get_or_none(request, "start", start)
+    if not start: start = time.time() - SINCE_INTERVALS["day"]
+    end = helper.get_or_none(request, "end", end)
+    if not end: end = time.time()
+    data = query.get_seednode_version_stats_data(int(start), int(end))
+    notary_scores = list(data.values('name').order_by('name').annotate(sum_score=Sum('score')))
+    notaries_with_scores = data.distinct('name').values_list('name', flat=True)
+
+    for notary in notary_list:
+        if notary not in notaries_with_scores:
+            notary_scores.append({"name": notary, "sum_score": 0})
+
+    resp = {}
+    for i in notary_scores:
+        if i["name"] in notary_list:
+            resp.update({i["name"]: round(i["sum_score"],2)})
+
+    return resp
+
+

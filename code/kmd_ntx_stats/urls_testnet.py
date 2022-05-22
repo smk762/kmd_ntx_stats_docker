@@ -23,9 +23,6 @@ frontend_testnet_urls = [
 ]
 
 api_testnet_urls = [
-    path('api/testnet/totals/',
-          api_testnet.api_testnet_totals,
-          name='api_testnet_totals'),
 
     path('api/testnet/proposals/',
           api_testnet.api_testnet_proposals,
@@ -40,8 +37,8 @@ api_testnet_urls = [
           name='vote_aggregates_api'),
     
     path('api/table/testnet_ntx_scoreboard/',
-          api_testnet.api_testnet_totals,
-          name='api_testnet_totals'),
+          api_testnet.api_testnet_scoreboard,
+          name='api_testnet_scoreboard'),
 
     path('api/info/is_election_over/',
           api_testnet.is_election_over_api,
