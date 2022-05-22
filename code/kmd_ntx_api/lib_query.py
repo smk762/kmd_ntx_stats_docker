@@ -19,7 +19,7 @@ load_dotenv()
 def get_seednode_version_stats_data(start, end, notary=None):
     data = seednode_version_stats.objects.filter(timestamp__range=(start, end-1))
     if notary: data = data.filter(name=notary)
-    return data.order_by("-timestamp")
+    return data
 
 
 def get_addresses_data(season=None, server=None, coin=None, notary=None, address=None):

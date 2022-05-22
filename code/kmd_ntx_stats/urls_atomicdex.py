@@ -53,6 +53,10 @@ api_atomicdex_urls = [
          api_atomicdex.seednode_version_month_table_api,
          name='seednode_version_month_table_api'),
 
+    path('api/atomicdex/seednode_version_score_total/',
+         api_atomicdex.seednode_version_score_total_api,
+         name='seednode_version_score_total_api'),
+
     path('api/atomicdex/activation_commands/',
           api_atomicdex.activation_commands_api,
           name='activation_commands_api'),

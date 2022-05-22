@@ -7,10 +7,9 @@ import kmd_ntx_api.lib_query as query
 
 
 # TODO: Deprecate after testnet ends
-def api_testnet_totals(request):
-    resp = testnet.get_api_testnet(request)
+def api_testnet_scoreboard(request):
+    resp = testnet.get_testnet_scoreboard(request)
     proposals = testnet.get_notary_candidates_info(request)
-    print(proposals)
     tabled = []
     for name in resp:
         candidate_name = testnet.translate_testnet_name(name, proposals.keys())

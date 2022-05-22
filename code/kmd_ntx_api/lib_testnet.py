@@ -3,10 +3,11 @@ from django.db.models import Sum, Max, Count
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_info as info
 import kmd_ntx_api.lib_query as query
+import kmd_ntx_api.lib_atomicdex as dex
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.serializers as serializers
 
-def get_api_testnet(request):
+def get_testnet_scoreboard(request):
     year = helper.get_or_none(request, "year", VOTE_YEAR)
     season = f"{year}_Testnet"
     notary_list = helper.get_notary_list(season)
@@ -18,6 +19,19 @@ def get_api_testnet(request):
     # Prepare 24hr ntx data
     ntx_data_24hr = info.get_notarised_data_24hr(
         season).order_by('coin', '-block_height').values()
+
+    testnet_coins = ["RICK", "MORTY"]
+    testnet_stats_dict = get_testnet_stats_dict(season, testnet_coins)
+    last_ntx = info.get_last_nn_coin_ntx(season)
+
+    seednode_scores = dex.get_seednode_version_score_total(request, "VOTE2022_Testnet", 1653091199, 1653436800)
+    for notary in seednode_scores:
+        testnet_stats_dict[notary].update({"seednode_score": seednode_scores[notary]})
+
+    seednode_scores_24hr = dex.get_seednode_version_score_total(request, "VOTE2022_Testnet")
+    for notary in seednode_scores_24hr:
+        testnet_stats_dict[notary].update({"24hr_seednode_score": seednode_scores_24hr[notary]})
+
 
     ntx_dict = {}
     ntx_dict_24hr = {}
@@ -43,9 +57,6 @@ def get_api_testnet(request):
         elif coin in ["KMD"] and item["block_height"] >= SEASONS_INFO[season]["start_block"]:
             ntx_dict_24hr[coin].append(item)
 
-    testnet_coins = list(ntx_dict.keys())
-    testnet_stats_dict = get_testnet_stats_dict(season, testnet_coins)
-    last_ntx = info.get_last_nn_coin_ntx(season)
 
     for coin in testnet_coins:
 
@@ -61,9 +72,9 @@ def get_api_testnet(request):
                 })
 
             except Exception as e:
-                logger.error(f"[get_api_testnet] Exception: {e} \
+                logger.error(f"[get_testnet_scoreboard] Exception: {e} \
                                | notary: {notary} | coin: {coin}")
-                logger.warning(f"[get_api_testnet] Setting last_ntx for \
+                logger.warning(f"[get_testnet_scoreboard] Setting last_ntx for \
                                  {notary} | coin: {coin} to > 24hrs")
                 testnet_stats_dict[notary].update({
                     f"Last_{coin}": "> 24hrs",
@@ -92,7 +103,7 @@ def get_api_testnet(request):
                         count = testnet_stats_dict[notary][coin]+1
                         testnet_stats_dict[notary].update({coin: count})
                 else:
-                    logger.warning(f"[get_api_testnet] {notary} not \
+                    logger.warning(f"[get_testnet_scoreboard] {notary} not \
                                      found in testnet_stats_dict: {item}")
 
         # Get notarisation counts 24hr
@@ -118,13 +129,21 @@ def get_api_testnet(request):
                         count = testnet_stats_dict[notary][f"24hr_{coin}"]+1
                         testnet_stats_dict[notary].update({f"24hr_{coin}": count})
                 else:
-                    logger.warning(f"[get_api_testnet] {notary} not found \
+                    logger.warning(f"[get_testnet_scoreboard] {notary} not found \
                                      in ntx_notaries: {item}")
 
-    # Get notarisation rank
+
+    for notary in testnet_stats_dict:
+        testnet_stats_dict[notary]["Total"] += seednode_scores[notary]
+        testnet_stats_dict[notary]["24hr_Total"] += seednode_scores_24hr[notary]
+
     notary_totals = {}
+    notary_totals_24hr = {}
     for notary in testnet_stats_dict:
         notary_totals.update({notary: testnet_stats_dict[notary]["Total"]})
+        notary_totals_24hr.update({notary: testnet_stats_dict[notary]["24hr_Total"]})
+
+    # Get notarisation rank
     ranked_totals = {k: v for k, v in sorted(
         notary_totals.items(), key=lambda x: x[1])}
     ranked_totals = dict(reversed(list(ranked_totals.items())))
@@ -136,10 +155,6 @@ def get_api_testnet(request):
         testnet_stats_dict[notary].update({"Rank": i})
 
     # Get 24hr notarisation rank
-    notary_totals_24hr = {}
-    for notary in testnet_stats_dict:
-        notary_totals_24hr.update(
-            {notary: testnet_stats_dict[notary]["24hr_Total"]})
     ranked_totals_24hr = {k: v for k, v in sorted(
         notary_totals_24hr.items(), key=lambda x: x[1])}
     ranked_totals_24hr = dict(reversed(list(ranked_totals_24hr.items())))
@@ -149,6 +164,7 @@ def get_api_testnet(request):
     for notary in ranked_totals_24hr:
         i += 1
         testnet_stats_dict[notary].update({"24hr_Rank": i})
+
 
     return testnet_stats_dict
 
@@ -322,15 +338,14 @@ def get_vote_aggregates(request):
 
     return resp
 
+
 def is_election_over(year):
     end_time = VOTE_PERIODS[year]["max_blocktime"]
-    print(time.time(), end_time)
     if time.time() < end_time:
         return "before timestamp"
     
     last_notarised_blocks = query.get_notarised_data(
         season="Season_5", coin=year, min_blocktime=end_time)
-    print(last_notarised_blocks.count())
     if last_notarised_blocks.count() == 0:
         return "Waiting for notarised block..."
 

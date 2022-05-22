@@ -500,13 +500,15 @@
 	function getVal(item) {
 	    return item[this];
 	}
+
 	function getSum(total, num) {
 	    return total + num;
 	}
-	function getAverage(data, key) {
+
+	function getAverage(data, key, dp=3) {
 		let totals = data.map(getVal, key)
 		let sum = totals.reduce(getSum, 0)
-		return sum / totals.length
+		return Math.round(sum / totals.length * dp) / dp
 	}
 
 function get_qrcode(id, text, title, subtitle) {

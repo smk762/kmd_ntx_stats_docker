@@ -154,7 +154,6 @@ def prepopulate_seednode_version_month(notaries):
         resp.update({x: {}})
 
     for notary in notaries:
-        print(notary)
         for i in resp.keys():
             resp[i].update({
                 notary: {
