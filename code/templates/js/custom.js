@@ -30,6 +30,12 @@
 		});
 	}
 
+	function titleCase(str) {
+	  return str.toLowerCase().split(' ').map(function(word) {
+	    return word.replace(word[0], word[0].toUpperCase());
+	  }).join(' ');
+	}
+
 	function show_timespan(timespan) {
 		const options = ["#season", "#month", "#week", "#last_24hrs"];
 		options.forEach(function (i) {

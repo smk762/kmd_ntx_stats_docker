@@ -1,96 +1,101 @@
-	<table id="mm2_day_version_tbl" class="table table-striped table-bordered" style="width:100%;">
-		<thead>
-			<tr>
-				<th data-data="Notary">Notary</th>
-				{% for i in day_headers %}
-					{% if i != 'Total' and i != 'Notary'%}
-						<th data-data="{{ i }}" class="hour_cell px-0">{{ i }}</th>	
-					{% endif %}
-				{% endfor %}
-				<th data-data="Total">Total</th>
-			</tr>
-		</thead>
-	</table>
-	<script>
-		$(document).ready(function() {
-			var start = parseInt(Math.floor($('#day_date_ts').val())/1000) + 86400
-			start = Math.floor(start/86400)*86400
-			var end = start + 86400
+    <table id="mm2_day_version_tbl" class="table table-striped table-bordered" style="width:100%;">
+        <thead>
+            <tr>
+                <th data-data="Notary">Notary</th>
+                {% for i in day_headers %}
+                    {% if i != 'Total' and i != 'Notary' and i != 'proposal' %}
+                        <th data-data="{{ i }}" class="hour_cell px-0">{{ i }}</th>    
+                    {% endif %}
+                {% endfor %}
+                <th data-data="Total">Total</th>
+                <th data-data="proposal">Proposal</th>
+            </tr>
+        </thead>
+    </table>
+    <script>
+        $(document).ready(function() {
+            var start = parseInt(Math.floor($('#day_date_ts').val())/1000) + 86400
+            start = Math.floor(start/86400)*86400
+            var end = start + 86400
 
-			let params = "?start="+start+"&end="+end+"&season={{ season }}"
-			let endpoint = "{% url 'seednode_version_date_table_api' %}"+params
+            let params = "?start="+start+"&end="+end+"&season={{ season }}"
+            let endpoint = "{% url 'seednode_version_date_table_api' %}"+params
 
-	        day_seed_table = $('#mm2_day_version_tbl').DataTable({
-	    		ajax: {
-				    url: endpoint,
-	    			dataSrc: 'table_data',
-	    			"deferRender": true
-				},
-	        	"paging": false,
-	        	"searching": false,
-	        	"info": false,
-	            "orderClasses": false,
-  				"pageLength": 50,
-        		order: [[ 0, 'asc' ]],
-        		"columnDefs": [
-					{ className: "text-left text-nowrap pl-2", "targets": [ 0 ] },
-		            { 
-		            	targets: 0,
-		            	orderable: true,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            		$(nTd).html('<b>'+oData.Notary+'</b>');
-			            }
-		            },
-		            { 
-		            	targets: $('#mm2_version_tbl').find('th').length - 1,
-		            	orderable: true,
-		            	className: 'text-right text-nowrap pr-2',
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            		$(nTd).html('<b>'+oData.Total+'</b>');
-			            }
-		            },
-		            { 
-		            	targets: 'hour_cell',
-		            	orderable: true,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-							let maxTime = new Date().valueOf()
-							let maxHour = new Date(maxTime).getUTCHours()
-			            	if (sData != 0){
-			            		$(nTd).html('<i class="fas fa-check-circle" style="color: #377c43;"></i>');
-			            	}
-			            	else if ((iCol-1 > maxHour) && (maxTime/1000 < end)) {
-			            		$(nTd).html('<i class="fa-solid fa-hourglass" style="color: #373f48;"></i>');
-			            	}
-			            	else {
-			            		$(nTd).html('<i class="fas fa-times-circle" style="color: #895050;"></i>');			            		
-			            	}
-			            }
-		            },
-		            { 
-		            	orderable: false,
-		                targets: '_all'
-		            }
-			    ],
+            day_seed_table = $('#mm2_day_version_tbl').DataTable({
+                ajax: {
+                    url: endpoint,
+                    dataSrc: 'table_data',
+                    "deferRender": true
+                },
+                "paging": false,
+                "searching": false,
+                "info": false,
+                "orderClasses": false,
+                "pageLength": 50,
+                order: [[ 0, 'asc' ]],
+                "columnDefs": [
+                    { className: "text-left text-nowrap pl-2", "targets": [ 0 ] },
+                    { 
+                        targets: 0,
+                        orderable: true,
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        	oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+titleCase(oData.Notary)+"</a>") : $(nTd).html(titleCase(oData.Notary));
+                        }
+                    },
+                    { 
+                        targets: $('#mm2_version_tbl').find('th').length - 2,
+                        orderable: true,
+                        className: 'text-right text-nowrap pr-2',
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html('<b>'+oData.Total+'</b>');
+                        }
+                    },
+                    { 
+                        targets: 'hour_cell',
+                        orderable: true,
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            let maxTime = new Date().valueOf()
+                            let maxHour = new Date(maxTime).getUTCHours()
+                            if (sData != 0){
+                                $(nTd).html('<i class="fas fa-check-circle" style="color: #377c43;"></i>');
+                            }
+                            else if ((iCol-1 > maxHour) && (maxTime/1000 < end)) {
+                                $(nTd).html('<i class="fa-solid fa-hourglass" style="color: #373f48;"></i>');
+                            }
+                            else {
+                                $(nTd).html('<i class="fas fa-times-circle" style="color: #895050;"></i>');                                
+                            }
+                        }
+                    },
+                    { 
+                        orderable: false,
+                        targets: '_all'
+                    },
+	                {
+                        targets: $('#mm2_version_tbl').find('th').length - 1,
+	                    "visible": false
+	                }
+                ],
                 // Custom DataTables search filter input styling 
-				"initComplete": function (settings, json) {
-	            }
-	        });
-			var maxDate = new Date()
-			var utc_max = new Date(maxDate.getTime() + getOffset())
-	        $( ".day_date_picker" ).datepicker({
-	            maxDate: utc_max,
-	            dateFormat: "D d M yy",
-	            altField: "#day_date_ts",
-	            altFormat: "@",
-	            onSelect : function (dateText, inst) {
-	            	start = parseInt($('#day_date_ts').val()/1000) + 86400
-					start = Math.floor(start/86400)*86400
-					end = start + 86400
-					let params = "?start="+start+"&end="+end+"&season={{ season }}"
-					let endpoint = "{% url 'seednode_version_date_table_api' %}"+params
-			        day_seed_table.ajax.url(endpoint).load();
-	            }
-	        });
-	    });
+                "initComplete": function (settings, json) {
+                }
+            });
+            var maxDate = new Date()
+            var utc_max = new Date(maxDate.getTime() + getOffset())
+            $( ".day_date_picker" ).datepicker({
+                maxDate: utc_max,
+                dateFormat: "D d M yy",
+                altField: "#day_date_ts",
+                altFormat: "@",
+                onSelect : function (dateText, inst) {
+                    start = parseInt($('#day_date_ts').val()/1000) + 86400
+                    start = Math.floor(start/86400)*86400
+                    end = start + 86400
+                    let params = "?start="+start+"&end="+end+"&season={{ season }}"
+                    let endpoint = "{% url 'seednode_version_date_table_api' %}"+params
+                    day_seed_table.ajax.url(endpoint).load();
+                }
+            });
+        });
 
-	</script>
+    </script>

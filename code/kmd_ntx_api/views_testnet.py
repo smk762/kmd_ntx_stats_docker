@@ -40,13 +40,13 @@ def notary_vote_detail_view(request):
     candidate = helper.get_or_none(request, "candidate")
     max_block = helper.get_or_none(request, "max_block", VOTE_PERIODS[year]["max_block"])
 
-    proposals = testnet.get_notary_candidates_info(request)
+    proposals = testnet.get_candidates_proposals(request)
     notary_vote_detail_table = testnet.get_notary_vote_table(request)
 
     for item in notary_vote_detail_table:
-        notary = testnet.translate_notary(item["candidate"])
+        notary = testnet.translate_candidate_to_proposal_name(item["candidate"])
         item.update({
-            "proposal": proposals[notary]
+            "proposal": proposals[notary.lower()]
         })
 
     if candidate:

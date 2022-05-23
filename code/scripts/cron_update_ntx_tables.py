@@ -12,6 +12,7 @@ It is intended to be run as a cronjob every 15-30 min
 Script runtime is around 5-10 mins, except for initial population which is up to 1 day per season
 '''
 
+
 @print_runtime
 def update_ntx_tables(rescan=False):
     # Uncomment if record contains address rather than notary in [notaries] list (e.g. saved before pubkeys updated)
