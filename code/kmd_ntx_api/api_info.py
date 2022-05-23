@@ -172,12 +172,6 @@ def notary_nodes_info(request):
     return helper.json_resp(resp, filters)
 
 
-def notary_candidates_info(request):
-    resp = info.get_notary_candidates_info(request)
-    filters = ['year']
-    return helper.json_resp(resp, filters)
-
-
 def rewards_by_address(request):
     resp = info.get_rewards_by_address_info(request)
     filters = ["address", "min_value", "min_block", "max_block",

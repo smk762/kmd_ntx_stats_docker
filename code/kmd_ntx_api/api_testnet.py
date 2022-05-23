@@ -8,39 +8,17 @@ import kmd_ntx_api.lib_query as query
 
 # TODO: Deprecate after testnet ends
 def api_testnet_scoreboard(request):
-    resp = testnet.get_testnet_scoreboard(request)
-    proposals = testnet.get_notary_candidates_info(request)
-    tabled = []
-    for name in resp:
-        candidate_name = testnet.translate_testnet_name(name, proposals.keys())
-        proposal = ""
-        if candidate_name in proposals:
-            proposal = proposals[candidate_name]
-        resp[name].update({
-            "name": name,
-            "proposal": proposal
-        })
-        tabled.append(resp[name])
-
+    tabled = testnet.get_testnet_scoreboard_table(request)
     return helper.json_resp(tabled)
 
 
 def api_testnet_proposals(request):
-    proposals = testnet.get_notary_candidates_info(request)
+    proposals = testnet.get_candidates_proposals(request)
     return helper.json_resp(proposals)
 
 
 def notary_vote_stats_info(request):
-    resp = testnet.get_notary_vote_stats_info(request)
-
-    proposals = testnet.get_notary_candidates_info(request)
-
-    for region in resp:
-        for item in resp[region]:
-            notary = testnet.translate_notary(item["candidate"])
-            item.update({
-                "proposal": proposals[notary]
-            })
+    resp = testnet.get_vote_stats_info(request)
 
     filters = ["year", "candidate", "block", "txid", "max_block",
                "max_blocktime", "max_locktime"]

@@ -685,5 +685,9 @@ NOTARY_PUBKEYS = {
 testnet_info = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/2022-testnet/iguana/testnet.json").json()
 for item in testnet_info["notaries"]:
     for k, v in item.items():
+        if k == "nashhash":
+            k = "theerbeen"
+        if k == "biz":
+            k = "who-biz"
         NOTARY_PUBKEYS["VOTE2022_Testnet"]["Main"].update({k:v})
 

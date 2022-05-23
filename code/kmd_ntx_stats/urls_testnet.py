@@ -23,7 +23,6 @@ frontend_testnet_urls = [
 ]
 
 api_testnet_urls = [
-
     path('api/testnet/proposals/',
           api_testnet.api_testnet_proposals,
           name='api_testnet_proposals'),

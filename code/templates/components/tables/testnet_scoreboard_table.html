@@ -1,172 +1,172 @@
 <div class="row" id="season">
-	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card floating-card m-0">
-			<div class="card-header table_card_title">
-				<h4>{{ year }} Testnet Notarisation rankings</h4>
-				<h6>Average: <span id="average"></span></h6>
-				<div class="countdown_timer">
-					Updating in <span class="countdown">30</span> seconds...
-				</div>
-			</div>
-			<div class="card-body table_card_body">
-				<table id="{{ season }}_table" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
-					<thead>
-						<tr>
-							<th data-data="Rank">Rank</th>
-							<th data-data="name">Candidate</th>
-							<th data-data="proposal">Proposal</th>
-							<th data-data="RICK">Rick</th>
-							<th data-data="MORTY">Morty</th>
-							<th data-data="seednode_score">Seed</th>
-							<th data-data="Total">Score</th>
-							<th data-data="Last_RICK">Last Rick</th>
-							<th data-data="Last_MORTY">Last Morty</th>
-						</tr>
-					</thead>
-				</table>
-			</div>
-		</div>
-	</div>
+    <div class="card-deck d-flex justify-content-between col-12 m-auto">
+        <div class="card table_card floating-card m-0">
+            <div class="card-header table_card_title">
+                <h4>{{ year }} Testnet Notarisation rankings</h4>
+                <h6>Average: <span id="average"></span></h6>
+                <div class="countdown_timer">
+                    Updating in <span class="countdown">30</span> seconds...
+                </div>
+            </div>
+            <div class="card-body table_card_body">
+                <table id="{{ season }}_table" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
+                    <thead>
+                        <tr>
+                            <th data-data="Rank">Rank</th>
+                            <th data-data="name">Candidate</th>
+                            <th data-data="proposal">Proposal</th>
+                            <th data-data="RICK">Rick</th>
+                            <th data-data="MORTY">Morty</th>
+                            <th data-data="seednode_score">Seed</th>
+                            <th data-data="Total">Score</th>
+                            <th data-data="Last_RICK">Last Rick</th>
+                            <th data-data="Last_MORTY">Last Morty</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row" id="last_24hrs" style="display: none;">
-	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card floating-card m-0">
-			<div class="card-header table_card_title">
-				<h4>{{ year }} Testnet Notarisation rankings (24hrs)</h4>
-				<h6>Average: <span id="average_24hr"></span></h6>
-				<div class="countdown_timer">
-					Updating in <span class="countdown">30</span> seconds...
-				</div>
-			</div>
-			<div class="card-body table_card_body">
-				<table id="{{ season }}_table_24hr" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
-					<thead>
-						<tr>
-							<th data-data="24hr_Rank">24hr Rank</th>
-							<th data-data="name">Candidate</th>
-							<th data-data="proposal">Proposal</th>
-							<th data-data="24hr_RICK">Rick 24hr</th>
-							<th data-data="24hr_MORTY">Morty 24hr</th>
-							<th data-data="24hr_seednode_score">Seed 24hr</th>
-							<th data-data="24hr_Total">Score 24hr</th>
-						</tr>
-					</thead>
-				</table>				
-			</div>
-		</div>
-	</div>
+    <div class="card-deck d-flex justify-content-between col-12 m-auto">
+        <div class="card table_card floating-card m-0">
+            <div class="card-header table_card_title">
+                <h4>{{ year }} Testnet Notarisation rankings (24hrs)</h4>
+                <h6>Average: <span id="average_24hr"></span></h6>
+                <div class="countdown_timer">
+                    Updating in <span class="countdown">30</span> seconds...
+                </div>
+            </div>
+            <div class="card-body table_card_body">
+                <table id="{{ season }}_table_24hr" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
+                    <thead>
+                        <tr>
+                            <th data-data="24hr_Rank">24hr Rank</th>
+                            <th data-data="name">Candidate</th>
+                            <th data-data="proposal">Proposal</th>
+                            <th data-data="24hr_RICK">Rick 24hr</th>
+                            <th data-data="24hr_MORTY">Morty 24hr</th>
+                            <th data-data="24hr_seednode_score">Seed 24hr</th>
+                            <th data-data="24hr_Total">Score 24hr</th>
+                        </tr>
+                    </thead>
+                </table>                
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     $(document).ready(function() {
         Testnet_table = $('#{{ season }}_table').DataTable({    
-    		ajax: {
-			    url: "{% url 'api_testnet_scoreboard' %}",
-    			dataSrc: 'results',
-    			"deferRender": true
-			},
-        	"paging": false,
-        	"searching": false,
-        	"info": false,
-			"orderClasses": false,
-    		order: [[ 0, 'asc' ]],
-        	"columns": [
-		        { "data": "Rank" },
-		        { "data": "name" },
-		        { "data": "proposal" },
-		        { "data": "RICK" },
-		        { "data": "MORTY" },
-		        { "data": "seednode_score" },
-		        { "data": "Total" },
-		        { "data": "Last_RICK" },
-		        { "data": "Last_MORTY" }
-		    ],			    
-	        "columnDefs": [
-        		{ className: "text-left text-nowrap", "targets": [ 1 ] },
-				{ className: "text-right text-nowrap", "targets": [ 3,4,5,6,7 ] },
-    			{
-		            "data": 'Rank',
-		            "targets": 0,
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				        $(nTd).html(oData.Rank);
-			        }
-		        },
-    			{
-		            "targets": 1,
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+oData.name+"</a>") : $(nTd).html(oData.name);
-		            }
-		        },
-	            {
-	                "targets": [ 2 ],
-	                "visible": false
-	            }
-	        ]
+            ajax: {
+                url: "{% url 'api_testnet_scoreboard' %}",
+                dataSrc: 'results',
+                "deferRender": true
+            },
+            "paging": false,
+            "searching": false,
+            "info": false,
+            "orderClasses": false,
+            order: [[ 0, 'asc' ]],
+            "columns": [
+                { "data": "Rank" },
+                { "data": "name" },
+                { "data": "proposal" },
+                { "data": "RICK" },
+                { "data": "MORTY" },
+                { "data": "seednode_score" },
+                { "data": "Total" },
+                { "data": "Last_RICK" },
+                { "data": "Last_MORTY" }
+            ],                
+            "columnDefs": [
+                { className: "text-left text-nowrap", "targets": [ 1 ] },
+                { className: "text-right text-nowrap", "targets": [ 3,4,5,6,7 ] },
+                {
+                    "data": 'Rank',
+                    "targets": 0,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html(oData.Rank);
+                    }
+                },
+                {
+                    "targets": 1,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+titleCase(oData.name)+"</a>") : $(nTd).html(titleCase(oData.name));
+                    }
+                },
+                {
+                    "targets": [ 2 ],
+                    "visible": false
+                }
+            ]
         });
 
         Testnet_table_24hr = $('#{{ season }}_table_24hr').DataTable({   
-    		ajax: {
-			    url: "{% url 'api_testnet_scoreboard' %}",
-    			dataSrc: 'results',
-    			"deferRender": true
-			},
-        	"paging": false,
-        	"searching": false,
-        	"info": false,
-			"orderClasses": false,
-    		order: [[ 0, 'asc' ]],
-        	"columns": [
-		        { "data": "24hr_Rank" },
-		        { "data": "name" },
-		        { "data": "proposal" },
-		        { "data": "24hr_RICK" },
-		        { "data": "24hr_MORTY" },
-		        { "data": "24hr_seednode_score" },
-		        { "data": "24hr_Total" }
-		    ],			    
-	        "columnDefs": [
-        		{ className: "text-left text-nowrap", "targets": [ 1 ] },
-				{ className: "text-right text-nowrap", "targets": [ 3,4,5,6 ] },
-    			{
-		            "data": 'Rank',
-		            "targets": 0,
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				        $(nTd).html(oData.Rank);
-			        }
-		        },
-    			{
-		            "targets": 1,
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+oData.name+"</a>") : $(nTd).html(oData.name);
-		            }
-		        },
-	            {
-	                "targets": [ 2 ],
-	                "visible": false
-	            }
-	        ]
+            ajax: {
+                url: "{% url 'api_testnet_scoreboard' %}",
+                dataSrc: 'results',
+                "deferRender": true
+            },
+            "paging": false,
+            "searching": false,
+            "info": false,
+            "orderClasses": false,
+            order: [[ 0, 'asc' ]],
+            "columns": [
+                { "data": "24hr_Rank" },
+                { "data": "name" },
+                { "data": "proposal" },
+                { "data": "24hr_RICK" },
+                { "data": "24hr_MORTY" },
+                { "data": "24hr_seednode_score" },
+                { "data": "24hr_Total" }
+            ],                
+            "columnDefs": [
+                { className: "text-left text-nowrap", "targets": [ 1 ] },
+                { className: "text-right text-nowrap", "targets": [ 3,4,5,6 ] },
+                {
+                    "data": 'Rank',
+                    "targets": 0,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html(oData.Rank);
+                    }
+                },
+                {
+                    "targets": 1,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+titleCase(oData.name)+"</a>") : $(nTd).html(titleCase(oData.name));
+                    }
+                },
+                {
+                    "targets": [ 2 ],
+                    "visible": false
+                }
+            ]
         });
         $('#{{ season }}_table').css('visibility', 'visible');
         $('#{{ season }}_table_24hr').css('visibility', 'visible');
 
-	    Testnet_table.on('xhr.dt', function (e, settings, json, xhr) {
-	    	console.log("get average")
-	    	let average = getAverage(json.results, 'Total')
-	    	let average_24hr = getAverage(json.results, '24hr_Total')
-	        $('#average').html(average);
-	        $('#average_24hr').html(average_24hr);
-	    })
+        Testnet_table.on('xhr.dt', function (e, settings, json, xhr) {
+            console.log("get average")
+            let average = getAverage(json.results, 'Total')
+            let average_24hr = getAverage(json.results, '24hr_Total')
+            $('#average').html(average);
+            $('#average_24hr').html(average_24hr);
+        })
 
-	    timer_increment = 30
-		setInterval( function () {
-			timer_increment -= 1
-			$('.countdown').html(timer_increment)
-			if (timer_increment == 0) {
-	 	    	Testnet_table.ajax.reload();
-	 	    	Testnet_table_24hr.ajax.reload();
-	 	    	timer_increment = 30
-	 	    }
-		}, 1000 );
+        timer_increment = 30
+        setInterval( function () {
+            timer_increment -= 1
+            $('.countdown').html(timer_increment)
+            if (timer_increment == 0) {
+                 Testnet_table.ajax.reload();
+                 Testnet_table_24hr.ajax.reload();
+                 timer_increment = 30
+             }
+        }, 1000 );
     });
 </script> 

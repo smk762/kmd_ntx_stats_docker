@@ -282,18 +282,17 @@ def get_notary_vote_table(request):
     return serializer.data
 
 
-def get_notary_candidates_info(request):
-    year = helper.get_or_none(request, "year", VOTE_YEAR)
-    data = query.get_notary_candidates_data(year).values()
+def get_candidates_proposals(request):
+    data = query.get_notary_candidates_data(VOTE_YEAR).values()
     props = {}
     for item in data:
-        notary = item['name']
+        notary = item['name'].lower()
         if notary not in props:
             props.update({notary:item["proposal_url"]})
     return props
 
 
-def translate_notary(notary):
+def translate_candidate_to_proposal_name(notary):
     notary = notary.lower().split("_")[0]
     if notary == "shadowbit":
         return "decker"
@@ -309,17 +308,54 @@ def translate_notary(notary):
         return "metaphilibert"
     if notary == "xenbug":
         return "xen"
+    if notary == "marmara":
+        return "marmarachain"
+    if notary == "biz":
+        return "who-biz"
     return notary
 
 
-def translate_testnet_name(name, candidates):
+def get_vote_stats_info(request):
+    resp = get_notary_vote_stats_info(request)
+
+    proposals = get_candidates_proposals(request)
+
+    for region in resp:
+        for item in resp[region]:
+            notary = translate_candidate_to_proposal_name(item["candidate"])
+            item.update({
+                "proposal": proposals[notary.lower()]
+            })
+    return resp
+
+
+def get_testnet_scoreboard_table(request):
+    resp = get_testnet_scoreboard(request)
+    proposals = get_candidates_proposals(request)
+    tabled = []
+    for name in resp:
+        candidate_name = translate_proposal_name_to_candidate(name, proposals.keys())
+        proposal = ""
+        if candidate_name in proposals:
+            proposal = proposals[candidate_name.lower()]
+        resp[name].update({
+            "name": name,
+            "proposal": proposal
+        })
+        tabled.append(resp[name])
+    return tabled
+
+
+def translate_proposal_name_to_candidate(name, candidates):
     if name == "metaphilbert":
         name =  "metaphilibert"
     if name == "xenbug":
         name = "xen"
+    if name == "who-biz":
+        return "biz"
     for candidate in candidates:
         if candidate.lower().find(name.lower()) > -1:
-            return candidate
+            return candidate.lower()
     return name
 
     

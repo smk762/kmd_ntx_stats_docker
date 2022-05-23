@@ -11,6 +11,7 @@ from kmd_ntx_api.lib_const_mm2 import *
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_struct as struct
 import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_testnet as testnet
 import kmd_ntx_api.serializers as serializers
 
 # https://stats-api.atomicdex.io/
@@ -578,18 +579,19 @@ def is_mm2_version_valid(version, timestamp):
 
 def get_seednode_version_date_table(request):
     season =  helper.get_or_none(request, "season", SEASON)
+    start = int(helper.get_or_none(request, "start", time.time() - SINCE_INTERVALS["day"]))
+    end = int(helper.get_or_none(request, "end", time.time()))
+
     notary_list = helper.get_notary_list(season)
     default_scores = helper.prepopulate_seednode_version_date(notary_list)
 
     hour_headers = list(default_scores.keys())
     hour_headers.sort()
-
     table_headers = ["Notary"] + hour_headers + ["Total"]
 
-    start = int(helper.get_or_none(request, "start", time.time() - SINCE_INTERVALS["day"]))
-    end = int(helper.get_or_none(request, "end", time.time()))
-
     data = query.get_seednode_version_stats_data(start, end)
+    proposals = testnet.get_candidates_proposals(request)
+    print(proposals)
 
     scores = data.values()
     for item in scores:
@@ -606,14 +608,26 @@ def get_seednode_version_date_table(request):
     for notary in notary_list:
         notary_row = {"Notary": notary}
         total = 0
+
         for hour in hour_headers:
             total += default_scores[hour][notary]["score"]
             notary_row.update({
                 hour: default_scores[hour][notary]["score"]
             })
+
         notary_row.update({
             "Total": round(total,1)
         })
+
+        print(notary)
+        notary = testnet.translate_candidate_to_proposal_name(notary)
+
+        if notary.lower() in proposals: proposal = proposals[notary.lower()]
+        else: proposal = ""
+        notary_row.update({
+            "proposal": proposal
+        })                          
+            
         table_data.append(notary_row)
 
     return {
@@ -636,6 +650,8 @@ def get_seednode_version_month_table(request):
     year = helper.get_or_none(request, "year", None)
     month = helper.get_or_none(request, "month", None)
     start, end, last_day = helper.get_month_epoch_range(year, month)
+    proposals = testnet.get_candidates_proposals(request)
+    print(proposals)
 
     notary_list = helper.get_notary_list(season)
     default_scores = helper.prepopulate_seednode_version_month(notary_list)
@@ -648,6 +664,7 @@ def get_seednode_version_month_table(request):
 
     for item in data:
         notary = item["name"]
+
         if notary in notary_list:
             score = item["score"]
             date, _ = helper.date_hour(item["timestamp"]).split(" ")
@@ -660,14 +677,26 @@ def get_seednode_version_month_table(request):
     for notary in notary_list:
         notary_row = {"Notary": notary}
         total = 0
+
         for day in day_headers:
             total += default_scores[day][notary]["score"]
             notary_row.update({
                 day: round(default_scores[day][notary]["score"],1)
             })
+
         notary_row.update({
             "Total": round(total,1)
         })
+
+
+        notary = testnet.translate_candidate_to_proposal_name(notary)
+        if notary.lower() in proposals: proposal = proposals[notary.lower()]
+        else: proposal = ""
+
+        notary_row.update({
+            "proposal": proposal
+        })
+
         table_data.append(notary_row)
 
     return {

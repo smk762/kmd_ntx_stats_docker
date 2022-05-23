@@ -96,10 +96,6 @@ api_info_urls = [
           api_info.notary_nodes_info,
           name='notary_nodes_info'),
 
-    path('api/info/notary_candidates/',
-          api_info.notary_candidates_info,
-          name='notary_candidates_info'),
-
     path('api/info/btc_txid_list/',
           api_info.btc_txid_list,
           name='btc_txid_list'),
