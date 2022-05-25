@@ -156,7 +156,6 @@ class notary_vote():
 
     def is_vote_valid(self, row):
         end_time = 1653523199
-        end_time = 1653512520
         last_notarised_blocks = query.select_from_notarised_tbl_where(
             season="Season_5", coin="VOTE2022", lowest_blocktime=end_time,
             order_by="block_height ASC"
@@ -173,12 +172,8 @@ class notary_vote():
         for b in last_notarised_blocks:
             ac_ntx_block = b[7]
             ac_ntx_blocktime = RPC[self.year].getblock(str(ac_ntx_block))["time"]
-            print(ac_ntx_block)
-            print(f"{ac_ntx_blocktime} > {end_time}")
-            print(ac_ntx_blocktime > end_time)
         
             if ac_ntx_blocktime > end_time:
-                print("setting last ntx block")
                 self.last_notarised_block = ac_ntx_block
                 row.notes = f"Awaiting notarisation to validate..."
                 break
