@@ -10,14 +10,18 @@ def select_from_notarised_tbl_where(
         season=None, server=None, epoch=None, coin=None,
         include_coins=None, exclude_coins=None,
         lowest_blocktime=None, highest_blocktime=None,
-        not_season=None, not_server=None, not_epoch=None
+        lowest_blockheight=None, highest_blockheight=None,
+        lowest_ac_blockheight=None, highest_ac_blockheight=None,
+        not_season=None, not_server=None, not_epoch=None, order_by=None
     ):
     sql = f"SELECT * FROM notarised"
     sql = get_notarised_conditions_filter(
         sql, season=season, server=server, epoch=epoch, coin=coin,
         include_coins=include_coins, exclude_coins=exclude_coins,
         lowest_blocktime=lowest_blocktime, highest_blocktime=highest_blocktime,
-        not_season=not_season, not_server=not_server, not_epoch=not_epoch
+        lowest_blockheight=lowest_blockheight, highest_blockheight=highest_blockheight,
+        lowest_ac_blockheight=lowest_ac_blockheight, highest_ac_blockheight=highest_ac_blockheight,
+        not_season=not_season, not_server=not_server, not_epoch=not_epoch, order_by=order_by
     )
     CURSOR.execute(sql)
     return helper.get_results_or_none(CURSOR)

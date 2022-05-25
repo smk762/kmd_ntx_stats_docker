@@ -20,7 +20,7 @@ class notary_vote():
         if rescan:
             self.start_block = 1
         else:
-            self.start_block = self.chain_tip - 100
+            self.start_block = self.chain_tip - 200
 
 
     @print_runtime
@@ -147,41 +147,47 @@ class notary_vote():
                         row.valid = self.is_vote_valid(row)
                         if not row.valid:
                             logger.warning("Invalid vote!")
-                            if row.block_height < self.last_notarised_block and self.last_notarised_block != 999999999999999:
+                            logger.warning(self.last_notarised_block)
+                            if row.block_height <= self.last_notarised_block and self.last_notarised_block != 999999999999999:
+                                row.notes = f"Before or in last notarised block {self.last_notarised_block}"
                                 row.valid = True
                         row.update()
 
 
     def is_vote_valid(self, row):
         end_time = 1653523199
-        #end_time = 1653447700
+        end_time = 1653512520
         last_notarised_blocks = query.select_from_notarised_tbl_where(
             season="Season_5", coin="VOTE2022", lowest_blocktime=end_time,
-            highest_blocktime=row.block_time
+            order_by="block_height ASC"
         )
-
         if row.block_time < end_time:
-            row.notes = "before timestamp"
+            row.notes = "Before timestamp"
             return True
 
         if len(last_notarised_blocks) == 0:
-            row.notes = "block after timestamp but before notarisation"
+            row.notes = f"Awaiting notarisation to validate..."
             return False
 
-        if len(last_notarised_blocks) == 1:
-            self.last_notarised_block = last_notarised_blocks[0][7]
 
-            if row.block_height > self.last_notarised_block:
-                row.notes = "block above last notarised after timestamp"
-                return False
-            row.notes = "block after timestamp but before or in last notarised after timestamp"
+        for b in last_notarised_blocks:
+            ac_ntx_block = b[7]
+            ac_ntx_blocktime = RPC[self.year].getblock(str(ac_ntx_block))["time"]
+            print(ac_ntx_block)
+            print(f"{ac_ntx_blocktime} > {end_time}")
+            print(ac_ntx_blocktime > end_time)
+        
+            if ac_ntx_blocktime > end_time:
+                print("setting last ntx block")
+                self.last_notarised_block = ac_ntx_block
+                row.notes = f"Awaiting notarisation to validate..."
+                break
+
+        if row.block_height > self.last_notarised_block:
+            row.notes = f"After last notarised block {self.last_notarised_block}"
             return False
-
-        if len(last_notarised_blocks) > 1:
-            row.notes = "more than one ntx since timestamp"
-            return False
-
         return False
+
 
 # Notarised table
 class notary_candidates():

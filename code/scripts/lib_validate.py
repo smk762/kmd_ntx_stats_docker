@@ -23,6 +23,7 @@ def validate_epoch_coins(epoch_coins, season):
                 return False
     return True
 
+
 def get_season_from_block(block):
     if not isinstance(block, int):
         block = int(block)

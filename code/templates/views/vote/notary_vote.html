@@ -42,26 +42,31 @@
 		function detect_final_ntx() {
 			$.getJSON('{% url "is_election_over_api" %}', function(resp) {
 
-	            if (resp.results != "before timestamp") {
-	                $('.vote_countdown').html(resp.results)
+          if (resp.results != "Before timestamp") {
+              $('.vote_countdown').html(resp.results)
 
-					if (resp.results != "Election complete!") {
+          console.log(resp.results.search("Election complete!"))
+					if (resp.results.search("Election complete!") == -1) {
 						setTimeout(detect_final_ntx, 10000);
-
-						if (timer_increment == 0) {
-				 	    	AR_table.ajax.reload();
-				 	    	EU_table.ajax.reload();
-				 	    	NA_table.ajax.reload();
-				 	    	SH_table.ajax.reload();
-				 	    	timer_increment = 30
-				 	    }
 					}
-		        }
-	        })		    
+					else {
+						clearInterval(countdown)
+						$('.countdown').html("")
+					}
+
+					if (timer_increment == 0) {
+		 	    	AR_table.ajax.reload();
+		 	    	EU_table.ajax.reload();
+		 	    	NA_table.ajax.reload();
+		 	    	SH_table.ajax.reload();
+		 	    	timer_increment = 30		 	    
+					}
+        }
+      })		    
 		}    
 
 
-        timer_increment = 5
+    timer_increment = 5
 		countdown = setInterval( function () {
 			timer_increment -= 1
 			$('.countdown').html("Updating in " + timer_increment + " seconds...")
@@ -71,7 +76,6 @@
 			}
 			else {
 				detect_final_ntx()
-				clearInterval(countdown)
 			}
 
 

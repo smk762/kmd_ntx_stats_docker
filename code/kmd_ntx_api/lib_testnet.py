@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 from django.db.models import Sum, Max, Count
+from datetime import datetime, timezone
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_dexstats as dexstats
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_atomicdex as dex
 import kmd_ntx_api.lib_helper as helper
@@ -238,7 +240,7 @@ def get_notary_vote_stats_info(request):
         if region not in resp:
             resp.update({region:[]})
             region_scores.update({region:[]})
-            
+
         ghost_votes = 0
         if region in unverified_resp:
             if item["candidate"] in unverified_resp[region]:
@@ -291,6 +293,31 @@ def get_notary_vote_table(request):
         item.update({"lag": item["block_time"]-item["lock_time"]})
 
     return serializer.data
+
+
+def get_notary_vote_detail_table(request):
+    year = helper.get_or_none(request, "year", VOTE_YEAR)
+    candidate = helper.get_or_none(request, "candidate")
+    proposals = get_candidates_proposals(request)
+    notary_vote_detail_table = get_notary_vote_table(request)
+
+    for item in notary_vote_detail_table:
+        notary = translate_candidate_to_proposal_name(item["candidate"])
+        item.update({
+            "proposal": proposals[notary.lower()]
+        })
+
+    if candidate:
+        candidate = request.GET["candidate"].replace(".", "-")
+
+    if 'results' in notary_vote_detail_table:
+        notary_vote_detail_table = notary_vote_detail_table["results"]
+
+    for item in notary_vote_detail_table:
+        date_time = datetime.fromtimestamp(item["block_time"])
+
+        item.update({"block_time_human":date_time.strftime("%m/%d/%Y, %H:%M:%S")})
+    return notary_vote_detail_table
 
 
 def get_candidates_proposals(request):
@@ -388,13 +415,26 @@ def get_vote_aggregates(request):
 
 def is_election_over(year):
     end_time = VOTE_PERIODS[year]["max_blocktime"]
+    end_time = 1653512520
+    print(f"{end_time} < {time.time()}")
     if time.time() < end_time:
-        return "before timestamp"
+        return "Before timestamp"
     
     last_notarised_blocks = query.get_notarised_data(
-        season="Season_5", coin=year, min_blocktime=end_time)
+        season="Season_5", coin=year, min_blocktime=end_time).order_by('block_height').values()
     if last_notarised_blocks.count() == 0:
         return "Waiting for notarised block..."
-
     else:
-        return "Election complete!"
+        for b in last_notarised_blocks:
+            print(b)
+            ac_ntx_block = b["ac_ntx_blockhash"]
+            ac_ntx_blocktime = dexstats.getblock(year, str(ac_ntx_block))["time"]
+            print(ac_ntx_block)
+            print(f"{ac_ntx_blocktime} > {end_time}")
+            print(ac_ntx_blocktime > end_time)
+        
+            if ac_ntx_blocktime > end_time:
+                final_block = b["ac_ntx_height"]
+                return f"Election complete! Final VOTE2022 block height: <a href='https://vote2022.komodod.com/b/{final_block}'>{final_block}</a>" 
+
+    return "Waiting for notarised block..."
