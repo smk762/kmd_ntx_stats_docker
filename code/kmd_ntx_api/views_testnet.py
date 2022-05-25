@@ -28,7 +28,6 @@ def notary_vote_view(request):
     context.update({
         "regions": ["AR", "EU", "NA", "SH"],
         "end_timestamp": VOTE_PERIODS[year]["max_blocktime"],
-        "end_timestamp": 1653512520,
         "year": year
     })
 
@@ -43,7 +42,7 @@ def notary_vote_detail_view(request):
 
     context.update({
         "candidate": candidate,
-        "end_timestamp": 1653512520,
+        "end_timestamp": VOTE_PERIODS[year]["max_blocktime"],
         "year": year
     })
 

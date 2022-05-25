@@ -415,8 +415,6 @@ def get_vote_aggregates(request):
 
 def is_election_over(year):
     end_time = VOTE_PERIODS[year]["max_blocktime"]
-    end_time = 1653512520
-    print(f"{end_time} < {time.time()}")
     if time.time() < end_time:
         return "Before timestamp"
     
@@ -426,12 +424,8 @@ def is_election_over(year):
         return "Waiting for notarised block..."
     else:
         for b in last_notarised_blocks:
-            print(b)
             ac_ntx_block = b["ac_ntx_blockhash"]
             ac_ntx_blocktime = dexstats.getblock(year, str(ac_ntx_block))["time"]
-            print(ac_ntx_block)
-            print(f"{ac_ntx_blocktime} > {end_time}")
-            print(ac_ntx_blocktime > end_time)
         
             if ac_ntx_blocktime > end_time:
                 final_block = b["ac_ntx_height"]
