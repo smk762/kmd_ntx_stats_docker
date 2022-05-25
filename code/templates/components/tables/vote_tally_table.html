@@ -16,8 +16,9 @@
 							<th data-data="candidate">Candidate</th>
 							<th data-data="candidate_address">Candidate Address</th>
 							<th data-data="num_votes">Vote Tx</th>
-							<th data-data="sum_votes">Votes</th>
+							<th data-data="sum_votes">Votes <span style="font-style: italic; font-size:0.8em">(unverified)</span></th>
 							<th data-data="proposal">Proposal</td>
+							<th data-data="unverified">Unverified</td>
 						</tr>
 					</thead>
 				</table>
@@ -110,6 +111,7 @@
 		        { "data": "num_votes" },
 		        { "data": "sum_votes" },
 		        { "data": "proposal" },
+		        { "data": "unverified" },
 		    ],
     		"columnDefs": [
 				{ className: "text-left text-nowrap", "targets": [ 1 ] },
@@ -145,10 +147,11 @@
     			{
 		            "targets": 4,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(oData.sum_votes+' <span style="font-style: italic; font-size:0.8em">('+parseInt(oData.unverified)+')</span>')
 		            }
 		        },
 	            {
-	                "targets": [ 5 ],
+	                "targets": [ 5, 6 ],
 	                "visible": false
 	            }
 		    ]
