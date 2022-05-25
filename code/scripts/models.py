@@ -1155,7 +1155,7 @@ class notary_vote_row():
         if self.validated():
             logger.info(f"Updating [notary_vote_row] {self.txid} | \
                           {self.block_height} | {self.candidate} | \
-                          {self.votes} | {self.valid}")
+                          {self.votes} | {self.valid} | {self.notes}") 
             update_notary_vote_row(row_data)
         else:
             logger.warning(f"[notary_vote_row] Row data invalid!")

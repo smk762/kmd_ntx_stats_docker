@@ -35,6 +35,10 @@ api_testnet_urls = [
           api_testnet.vote_aggregates_api,
           name='vote_aggregates_api'),
     
+    path('api/table/notary_vote_detail_table/',
+          api_testnet.api_notary_vote_detail_table,
+          name='api_notary_vote_detail_table'),
+    
     path('api/table/testnet_ntx_scoreboard/',
           api_testnet.api_testnet_scoreboard,
           name='api_testnet_scoreboard'),

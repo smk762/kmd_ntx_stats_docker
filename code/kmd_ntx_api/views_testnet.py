@@ -28,6 +28,7 @@ def notary_vote_view(request):
     context.update({
         "regions": ["AR", "EU", "NA", "SH"],
         "end_timestamp": VOTE_PERIODS[year]["max_blocktime"],
+        "end_timestamp": 1653512520,
         "year": year
     })
 
@@ -38,32 +39,12 @@ def notary_vote_detail_view(request):
     context = helper.get_base_context(request)
     year = helper.get_or_none(request, "year", VOTE_YEAR)
     candidate = helper.get_or_none(request, "candidate")
-    max_block = helper.get_or_none(request, "max_block", VOTE_PERIODS[year]["max_block"])
 
-    proposals = testnet.get_candidates_proposals(request)
-    notary_vote_detail_table = testnet.get_notary_vote_table(request)
-
-    for item in notary_vote_detail_table:
-        notary = testnet.translate_candidate_to_proposal_name(item["candidate"])
-        item.update({
-            "proposal": proposals[notary.lower()]
-        })
-
-    if candidate:
-        candidate = request.GET["candidate"].replace(".", "-")
-
-    if 'results' in notary_vote_detail_table:
-        notary_vote_detail_table = notary_vote_detail_table["results"]
-
-    for item in notary_vote_detail_table:
-        date_time = datetime.fromtimestamp(item["block_time"])
-
-        item.update({"block_time_human":date_time.strftime("%m/%d/%Y, %H:%M:%S")})
 
     context.update({
         "candidate": candidate,
-        "year": year,
-        "notary_vote_detail_table": notary_vote_detail_table
+        "end_timestamp": 1653512520,
+        "year": year
     })
 
     return render(request, 'views/vote/notary_vote_detail.html', context)

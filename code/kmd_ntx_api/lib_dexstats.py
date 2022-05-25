@@ -42,6 +42,15 @@ def get_block_info(coin, block_height):
         return f"{e}"
 
 
+def getblock(coin, block_hash):
+    try:
+        subdomain = get_base_endpoint(coin)
+        endpoint = f"block/{block_hash}"
+        return requests.get(f"{subdomain}/{endpoint}").json()
+    except Exception as e:
+        return f"{e}"
+
+
 def get_balance(coin, addr):
     try:
         subdomain = get_base_endpoint(coin)

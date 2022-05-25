@@ -464,6 +464,7 @@ def update_notary_vote_row(row_data):
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()
+        print("Notary Vote Row updated")
     except Exception as e:
         logger.debug(e)
         if str(e).find('duplicate') == -1:
