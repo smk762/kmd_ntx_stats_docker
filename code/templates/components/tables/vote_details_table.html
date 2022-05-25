@@ -17,6 +17,7 @@
 							<th data-data="block_time">Timestamp</th>
 							<th data-data="block_time_human">Timestamp</th>
 							<th data-data="valid">Valid</th>
+							<th data-data="notes">Notes</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -31,6 +32,7 @@
 								<td data-data="block_time">{{ item.block_time }}</td>
 								<td data-data="block_time_human">{{ item.block_time_human }}</td>
 								<td data-data="valid">{{ item.valid }}</td>
+								<td data-data="notes">{{ item.notes }}</td>
 							</tr>
 						{% endfor %}
 					</tbody>
@@ -61,6 +63,7 @@
 		        { "data": "block_time" },
 		        { "data": "block_time_human" },
 		        { "data": "valid" },
+		        { "data": "notes" }
 		    ],
 	        "columnDefs": [
 				{ "orderData":[ 6 ],  "targets": [ 7 ] },

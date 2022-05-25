@@ -216,13 +216,20 @@ def get_notary_vote_stats_info(request):
     max_blocktime = helper.get_or_none(request, "max_blocktime")
     max_locktime = helper.get_or_none(request, "max_locktime")
     year = helper.get_or_none(request, "year", VOTE_YEAR)
-    valid = helper.get_or_none(request, "valid", "true")
 
-    if valid is not None:
-        valid = (valid == "true")
-
-    data = query.get_notary_vote_data(year, candidate, block, txid, max_block, max_blocktime, max_locktime, None, valid)
+    data = query.get_notary_vote_data(year, candidate, block, txid, max_block, max_blocktime, max_locktime, None, True)
     data = data.values('candidate', 'candidate_address').annotate(num_votes=Count('votes'), sum_votes=Sum('votes'))
+    unverified = query.get_notary_vote_data(year, candidate, block, txid, max_block, max_blocktime, max_locktime, None, False)
+    unverified = unverified.values('candidate').annotate(sum_votes=Sum('votes'))
+
+    unverified_resp = {}
+    for item in unverified:
+        region = item["candidate"].split("_")[1]
+        if region not in unverified_resp:
+            unverified_resp.update({region:{}})
+        unverified_resp[region].update({
+            item["candidate"]: item["sum_votes"]
+        })
 
     resp = {}
     region_scores = {}
@@ -231,25 +238,29 @@ def get_notary_vote_stats_info(request):
         if region not in resp:
             resp.update({region:[]})
             region_scores.update({region:[]})
-        resp[region].append(item)
-        if item["candidate"] in DISQUALIFIED:
-            region_scores[region].append(-1)
-        else:
-            region_scores[region].append(item["sum_votes"])
+            
+        ghost_votes = 0
+        if region in unverified_resp:
+            if item["candidate"] in unverified_resp[region]:
+                ghost_votes = unverified_resp[region][item["candidate"]]
+            
 
+        item.update({
+            "unverified": ghost_votes
+        })
+        resp[region].append(item)
+        region_scores[region].append(item["sum_votes"])
 
     for region in resp:
         region_scores[region].sort()
         region_scores[region].reverse()
         for item in resp[region]:
-            if item["candidate"] in DISQUALIFIED:
-                rank = region_scores[region].index(-1) + 1
-                item.update({"sum_votes": "DISQUALIFIED"})
-            else:
-                rank = region_scores[region].index(item["sum_votes"]) + 1
+            rank = region_scores[region].index(item["sum_votes"]) + 1
             item.update({"region_rank": rank})
+
     for region in resp:
         resp[region] = sorted(resp[region], key = lambda item: item['region_rank'])
+
     return resp
 
 
