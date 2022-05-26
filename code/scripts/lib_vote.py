@@ -171,6 +171,7 @@ class notary_vote():
 
         for b in last_notarised_blocks:
             ac_ntx_block = b[7]
+            print(b)
             ac_ntx_blocktime = RPC[self.year].getblock(str(ac_ntx_block))["time"]
         
             if ac_ntx_blocktime > end_time:

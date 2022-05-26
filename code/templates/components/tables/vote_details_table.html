@@ -115,6 +115,12 @@
         });
     });
 		function detect_final_ntx() {
+			$('.vote_countdown').html("Election is over!")
+			$('.countdown').html("")
+			clearInterval(countdown)
+		}
+
+		function detect_final_ntx2() {
 			$.getJSON('{% url "is_election_over_api" %}', function(resp) {
 
 	            if (resp.results != "Before timestamp") {
