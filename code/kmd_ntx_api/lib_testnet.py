@@ -414,21 +414,5 @@ def get_vote_aggregates(request):
 
 
 def is_election_over(year):
-    end_time = VOTE_PERIODS[year]["max_blocktime"]
-    if time.time() < end_time:
-        return "Before timestamp"
-    
-    last_notarised_blocks = query.get_notarised_data(
-        season="Season_5", coin=year, min_blocktime=end_time).order_by('block_height').values()
-    if last_notarised_blocks.count() == 0:
-        return "Waiting for notarised block..."
-    else:
-        for b in last_notarised_blocks:
-            ac_ntx_block = b["ac_ntx_blockhash"]
-            ac_ntx_blocktime = dexstats.getblock(year, str(ac_ntx_block))["time"]
-        
-            if ac_ntx_blocktime > end_time:
-                final_block = b["ac_ntx_height"]
-                return f"Election complete! Final VOTE2022 block height: <a href='https://vote2022.komodod.com/b/{final_block}'>{final_block}</a>" 
-
-    return "Waiting for notarised block..."
+    final_block = 22920
+    return f"Election complete! Final VOTE2022 block height: <a href='https://vote2022.komodod.com/b/{final_block}'>{final_block}</a>" 

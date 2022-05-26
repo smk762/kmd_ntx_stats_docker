@@ -46,10 +46,7 @@
               $('.vote_countdown').html(resp.results)
 
           console.log(resp.results.search("Election complete!"))
-					if (resp.results.search("Election complete!") == -1) {
-						setTimeout(detect_final_ntx, 10000);
-					}
-					else {
+					if (resp.results.search("Election complete") > -1) {
 						clearInterval(countdown)
 						$('.countdown').html("")
 					}
