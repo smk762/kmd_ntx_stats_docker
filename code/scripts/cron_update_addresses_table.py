@@ -18,9 +18,9 @@ def update_adresses():
         CONN.commit()
 
     for season in SEASONS_INFO:
-        if season not in EXCLUDED_SEASONS:
-            for server in ["Main", "Third_Party"]:
-                populate_addresses(season, server)
+        print(season)
+        for server in SEASONS_INFO[season]['servers']:
+            populate_addresses(season, server)
 
     CURSOR.close()
     CONN.close()
