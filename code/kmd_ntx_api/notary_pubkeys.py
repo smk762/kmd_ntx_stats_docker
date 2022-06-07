@@ -682,13 +682,14 @@ NOTARY_PUBKEYS = {
     }
 }
 
+
 def get_notary_pubkeys():    
-    testnet_info = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/2022-testnet/iguana/testnet.json").json()
-    for item in testnet_info["notaries"]:
-        for k, v in item.items():
-            if k == "nashhash":
-                k = "theerbeen"
-            NOTARY_PUBKEYS["VOTE2022_Testnet"]["Main"].update({k:v})
+    #testnet_info = requests.get("https://raw.githubusercontent.com/KomodoPlatform/dPoW/2022-testnet/iguana/testnet.json").json()
+    #for item in testnet_info["notaries"]:
+    #    for k, v in item.items():
+    #        if k == "nashhash":
+    #            k = "theerbeen"
+    #        NOTARY_PUBKEYS["VOTE2022_Testnet"]["Main"].update({k:v})
     return NOTARY_PUBKEYS
 
 
