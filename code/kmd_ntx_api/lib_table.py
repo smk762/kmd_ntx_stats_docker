@@ -81,6 +81,8 @@ def get_last_mined_table(request):
     data = query.get_mined_data(season, name, address)
     data = data.order_by('season', 'name')
     data = data.values("season", "name", "address")
+
+
     data = data.annotate(Max("block_time"), Max("block_height"))
 
     resp = []

@@ -24,6 +24,10 @@ api_info_urls = [
           api_info.coins_info,
           name='coins_info'),
 
+    path('api/info/coin_prefixes/',
+          api_info.coin_prefixes,
+          name='coin_prefixes'),
+
     path('api/info/coin_icons/',
           api_info.coin_icons_info,
           name='coin_icons_info'),

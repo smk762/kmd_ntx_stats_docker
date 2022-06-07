@@ -4,7 +4,7 @@ import time
 import json
 import requests
 
-from lib_urls import *
+import lib_urls as urls
 from lib_crypto import * 
 from notary_pubkeys import NOTARY_PUBKEYS
 from notary_candidates import CANDIDATE_ADDRESSES
@@ -57,6 +57,15 @@ OTHER_CONF_FILE = {
     "VRSC": "~/.komodo/VRSC/VRSC.conf",   
     "GLEEC": "~/.komodo/GLEEC/GLEEC.conf",
     "GLEEC-OLD": "~/.gleecbtc/gleecbtc.conf",   
+}
+
+
+OTHER_PREFIXES = {
+    "MIL": {
+        "p2shtype": 196,
+        "pubtype": 50,
+        "wiftype": 239
+    }
 }
 
 
@@ -193,7 +202,7 @@ EXCLUDE_DECODE_OPRET_COINS = ['D']
 
 
 EXCLUDED_SERVERS = ["Unofficial"]
-EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_4", "Season_5_Testnet"]
+EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_4", "Season_5_Testnet", "VOTE2022_Testnet"]
 
 
 RETIRED_DPOW_COINS = ["HUSH3", "GLEEC-OLD", "AXO", "BTCH", "COQUICASH", "OOT"]
@@ -286,7 +295,7 @@ SEASONS_INFO = {
     }
 }
 
-SCORING_EPOCHS_REPO_DATA = requests.get(get_scoring_epochs_repo_url('smk762-epochs')).json()
+SCORING_EPOCHS_REPO_DATA = requests.get(urls.get_scoring_epochs_repo_url()).json()
 for _season in SCORING_EPOCHS_REPO_DATA:
     _servers = list(SCORING_EPOCHS_REPO_DATA[_season]["Servers"].keys())[:]
     for _server in _servers:
@@ -332,7 +341,7 @@ def get_season_start_end(season):
 # Get epoch data from local
 def populate_epochs():
     epoch_dict = {}
-    epochs_data = requests.get(get_season_scoring_epochs_url()).json()["results"]
+    epochs_data = requests.get(urls.get_season_scoring_epochs_url()).json()["results"]
     for item in epochs_data:
         _season = item["season"]
         _server = item["server"]
@@ -363,7 +372,7 @@ NOW = time.time()
 EPOCHS = populate_epochs()
 print("Collected epochs data...")
 
-DPOW_COINS_ACTIVE = requests.get(get_dpow_active_coins_url()).json()["results"]
+DPOW_COINS_ACTIVE = requests.get(urls.get_dpow_active_coins_url()).json()["results"]
 
 # Get current dpow coins from repo
 for _season in SEASONS_INFO:

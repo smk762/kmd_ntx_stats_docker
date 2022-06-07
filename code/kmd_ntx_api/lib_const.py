@@ -191,7 +191,7 @@ POSTSEASON = False
 # Links to ecosystem sites
 _url = "https://raw.githubusercontent.com/"
 _url += "gcharang/data/master/info/ecosystem.json"
-ECO_DATA = requests.get(_url).json()
+ECO_DATA = {} # requests.get(_url).json()
 
 VOTE_YEAR = "VOTE2022"
 

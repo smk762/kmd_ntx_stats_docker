@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import time
-from django.db.models import Sum
+from django.db.models import Sum, Max
 from kmd_ntx_api.lib_const import *
+from kmd_ntx_api.notary_pubkeys import NOTARY_PUBKEYS
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
 
@@ -79,4 +80,19 @@ def get_notary_mined_last_24hrs(notary):
         sum_mined = 0
     return sum_mined
 
+
+def get_notary_last_mined_table(request):
+    season = helper.get_or_none(request, "season", SEASON)
+    season_notary_addresses = query.get_addresses_data(season=season, server="Main", coin="KMD")
+    season_notary_addresses = list(season_notary_addresses.values_list("address", flat=True))
+    print(season_notary_addresses)
+    data = query.get_mined_data(season)
+    data = data.values("season", "name", "address")
+    data = data.annotate(blocktime=Max("block_time"), blockheight=Max("block_height"))
+
+    resp = []
+    for item in data:
+        if item["address"] in season_notary_addresses:
+            resp.append(item)
+    return resp
 
