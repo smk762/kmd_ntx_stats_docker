@@ -452,6 +452,31 @@ def get_coin_electrums_ssl(coin):
         return data.values('electrums_ssl')[0]['electrums_ssl']
 
 
+def get_coin_prefixes(request, coin=None):
+    coin = helper.get_or_none(request, "coin", coin)
+    data = query.get_coins_data(coin)
+    data = data.order_by('coin').values('coin', 'coins_info')
+
+    resp = {}
+    for item in data:
+        for i in ["pubtype", "wiftype", "p2shtype"]:
+            if i in item['coins_info']:
+                if item['coin'] not in resp:
+                    resp.update({item['coin']: {
+                        "decimal": {},
+                        "hex": {}
+                    }})
+                resp[item['coin']]["decimal"].update({i: item['coins_info'][i]})
+                resp[item['coin']]["hex"].update({i: pad_dec_to_hex(item['coins_info'][i])})
+    return resp
+
+
+def pad_dec_to_hex(num):
+    hex_val = hex(num)[2:]
+    if len(hex_val) % 2 != 0:
+        hex_val = f"0{hex_val}"
+    return hex_val.upper()
+
 def get_coin_icons(request):
     coin = helper.get_or_none(request, "coin")
 

@@ -192,8 +192,9 @@ def get_sidebar_links(season):
 
 
 def get_base_context(request):
+    print("getting context")
     season = get_page_season(request)
-    return {
+    context = {
         "season": season,
         "season_clean": season.replace("_"," "),
         "explorers": get_explorers(), 
@@ -205,6 +206,8 @@ def get_base_context(request):
         "sidebar_links": get_sidebar_links(season),
         "eco_data_link": get_eco_data_link()
     }
+    print("got context")
+    return context
 
 
 def get_coin_icons(season=None):
@@ -348,7 +351,6 @@ def items_row_to_dict(items_row, top_key):
     return nested_json
 
 
-
 def get_regions_info(season):
     return SEASONS_INFO[season]["regions"]
 
@@ -377,6 +379,8 @@ def sort_dict(item: dict):
     
 
 def get_eco_data_link():
+    if len(ECO_DATA) == 0:
+        return ""
     item = random.choice(ECO_DATA)
     ad = random.choice(item['ads'])
     while ad['frequency'] == "never": 

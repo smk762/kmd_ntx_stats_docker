@@ -13,8 +13,7 @@ def mining_24hrs_view(request):
     context = helper.get_base_context(request)
     context.update({
         "page_title":"KMD Mining Last 24hrs",
-        "mined_24hrs":mined_24hrs,
-        "explorers":info.get_explorers(request)
+        "mined_24hrs":mined_24hrs
     })
     return render(request, 'views/coin/mining_24hrs.html', context)
 
@@ -23,7 +22,14 @@ def mining_overview_view(request):
     context = helper.get_base_context(request)
     context.update({
         "page_title":f"Mining Overview",
-        "explorers":info.get_explorers(request),
     })
     return render(request, 'views/coin/mining_overview.html', context)
+
+
+def notary_last_mined_view(request):
+    context = helper.get_base_context(request)
+    context.update({
+        "page_title":f"Notary Last Mined"
+    })
+    return render(request, 'views/coin/notary_last_mined.html', context)
 

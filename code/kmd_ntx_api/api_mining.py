@@ -20,6 +20,12 @@ def mined_count_season_by_name(request):
     return helper.json_resp(resp, filters)
 
 
+def notary_last_mined_table(request):
+    resp = mining.get_notary_last_mined_table(request)
+    filters = ['season']
+    return helper.json_resp(resp, filters)
+
+
 # USED FOR MINING ALERT IN DISCORD
 def nn_mined_4hrs_api(request):
     mined_4hrs = query.get_mined_data().filter(

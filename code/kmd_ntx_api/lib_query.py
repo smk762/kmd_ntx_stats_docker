@@ -39,7 +39,7 @@ def get_addresses_data(season=None, server=None, coin=None, notary=None, address
     if address:
         data = data.filter(address=address)
 
-    return data.order_by('-season', 'server', 'coin', 'notary')
+    return data
 
 
 def get_balances_data(season=None, server=None, coin=None, notary=None, address=None):

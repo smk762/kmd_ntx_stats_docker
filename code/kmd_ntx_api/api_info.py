@@ -39,6 +39,12 @@ def coins_info(request, coin=None):
     return helper.json_resp(resp, filters)
 
 
+def coin_prefixes(request, coin=None):
+    resp = info.get_coin_prefixes(request, coin)
+    filters = ['coin']
+    return helper.json_resp(resp, filters)
+
+
 def coin_daemon_cli(request):
     resp = info.get_daemon_cli(request)
     filters = ['coin']
