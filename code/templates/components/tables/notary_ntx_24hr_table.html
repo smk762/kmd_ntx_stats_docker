@@ -1,11 +1,11 @@
 	<div class="row" id="ntx_24hr">	
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card">
-			<div class="card-header table_card_title">
+		<div class="card table_card floating-card">
+			<div class="card-header table_card_title floating-card">
 				{{ notary_clean }} Notarisations last 24hrs
 			</div>
 			<div class="card-body table_card_body">
-				<table id="ntx_24hr_tbl" class="table table-striped table-bordered" style="width:99%; visibility: hidden;">
+				<table id="ntx_24hr_tbl" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
 					<thead>
 						<tr>
 							<th class="px-2 py-2" data-data="coin">Coin</th>
@@ -42,8 +42,9 @@
         $('#ntx_24hr_tbl').DataTable({
     		order: [[ 1, 'desc' ]],
 			deferRender: true,
-			"paging": true,
-			"pageLength": 25,
+        	"paging": false,
+        	"searching": false,
+        	"info": false,
             "orderClasses": false,
     		"columnDefs": [
 				{ className: "text-left text-nowrap", "targets": [ 0 ] },
@@ -60,21 +61,33 @@
 		            "data": 'block_height',
 		            "targets": 1,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(get_block_url("KMD", oData.block_height))
+		            	let ntx_coin = "KMD"
+		            	if (oData.coin == "LTC") {
+		            		ntx_coin = "LTC"
+		            	}
+		            	$(nTd).html(get_block_url(ntx_coin, oData.block_height))
 			        }
 		        },
     			{
 		            "data": 'ac_ntx_height',
 		            "targets": 2,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(get_block_url(oData.coin, oData.ac_ntx_height))
+		            	let ntx_coin = oData.coin
+		            	if (oData.coin == "LTC") {
+		            		ntx_coin = "KMD"
+		            	}
+		            	$(nTd).html(get_block_url(ntx_coin, oData.ac_ntx_height))
 			        }
 		        },
     			{
 		            "data": 'txid',
 		            "targets": 3,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(get_txid_url("KMD", oData.txid))
+		            	let ntx_coin = "KMD"
+		            	if (oData.coin == "LTC") {
+		            		ntx_coin = "LTC"
+		            	}
+		            	$(nTd).html(get_txid_url(ntx_coin, oData.txid))
 			        }
 		        },
     			{

@@ -1,12 +1,12 @@
 
 {% load static %}
-            	<div class="card notary_card">
-            		<div class="card-header notary_card_header notary_card_name">
+            	<div class="card notary_card" style="max-width: 150px;">
+            		<div class="card-header notary_card_header notary_card_name px-0">
             			<a href="//{{ request.get_host }}/notary_profile/{{ node }}/?season={{ season }}">
             				{{ node }}
 							{% for nn, site_links in nn_social.items %}
 								{% if node == nn %}
-		            				{% include "components/cards/card_img.html" with img_size=96 img_src=site_links.icon alt_text=nn profile_page="notary_profile" profile_name=node  %}
+		            				{% include "components/cards/card_img.html" with img_size=72 img_src=site_links.icon alt_text=nn profile_page="notary_profile" profile_name=node  %}
 								{% endif %}
 							{% endfor %}
 						</a>

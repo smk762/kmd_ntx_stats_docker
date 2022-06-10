@@ -149,7 +149,7 @@ def decode_op_return_view(request):
         decoded = b58.decode_opret(op_return)
 
         if not "error" in decoded:
-            opret_rows = [{"key":"OP_RETURN", "value":op_return}]
+            opret_rows = []
             for item in decoded:
                 key_val = item.replace("_", " ").title()
                 opret_rows.append({"key":key_val, "value":decoded[item]})

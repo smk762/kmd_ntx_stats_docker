@@ -5,7 +5,7 @@
 				{{ notary_clean }} Last 200 mined blocks
 			</div>
 			<div class="card-body table_card_body">
-				<table id="mining_table" class="table table-striped table-bordered" style="width:99%; visibility: hidden;">
+				<table id="mining_table" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
 					<thead>
 						<tr>
 							<th data-data="block_height">BLOCK HEIGHT</th>
@@ -31,8 +31,9 @@
     			"deferRender": true
 			},
             "orderClasses": false,
-			"paging": true,
-			"pageLength": 25,
+        	"paging": false,
+        	"searching": false,
+        	"info": false,
     		"order": [ 0, 'desc' ],
     		"columnDefs": [
         			{

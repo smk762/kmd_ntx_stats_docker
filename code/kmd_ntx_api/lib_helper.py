@@ -13,6 +13,7 @@ from datetime import timezone as tz
 from calendar import monthrange
 from django.http import JsonResponse
 from kmd_ntx_api.lib_const import *
+from kmd_ntx_api.navigation import NAV_DATA
 import kmd_ntx_api.lib_struct as struct
 
 
@@ -204,6 +205,7 @@ def get_base_context(request):
         "notaries": get_notary_list(season),
         "scheme_host": get_current_host(request),
         "sidebar_links": get_sidebar_links(season),
+        "nav_data": NAV_DATA,
         "eco_data_link": get_eco_data_link()
     }
     print("got context")

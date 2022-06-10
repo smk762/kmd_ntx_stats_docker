@@ -2,8 +2,8 @@
 {% load static %}
 {% block content %}
 
-	<div class="row col-12" style="color: #b9b5b5;">
-		<div class="card-deck d-flex justify-content-between col-12 m-auto">
+	<div class="row col-12 m-0" style="color: #b9b5b5;">
+		<div class="card-deck d-flex justify-content-between col-12 m-0">
             {% include "components/profile_stats/notary_ntx_stats.html" %}
             {% include "components/cards/notary_profile_card.html" %}
             {% include "components/profile_stats/mining_stats.html" %}
@@ -11,7 +11,7 @@
 	</div>
 
 	<div class="row">
-		<div class="card-deck d-flex justify-content-around col-12 m-auto">
+		<div class="card-deck d-flex justify-content-around col-12 m-0">
 			{% include "components/buttons/anchor_button.html" with btn_url="#ntx" width_pct="17" btn_text="Notarisations" %}
 			{% include "components/buttons/anchor_button.html" with btn_url="#ntx_24hr" width_pct="17" btn_text="Notarisations (24hrs)" %}
 			{% include "components/buttons/anchor_button.html" with btn_url="#balance" width_pct="17" btn_text="Balances" %}

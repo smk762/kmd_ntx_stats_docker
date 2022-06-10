@@ -3,7 +3,7 @@
 				<div class="card-body p-0" style="background-color: #101721 !important;">
 					<ul class="list-group">
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+					    <div class="px-2 py-1 stat-li-div col-12 d-flex justify-content-between align-items-center">
 						    Notarised Last 24hrs
 							<a href="#ntx_24hrs">
 						    	{% include "components/badges/stats_badge.html" with stat_val=master_notarised_24hr stat_label="LTC" %}
@@ -17,7 +17,7 @@
 						</div>
 					  </li>
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+					    <div class="px-2 py-1 stat-li-div col-12 d-flex justify-content-between align-items-center">
 					    	Notarised Season
 							<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
 						    	{% include "components/badges/stats_badge.html" with stat_val=master_server_count stat_label="LTC" %}
@@ -31,7 +31,7 @@
 						</div>									    
 					  </li>
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+					    <div class="px-2 py-1 stat-li-div col-12 d-flex justify-content-between align-items-center">
 						    Last Notarisation
 							<a href="//{{ request.get_host }}/coins_last_ntx/?season={{ season }}">
    						    	{% include "components/badges/stats_badge.html" with stat_val=last_ntx_time stat_label=last_ntx_coin %}
@@ -39,7 +39,7 @@
 						</div>
 					  </li>
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+					    <div class="px-2 py-1 stat-li-div col-12 d-flex justify-content-between align-items-center">
 					    	Last LTC Notarisation
 							<a href="//{{ request.get_host }}/coins_last_ntx/?season={{ season }}">
    						    	{% include "components/badges/stats_badge.html" with stat_val=last_ltc_ntx_time stat_label="" %}
@@ -47,7 +47,7 @@
 						</div>
 					  </li>
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
-					    	<div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
+					    	<div class="px-2 py-1 stat-li-div col-12 d-flex justify-content-between align-items-center">
 							    Score
 							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
 						    		{% include "components/badges/stats_badge.html" with stat_val=ntx_score|floatformat:-3 stat_label="Notarisation" %}

@@ -9,7 +9,7 @@
 	</div>
 	<div class="row col-12 m-auto">
 		<div class="card table_card floating-card m-auto" id="mined_24hr_card" style="visibility: hidden; font-size: 1.1em;" >
-			<div class="card-header table_card_title">
+			<div class="card-header table_card_title " id="">
 				KMD Mined Last 24hrs
 			</div>
 			<div class="card-body table_card_body">
@@ -50,10 +50,10 @@
 	        	"searching": false,
 	        	"info": false,
                 "orderClasses": false,
-        		order: [[ 0, 'desc' ]],
+        		order: [[ 1, 'desc' ]],
         		"columnDefs": [
         			{ className: "text-left text-nowrap", "targets": [ 0 ] },
-        			{ className: "text-right text-nowrap", "targets": [ 2, 4 ] },
+        			{ className: "text-right text-nowrap", "targets": [ 3, 5 ] },
         			{
 			            "data": 'name',
 			            "targets": 0,

@@ -292,6 +292,12 @@ def get_ticker(x):
 
 def decode_opret(op_return):
     op_return = op_return.replace("OP_RETURN ", "")
+    if op_return.startswith("6a"):
+        datalen_byte = op_return[2:4]
+        datalen = int(datalen_byte, 16)
+        if len(op_return) == datalen * 2 + 4:
+            op_return = op_return[4:]
+
     ac_ntx_blockhash = lil_endian(op_return[:64])
 
     try:
@@ -323,8 +329,12 @@ def decode_opret(op_return):
             MoM_depth = int(lil_endian(op_return[end:]), 16)
         except Exception as e:
             logger.error(f"[decode_opret] Exception: {e}")
-    resp = {"coin": coin, "notarised_block": ac_ntx_height,
-            "notarised_blockhash": ac_ntx_blockhash}
+    resp = {
+            "op_return": op_return,
+            "coin": coin,
+            "notarised_block": ac_ntx_height,
+            "notarised_blockhash": ac_ntx_blockhash
+        }
     return resp
 
 

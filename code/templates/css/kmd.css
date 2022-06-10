@@ -116,6 +116,10 @@
             .c-app {
                 color: #8ba7ca;
             }
+            .c-body {
+                 margin-top: 50px;
+                 margin-bottom: 15px
+            }
             .c-header {
                 background-color: #172331 !important;
                 border-bottom: 1px solid #000 !important;
@@ -127,6 +131,12 @@
             .c-footer {
                 background-color: #172331 !important;
                 border-top: 1px solid #000 !important;
+                min-height: 25px;
+                max-height: 25px;
+                position: fixed;
+                z-index: 7;
+                width: 100%;
+                bottom: 0px;
             }
             .c-sidebar i {
                 font-size: 28px;
@@ -176,7 +186,8 @@
             }
 
             .leader-badge {
-                width:19%;
+                width: 150px;
+                margin: 4px;
                 filter: grayscale(30%);
                 border: solid 1px #303030;
                 background-color:#0d0f1c;
@@ -330,13 +341,12 @@
                 background-color: #111 !important;
                 border: solid 1px #303030 !important;
                 box-shadow: none !important;
-                margin-bottom: 1.5em !important;
+                margin-bottom: 0.75em !important;
                 filter: grayscale(30%);
                 padding-right: 0;
                 padding-left: 0;
                 margin-left: 0;
                 margin-right: 0;
-                width: 17%;
             }
 
             .notary_card:hover, .coin_card:hover {
@@ -344,7 +354,6 @@
                 background-color: #05081a !important;
                 border: solid 1px #3cddd4aa !important;
                 box-shadow: none !important;
-                margin-bottom: 1.5em !important;
                 filter: grayscale(0%);
             }
 
@@ -391,7 +400,7 @@
             }
             .notary_card_name a, .coin_card_name a {
                 display: block;
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.5em;
             }
             .notary_card_name a:hover {
                 font-weight: bold;
@@ -406,11 +415,12 @@
             /* Inputs & Form Fields */
 
             .stat-li-div {
-                 text-transform:none;
-                 border-radius: 0.25rem;
-                 border: solid 1px #303030 !important;
-                 background-color: #0d0f1c !important;
-                 color: #ffebcd;
+                text-transform:none;
+                border-radius: 0.25rem;
+                border: solid 1px #303030 !important;
+                background-color: #0d0f1c !important;
+                color: #ffebcd;
+                height: 44px;
             }
             .list-group-item {
                 padding-left: 0;
@@ -422,6 +432,18 @@
             }
             .progress {
                 background-color:#364C65;
+            }
+
+            .shown-dropdown:hover {
+                background-color:#11253e !important;
+                color:#41EAD4 !important;
+                border: solid #3CC9BF 1px !important;
+            }
+            .shown-dropdown {
+                background-color:#1c293a !important;
+                color:#41EAD4 !important;
+                border: solid #1a5db1 1px !important;
+
             }
 
             .dropdown-toggle:hover {
@@ -440,6 +462,10 @@
                 color:#41EAD4 !important;
                 border: solid #11253e 1px !important;
 
+            }
+
+            .dropdown-item {
+                color:#2eb0ae !important;
             }
             .dropdown-item:hover {
                 background-color:#11253e !important;

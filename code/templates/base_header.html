@@ -1,53 +1,28 @@
 {% load static %}
+        <header class="c-header kmd_ui_light1 c-header-fluid" style="position: fixed; width:100%; z-index:7">
+            <div class="row justify-content-between col-12 m-0">
+                <div>
+                    <a class="c-header-brand mx-1" href="https://www.komodoplatform.com/">
+                        <img class="c-sidebar-brand-minimized" width="36" height="36" alt="Komodo Logo" src="{% static 'img/brand/KMD_Mark_Color.png' %}" />
+                    </a>
+                    <a class="c-header-brand mx-1" href="https://www.atomicdex.io/">
+                        <img class="c-sidebar-brand-minimized" width="36" height="36" alt="Komodo Logo" src="{% static 'img/brand/dex-logo.png' %}" />
+                    </a>
+                </div>
+                <div class="py-auto my-auto d-lg-none">
+                    <!-- Hamburger Menu Button-->
+                    <button class="c-header-toggler c-class-toggler d-lg-none mfe-auto" type="button" data-target="#sidebar" data-class="c-sidebar-show">
+                        <i class="cil-menu" data-toggle='modal' data-target='#menu-modal'></i>
+                    </button>
+                </div>   
+            <!--
+                <h2 class="c-header-fluid col-md-auto">dPoW Stats</h2>
+            -->
+                <div>
+                    {% include 'components/buttons/header-nav-buttons.html' %}
+                </div>   
+            </div>
 
-        <header class="c-header  kmd_ui_light1 c-header-fluid">          
-            <!-- Hamburger Menu Button-->
-            <button class="c-header-toggler c-class-toggler d-lg-none mfe-auto" type="button" data-target="#sidebar" data-class="c-sidebar-show">
-                <i class="cil-menu"></i>
-            </button>
-            <a class="c-header-brand d-lg-none c-header-brand-sm-up-center" href="#">
-                <img class="c-sidebar-brand-full" height="46" alt="Komodo Logo" src="{% static 'img/brand/KMD_Horiz_Light.png' %}" />
-            </a>
-            <button class="c-header-toggler c-class-toggler mfs-3 d-md-down-none" type="button" data-target="#sidebar" data-class="c-sidebar-lg-show">
-                <i class="cil-menu"></i>
-            </button>
-
-            <ul class="c-header-nav d-md-down-none">
-                <li class="c-header-nav-item px-1">
-                    <button class="btn btn-secondary dropdown-toggle" id="docsDropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> Docs
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="docsDropdownMenuButton" data-popper-placement="bottom-start">
-                        <a class="dropdown-item" href="https://developers.komodoplatform.com/"> Developer Docs</a>
-                        <a class="dropdown-item" href="https://docs.komodoplatform.com/notary/setup-Komodo-Notary-Node.html#nn-repo-quick-reference"> NN Setup Guide</a>
-                        <a class="dropdown-item" href="https://github.com/komodoplatform/dpow"> dPoW Guide</a>
-                        <a class="dropdown-item" href="https://github.com/KomodoPlatform/dPoW/blob/dev/doc/bible.md"> Notary Node Bible</a>
-                    </div>
-                </li>
-                <li class="c-header-nav-item px-1">
-                    <button class="btn btn-secondary dropdown-toggle" id="toolsDropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> Tools
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="toolsDropdownMenuButton" data-popper-placement="bottom-start">
-                        <a class="dropdown-item" href="https://github.com/MrMLynch/nnutils"> Mr Lynch's NN Utils</a>
-                        <a class="dropdown-item" href="https://github.com/KomodoPlatform/komodotools"> KomodoTools</a>
-                        <a class="dropdown-item" href="https://github.com/DeckerSU/komodo_scripts"> Decker's Komodo Scripts</a>
-                        <a class="dropdown-item" href="https://github.com/TheComputerGenie/Misc_Stuff/blob/master/NN%20stuff/BTCsplit.sh"> CG's Low Fee BTC Split Script</a>
-                        <a class="dropdown-item" href="https://github.com/DeckerSU/komodo_scripts/blob/master/resend_funds.sh"> Decker's Wallet Cleaner Script</a>
-                        
-                    </div>
-                </li>
-                <li class="c-header-nav-item px-1">
-                    <button class="btn btn-secondary dropdown-toggle" id="statsDropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> Resources
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="statsDropdownMenuButton" data-popper-placement="bottom-start">
-                        <a class="dropdown-item" href="https://www.dexstats.info/"> DexStats</a>
-                        <a class="dropdown-item" href="https://komodod.com/"> Komodod</a>
-                        <a class="dropdown-item" href="https://notarystats.info/"> Notary Stats</a>
-                        <a class="dropdown-item" href="https://komodostats.com/"> Komodo Stats</a>
-                        <a class="dropdown-item" href="https://dpow.io/"> dpow.io Notary Stats</a>
-                        <a class="dropdown-item" href="https://ikomodo.com/"> iKomodo</a>
-                    </div>
-                </li>
-            </ul>
 
             <!--
             <ul class="c-header-nav mfs-auto">
@@ -125,3 +100,28 @@
                 </li>
             </ul> -->
         </header>
+
+<!-- Small screen menu modal -->
+<div class="modal fade" id="menu-modal" tabindex="-1" role="dialog" aria-labelledby="menu-modal-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <ul class="c-sidebar-nav">
+                {% for section, options in nav_data.items %}
+                    <li class="c-header-nav-item show">
+                        <button class="btn btn-secondary shown-dropdown col-12" id="{{ section }}DropdownMenuButton" type="button" aria-haspopup="true" aria-expanded="true"> {{ section }}
+                        </button>
+                        <div class="dropdown-menu col-12 show" aria-labelledby="{{ section }}DropdownMenuButton" data-popper-placement="bottom-end">
+                            {% for item, values in options.items %}
+                                {% if not values.hide %}
+                                    <a class="dropdown-item" href="{{ values.url }}"> {{ item }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
