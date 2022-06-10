@@ -32,12 +32,16 @@
     			"deferRender": true
 			},
 			"rowCallback": function( row, data ) {
+				let since = new Date() / 1000 - data.blocktime
+				if ( since > 86400 ) {
+					$(row).addClass( 'danger_row' );	
+				}
 			},
         	"paging": false,
         	"searching": false,
         	"info": false,
             "orderClasses": false,
-    		order: [[ 0, 'asc' ]],
+    		order: [[ 2, 'desc' ]],
         	"columns": [
 		        { "data": "name" },
 		        { "data": "address" },

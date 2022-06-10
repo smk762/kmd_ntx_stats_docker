@@ -94,10 +94,10 @@
                 background-color: #193823 !important;
             }
             tr.top_3_row td {
-                background-color: #c9890088 !important;
+                color: #c98900 !important;
             }
             tr.top_5_row td {
-                background-color: #9a9a9a88 !important;
+                color: #c98900a8 !important;
             }
             /*
             tr.danger_row td {

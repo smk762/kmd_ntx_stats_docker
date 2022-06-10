@@ -179,7 +179,6 @@ def funding(request):
         "coin_list":coin_list,
         "notaries_list":notary_list,
         "last_balances_update":last_balances_update,
-        "explorers":info.get_explorers(request),
         "low_nn_balances": helper.low_nn_balances['low_balances'],
         "notary_funding": helper.get_notary_funding(),
         "bot_balance_deltas": helper.get_bot_balance_deltas()

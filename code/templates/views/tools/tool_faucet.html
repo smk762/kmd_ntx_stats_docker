@@ -2,11 +2,11 @@
 {% load static %}
 {% block content %}
 	<div class="row col-12 m-auto">
-		<div class="card table_card">
-			<div class="card-header table_card_title flex">
+		<div class="card table_card floating-card m-0">
+			<div class="card-header table_card_title flex floating-card">
 				RICK / MORTY Faucet
 			</div>
-			<div class="card-body table_card_body">
+			<div class="card-body table_card_body m-0">
 				<div class="m-auto card-text my-3">
         			{% if result == 'fail' %}
 						<img src="{% static 'img/faucet/drink_fail.gif' %}" alt="Failed" class="faucet-img" />
@@ -21,11 +21,19 @@
         			{% endif %}                            			
 				</div>
 				<div class="card-text">
+					<div class="mt-2"><b>24 hr Drips:</b> {{ count_24hrs }} | <b>24 hr Drip Value:</b> {{ sum_24hrs|floatformat:-4 }}</div>
+					<div class="m-auto"><b>Rick Supply:</b> {{ faucet_supply.RICK|floatformat:-4 }} | <b>Morty Supply:</b> {{ faucet_supply.MORTY|floatformat:-4 }}</div>
 					<form action="#" method="post" class="col-6 m-auto">
 						{% csrf_token %}
-
-
-						<div class="input-group my-3">
+						<div class="input-group my-2" >
+							<div class="input-group-prepend prepend-label-left p-0 col-3">
+							  <span class="input-group-text prepend-span">
+							  	Address
+							  </span>
+							</div>
+							<input type="text" class="form-control col-9" id="address" name="address" placeholder="RTUfq3PgPPMVY1YZa3P18icFNDsHpicKLe">
+						</div>
+						<div class="input-group mb-2">
 						    <div class="input-group-prepend prepend-label-left p-0 col-3">
 						        <span class="input-group-text prepend-span">
 						      	    Coin
@@ -35,30 +43,20 @@
 							      <option value="RICK">RICK</option>
 							      <option value="MORTY">MORTY</option>
 							</select>
-						</div>
-
-						<div class="input-group mb-3" >
-							<div class="input-group-prepend prepend-label-left p-0 col-3">
-							  <span class="input-group-text prepend-span">
-							  	Address
-							  </span>
+							<div class="input-group-append p-0">
+								<button class="append-btn px-4" type="submit">Drip</button>
 							</div>
-							<input type="text" class="form-control col-9" id="address" name="address" placeholder="RTUfq3PgPPMVY1YZa3P18icFNDsHpicKLe">
 						</div>
-
-						<button class="btn-dark4 col-4" type="submit">
-						    Drip
-						</button>
 					</form>
 				</div>
-			</div>
+			</div>	
 		</div>
 	</div>
 
 	<div class="row col-12 m-auto">
-		<div class="card table_card">
-			<div class="card-header table_card_title flex">
-				Last 250 Faucet Transactions
+		<div class="card table_card floating-card m-0">
+			<div class="card-header table_card_title flex floating-card">
+				Last 200 Faucet Transactions
 			</div>
 			<div class="card-body table_card_body pb-0">
 				<table style="visibility: hidden;" id="faucet_tx_tbl" class="table table-striped table-bordered">
@@ -86,12 +84,6 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="card-footer table_card_footer flex">
-				<div class="m-auto"><b>24 hr Drips:</b> {{ count_24hrs }}</div>
-				<div class="m-auto"><b>Rick Supply:</b> {{ faucet_supply.RICK|floatformat:-4 }}</div>
-				<div class="m-auto"><b>Morty Supply:</b> {{ faucet_supply.MORTY|floatformat:-4 }}</div>
-				<div class="m-auto"><b>24 hr Drip Value:</b> {{ sum_24hrs|floatformat:-4 }}</div>
-			</div>			
 		</div>
 	</div>
 
@@ -99,10 +91,11 @@
 	    $(document).ready(function() {
 	    	$('#faucet_tx_tbl').css('visibility', 'visible');
 	        $('#faucet_tx_tbl').DataTable({
-  				"pageLength": 25,
     			deferRender: true,
+	        	"paging": false,
+	        	"searching": false,
+	        	"info": false,
                 "orderClasses": false,
-    			"paging": true,
         		order: [[ 4, 'asc' ]],
         		"columnDefs": [
         			{

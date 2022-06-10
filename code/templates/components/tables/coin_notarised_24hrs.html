@@ -1,10 +1,10 @@
 <div class="row col-12 m-auto" id="ntx_24hr">	
-	<div class="card table_card">
-		<div class="card-header table_card_title flex">
+	<div class="card table_card floating-card">
+		<div class="card-header table_card_title flex floating-card">
 			{{ season_clean }} {{ coin }} Notarisations (last 24 hrs)
 		</div>
 		<div class="card-body table_card_body flex">
-			<table id="ntx_24hr_tbl" class="table table-striped table-bordered m-auto" style="width:99%; visibility: hidden;">
+			<table id="ntx_24hr_tbl" class="table table-striped table-bordered m-auto" style="width:100%; visibility: hidden;">
 				<thead>
 					<tr>
 						<th class="px-2 py-2" data-data="coin">Coin</th>
@@ -32,8 +32,9 @@
 			},
     		order: [[ 1, 'desc' ]],
 			deferRender: true,
-			"paging": true,
-			"pageLength": 100,
+        	"paging": false,
+        	"searching": false,
+        	"info": false,
             "orderClasses": false,
     		"columnDefs": [
 				{ className: "text-left text-nowrap", "targets": [ 0 ] },

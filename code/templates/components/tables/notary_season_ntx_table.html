@@ -1,11 +1,11 @@
 <div class="row" id="ntx">
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card">
-			<div class="card-header table_card_title">
+		<div class="card table_card floating-card m-1">
+			<div class="card-header table_card_title floating-card">
 				{{ notary_clean }} {{ season_clean }} Notarisations Summary
 			</div>
 			<div class="card-body table_card_body">
-				<table id="ntx_table" class="table table-striped table-bordered" style="width:99%; visibility: hidden;">
+				<table id="ntx_table" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
 					<thead>
 						<tr>
 							<th data-data="coin">Coin</th>
@@ -46,7 +46,9 @@
     		order: [ 5, 'desc' ], 
 			deferRender: true,
             "orderClasses": false,
-	        "paging": false,
+        	"paging": false,
+        	"searching": false,
+        	"info": false,
         	"columns": [
 		        { "data": "coin" },
 		        { "data": "ntx_server" },
