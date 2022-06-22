@@ -126,6 +126,10 @@ NAV_DATA = {
             "icon": "",
             "url": "https://github.com/komodoplatform/dpow/"
         },
+        "JMJ's Dev blog": {
+            "icon": "",
+            "url": "https://www.jmjatlanta.com/"
+        },
         "Notary Node Bible": {
             "icon": "",
             "url": "https://github.com/KomodoPlatform/dPoW/blob/dev/doc/bible.md"

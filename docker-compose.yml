@@ -19,7 +19,7 @@ services:
         max-file: "10"
     restart: always
   kmd: 
-    image: komodoofficial/komodo:cd_release_ecb4784_dev
+    image: komodoofficial/komodo:cd_release_fb4b355_master
     volumes:
       - ./code:/code
       - /home/smk762/.komodo:/root/.komodo
