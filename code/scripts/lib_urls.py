@@ -20,7 +20,6 @@ def get_ntxid_list_url(season, server, coin, local=True):
     return f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&coin={coin}"
     
 
-
 def get_notarised_txid_url(txid, local=True):
     api_server = get_api_server(local)
     return f"{api_server}/api/info/notarised_txid/?txid={txid}"
@@ -196,11 +195,6 @@ def get_notary_nodes_repo_elected_nn_social_url(season):
 
 def get_scoring_epochs_repo_url(branch='master'):
     return f"https://raw.githubusercontent.com/KomodoPlatform/dPoW/{branch}/doc/scoring_epochs.json"
-
-
-def get_coins_info_url(local=True):
-    api_server = get_api_server(local)
-    return f'{api_server}/api/info/coins/'
 
 
 def get_electrums_info_url(local=True):

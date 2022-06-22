@@ -155,46 +155,46 @@ VALID_SERVERS = ["Main", "Third_Party", "KMD", "BTC", "LTC"]
 
 
 NEXT_SEASON_COINS = {
-    "LTC": ["LTC"],
-    "KMD": ["KMD"],
-    "Main": [
-        "AXO",
-        "BET",
-        "BOTS",
-        "BTCH",
-        "CLC",
-        "CCL",
-        "COQUICASH",
-        "CRYPTO",
-        "DEX",
-        "GLEEC",
-        "HODL",
-        "ILN",
-        "JUMBLR",
-        "KOIN",
-        "MESH",
-        "MGW",
-        "MORTY",
-        "MSHARK",
-        "NINJA",
-        "PANGEA",
-        "PIRATE",
-        "REVS",
-        "RICK",
-        "SUPERNET",
-        "THC",
-        "ZILLA"
-    ],
-    "Third_Party": [
-        "AYA",
-        "CHIPS",
-        "EMC2",
-        "MIL",
-        "MCL",
-        "SFUSD",
-        "VRSC",
-        "TOKEL"
-    ]
+    "Season_6": {
+        "LTC": ["LTC"],
+        "KMD": ["KMD"],
+        "Main": [
+            "AXO",
+            "BET",
+            "BOTS",
+            "BTCH",
+            "CLC",
+            "CCL",
+            "COQUICASH",
+            "CRYPTO",
+            "DEX",
+            "GLEEC",
+            "HODL",
+            "ILN",
+            "JUMBLR",
+            "KOIN",
+            "MGW",
+            "MORTY",
+            "MSHARK",
+            "NINJA",
+            "PANGEA",
+            "PIRATE",
+            "REVS",
+            "RICK",
+            "SUPERNET",
+            "THC"
+        ],
+        "Third_Party": [
+            "AYA",
+            "CHIPS",
+            "EMC2",
+            "MIL",
+            "MCL",
+            "SFUSD",
+            "VRSC",
+            "TOKEL"
+        ]
+    }
 }
 
 
@@ -257,9 +257,9 @@ SEASONS_INFO = {
         "servers": {}
     },
     "Season_6": {
-        "start_block": 3437000,
+        "start_block": 2963330,
         "end_block": 4437000,
-        "start_time": 1751328000,
+        "start_time": 1656077853,
         "end_time": 2773682800,
         "notaries": [],
         "coins": [],
@@ -294,6 +294,32 @@ SEASONS_INFO = {
         }    
     }
 }
+
+for _server in NEXT_SEASON_COINS["Season_6"]:
+    SEASONS_INFO["Season_6"]["coins"] += NEXT_SEASON_COINS["Season_6"][_server]
+    SEASONS_INFO["Season_6"]["servers"].update({
+        _server: {
+            "epochs": {
+                "Epoch_0": {
+                    "start_event": "Season start",
+                    "end_event": "Season end",
+                    "start_block": 2963330,
+                    "end_block": 4437000,
+                    "start_time": 1656077853,
+                    "end_time": 2773682800,
+                    "coins": NEXT_SEASON_COINS["Season_6"][_server]
+                }
+            },
+            "coins": NEXT_SEASON_COINS["Season_6"][_server],
+            "addresses": {}
+        }
+    })
+
+    for coin in NEXT_SEASON_COINS["Season_6"][_server]:
+        SEASONS_INFO["Season_6"]["servers"][_server]["addresses"].update({
+            coin: {}
+        })
+
 
 SCORING_EPOCHS_REPO_DATA = requests.get(urls.get_scoring_epochs_repo_url()).json()
 for _season in SCORING_EPOCHS_REPO_DATA:
