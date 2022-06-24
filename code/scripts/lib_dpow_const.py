@@ -202,7 +202,7 @@ EXCLUDE_DECODE_OPRET_COINS = ['D']
 
 
 EXCLUDED_SERVERS = ["Unofficial"]
-EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_4", "Season_5_Testnet", "VOTE2022_Testnet"]
+EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_4", "Season_5", "Season_5_Testnet", "VOTE2022_Testnet"]
 
 
 RETIRED_DPOW_COINS = ["HUSH3", "GLEEC-OLD", "AXO", "BTCH", "COQUICASH", "OOT"]
@@ -294,7 +294,7 @@ SEASONS_INFO = {
         }    
     }
 }
-
+'''
 for _server in NEXT_SEASON_COINS["Season_6"]:
     SEASONS_INFO["Season_6"]["coins"] += NEXT_SEASON_COINS["Season_6"][_server]
     SEASONS_INFO["Season_6"]["servers"].update({
@@ -319,7 +319,7 @@ for _server in NEXT_SEASON_COINS["Season_6"]:
         SEASONS_INFO["Season_6"]["servers"][_server]["addresses"].update({
             coin: {}
         })
-
+'''
 
 SCORING_EPOCHS_REPO_DATA = requests.get(urls.get_scoring_epochs_repo_url()).json()
 for _season in SCORING_EPOCHS_REPO_DATA:
@@ -603,7 +603,7 @@ for _season in SEASONS_INFO:
                     SEASONS_INFO[_season]["servers"].update({
                         _server: {
                             "coins": [],
-                            "epochs": [],
+                            "epochs": {},
                             "addresses": {}
                         }
                     })

@@ -159,22 +159,24 @@ def deregister_nodes_from_db(notary_seeds):
 
 def update_seednode_version_stats_row(row_data):
     try:
-        timestamp = row_data["timestamp"]
+        timestamp = row_data[3]
         season = validate.get_season(timestamp)
         sql = f"INSERT INTO seednode_version_stats \
                     (name, season, version, timestamp, error, score) \
                 VALUES (%s, %s, %s, %s, %s, %s) \
                 ON CONFLICT ON CONSTRAINT unique_mm2_version_stat \
                 DO UPDATE SET \
-                    season='{row_data[1]}', version='{row_data[2]}', \
-                    timestamp='{row_data[3]}', error='{row_data[4]}', \
+                    season='{season}', version='{row_data[2]}', \
+                    timestamp='{timestamp}', error='{row_data[4]}', \
                     score='{row_data[5]}';"
+        print(sql)
         CURSOR.execute(sql, row_data)
         CONN.commit()
+        print("commited")
     except Exception as e:
-        #logger.error(f"Exception in [update_seednode_version_stats_row]: {e}")
-        #logger.error(f"[update_seednode_version_stats_row] sql: {sql}")
-        #logger.error(f"[update_seednode_version_stats_row] row_data: {row_data}")
+        logger.error(f"Exception in [update_seednode_version_stats_row]: {e}")
+        logger.error(f"[update_seednode_version_stats_row] sql: {sql}")
+        logger.error(f"[update_seednode_version_stats_row] row_data: {row_data}")
         CONN.rollback()
 
 
@@ -211,16 +213,17 @@ def get_version_score(version, timestamp, notary, season):
 
 def test_wss(notary, season):
     
-    url = notary_seeds[season][notary]["IP"]
-    peer_id = notary_seeds[season][notary]["PeerID"]
-    data = {"userpass": "userpass"}
-    resp = electrum.get_from_electrum_ssl(url, 38900, "version", data)
-    if str(resp).find("read operation timed out") > -1:
-        print(f"{notary}: WSS connection detected...")
-        return True
-    else:
-        print(f"{notary}: {resp}")
-    return False
+    if season in notary_seeds:
+        url = notary_seeds[season][notary]["IP"]
+        peer_id = notary_seeds[season][notary]["PeerID"]
+        data = {"userpass": "userpass"}
+        resp = electrum.get_from_electrum_ssl(url, 38900, "version", data)
+        if str(resp).find("read operation timed out") > -1:
+            print(f"{notary}: WSS connection detected...")
+            return True
+        else:
+            print(f"{notary}: {resp}")
+        return False
 
 
 def migrate_sqlite_to_pgsql(ts):

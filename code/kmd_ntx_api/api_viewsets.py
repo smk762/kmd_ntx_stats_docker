@@ -174,7 +174,7 @@ class mm2VersionStatsViewSet(viewsets.ModelViewSet):
     queryset = seednode_version_stats.objects.all()
     serializer_class = serializers.mm2VersionStatsSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    pagination_class = StandardResultsSetPagination
+    pagination_class = MassiveResultsSetPagination
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['name', 'season', 'version']
     ordering_fields = ['-timestamp']
