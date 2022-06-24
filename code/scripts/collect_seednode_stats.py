@@ -239,10 +239,12 @@ def migrate_sqlite_to_pgsql(ts):
             update_seednode_version_stats_row(row_data)
 
 def import_seednode_stats(season):
-    resp = requests.get(f"https://stats.kmd.io/api/source/seednode_version_stats/?season={season}").json()
+    url = get_seednode_stats_url(season)
+    print(url)
+    resp = requests.get(url).json()
 
     for i in resp["results"]:
-        row_data = (resp["name"], resp["season"], resp["version"], resp["timestamp"], resp["error"], resp["score"])
+        row_data = (i["name"], i["season"], i["version"], i["timestamp"], i["error"], i["score"])
         print(row_data)
         update_seednode_version_stats_row(row_data)
 
