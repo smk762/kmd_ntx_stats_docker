@@ -25,6 +25,12 @@ def get_dpow_coin_src(src):
         return src
 
 
+def get_nn_region_split(notary):
+    x = notary.split("_")
+    region = x[-1]
+    nn = notary.replace(f"_{region}", "")
+    return nn, region
+
 def get_results_or_none(cursor):
     try:
         results = cursor.fetchall()

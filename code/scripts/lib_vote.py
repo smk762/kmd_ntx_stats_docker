@@ -258,7 +258,7 @@ def get_proposal_nodes(year=None):
 
     resp = {}
     for address, notary in CANDIDATE_ADDRESSES[year].items():
-        name, region = notary.split('_')
+        name, region = get_nn_region_split(notary)
         if name not in resp:
             resp.update({name:{}})
         resp[name].update({
@@ -268,7 +268,7 @@ def get_proposal_nodes(year=None):
 
 
 def translate_notary(notary):
-    notary = notary.lower().split("_")[0]
+    notary, region = get_nn_region_split(notary)
     if notary == "shadowbit":
         return "decker"
     if notary == "kolo2":

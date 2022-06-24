@@ -1,4 +1,8 @@
-
+			{% if hide %}
+			<div id="date_selection" style="display:none; height:30px;">
+			{% else %}
+			<div id="date_selection" style="height:30px;">
+			{% endif %}
 				<form class="m-0" id="datepicker_form">
 				    <div class="form-row justify-content-center">
 				        <div class="form-group">
@@ -14,3 +18,4 @@
 						</div>
 					</div>
 				</form>
+			</div>

@@ -251,7 +251,7 @@ SEASONS_INFO = {
         "post_season_end_block": 3436999,
         "start_time": 1623682800,
         "end_time": 1651622400,
-        "post_season_end_time": 1751328000,
+        "post_season_end_time": 1656077852,
         "notaries": [],
         "coins": [],
         "servers": {}
@@ -417,7 +417,7 @@ for _season in SEASONS_INFO:
 
                 CURRENT_DPOW_COINS[_season][DPOW_COINS_ACTIVE[_coin]["dpow"]["server"]].append(_coin)
 
-        elif SEASONS_INFO[_season]["start_time"] > NOW:
+        elif SEASONS_INFO[_season]["start_time"] > NOW - 96 * 60 * 60:
             EXCLUDED_SEASONS.append(_season)
 
 print("Collected dpow coins data...")

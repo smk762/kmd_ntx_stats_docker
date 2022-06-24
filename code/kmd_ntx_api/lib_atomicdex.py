@@ -590,8 +590,10 @@ def get_seednode_version_date_table(request):
     table_headers = ["Notary"] + hour_headers + ["Total"]
 
     data = query.get_seednode_version_stats_data(start, end)
-    proposals = testnet.get_candidates_proposals(request)
-    print(proposals)
+    '''
+    if is_testnet:
+        proposals = testnet.get_candidates_proposals(request)
+    '''
 
     scores = data.values()
     for item in scores:
@@ -600,6 +602,7 @@ def get_seednode_version_date_table(request):
             score = item["score"]
             _, hour = helper.date_hour(item["timestamp"]).split(" ")
             hour = hour.replace(":00", "")
+
             default_scores[hour][notary]["score"] = score
             if item["version"] not in default_scores[hour][notary]["versions"]:
                 default_scores[hour][notary]["versions"].append(item["version"])
@@ -610,7 +613,12 @@ def get_seednode_version_date_table(request):
         total = 0
 
         for hour in hour_headers:
-            total += default_scores[hour][notary]["score"]
+            if default_scores[hour][notary]["score"] == 0.2:
+                total += default_scores[hour][notary]["score"]
+            elif default_scores[hour][notary]["score"] == 0.01:
+                default_scores[hour][notary]["score"] = f'0 (WSS connection failing)'
+            elif default_scores[hour][notary]["score"] == 0:
+                default_scores[hour][notary]["score"] = f'0 (Wrong version: {default_scores[hour][notary]["versions"]})'
             notary_row.update({
                 hour: default_scores[hour][notary]["score"]
             })
@@ -619,15 +627,17 @@ def get_seednode_version_date_table(request):
             "Total": round(total,1)
         })
 
-        print(notary)
-        notary = testnet.translate_candidate_to_proposal_name(notary)
+        '''
+        if is_testnet:
+            notary = testnet.translate_candidate_to_proposal_name(notary)
 
-        if notary.lower() in proposals: proposal = proposals[notary.lower()]
-        else: proposal = ""
-        notary_row.update({
-            "proposal": proposal
-        })                          
-            
+            if notary.lower() in proposals: proposal = proposals[notary.lower()]
+            else: proposal = ""
+
+            notary_row.update({
+                "proposal": proposal
+            })                          
+        '''
         table_data.append(notary_row)
 
     return {
@@ -650,8 +660,12 @@ def get_seednode_version_month_table(request):
     year = helper.get_or_none(request, "year", None)
     month = helper.get_or_none(request, "month", None)
     start, end, last_day = helper.get_month_epoch_range(year, month)
-    proposals = testnet.get_candidates_proposals(request)
-    print(proposals)
+
+    '''
+    if is_testnet:
+        proposals = testnet.get_candidates_proposals(request)
+        print(proposals)
+    '''
 
     notary_list = helper.get_notary_list(season)
     default_scores = helper.prepopulate_seednode_version_month(notary_list)
@@ -667,11 +681,12 @@ def get_seednode_version_month_table(request):
 
         if notary in notary_list:
             score = item["score"]
-            date, _ = helper.date_hour(item["timestamp"]).split(" ")
-            day = date.split("/")[1]
-            default_scores[day][notary]["score"] += score
-            if item["version"] not in default_scores[day][notary]["versions"]:
-                default_scores[day][notary]["versions"].append(item["version"])
+            if score == 0.2:
+                date, _ = helper.date_hour(item["timestamp"]).split(" ")
+                day = date.split("/")[1]
+                default_scores[day][notary]["score"] += score
+                if item["version"] not in default_scores[day][notary]["versions"]:
+                    default_scores[day][notary]["versions"].append(item["version"])
 
     table_data = []
     for notary in notary_list:
@@ -689,13 +704,16 @@ def get_seednode_version_month_table(request):
         })
 
 
-        notary = testnet.translate_candidate_to_proposal_name(notary)
-        if notary.lower() in proposals: proposal = proposals[notary.lower()]
-        else: proposal = ""
+        '''
+        if is_testnet:
+            notary = testnet.translate_candidate_to_proposal_name(notary)
+            if notary.lower() in proposals: proposal = proposals[notary.lower()]
+            else: proposal = ""
 
-        notary_row.update({
-            "proposal": proposal
-        })
+            notary_row.update({
+                "proposal": proposal
+            })
+        '''
 
         table_data.append(notary_row)
 

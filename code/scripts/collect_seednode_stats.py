@@ -16,16 +16,18 @@ import logging.handlers
 
 from lib_helper import *
 import lib_validate as validate
+import lib_electrum as electrum
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
-formatter = logging.Formatter(
-    '%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
 VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/smk762/DragonhoundTools/master/atomicdex/seednode_version.json"
+
+SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 # ENV VARS
 load_dotenv()
@@ -39,54 +41,60 @@ cursor = conn.cursor()
 
 
 def mm2_proxy(method, params=None):
-	if not params:
-		params = {}
-	params.update({
-		"method": method,
-		"userpass": MM2_USERPASS,
-		})
-	r = requests.post(MM2_IP, json.dumps(params))
-	print(r.json())
-	return r
+    if not params:
+        params = {}
+    params.update({
+        "method": method,
+        "userpass": MM2_USERPASS,
+        })
+    r = requests.post(MM2_IP, json.dumps(params))
+    print(r.json())
+    return r
 
 
 def get_active_mm2_versions(ts):
-	data = requests.get(VERSION_TIMESPANS_URL).json()
-	active_versions = []
-	for version in data:
-		if int(ts) > data[version]["start"] and int(ts) < data[version]["end"]:
-			active_versions.append(version)
-	return active_versions
-
-
-def get_seedinfo_from_csv():
-	notary_seeds = []
-	with open('notary_seednodes.csv', 'r') as file:
-	    csv_file = csv.DictReader(file)
-	    for row in csv_file:
-	    	notary_seeds.append(dict(row))
-	return notary_seeds
+    data = requests.get(VERSION_TIMESPANS_URL).json()
+    active_versions = []
+    for version in data:
+        if int(ts) > data[version]["start"] and int(ts) < data[version]["end"]:
+            active_versions.append(version)
+    return active_versions+["b8598439a"]
 
 
 def get_seedinfo_from_json():
-	notary_seeds = []
-	with open('notary_seednodes.json', 'r') as f:
-		return json.load(f)
+    file = f'{SCRIPT_PATH}/notary_seednodes.json'
+    print(file)
+    with open(file, 'r') as f:
+        return json.load(f)
 
 
 def add_notaries(notary_seeds):
-	# Add to tracking
-	for season in notary_seeds:
-		for notary in notary_seeds[season]:
-			params = {
-				"mmrpc": "2.0",
-				"params": {
-					"name": notary,
-					"address": notary_seeds[season][notary]["IP"],
-					"peer_id": notary_seeds[season][notary]["PeerID"]
-				}
-			}
-			r = mm2_proxy('add_node_to_version_stat', params)
+    # Add to tracking
+    for season in notary_seeds:
+        for notary in notary_seeds[season]:
+            params = {
+                "mmrpc": "2.0",
+                "params": {
+                    "name": notary,
+                    "address": notary_seeds[season][notary]["IP"],
+                    "peer_id": notary_seeds[season][notary]["PeerID"]
+                }
+            }
+            print(notary)
+            r = mm2_proxy('add_node_to_version_stat', params)
+
+def remove_notaries(notary_seeds):
+    # Add to tracking
+    for season in notary_seeds:
+        for notary in notary_seeds[season]:
+            params = {
+                "mmrpc": "2.0",
+                "params": {
+                    "name": notary
+                }
+            }
+            print(notary)
+            r = mm2_proxy('remove_node_from_version_stat', params)
 
 
 def get_local_version():
@@ -94,60 +102,71 @@ def get_local_version():
 
 
 def start_stats_collection():
-	# set to every 30 minutes
-	params = {
-		"mmrpc": "2.0",
-		"params": {
-			"interval":1800,
-		}
-	}
-	print("Starting stats collection...")
-	r = mm2_proxy('start_version_stat_collection', params)
+    # set to every 30 minutes
+    params = {
+        "mmrpc": "2.0",
+        "params": {
+            "interval":1800,
+        }
+    }
+    print("Starting stats collection...")
+    r = mm2_proxy('start_version_stat_collection', params)
 
 
 def empty_pg_table():
-	rows = CURSOR.execute("DELETE FROM seednode_version_stats;")
-	CONN.commit()
-	print('Deleted', CURSOR.rowcount, 'records from seednode_version_stats PgSQL table.')
+    rows = CURSOR.execute("DELETE FROM seednode_version_stats;")
+    CONN.commit()
+    print('Deleted', CURSOR.rowcount, 'records from seednode_version_stats PgSQL table.')
 
 
 def empty_sqlite_table(table):
-	rows = cursor.execute(f"DELETE FROM {table};")
-	conn.commit()
-	print('Deleted', cursor.rowcount, 'records from the table.')
+    rows = cursor.execute(f"DELETE FROM {table};")
+    conn.commit()
+    print('Deleted', cursor.rowcount, 'records from the table.')
 
 
 def get_version_stats_from_sqlite_db(from_time=0, version=None):
-	sql = f"SELECT * FROM stats_nodes WHERE version = '{version}' and timestamp > {from_time}"
-	if not version:
-		sql = f"SELECT * FROM stats_nodes WHERE version != '' and timestamp > {from_time}"
-	print(sql)
-	rows = cursor.execute(sql).fetchall()
-	resp = []
-	for row in rows:
-	    resp.append(dict(row))
-	print(f"{len(resp)} records returned")
-	return resp
+    sql = f"SELECT * FROM stats_nodes WHERE version = '{version}' and timestamp > {from_time}"
+    if not version:
+        sql = f"SELECT * FROM stats_nodes WHERE version != '' and timestamp > {from_time}"
+    print(sql)
+    rows = cursor.execute(sql).fetchall()
+    resp = []
+    for row in rows:
+        resp.append(dict(row))
+    print(f"{len(resp)} records returned")
+    return resp
 
 
 def get_version_stats_from_db():
-	rows = cursor.execute("SELECT * FROM stats_nodes WHERE version != ''").fetchall()
-	for row in rows:
-	    print(dict(row))
+    rows = cursor.execute("SELECT * FROM stats_nodes WHERE version != ''").fetchall()
+    for row in rows:
+        print(dict(row))
+
 
 def get_registered_nodes_from_db():
-        rows = cursor.execute("SELECT * FROM nodes;").fetchall()
-        print("---------")
-        for row in rows:
-            print(dict(row))	
-        print("---------")
+    rows = cursor.execute("SELECT * FROM nodes;").fetchall()
+    print("---------")
+    for row in rows:
+        print(dict(row))    
+    print("---------")
 
+def deregister_nodes_from_db(notary_seeds):
+    for season in notary_seeds:
+        for notary in notary_seeds[season]:
+	        cursor.execute(f"DELETE FROM nodes where name = '{notary}';")
+	        cursor.commit()
 
 def update_seednode_version_stats_row(row_data):
     try:
         sql = f"INSERT INTO seednode_version_stats \
                     (name, season, version, timestamp, error, score) \
-                VALUES (%s, %s, %s, %s, %s, %s);"
+                VALUES (%s, %s, %s, %s, %s, %s) \
+                ON CONFLICT ON CONSTRAINT unique_mm2_version_stat \
+                DO UPDATE SET \
+                    season='{row_data[1]}', version='{row_data[2]}', \
+                    timestamp='{row_data[3]}', error='{row_data[4]}', \
+                    score='{row_data[5]}';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
     except Exception as e:
@@ -173,80 +192,107 @@ def get_pgsql_latest():
 
 
 def round_ts_to_hour(timestamp):
-	return round(int(timestamp)/3600)*3600
+    return round(int(timestamp)/3600)*3600
 
-def get_version_score(version, timestamp):
-	active_versions_at = get_active_mm2_versions(timestamp)
-	if version in active_versions_at:
-		return 0.2
-	return 0
+
+def get_version_score(version, timestamp, notary, season):
+    active_versions_at = get_active_mm2_versions(timestamp)
+    print(f"mm2 active versions: {active_versions_at}")
+    for v in active_versions_at:
+        if version.find(v) > -1:
+            if test_wss(notary, season):
+                return 0.2
+            else:
+                return 0.01
+    return 0
+
+
+def test_wss(notary, season):
+    
+    url = notary_seeds[season][notary]["IP"]
+    peer_id = notary_seeds[season][notary]["PeerID"]
+    data = {"userpass": "userpass"}
+    resp = electrum.get_from_electrum_ssl(url, 38900, "version", data)
+    if str(resp).find("read operation timed out") > -1:
+        print(f"{notary}: WSS connection detected...")
+        return True
+    else:
+        print(f"{notary}: {resp}")
+    return False
 
 
 def migrate_sqlite_to_pgsql(ts):
-	print(f"Migrating to pgsql from {ts}")
-	rows = get_version_stats_from_sqlite_db()
-	if ts:
-		rows = get_version_stats_from_sqlite_db(ts)
-	for row in rows:
-		print(row)
-		if row["version"] != '':
-			hr_timestamp = round_ts_to_hour(row["timestamp"])
-
-			season = validate.get_season(hr_timestamp)
-			score = get_version_score(row["version"], hr_timestamp)
-			row_data = (row["name"], season, row["version"], hr_timestamp, row["error"], score)
-			print(row_data)
-			update_seednode_version_stats_row(row_data)
+    print(f"Migrating to pgsql from {ts}")
+    rows = get_version_stats_from_sqlite_db()
+    if ts:
+        rows = get_version_stats_from_sqlite_db(ts)
+    for row in rows:
+        print(row)
+        if row["version"] != '':
+            hr_timestamp = round_ts_to_hour(row["timestamp"])
+            season = validate.get_season(hr_timestamp)
+            score = get_version_score(row["version"], hr_timestamp, row["name"], season)
+            row_data = (row["name"], season, row["version"], hr_timestamp, row["error"], score)
+            print(row_data)
+            update_seednode_version_stats_row(row_data)
 
 
 if __name__ == '__main__':
 
-	active_versions = get_active_mm2_versions(time.time())
-	logger.info(f"Local MM2 version: {get_local_version().json()}")
-	print(f"active_versions: {active_versions}")
+    notary_seeds = get_seedinfo_from_json()
+    active_versions = get_active_mm2_versions(time.time())
+    logger.info(f"Local MM2 version: {get_local_version().json()}")
+    print(f"active_versions: {active_versions}")
 
-	if len(sys.argv) > 1:
+    if len(sys.argv) > 1:
 
-		# Clears tables
-		if sys.argv[1] == 'empty':
-			empty_pg_table()
+        # Clears tables
+        if sys.argv[1] == 'empty':
+            empty_pg_table()
 
-		# Starts stats collection in sqliteDB
-		# mm2 Dockerfile takes care of this in init.sh
-		elif sys.argv[1] == 'start':
-			start_stats_collection()
+        # Starts stats collection in sqliteDB
+        # mm2 Dockerfile takes care of this in init.sh
+        elif sys.argv[1] == 'start':
+            start_stats_collection()
 
-		# Returns registered nodes
-		elif sys.argv[1] == 'nodes':
-			get_registered_nodes_from_db()
+        # Returns registered nodes
+        elif sys.argv[1] == 'nodes':
+            get_registered_nodes_from_db()
 
-		# Run manually to register nodes via CSV file
-		elif sys.argv[1] == 'register':
-			notary_seeds = get_seedinfo_from_json()
-			add_notaries(notary_seeds)
+        # Run manually to register nodes via JSON file
+        elif sys.argv[1] == 'register':
+            remove_notaries(notary_seeds)
+            add_notaries(notary_seeds)
 
-		# This is what gets cron'd
-		elif sys.argv[1] == 'migrate':
-			latest_record = get_pgsql_latest()
-			logger.info(f"Latest entry in pgsql db: {latest_record}")
-			migrate_sqlite_to_pgsql(latest_record)
+        # This is what gets cron'd
+        elif sys.argv[1] == 'migrate':
+            latest_record = get_pgsql_latest()
+            logger.info(f"Latest entry in pgsql db: {latest_record}")
+            migrate_sqlite_to_pgsql(latest_record)
 
-		# outputs SQLite data
-		elif sys.argv[1] == 'sqlite_data':
-			sqlite_version_stats = get_version_stats_from_sqlite_db(0)
-			print(f"sqlite_version_stats: {sqlite_version_stats}")
+        # outputs SQLite data
+        elif sys.argv[1] == 'sqlite_data':
+            sqlite_version_stats = get_version_stats_from_sqlite_db(0)
+            print(f"sqlite_version_stats: {sqlite_version_stats}")
 
-		# outputs pgSQL data
-		elif sys.argv[1] == 'pgsql_data':
-			pgsql_version_stats = get_version_stats_from_pgsql_db(0)
-			print(f"pgsql_version_stats: {pgsql_version_stats}")
+        # outputs pgSQL data
+        elif sys.argv[1] == 'pgsql_data':
+            pgsql_version_stats = get_version_stats_from_pgsql_db(0)
+            print(f"pgsql_version_stats: {pgsql_version_stats}")
 
-		else:
-			print("invalid param, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data]")
+        # tests WSS connection
+        elif sys.argv[1] == 'wss_test':
+            for season in notary_seeds:
+                for notary in notary_seeds[season]:
+                    test_wss(notary, season)
+                
 
-	else:
-		print("no param given, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data]")
+        else:
+            print("invalid param, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test]")
 
-	#get_version_stats_from_db()
-	conn.close()
-	CONN.close()
+    else:
+        print("no param given, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test]")
+
+    #get_version_stats_from_db()
+    conn.close()
+    CONN.close()

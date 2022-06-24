@@ -8,7 +8,6 @@
                     {% endif %}
                 {% endfor %}
                 <th data-data="Total">Total</th>
-                <th data-data="proposal">Proposal</th>
             </tr>
         </thead>
     </table>
@@ -23,6 +22,7 @@
             var maxYear = new Date(maxTime).getUTCFullYear()
             var last_day = daysInMonth(my[0], my[1])
 
+            $("#monthly_api_link").html('<i>Link to API data: <a href="'+endpoint+'">'+endpoint+'</a></i>')
             month_seed_table = $('#mm2_month_version_tbl').DataTable({
                 ajax: {
                     url: endpoint,
@@ -41,7 +41,8 @@
                         targets: 0,
                         orderable: true,
                         "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        	oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+titleCase(oData.Notary)+"</a>") : $(nTd).html(titleCase(oData.Notary));
+                        	// oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+titleCase(oData.Notary)+"</a>") : $(nTd).html(titleCase(oData.Notary));
+                            $(nTd).html(oData.Notary);
                         }
                     },
                     { 
@@ -105,6 +106,7 @@
                     params = "?year="+my[1]+"&month="+my[0]+"&season={{ season }}"
                     endpoint = "{% url 'seednode_version_month_table_api' %}"+params
                     last_day = daysInMonth(my[0], my[1])
+                    $("#monthly_api_link").html('<i>Link to API data: <a href="'+endpoint+'">'+endpoint+'</a></i>')
                     month_seed_table.ajax.url(endpoint).load();
                 }
             });

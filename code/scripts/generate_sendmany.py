@@ -4,10 +4,10 @@ import sys
 import json
 import requests
 
-coin = inut("Coin: ")
-season = inut("Season: ")
-server = inut("Server: ")
-amount = inut("amount: ")
+coin = input("Coin: ")
+season = input("Season: ")
+server = input("Server: ")
+amount = input("amount: ")
 
 r = requests.get(f"http://116.203.120.91:8762/api/table/addresses/?season={season}&server={server}&coin={coin}")
 resp = r.json()["results"]

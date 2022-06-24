@@ -16,6 +16,10 @@ NAV_DATA = {
             "icon": "",
             "url": "/ntx_scoreboard_24hrs"
         },
+        "Seednode Version": {
+            "icon": "",
+            "url": "/atomicdex/seednode_version"
+        },
         " Last Notarisation (Coin)": {
             "icon": "",
             "url": "/coins_last_ntx"

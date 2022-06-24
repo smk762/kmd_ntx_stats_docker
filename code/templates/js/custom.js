@@ -42,6 +42,14 @@
 			if (i == timespan) {
 				$(i).fadeTo(1000, 1)
 				$(i+"_btn").addClass('btn-selected')
+				if (i == '#month') {
+					$("#month_selection").show()
+					$("#date_selection").hide()
+				}
+				if (i == '#last_24hrs') {
+					$("#month_selection").hide()
+					$("#date_selection").show()
+				}
 			}
 			else {
 				$(i).css('display', 'none')	

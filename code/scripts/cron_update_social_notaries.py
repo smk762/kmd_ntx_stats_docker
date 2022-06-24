@@ -6,7 +6,7 @@ import logging
 import logging.handlers
 from lib_const import *
 from decorators import *
-from lib_helper import get_season_notaries
+from lib_helper import get_season_notaries, get_nn_region_split
 from lib_urls import get_notary_nodes_repo_elected_nn_social_url, get_notary_addresses_url
 from models import nn_social_row
 
@@ -21,7 +21,7 @@ def generate_social_notaries_template(season):
         repo_info = {}
     template = {}
     for notary in notaries:
-        notary_name = notary.split("_")[0]
+        notary_name, region = get_nn_region_split(notary)
         template.update({
             notary_name: {
                 "discord": "",
@@ -42,9 +42,7 @@ def generate_social_notaries_template(season):
                 template[notary_name].update({item:repo_info[notary_name][item]})
 
     for notary in notaries:
-        split_name = notary.split("_")
-        notary_name = split_name[0]
-        notary_region = split_name[1]
+        notary_name, notary_region = get_nn_region_split(notary)
         if notary_region not in template[notary_name]["regions"]:
             notary_addresses = requests.get(get_notary_addresses_url(season, notary)).json()
             template[notary_name]["regions"].update({
@@ -78,7 +76,7 @@ def populate_social_notaries(season):
 
         for notary in SEASONS_INFO[season]["notaries"]:
             nn_social = nn_social_row()
-            notary_name = notary.split("_")[0]
+            notary_name, region = get_nn_region_split(notary)
             if notary_name in list(elected_nn_social.keys()):
 
                 for region in elected_nn_social[notary_name]['regions']:
@@ -183,13 +181,12 @@ def remove_invalid_notaries(season):
 
 
 if __name__ == "__main__":
-
-    logger.info(f"Preparing to populate [social_notaries] table...")
-    for season in SEASONS_INFO:
-        if season not in EXCLUDED_SEASONS:
-            populate_social_notaries(season)
-            remove_invalid_notaries(season)
-            generate_social_notaries_template(season)
+    print(EXCLUDED_SEASONS)
+    season = "Season_6"
+    logger.info(f"Preparing to populate {season} [social_notaries] table...")
+    populate_social_notaries(season)
+    remove_invalid_notaries(season)
+    generate_social_notaries_template(season)
     
     CURSOR.close()
     CONN.close()
