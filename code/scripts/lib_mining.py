@@ -44,7 +44,7 @@ def update_mined_table(season, coin="KMD", start_block=None):
 
     tip = int(RPC[coin].getblockcount())
     if not start_block:
-        start_block = tip-10   
+        start_block = tip-40000   
 
     all_blocks = [*range(start_block,tip,1)] 
     recorded_blocks = [block[0] for block in select_from_table('mined', 'block_height')]
@@ -73,7 +73,7 @@ def update_mined_count_daily_table(season, rescan=None):
     now = int(time.time())
 
     if not rescan:
-        start = end - datetime.timedelta(days=5)
+        start = end - datetime.timedelta(days=30)
 
     logger.info(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
 

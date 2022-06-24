@@ -18,10 +18,13 @@ def get_from_electrum(url, port, method, params=[]):
 def get_from_electrum_ssl(url, port, method, params=[]):
     params = [params] if not isinstance(params, list) else params
     context = ssl.create_default_context()
-    with socket.create_connection((url, port)) as sock:
-        with context.wrap_socket(sock, server_hostname=url) as ssock:
-            ssock.send(json.dumps({"id": 0, "method": method, "params": params}).encode() + b'\n')
-            return json.loads(ssock.recv(99999)[:-1].decode())
+    try:
+        with socket.create_connection((url, port)) as sock:
+            with context.wrap_socket(sock, server_hostname=url) as ssock:
+                ssock.send(json.dumps({"id": 0, "method": method, "params": params}).encode() + b'\n')
+                return json.loads(ssock.recv(99999)[:-1].decode())
+    except Exception as e:
+        return e
 
 
 def get_full_electrum_balance(pubkey, coin):

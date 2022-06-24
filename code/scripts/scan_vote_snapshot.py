@@ -20,7 +20,7 @@ with open('candidate_VOTE2022_22920.json', 'w') as j:
 regions = {}
 region_scores = {}
 for i in candidate_votes:
-    candidate, region = i.split("_")
+    candidate, region = get_nn_region_split(i)
     if region not in regions:
         region_scores.update({region:[]})
         regions.update({region:{}})

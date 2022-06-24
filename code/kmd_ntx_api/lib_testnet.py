@@ -226,7 +226,7 @@ def get_notary_vote_stats_info(request):
 
     unverified_resp = {}
     for item in unverified:
-        region = item["candidate"].split("_")[1]
+        region = item["candidate"].split("_")[-1]
         if region not in unverified_resp:
             unverified_resp.update({region:{}})
         unverified_resp[region].update({
@@ -236,7 +236,7 @@ def get_notary_vote_stats_info(request):
     resp = {}
     region_scores = {}
     for item in data:
-        region = item["candidate"].split("_")[1]
+        region = item["candidate"].split("_")[-1]
         if region not in resp:
             resp.update({region:[]})
             region_scores.update({region:[]})
@@ -331,7 +331,9 @@ def get_candidates_proposals(request):
 
 
 def translate_candidate_to_proposal_name(notary):
-    notary = notary.lower().split("_")[0]
+    x = notary.split("_")
+    region = x[-1]
+    notary = notary.replace(f"_{region}", "")
     if notary == "shadowbit":
         return "decker"
     if notary == "kolo2":

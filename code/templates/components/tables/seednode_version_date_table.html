@@ -8,7 +8,6 @@
                     {% endif %}
                 {% endfor %}
                 <th data-data="Total">Total</th>
-                <th data-data="proposal">Proposal</th>
             </tr>
         </thead>
     </table>
@@ -20,6 +19,7 @@
 
             let params = "?start="+start+"&end="+end+"&season={{ season }}"
             let endpoint = "{% url 'seednode_version_date_table_api' %}"+params
+            $("#date_api_link").html('<i>Link to API data: <a href="'+endpoint+'">'+endpoint+'</a></i>')
 
             day_seed_table = $('#mm2_day_version_tbl').DataTable({
                 ajax: {
@@ -39,7 +39,8 @@
                         targets: 0,
                         orderable: true,
                         "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        	oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+titleCase(oData.Notary)+"</a>") : $(nTd).html(titleCase(oData.Notary));
+                        	//oData.proposal.length > 0 ? $(nTd).html("<a href='"+oData.proposal+"'>"+titleCase(oData.Notary)+"</a>") : $(nTd).html(titleCase(oData.Notary));
+                            $(nTd).html(oData.Notary);
                         }
                     },
                     { 
@@ -56,14 +57,28 @@
                         "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
                             let maxTime = new Date().valueOf()
                             let maxHour = new Date(maxTime).getUTCHours()
-                            if (sData != 0){
-                                $(nTd).html('<i class="fas fa-check-circle" style="color: #377c43;"></i>');
-                            }
-                            else if ((iCol-1 > maxHour) && (maxTime/1000 < end)) {
-                                $(nTd).html('<i class="fa-solid fa-hourglass" style="color: #373f48;"></i>');
+                            if (typeof(sData) != 'number') {
+                                if (sData.search("WSS") > -1) {
+                                    $(nTd).html('<span data-toggle="tooltip" data-placement="top" title="'+sData+'"><i class="fas fa-times-circle" style="color: #039bd7;"></i></span>');
+                                }
+                                else if (sData.search("Wrong version") > -1) {
+                                    $(nTd).html('<span data-toggle="tooltip" data-placement="top" title="'+sData+'"><i class="fas fa-times-circle" style="color: #8842ab;"></i></span>');
+                                }
+                                else {
+                                    $(nTd).html('<span data-toggle="tooltip" data-placement="top" title="unknown error"><i class="fas fa-times-circle" style="color: #895050;"></i></span>');
+                                }
+                                
                             }
                             else {
-                                $(nTd).html('<i class="fas fa-times-circle" style="color: #895050;"></i>');                                
+                                if (sData > 0) {
+                                    $(nTd).html('<span data-toggle="tooltip" data-placement="top" title="'+sData+'"><i class="fas fa-check-circle" style="color: #377c43;"></i></span>');
+                                }
+                                else if ((iCol - 1 > maxHour) && (maxTime/1000 < end)) {
+                                    $(nTd).html('<i class="fa-solid fa-hourglass" style="color: #373f48;"></i>');
+                                }
+                                else {
+                                    $(nTd).html('<i class="fas fa-times-circle" style="color: #373f48;"></i>');
+                                }
                             }
                         }
                     },
@@ -93,6 +108,7 @@
                     end = start + 86400
                     let params = "?start="+start+"&end="+end+"&season={{ season }}"
                     let endpoint = "{% url 'seednode_version_date_table_api' %}"+params
+                    $("#date_api_link").html('<i>Link to API data: <a href="'+endpoint+'">'+endpoint+'</a></i>')
                     day_seed_table.ajax.url(endpoint).load();
                 }
             });

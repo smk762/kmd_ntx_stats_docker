@@ -122,12 +122,13 @@ SEASONS_INFO = {
         "start_block": 2437000,
         "end_block": 3437000,
         "start_time": 1623682800,
-        "end_time": 1773682800
+        "end_time": 1656077852
     },
     "Season_6": {
         "start_block": 2963330,
         "end_block": 4437000,
-        "start_time": 1656077853,
+        "start_time": 1656061945,
+        "actual_start_time": 1656077853,
         "end_time": 2773682800,
     },
     "VOTE2022_Testnet": {
@@ -165,7 +166,7 @@ for _season in SEASONS_INFO:
             "notaries": _notaries
         })
         for _notary in _notaries:
-            _region = _notary.split('_')[-1]
+            _region = _notary.split("_")[-1]
             if _region not in SEASONS_INFO[_season]["regions"].keys():
                 _region = "DEV"
             SEASONS_INFO[_season]["regions"][_region]['nodes'].append(_notary)

@@ -2,19 +2,31 @@
 {% load static %}
 {% block content %}
 {% load mathfilters %}
+	<div class="mb-3">
+		{% include "components/anchors/timespans.html" with month_btn='true' day_btn='true' %}
+	</div>
+	
 	<div class="row col-12 m-auto p-0 m-0" id="last_24hrs">
 		<div class="card table_card floating-card m-0">
 			<div class="card-header table_card_title">
 				<span class="mx-1">MM2 Version Daily Stats</span>
 			</div>
 			<div class="card-header pb-0">
-				{% include 'components/form/date_selection.html' %}
+				<div class="d-flex justify-content-around">
+                    <div><i class="fas fa-times-circle" style="color: #373f48;"></i> Not Found</div>
+					<div><i class="fas fa-check-circle" style="color: #377c43;"></i> Operational</div>
+					<div><i class="fas fa-times-circle" style="color: #039bd7;"></i> WSS Failing</div>
+					<div><i class="fas fa-times-circle" style="color: #8842ab;"></i> Wrong Version</div>
+					<div><i class="fas fa-times-circle" style="color: #895050;"></i> Other Error</div>
+                    <div><i class="fa-solid fa-hourglass" style="color: #373f48;"></i> Future</div>
+				</div>
 			</div>
 			<div class="card-body table_card_body pb-0 px-3" style="overflow-x: auto;">
 				{% include 'components/tables/seednode_version_date_table.html' %}
 			</div>
 			<div class="card-footer">
-				<i>Times are in UTC. The current active mm2 version: <a href="https://github.com/KomodoPlatform/atomicDEX-API/commit/{{ active_version }}">{{ active_version }}</a></i>
+				<div><i>Times are in UTC. The current active mm2 version: <a href="https://github.com/KomodoPlatform/atomicDEX-API/commit/{{ active_version }}">{{ active_version }}</a></i></div>
+				<div id="date_api_link"></div>
 			</div>
 		</div>
 	</div>
@@ -25,20 +37,21 @@
 				<span class="mx-1">MM2 Version Monthly Stats</span>
 			</div>
 			<div class="card-header pb-0">
-				{% include 'components/form/month_selection.html' %}
+				<div class="d-flex justify-content-around">
+					<div><i class="fas fa-check-circle" style="color: #377c43;"></i> Operational (opacity indicates uptime)</div>
+					<div><i class="fas fa-times-circle" style="color: #895050;"></i> Not Operational</div>
+                    <div><i class="fa-solid fa-hourglass" style="color: #373f48;"></i> Future</div>
+				</div>
 			</div>
 			<div class="card-body table_card_body pb-0 px-3" style="overflow-x: auto;">
 				{% include 'components/tables/seednode_version_month_table.html' %}
 			</div>
 			<div class="card-footer">
-				<i>Times are in UTC. The current active mm2 version: <a href="https://github.com/KomodoPlatform/atomicDEX-API/commit/{{ active_version }}">{{ active_version }}</a></i>
+				<div><i>Times are in UTC. The current active mm2 version: <a href="https://github.com/KomodoPlatform/atomicDEX-API/commit/{{ active_version }}">{{ active_version }}</a></i></div>
+				<div id="monthly_api_link"></div>
 			</div>
 		</div>
 	</div>
 
-	<div class="mb-3">
-		{% include "components/anchors/timespans.html" with month_btn='true' day_btn='true' %}
-	</div>
-	
 	
 {% endblock %}

@@ -1,18 +1,30 @@
 	<div class="d-flex justify-content-around align-items-center">
 		
-		{% if season_btn %}
-			{% include "components/buttons/show_button.html" with btn_text="Season" btn_url="#season" width_pct="19" btn_id='season' extra_class='btn-selected' toggle_category='timespan' %}
-		{% endif %}
-		{% if month_btn %}
-			{% include "components/buttons/show_button.html" with btn_text="Month" btn_url="#month" width_pct="19" btn_id='month' toggle_category='timespan' %}
-		{% endif %}
-		{% if week_btn %}
-			{% include "components/buttons/show_button.html" with btn_text="Week" btn_url="#week" width_pct="19" btn_id='week' toggle_category='timespan' %}
-		{% endif %}
-		{% if day_btn and not season_btn %}
+
+		{% if day_btn and month_btn %}
 			{% include "components/buttons/show_button.html" with btn_text="24 Hours" btn_url="#last_24hrs" width_pct="19" btn_id='last_24hrs' toggle_category='timespan' extra_class='btn-selected' %}
-		{% elif day_btn %}
-			{% include "components/buttons/show_button.html" with btn_text="24 Hours" btn_url="#last_24hrs" width_pct="19" btn_id='last_24hrs' toggle_category='timespan' %}
+			{% include 'components/form/date_selection.html' %}
+			{% include 'components/form/month_selection.html' with hide='true' %}
+			{% include "components/buttons/show_button.html" with btn_text="Month" btn_url="#month" width_pct="19" btn_id='month' toggle_category='timespan' %}
+		{% else %}
+			{% if season_btn %}
+				{% include "components/buttons/show_button.html" with btn_text="Season" btn_url="#season" width_pct="19" btn_id='season' extra_class='btn-selected' toggle_category='timespan' %}
+			{% endif %}
+
+			{% if month_btn %}
+				{% include "components/buttons/show_button.html" with btn_text="Month" btn_url="#month" width_pct="19" btn_id='month' toggle_category='timespan' %}
+			{% endif %}
+
+			{% if week_btn %}
+				{% include "components/buttons/show_button.html" with btn_text="Week" btn_url="#week" width_pct="19" btn_id='week' toggle_category='timespan' %}
+			{% endif %}
+
+			{% if day_btn and not season_btn %}
+				{% include "components/buttons/show_button.html" with btn_text="24 Hours" btn_url="#last_24hrs" width_pct="19" btn_id='last_24hrs' toggle_category='timespan' extra_class='btn-selected' %}
+			{% elif day_btn %}
+				{% include "components/buttons/show_button.html" with btn_text="24 Hours" btn_url="#last_24hrs" width_pct="19" btn_id='last_24hrs' toggle_category='timespan' %}
+			{% endif %}
 		{% endif %}
+
 
 	</div>

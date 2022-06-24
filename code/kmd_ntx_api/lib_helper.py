@@ -23,6 +23,13 @@ def keys_to_list(_dict):
     return _list
 
 
+def get_nn_region_split(notary):
+    x = notary.split("_")
+    region = x[-1]
+    nn = notary.replace(f"_{region}", "")
+    return nn, region
+
+
 def has_error(_dict):
     if "error" in _dict:
         return True
@@ -121,11 +128,7 @@ def get_or_none(request, key, default=None):
     
 
 def get_notary_clean(notary):
-    notary_split = notary.split('_')
-    if len(notary_split) == 1:
-        return notary.title()
-    notary_clean = notary_split[0].title() + " " + notary_split[1]
-    return notary_clean
+    return notary.title().replace("_", "")
 
 
 def prepopulate_seednode_version_date(notaries):
@@ -139,7 +142,7 @@ def prepopulate_seednode_version_date(notaries):
             resp[i].update({
                 notary: {
                     "versions": [],
-                    "score": 0
+                    "score": -1
                 }
             })
     return resp
