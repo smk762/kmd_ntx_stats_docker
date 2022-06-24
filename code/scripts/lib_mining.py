@@ -44,7 +44,7 @@ def update_mined_table(season, coin="KMD", start_block=None):
 
     tip = int(RPC[coin].getblockcount())
     if not start_block:
-        start_block = tip-40000   
+        start_block = tip-10   
 
     all_blocks = [*range(start_block,tip,1)] 
     recorded_blocks = [block[0] for block in select_from_table('mined', 'block_height')]

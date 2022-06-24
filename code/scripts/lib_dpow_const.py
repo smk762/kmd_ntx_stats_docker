@@ -622,7 +622,7 @@ for _season in SEASONS_INFO:
                     SEASONS_INFO[_season]["servers"].update({
                         _coin: {
                             "coins": [],
-                            "epochs": [],
+                            "epochs": {},
                             "addresses": {}
                         }
                     })

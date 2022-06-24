@@ -58,7 +58,7 @@ def get_active_mm2_versions(ts):
     for version in data:
         if int(ts) > data[version]["start"] and int(ts) < data[version]["end"]:
             active_versions.append(version)
-    return active_versions+["b8598439a"]
+    return active_versions
 
 
 def get_seedinfo_from_json():
