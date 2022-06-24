@@ -253,7 +253,7 @@ def import_seednode_stats(season):
             resp = requests.get(resp["next"]).json()
 
             for i in resp["results"]:
-                row_data = (resp["name"], resp["season"], resp["version"], resp["timestamp"], resp["error"], resp["score"])
+                row_data = (i["name"], i["season"], i["version"], i["timestamp"], i["error"], i["score"])
                 print(row_data)
                 update_seednode_version_stats_row(row_data)
 
