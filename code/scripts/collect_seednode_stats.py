@@ -159,6 +159,8 @@ def deregister_nodes_from_db(notary_seeds):
 
 def update_seednode_version_stats_row(row_data):
     try:
+        timestamp = row_data["timestamp"]
+        season = validate.get_season(timestamp)
         sql = f"INSERT INTO seednode_version_stats \
                     (name, season, version, timestamp, error, score) \
                 VALUES (%s, %s, %s, %s, %s, %s) \
@@ -236,6 +238,25 @@ def migrate_sqlite_to_pgsql(ts):
             print(row_data)
             update_seednode_version_stats_row(row_data)
 
+def import_seednode_stats(season):
+    resp = requests.get(f"https://stats.kmd.io/api/source/seednode_version_stats/?season={season}").json()
+
+    for i in resp["results"]:
+        row_data = (resp["name"], resp["season"], resp["version"], resp["timestamp"], resp["error"], resp["score"])
+        print(row_data)
+        update_seednode_version_stats_row(row_data)
+
+    if resp["next"]:
+        while resp["next"]:
+            resp = requests.get(resp["next"]).json()
+
+            for i in resp["results"]:
+                row_data = (resp["name"], resp["season"], resp["version"], resp["timestamp"], resp["error"], resp["score"])
+                print(row_data)
+                update_seednode_version_stats_row(row_data)
+
+
+
 
 if __name__ == '__main__':
 
@@ -286,12 +307,17 @@ if __name__ == '__main__':
                 for notary in notary_seeds[season]:
                     test_wss(notary, season)
                 
+        # import data from other server
+        elif sys.argv[1] == 'import':
+            for season in notary_seeds:
+                import_seednode_stats(season)
+                
 
         else:
-            print("invalid param, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test]")
+            print("invalid param, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test, import]")
 
     else:
-        print("no param given, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test]")
+        print("no param given, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test, import]")
 
     #get_version_stats_from_db()
     conn.close()
