@@ -156,6 +156,7 @@ def get_season_coins(season=None, server=None, epoch=None):
             if epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:
                 coins = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["coins"]
     coins.sort()
+    print(f"get_season_coins: {season} {server} {epoch} | {coins}")
     return coins
 
     

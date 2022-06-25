@@ -456,6 +456,10 @@ class ntx_season_stats():
         self.season_servers = list(set(helper.get_season_servers(self.season)).difference({"Unofficial", "LTC", "BTC"}))
         self.season_notaries = helper.get_season_notaries(self.season)
         self.epoch_scores_dict = validate.get_epoch_scores_dict(self.season)
+        print(self.season)
+        print(self.season_coins)
+        print(self.season_servers)
+        print(self.season_notaries)
         
         # Prefill Coins Dicts
         for coin in self.season_coins:

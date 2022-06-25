@@ -341,6 +341,8 @@ for _season in SCORING_EPOCHS_REPO_DATA:
     if SCORING_EPOCHS_REPO_DATA[_season]["season_end"] > SEASONS_INFO[_season]["end_time"]:
         SCORING_EPOCHS_REPO_DATA[_season]["season_end"] = SEASONS_INFO[_season]["end_time"]
 
+#print(f"SCORING_EPOCHS_REPO_DATA: {SCORING_EPOCHS_REPO_DATA[_season]}")
+
 def calc_epoch_score(server, num_coins):
     if num_coins == 0:
         return 0
@@ -400,6 +402,8 @@ print("Collected epochs data...")
 
 DPOW_COINS_ACTIVE = requests.get(urls.get_dpow_active_coins_url()).json()["results"]
 
+#print(f"DPOW_COINS_ACTIVE: {DPOW_COINS_ACTIVE}")
+
 # Get current dpow coins from repo
 for _season in SEASONS_INFO:
     if _season.find("Testnet") == -1:
@@ -429,18 +433,20 @@ for _season in SEASONS_INFO:
         SEASONS_INFO[_season]["notaries"].sort()
 
 print("Collected notaries data...")
-
 # For new seasons, will prepopulate from dPoW repo
 for _season in SEASONS_INFO:
     if NOW - SEASONS_INFO[_season]["start_time"] < 48 * 60 * 60:
         print("Using DPOW repo to populate season early")
 
+        _servers = ["Main", "Third_Party", "KMD", "BTC", "LTC"]
+
         for _coin in DPOW_COINS_ACTIVE:
             _epoch = "Epoch_0"
             SEASONS_INFO[_season]["coins"].append(_coin)
 
-            if "server" in DPOW_COINS_ACTIVE[_coin]:
-                _server = DPOW_COINS_ACTIVE[_coin]["server"]
+            if "server" in DPOW_COINS_ACTIVE[_coin]["dpow"]:
+                _server = DPOW_COINS_ACTIVE[_coin]["dpow"]["server"]
+
                 if _coin in ["KMD", "LTC", "BTC"]:
                     SEASONS_INFO[_season]["servers"].update({
                         _coin: {
@@ -461,7 +467,11 @@ for _season in SEASONS_INFO:
                     SEASONS_INFO[_season]["servers"].update({
                         _server: {
                             "coins": [],
-                            "addresses": {},
+                            "addresses": {
+                                "BTC": {},
+                                "LTC": {},
+                                "KMD": {}
+                            },
                             "epochs": {}
                         }
                     })
@@ -471,7 +481,7 @@ for _season in SEASONS_INFO:
                         _epoch: {"coins":[]}
                     })
 
-                SEASONS_INFO[_season]["servers"][server]["addresses"].update({_coin:{}})
+                SEASONS_INFO[_season]["servers"][_server]["addresses"].update({_coin:{}})
 
                 if _server in ["Main", "Third_Party"] and _coin not in ["KMD", "LTC", "BTC"]:
                     SEASONS_INFO[_season]["servers"][_server]["coins"].append(_coin)
@@ -774,5 +784,7 @@ for _season in SEASONS_INFO:
                     SEASON = _season
             elif SEASONS_INFO[_season]["end_time"] > NOW:
                     SEASON = _season
+
+#print(f"SEASONS_INFO: {SEASONS_INFO}")
 
 print(f"{int(time.time()) - NOW} sec to complete dpow const")

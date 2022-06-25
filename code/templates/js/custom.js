@@ -30,6 +30,32 @@
 		});
 	}
 
+	function show_season(season) {
+		const options = ["Season_4", "Season_5", "Season_6"];
+		options.forEach(function (i) {
+			if (i == season) {
+				$('#'+i+"_btn").addClass('btn-selected')
+			}
+			else {
+				$('#'+i+"_btn").removeClass('btn-selected')
+			}
+		});
+	}
+
+    function update_tabledata(table, endpoint, params)
+    {
+    	let new_url = endpoint+params
+		table.ajax.url(new_url).load();
+	}
+
+	function get_coin_icons_from_list(coins_list) {
+    	let coin_icons = ''
+    	for (let coin of coins_list) {
+    		coin_icons += get_coin_icon_only(coin)
+    	}
+        return coin_icons
+	}
+
 	function titleCase(str) {
 	  return str.toLowerCase().split(' ').map(function(word) {
 	    return word.replace(word[0], word[0].toUpperCase());
