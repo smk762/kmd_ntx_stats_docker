@@ -58,7 +58,7 @@ def get_active_mm2_versions(ts):
     for version in data:
         if int(ts) > data[version]["start"] and int(ts) < data[version]["end"]:
             active_versions.append(version)
-    return active_versions+["b8598439a"]
+    return active_versions
 
 
 def get_seedinfo_from_json():
@@ -169,10 +169,10 @@ def update_seednode_version_stats_row(row_data):
                     season='{season}', version='{row_data[2]}', \
                     timestamp='{timestamp}', error='{row_data[4]}', \
                     score='{row_data[5]}';"
-        print(sql)
+
         CURSOR.execute(sql, row_data)
         CONN.commit()
-        print("commited")
+
     except Exception as e:
         logger.error(f"Exception in [update_seednode_version_stats_row]: {e}")
         logger.error(f"[update_seednode_version_stats_row] sql: {sql}")

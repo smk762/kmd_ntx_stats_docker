@@ -1,0 +1,133 @@
+
+{% load mathfilters %}
+	<table id="epochs_tbl" class="table table-striped table-bordered">
+		<thead>
+			<tr>
+				<th data-data="season">Season</th>
+				<th data-data="server">Server</th>
+				<th data-data="epoch">Epoch</th>
+				<th data-data="epoch_start">Start</th>
+				<th data-data="epoch_end">End</th>
+				<th data-data="start_event">Start</th>
+				<th data-data="end_event">End</th>
+				<th data-data="duration">dPoW Days</th>
+				<th data-data="num_epoch_coins">Num Coins</th>
+				<th data-data="epoch_coins">Coins</th>
+				<th data-data="score_per_ntx">Score per Ntx</th>
+			</tr>
+		</thead>
+	</table>
+	<script>
+	    $(document).ready(function() {
+            let params = "?season={{ season }}"
+            let endpoint = "{% url 'scoring_epochs_table' %}"+params
+            $("#scoring_epochs_api_link").html('<i>Link to API data: <a href="'+endpoint+'">'+endpoint+'</a></i>')
+
+	        epochs_table = $('#epochs_tbl').DataTable({
+                ajax: {
+                    url: endpoint,
+                    dataSrc: 'results',
+                    "deferRender": true
+                },
+	        	"paging": false,
+	        	"searching": false,
+	        	"info": false,
+    			deferRender: true,
+                "orderClasses": false,
+        		order: [[ 0, 'desc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
+	        	"columns": [
+			        { "data": "season" },
+			        { "data": "server" },
+			        { "data": "epoch" },
+			        { "data": "epoch_start" },
+			        { "data": "epoch_end" },
+			        { "data": "start_event" },
+			        { "data": "end_event" },
+			        { "data": "duration" },	
+			        { "data": "num_epoch_coins" },	
+			        { "data": "epoch_coins" },	
+			        { "data": "score_per_ntx" }
+			    ],
+        		"columnDefs": [
+        			{ className: "fixed-width-240", "targets": [ 9 ] },
+        			{
+			            "targets": 0,
+			            "visible": false,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	$(nTd).html(get_season_styled(oData.season))
+				        }
+			        },
+        			{
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(get_server_styled(oData.server));
+				        }
+			        },
+        			{
+			            "data": 'epoch',
+			            "targets": 2,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(get_epoch_styled(oData.epoch));
+				        }
+			        },
+		            {
+		                "targets": [ 3,4 ],
+		                "visible": false
+		            },
+        			{
+			            "data": 'start_event',
+			            "targets": 5,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            
+				        }
+			        },
+        			{
+			            "data": 'end_event',
+			            "targets": 6,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            
+				        }
+			        },
+        			{
+			            "data": 'duration',
+			            "targets": 7,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(parseInt(oData.duration/86400));
+				        }
+			        },
+        			{
+			            "data": 'num_epoch_coins',
+			            "targets": 8,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(oData.num_coins);
+				        }
+			        },
+        			{
+			            "data": 'epoch_coins',
+			            "targets": 9,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	$(nTd).html(get_coin_icons_from_list(oData.epoch_coins))
+				        }
+			        },
+        			{
+			            "data": 'score_per_ntx',
+			            "targets": 10,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(get_score_per_ntx(oData.server, oData.num_epoch_coins));
+				        }
+			        }
+        		]
+	        });
+
+
+	    });
+
+
+			function update_season(season) {
+				let endpoint = '{% url 'scoring_epochs_table' %}'
+				let params = '?season='+season
+				update_tabledata(epochs_table, endpoint, params)
+				show_season(season)
+            	$("#scoring_epochs_api_link").html('<i>Link to API data: <a href="'+endpoint+params+'">'+endpoint+params+'</a></i>')
+			}
+	</script>
