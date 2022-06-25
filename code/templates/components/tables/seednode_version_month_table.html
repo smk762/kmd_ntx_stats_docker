@@ -1,13 +1,13 @@
     <table id="mm2_month_version_tbl" class="table table-striped table-bordered" style="width:100%;">
         <thead>
             <tr>
-                <th data-data="Notary">Notary</th>
+                <th data-data="Notary" class="px-0">Notary</th>
                 {% for i in month_headers %}
                     {% if i != 'Total' and i != 'Notary' and i != 'proposal' %}
                         <th data-data="{{ i }}" class="hour_cell px-0">{{ i }}</th>    
                     {% endif %}
                 {% endfor %}
-                <th data-data="Total">Total</th>
+                <th data-data="Total" class="px-0">Total</th>
             </tr>
         </thead>
     </table>
@@ -37,6 +37,7 @@
                 order: [[ 0, 'asc' ]],
                 "columnDefs": [
                     { className: "text-left text-nowrap pl-2", "targets": [ 0 ] },
+                    { className: "px-0", "targets": [ 'hour_cell' ] },
                     { 
                         targets: 0,
                         orderable: true,
@@ -46,7 +47,7 @@
                         }
                     },
                     { 
-                        targets: $('#mm2_version_tbl').find('th').length - 2,
+                        targets: $('#mm2_version_tbl').find('th').length - 1,
                         orderable: true,
                         className: 'text-right text-nowrap pr-2',
                         "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
@@ -65,24 +66,22 @@
                                 let opacity = Math.round(sData / 6 * 100) / 100 + 0.2
                                 let pct = Math.round(sData / 4.8 * 100)
 
-                                $(nTd).html('<span class="p-0" style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="'+sData+' ('+pct+'%)"><i class="fas fa-check-circle" style="color: #377c43; opacity: '+opacity+'"></i></span>');
+                                $(nTd).html('<span class="p-0" style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="'+sData+' ('+pct+'%)"> \
+                                    <svg style="width: 0.9em; height: 0.9em; color: #377c43; opacity: '+opacity+'"><use xlink:href="#check"></use></svg> \
+                                    </span>');
                             }
                             else if ((my[1] >= maxYear) && (my[0] >= maxMonth) && (iCol > maxDay)) {
-                                $(nTd).html('<i class="fa-solid fa-hourglass" style="color: #373f48;"></i>');
+                                $(nTd).html('<svg style="width: 0.9em; height: 0.9em; color: #373f48;"><use xlink:href="#hourglass"></use></svg>');
                             }
                             else {
-                                $(nTd).html('<i class="fas fa-times-circle" style="color: #895050;"></i>');                                
+                                $(nTd).html('<svg style="width: 0.9em; height: 0.9em; color: #895050;"><use xlink:href="#times"></use></svg>');
                             }
                         }
                     },
                     { 
                         orderable: false,
                         targets: '_all'
-                    },
-	                {
-                        targets: $('#mm2_version_tbl').find('th').length - 1,
-	                    "visible": false
-	                }
+                    }
                 ],
                 // Custom DataTables search filter input styling 
                 "initComplete": function (settings, json) {
