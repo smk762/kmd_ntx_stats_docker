@@ -14,23 +14,25 @@ Tables updated:
 '''
 
 @print_runtime
-def run_updates():
-    for season in SEASONS_INFO:
-        if season not in EXCLUDED_SEASONS:
-            if season.find("Testnet") == -1:
-                if has_season_started(season):
-                    if RESCAN_SEASON:
-                        update_mined_table(season, "KMD", SEASONS_INFO[season]["start_block"])
-                        update_mined_count_daily_table(season, True)
-                    else:
-                        update_mined_table(season)
-                        update_mined_count_daily_table(season)
-                    update_mined_count_season_table(season)
+def run_updates(seasons):
+    for season in seasons:
+        print(f"Getting mined blocks for {season}")
+        if RESCAN_SEASON:
+            update_mined_table(season, "KMD", SEASONS_INFO[season]["start_block"])
+            update_mined_count_daily_table(season, True)
+        else:
+            update_mined_table(season)
+            update_mined_count_daily_table(season)
+        update_mined_count_season_table(season)
 
 if __name__ == "__main__":
 
+    seasons = [CURRENT_SEASON]
     if len(sys.argv) > 1:
         if sys.argv[1] == "rescan":
             RESCAN_SEASON = True
+    
+        if sys.argv[1] == "all":
+            seasons = SEASONS_INFO.keys()
 
-    run_updates()
+    run_updates(seasons)

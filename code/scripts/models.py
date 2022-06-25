@@ -393,7 +393,7 @@ class notarised_row():
                     self.score_value, self.epoch)
 
         if self.validated():
-            logger.info(f"Updating [notarised] {self.block_datetime} {self.txid} {self.season} {self.server} {self.epoch} | {self.scored} {self.score_value} {self.coin} ")
+            logger.info(f"Updating [notarised] {self.block_datetime} [{self.block_height}] {self.txid} {self.season} {self.server} {self.epoch} | {self.scored} {self.score_value} {self.coin} ")
             update_ntx_row(row_data)
         else:
             logger.warning(f"[notarised] row invalid {self.block_datetime} {self.txid} {self.season} {self.server} {self.epoch} | {self.scored} {self.score_value} {self.coin}")
@@ -675,7 +675,7 @@ class notary_last_ntx_row():
                      self.kmd_ntx_txid, self.ac_ntx_blockhash,\
                      self.ac_ntx_height)
         if self.validated():
-            logger.info(f"[notary_last_ntx] Updating {self.season} {self.notary} {self.coin} {self.kmd_ntx_txid}")
+            logger.info(f"[notary_last_ntx] Updating {self.season} {self.notary} {self.coin} [{self.kmd_ntx_blockheight}] {self.kmd_ntx_txid}")
             update_notary_last_ntx_row(row_data)
         else:
             logger.warning(f"[notary_last_ntx] Row data invalid!")
@@ -847,6 +847,10 @@ class daily_mined_count_row():
         self.time_stamp = time_stamp
 
     def validated(self):
+        for item in [self.notary, self.mined_date]:
+            if item == '':
+                logger.warning(f"No value for {item}!")
+                return False
         return True
 
     def update(self):

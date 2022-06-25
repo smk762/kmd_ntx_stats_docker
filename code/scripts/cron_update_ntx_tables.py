@@ -25,13 +25,14 @@ def update_ntx_tables(seasons, rescan=False):
             rescan = True
         notarised_table.update_table()
 
-        ntx_daily_tables = lib_ntx.ntx_daily_stats(season, rescan)
-        ntx_daily_tables.update_daily_ntx_tables()
+        if SEASONS_INFO[season]["end_time"] > time.time() + 2 * 86400 and not FULL_SCAN:
+            ntx_daily_tables = lib_ntx.ntx_daily_stats(season, rescan)
+            ntx_daily_tables.update_daily_ntx_tables()
 
-        ntx_season_tables = lib_ntx.ntx_season_stats(season)
-        if CLEAN_UP:
-            ntx_season_tables.clean_up(season)
-        ntx_season_tables.update_ntx_season_stats_tables()
+            ntx_season_tables = lib_ntx.ntx_season_stats(season)
+            if CLEAN_UP:
+                ntx_season_tables.clean_up(season)
+            ntx_season_tables.update_ntx_season_stats_tables()
 
         last_ntx_tables = lib_ntx.last_notarisations(season)
         last_ntx_tables.update_coin_table()
@@ -42,6 +43,7 @@ if __name__ == "__main__":
     # Rescan will check chain for data since season start
     # Clean will recalculate data existing in table
     CLEAN_UP = False
+    FULL_SCAN = False
     RESCAN_SEASON = False
     seasons = [
         "Season_5",
@@ -53,6 +55,7 @@ if __name__ == "__main__":
         elif "clean" in sys.argv:
             CLEAN_UP = True
         elif "all" in sys.argv:
+            FULL_SCAN = True
             seasons = SEASONS_INFO.keys()
         elif "season" in sys.argv:
             seasons = [sys.argv[2]]

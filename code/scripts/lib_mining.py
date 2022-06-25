@@ -44,16 +44,12 @@ def update_mined_table(season, coin="KMD", start_block=None):
 
     tip = int(RPC[coin].getblockcount())
     if not start_block:
-        start_block = tip-10   
+        start_block = tip - 100
 
     all_blocks = [*range(start_block,tip,1)] 
     recorded_blocks = [block[0] for block in select_from_table('mined', 'block_height')]
     unrecorded_blocks = set(all_blocks) - set(recorded_blocks)
-    
-    if RESCAN_SEASON:
-        start_block = SEASONS_INFO[season]["start_block"]
     rescan_blocks = list(set(list(unrecorded_blocks) + [*range(start_block,tip,1)]))
-
     logger.info(f"[update_mined_table] {len(recorded_blocks)} in mined table in db")
     logger.info(f"[update_mined_table] {len(unrecorded_blocks)} not in mined table in db")
     logger.info(f"[update_mined_table] {len(rescan_blocks)} blocks to scan")
@@ -131,7 +127,7 @@ def update_mined_count_season_table(season):
                 season_notaries.remove(row.name)
 
     for remaining_notary in season_notaries:
-        row = daily_mined_count_row()
+        row = season_mined_count_row()
         row.address = lib_helper.get_address_from_notary(season, remaining_notary, "KMD")
         row.blocks_mined = 0
         row.season = season

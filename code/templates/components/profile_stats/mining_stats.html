@@ -34,7 +34,7 @@
 					    	<div class="px-2 py-1 stat-li-div col-12 d-flex justify-content-between align-items-center">
 							    Last Mined block
 							    <a href="//{{ request.get_host }}/mining_24hrs/?season={{ season }}">
-						    		{% include "components/badges/stats_badge.html" with stat_val=mining_summary.time_since_mined stat_label="KMD" %}
+						    		{% include "components/badges/stats_badge.html" with id="since_mined" stat_val=mining_summary.time_since_mined stat_label="KMD" %}
 					    		</a>
 							</div>
 					  	</li>
@@ -49,3 +49,11 @@
 					</ul> 
 				</div>
 			</div>
+			<script type="text/javascript">
+		        $(document).ready(function() {
+		        	if ({{ mining_summary.time_since_mined_ts }} > 10800) {
+		        		console.log("Mining Alert!")
+		        		$("#profile-since_mined-stat").css({'color':'red'})
+		        	}
+		        });
+			</script>

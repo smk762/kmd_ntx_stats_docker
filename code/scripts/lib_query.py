@@ -116,9 +116,8 @@ def get_all_coins():
 
 
 @print_runtime
-def get_notary_last_ntx(season):
-    sql = f"SELECT notary, coin, kmd_ntx_blockheight from notary_last_ntx \
-           WHERE season='{season}';"
+def get_notary_last_ntx():
+    sql = f"SELECT notary, coin, kmd_ntx_blockheight from notary_last_ntx;"
     CURSOR.execute(sql)
     last_ntx = CURSOR.fetchall()
     notary_last_ntx = {}
@@ -132,9 +131,8 @@ def get_notary_last_ntx(season):
 
 
 @print_runtime
-def get_coin_last_ntx(season):
-    sql = f"SELECT coin, kmd_ntx_blockheight from coin_last_ntx \
-           WHERE season='{season}';"
+def get_coin_last_ntx():
+    sql = f"SELECT coin, kmd_ntx_blockheight from coin_last_ntx;"
     CURSOR.execute(sql)
     last_ntx = CURSOR.fetchall()
     coin_last_ntx = {}
