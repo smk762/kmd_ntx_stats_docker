@@ -46,8 +46,10 @@ def get_nn_mining_summary(notary, season=None):
     mining_summary = requests.get(url).json()['results']
     if len(mining_summary) > 0:
         mining_summary = mining_summary[0]
+        time_since_mined_ts, time_since_mined = helper.get_time_since(mining_summary["last_mined_blocktime"])
         mining_summary.update({
-            "time_since_mined": helper.get_time_since(mining_summary["last_mined_blocktime"])[1]
+            "time_since_mined_ts": time_since_mined_ts,
+            "time_since_mined": time_since_mined
         })
     else:
         mining_summary = {

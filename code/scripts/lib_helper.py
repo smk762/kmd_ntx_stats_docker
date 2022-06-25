@@ -124,10 +124,14 @@ def get_address_from_notary(season, notary, coin):
     return "Unknown"
 
 
-def has_season_started(season):
+def has_season_started(season, by_block=False):
     now = time.time()
     if season in SEASONS_INFO:
-        if SEASONS_INFO[season]["start_time"] < now:
+        if by_block:
+            if SEASONS_INFO[season]["start_block"] < now:
+                return True
+
+        elif SEASONS_INFO[season]["start_time"] < now:
             return True
     return False
 
@@ -156,7 +160,6 @@ def get_season_coins(season=None, server=None, epoch=None):
             if epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:
                 coins = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["coins"]
     coins.sort()
-    print(f"get_season_coins: {season} {server} {epoch} | {coins}")
     return coins
 
     

@@ -157,23 +157,6 @@ def delete_from_notarised_tbl_where(
     CONN.commit()
 
 
-def update_season_notarised_coin_row(row_data):
-    sql = "INSERT INTO coin_last_ntx \
-         (coin, ntx_count, block_height, kmd_ntx_blockhash,\
-          kmd_ntx_txid, kmd_ntx_blocktime, opret, ac_ntx_blockhash, \
-          ac_ntx_height, ac_block_height, ntx_lag, season, server) \
-          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-          ON CONFLICT ON CONSTRAINT unique_coin_last_ntx_server DO UPDATE \
-          SET ntx_count="+str(row_data[1])+", block_height="+str(row_data[2])+", \
-          kmd_ntx_blockhash='"+str(row_data[3])+"', kmd_ntx_txid='"+str(row_data[4])+"', \
-          kmd_ntx_blocktime="+str(row_data[5])+", opret='"+str(row_data[6])+"', \
-          ac_ntx_blockhash='"+str(row_data[7])+"', ac_ntx_height="+str(row_data[8])+", \
-          ac_block_height='"+str(row_data[9])+"', ntx_lag='"+str(row_data[10])+"';"
-         
-    CURSOR.execute(sql, row_data)
-    CONN.commit()
-
-
 def update_coin_ntx_season_row(row_data): 
     sql = f"INSERT INTO coin_ntx_season \
             (season, coin, coin_data, time_stamp) \
@@ -235,7 +218,6 @@ def update_daily_notarised_count_row(row_data):
     CONN.commit()
 
 
-
 def update_coin_last_ntx_row(row_data):
     try:
         sql = F"INSERT INTO coin_last_ntx \
@@ -256,14 +238,11 @@ def update_coin_last_ntx_row(row_data):
                     ac_ntx_height={row_data[10]};"
         CURSOR.execute(sql, row_data)
         CONN.commit()
-        
-        return 1
     except Exception as e:
         logger.debug(e)
         if str(e).find('Duplicate') == -1:
             logger.debug(row_data)
         CONN.rollback()
-        return 0
 
 
 def update_notary_last_ntx_row(row_data):

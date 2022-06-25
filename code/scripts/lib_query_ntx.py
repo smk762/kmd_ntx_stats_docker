@@ -174,11 +174,11 @@ def get_notarised_coin_epoch_scores(
 
 
 @print_runtime
-def get_notarised_last_data_by_coin(season):
+def get_notarised_last_data_by_coin():
     sql = f"SELECT coin, MAX(block_height), \
-                   MAX(block_time), COALESCE(COUNT(*), 0) \
-            FROM notarised WHERE season = '{season}' \
-            AND epoch != 'Unofficial' GROUP BY coin;"
+                MAX(block_time), COALESCE(COUNT(*), 0) \
+                FROM notarised WHERE \
+                server != 'Unofficial' GROUP BY coin;"
     CURSOR.execute(sql)
     last_ntx = CURSOR.fetchall()
     coin_last_ntx = {}

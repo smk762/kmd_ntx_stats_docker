@@ -624,7 +624,7 @@ def get_seednode_version_date_table(request):
             })
 
         notary_row.update({
-            "Total": round(total,1)
+            "Total": total
         })
 
         '''
@@ -696,11 +696,11 @@ def get_seednode_version_month_table(request):
         for day in day_headers:
             total += default_scores[day][notary]["score"]
             notary_row.update({
-                day: round(default_scores[day][notary]["score"],1)
+                day: default_scores[day][notary]["score"]
             })
 
         notary_row.update({
-            "Total": round(total,1)
+            "Total": total
         })
 
 

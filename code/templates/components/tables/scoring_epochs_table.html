@@ -32,7 +32,6 @@
 	        	"paging": false,
 	        	"searching": false,
 	        	"info": false,
-    			deferRender: true,
                 "orderClasses": false,
         		order: [[ 0, 'desc' ], [ 1, 'asc' ], [ 2, 'asc' ]],
 	        	"columns": [
@@ -118,16 +117,14 @@
 			        }
         		]
 	        });
-
-
 	    });
 
 
-			function update_season(season) {
-				let endpoint = '{% url 'scoring_epochs_table' %}'
-				let params = '?season='+season
-				update_tabledata(epochs_table, endpoint, params)
-				show_season(season)
-            	$("#scoring_epochs_api_link").html('<i>Link to API data: <a href="'+endpoint+params+'">'+endpoint+params+'</a></i>')
-			}
+		function update_season(season) {
+			let endpoint = '{% url 'scoring_epochs_table' %}'
+			let params = '?season='+season
+			update_tabledata(epochs_table, endpoint, params)
+			show_season(season)
+        	$("#scoring_epochs_api_link").html('<i>Link to API data: <a href="'+endpoint+params+'">'+endpoint+params+'</a></i>')
+		}
 	</script>

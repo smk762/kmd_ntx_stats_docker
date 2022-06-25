@@ -456,10 +456,6 @@ class ntx_season_stats():
         self.season_servers = list(set(helper.get_season_servers(self.season)).difference({"Unofficial", "LTC", "BTC"}))
         self.season_notaries = helper.get_season_notaries(self.season)
         self.epoch_scores_dict = validate.get_epoch_scores_dict(self.season)
-        print(self.season)
-        print(self.season_coins)
-        print(self.season_servers)
-        print(self.season_notaries)
         
         # Prefill Coins Dicts
         for coin in self.season_coins:
@@ -581,7 +577,6 @@ class ntx_season_stats():
                         self.season_ntx_dict["ntx_count"] += server_epoch_coin_count
                         self.season_ntx_dict["ntx_score"] += float(server_epoch_coin_score)
 
-                        print(f"[add_scores_counts]: {coin}, {server}, {epoch}")
                         # Global Coin Score and Count Totals
                         self.season_ntx_dict["coins"][coin]["ntx_count"] += server_epoch_coin_count
                         self.season_ntx_dict["coins"][coin]["ntx_score"] += float(server_epoch_coin_score)
@@ -1345,9 +1340,9 @@ class last_notarisations():
         self.ntx_coin_last = {}
         self.last_nota = {}
         if self.season in SEASONS_INFO:
-            self.season_last_ntx = query.get_notary_last_ntx(self.season)
-            self.last_ntx_data = query.get_coin_last_ntx(self.season)
-            self.notarised_last_data = query.get_notarised_last_data_by_coin(self.season)
+            self.season_last_ntx = query.get_notary_last_ntx()
+            self.last_ntx_data = query.get_coin_last_ntx()
+            self.notarised_last_data = query.get_notarised_last_data_by_coin()
 
     @print_runtime
     def update_coin_table(self):
@@ -1380,8 +1375,7 @@ class last_notarisations():
             if self.last_ntx_data[coin] < data["block_height"]:
                 cols = 'server, notaries, opret, block_hash, block_height, \
                         block_time, txid, ac_ntx_blockhash, ac_ntx_height'
-                conditions = f"block_height={row.kmd_ntx_blockheight} AND coin='{row.coin}' \
-                               AND season='{self.season}'"
+                conditions = f"block_height={row.kmd_ntx_blockheight} AND coin='{row.coin}'"
                 last_ntx_data = query.select_from_table('notarised', cols, conditions)[0]
 
                 row.server = last_ntx_data[0]
@@ -1445,8 +1439,7 @@ class last_notarisations():
 
                     cols = 'server, notaries, opret, block_hash, block_height, \
                             block_time, txid, ac_ntx_blockhash, ac_ntx_height'
-                    conditions = f"block_height={row.kmd_ntx_blockheight} AND coin='{coin}' \
-                                   AND season='{self.season}'"
+                    conditions = f"block_height={row.kmd_ntx_blockheight} AND coin='{coin}'"
                     last_ntx_data = query.select_from_table('notarised', cols, conditions)[0]
 
                     row.server = last_ntx_data[0]
@@ -1464,7 +1457,6 @@ class last_notarisations():
                     return None
 
             else:
-                logger.info(f"default {row.coin} ntx for {row.notary}")
                 row.server = "N/A"
                 row.notaries = []
                 row.opret = "N/A"
