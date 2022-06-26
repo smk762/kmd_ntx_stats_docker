@@ -624,7 +624,7 @@ def get_seednode_version_date_table(request):
             })
 
         notary_row.update({
-            "Total": total
+            "Total": round(total,1)
         })
 
         '''
@@ -700,7 +700,7 @@ def get_seednode_version_month_table(request):
             })
 
         notary_row.update({
-            "Total": total
+            "Total": round(total,1)
         })
 
 
