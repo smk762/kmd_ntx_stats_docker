@@ -520,7 +520,7 @@ for _season in SEASONS_INFO:
             # Get coins from dPoW repo
             current_dpow_coins = []
             if _season == CURRENT_SEASON:
-                print(f"Using dPoW repo coins for current season {season}")
+                print(f"Using dPoW repo coins for current season {_season}")
                 if _season in CURRENT_DPOW_COINS:
                     if _server in CURRENT_DPOW_COINS[_season]:
                         current_dpow_coins = CURRENT_DPOW_COINS[_season][_server]
