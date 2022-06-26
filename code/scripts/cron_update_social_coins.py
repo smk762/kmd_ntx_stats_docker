@@ -4,37 +4,18 @@ import json
 import time
 import requests
 from lib_const import *
-from lib_helper import *
 from decorators import *
-from lib_urls import get_dpow_server_coins_url, get_notary_nodes_repo_coin_social_url
 from models import coin_social_row
-from lib_validate import *
-
-
-season = get_season()
-
-dpow_main_coins = SEASONS_INFO[season]["servers"]["Main"]["coins"]
-dpow_3p_coins = SEASONS_INFO[season]["servers"]["Third_Party"]["coins"]
-all_coins = dpow_3p_coins + dpow_main_coins + ["KMD", "LTC", "BTC"]
+import lib_helper as helper
+import lib_urls as urls
 
 
 @print_runtime
 def generate_social_coins_template(season):
 
-    translated_coins_main = []
-    for coin in dpow_main_coins:
-        translated_coin = handle_translate_coins(coin)
-        translated_coins_main.append(translated_coin)
-
-    translated_coins_3p = []
-    for coin in dpow_3p_coins:
-        translated_coin = handle_translate_coins(coin)
-        translated_coins_3p.append(translated_coin)
-
-    all_coins = list(set(translated_coins_main + translated_coins_3p + ["KMD", "LTC", "BTC"]))
-
+    all_coins = SEASONS_INFO[season]["coins"]
     try:
-        url = get_notary_nodes_repo_coin_social_url(season)
+        url = urls.get_notary_nodes_repo_coin_social_url(season)
         repo_info = requests.get(url).json()
     except Exception as e:
         logger.error(f"Error getting info from {url} {e}")
@@ -64,7 +45,7 @@ def generate_social_coins_template(season):
         elif coin in TRANSLATE_COINS:
             
             for item in repo_info[coin]:
-                template[handle_translate_coins(coin)].update({item:repo_info[coin][item]})
+                template[helper.handle_translate_coins(coin)].update({item:repo_info[coin][item]})
                 
 
     with open(f"{os.path.dirname(os.path.abspath(__file__))}/social_coins_{season.lower()}.json", 'w+') as j:
@@ -77,8 +58,8 @@ def populate_coins_social(season):
         with open(f"{os.path.dirname(os.path.abspath(__file__))}/social_coins_{season.lower()}.json", 'r') as j:
             coin_social = json.load(j)
 
-
-        coin_info = requests.get(get_coins_info_url()).json()['results']
+        all_coins = SEASONS_INFO[season]["coins"]
+        coin_info = requests.get(urls.get_coins_info_url()).json()['results']
 
         for coin in all_coins:
 
@@ -120,10 +101,9 @@ def populate_coins_social(season):
 if __name__ == "__main__":
 
     logger.info(f"Preparing to populate [social_coins] table...")
-    for season in SEASONS_INFO:
-        if season not in EXCLUDED_SEASONS:
-            generate_social_coins_template(season)
-            populate_coins_social(season)
+    for season in ["Season_6"]:
+        generate_social_coins_template(season)
+        populate_coins_social(season)
     
     CURSOR.close()
     CONN.close()
