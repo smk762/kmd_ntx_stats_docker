@@ -383,8 +383,7 @@ def scan_ltc_transactions(season):
 
 if __name__ == "__main__":
     
-    for season in SEASONS_INFO:
-        if season not in EXCLUDED_SEASONS:
+    for season in ["Season_6"]:
             scan_ltc_transactions(season)
 
     CURSOR.close()

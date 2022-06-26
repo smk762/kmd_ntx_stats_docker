@@ -18,6 +18,7 @@
 							<th data-data="notaries">Notaries</th>
 							<th data-data="kmd_ntx_blocktime">Time Since</th>
 							<th data-data="ac_ntx_blockhash">NTX'd Hash</th>
+							<th data-data="season">Season</th>
 						</tr>
 					</thead>
 				</table>
@@ -45,7 +46,8 @@
 			        { "data": "kmd_ntx_txid" },
 			        { "data": "notaries" },
 			        { "data": "kmd_ntx_blocktime" },
-			        { "data": "ac_ntx_blockhash" }
+			        { "data": "ac_ntx_blockhash" },
+			        { "data": "season" }
 			    ],
         		order: [[ 3, 'desc' ]],
         		"columnDefs": [
@@ -69,14 +71,27 @@
 			            "data": 'ac_ntx_height',
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(get_block_url(oData.coin, oData.ac_ntx_height))
+			            	if (oData.coin == "LTC")
+			            	{
+			            		$(nTd).html(get_block_url("KMD", oData.ac_ntx_height))
+			            	}
+			            	else{
+			            		$(nTd).html(get_block_url(oData.coin, oData.ac_ntx_height))
+			            	}
+			            	
 				        }
 			        },
 	        		{
 			            "data": 'kmd_ntx_blockheight',
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(get_block_url("KMD", oData.kmd_ntx_blockheight))
+			            	if (oData.coin == "LTC")
+			            	{
+			            		$(nTd).html(get_block_url("LTC", oData.kmd_ntx_blockheight))
+			            	}
+			            	else{
+			            		$(nTd).html(get_block_url("KMD", oData.kmd_ntx_blockheight))
+			            	}
 				        }
 			        },
         			{
