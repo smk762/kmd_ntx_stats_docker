@@ -288,8 +288,9 @@ def get_mined_count_season_table(request):
             "error": "You need to specify at least one of the following filter parameters: ['season', 'name', 'address']"
         }
 
-    data = query.get_mined_count_season_data(
-        season, name, address).filter(blocks_mined__gte=10)
+    data = query.get_mined_count_season_data(season, name, address)
+    if not name:
+        data = data.filter(blocks_mined__gte=10)
     data = data.order_by('season', 'name').values()
     serializer = serializers.minedCountSeasonSerializer(data, many=True)
     return serializer.data

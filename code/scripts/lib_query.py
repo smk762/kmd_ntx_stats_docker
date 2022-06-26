@@ -84,19 +84,19 @@ def get_season_mined_counts(season):
 def get_max_value_mined_txid(max_value, season=None):
     sql = f"SELECT txid FROM mined WHERE value = {max_value}"
     if season:
-        sql += f"AND season = '{season}'"
+        sql += f" AND season = '{season}'"
     sql += ";"
     CURSOR.execute(sql)
     results = CURSOR.fetchone()
     try:
-        if len(results) > 0:
-            return results[0]
-        else:
-            return ''
+        if results:
+            if len(results) > 0:
+                return results[0]
     except Exception as e:
-        print(sql)
+        #print(sql)
         print(e)
-        return ''
+
+    return ''
 
 
 def get_all_coins():
