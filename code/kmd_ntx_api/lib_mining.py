@@ -43,10 +43,7 @@ def get_nn_mining_summary(notary, season=None):
         season = SEASON
 
     url = f"{THIS_SERVER}/api/table/mined_count_season/?season={season}&name={notary}"
-
-    print(url)
     mining_summary = requests.get(url).json()['results']
-    print(mining_summary)
     if len(mining_summary) > 0:
         mining_summary = mining_summary[0]
         time_since_mined_ts, time_since_mined = helper.get_time_since(mining_summary["last_mined_blocktime"])
