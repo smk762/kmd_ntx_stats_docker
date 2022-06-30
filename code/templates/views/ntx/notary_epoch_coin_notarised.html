@@ -71,7 +71,7 @@
 			            "data": 'notaries',
 			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-							$(nTd).html(get_notaries_symbol('{{ season }}', oData.notaries, oData.txid))
+							$(nTd).html(get_notaries_symbol(oData.notaries, oData.txid))
 						}
 			        },
         			{

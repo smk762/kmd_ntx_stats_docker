@@ -198,8 +198,16 @@ def get_sidebar_links(season):
 def get_base_context(request):
     print("getting context")
     season = get_page_season(request)
+    server = get_or_none(request, "server")
+    epoch = get_or_none(request, "epoch")
+    coin = get_or_none(request, "coin")
+    notary = get_or_none(request, "notary")
     context = {
         "season": season,
+        "server": server,
+        "epoch": epoch,
+        "coin": coin,
+        "notary": notary,
         "season_clean": season.replace("_"," "),
         "explorers": get_explorers(), 
         "coin_icons": get_coin_icons(),

@@ -18,8 +18,8 @@ from kmd_ntx_stats.urls_docs import doc_urls
 from kmd_ntx_stats.urls_community import frontend_community_urls
 
 from kmd_ntx_stats.urls_page import frontend_page_urls
-from kmd_ntx_stats.urls_coin import frontend_coin_urls
-from kmd_ntx_stats.urls_ntx import frontend_ntx_urls
+from kmd_ntx_stats.urls_coin import frontend_coin_urls, api_coins_urls
+from kmd_ntx_stats.urls_ntx import frontend_ntx_urls, api_ntx_urls
 from kmd_ntx_stats.urls_tool import frontend_tool_urls, api_tool_urls
 from kmd_ntx_stats.urls_mining import frontend_mining_urls, api_mining_urls
 from kmd_ntx_stats.urls_testnet import frontend_testnet_urls, api_testnet_urls
@@ -73,11 +73,14 @@ url_lists = [
     frontend_atomicdex_urls, api_atomicdex_urls,
     frontend_mining_urls, api_mining_urls,
     frontend_testnet_urls, api_testnet_urls,
-    frontend_coin_urls, frontend_ntx_urls,
-    frontend_page_urls, frontend_tool_urls,
-    api_csv_urls, api_graph_urls, api_info_urls,
-    api_status_urls, api_table_urls, api_tool_urls,
-    api_wallet_urls, doc_urls, frontend_community_urls
+    frontend_coin_urls, api_coins_urls, 
+    frontend_ntx_urls, api_ntx_urls,
+    frontend_page_urls,
+    frontend_tool_urls,
+    frontend_community_urls,
+    api_csv_urls, api_graph_urls,
+    api_info_urls, api_status_urls, api_table_urls,
+    api_tool_urls, api_wallet_urls, doc_urls    
 ]
 
 for i in url_lists:

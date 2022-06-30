@@ -1,6 +1,6 @@
 from django.urls import path
 from kmd_ntx_api import views_coin
-#from kmd_ntx_api import api_coin
+from kmd_ntx_api import api_mining
 
 frontend_coin_urls = [
     path('coin_profile/',
@@ -29,11 +29,14 @@ frontend_coin_urls = [
     ]
 
 
-'''
 api_coins_urls = [
     path('api/info/nn_mined_4hrs_count/',
           api_mining.nn_mined_4hrs_api,
           name='nn_mined_4hrs_api'),
+
+    path('api/mining/mining_24hrs/',
+          api_mining.mining_24hrs_api,
+          name='mining_24hrs_api'),
 
     path('api/info/mined_count_daily/',
           api_mining.mined_count_daily_by_name,
@@ -43,4 +46,3 @@ api_coins_urls = [
           api_mining.mined_count_season_by_name,
           name='mined_count_season_by_name'),
     ]
-'''

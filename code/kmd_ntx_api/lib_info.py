@@ -136,11 +136,6 @@ def get_seed_stat_season(season, notary=None):
 
 
 
-def get_notarised_data_24hr(season=None, server=None, coin=None, notary=None):
-    day_ago = int(time.time()) - SINCE_INTERVALS['day']
-    return query.get_notarised_data(season, server, None, coin, notary).filter(block_time__gt=str(day_ago))
-
-
 def get_dpow_coins_list(season=None, server=None, epoch=None):
     dpow_coins = query.get_scoring_epochs_data(season, server, None, epoch).values('epoch_coins')
     

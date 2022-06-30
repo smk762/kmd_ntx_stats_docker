@@ -30,81 +30,86 @@
 		  	$('[data-toggle="tooltip"]').tooltip();
 	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	    	var coin_icons = JSON.parse(document.getElementById('coin_icons-data').textContent);
-		        $('#last_notarised_tbl').DataTable({
-	        		order: [[ 5, 'desc' ]],
-  					"paging": false,
-		        	"columns": [
-				        { "data": "coin" },
-				        { "data": "notary" },
-				        { "data": "kmd_ntx_blockheight" },
-				        { "data": "kmd_ntx_txid" },
-				        { "data": "notaries" },
-				        { "data": "kmd_ntx_blocktime" },
-				        { "data": "ac_ntx_blockhash" },
-				        { "data": "ac_ntx_height" }
-				    ],
-	        		"columnDefs": [
-        				{ className: "text-left text-nowrap", "targets": [ 0 ] },
-	        			{
-				            "data": "coin",
-				            "targets": 0,
-				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					        	$(nTd).html(get_coin_icon(oData.coin));
-					        }
-				        },
-	        			{
-				            "data": "notary",
-				            "targets": 1,
-				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            	$(nTd).html(get_notary_url('{{ season }}', oData.notary))
-
-					        }
-				        },
-		        		{
-				            "data": 'kmd_ntx_blockheight',
-				            "targets": 2,
-				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            		$(nTd).html(get_block_url("KMD", oData.kmd_ntx_blockheight))
-					        }
-				        },
-	        			{
-				            "data": 'kmd_ntx_txid',
-				            "targets": 3,
-				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            		$(nTd).html(get_txid_url("KMD", oData.kmd_ntx_txid))
-					        }
-				        },
-	        			{
-				            "data": 'notaries',
-				            "targets": 4,
-				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-								$(nTd).html(get_notaries_symbol('{{ season }}', oData.notaries, oData.txid))
-							}
-				        },
-	        			{
-				            "data": 'kmd_ntx_blocktime',
-				            "targets": 5,
-				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            		$(nTd).html(get_time_since(oData.kmd_ntx_blocktime));
-					        }
-				        },
-	        			{
-				            "data": 'ac_ntx_blockhash',
-				            "targets": 6,
-                			"visible": false
-				        },
-	        			{
-				            "data": 'ac_ntx_height',
-				            "targets": 7,
-				            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            		$(nTd).html(get_block_url(oData.coin, oData.ac_ntx_height))
-					        }
+	        $('#last_notarised_tbl').DataTable({
+        		order: [[ 5, 'desc' ]],
+					"paging": false,
+	        	"columns": [
+			        { "data": "coin" },
+			        { "data": "notary" },
+			        { "data": "kmd_ntx_blockheight" },
+			        { "data": "kmd_ntx_txid" },
+			        { "data": "notaries" },
+			        { "data": "kmd_ntx_blocktime" },
+			        { "data": "ac_ntx_blockhash" },
+			        { "data": "ac_ntx_height" }
+			    ],
+        		"columnDefs": [
+    				{ className: "text-left text-nowrap", "targets": [ 0 ] },
+        			{
+			            "data": "coin",
+			            "targets": 0,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				        	$(nTd).html(get_coin_icon(oData.coin));
 				        }
-	        		]
-		        });
+			        },
+        			{
+			            "data": "notary",
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	$(nTd).html(get_notary_url('{{ season }}', oData.notary))
+
+				        }
+			        },
+	        		{
+			            "data": 'kmd_ntx_blockheight',
+			            "targets": 2,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            		$(nTd).html(get_block_url("KMD", oData.kmd_ntx_blockheight))
+				        }
+			        },
+        			{
+			            "data": 'kmd_ntx_txid',
+			            "targets": 3,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            		$(nTd).html(get_txid_url("KMD", oData.kmd_ntx_txid))
+				        }
+			        },
+        			{
+			            "data": 'notaries',
+			            "targets": 4,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							$(nTd).html(get_notaries_symbol(oData.notaries, oData.txid))
+						}
+			        },
+        			{
+			            "data": 'kmd_ntx_blocktime',
+			            "targets": 5,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            		$(nTd).html(get_time_since(oData.kmd_ntx_blocktime));
+				        }
+			        },
+        			{
+			            "data": 'ac_ntx_blockhash',
+			            "targets": 6,
+            			"visible": false
+			        },
+        			{
+			            "data": 'ac_ntx_height',
+			            "targets": 7,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            		$(nTd).html(get_block_url(oData.coin, oData.ac_ntx_height))
+				        }
+			        }
+        		],
+	    		dom: '<"row mx-0 mt-3 "<"balances_tbl_title col-md-6">f>tr<"row mx-0 mb-3 d-flex justify-content-between"<"api_link ml-2">ip>',
+		        fnInitComplete: function(){
+		           $('.balances_tbl_title').html('<h3 class="text-left">{{ season_clean }} {{ notary }} {{ coin }} Notarisations</h3>');
+		           $('.api_link').html('<i>Link to API data: <a href="'+url+'">'+url+'</a></i>');
+		        }
+	        });
 	    });
-		Chart.defaults.global.defaultFontColor = 'white';
-		Chart.defaults.global.defaultFontSize = 14;
+		
+		
 
   </script> 
 

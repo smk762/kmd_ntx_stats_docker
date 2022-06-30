@@ -6,6 +6,7 @@ from django.shortcuts import render
 
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_ntx as ntx
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_stats as stats
 import kmd_ntx_api.lib_graph as graph
@@ -20,14 +21,11 @@ def notary_coin_ntx_detail_view(request):
     coin = helper.get_or_none(request, "coin")
     server = helper.get_or_none(request, "server")
 
-    url = f"{THIS_SERVER}/api/table/notary_ntx"
-    coin_ntx_table = requests.get(f"{url}/?season={season}&server={server}&notary={notary}&coin={coin}").json()['results']
-
     context.update({
         "page_title":"Notary Profile Index",
         "notary":notary,
-        "coin":coin,
-        "coin_ntx": coin_ntx_table
+        "server":server,
+        "coin":coin
     })
 
     return render(request, 'views/ntx/notary_coin_ntx_detail.html', context)
@@ -81,7 +79,7 @@ def notary_profile_view(request, notary=None):
                     "third_party_server_count": ntx_season_data['third_party_server_count'],
                 })
 
-                notarised_data_24hr = info.get_notarised_data_24hr(season, None, None, notary)
+                notarised_data_24hr = ntx.get_notarised_date(season, None, None, notary, True)
                 context.update({
                     "master_notarised_24hr": notarised_data_24hr.filter(server='KMD').count(),
                     "main_notarised_24hr": notarised_data_24hr.filter(server='Main').count(),
@@ -115,6 +113,7 @@ def notary_profile_view(request, notary=None):
     return render(request, 'views/ntx/notary_profile_index.html', context)
 
 
+# TODO: Add Date Form to restrict results returned. merge with "last 24hrs?"
 def notary_mining_view(request, notary=None):
     season = helper.get_page_season(request)
     context = helper.get_base_context(request)
@@ -123,7 +122,7 @@ def notary_mining_view(request, notary=None):
 
     context.update({
         "page_title": f"{notary} Notary KMD Mining",
-        "notary_mining":query.get_mined_data(None, notary).values().order_by('block_height'),
+        "notary_mining": query.get_mined_data(None, notary).values().order_by('block_height'),
     })
 
     return render(request, 'views/ntx/notary_mining.html', context)
@@ -191,16 +190,11 @@ def notary_epoch_scores_view(request):
     return render(request, 'views/ntx/notary_epoch_scores_view.html', context)
 
 
-def notarised_24hrs(request):
-    season = helper.get_page_season(request)
-    notarised_24hrs = info.get_notarised_data_24hr(season)
-    notarised_24hrs = notarised_24hrs.order_by('-block_time').values()[:200]
-    
+def notarised_24hrs(request):    
     context = helper.get_base_context(request)
     context.update({
         "page_title":"dPoW Notarisations (last 200)",
-        "notarised_24hrs":notarised_24hrs,
-        "explorers":info.get_explorers(request)
+        "notarised_24hrs":notarised_24hrs
     })
     return render(request, 'views/ntx/notarised_24hrs.html', context)
 

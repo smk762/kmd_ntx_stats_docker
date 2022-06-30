@@ -931,4 +931,18 @@
                 padding: 0px;
             }
 
+
+            .tbl_title {
+                text-align: left;
+            }
+            .dataTables_filter {
+                -ms-flex: 0 0 50%;
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+            .api_link {
+                padding-top: 0.85em;
+            }
+
+
         </style>

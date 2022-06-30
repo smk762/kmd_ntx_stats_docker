@@ -2,8 +2,9 @@
 {% load static %}
 {% block content %}
 <!--
-	Loads slow, not in sidebar, table too wide.
-
+# TODO: Add Date Form to restrict results returned. merge with "last 24hrs?"
+Use API directly with ajax, apply standard table dom layout etc
+All link to the page on notary profile page
  -->
 	<div class="row col-12 m-auto">
 		<div class="card table_card floating-card m-0">
@@ -40,8 +41,6 @@
 	        $('#notary_mining_tbl').DataTable({
 				deferRender: true,
 	        	"paging": false,
-	        	"searching": false,
-	        	"info": false,
                 "orderClasses": false,
 			    buttons: [
 			        {

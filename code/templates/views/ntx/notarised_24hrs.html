@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+	<div class="text-center" id="loading-spinner" style="height: 100%">
+		<div class="spinner-border m-10" role="status">
+		</div>
+		<div class="m-3">Loading...</div>
+	</div>
 	<div class="row col-12 m-auto">
-		<div class="card table_card floating-card">
-			<div class="card-header table_card_title flex floating-card">
-				Last 200 {{ season_clean }} Notarisations
-			</div>
+		<div class="card table_card floating-card m-auto" id="ntx_24hr_card" style="visibility: hidden; font-size: 1.1em;" >
 			<div class="card-body table_card_body flex">
-				<table id="ntx_24hr_tbl" class="table table-striped table-bordered m-auto" style="width:100%; visibility: hidden;">
+				<table id="ntx_24hr_tbl" class="table table-striped table-bordered m-auto" style="width:100%;">
 					<thead>
 						<tr>
 							<th class="px-3 py-2" data-data="coin">Coin</th>
@@ -19,37 +21,38 @@
 							<th class="px-3 py-2" data-data="block_time">Time Since</th>
 						</tr>
 					</thead>
-					<tbody>
-					{% for row in notarised_24hrs %}
-						<tr>
-							<td data-data="coin" class="px-2 text-left">{{ row.coin }}</td>
-							<td data-data="block_height">{{ row.block_height }}</td>
-							<td data-data="ac_ntx_height">{{ row.ac_ntx_height }}</td>
-							<td data-data="txid">{{ row.txid }}</td>
-							<td data-data="notaries">
-								<span class='badge p-0' style="border-radius: 50%;" data-toggle="tooltip" data-placement="top" title="{{ row.notaries }}">
-									<i class="fa fa-users" style="color:white;"></i>
-								</span>
-							</td>
-							<td data-data="opret">
-								{{ row.opret }}
-							</td>
-							<td data-data="block_time">{{ row.block_time }}</td>
-						</tr>
-					{% endfor %}
-					</tbody>
 				</table>
 			</div>
 		</div>
 	</div>
 	<script>
 	    $(document).ready(function() {
-	    	$('#ntx_24hr_tbl').css('visibility', 'visible');
+	    	let url = "/api/ntx/notarised_date?last_24hrs=true"
+	    	if ('{{ coin }}' != 'None') {
+	    		url += '&coin={{ coin }}'
+	    	}
+	    	if ('{{ notary }}' != 'None') {
+	    		url += '&notary={{ notary }}'
+	    	}
+	    	console.log(url)
 	        $('#ntx_24hr_tbl').DataTable({
-    			deferRender: true,
+	     		ajax: {
+				    url: url,
+	    			dataSrc: 'results',
+	    			"deferRender": true
+				},
                 "orderClasses": false,
     			"paging": true,
   				"pageLength": 50,
+	        	"columns": [
+			        { "data": "coin" },
+			        { "data": "block_height" },
+			        { "data": "ac_ntx_height" },
+			        { "data": "txid" },
+			        { "data": "notaries" },
+			        { "data": "opret" },
+			        { "data": "block_time" }
+			    ],  				
         		order: [[ 6, 'desc' ]],
         		"columnDefs": [
     				{ className: "text-left text-nowrap", "targets": [ 0 ] },
@@ -83,7 +86,6 @@
 			            	$(nTd).html(get_block_url(ntx_coin, oData.ac_ntx_height))
 				        }
 			        },
-
         			{
 			            "data": 'txid',
 			            "targets": 3,
@@ -97,7 +99,10 @@
 			        },
         			{
 			            "data": 'notaries',
-			            "targets": 4
+			            "targets": 4,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+				            $(nTd).html(get_notaries_symbol(oData.notaries, oData.txid));
+				        }
 			        },
         			{
 			            "data": 'opret',
@@ -117,7 +122,15 @@
 				            $(nTd).html(get_time_since(oData.block_time));
 				        }
 			        }
-			    ]
+			    ],
+	    		dom: '<"row mx-0 mt-3 "<"ntx_24h_tbl_title col-md-6">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"ntx_24h_api_link">ip>',
+		        fnInitComplete: function(){
+	    			$('#loading-spinner').css('display', 'none');
+	    			$('#ntx_24hr_card').css('visibility', 'visible');
+		            $('.ntx_24h_tbl_title').html('<h3 class="text-left">{{ coin }} {{ notary }} Notarisations Last 24hrs</h3>');
+		            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="ntx_24hr" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+		            $('.ntx_24h_api_link').html(api_btn);
+		        }
 	        });
 	    });
 	</script>

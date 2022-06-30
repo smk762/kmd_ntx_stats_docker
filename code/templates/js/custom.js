@@ -138,12 +138,12 @@
 	    return timesince
 	}
 
-	function get_notaries_symbol(season, notaries, txid) {
+	function get_notaries_symbol(notaries, txid) {
 		let tooltip_html = ""
 		for (let notary of notaries) {
 			tooltip_html += notary+"\n"
 		}
-		return "<a href='{% url 'notarisedViewSet-list' %}?txid="+txid+"'><span class='badge p-0' style='border-radius: 50%;' data-bs-toggle='tooltip'\
+		return "<a href='{% url 'notarisedViewSet-list' %}?txid="+txid+"'><span class='' style='font-size: 0.7em' data-bs-toggle='tooltip'\
 					data-bs-placement='top' title=' "+tooltip_html+"'>\
 		<i class='fa fa-users' style='font-size:1.5em;'></i>\
 		</span></a>";
@@ -551,11 +551,29 @@
 		return Math.round(sum / totals.length * dp) / dp
 	}
 
-function get_qrcode(id, text, title, subtitle) {
-	$(id).html('')
-	jQuery(id).qrcode({foreground:"#070e28", background:"#b1d1d3", "text":text});
-	$('#qrcode-modal-label').html(title)
-	$('#qrcode-modal-subtitle').html(subtitle)
-}
+	function get_qrcode(id, text, title, subtitle) {
+		$(id).html('')
+		jQuery(id).qrcode({foreground:"#070e28", background:"#b1d1d3", "text":text});
+		$('#qrcode-modal-label').html(title)
+		$('#qrcode-modal-subtitle').html(subtitle)
+	}
 
+    // Custom DataTables search filter input styling
+    function update_dt_search(id) {
+        filter_div = '<div class="col-6 input-group-prepend px-0 ml-auto"><span class="input-group-text col-4">Search: </span><input type="search" class="col-8 ml-0 mr-3 form-control form-control-sm" placeholder="" aria-controls="'+id+'"></div>'
+        $("#"+id+"_filter").html(filter_div)
+        $("#"+id+"_filter").on("keyup", 'input', function() {
+            $("#"+id).DataTable().search(this.value.trim(), false, false).draw();
+        });
+    }
+
+    function update_dt_length(id) {
+
+        custom_select = '<div class="col-6 input-group-prepend px-0 mr-auto"><span class="input-group-text col-4">Show </span><select id="tbl_select" name="'+id+'_length" aria-controls="'+id+'" class="custom-select custom-select-sm form-control form-control-sm"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select><span class="input-group-text std-append col-4"> Rows</span></div>'
+        $("#"+id+"_length").html(custom_select)
+        $("#"+id).DataTable().page.len(50).draw();
+        $("#tbl_select").on("change", function() {
+            $("#"+id).DataTable().page.len(parseInt(this.value)).draw();
+        });
+    }
 </script>

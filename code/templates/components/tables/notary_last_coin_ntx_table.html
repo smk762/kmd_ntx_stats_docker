@@ -1,9 +1,6 @@
 <div class="row" id="ntx_24hr">	
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
 		<div class="card table_card floating-card">
-			<div class="card-header table_card_title floating-card">
-				{{ notary_clean }} Last {{ season_clean }} Coin Notarisation
-			</div>
 			<div class="card-body table_card_body">
 				<table id="notary_last_coin_ntx_tbl" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
 					<thead>
@@ -34,8 +31,6 @@
     		order: [[ 2, 'desc' ]],
 			deferRender: true,
         	"paging": false,
-        	"searching": false,
-        	"info": false,
             "orderClasses": false,
         	"columns": [
 		        { "data": "coin" },
@@ -97,7 +92,12 @@
 	            		$(nTd).html(get_time_since(oData.kmd_ntx_blocktime));
 			        }
 		        }
-    		]
+    		],
+    		dom: '<"row mx-0 mt-3 "<"tbl_title col-md-6">f>tr<"row mx-0 mb-3 d-flex justify-content-between"<"api_link ml-2">ip>',
+	        fnInitComplete: function(){
+	           $('.tbl_title').html('<h3 class="">{{ notary_clean }} Last {{ season_clean }} Coin Notarisation</h3>');
+	           $('.api_link').html('<i>Link to API data: <a href="'+url+'">'+url+'</a></i>');
+	        }
         });
     });
 
