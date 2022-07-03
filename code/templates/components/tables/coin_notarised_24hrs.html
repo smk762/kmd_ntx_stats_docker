@@ -110,10 +110,12 @@
 			        }
 		        }
 		    ],
-    		dom: '<"row mx-0 mt-3 "<"tbl_title col-md-6">f>tr<"row mx-0 mb-3 d-flex justify-content-between"<"api_link ml-2">ip>',
+    		dom: '<"row mx-0 mt-3 "<"coin_ntx_24hr_tbl_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"coin_ntx_24hr_api_link">ip>',
+
 	        fnInitComplete: function(){
-	           $('.tbl_title').html('<h3 class="">{{ season_clean }} {{ coin }} Notarisations (last 24 hrs)</h3>');
-	           $('.api_link').html('<i>Link to API data: <a href="'+url+'">'+url+'</a></i>');
+	           $('.coin_ntx_24hr_tbl_title').html('<h3 class="">{{ season_clean }} {{ coin }} Notarisations (last 24 hrs)</h3>');
+	            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="last_coin_ntx" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+	            $('.coin_ntx_24hr_api_link').html(api_btn);
 	        }
         });
     });

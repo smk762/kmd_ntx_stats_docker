@@ -1,0 +1,5 @@
+{% if active == btn_id %}
+<span id='{{ btn_id }}_btn' class='btn btn-dark5 btn-selected py-2 px-4 m-1 {{ extra_class }}' style='width: {{ width_pct }}%; align-self: baseline;' onclick='{{ action }}'>{{ text }}</span>
+{% else %}
+<span id='{{ btn_id }}_btn' class='btn btn-dark5 py-2 px-4 m-1 {{ extra_class }}' style='width: {{ width_pct }}%; align-self: baseline;' onclick='{{ action }}'>{{ text }}</span>
+{% endif %}

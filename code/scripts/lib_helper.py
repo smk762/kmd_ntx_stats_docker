@@ -87,7 +87,6 @@ def is_notary_ltc_address(addr):
     return False
 
 
-
 def is_postseason(timestamp=None, block=None):
     if block:
         for season in SEASONS_INFO:

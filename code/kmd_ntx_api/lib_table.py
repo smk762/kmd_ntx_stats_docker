@@ -38,23 +38,6 @@ def get_addresses_table(request):
     return resp
 
 
-def get_balances_table(request, notary=None, coin=None):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
-    coin = helper.get_or_none(request, "coin", coin)
-    notary = helper.get_or_none(request, "notary", notary)
-    address = helper.get_or_none(request, "address")
-
-    if not season and not coin and not notary and not address:
-        return {
-            "error": "You need to specify at least one of the following filter parameters: ['season', 'coin', 'notary', 'address']"
-        }
-    data = query.get_balances_data(season, server, coin, notary, address)
-    data = data.values()
-
-    serializer = serializers.balancesSerializer(data, many=True)
-
-    return serializer.data
 
 
 def get_coin_social_table(request):
@@ -121,20 +104,6 @@ def get_notary_last_ntx_table(request, notary=None):
 
     return data
 
-
-# 
-def get_notary_ntx_24hr_table_data(request, notary=None):
-    season = helper.get_or_none(request, "season", SEASON)
-    notary = helper.get_or_none(request, "notary", notary)
-
-    if not notary or not season:
-        return {
-            "error": "You need to specify at least both of the following filter parameters: ['notary', 'season']"
-        }
-    min_blocktime = int(time.time() - SINCE_INTERVALS['day'])
-    data = query.get_notarised_data(season=season, notary=notary, min_blocktime=min_blocktime)
-    data = list(data.order_by('coin').values())
-    return data
 
 
 # TODO: Handle where coin not notarised
@@ -296,26 +265,6 @@ def get_mined_count_season_table(request):
     return serializer.data
 
 
-def get_notarised_24hrs_table(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
-    epoch = helper.get_or_none(request, "epoch")
-    coin = helper.get_or_none(request, "coin")
-    notary = helper.get_or_none(request, "notary")
-    address = helper.get_or_none(request, "address")
-
-    if not season or (not coin and not notary):
-        return {
-            "error": "You need to specify the following filter parameters: ['season'] and at least one of ['notary','coin']"
-        }
-    day_ago = int(time.time()) - SINCE_INTERVALS['day']
-    data = query.get_notarised_data(
-        season, server, epoch, coin, notary, address).filter(block_time__gt=str(day_ago))
-    data = data.values()
-
-    serializer = serializers.notarisedSerializer(data, many=True)
-
-    return serializer.data
 
 
 def get_coin_last_ntx_table(request, coin=None):
@@ -376,7 +325,7 @@ def get_notary_ntx_season_table(request, notary=None):
 def get_server_ntx_season_table(request, server=None):
     season = helper.get_or_none(request, "season", SEASON)
     server = helper.get_or_none(request, "server", server)
-    data = query.get_notary_ntx_season_data(season, notary)
+    data = query.get_servr_ntx_season_data(season, server)
     data = data.order_by('server').values()
 
     resp = []
@@ -395,7 +344,6 @@ def get_server_ntx_season_table(request, server=None):
         })
 
     return resp
-
 
 def get_coin_ntx_season_table(request, coin=None):
     season = helper.get_or_none(request, "season", SEASON)
@@ -426,46 +374,6 @@ def get_coin_ntx_season_table(request, coin=None):
     return resp
 
 
-def get_notary_ntx_table(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
-    epoch = helper.get_or_none(request, "epoch")
-    coin = helper.get_or_none(request, "coin")
-    notary = helper.get_or_none(request, "notary")
-
-    if not season or not coin or not notary:
-        return {
-            "error": "You need to specify all of the following filter parameters: ['season', 'coin', 'notary']"
-        }
-    data = query.get_notarised_data(
-        season, server, epoch, coin, notary).order_by('-block_time')
-    data = data.values('txid', 'coin', 'block_height',
-                       'block_time', 'ac_ntx_height', 'score_value')
-
-    serializer = serializers.notary_ntxSerializer(data, many=True)
-
-    return serializer.data
-
-
-def get_notarised_table(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
-    epoch = helper.get_or_none(request, "epoch")
-    coin = helper.get_or_none(request, "coin")
-    notary = helper.get_or_none(request, "notary")
-    address = helper.get_or_none(request, "address")
-
-    if not season or not server or not coin or not notary:
-        return {
-            "error": "You need to specify all of the following filter parameters: ['season', 'server', 'coin', 'notary']"
-        }
-    data = query.get_notarised_data(
-        season, server, epoch, coin, notary, address).order_by('-block_time')
-    data = data.values()
-
-    serializer = serializers.notarisedSerializer(data, many=True)
-
-    return serializer.data
 
 
 def get_notarised_tenure_table(request):
@@ -651,18 +559,3 @@ def get_split_stats_table(request):
         resp.append(row)
     return resp
 
-
-def tablize_notarised(resp):
-    table_resp = []
-
-    for i in resp:
-        table_resp.append({
-            "coin": i["coin"],
-            "block_height": i["block_height"],
-            "ac_ntx_height": i["ac_ntx_height"],
-            "txid": i["txid"],
-            "notaries": i["notaries"],
-            "opret": i["opret"],
-            "block_time": i["block_time"]
-        })
-    return table_resp

@@ -10,7 +10,7 @@
 						<th data-data="server">Server</th>
 						<th data-data="address">Address</th>
 						<th data-data="balance">Balance</th>
-						<th data-data="update">Since Updated</th>
+						<th data-data="update_time">Since Updated</th>
 					</tr>
 				</thead>
 			</table>
@@ -35,7 +35,7 @@
 		        { "data": "server" },
 		        { "data": "address" },
 		        { "data": "balance" },
-		        { "data": "update" }
+		        { "data": "update_time" }
 		    ], 
         	"paging": false,
             "orderClasses": false,
@@ -97,10 +97,12 @@
 			        }
 		        }
     		],
-    		dom: '<"row mx-0 mt-3 "<"balances_tbl_title col-md-6">f>tr<"row mx-0 mb-3 d-flex justify-content-between"<"balances_api_link ml-2">ip>',
+    		dom: '<"row mx-0 mt-3 "<"balances_tbl_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"balances_api_link">ip>',
 	        fnInitComplete: function(){
 	           $('.balances_tbl_title').html('<h3 class="">{{ season_clean }} {{ coin }} Addresses & Balances</h3>');
-	           $('.balances_api_link').html('<i>Link to API data: <a href="'+balances_url+'">'+balances_url+'</a></i>');
+    			let balances_url = "{% url 'balancesViewSet-list' %}?format=datatables&coin={{ coin }}&season={{ season }}"
+		        let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="coin_balances" width_pct="100" btn_url="'+balances_url+'" btn_text="Source Data" %}'
+		        $('.balances_api_link').html(api_btn);
 	        }
         });
     });

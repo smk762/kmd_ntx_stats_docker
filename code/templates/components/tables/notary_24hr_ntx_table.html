@@ -1,11 +1,13 @@
+<div class="text-center" id="ntx-24hr-loading-spinner" style="height: 100%">
+	<div class="spinner-border m-10" role="status">
+	</div>
+	<div class="m-3">Loading {{ notary_clean }} 24hr NTX Summary...</div>
+</div>
 	<div class="row" id="ntx_24hr">	
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card floating-card">
-			<div class="card-header table_card_title floating-card">
-				{{ notary_clean }} Notarisations last 24hrs
-			</div>
+		<div class="card table_card floating-card m-auto col-12" id="ntx_24hr_card" style="visibility: hidden;">
 			<div class="card-body table_card_body">
-				<table id="ntx_24hr_tbl" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
+				<table id="ntx_24hr_tbl" class="table table-striped table-bordered" style="width:100%;">
 					<thead>
 						<tr>
 							<th class="px-2 py-2" data-data="coin">Coin</th>
@@ -17,19 +19,6 @@
 							<th class="px-2 py-2" data-data="block_time">Time Since</th>
 						</tr>
 					</thead>
-					<tbody>
-						{% for item in notary_ntx_24hr %}
-						<tr>
-							<td class="px-2 py-2" data-data="coin">{{ item.coin }}</td>
-							<td class="px-2 py-2" data-data="block_height">{{ item.block_height }}</td>
-							<td class="px-2 py-2" data-data="ac_ntx_height">{{ item.ac_ntx_height }}</td>
-							<td class="px-2 py-2" data-data="txid">{{ item.txid }}</td>
-							<td class="px-2 py-2" data-data="notaries">{{ item.notaries }}</td>
-							<td class="px-2 py-2" data-data="opret">{{ item.opret }}</td>
-							<td class="px-2 py-2" data-data="block_time">{{ item.block_time }}</td>
-						</tr>
-						{% endfor %}
-					</tbody>
 				</table>
 			</div>
 		</div>
@@ -38,13 +27,14 @@
 
 <script>
     $(document).ready(function() {
-    	$('#ntx_24hr_tbl').css('visibility', 'visible');
+     	let url = "{% url 'notarised_table' %}?notary={{ notary }}&season={{ season }}"
         $('#ntx_24hr_tbl').DataTable({
+     		ajax: {
+			    url: url,
+    			dataSrc: 'results',
+    			"deferRender": true
+			},
     		order: [[ 1, 'desc' ]],
-			deferRender: true,
-        	"paging": false,
-        	"searching": false,
-        	"info": false,
             "orderClasses": false,
     		"columnDefs": [
 				{ className: "text-left text-nowrap", "targets": [ 0 ] },
@@ -115,7 +105,16 @@
 		            	$(nTd).html(get_time_since(oData.block_time));
 			        }
 		        }
-		    ]
+		    ],
+    		dom: '<"row mx-0 mt-3 "<"ntx_24hr_tbl_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"ntx_24hr_api_link">ip>',
+	        fnInitComplete: function(){
+		    	$('#ntx-24hr-loading-spinner').css('display', 'none');
+		    	$('#ntx_24hr_card').css('visibility', 'visible');
+	            $('.ntx_24hr_tbl_title').html('<h3 class="">{{ notary_clean }} Notarisations Last 24hrs</h3>');
+	            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="mining_24hr" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+	            $('.ntx_24hr_api_link').html(api_btn);
+
+	        }
         });
     });
 </script>

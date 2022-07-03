@@ -15,6 +15,12 @@ def mined_count_daily_by_name(request):
     return helper.json_resp(resp, filters)
 
 
+def notary_mining_api(request):
+    resp = mining.get_notary_mining(request)
+    filters = ['notary, season']
+    return helper.json_resp(resp, filters)
+
+
 def mining_24hrs_api(request):
     season = helper.get_page_season(request)
     notary_list = helper.get_notary_list(season)

@@ -124,12 +124,6 @@ def notarised_count_daily_info(request):
     return helper.json_resp(resp, filters)
 
 
-def notarised_txid(request):
-    resp = info.get_notarised_txid(request)
-    filters = ['txid']
-    return helper.json_resp(resp, filters)
-
-
 def notarised_coins(request):
     resp = info.get_notarised_coins(request)
     filters = ['txid']

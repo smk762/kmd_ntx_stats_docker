@@ -16,17 +16,21 @@
 							{% endfor %}
 						</div>
 					</div>
+					
             		<div class="row  m-auto justify-content-around col-11">
 						{% for notary, seasons in notary_seasons.items %}
 							{% if notary == node %} 
 								{% for season in seasons %}
+								<!-- TODO: This is for looking back at older seasons, but needs a fully populated db
 									<a href="/notary_profile/{{ notary }}?season={{ season }}">
-										<span class="badge">{{ season|cut:"eason_" }}</span>
 									</a>
+								-->
+										<span class="badge">{{ season|cut:"eason_" }}</span>
 								{% endfor %}		
 							{% endif %}
 						{% endfor %}
 					</div>
+					
 					<div class="justify-content-md-center" style="font-size: 1.6rem;">
 						{% for nn, site_links in nn_social.items %}
 							{% if notary == nn %}

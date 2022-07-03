@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import kmd_ntx_api.lib_table as table
 import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_ntx as ntx
+import kmd_ntx_api.lib_wallet as wallet
 
 
 def addresses_table(request):
@@ -8,8 +10,9 @@ def addresses_table(request):
     filters = ['season', 'server', 'coin', 'notary', 'address']
     return helper.json_resp(resp, filters)
 
+
 def balances_table(request):
-    resp = table.get_balances_table(request)
+    resp = wallet.get_balances_rows(request)
     filters = ['season', 'server', 'coin', 'notary', 'address']
     return helper.json_resp(resp, filters)
 
@@ -18,6 +21,7 @@ def last_mined_table(request):
     resp = table.get_last_mined_table(request)
     filters = ["name", "address", "season"]
     return helper.json_resp(resp, filters)
+
 
 def coin_social_table(request):
     resp = table.get_coin_social_table(request)
@@ -55,12 +59,6 @@ def mined_count_season_table(request):
     return helper.json_resp(resp, filters)
 
 
-def notarised_24hrs_table(request):
-    resp = table.get_notarised_24hrs_table(request)
-    filters = ['season', 'server', 'epoch', 'coin', 'notary', 'address']
-    return helper.json_resp(resp, filters)
-
-
 def notary_ntx_season_table(request):
     resp = table.get_notary_ntx_season_table(request)
     filters = ["season", "notary", "coin"]
@@ -72,16 +70,6 @@ def coin_ntx_season_table(request):
     filters = ["season", "coin"]
     return helper.json_resp(resp, filters)
 
-
-def notary_ntx_table(request):
-    resp = table.get_notary_ntx_table(request)
-    filters = ['season', 'server', 'epoch', 'coin', 'notary']
-    return helper.json_resp(resp, filters)
-
-def notarised_table(request):
-    resp = table.get_notarised_table(request)
-    filters = ['season', 'server', 'epoch', 'coin', 'notary', 'address']
-    return helper.json_resp(resp, filters)
 
 
 def notarised_tenure_table(request):
@@ -109,25 +97,10 @@ def notary_epoch_scores_table(request):
     return helper.json_resp(resp, filters)
     
 
-def notary_epoch_coin_notarised_table(request):
-    resp = table.get_notarised_table(request)
-    if not "error" in resp:
-        resp = table.tablize_notarised(resp)
-    filters = ['season', 'server', 'epoch', 'coin', 'notary']
-    return helper.json_resp(resp, filters)
-
-
-def notary_coin_notarised_table(request):
-    resp = table.get_notarised_table(request)
-    if not "error" in resp:
-        resp = table.tablize_notarised(resp)
-    filters = ['season', 'server', 'epoch', 'coin', 'notary']
-    return helper.json_resp(resp, filters)
-
-
-def coin_notarised_24hrs_table(request):
-    resp = table.get_notarised_24hrs_table(request)
-    if not "error" in resp:
-        resp = table.tablize_notarised(resp)
-    filters = ['season', 'server', 'epoch', 'coin', 'notary']
+def notarised_table(request):
+    resp = ntx.get_notarised_rows(request)
+    filters = ['season', 'server', 'epoch',
+               'coin', 'notary', 'address',
+               'txid', 'min_blocktime', 'max_blocktime',
+              ]
     return helper.json_resp(resp, filters)

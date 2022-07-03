@@ -24,9 +24,9 @@ NAV_DATA = {
             "icon": "",
             "url": "/coins_last_ntx"
         },
-        "Last 200 Notarisations": {
+        "Notarisations Last 24hrs": {
             "icon": "",
-            "url": "/notarised_24hrs"
+            "url": "/notarised_24hrs/?coin=RICK"
         },
         "Coin dPoW Tenure": {
             "icon": "",

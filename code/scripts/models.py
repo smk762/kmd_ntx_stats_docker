@@ -706,7 +706,8 @@ class notary_last_ntx_row():
 
 class mined_row():
     def __init__(self, block_height='', block_time='', block_datetime='', 
-             value='', address='', name='', txid='', diff=0, season=''):
+             value='', address='', name='', txid='', diff=0, season='',
+             btc_price=0, usd_price=0):
         self.block_height = block_height
         self.block_time = block_time
         self.block_datetime = block_datetime
@@ -716,6 +717,8 @@ class mined_row():
         self.txid = txid
         self.diff = diff
         self.season = season
+        self.btc_price = btc_price
+        self.usd_price = usd_price
 
     def validated(self):
         for item in [self.address, self.name, self.season]:
@@ -729,17 +732,20 @@ class mined_row():
                 for season in SEASONS_INFO:
                     if season.find("Testnet") == -1:
                         if "Main" in SEASONS_INFO[season]["servers"]:
-                            if self.address == SEASONS_INFO[season]["servers"]["Main"]["addresses"]["KMD"]:
+                            if self.address in SEASONS_INFO[season]["servers"]["Main"]["addresses"]["KMD"]:
                                 self.season = season
                                 return True
         return True
 
     def update(self):
-        self.season = lib_validate.get_season_from_block(self.block_height)
+        self.season = lib_validate.get_season(self.block_time)
         self.name = lib_validate.get_name_from_address(self.address)
         self.block_datetime = dt.utcfromtimestamp(self.block_time)
-        row_data = (self.block_height, self.block_time, self.block_datetime, 
-            self.value, self.address, self.name, self.txid, self.diff, self.season)
+        row_data = (
+            self.block_height, self.block_time, self.block_datetime, 
+            self.value, self.address, self.name, self.txid, self.diff,
+            self.season, self.btc_price, self.usd_price
+        )
 
         if self.validated():
             update_mined_row(row_data)

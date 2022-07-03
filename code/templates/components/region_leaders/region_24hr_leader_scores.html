@@ -17,9 +17,9 @@
 	{% if anchored %}
 
 		{% if region == 'AR' %}
-		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button btn-selected py-1 px-4 m-0" onclick="show_region('#{{ region }}')">{{ region_name }}</div>
+		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button btn-selected py-1 px-4 m-0" onclick="show_region('{{ region }}')">{{ region_name }}</div>
 		{% else %}
-		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0" onclick="show_region('#{{ region }}')">{{ region_name }}</div>
+		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0" onclick="show_region('{{ region }}')">{{ region_name }}</div>
 		{% endif %}
 
 	{% else %}

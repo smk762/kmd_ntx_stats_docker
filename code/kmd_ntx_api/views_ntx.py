@@ -92,40 +92,81 @@ def notary_profile_view(request, notary=None):
                 context.update({
                     "rank": rank,
                 })
-
+                buttons = ["ntx", "ntx_24hr", "balances", "mining", "last_coin_ntx"]
+                button_params = {
+                    "ntx": {
+                        "action": f"show_card('ntx', {buttons})",
+                        "width_pct": 17,
+                        "text": "Notarisations"
+                    },
+                    "ntx_24hr": {
+                        "action": f"show_card('ntx_24hr', {buttons})",
+                        "width_pct": 17,
+                        "text": "Notarisations (24hrs)"
+                    },
+                    "balances": {
+                        "action": f"show_card('balances', {buttons})",
+                        "width_pct": 17,
+                        "text": "Addresses"
+                    },
+                    "mining": {
+                        "action": f"show_card('mining', {buttons})",
+                        "width_pct": 17,
+                        "text": "Mining"
+                    },
+                    "last_coin_ntx": {
+                        "action": f"show_card('last_coin_ntx', {buttons})",
+                        "width_pct": 17,
+                        "text": "Last Coin Ntx"
+                    }
+                }
                 context.update({
                     "page_title": f"{notary} Notary Profile",
                     "notary": notary,
+                    "buttons": button_params,
                     "notary_clean": notary.replace("_", " "),
                     "nn_social": info.get_nn_social_info(request), # Social Media Links
                     "mining_summary": mining.get_nn_mining_summary(notary), #  Mining Summary
-                    "notary_balances": table.get_balances_table(request, notary), # Balances in table format
-                    "notary_ntx_24hr": table.get_notary_ntx_24hr_table_data(request, notary), # Balances in table format
                 })
 
                 return render(request, 'views/ntx/notary_profile.html', context)
 
+    buttons = ["AR", "EU", "NA", "SH", "DEV"]
+    button_params = {
+        "AR": {
+            "action": f"show_card('AR', {buttons})",
+            "width_pct": 19,
+            "text": "Asia & Russia"
+        },
+        "EU": {
+            "action": f"show_card('EU', {buttons})",
+            "width_pct": 19,
+            "text": "Europe"
+        },
+        "NA": {
+            "action": f"show_card('NA', {buttons})",
+            "width_pct": 19,
+            "text": "North America"
+        },
+        "SH": {
+            "action": f"show_card('SH', {buttons})",
+            "width_pct": 19,
+            "text": "Southern Hemisphere"
+        },
+        "DEV": {
+            "action": f"show_card('DEV', {buttons})",
+            "width_pct": 19,
+            "text": "Developers"
+        }
+    }
+
     context.update({
+        "buttons": button_params,
         "nn_social": info.get_nn_social_info(request),
         "nn_regions": helper.get_regions_info(season)
     })
 
     return render(request, 'views/ntx/notary_profile_index.html', context)
-
-
-# TODO: Add Date Form to restrict results returned. merge with "last 24hrs?"
-def notary_mining_view(request, notary=None):
-    season = helper.get_page_season(request)
-    context = helper.get_base_context(request)
-    if not notary:
-        return render(request, 'dash_index.html', context)
-
-    context.update({
-        "page_title": f"{notary} Notary KMD Mining",
-        "notary_mining": query.get_mined_data(None, notary).values().order_by('block_height'),
-    })
-
-    return render(request, 'views/ntx/notary_mining.html', context)
 
 
 def ntx_scoreboard(request):
@@ -193,8 +234,7 @@ def notary_epoch_scores_view(request):
 def notarised_24hrs(request):    
     context = helper.get_base_context(request)
     context.update({
-        "page_title":"dPoW Notarisations (last 200)",
-        "notarised_24hrs":notarised_24hrs
+        "page_title":"dPoW Notarisations (last 200)"
     })
     return render(request, 'views/ntx/notarised_24hrs.html', context)
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import os
+import sys
 import time
 from decimal import *
 from datetime import datetime as dt
@@ -7,10 +9,13 @@ from lib_const import *
 from decorators import *
 from models import mined_row, daily_mined_count_row, season_mined_count_row
 from lib_query import *
+import lib_api as api
+import lib_validate
 import lib_helper
 
+script_path = os.path.abspath(os.path.dirname(sys.argv[0]))
 
-def get_mined_row(block_height, coin="KMD"):
+def get_mined_row(block_height, coin="KMD", prices=dict):
     row = mined_row()
     blockinfo = RPC[coin].getblock(str(block_height), 2)
 
@@ -29,12 +34,19 @@ def get_mined_row(block_height, coin="KMD"):
                 row.txid = tx['txid']
                 row.diff = blockinfo['difficulty']
                 row.value = Decimal(tx['vout'][0]['value'])
+
+                season = lib_validate.get_season(row.block_time)
+                date = f"{dt.fromtimestamp(row.block_time)}".split(" ")[0]
+                if date in prices[season]:
+                    row.usd_price = Decimal(prices[season][date]['usd'])
+                    row.btc_price = Decimal(prices[season][date]['btc'])
+
                 break
     return row
 
 
-def update_mined_row(block_height, coin="KMD"):
-    row = get_mined_row(block_height, coin)
+def update_mined_row(block_height, coin="KMD", prices=dict):
+    row = get_mined_row(block_height, coin, prices)
     if row.address not in ['', 'N/A']:
         row.update()
 
@@ -54,12 +66,26 @@ def update_mined_table(season, coin="KMD", start_block=None):
     logger.info(f"[update_mined_table] {len(unrecorded_blocks)} not in mined table in db")
     logger.info(f"[update_mined_table] {len(rescan_blocks)} blocks to scan")
 
+    try:
+        with open(f"{script_path}/prices_history.json", "r") as j:
+            prices = json.load(j)
+    except Exception as e:
+        print(e)
+        prices = {}
+
     for block in rescan_blocks:
-        update_mined_row(block)
+        update_mined_row(block, "KMD", prices)
 
 
 @print_runtime
 def update_mined_count_daily_table(season, rescan=None):
+
+    try:
+        with open(f"{script_path}/prices_history.json", "r") as j:
+            prices = json.load(j)
+    except Exception as e:
+        print(e)
+        prices = {}
 
     season_notaries = SEASONS_INFO[season]["notaries"]
     season_start_dt = dt.fromtimestamp(SEASONS_INFO[season]["start_time"])
@@ -72,8 +98,20 @@ def update_mined_count_daily_table(season, rescan=None):
         start = end - datetime.timedelta(days=30)
 
     logger.info(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
+    print(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
 
     while start <= end:
+
+        if f"{start}" not in prices[season] or start >= end - delta:
+            prices[season].update({f"{start}":{}})
+            logger.info(f"Updating [kmd_price] for {start}")
+            date = f"{start}".split("-")
+            date.reverse()
+            date = "-".join(date)
+            api_prices = api.get_kmd_price(date)
+            prices[season][f"{start}"].update(api_prices)
+            time.sleep(1)
+
         logger.info(f"[process_mined_aggregates] Aggregating daily mined counts for {start}")
         results = get_mined_date_aggregates(start)
 
@@ -99,7 +137,10 @@ def update_mined_count_daily_table(season, rescan=None):
             row.update()
 
         start += delta
+
     logger.info("[process_mined_aggregates] Finished!")
+    with open(f"{script_path}/prices_history.json", "w+") as j:
+        json.dump(prices, j, indent=4)
 
 
 @print_runtime
