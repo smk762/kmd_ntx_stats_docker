@@ -38,7 +38,8 @@
             }
 
             input, select {
-                background-color:#172331 !important;
+                /*background-color:#172331 !important;*/
+                background-color:#000000 !important;
                 border: solid 1px #303030 !important;
                 color: #aeaeae;
                 text-align: center;
@@ -336,7 +337,6 @@
                 border-radius: 0.25rem;
             }
 
-
             .notary_card, .coin_card {
                 background-color: #111 !important;
                 border: solid 1px #303030 !important;
@@ -354,6 +354,14 @@
                 background-color: #05081a !important;
                 border: solid 1px #3cddd4aa !important;
                 box-shadow: none !important;
+                filter: grayscale(0%);
+            }
+
+            .mute_on_hover {
+                filter: grayscale(80%);
+            }
+
+            .mute_on_hover:hover {
                 filter: grayscale(0%);
             }
 
@@ -699,7 +707,7 @@
                 border-left: solid 1px #182331 !important;
                 border-right: solid 1px #182331 !important;
                 border-bottom: solid 1px #182331 !important;
-                background-color:#182331;
+                background-color:#182e50;
                 color: #41EAD4 !important;
                 border-radius: 0.5em;
             }
@@ -719,6 +727,18 @@
                 border-radius: 0.5em;
             }
             .btn-dark4:hover {
+                background-color: #11253e !important;
+                color: #41EAD4 !important;
+                border: solid #3cddd4aa 1px !important;
+                text-decoration: none;
+            }
+            .btn-dark5 {
+                background-color: #182e50;
+                border: solid 1px #303030 !important;
+                color: #9ee1d9 !important;
+                border-radius: 0.5em;
+            }
+            .btn-dark5:hover {
                 background-color: #11253e !important;
                 color: #41EAD4 !important;
                 border: solid #3cddd4aa 1px !important;
@@ -930,5 +950,19 @@
             .col-sm-12 {
                 padding: 0px;
             }
+
+
+            .tbl_title {
+                text-align: left;
+            }
+            .dataTables_filter {
+                -ms-flex: 0 0 50%;
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+            .api_link {
+                padding-top: 0.85em;
+            }
+
 
         </style>

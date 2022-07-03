@@ -2,12 +2,11 @@ import requests
 from django.db.models import Count, Min, Max, Sum
 from datetime import datetime, timezone
 import datetime as dt
-from kmd_ntx_api.endpoints import ENDPOINTS
 from kmd_ntx_api.notary_pubkeys import get_notary_pubkeys
-from kmd_ntx_api.pages import PAGES
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
+import kmd_ntx_api.lib_ntx as ntx
 import kmd_ntx_api.lib_dexstats as dexstats
 import kmd_ntx_api.serializers as serializers
 
@@ -44,7 +43,7 @@ def get_coin_ntx_summary(season, coin):
                     coin_ntx_last[0]['kmd_ntx_blocktime']
                 )[1]
         coin_ntx_summary.update({
-            'ntx_24hr_count': get_notarised_data_24hr(season, server, coin).count(),
+            'ntx_24hr_count': ntx.get_notarised_date(season, server, coin, None, True).count(),
             'last_ntx_time': coin_ntx_last[0]['kmd_ntx_blocktime'],
             'time_since_ntx': time_since_last_ntx,
             'last_ntx_txid': coin_ntx_last[0]['kmd_ntx_txid'],
@@ -134,11 +133,6 @@ def get_funding_totals(funding_data):
 def get_seed_stat_season(season, notary=None):
      return query.get_seed_version_data(season, notary).values('name').annotate(sum_score=Sum('score'))
 
-
-
-def get_notarised_data_24hr(season=None, server=None, coin=None, notary=None):
-    day_ago = int(time.time()) - SINCE_INTERVALS['day']
-    return query.get_notarised_data(season, server, None, coin, notary).filter(block_time__gt=str(day_ago))
 
 
 def get_dpow_coins_list(season=None, server=None, epoch=None):
@@ -324,40 +318,6 @@ def get_epoch_coins_dict(season):
                 }
             })
     return epoch_coins_dict
-
-
-
-### V2 for API/INFO
-def get_api_index(request):
-    category = helper.get_or_none(request, "category")
-    sidebar = helper.get_or_none(request, "sidebar")
-
-    resp = []
-    for endpoint in ENDPOINTS:
-        endpoint_category = ENDPOINTS[endpoint]["category"]
-        sidebar_status = ENDPOINTS[endpoint]["sidebar"]
-        if (not category or category == endpoint_category) and (not sidebar or sidebar == sidebar_status):
-            item = {"url": f"{THIS_SERVER}/api/{endpoint}"}
-            item.update(ENDPOINTS[endpoint])
-            resp.append(item)
-
-    return resp
-
-
-def get_pages_index(request):
-    category = helper.get_or_none(request, "category")
-    sidebar = helper.get_or_none(request, "sidebar")
-
-    resp = []
-    for page in PAGES:
-        page_category = PAGES[page]["category"]
-        sidebar_status = PAGES[page]["sidebar"]
-        if (not category or category == page_category) and (not sidebar or sidebar == sidebar_status):
-            item = {"url": f"{THIS_SERVER}/{page}"}
-            item.update(PAGES[page])
-            resp.append(item)
-
-    return resp
 
 
 def get_balances(request):
@@ -704,19 +664,6 @@ def get_notarised_count_daily(request):
     }
 
 
-def get_notarised_txid(request):
-    txid = helper.get_or_none(request, "txid")
-
-    if not txid:
-        return {
-            "error": "You need to specify the following filter parameter: ['txid']"
-        }
-    data = query.get_notarised_data(None, None, None, None, None, None, txid)
-    data = data.values()
-
-    serializer = serializers.notarisedSerializer(data, many=True)
-
-    return serializer.data
 
 
 def get_notarised_coins(request):
@@ -855,30 +802,6 @@ def get_notary_ltc_transactions(request):
 
     return api_resp
 
-
-def get_notarisation_txid_list(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
-    epoch = helper.get_or_none(request, "epoch")
-    coin = helper.get_or_none(request, "coin")
-    notary = helper.get_or_none(request, "notary")
-
-    if coin in ["BTC", "LTC", "KMD"]:
-        server = coin
-
-    if not season or not server or not coin:
-        return {
-            "error": "You need to specify the following filter parameters: ['season', 'server', 'coin']"
-        }
-
-    data = query.get_notarised_data(season, server, epoch, coin, notary).values('txid')
-
-    resp = []
-    for item in data:
-        resp.append(item["txid"])
-
-    resp = list(set(resp))
-    return resp
 
 
 def get_notary_btc_txid(request):

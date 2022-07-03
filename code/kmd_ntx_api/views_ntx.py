@@ -6,6 +6,7 @@ from django.shortcuts import render
 
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_ntx as ntx
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_stats as stats
 import kmd_ntx_api.lib_graph as graph
@@ -20,14 +21,11 @@ def notary_coin_ntx_detail_view(request):
     coin = helper.get_or_none(request, "coin")
     server = helper.get_or_none(request, "server")
 
-    url = f"{THIS_SERVER}/api/table/notary_ntx"
-    coin_ntx_table = requests.get(f"{url}/?season={season}&server={server}&notary={notary}&coin={coin}").json()['results']
-
     context.update({
         "page_title":"Notary Profile Index",
         "notary":notary,
-        "coin":coin,
-        "coin_ntx": coin_ntx_table
+        "server":server,
+        "coin":coin
     })
 
     return render(request, 'views/ntx/notary_coin_ntx_detail.html', context)
@@ -81,7 +79,7 @@ def notary_profile_view(request, notary=None):
                     "third_party_server_count": ntx_season_data['third_party_server_count'],
                 })
 
-                notarised_data_24hr = info.get_notarised_data_24hr(season, None, None, notary)
+                notarised_data_24hr = ntx.get_notarised_date(season, None, None, notary, True)
                 context.update({
                     "master_notarised_24hr": notarised_data_24hr.filter(server='KMD').count(),
                     "main_notarised_24hr": notarised_data_24hr.filter(server='Main').count(),
@@ -94,39 +92,81 @@ def notary_profile_view(request, notary=None):
                 context.update({
                     "rank": rank,
                 })
-
+                buttons = ["ntx", "ntx_24hr", "balances", "mining", "last_coin_ntx"]
+                button_params = {
+                    "ntx": {
+                        "action": f"show_card('ntx', {buttons})",
+                        "width_pct": 17,
+                        "text": "Notarisations"
+                    },
+                    "ntx_24hr": {
+                        "action": f"show_card('ntx_24hr', {buttons})",
+                        "width_pct": 17,
+                        "text": "Notarisations (24hrs)"
+                    },
+                    "balances": {
+                        "action": f"show_card('balances', {buttons})",
+                        "width_pct": 17,
+                        "text": "Addresses"
+                    },
+                    "mining": {
+                        "action": f"show_card('mining', {buttons})",
+                        "width_pct": 17,
+                        "text": "Mining"
+                    },
+                    "last_coin_ntx": {
+                        "action": f"show_card('last_coin_ntx', {buttons})",
+                        "width_pct": 17,
+                        "text": "Last Coin Ntx"
+                    }
+                }
                 context.update({
                     "page_title": f"{notary} Notary Profile",
                     "notary": notary,
+                    "buttons": button_params,
                     "notary_clean": notary.replace("_", " "),
                     "nn_social": info.get_nn_social_info(request), # Social Media Links
                     "mining_summary": mining.get_nn_mining_summary(notary), #  Mining Summary
-                    "notary_balances": table.get_balances_table(request, notary), # Balances in table format
-                    "notary_ntx_24hr": table.get_notary_ntx_24hr_table_data(request, notary), # Balances in table format
                 })
 
                 return render(request, 'views/ntx/notary_profile.html', context)
 
+    buttons = ["AR", "EU", "NA", "SH", "DEV"]
+    button_params = {
+        "AR": {
+            "action": f"show_card('AR', {buttons})",
+            "width_pct": 19,
+            "text": "Asia & Russia"
+        },
+        "EU": {
+            "action": f"show_card('EU', {buttons})",
+            "width_pct": 19,
+            "text": "Europe"
+        },
+        "NA": {
+            "action": f"show_card('NA', {buttons})",
+            "width_pct": 19,
+            "text": "North America"
+        },
+        "SH": {
+            "action": f"show_card('SH', {buttons})",
+            "width_pct": 19,
+            "text": "Southern Hemisphere"
+        },
+        "DEV": {
+            "action": f"show_card('DEV', {buttons})",
+            "width_pct": 19,
+            "text": "Developers"
+        }
+    }
+
     context.update({
+        "buttons": button_params,
         "nn_social": info.get_nn_social_info(request),
         "nn_regions": helper.get_regions_info(season)
     })
 
     return render(request, 'views/ntx/notary_profile_index.html', context)
-
-
-def notary_mining_view(request, notary=None):
-    season = helper.get_page_season(request)
-    context = helper.get_base_context(request)
-    if not notary:
-        return render(request, 'dash_index.html', context)
-
-    context.update({
-        "page_title": f"{notary} Notary KMD Mining",
-        "notary_mining":query.get_mined_data(None, notary).values().order_by('block_height'),
-    })
-
-    return render(request, 'views/ntx/notary_mining.html', context)
 
 
 def ntx_scoreboard(request):
@@ -191,16 +231,10 @@ def notary_epoch_scores_view(request):
     return render(request, 'views/ntx/notary_epoch_scores_view.html', context)
 
 
-def notarised_24hrs(request):
-    season = helper.get_page_season(request)
-    notarised_24hrs = info.get_notarised_data_24hr(season)
-    notarised_24hrs = notarised_24hrs.order_by('-block_time').values()[:200]
-    
+def notarised_24hrs(request):    
     context = helper.get_base_context(request)
     context.update({
-        "page_title":"dPoW Notarisations (last 200)",
-        "notarised_24hrs":notarised_24hrs,
-        "explorers":info.get_explorers(request)
+        "page_title":"dPoW Notarisations (last 200)"
     })
     return render(request, 'views/ntx/notarised_24hrs.html', context)
 

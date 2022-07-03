@@ -6,6 +6,7 @@ import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_struct as struct
 import kmd_ntx_api.lib_mining as mining
+import kmd_ntx_api.lib_ntx as ntx
 from django.db.models import Count, Min, Max, Sum
 
     
@@ -96,7 +97,7 @@ def get_daily_stats_sorted(season=None, coins_dict=None):
         if notary not in nn_mined_last_24hrs:
             nn_mined_last_24hrs.update({notary:0})
 
-    ntx_24hr = info.get_notarised_data_24hr().values()   
+    ntx_24hr = ntx.get_notarised_date().values()
     for notary_name in notary_list:
         notary_ntx_24hr_summary = info.get_notary_ntx_24hr_summary(ntx_24hr, notary_name, season, coins_dict)
         region = helper.get_notary_region(notary_name)

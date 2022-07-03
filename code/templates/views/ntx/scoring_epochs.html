@@ -5,6 +5,8 @@
 		<div class="card table_card floating-card m-0">
 			<div class="card-header table_card_title floating-card">
 				<h2>dPoW Scoring Epochs</h2>
+				<h6>Note: Score for KMD to LTC/BTC notarisations are 0.0325 each</h6>
+
 				<div class="d-flex justify-content-around align-items-center">
 					<span id="Season_5_btn" class="btn btn-dark4 py-1 px-4 m-1" style="width: 33%;" onclick="update_season('Season_5')">
 						Season 5
@@ -19,10 +21,9 @@
 			<div class="card-body table_card_body p-0 m-auto" style="font-size: 1.1em">
 				{% include 'components/tables/scoring_epochs_table.html' %}
 			</div>
-			<div class="card-footer table_card_body flex">
-				<div><i>Note: Score for KMD to LTC/BTC notarisations are 0.0325 each</i></div>
-				<div id="scoring_epochs_api_link"></div>
-			</div>
+		    <div class="card-footer mb-3">
+		        <div id="scoring_epochs_api_link" class="col-4 m-auto"></div>
+		    </div>
 		</div>
 	</div>
 {% endblock %}

@@ -6,8 +6,6 @@ from datetime import datetime as dt
 from django.shortcuts import render
 from django.db.models import Sum
 from kmd_ntx_api.lib_const import *
-from kmd_ntx_api.pages import *
-from kmd_ntx_api.endpoints import *
 
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_mining as mining
@@ -185,17 +183,6 @@ def funding(request):
     })
     return render(request, 'funding.html', context)
 
-
-def sitemap(request):
-
-    context = helper.get_base_context(request)
-    context.update({
-        "page_title":f"Sitemap",
-        "endpoints":ENDPOINTS,
-        "pages":PAGES
-    })
-
-    return render(request, 'sitemap.html', context)
 
 
 def test_component(request):

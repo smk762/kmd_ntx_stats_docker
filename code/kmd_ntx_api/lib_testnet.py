@@ -2,6 +2,7 @@
 from django.db.models import Sum, Max, Count
 from datetime import datetime, timezone
 from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.lib_ntx as ntx
 import kmd_ntx_api.lib_info as info
 import kmd_ntx_api.lib_dexstats as dexstats
 import kmd_ntx_api.lib_query as query
@@ -19,7 +20,7 @@ def get_testnet_scoreboard(request):
         'coin', '-block_height').values()
 
     # Prepare 24hr ntx data
-    ntx_data_24hr = info.get_notarised_data_24hr(
+    ntx_data_24hr = ntx.get_notarised_date(
         season).order_by('coin', '-block_height').values()
 
     testnet_coins = ["RICK", "MORTY"]

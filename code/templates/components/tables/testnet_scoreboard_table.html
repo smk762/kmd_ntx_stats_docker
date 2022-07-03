@@ -158,6 +158,8 @@
             $('#average_24hr').html(average_24hr);
         })
 
+        tables_refresh_rate(30, '.countdown', [Testnet_table, Testnet_table_24hr])
+
         timer_increment = 30
         setInterval( function () {
             timer_increment -= 1

@@ -198,8 +198,18 @@ def get_sidebar_links(season):
 def get_base_context(request):
     print("getting context")
     season = get_page_season(request)
+    server = get_or_none(request, "server")
+    epoch = get_or_none(request, "epoch")
+    coin = get_or_none(request, "coin")
+    notary = get_or_none(request, "notary")
     context = {
         "season": season,
+        "server": server,
+        "epoch": epoch,
+        "coin": coin,
+        "notary": notary,
+        "regions": ["AR", "EU", "NA", "SH", "DEV"],
+        "notary_clean": get_notary_clean(notary),
         "season_clean": season.replace("_"," "),
         "explorers": get_explorers(), 
         "coin_icons": get_coin_icons(),
@@ -211,9 +221,15 @@ def get_base_context(request):
         "nav_data": NAV_DATA,
         "eco_data_link": get_eco_data_link()
     }
-    print("got context")
     return context
 
+def get_notary_clean(notary):
+    if notary:
+        notary_split = notary.split("_")
+        notary = notary_split[0].title()
+        if len(notary_split) > 1:
+            notary = notary + " " + notary_split[1]
+    return notary
 
 def get_coin_icons(season=None):
     url = f"{THIS_SERVER}/api/info/coin_icons"
@@ -303,18 +319,15 @@ def get_season(time_stamp=None):
         time_stamp = int(time.time())
     for season in SEASONS_INFO:
         if season.find("Testnet") == -1:
-            if season in SEASONS_INFO:
-                if POSTSEASON:
-                    if 'post_season_end_time' in SEASONS_INFO[season]:
-                        end_time = SEASONS_INFO[season]['post_season_end_time']
-                    else:
-                        end_time = SEASONS_INFO[season]['end_time']
+            if POSTSEASON:
+                if 'post_season_end_time' in SEASONS_INFO[season]:
+                    end_time = SEASONS_INFO[season]['post_season_end_time']
                 else:
                     end_time = SEASONS_INFO[season]['end_time']
-                if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= end_time:
-                    return season
             else:
-                logger.warning(f"[get_season] unrecognised season (not in SEASONS_INFO): {season}")
+                end_time = SEASONS_INFO[season]['end_time']
+            if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= end_time:
+                return season
         else:
             logger.warning(f"[get_season] ignoring season: {season}")
     return "Unofficial"

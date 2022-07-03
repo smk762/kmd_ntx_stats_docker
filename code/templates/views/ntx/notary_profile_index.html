@@ -2,7 +2,11 @@
 {% load static %}
 {% block content %}
 	<h2 class="m-auto kmd_ui_light3">{{ season_clean }} Notary Node Profiles</h2>
-    {% include "components/anchors/regions.html" %}
+
+	{% for button, params in buttons.items %}
+		{% include "components/buttons/action_button.html" with action=params.action width_pct=params.width_pct text=params.text btn_id=button active="AR" %}
+	{% endfor %}
+
 	{% for region, info in nn_regions.items %}
 		{% if region == 'AR' %}
 			<div id="{{region}}" class="section-anchor">

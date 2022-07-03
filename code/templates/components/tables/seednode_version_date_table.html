@@ -1,16 +1,34 @@
-    <table id="mm2_day_version_tbl" class="table table-striped table-bordered" style="width:100%;">
-        <thead>
-            <tr>
-                <th data-data="Notary">Notary</th>
-                {% for i in day_headers %}
-                    {% if i != 'Total' and i != 'Notary' and i != 'proposal' %}
-                        <th data-data="{{ i }}" class="hour_cell px-0">{{ i }}</th>    
-                    {% endif %}
-                {% endfor %}
-                <th data-data="Total">Total</th>
-            </tr>
-        </thead>
-    </table>
+<div id="last_24hrs">
+    <div class="card-header pb-0">
+        <div class="d-flex justify-content-around">
+            <div><i class="fas fa-times-circle" style="color: #373f48;"></i> Not Found</div>
+            <div><i class="fas fa-check-circle" style="color: #377c43;"></i> Operational</div>
+            <div><i class="fas fa-times-circle" style="color: #039bd7;"></i> WSS Failing</div>
+            <div><i class="fas fa-times-circle" style="color: #8842ab;"></i> Wrong Version</div>
+            <div><i class="fas fa-times-circle" style="color: #895050;"></i> Other Error</div>
+            <div><i class="fa-solid fa-hourglass" style="color: #373f48;"></i> Future</div>
+        </div>
+    </div>
+    <div class="card-body table_card_body pb-0 px-3" style="overflow-x: auto;">
+        <table id="mm2_day_version_tbl" class="table table-striped table-bordered" style="width:100%;">
+            <thead>
+                <tr>
+                    <th data-data="Notary">Notary</th>
+                    {% for i in day_headers %}
+                        {% if i != 'Total' and i != 'Notary' and i != 'proposal' %}
+                            <th data-data="{{ i }}" class="hour_cell px-0">{{ i }}</th>    
+                        {% endif %}
+                    {% endfor %}
+                    <th data-data="Total">Total</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="card-footer mb-3">
+        <div id="date_api_link" class="col-4 m-auto"></div>
+    </div>
+</div>
+
     <script>
         $(document).ready(function() {
             var start = parseInt(Math.floor($('#day_date_ts').val())/1000) + 86400
@@ -18,12 +36,11 @@
             var end = start + 86400
 
             let params = "?start="+start+"&end="+end+"&season={{ season }}"
-            let endpoint = "{% url 'seednode_version_date_table_api' %}"+params
-            $("#date_api_link").html('<i>Link to API data: <a href="'+endpoint+'">'+endpoint+'</a></i>')
+            let url = "{% url 'seednode_version_date_table_api' %}"+params
 
             day_seed_table = $('#mm2_day_version_tbl').DataTable({
                 ajax: {
-                    url: endpoint,
+                    url: url,
                     dataSrc: 'table_data',
                     "deferRender": true
                 },
@@ -86,8 +103,9 @@
                         targets: '_all'
                     }
                 ],
-                // Custom DataTables search filter input styling 
-                "initComplete": function (settings, json) {
+                fnInitComplete: function(){
+                    let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="seednode_date" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+                    $('#date_api_link').html(api_btn);
                 }
             });
             var maxDate = new Date()
@@ -102,9 +120,10 @@
                     start = Math.floor(start/86400)*86400
                     end = start + 86400
                     let params = "?start="+start+"&end="+end+"&season={{ season }}"
-                    let endpoint = "{% url 'seednode_version_date_table_api' %}"+params
-                    $("#date_api_link").html('<i>Link to API data: <a href="'+endpoint+'">'+endpoint+'</a></i>')
-                    day_seed_table.ajax.url(endpoint).load();
+                    let url = "{% url 'seednode_version_date_table_api' %}"+params
+                    day_seed_table.ajax.url(url).load();
+                    let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="seednode_date" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+                    $('#date_api_link').html(api_btn);
                 }
             });
         });

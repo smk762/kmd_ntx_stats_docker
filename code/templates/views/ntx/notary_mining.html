@@ -2,88 +2,99 @@
 {% load static %}
 {% block content %}
 <!--
-	Loads slow, not in sidebar, table too wide.
-
+# TODO: Add Date Form to restrict results returned. merge with "last 24hrs?"
+Use API directly with ajax, apply standard table dom layout etc
+All link to the page on notary profile page
  -->
-	<div class="row col-12 m-auto">
-		<div class="card table_card floating-card m-0">
-			<div class="card-header table_card_title">
-				{{ notary }} {{ page_title }}
-			</div>
-			<div class="card-body table_card_body">
-				<table style="visibility: hidden;" id="notary_mining_tbl" class="table table-striped table-bordered">
-					<thead>
-						<tr>
-							<th data-data="block_height">BLOCK HEIGHT</th>
-							<th data-data="value">VALUE</th>
-							<th data-data="txid">TXID</th>
-							<th data-data="block_time">Blocktime</th>
-						</tr>
-					</thead>
-					<tbody>
-					{% for row in notary_mining %}
-						<tr>
-							<td data-data="block_height">{{ row.block_height }}</td>
-							<td data-data="value">{{ row.value }}</td>
-							<td data-data="txid">{{ row.txid }}</td>
-							<td data-data="block_time">{{ row.block_time }}</td>
-						</tr>
-					{% endfor %}
-					</tbody>
-				</table>
-			</div>
-		</div>
+<div class="text-center" id="loading-spinner" style="height: 100%">
+	<div class="spinner-border m-10" role="status">
 	</div>
-	<script>
-	    $(document).ready(function() {
-	    	$('#notary_mining_tbl').css('visibility', 'visible');
-	        $('#notary_mining_tbl').DataTable({
-				deferRender: true,
-	        	"paging": false,
-	        	"searching": false,
-	        	"info": false,
-                "orderClasses": false,
-			    buttons: [
-			        {
-			            extend: 'csv',
-			            text: 'Export CSV',
-			            exportOptions: {
-			                modifier: {
-			                    search: 'none'
-			                }
-			            }
+	<div class="m-3">Loading {{ notary_clean }} {{ season_clean }} Mining Data...</div>
+</div>
+<div class="card table_card floating-card m-0" id="notary_mining_card" style="visibility: hidden;">
+	<div class="card-body table_card_body">
+		<table id="notary_mining_tbl" class="table table-striped table-bordered">
+			<thead>
+				<tr>
+					<th data-data="block_height">Block Height</th>
+					<th data-data="value">KMD Mined</th>
+					<th data-data="price_usd">USD Value</th>
+					<th data-data="txid">Transaction ID</th>
+					<th data-data="block_time">Block Time</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div>
+
+<script>
+    $(document).ready(function() {
+	    let url = "/api/mining/notary_mining?notary={{ notary }}&season={{ season }}"
+        $('#notary_mining_tbl').DataTable({
+     		ajax: {
+			    url: url,
+    			dataSrc: 'results',
+    			"deferRender": true
+			},
+            "orderClasses": false,
+		    buttons: [
+		        {
+		            extend: 'csv',
+		            text: 'Export CSV',
+		            exportOptions: {
+		                modifier: {
+		                    search: 'none'
+		                }
+		            }
+		        }
+		    ],
+    		order: [[ 0, 'desc' ]],
+    		"columnDefs": [
+    			{
+		            "data": 'block_height',
+		            "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(get_block_url("KMD", oData.block_height))
 			        }
-			    ],
-        		order: [[ 0, 'desc' ]],
-        		"columnDefs": [
-        			{
-			            "data": 'block_height',
-			            "targets": 0,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(get_block_url(oData.coin, oData.block_height))
-				        }
-			        },
-        			{
-			            "data": 'value',
-			            "targets": 1,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html(get_txid_url(oData.coin, oData.txid));
-				        }
-			        },
-        			{
-			            "data": 'txid',
-			            "targets": 2,
-				            $(nTd).html(get_txid_url(oData.coin, oData.txid));
-			        },
-        			{
-			            "data": 'block_time',
-			            "targets": 3,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(get_time_since(oData.block_time));
-				        }
+		        },
+    			{
+		            "data": 'value',
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(oData.value+" KMD");
 			        }
-			    ]
-	        });
-	    });
-	</script>
+		        },
+    			{
+		            "data": 'usd_price',
+		            "targets": 2,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html("$USD " + Math.round(oData.usd_price * oData.value * 100)/100);
+			        }
+		        },
+    			{
+		            "data": 'txid',
+		            "targets": 3,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(get_txid_url("KMD", oData.txid));
+			        }
+		        },
+    			{
+		            "data": 'block_time',
+		            "targets": 4,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(get_time_since(oData.block_time));
+			        }
+		        }
+		    ],
+    		dom: '<"row mx-0 mt-3 "<"notary_mining_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"notary_mining_api_link">ip>',
+	        fnInitComplete: function(){
+    			$('#loading-spinner').css('display', 'none');
+    			$('#notary_mining_card').css('visibility', 'visible');
+	            $('.notary_mining_title').html('<h4 class="text-left">{{ notary_clean }} {{ season_clean }} {{ page_title }}</h4>');
+	            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="notary_mining" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+	            $('.notary_mining_api_link').html(api_btn);
+	        }
+        });
+    });
+</script>
 {% endblock %}

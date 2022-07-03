@@ -25,6 +25,10 @@ def get_notarised_txid_url(txid, local=True):
     return f"{api_server}/api/info/notarised_txid/?txid={txid}"
 
 
+def get_kmd_price_url(date):
+    return f"https://api.coingecko.com/api/v3/coins/komodo/history?date={date}"
+
+
 def get_coins_info_url(local=True):
     api_server = get_api_server(local)
     return f"{api_server}/api/info/coins/"

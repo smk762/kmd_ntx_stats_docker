@@ -1,11 +1,13 @@
-<div class="row" id="ntx_24hr">	
+<div class="text-center" id="last_coin_ntx-loading-spinner" style="height: 100%">
+	<div class="spinner-border m-10" role="status">
+	</div>
+	<div class="m-3">Loading {{ notary_clean }} Last Coin Notarisations...</div>
+</div>
+<div class="row" id="last_coin_ntx">	
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card floating-card">
-			<div class="card-header table_card_title floating-card">
-				{{ notary_clean }} Last {{ season_clean }} Coin Notarisation
-			</div>
+		<div class="card table_card floating-card" id="last_coin_ntx_card" style="visibility: hidden;">
 			<div class="card-body table_card_body">
-				<table id="notary_last_coin_ntx_tbl" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
+				<table id="last_coin_ntx_tbl" class="table table-striped table-bordered" style="width:100%;">
 					<thead>
 						<tr>
 							<th data-data="coin" class="px-4 py-2">Coin</th>
@@ -24,18 +26,16 @@
 </div>
 	<script>
     $(document).ready(function() {
-    	$('#notary_last_coin_ntx_tbl').css('visibility', 'visible');
-        $('#notary_last_coin_ntx_tbl').DataTable({
+	    let url = "{% url 'notaryLastNtxViewSet-list' %}?format=datatables&notary={{ notary }}&season={{ season }}"
+        $('#last_coin_ntx_tbl').DataTable({
      		ajax: {
                 "serverSide": true,
-			    url: "{% url 'notaryLastNtxViewSet-list' %}?format=datatables&notary={{ notary }}&season={{ season }}",
+			    url: url,
+    			dataSrc: 'data',
     			"deferRender": true
 			},
     		order: [[ 2, 'desc' ]],
-			deferRender: true,
         	"paging": false,
-        	"searching": false,
-        	"info": false,
             "orderClasses": false,
         	"columns": [
 		        { "data": "coin" },
@@ -97,7 +97,15 @@
 	            		$(nTd).html(get_time_since(oData.kmd_ntx_blocktime));
 			        }
 		        }
-    		]
+    		],
+    		dom: '<"row mx-0 mt-3 "<"last_coin_ntx_tbl_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"last_coin_ntx_api_link">ip>',
+	        fnInitComplete: function(){
+		    	$('#last_coin_ntx-loading-spinner').css('display', 'none');
+		    	$('#last_coin_ntx_card').css('visibility', 'visible');
+	           	$('.last_coin_ntx_tbl_title').html('<h3 class="">{{ notary_clean }} Last {{ season_clean }} Coin Notarisation</h3>');
+	            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="last_coin_ntx" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+	            $('.last_coin_ntx_api_link').html(api_btn);
+	        }
         });
     });
 

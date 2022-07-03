@@ -5,7 +5,7 @@ import json
 import time
 from lib_const import *
 from lib_github import *
-from lib_urls import get_dpow_active_coins_url
+from lib_urls import get_dpow_active_coins_url, get_kmd_price_url
 
 
 def api_sleep_or_exit(resp, exit=None):
@@ -26,6 +26,10 @@ def api_sleep_or_exit(resp, exit=None):
     else:
         return True
 
+def get_kmd_price(date):
+    url = get_kmd_price_url(date)
+    return requests.get(url).json()["market_data"]["current_price"]
+  
 
 def get_ac_block_info():
     ac_block_info = {}

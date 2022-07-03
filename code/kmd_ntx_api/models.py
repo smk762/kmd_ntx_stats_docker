@@ -218,6 +218,8 @@ class mined(models.Model):
     txid = models.CharField(max_length=64)
     diff = models.FloatField(default=0)
     season = models.CharField(max_length=34)
+    usd_price = models.DecimalField(max_digits=18, decimal_places=8, default=0)
+    btc_price = models.DecimalField(max_digits=18, decimal_places=8, default=0)
 
     class Meta:
         db_table = 'mined'

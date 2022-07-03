@@ -17,29 +17,26 @@
 	}
 
 	function show_region(region) {
-		const options = ["#AR", "#EU", "#NA", "#SH", "#DEV"];
-		options.forEach(function (i) {
-			if (i == region) {
-				$(i).fadeTo(1000, 1)
-				$(i+"_btn").addClass('btn-selected')
+		const options = ["AR", "EU", "NA", "SH", "DEV"];
+		show_card(region, options)
+	}
+
+	function show_card(card_id, cards_list) {
+		cards_list.forEach(function (i) {
+			if (i == card_id) {
+				$("#"+i).fadeTo(1000, 1)
+				$("#"+i+"_btn").addClass('btn-selected')
 			}
 			else {
-				$(i).css('display', 'none')	
-				$(i+"_btn").removeClass('btn-selected')
+				$("#"+i).css('display', 'none')	
+				$("#"+i+"_btn").removeClass('btn-selected')
 			}
 		});
 	}
 
 	function show_season(season) {
 		const options = ["Season_4", "Season_5", "Season_6"];
-		options.forEach(function (i) {
-			if (i == season) {
-				$('#'+i+"_btn").addClass('btn-selected')
-			}
-			else {
-				$('#'+i+"_btn").removeClass('btn-selected')
-			}
-		});
+		show_card(season, options)
 	}
 
     function update_tabledata(table, endpoint, params)
@@ -48,10 +45,23 @@
 		table.ajax.url(new_url).load();
 	}
 
-	function get_coin_icons_from_list(coins_list) {
+	function get_param_join(url) {
+    	if (url.search("\\?") > -1) return "&"
+		return "?"
+	}
+
+	function get_coin_icons_from_list(coins_list, base_url='', active_coin='') {
+		url = ''
     	let coin_icons = ''
+    	let param_join = get_param_join(url)
     	for (let coin of coins_list) {
-    		coin_icons += get_coin_icon_only(coin)
+			if (base_url != '') {
+				url = base_url + param_join + 'coin=' + coin
+			}
+			if (coin == active_coin) {
+				coin_icons += get_coin_icon_only(coin, url, size=48, "m-2")
+			}
+			coin_icons += get_coin_icon_only(coin, url, size=24, "m-1 mute_on_hover")
     	}
         return coin_icons
 	}
@@ -71,10 +81,14 @@
 				if (i == '#month') {
 					$("#month_selection").show()
 					$("#date_selection").hide()
+					$("#month_title").show()
+					$("#date_title").hide()
 				}
 				if (i == '#last_24hrs') {
 					$("#month_selection").hide()
 					$("#date_selection").show()
+					$("#month_title").hide()
+					$("#date_title").show()
 				}
 			}
 			else {
@@ -138,12 +152,12 @@
 	    return timesince
 	}
 
-	function get_notaries_symbol(season, notaries, txid) {
+	function get_notaries_symbol(notaries, txid) {
 		let tooltip_html = ""
 		for (let notary of notaries) {
 			tooltip_html += notary+"\n"
 		}
-		return "<a href='{% url 'notarisedViewSet-list' %}?txid="+txid+"'><span class='badge p-0' style='border-radius: 50%;' data-bs-toggle='tooltip'\
+		return "<a href='{% url 'notarisedViewSet-list' %}?txid="+txid+"'><span class='' style='font-size: 0.7em' data-bs-toggle='tooltip'\
 					data-bs-placement='top' title=' "+tooltip_html+"'>\
 		<i class='fa fa-users' style='font-size:1.5em;'></i>\
 		</span></a>";
@@ -164,15 +178,17 @@
 	}
 
 
-	function get_coin_icon_only(coin, url) {
+	function get_coin_icon_only(coin, url='', size=18, img_class="m-1") {
 		if (dpow_coins.includes(coin)) {
-			url = "/coin_profile/" + coin
+			if (url == '') {
+				url = "/coin_profile/" + coin
+			}
 		}
     	if (coin_icons.hasOwnProperty(coin)) {
-        	return "<span class='' style='' data-toggle='tooltip' data-placement='top' title='"+coin+"'><a href='"+url+"'><img height='18px' class='m-1' src='"+coin_icons[coin]+"' /></a></span>";
+        	return "<span class='' style='' data-toggle='tooltip' data-placement='top' title='"+coin+"'><a href='"+url+"'><img height='"+size+"px' class='"+img_class+"' src='"+coin_icons[coin]+"' /></a></span>";
         }
         else {
-        	return "<span class='' style='' data-toggle='tooltip' data-placement='top' title='"+coin+"'><a href='"+url+"'><img height='18px' class='m-1' src='/static/img/notary/icon/blank.png' /></a></span>"
+        	return "<span class='' style='' data-toggle='tooltip' data-placement='top' title='"+coin+"'><a href='"+url+"'><img height='"+size+"px' class='"+img_class+"' src='/static/img/notary/icon/blank.png' /></a></span>"
         }		
 	}
 
@@ -219,6 +235,82 @@
 	    else {
     		return "<span>"+label+"</span>";	
     	}
+	}
+
+	function get_region_scoreboard_table(season, region, url, title='') {
+	    table = $('#'+region+'_notarisations').DataTable({
+	    	"paging": false,
+	        "orderClasses": false,
+			order: [[ 0, 'asc' ]],
+	    	"columns": [
+		        { "data": "rank" },
+		        { "data": "notary" },
+		        { "data": "master" },
+		        { "data": "main" },
+		        { "data": "third_party" },	
+		        { "data": "seed" },	
+		        { "data": "mining" },
+		        { "data": "score" }
+		    ],
+			"columnDefs": [
+				{ className: "text-left text-nowrap", "targets": [ 1 ] },
+				{ className: "text-right text-nowrap", "targets": [ 2,3,4,5,6,7 ] },
+				{
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(get_notary_url(season, oData.notary));
+			        }
+		        },
+				{
+		            "targets": 7,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html(Math.round(oData.score*100, 2)/100);
+			        }
+		        }
+			],
+			dom: '<"row mx-0 mt-3 "<"'+region+'_scoreboard_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"'+region+'_scoreboard_api_link">ip>',
+			fnInitComplete: function(){
+				// $('#loading-spinner').css('display', 'none');
+				// $('#notary_mining_card').css('visibility', 'visible');
+	            $('.'+region+'_scoreboard_title').html('<h5 class="text-left">'+title+'</h5>');
+	            if (url != '') {
+	    	        let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="notary_mining" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+		            $('.'+region+'_scoreboard_api_link').html(api_btn);
+		        }
+			}
+	    });
+
+	    // TODO: review highlights here
+	    var max = table.column(6).data()[0]
+	    table.rows().every( function (index) {
+	    	var row = table.row(index);
+		    var d = row.data();
+		    if (d.score > max/3) {
+		    	row.nodes().to$().addClass( 'kmd_secondary_purple' );
+		    }
+		});
+	    highlight_notaries(table)
+		return table
+	}
+
+	function make_graph(graphtype, url, id) {
+	    $.ajax({ 
+			method: "GET", 
+			url: '//{{ request.get_host }}/api/graph_json/balances/?coin={{ coin }}', 
+			success: function(data) { 
+				//document.getElementById('graph_title').innerHTML = data.chartLabel;
+				if (graphtype == 'line') {
+					drawLineGraph(data, 'myChartline');
+				}
+				else if (graphtype == 'bar') {
+					drawBarGraph(data, 'myChartBar');
+				}
+				console.log("drawing "+id+" graph");
+			}, 
+			error: function(error_data) { 
+				console.log(error_data); 
+			} 
+	    }) 
 	}
 
 	function get_block_url(coin, blockheight, extra_class) {
@@ -551,11 +643,43 @@
 		return Math.round(sum / totals.length * dp) / dp
 	}
 
-function get_qrcode(id, text, title, subtitle) {
-	$(id).html('')
-	jQuery(id).qrcode({foreground:"#070e28", background:"#b1d1d3", "text":text});
-	$('#qrcode-modal-label').html(title)
-	$('#qrcode-modal-subtitle').html(subtitle)
-}
+	function get_qrcode(id, text, title, subtitle) {
+		$(id).html('')
+		jQuery(id).qrcode({foreground:"#070e28", background:"#b1d1d3", "text":text});
+		$('#qrcode-modal-label').html(title)
+		$('#qrcode-modal-subtitle').html(subtitle)
+	}
 
+    // Custom DataTables search filter input styling
+    function update_dt_search(id) {
+        filter_div = '<div class="col-6 input-group-prepend px-0 ml-auto"><span class="input-group-text col-4">Search: </span><input type="search" class="col-8 ml-0 mr-3 form-control form-control-sm" placeholder="" aria-controls="'+id+'"></div>'
+        $("#"+id+"_filter").html(filter_div)
+        $("#"+id+"_filter").on("keyup", 'input', function() {
+            $("#"+id).DataTable().search(this.value.trim(), false, false).draw();
+        });
+    }
+
+    function update_dt_length(id) {
+
+        custom_select = '<div class="col-6 input-group-prepend px-0 mr-auto"><span class="input-group-text col-4">Show </span><select id="tbl_select" name="'+id+'_length" aria-controls="'+id+'" class="custom-select custom-select-sm form-control form-control-sm"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select><span class="input-group-text std-append col-4"> Rows</span></div>'
+        $("#"+id+"_length").html(custom_select)
+        $("#"+id).DataTable().page.len(50).draw();
+        $("#tbl_select").on("change", function() {
+            $("#"+id).DataTable().page.len(parseInt(this.value)).draw();
+        });
+    }
+
+    function tables_refresh_rate(seconds, countdown, tables) {
+        let timer_increment = seconds
+        setInterval( function () {
+            timer_increment -= 1
+            $(countdown).html(timer_increment)
+            if (timer_increment == 0) {
+            	for (let table of tables) {
+					table.ajax.reload();
+				}
+				timer_increment = seconds
+             }
+        }, 1000 );
+    }
 </script>

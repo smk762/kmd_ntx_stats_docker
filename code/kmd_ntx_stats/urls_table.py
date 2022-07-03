@@ -31,30 +31,10 @@ api_table_urls = [
     path('api/table/mined_count_season/',
           api_table.mined_count_season_table,
           name='mined_count_season_table'),
-
-    path('api/table/notary_ntx/',
-          api_table.notary_ntx_table,
-          name='notary_ntx_table'),
-    
-    path('api/table/notary_epoch_coin_notarised/',
-          api_table.notary_epoch_coin_notarised_table,
-          name='notary_epoch_coin_notarised_table'), 
-
-    path('api/table/notary_coin_notarised/',
-          api_table.notary_coin_notarised_table,
-          name='notary_coin_notarised_table'),
-    
-    path('api/table/coin_notarised_24hrs/',
-          api_table.coin_notarised_24hrs_table,
-          name='coin_notarised_24hrs_table'),
     
     path('api/table/notarised/',
           api_table.notarised_table,
           name='notarised_table'),
-
-    path('api/table/notarised_24hrs/',
-          api_table.notarised_24hrs_table,
-          name='notarised_24hrs_table'),
 
     path('api/table/coin_ntx_season/',
           api_table.coin_ntx_season_table,

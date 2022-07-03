@@ -2,9 +2,6 @@
 <div class="row" id="">
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
 		<div class="card table_card floating-card m-0">
-			<div class="card-header table_card_title floating-card">
-				<h2>{{ page_title }}</h2>
-			</div>
 			<div class="card-body table_card_body">
 				<table id="last_mined_table" class="table table-striped table-bordered" style="width:100%; font-size: 1.15em;">
 					<thead>
@@ -24,10 +21,10 @@
 
 <script>
     $(document).ready(function() {
-    	last_mined_table = $('#last_mined_table').DataTable({	
-        
+	    let url = "{% url 'notary_last_mined_table' %}"
+    	last_mined_table = $('#last_mined_table').DataTable({        
     		ajax: {
-			    url: "{% url 'notary_last_mined_table' %}",
+			    url: url,
     			dataSrc: 'results',
     			"deferRender": true
 			},
@@ -38,8 +35,6 @@
 				}
 			},
         	"paging": false,
-        	"searching": false,
-        	"info": false,
             "orderClasses": false,
     		order: [[ 2, 'desc' ]],
         	"columns": [
@@ -76,7 +71,13 @@
 		            	
 		            }
 		        }
-		    ]
+		    ],
+    		dom: '<"row mx-0 mt-3 "<"last_mined_tbl_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"last_mined_api_link">ip>',
+	        fnInitComplete: function(){
+	            $('.last_mined_tbl_title').html('<h3 class="">{{ page_title }}</h3>');
+	            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="mining_24hr" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+	            $('.last_mined_api_link').html(api_btn);
+	        }
         });
 
 		last_mined_table.on( 'xhr', function () {

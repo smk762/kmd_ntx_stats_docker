@@ -1,5 +1,6 @@
 from django.urls import path
 from kmd_ntx_api import views_ntx
+from kmd_ntx_api import api_ntx
 
 frontend_ntx_urls = [
     path('notary_profile/',
@@ -13,10 +14,6 @@ frontend_ntx_urls = [
     path('notary_profile/<str:notary>/',
           views_ntx.notary_profile_view,
           name='notary_profile_view'),
-
-    path('notary_mining/<str:notary>/',
-          views_ntx.notary_mining_view,
-          name='notary_mining_view'),
 
     path('ntx_scoreboard/',
           views_ntx.ntx_scoreboard,
@@ -41,4 +38,22 @@ frontend_ntx_urls = [
     path('notarised_24hrs/',
           views_ntx.notarised_24hrs,
           name='notarised_24hrs_view'),
+]
+
+api_ntx_urls = [
+    path('api/ntx/notarised_date/',
+          api_ntx.notarised_date_api,
+          name='notarised_date_api'),
+
+    path('api/ntx/season_stats/',
+          api_ntx.season_stats_sorted_api,
+          name='season_stats_sorted_api'),
+
+    path('api/ntx/24hr_stats/',
+          api_ntx.daily_stats_sorted_api,
+          name='daily_stats_sorted_api'),
+
+    path('api/ntx/notarised_tenure/',
+          api_ntx.ntx_tenture_api,
+          name='ntx_tenture_api'),
 ]

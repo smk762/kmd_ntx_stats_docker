@@ -13,6 +13,7 @@ Tables updated:
     - mined_count_season
 '''
 
+
 @print_runtime
 def run_updates(seasons):
     for season in seasons:
@@ -26,7 +27,7 @@ def run_updates(seasons):
         update_mined_count_season_table(season)
 
 if __name__ == "__main__":
-
+        
     seasons = [CURRENT_SEASON]
     if len(sys.argv) > 1:
         if sys.argv[1] == "rescan":

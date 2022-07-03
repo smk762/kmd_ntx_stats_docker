@@ -1,10 +1,7 @@
 <div class="row col-12 m-auto" id="addresses">
 	<div class="card table_card floating-card">
-		<div class="card-header table_card_title flex floating-card">
-			{{ season_clean }} {{ coin }} Addresses & Balances
-		</div>
 		<div class="card-body table_card_body">
-			<table id="balances_table" class="table table-striped table-bordered" style="width:100%; visibility: hidden;" data-ajax="{% url 'balancesViewSet-list' %}?format=datatables&coin={{ coin }}&season={{ season }}">
+			<table id="balances_table" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
 				<thead>
 					<tr>
 						<th data-data="coin">Coin</th>
@@ -13,7 +10,7 @@
 						<th data-data="server">Server</th>
 						<th data-data="address">Address</th>
 						<th data-data="balance">Balance</th>
-						<th data-data="update">Since Updated</th>
+						<th data-data="update_time">Since Updated</th>
 					</tr>
 				</thead>
 			</table>
@@ -24,11 +21,23 @@
 <script>
     $(document).ready(function() {
     	$('#balances_table').css('visibility', 'visible');
+    	let balances_url = "{% url 'balancesViewSet-list' %}?format=datatables&coin={{ coin }}&season={{ season }}"
         $('#balances_table').DataTable({
+     		ajax: {
+			    url: balances_url,
+    			dataSrc: 'data',
+    			"deferRender": true
+			},
+        	"columns": [
+		        { "data": "coin" },
+		        { "data": "notary" },
+		        { "data": "season" },
+		        { "data": "server" },
+		        { "data": "address" },
+		        { "data": "balance" },
+		        { "data": "update_time" }
+		    ], 
         	"paging": false,
-        	"searching": false,
-        	"info": false,
-			deferRender: true,
             "orderClasses": false,
     		order: [[ 0, 'asc' ], [ 1, 'asc' ], [ 3, 'asc' ], [ 4, 'asc' ]],
     		"columnDefs": [
@@ -87,7 +96,14 @@
 		            	$(nTd).html(get_time_since(oData.update_time));
 			        }
 		        }
-    		]
+    		],
+    		dom: '<"row mx-0 mt-3 "<"balances_tbl_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"balances_api_link">ip>',
+	        fnInitComplete: function(){
+	           $('.balances_tbl_title').html('<h3 class="">{{ season_clean }} {{ coin }} Addresses & Balances</h3>');
+    			let balances_url = "{% url 'balancesViewSet-list' %}?format=datatables&coin={{ coin }}&season={{ season }}"
+		        let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="coin_balances" width_pct="100" btn_url="'+balances_url+'" btn_text="Source Data" %}'
+		        $('.balances_api_link').html(api_btn);
+	        }
         });
     });
 </script>

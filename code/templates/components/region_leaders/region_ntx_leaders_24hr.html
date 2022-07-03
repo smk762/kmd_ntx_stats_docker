@@ -3,7 +3,7 @@
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card text-center kmd_ui_light3 col-12" style="border:none !important; background-color: #101721 !important; box-shadow: none; margin-top:0 !important;">
 		    	<h2>Top Region Notarisation Scores (Last 24hrs)</h2>
-			    <div class="justify-content-between align-items-center">
+			    <div class="m-auto">
 					{% for region, region_data in daily_stats_sorted.items %}
 						{% for item in region_data %}
 							{% if item.rank == 1 %}

@@ -12,6 +12,7 @@ import kmd_ntx_api.lib_graph as graph
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_mining as mining
 import kmd_ntx_api.lib_table as table
+import kmd_ntx_api.lib_wallet as wallet
 
 
 def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY PROFILE
@@ -34,7 +35,7 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
             if coin in coins_data:
                 coins_data = coins_data[coin]
 
-            coin_balances = table.get_balances_table(request, None, coin)
+            coin_balances = wallet.get_balances_rows(request, None, coin)
             max_tick = 0
             for item in coin_balances:
                 if float(item['balance']) > max_tick:
@@ -69,10 +70,24 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
 
             return render(request, 'views/coin/coin_profile.html', context)
 
+    buttons = ["Main", "Third_Party"]
+    button_params = {
+        "Main": {
+            "action": f"show_card('Main', {buttons})",
+            "width_pct": 19,
+            "text": "Main"
+        },
+        "Third_Party": {
+            "action": f"show_card('Third_Party', {buttons})",
+            "width_pct": 19,
+            "text": "Third Party"
+        }
+    }
     coins_dict = helper.get_dpow_server_coins_dict(season)
     coins_dict["Main"] += ["KMD", "LTC"]
     coins_dict["Main"].sort()
     context.update({ 
+        "buttons": button_params,
         "coin_social": info.get_coin_social_info(request),
         "server_coins": coins_dict
     })
@@ -80,21 +95,9 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
 
 
 def notarised_tenure_view(request):
-    tenure_data = query.get_notarised_tenure_data().values()
-    for item in tenure_data:
-        start_time = item["official_start_block_time"]
-        end_time = item["official_end_block_time"]
-        now = time.time()
-        if end_time > now:
-            end_time = now
-        ntx_days = (end_time - start_time) / 86400
-        item.update({
-            "ntx_days": ntx_days
-        })
     context = helper.get_base_context(request)
     context.update({
-        "page_title":f"Coin Notarisation Tenure",
-        "tenure_data":tenure_data
+        "page_title":f"Coin Notarisation Tenure"
     })
     return render(request, 'views/ntx/notarised_tenure.html', context)
 

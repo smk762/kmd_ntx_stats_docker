@@ -24,9 +24,9 @@ NAV_DATA = {
             "icon": "",
             "url": "/coins_last_ntx"
         },
-        "Last 200 Notarisations": {
+        "Notarisations Last 24hrs": {
             "icon": "",
-            "url": "/notarised_24hrs"
+            "url": "/notarised_24hrs/?coin=RICK"
         },
         "Coin dPoW Tenure": {
             "icon": "",
@@ -161,7 +161,12 @@ NAV_DATA = {
         "Decker's Wallet Cleaner Script": {
             "icon": "",
             "url": "https://github.com/DeckerSU/komodo_scripts/blob/master/resend_funds.sh"
+        },
+        "Shossain's Wallet Cleaner Notes": {
+            "icon": "",
+            "url": "https://techloverhd.com/2020/07/how-to-send-komodo-or-any-smart-chain-funds-from-your-address-without-rescanning-the-wallet/"
         }
+
     },
     "AtomicDEX": {
         "Activation": {

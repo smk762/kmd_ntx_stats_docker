@@ -27,10 +27,6 @@ frontend_page_urls = [
           views_page.funds_sent,
           name='funds_sent'),
 
-    path('sitemap/',
-          views_page.sitemap,
-          name='sitemap'),
-
     path('test_component/',
           views_page.test_component,
           name='test_component'),

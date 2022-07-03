@@ -88,10 +88,6 @@ api_info_urls = [
           api_info.notarised_count_daily_info,
           name='notarised_count_daily_info'),
 
-    path('api/info/notarised_txid/',
-          api_info.notarised_txid,
-          name='notarised_txid'),
-
     path('api/info/notary_icons/',
           api_info.notary_icons_info,
           name='notary_icons_info'),

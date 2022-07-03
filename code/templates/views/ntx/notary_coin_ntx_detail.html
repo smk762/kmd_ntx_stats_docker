@@ -5,9 +5,6 @@
 	<div class="row my-3">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card shadow-none">
-				<div class="card-header flex">
-					<h4>{{ season_clean }} {{ notary }} {{ coin }} Notarisations</h4>
-				</div>
 				<div class="card-body">
 					<table id="ntx_table" class="table table-striped table-bordered">
 						<thead>
@@ -19,17 +16,6 @@
 								<th data-data="score_value">Score</th>
 							</tr>
 						</thead>
-						<tbody>
-							{% for item in coin_ntx %}
-								<tr>
-									<td data-data="txid" style="font-size: 0.9em;">{{ item.txid }}</td>
-									<td data-data="ac_ntx_height">{{ item.ac_ntx_height }}</td>
-									<td data-data="block_height">{{ item.block_height }}</td>
-									<td data-data="block_time" style="font-size: 0.9em;">{{ item.block_time }}</td>
-									<td data-data="score_value">{{ item.score_value }}</td>
-								</tr>
-							{% endfor %}
-						</tbody>
 					</table>
 				</div>
 			</div>	
@@ -38,9 +24,14 @@
 
   	<script>  
 	    $(document).ready(function() {
+	    	let url = "/api/table/notary_ntx/?season={{ season }}&server={{ server }}&notary={{ notary }}&coin={{ coin }}"
 	        var ntxTable = $('#ntx_table').DataTable({
-        		order: [[ 3, 'desc' ]], 
-    			deferRender: true,
+	     		ajax: {
+				    url: url,
+	    			dataSrc: 'results',
+	    			"deferRender": true
+				},
+        		order: [[ 3, 'desc' ]],
                 "orderClasses": false,
     			"paging": true,
 	        	"columns": [
@@ -49,7 +40,7 @@
 			        { "data": "block_height" },
 			        { "data": "block_time" },
 			        { "data": "score_value" }
-			    ], 
+			    ],
         		"columnDefs": [
         			{
 			            "data": 'txid',
@@ -86,7 +77,13 @@
 			            	$(nTd).html(oData.score_value);
 				        }
 			        },
-        		]
+        		],
+	    		dom: '<"row mx-0 mt-3 "<"ntx_detail_tbl_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"ntx_detail_api_link">ip>',
+		        fnInitComplete: function(){
+		           $('.ntx_detail_tbl_title').html('<h3 class="text-left">{{ season_clean }} {{ notary }} {{ coin }} Notarisations</h3>');
+		            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="ntx_deatail" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+		            $('.ntx_detail_api_link').html(api_btn);
+		        }
 	        });
 	    });
   </script> 

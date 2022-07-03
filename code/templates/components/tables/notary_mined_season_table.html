@@ -1,80 +1,104 @@
-<div class="row" id="addresses">
+<!-- TODO: Add season menu buttons, and notary icon selection row (which updates woth the season).  -->
+<div class="text-center" id="mining-loading-spinner" style="height: 100%">
+	<div class="spinner-border m-10" role="status">
+	</div>
+	<div class="m-3">Loading {{ notary_clean }} Mining...</div>
+</div>
+<div class="row" id="mining">	
 	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card">
-			<div class="card-header table_card_title">
-				{{ notary_clean }} Last 200 mined blocks
-			</div>
+		<div class="card table_card floating-card m-auto col-12" id="mining_card" style="visibility: hidden;">
 			<div class="card-body table_card_body">
-				<table id="mining_table" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
+				<table id="mining_table" class="table table-striped table-bordered" style="width:100%;">
 					<thead>
 						<tr>
-							<th data-data="block_height">BLOCK HEIGHT</th>
-							<th data-data="name">MINED BY</th>
-							<th data-data="address" style="display: none">ADDRESS</th>
-							<th data-data="value">VALUE</th>
-							<th data-data="txid" style="display: none">TXID</th>
-							<th data-data="block_time">LAST MINED</th>
+							<th data-data="block_height">Block Height</th>
+							<th data-data="name">Mined by</th>
+							<th data-data="address" style="display: none">Address</th>
+							<th data-data="value">Value</th>
+							<th data-data="price_usd">USD Value</th>
+							<th data-data="txid">Txid</th>
+							<th data-data="block_time">Last Mined</th>
 						</tr>
 					</thead>
 				</table>
 			</div>
-		</div>	
+		</div>
 	</div>
 </div>
 <script>  
     $(document).ready(function() {
+	    let url = "{% url 'minedViewSet-list' %}?format=datatables&name={{ notary }}&season={{ season }}"
     	$('#mining_table').css('visibility', 'visible');
         var balTable = $('#mining_table').DataTable({
      		ajax: {
                 "serverSide": true,
-			    url: "{% url 'minedViewSet-list' %}?format=datatables&name={{ notary }}&season={{ season }}",
+			    url: url,
+	    		dataSrc: 'data',
     			"deferRender": true
 			},
             "orderClasses": false,
-        	"paging": false,
-        	"searching": false,
-        	"info": false,
     		"order": [ 0, 'desc' ],
     		"columnDefs": [
-        			{
-			            "data": 'block_height',
-			            "targets": 0,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(get_block_url("KMD", oData.block_height))
-				        }
-			        },
-        			{
-			            "data": 'name',
-			            "targets": 1,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='https://komodod.com/a/"+oData.address+"'>"+oData.name+"</a>");
-				        }
-			        },
-        			{
-			            "data": 'address',
-			            "targets": 2,
-		                "visible": false
-			        },
-        			{
-			            "data": 'value',
-			            "targets": 3,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				            $(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.value+"</a>");
-				        }
-			        },
-        			{
-			            "data": 'txid',
-			            "targets": 4,
-		                "visible": false
-			        },
-        			{
-			            "data": 'block_time',
-			            "targets": 5,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(get_time_since(oData.block_time));
-				        }
+				{ className: "fw-14pct", "targets": [ 0, 1, 3, 4, 5 ] },
+    			{ className: "text-right text-nowrap fw-14pct", "targets": [ 6 ] },
+    			{
+		            "data": 'block_height',
+		            "targets": 0,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(get_block_url("KMD", oData.block_height))
 			        }
-    		]
+		        },
+    			{
+		            "data": 'name',
+		            "targets": 1,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html("<a href='https://komodod.com/a/"+oData.address+"'>"+oData.name+"</a>");
+			        }
+		        },
+    			{
+		            "data": 'address',
+		            "targets": 2,
+	                "visible": false
+		        },
+    			{
+		            "data": 'value',
+		            "targets": 3,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.value+"</a>");
+			        }
+		        },
+    			{
+		            "data": 'usd_price',
+		            "targets": 4,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            $(nTd).html("$" + Math.round(oData.usd_price * oData.value*100, 2)/100 + " USD");
+			        }
+		        },
+    			{
+		            "data": 'txid',
+		            "targets": 5,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+						$(nTd).html(get_txid_url("KMD", oData.txid))
+			        }
+		        },
+    			{
+		            "data": 'block_time',
+		            "targets": 6,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(get_time_since(oData.block_time));
+			        }
+		        }
+    		],
+    		dom: '<"row mx-0 mt-3 "<"mining_tbl_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"mining_api_link">ip>',
+	        fnInitComplete: function(){
+    			$('#mining-loading-spinner').css('display', 'none');
+    			$('#mining_card').css('visibility', 'visible');
+    			let title_notary =  '{{ notary }}'.replace('None', '').replace('_', ' ')
+    			let title = '<h3 class="text-left">'+title_notary+' Mined</h3>'
+	            $('.mining_tbl_title').html(title);
+	            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="mining" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+	            $('.mining_api_link').html(api_btn);
+	        }
         });
     });
 </script>

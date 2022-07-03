@@ -1,6 +1,6 @@
 
 {% load mathfilters %}
-	<table id="epochs_tbl" class="table table-striped table-bordered">
+	<table id="epochs_tbl" class="table table-striped table-bordered" style="width:100%;">
 		<thead>
 			<tr>
 				<th data-data="season">Season</th>
@@ -20,12 +20,13 @@
 	<script>
 	    $(document).ready(function() {
             let params = "?season={{ season }}"
-            let endpoint = "{% url 'scoring_epochs_table' %}"+params
-            $("#scoring_epochs_api_link").html('<i>Link to API data: <a href="'+endpoint+'">'+endpoint+'</a></i>')
+            let url = "{% url 'scoring_epochs_table' %}"+params
+            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="scoring_epochs" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+            $('#scoring_epochs_api_link').html(api_btn);
 
 	        epochs_table = $('#epochs_tbl').DataTable({
                 ajax: {
-                    url: endpoint,
+                    url: url,
                     dataSrc: 'results',
                     "deferRender": true
                 },
@@ -121,10 +122,11 @@
 
 
 		function update_season(season) {
-			let endpoint = '{% url 'scoring_epochs_table' %}'
+			let url = '{% url 'scoring_epochs_table' %}'
 			let params = '?season='+season
-			update_tabledata(epochs_table, endpoint, params)
+			update_tabledata(epochs_table, url, params)
 			show_season(season)
-        	$("#scoring_epochs_api_link").html('<i>Link to API data: <a href="'+endpoint+params+'">'+endpoint+params+'</a></i>')
+            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="scoring_epochs" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+            $('#scoring_epochs_api_link').html(api_btn);
 		}
 	</script>

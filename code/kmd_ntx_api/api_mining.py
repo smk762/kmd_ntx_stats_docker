@@ -8,10 +8,25 @@ import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.serializers as serializers
 
 
+
 def mined_count_daily_by_name(request):
     resp = mining.get_mined_count_daily_by_name(request)
     filters = ['mined_date']
     return helper.json_resp(resp, filters)
+
+
+def notary_mining_api(request):
+    resp = mining.get_notary_mining(request)
+    filters = ['notary, season']
+    return helper.json_resp(resp, filters)
+
+
+def mining_24hrs_api(request):
+    season = helper.get_page_season(request)
+    notary_list = helper.get_notary_list(season)
+    resp = mining.get_mined_data_24hr().values()
+    serializer = serializers.minedSerializer(resp, many=True)
+    return helper.json_resp(serializer.data)
 
 
 def mined_count_season_by_name(request):

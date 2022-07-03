@@ -1,12 +1,20 @@
-	<div class="d-flex justify-content-around align-items-center">
-		
+
+	<h3 id="month_title" style="display: none;">{{ month_title }}</h3>
+	<h3 id="date_title">{{ date_title }}</h3>
+	{% if seednodes %}
+	<h6>Times are in UTC. The current active mm2 version: <a href="https://github.com/KomodoPlatform/atomicDEX-API/commit/{{ active_version }}">{{ active_version }}</a></h6>
+	{% endif %}
+	<div class="d-flex justify-content-around align-items-center" style="font-size: 0.6em;">
 
 		{% if day_btn and month_btn %}
+
 			{% include "components/buttons/show_button.html" with btn_text="24 Hours" btn_url="#last_24hrs" width_pct="19" btn_id='last_24hrs' toggle_category='timespan' extra_class='btn-selected' %}
 			{% include 'components/form/date_selection.html' %}
 			{% include 'components/form/month_selection.html' with hide='true' %}
 			{% include "components/buttons/show_button.html" with btn_text="Month" btn_url="#month" width_pct="19" btn_id='month' toggle_category='timespan' %}
+
 		{% else %}
+
 			{% if season_btn %}
 				{% include "components/buttons/show_button.html" with btn_text="Season" btn_url="#season" width_pct="19" btn_id='season' extra_class='btn-selected' toggle_category='timespan' %}
 			{% endif %}
@@ -24,6 +32,7 @@
 			{% elif day_btn %}
 				{% include "components/buttons/show_button.html" with btn_text="24 Hours" btn_url="#last_24hrs" width_pct="19" btn_id='last_24hrs' toggle_category='timespan' %}
 			{% endif %}
+
 		{% endif %}
 
 

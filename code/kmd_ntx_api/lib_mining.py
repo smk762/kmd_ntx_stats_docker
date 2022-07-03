@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import time
+import random
 from django.db.models import Sum, Max
 from kmd_ntx_api.lib_const import *
+import kmd_ntx_api.serializers as serializers
 from kmd_ntx_api.notary_pubkeys import NOTARY_PUBKEYS
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
@@ -22,6 +24,18 @@ def get_mined_count_season_by_name(request):
                 if k not in ["name", "season", "id"]:
                     resp[i["name"]].update({k:v})            
     return resp
+
+def get_notary_mining(request):
+    notary = helper.get_or_none(request, "notary")
+    season = helper.get_or_none(request, "season", SEASON)
+
+    if not notary:
+        notary_list = helper.get_notary_list(season)
+        notary = random.choice(notary_list)
+
+    data = query.get_mined_data(season, notary).values().order_by('block_height')
+    serializer = serializers.minedSerializer(data, many=True)
+    return serializer.data
 
 
 def get_mined_count_daily_by_name(request):
