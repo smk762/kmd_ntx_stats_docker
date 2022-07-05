@@ -13,6 +13,24 @@ def get_source_addresses(request):
     return query.get_addresses_data(season, server, coin, notary)
 
 
+def get_addresses_rows(request):
+    filters = ["season", "server", "notary", "coin"]
+    data = query.get_addresses_data()
+    distinct = query.get_distinct_filters(data, filters)
+    print(distinct)
+    data = helper.apply_filters_api(
+        request, serializers.addressesSerializer, data
+    ).values()
+    serializer = serializers.addressesSerializer(data, many=True)
+    count = data.count()
+    return {
+        "filters": filters,
+        "count": count,
+        "distinct": distinct,
+        "results": serializer.data,
+    }
+
+
 def get_source_balances(request):
     season = helper.get_or_none(request, "season")
     server = helper.get_or_none(request, "server")

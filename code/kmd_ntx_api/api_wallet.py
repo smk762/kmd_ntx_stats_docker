@@ -2,6 +2,7 @@
 from django.http import JsonResponse
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_wallet as wallet
+import kmd_ntx_api.lib_helper as helper
 
 # Season > Server > Notary > Coin
 
@@ -123,3 +124,7 @@ def coin_balances_wallet(request):
         })
 
     return JsonResponse(resp)
+
+def addresses_table_api(request):
+    data = wallet.get_addresses_rows(request)
+    return helper.json_resp(data)
