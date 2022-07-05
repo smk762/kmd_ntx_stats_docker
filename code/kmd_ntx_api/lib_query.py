@@ -16,6 +16,16 @@ import kmd_ntx_api.lib_helper as helper
 load_dotenv()
 
 
+def get_distinct_filters(queryset, filters=list):
+    distinct = {}
+    for x in filters:
+        y = list(queryset.values_list(x, flat=True).distinct())
+        y.sort()
+        distinct.update({x: y})
+    return distinct
+
+
+
 def get_seednode_version_stats_data(start, end, notary=None):
     data = seednode_version_stats.objects.filter(timestamp__range=(start, end-1))
     if notary: data = data.filter(name=notary)

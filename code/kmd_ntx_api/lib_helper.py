@@ -79,6 +79,12 @@ def json_resp(resp, filters=None, params=None):
     if has_error(resp):
         data.update({"error": resp["error"]})
 
+    if "filters" in resp:
+        data.update({"filters": resp["filters"]})
+        
+    if "distinct" in resp:
+        data.update({"distinct": resp["distinct"]})
+
     if "next" in resp:
         data.update({"next": resp["next"]})
 
