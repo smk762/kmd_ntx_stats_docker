@@ -37,9 +37,11 @@ def get_mined_row(block_height, coin="KMD", prices=dict):
 
                 season = lib_validate.get_season(row.block_time)
                 date = f"{dt.fromtimestamp(row.block_time)}".split(" ")[0]
-                if date in prices[season]:
-                    row.usd_price = Decimal(prices[season][date]['usd'])
-                    row.btc_price = Decimal(prices[season][date]['btc'])
+
+                if season in prices:
+                    if date in prices[season]:
+                        row.usd_price = Decimal(prices[season][date]['usd'])
+                        row.btc_price = Decimal(prices[season][date]['btc'])
 
                 break
     return row
