@@ -103,16 +103,16 @@ def update_mined_count_daily_table(season, rescan=None):
     print(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
 
     while start <= end:
-
-        if f"{start}" not in prices[season] or start >= end - delta:
-            prices[season].update({f"{start}":{}})
-            logger.info(f"Updating [kmd_price] for {start}")
-            date = f"{start}".split("-")
-            date.reverse()
-            date = "-".join(date)
-            api_prices = api.get_kmd_price(date)
-            prices[season][f"{start}"].update(api_prices)
-            time.sleep(1)
+        if season in prices:
+            if f"{start}" not in prices[season] or start >= end - delta:
+                prices[season].update({f"{start}":{}})
+                logger.info(f"Updating [kmd_price] for {start}")
+                date = f"{start}".split("-")
+                date.reverse()
+                date = "-".join(date)
+                api_prices = api.get_kmd_price(date)
+                prices[season][f"{start}"].update(api_prices)
+                time.sleep(1)
 
         logger.info(f"[process_mined_aggregates] Aggregating daily mined counts for {start}")
         results = get_mined_date_aggregates(start)
