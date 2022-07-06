@@ -726,15 +726,16 @@ class mined_row():
                 logger.warning(f"No value for {item}!")
                 return False
 
-        if self.name in SEASONS_INFO[self.season]["notaries"]:
-            if self.address != SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]:
-                logger.warning(f'{self.address} not in SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]')
-                for season in SEASONS_INFO:
-                    if season.find("Testnet") == -1:
-                        if "Main" in SEASONS_INFO[season]["servers"]:
-                            if self.address in SEASONS_INFO[season]["servers"]["Main"]["addresses"]["KMD"]:
-                                self.season = season
-                                return True
+        if self.season in SEASONS_INFO:
+            if self.name in SEASONS_INFO[self.season]["notaries"]:
+                if self.address != SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]:
+                    logger.warning(f'{self.address} not in SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]')
+                    for season in SEASONS_INFO:
+                        if season.find("Testnet") == -1:
+                            if "Main" in SEASONS_INFO[season]["servers"]:
+                                if self.address in SEASONS_INFO[season]["servers"]["Main"]["addresses"]["KMD"]:
+                                    self.season = season
+                                    return True
         return True
 
     def update(self):
