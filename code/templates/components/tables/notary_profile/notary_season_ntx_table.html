@@ -113,8 +113,8 @@
 	        fnInitComplete: function(){
 		    	$('#ntx-loading-spinner').css('display', 'none');
 		    	$('#season_ntx_card').css('visibility', 'visible');
-	            $('.season_ntx_tbl_title').html('<h4 class="">{{ notary_clean }} {{ season_clean }} NTX Summary</h3>');
-	            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="mining_24hr" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+	            $('.season_ntx_tbl_title').html('<h4 class="">{{ notary_clean }} NTX Summary</h3>');
+	            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="season_ntx" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
 	            $('.season_ntx_api_link').html(api_btn);
 
 	        }

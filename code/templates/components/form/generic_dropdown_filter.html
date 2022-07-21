@@ -1,0 +1,11 @@
+
+{% load coin_filter %}
+		<div class="p-2 m-1 col-2 btn-dark4" style="min-width: 130px; max-width: 130px;">
+			<label for="{{ table }}-{{ filter }}-input" class="form-label m-0">
+				{{ filter|title|clean_underscore }}
+			</label>
+			<select class="form-select col-12" aria-label="{{ table }}-{{ filter }}-input" id="{{ table }}-{{ filter }}-input" onchange="refresh_table('{{ table }}', '{{ endpoint }}', {{ filters }}, {{ required }})">
+			</select>
+		</div>
+
+

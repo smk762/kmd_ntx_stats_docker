@@ -1,13 +1,13 @@
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
-import kmd_ntx_api.lib_stats as stats
+import kmd_ntx_api.lib_atomicdex as dex
 
 
 def get_balances_graph_data(request, notary=None, coin=None):
 
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
+    season = helper.get_page_season(request)
+    server = helper.get_page_server(request)
     coin = helper.get_or_none(request, "coin", coin)
     notary = helper.get_or_none(request, "notary", notary)
 
@@ -103,7 +103,7 @@ def get_daily_ntx_graph_data(request):
     filter_kwargs = {}
 
     notarised_date = helper.get_or_none(request, "notarised_date")
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     coin = helper.get_or_none(request, "coin")
     notary = helper.get_or_none(request, "notary")
 
@@ -181,7 +181,7 @@ def get_daily_ntx_graph_data(request):
 
 def get_mm2gui_piechart(request):
     stats_type = ["swap_total", "swap_pct", "pubkey_total"]
-    swaps_gui_stats = stats.get_swaps_gui_stats(request)
+    swaps_gui_stats = dex.get_swaps_gui_stats(request)
     stats = {
         "taker": swaps_gui_stats["taker"],
         "maker": swaps_gui_stats["maker"]
@@ -194,8 +194,13 @@ def get_mm2gui_piechart(request):
             total = 0
             axis_labels = []
 
-            for category in helper.keys_to_list(stats[side]):
+            for category in stats[side]:
                 if category not in stats_type:
+                    print("-----------------------")
+                    print(side)
+                    print(category)
+                    print(x)
+                    print(stats[side][category][x])
                     data.append(stats[side][category][x])
                     axis_labels.append(f"{category}")
                     total += stats[side][category][x]

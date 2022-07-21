@@ -324,73 +324,13 @@
 							</div>');
 		}
 
-		function floorRound (num, num_dec) {
-		    var dp = parseInt("1" + "0".repeat(num_dec));
-		    num = parseFloat(num)
-			num = Math.floor(num * dp);
-		    return num / dp;
-		}
 
-		function get_fees(coin='KMD', size=80, sat_per_byte=10) {
-			return 0.0001
-		}
-
-		function get_unallocated(address_rows) {
-			sum_selected = floorRound(parseFloat($("#sum_selected").html()), 5)
-			sum_outputs = get_sum_outputs(address_rows)
-			fees = get_fees()
-			unallocated = sum_selected - sum_outputs - fees
-			return unallocated
-		}
-
-		function spendMax(id) {
-			unallocated = get_unallocated($(id).parent())
-			output_amount = parseFloat($(id).val())
-			$(id).val(floorRound(output_amount+unallocated,5))
-			sanitize_outputs()
-		}
-
-		function get_sum_outputs(address_rows) {
-			num_rows = $(address_rows).children().length;
-			sum_outputs = 0
-			for (var i = 0; i < num_rows; i++) {
-				output_amount = $("#output_amount_"+i).val()
-				if (!($.isNumeric(output_amount))) {
-					output_amount = 0
-					$("#output_amount_"+i).val(0)
-				}
-				sum_outputs += parseFloat(output_amount)
-			}
-			return floorRound(sum_outputs,5)
-		}
-
-    	function zero_NaN(num) {
-			if (!($.isNumeric(output_amount))) {
-				return 0
-			}
-			else {
-				return parseFloat(num)
-			}
-
-    	}
-
-		function sanitize_outputs(address_rows='#output_addresses') {
-			sum_selected = floorRound(parseFloat($("#sum_selected").html()),5)
-			sum_outputs = get_sum_outputs(address_rows)
-			fee_val = sum_selected - sum_outputs
-			$("#fee_val").html(floorRound(fee_val,5))
-			$("#total_val").html(sum_outputs+fee_val)
-			/* if fees > 0.001 , red text warning, disable submit */
-			/* if remaining < 0 , red text warning, disable submit */		
-		}
 
 	</script>
-    {{ explorers|json_script:"explorers-data" }}
 
   	<script>
 	    $(document).ready(function() {
 	    	$('#utxo_table').css('visibility', 'visible');
-	    	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	        var utxo_table = $('#utxo_table').DataTable({
     			deferRender: true,
                 "orderClasses": false,

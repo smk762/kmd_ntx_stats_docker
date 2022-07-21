@@ -80,59 +80,9 @@ def get_btc_txid_data(category=None):
 
     return resp
 
- 
-# notary > coin > data
-def get_last_nn_coin_ntx(season):
-    ntx_last = query.get_notary_last_ntx_data(season).values()
-    last_nn_coin_ntx = {}
-    for item in ntx_last:
-        notary = item['notary']
-        if notary not in last_nn_coin_ntx:
-            last_nn_coin_ntx.update({notary:{}})
-        coin = item['coin']
-        time_since = helper.get_time_since(item['kmd_ntx_blocktime'])[1]
-        last_nn_coin_ntx[notary].update({
-            coin:{
-                "txid": item['kmd_ntx_txid'],
-                "block_height": item['kmd_ntx_blockheight'],
-                "block_time": item['kmd_ntx_blocktime'],
-                "time_since": time_since
-            }
-        })
-    return last_nn_coin_ntx   
 
-
-def get_funding_totals(funding_data):
-    funding_totals = {"fees": {}}
-    now = int(time.time())
-
-    for item in funding_data:
-        tx_time = helper.day_hr_min_sec(now - item['block_time'])
-        item.update({"time": tx_time})
-
-        if item["notary"] not in ["unknown", "funding bot"]:
-            if item["notary"] not in funding_totals:
-                funding_totals.update({item["notary"]:{}})
-
-            if item["coin"] not in funding_totals[item["notary"]]:
-                funding_totals[item["notary"]].update({item["coin"]:-item["amount"]})
-            else:
-                val = funding_totals[item["notary"]][item["coin"]]-item["amount"]
-                funding_totals[item["notary"]].update({item["coin"]:val})
-
-            if item["coin"] not in funding_totals["fees"]:
-                funding_totals["fees"].update({item["coin"]:-item["fee"]})
-            else:
-                val = funding_totals["fees"][item["coin"]]-item["fee"]
-                funding_totals["fees"].update({item["coin"]:val})
-
-    return funding_totals
-
-
-
-def get_seed_stat_season(season, notary=None):
-     return query.get_seed_version_data(season, notary).values('name').annotate(sum_score=Sum('score'))
-
+def get_seednode_version_season_stats_data(season, notary=None):
+    return query.get_seednode_version_stats_data(season=season, name=notary, score=0.2).values('name').annotate(sum_score=Sum('score'))
 
 
 def get_dpow_coins_list(season=None, server=None, epoch=None):
@@ -144,7 +94,6 @@ def get_dpow_coins_list(season=None, server=None, epoch=None):
     coins_list = list(set(coins_list))
     coins_list.sort()
     return coins_list
-
 
 
 def get_coin_addresses(coin, season=None):
@@ -208,7 +157,7 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
     seed_node_score = 0
     start = time.time() - SINCE_INTERVALS["day"]
     end = time.time()
-    seed_data = query.get_seednode_version_stats_data(start, end-1, notary).values()
+    seed_data = query.get_seednode_version_stats_data(start=start, end=end, name=notary).filter(score=0.2).values()
     notary_ntx_24hr["score"] = float(notary_ntx_24hr["score"])
     for item in seed_data:
         seed_node_score += round(item["score"], 2)
@@ -323,7 +272,7 @@ def get_epoch_coins_dict(season):
 def get_balances(request):
     resp = {}
     data = query.get_balances_data()
-    data = helper.apply_filters_api(request, serializers.balancesSerializer, data) \
+    data = query.apply_filters_api(request, serializers.balancesSerializer, data) \
             .order_by('-season','notary', 'coin', 'balance') \
             .values()
 
@@ -380,7 +329,7 @@ def get_coins(request, coin=None):
     if coin:
         data = data.filter(coin=coin)
 
-    data = helper.apply_filters_api(request, serializers.coinsSerializer, data)
+    data = query.apply_filters_api(request, serializers.coinsSerializer, data)
     data = data.order_by('coin').values()
 
     for item in data:
@@ -468,8 +417,8 @@ def get_daemon_cli(request):
 
 
 def get_dpow_server_coins_info(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
+    season = helper.get_page_season(request)
+    server = helper.get_page_server(request)
     epoch = helper.get_or_none(request, "epoch")
     coin = helper.get_or_none(request, "coin")
     timestamp = helper.get_or_none(request, "timestamp")
@@ -583,7 +532,7 @@ def get_notarised_coin_daily(request):
 
     resp = {str(notarised_date):{}}
     data = query.get_notarised_coin_daily_data(notarised_date)
-    data = helper.apply_filters_api(request, serializers.notarisedCoinDailySerializer, data, 'daily_notarised_coin')
+    data = query.apply_filters_api(request, serializers.notarisedCoinDailySerializer, data, 'daily_notarised_coin')
     data = data.order_by('notarised_date', 'coin').values()
     if len(data) > 0:
         for item in data:
@@ -621,7 +570,7 @@ def get_notarised_count_daily(request):
 
     resp = {str(notarised_date):{}}
     data = query.get_notarised_count_daily_data(notarised_date)
-    data = helper.apply_filters_api(request, serializers.notarisedCountDailySerializer, data, 'daily_notarised_count')
+    data = query.apply_filters_api(request, serializers.notarisedCountDailySerializer, data, 'daily_notarised_count')
     data = data.order_by('notarised_date', 'notary').values()
     if len(data) > 0:
         for item in data:
@@ -634,7 +583,7 @@ def get_notarised_count_daily(request):
                     "third_party_server_count": item['third_party_server_count'],
                     "other_server_count": item['other_server_count'],
                     "total_ntx_count": item['total_ntx_count'],
-                    "time_stamp": item['time_stamp'],
+                    "timestamp": item['timestamp'],
                     "coins": {}
                 }
             })
@@ -667,8 +616,8 @@ def get_notarised_count_daily(request):
 
 
 def get_notarised_coins(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
+    season = helper.get_page_season(request)
+    server = helper.get_page_server(request)
     epoch = helper.get_or_none(request, "epoch")
     data = query.get_notarised_coins_data(season, server, epoch)
     data = data.distinct('coin')
@@ -679,7 +628,7 @@ def get_notarised_coins(request):
 
 
 def get_notarised_servers(request):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     data = query.get_notarised_coins_data(season)
     data = data.distinct('server')
     resp = []
@@ -689,7 +638,7 @@ def get_notarised_servers(request):
 
 
 def get_notary_nodes_info(request):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     if not season:
         return {
             "error": "You need to specify the following filter parameter: ['season']"
@@ -706,7 +655,7 @@ def get_notary_nodes_info(request):
 
 
 def get_notary_btc_transactions(request):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary")
     category = helper.get_or_none(request, "category")
     address = helper.get_or_none(request, "address")
@@ -755,7 +704,7 @@ def get_notary_btc_transactions(request):
 
 
 def get_notary_ltc_transactions(request):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary")
     category = helper.get_or_none(request, "category")
     address = helper.get_or_none(request, "address")
@@ -835,7 +784,7 @@ def get_notary_ltc_txid(request):
 
 
 def get_btc_txid_list(request):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary")
     category = helper.get_or_none(request, "category")
     address = helper.get_or_none(request, "address")
@@ -857,7 +806,7 @@ def get_btc_txid_list(request):
 
 
 def get_ltc_txid_list(request):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary")
     category = helper.get_or_none(request, "category")
     address = helper.get_or_none(request, "address")
@@ -878,7 +827,7 @@ def get_ltc_txid_list(request):
 
 
 def get_nn_social_info(request):
-    season = helper.get_or_none(request, "season", helper.get_page_season(request))
+    season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary")
     nn_social_info = {}
     nn_social_data = query.get_nn_social_data(season, notary).values()
@@ -888,7 +837,7 @@ def get_nn_social_info(request):
 
 
 def get_coin_social_info(request):
-    season = helper.get_or_none(request, "season", helper.get_page_season(request))
+    season = helper.get_page_season(request)
     coin = helper.get_or_none(request, "coin")
     coin_social_info = {}
     coin_social_data = query.get_coin_social_data(coin, season).values()
@@ -900,7 +849,7 @@ def get_coin_social_info(request):
 
 
 def get_rewards_by_address_info(request):
-    season = helper.get_or_none(request, "season").title()
+    season = helper.get_page_season(request)
     address = helper.get_or_none(request, "address")
     min_value = helper.get_or_none(request, "min_value")
     min_block = helper.get_or_none(request, "min_block")
@@ -1029,3 +978,30 @@ def get_notary_seasons():
         ntx_seasons[notary].sort()
 
     return ntx_seasons
+
+
+
+##########################################  Notarisation  ##########################################
+def get_notarisation_txid_list(request):
+    season = helper.get_page_season(request)
+    server = helper.get_page_server(request)
+    epoch = helper.get_or_none(request, "epoch")
+    coin = helper.get_or_none(request, "coin")
+    notary = helper.get_or_none(request, "notary")
+
+    if coin in ["BTC", "LTC", "KMD"]:
+        server = coin
+
+    if not season or not server or not coin:
+        return {
+            "error": "You need to specify the following filter parameters: ['season', 'server', 'coin']"
+        }
+
+    data = query.get_notarised_data(season, server, epoch, coin, notary).values('txid')
+
+    resp = []
+    for item in data:
+        resp.append(item["txid"])
+
+    resp = list(set(resp))
+    return resp

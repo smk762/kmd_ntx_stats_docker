@@ -35,6 +35,7 @@ def has_error(_dict):
         return True
     return False
 
+
 def get_month_epoch_range(year=None, month=None):
     if not year or not month:
         dt_today = datetime.date.today()
@@ -82,6 +83,12 @@ def json_resp(resp, filters=None, params=None):
     if "filters" in resp:
         data.update({"filters": resp["filters"]})
         
+    if "selected" in resp:
+        data.update({"selected": resp["selected"]})
+
+    if "required" in resp:
+        data.update({"required": resp["required"]})
+
     if "distinct" in resp:
         data.update({"distinct": resp["distinct"]})
 
@@ -204,16 +211,23 @@ def get_sidebar_links(season):
 def get_base_context(request):
     print("getting context")
     season = get_page_season(request)
-    server = get_or_none(request, "server")
+    server = get_page_server(request)
     epoch = get_or_none(request, "epoch")
     coin = get_or_none(request, "coin")
     notary = get_or_none(request, "notary")
+    hide_filters = get_or_none(request, "hide_filters", [])
+    selected = {}
+    [selected.update({i: request.GET[i]}) for i in request.GET]
+        
+
     context = {
         "season": season,
         "server": server,
         "epoch": epoch,
         "coin": coin,
         "notary": notary,
+        "selected": selected,
+        "hide_filters": hide_filters,
         "regions": ["AR", "EU", "NA", "SH", "DEV"],
         "notary_clean": get_notary_clean(notary),
         "season_clean": season.replace("_"," "),
@@ -256,50 +270,6 @@ def get_explorers():
     explorers = requests.get(url).json()
     return explorers["results"]
 
-def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=None):
-    if not filter_kwargs:
-        filter_kwargs = {}
-
-    for field in serializer.Meta.fields:
-        # handle both standard 'WSGIRequest' object and DRF request object
-        if hasattr(request, 'query_params'):
-            val = request.query_params.get(field, None)
-        else:
-            val = request.GET.get(field, None)
-        if val is not None:
-            filter_kwargs.update({field:val}) 
-
-    if 'from_block' in request.GET:
-        filter_kwargs.update({'block_height__gte':request.GET['from_block']}) 
-
-    if 'to_block' in request.GET:
-        filter_kwargs.update({'block_height__lte':request.GET['to_block']})  
-
-    if 'from_timestamp' in request.GET:
-        filter_kwargs.update({'block_time__gte':request.GET['from_timestamp']}) 
-
-    if 'to_timestamp' in request.GET:
-        filter_kwargs.update({'block_time__lte':request.GET['to_timestamp']})
-
-    if table in ['mined_count_daily']:
-
-        if 'from_date' in request.GET:
-            filter_kwargs.update({'mined_date__gte':request.GET['from_date']})  
-
-        if 'to_date' in request.GET:
-            filter_kwargs.update({'mined_date__lte':request.GET['to_date']})   
-
-    if table in ['daily_notarised_coin', 'daily_notarised_count']:
-
-        if 'from_date' in request.GET:
-            filter_kwargs.update({'notarised_date__gte':request.GET['from_date']}) 
-
-        if 'to_date' in request.GET:
-            filter_kwargs.update({'notarised_date__lte':request.GET['to_date']})  
-
-    if len(filter_kwargs) > 0:
-        queryset = queryset.filter(**filter_kwargs)
-    return queryset
 
 
 def get_current_host(request):
@@ -320,9 +290,9 @@ def get_dexstats_explorers():
     return dexplorers
 
 
-def get_season(time_stamp=None):
-    if not time_stamp:
-        time_stamp = int(time.time())
+def get_season(timestamp=None):
+    if not timestamp:
+        timestamp = int(time.time())
     for season in SEASONS_INFO:
         if season.find("Testnet") == -1:
             if POSTSEASON:
@@ -332,7 +302,7 @@ def get_season(time_stamp=None):
                     end_time = SEASONS_INFO[season]['end_time']
             else:
                 end_time = SEASONS_INFO[season]['end_time']
-            if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= end_time:
+            if timestamp >= SEASONS_INFO[season]['start_time'] and timestamp <= end_time:
                 return season
         else:
             logger.warning(f"[get_season] ignoring season: {season}")
@@ -381,9 +351,19 @@ def get_regions_info(season):
 
 def get_page_season(request):
     if "season" in request.GET:
-        if request.GET["season"] in SEASONS_INFO:
-            return request.GET["season"]
+        if request.GET["season"].isnumeric():
+            return f"Season_{request.GET['season']}"
+        if request.GET["season"].title() in SEASONS_INFO:
+            return request.GET["season"].title()
     return SEASON
+
+
+def get_page_server(request):
+    if "server" in request.GET:
+        if request.GET['server'] == "3P": return "Third_Party"
+        if request.GET["server"].title() in ["Main", "Third_Party", "LTC", "KMD"]:
+            return request.GET["server"].title()
+    return "Main"
 
 
 def day_hr_min_sec(seconds, granularity=2):
@@ -566,21 +546,3 @@ def safe_div(x,y):
     if y==0: return 0
     return float(x/y)
 
-
-# DEPRECATE
-def get_low_nn_balances():
-    url = "http://138.201.207.24/nn_balances_report"
-    r = requests.get(url)
-    return r.json()
-
-
-def get_notary_funding():
-    url = "http://138.201.207.24/nn_funding"
-    r = requests.get(url)
-    return r.json()
-
-
-def get_bot_balance_deltas():
-    url = "http://138.201.207.24/nn_balances_deltas"
-    r = requests.get(url)
-    return r.json()

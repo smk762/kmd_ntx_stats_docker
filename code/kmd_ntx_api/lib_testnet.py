@@ -25,7 +25,6 @@ def get_testnet_scoreboard(request):
 
     testnet_coins = ["RICK", "MORTY"]
     testnet_stats_dict = get_testnet_stats_dict(season, testnet_coins)
-    last_ntx = info.get_last_nn_coin_ntx(season)
 
     seednode_scores = dex.get_seednode_version_score_total(request, "VOTE2022_Testnet", 1653091199, 1653436800)
     for notary in seednode_scores:
@@ -62,27 +61,6 @@ def get_testnet_scoreboard(request):
 
 
     for coin in testnet_coins:
-
-        # Get last notarised times
-        for notary in testnet_stats_dict:
-
-            try:
-                last_coin_ntx = last_ntx[notary][coin]["time_since"]
-                last_coin_ntx_time = last_ntx[notary][coin]["block_time"]
-                testnet_stats_dict[notary].update({
-                    f"Last_{coin}": last_coin_ntx,
-                    f"Last_{coin}_time": last_coin_ntx_time
-                })
-
-            except Exception as e:
-                logger.error(f"[get_testnet_scoreboard] Exception: {e} \
-                               | notary: {notary} | coin: {coin}")
-                logger.warning(f"[get_testnet_scoreboard] Setting last_ntx for \
-                                 {notary} | coin: {coin} to > 24hrs")
-                testnet_stats_dict[notary].update({
-                    f"Last_{coin}": "> 24hrs",
-                    f"Last_{coin}_time": 0
-                })
 
         # Get notarisation counts
         for item in ntx_dict[coin]:

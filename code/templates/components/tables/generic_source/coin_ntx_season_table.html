@@ -1,69 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="row col-12 m-auto" id="mining_season">
-    <div class="card table_card">
-        <div class="card-header table_card_title">
-            Source: Coin NTX Season Table
-        </div>
-        <div class="card-body table_card_body">
-			<table id="coin_ntx_season_tbl" class="table table-striped table-bordered m-auto" style="width:99%; visibility: hidden;" data-ajax="{% url 'coinNtxSeasonViewSet-list' %}?format=datatables">
-				<thead>
-					<tr>
-						<th data-data="coin">Coin</th>
-						<th data-data="season">Season</th>
-						<th data-data="coin_data">Data</th>
-						<th data-data="time_stamp">Time</th>
-					</tr>
-				</thead>
-			</table>
-		</div>			
-	</div>
-</div>
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#coin_ntx_season_tbl').DataTable({
-    	$('#coin_ntx_season_tbl').css('visibility', 'visible');
-        	"paging": false,
-			deferRender: true,
-            "orderClasses": false,
-    		order: [[ 3, 'desc' ], [ 2, 'desc' ], [ 0, 'asc' ]],
-    		"columnDefs": [
-				{ className: "text-left text-nowrap", "targets": [ 0 ] },
-				{ className: "text-right text-nowrap", "targets": [ 3 ] },
-    			{
-		            "data": "coin",
-		            "targets": 0,
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			        	$(nTd).html(get_coin_icon(oData.coin));
-			        }
-		        },
-    			{
-		            "data": "season",
-		            "targets": 1,
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html(get_season_styled(oData.season));
-			        }
-		        },
-    			{
-		            "data": 'coin_data',
-		            "targets": 2,
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-						let icon = "<i class='fas fa-arrow-right'></i>"
-		            	let tooltip = "Link to coin data"
-		            	let url = "http://116.203.120.91:8762/api/source/coin_ntx_season/?coin="+oData.coin
-			            $(nTd).html(get_detail_link_icon(icon, tooltip, url));
-			        }
-		        },
-    			{
-		            "data": 'time_stamp',
-		            "targets": 3,
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-	            		$(nTd).html(get_time_since(oData.time_stamp));
-			        }
-		        }
-	        ]
-        });
-    });
-</script>
+
+{% include 'components/tables/generic_source/generic_table.html' with table=table filters=filters required=required columns=columns endpoint=endpoint table_title="Source: Coin NTX Season Table" %}
+
 {% endblock %}

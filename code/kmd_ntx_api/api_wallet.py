@@ -124,7 +124,3 @@ def coin_balances_wallet(request):
         })
 
     return JsonResponse(resp)
-
-def addresses_table_api(request):
-    data = wallet.get_addresses_rows(request)
-    return helper.json_resp(data)

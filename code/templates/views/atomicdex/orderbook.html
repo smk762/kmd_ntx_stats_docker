@@ -1,166 +1,128 @@
 {% extends "base.html" %}
+{% load coin_filter %}
 {% load static %}
 {% block content %}
 	<div class="row col-12 m-auto">
-		<div class="card table_card">
-			<div class="card-header table_card_title flex">
-				{{ page_title }}
-			</div>			
-			<div class="card-body table_card_body flex">
-				<form style="visibility: hidden;" class="d-flex justify-content-between col-12 mx-auto my-4" id="select_base_rel">
-					<!-- Dropdown --> 
-					<div class="col-2">
-					</div>
-					<div class="input-group">
-					    <div class="input-group-prepend prepend-label-left p-0 col-3" >
-					        <span class="input-group-text col-12">
-					      	    Base
-					        </span>
-					    </div>
-						<select class="form-control col-2" id='base' name="base" style='width: 160px;'>
-						{% for coin in mm2_coins %}
-							{% if coin == base %}
-						    	<option value='{{ base }}' selected>
-							    	{{ base }}
-							    </option> 
-						    {% else %}
-						    	<option value='{{ coin }}'>
-							    	{{ coin }}
-							    </option> 
-						    {% endif %}
-						{% endfor %}
-						</select>
-					</div>
-					<div class="input-group">
-					    <div class="input-group-prepend prepend-label-left p-0 col-3" >
-					        <span class="input-group-text col-12">
-					      	    Rel
-					        </span>
-					    </div>
-						<select class="form-control col-2" id='rel' name="rel" style='width: 160px;'>
-						{% for coin in mm2_coins %}
-							{% if coin == rel %}
-						    	<option value='{{ rel }}' selected>
-							    	{{ rel }}
-						    	</option> 
-						    {% else %}
-						    	<option value='{{ coin }}'>
-							    	{{ coin }}
-						    	</option> 
-						    {% endif %}
-						{% endfor %}
-						</select>
-					</div>
-
-					<button class="btn-dark4" type="submit">
-					    Update
-					</button>
-					<div class="col-2">
-					</div>
-				</form>
-				<h4>Sell {{ base }} for {{ rel }}</h4>
-				<table style="visibility: hidden;" id="bids" class="table table-striped table-bordered">
+		<div class="card table_card floating-card m-auto col-12" id="last-swaps-card" style="font-size: 1.1em;" >
+			<div class="card-body table_card_body col-12">
+				<table style="" id="orderbook" class="table table-striped table-bordered m-auto" style="width:100%">
 					<thead>
 						<tr>
+							<th data-data="type">Type</th>
 							<th data-data="base">Sell</th>
 							<th data-data="rel">Buy</th>
-							<th data-data="price">{{ rel }} Price</th>
-							<th data-data="min_volume">{{ rel }} Min Volume</th>
-							<th data-data="maxvolume">{{ rel }} Max Volume</th>
-							<th data-data="base_total">{{ base }} Total</th>
+							<th data-data="price" id="price-lbl">Price</th>
+							<th data-data="min_volume" id="min-volume-lbl">Min Volume</th>
+							<th data-data="maxvolume" id="maxvolume-lbl">Max Volume</th>
+							<th data-data="total" id="total-lbl">Total</th>
 						</tr>
 					</thead>
-					<tbody>
-					{% for row in bids %}
-						<tr>
-							<td data-data="rel">{{ rel }}</td>
-							<td data-data="base">{{ base }}</td>
-							<td data-data="price">{{ row.price|floatformat:-8 }}</td>
-							<td data-data="min_volume">{{ row.min_volume|floatformat:-8 }}</td>
-							<td data-data="maxvolume">{{ row.maxvolume|floatformat:-8 }}</td>
-							<td data-data="base_total">{{ row.base_total|floatformat:-8 }}</td>
-						</tr>
-					{% endfor %}
-					</tbody>
-				</table>
-				<h4>Buy {{ base }} with {{ rel }}</h4>
-				<table style="visibility: hidden;" id="asks" class="table table-striped table-bordered">
-					<thead>
-						<tr>
-							<th data-data="rel">Sell</th>
-							<th data-data="base">Buy</th>
-							<th data-data="price">{{ rel }} Price</th>
-							<th data-data="min_volume">{{ base }} Min Volume</th>
-							<th data-data="maxvolume">{{ base }} Max Volume</th>
-							<th data-data="rel_total">{{ rel }} Total</th>
-						</tr>
-					</thead>
-					<tbody>
-					{% for row in asks %}
-						<tr>
-							<td data-data="rel">{{ rel }}</td>
-							<td data-data="base">{{ base }}</td>
-							<td data-data="price">{{ row.price|floatformat:-8 }}</td>
-							<td data-data="min_volume">{{ row.min_volume|floatformat:-8 }}</td>
-							<td data-data="maxvolume">{{ row.maxvolume|floatformat:-8 }}</td>
-							<td data-data="rel_total">{{ row.rel_total|floatformat:-8 }}</td>
-						</tr>
-					{% endfor %}
-					</tbody>
 				</table>
 			</div>
 		</div>
 	</div>
-    {{ icons|json_script:"icons-data" }}
 	<script type="text/javascript">
+
+    	function get_url() {
+	    	let base = $('#base').val() == undefined ? '{{ base }}' :  $('#base').val()
+	    	let rel = $('#rel').val() == undefined ? '{{ rel }}' :  $('#rel').val()
+	    	let url = "{{ endpoint }}?base="+base+"&rel="+rel
+	    	/*
+	    	$('#price-lbl').html(base+' Price')
+	    	$('#min-volume-lbl').html(base+' Min Volume')
+	    	$('#maxvolume-lbl').html(base+' Max Volume')
+	    	$('#total-lbl').html(rel+' Total')
+	    	*/
+	    	return url
+    	}
+
+    	// Load json into var
+    	// connect bid / ask data to their tables
+		    
 	    $(document).ready(function() {
-	    	var icons = JSON.parse(document.getElementById('icons-data').textContent);
-	    	$('#select_base_rel').css('visibility', 'visible');
-	    	$('#bids').css('visibility', 'visible');
-	    	$('#asks').css('visibility', 'visible');
-	        $('#bids').DataTable({
+	    	const orderbook_dom = '{% include "components/tables/dt_dom.html" with table="orderbook" %}'
+
+			{% autoescape off %}	
+		    	const dropdown_pair = `{% include 'components/form/dropdown_pair.html' with id_a='base' label_a='Base ' width_a='125px' id_b='rel' label_b='Rel ' width_b='125px' action="switch_combos('#base', '#rel')" %}`
+				var options = {{ mm2_coins }}
+			{% endautoescape %}
+
+	        const orderbook_table = $('#orderbook').DataTable({
+	     		"ajax": {
+				    "url": get_url(),
+	    			'dataSrc': 'results',
+	    			"deferRender": true
+				},
   				"pageLength": 50,
-        		order: [[ 2, 'desc' ]],	
+    			"dom": orderbook_dom,
+        		"order": [[ 3, 'desc' ]],	
         		"columnDefs": [
+					{ "className": "text-left text-nowrap", "targets": [ 0, 1, 2 ] },
+					{ "className": "text-right text-nowrap", "targets": [ 3, 4, 5, 6 ] },
         			{
 			            "data": 'base',
-			            "targets": 0,
+			            "targets": 1,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 					        $(nTd).html(get_coin_icon(oData.base));
 				        }
         			},
         			{
 			            "data": 'rel',
-			            "targets": 1,
+			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 					        $(nTd).html(get_coin_icon(oData.rel));
-				        }
-        			}
-			    ]
-	        });
-	    	$('#asks').css('visibility', 'visible');
-	        $('#asks').DataTable({
-  				"pageLength": 50,
-        		order: [[ 2, 'asc' ]],
-        		"columnDefs": [
-        			{
-			            "data": 'base',
-			            "targets": 0,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					        $(nTd).html(get_coin_icon(oData.base));
 				        }
         			},
         			{
-			            "data": 'rel',
-			            "targets": 1,
+			            "data": 'price',
+			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					        $(nTd).html(get_coin_icon(oData.rel));
+					        $(nTd).html(parseFloat(oData.price).toFixed(8));
+				        }
+        			},
+        			{
+			            "data": 'min_volume',
+			            "targets": 4,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					        $(nTd).html(parseFloat(oData.min_volume).toFixed(8));
+				        }
+        			},
+        			{
+			            "data": 'maxvolume',
+			            "targets": 5,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					        $(nTd).html(parseFloat(oData.maxvolume).toFixed(8));
+				        }
+        			},
+        			{
+			            "data": 'total',
+			            "targets": 6,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					        $(nTd).html(parseFloat(oData.total).toFixed(8));
 				        }
         			}
-			    ]
+			    ],
+		        fnInitComplete: function(){
+		            $('.orderbook-tbl-title').html(dropdown_pair);
+		            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="orderbook" width_pct="100" btn_url="'+get_url()+'" btn_text="Source Data" %}'
+		            $('.orderbook-api-link').html(api_btn);
+		    		$('#base').select2();
+		    		$('#rel').select2();
+
+		            add_dropdown_options(options, '#base', '{{ base }}')
+		            add_dropdown_options(options, '#rel', '{{ rel }}')
+
+				    $('#rel').on('select2:select', function (e) {
+				    	orderbook_table.ajax.url(get_url()).load()
+					});
+				    $('#rel').on('change', function (e) {
+				    	orderbook_table.ajax.url(get_url()).load()
+					});
+				    $('#base').on('select2:select', function (e) {
+				    	orderbook_table.ajax.url(get_url()).load()
+					});
+		        }
 	        });
-    		$('#base').select2();
-    		$('#rel').select2();
 	    });
 	</script>
 {% endblock %}

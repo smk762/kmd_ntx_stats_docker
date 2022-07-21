@@ -128,7 +128,7 @@ SEASONS_INFO = {
         "start_block": 2963330,
         "end_block": 4437000,
         "start_time": 1656077853,
-        "end_time": 2773682800,
+        "end_time": 2147483647,
     },
     "VOTE2022_Testnet": {
         "start_block": 2903777,
@@ -146,10 +146,6 @@ SEASONS_INFO = {
         }    
     }
 }
-NOW = time.time()
-print(f"getting dpow coins {NOW}")
-
-_coins_url = f"{THIS_SERVER}/api/info/dpow_server_coins"
 
 NOW = time.time()
 print(f"building regions info {NOW}")

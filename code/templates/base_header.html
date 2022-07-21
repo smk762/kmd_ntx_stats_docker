@@ -1,105 +1,25 @@
 {% load static %}
-        <header class="c-header kmd_ui_light1 c-header-fluid" style="position: fixed; width:100%; z-index:7">
-            <div class="row justify-content-between col-12 m-0">
-                <div>
-                    <a class="c-header-brand mx-1" href="https://www.komodoplatform.com/">
-                        <img class="c-sidebar-brand-minimized" width="36" height="36" alt="Komodo Logo" src="{% static 'img/brand/KMD_Mark_Color.png' %}" />
-                    </a>
-                    <a class="c-header-brand mx-1" href="https://www.atomicdex.io/">
-                        <img class="c-sidebar-brand-minimized" width="36" height="36" alt="Komodo Logo" src="{% static 'img/brand/dex-logo.png' %}" />
-                    </a>
-                </div>
-                <div class="py-auto my-auto d-lg-none">
-                    <!-- Hamburger Menu Button-->
-                    <button class="c-header-toggler c-class-toggler d-lg-none mfe-auto" type="button" data-target="#sidebar" data-class="c-sidebar-show">
-                        <i class="cil-menu" data-toggle='modal' data-target='#menu-modal'></i>
-                    </button>
-                </div>   
-            <!--
-                <h2 class="c-header-fluid col-md-auto">dPoW Stats</h2>
-            -->
-                <div>
-                    {% include 'components/buttons/header-nav-buttons.html' %}
-                </div>   
-            </div>
-
-
-            <!--
-            <ul class="c-header-nav mfs-auto">
-                <li class="c-header-nav-item dropdown d-md-down-none mx-2">
-                    <a class="c-header-nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                        <i class="cil-bell"></i>
-                        <span class="badge badge-pill badge-danger">5</span>
-                    </a>
-
-                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg pt-0">
-                        <div class="dropdown-header  kmd_ui_light3">
-                            <strong>Notary Node Network Health</strong>
-                        </div>
-
-                        <span data-toggle="tooltip" data-placement="left" data-html="true" title="{{ nn_health.ntx_coins_tooltip }}">
-                            <a class="dropdown-item d-block" href="#">
-                                <div class="mb-1">
-                                    <i class="fas fa-link"></i> Coin Notarisation
-                                </div>
-                                <span class="progress progress-xs">
-                                    <div class="progress-bar kmd_secondary_green_bg" role="progressbar" style="width: {{ nn_health.ntx_coins_pct }}%" aria-valuenow="{{ nn_health.ntx_coins_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                </span>
-                                <small class="text-uppercase text-muted">Coins notarised 24hrs</small>
-                            </a>
-                        </span>
-
-                        <span data-html="true" data-toggle="tooltip" data-placement="left" title="{{ nn_health.ntx_nodes_tooltip }}">
-                            <a class="dropdown-item d-block" href="#">
-                                <div class="mb-1">
-                                    <i class="fas fa-gavel"></i> Node Notarisation
-                                </div>
-                                <span class="progress progress-xs">
-                                    <div class="progress-bar kmd_secondary_red_bg" role="progressbar" style="width: {{ nn_health.ntx_nodes_pct }}%" aria-valuenow="{{ nn_health.ntx_nodes_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                </span>
-                                <small class="text-uppercase text-muted">Nodes notarised 24hrs</small>
-                            </a>
-                        </span>
-
-                        <span data-html="true" data-toggle="tooltip" data-placement="left" title="{{ nn_health.mining_tooltip }}">
-                        <a class="dropdown-item d-block" href="#">
-                            <div class="mb-1">
-                                <i class="fas fa-dragon"></i> Node Mining
-                            </div>
-                            <span class="progress progress-xs">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ nn_health.mining_nodes_pct }}%" aria-valuenow="{{ nn_health.mining_nodes_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
-                            </span>
-                            <small class="text-uppercase text-muted">Nodes mining 24hrs</small>
-                        </a>
-                        </span>
-
-                        <span data-html="true" data-toggle="tooltip" data-placement="left" title="{{ nn_health.low_balances_tooltip }}">
-                        <a class="dropdown-item d-block" href="#">
-                            <div class="mb-1">
-                                <i class="fab fa-btc"></i> Node Balances
-                            </div>
-                            <span class="progress progress-xs">
-                                <div class="progress-bar kmd_secondary_purple_bg" role="progressbar" style="width: {{ nn_health.balance_pct }}%" aria-valuenow="{{ nn_health.balance_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
-                            </span>
-                            <small class="text-uppercase text-muted">Balances available</small>
-                        </a>
-                        </span>
-
-                        <span data-html="true" data-toggle="tooltip" data-placement="left" title="{{ nn_health.sync_tooltip }}">
-                            <a class="dropdown-item d-block" href="#">
-                                <div class="mb-1">
-                                    <i class="fas fa-code-branch"></i> dPoW Sync
-                                </div>
-                                <span class="progress progress-xs">
-                                    <div class="progress-bar kmd_ltblue" role="progressbar" style="width: {{ nn_health.sync_pct }}%" aria-valuenow="{{ nn_health.sync_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                </span>
-                                <small class="text-uppercase text-muted">Coin tips matching</small>
-                            </a>
-                        </span>
-                    </div>
-                </li>
-            </ul> -->
-        </header>
+<header class="c-header kmd_ui_light1 c-header-fluid" style="position: fixed; width:100%; z-index:7">
+    <div class="row justify-content-between col-12 m-0">
+        <div>
+            <a class="c-header-brand mx-1" href="https://www.komodoplatform.com/">
+                <img class="c-sidebar-brand-minimized" width="36" height="36" alt="Komodo Logo" src="{% static 'img/brand/KMD_Mark_Color.png' %}" />
+            </a>
+            <a class="c-header-brand mx-1" href="https://www.atomicdex.io/">
+                <img class="c-sidebar-brand-minimized" width="36" height="36" alt="Komodo Logo" src="{% static 'img/brand/dex-logo.png' %}" />
+            </a>
+        </div>
+        <div class="pl-auto ml-auto my-auto d-lg-none">
+            <!-- Hamburger Menu Button-->
+            <button class="c-header-toggler c-class-toggler d-lg-none mfe-auto" type="button" data-target="#sidebar" data-class="c-sidebar-show">
+                <i class="cil-menu" data-toggle='modal' data-target='#menu-modal'></i>
+            </button>
+        </div>
+        <div>
+            {% include 'components/buttons/header-nav-buttons.html' %}
+        </div>   
+    </div>
+</header>
 
 <!-- Small screen menu modal -->
 <div class="modal fade" id="menu-modal" tabindex="-1" role="dialog" aria-labelledby="menu-modal-label" aria-hidden="true">
@@ -114,7 +34,7 @@
                         <div class="dropdown-menu col-12 show" aria-labelledby="{{ section }}DropdownMenuButton" data-popper-placement="bottom-end">
                             {% for item, values in options.items %}
                                 {% if not values.hide %}
-                                    <a class="dropdown-item" href="{{ values.url }}"> {{ item }}</a>
+                                     <a class="dropdown-item" href="{{ values.url }}"><i class="{{ values.icon }} mr-2"></i> {{ item }}</a>
                                 {% endif %}
                             {% endfor %}
                         </div>

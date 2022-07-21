@@ -102,7 +102,7 @@
 	        fnInitComplete: function(){
 		    	$('#last_coin_ntx-loading-spinner').css('display', 'none');
 		    	$('#last_coin_ntx_card').css('visibility', 'visible');
-	           	$('.last_coin_ntx_tbl_title').html('<h3 class="">{{ notary_clean }} Last {{ season_clean }} Coin Notarisation</h3>');
+	           	$('.last_coin_ntx_tbl_title').html('<h3 class="">{{ notary_clean }} Last Coin Notarisation</h3>');
 	            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="last_coin_ntx" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
 	            $('.last_coin_ntx_api_link').html(api_btn);
 	        }

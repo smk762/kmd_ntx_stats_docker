@@ -21,7 +21,7 @@
 
 <script>
     $(document).ready(function() {
-	    let url = "{% url 'notary_last_mined_table' %}"
+	    let url = "{% url 'notary_last_mined_table_api' %}"
     	last_mined_table = $('#last_mined_table').DataTable({        
     		ajax: {
 			    url: url,

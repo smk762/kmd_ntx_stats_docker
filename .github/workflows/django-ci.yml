@@ -1,0 +1,63 @@
+    name: Django CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.7]
+    
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=postgresdb
+      - POSTGRES_USER=postgresuser
+      - POSTGRES_PASSWORD=postgrespw
+    depends_on:
+      - mm2
+    ports:
+      - "5432:5432"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python $
+      uses: actions/setup-python@v2
+      with:
+        python-version: $
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run Migrations
+      run: python manage.py migrate
+      env: 
+        DBENGINE: django.db.backends.mysql
+        DBNAME: postgresdb
+        DBUSER: postgresuser
+        DBPASSWORD: postgrespw
+        DBHOST: 127.0.0.1
+        DBPORT: $
+    - name: Run Tests
+      run: |
+        python manage.py test
+      env: 
+        DBENGINE: django.db.backends.postgresql
+        DBNAME: postgresdb
+        DBUSER: postgresuser
+        DBPASSWORD: postgrespw
+        DBHOST: 127.0.0.1
+        DBPORT: $

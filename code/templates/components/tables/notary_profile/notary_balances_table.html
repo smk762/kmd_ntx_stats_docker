@@ -24,7 +24,7 @@
 </div>
 <script>  
     $(document).ready(function() {
-    	let balances_url = "{% url 'balances_table' %}?notary={{ notary }}&season={{ season }}"
+    	let balances_url = "{% url 'balances_table_api' %}?notary={{ notary }}&season={{ season }}"
         var balTable = $('#balances_table').DataTable({
      		ajax: {
 			    url: balances_url,

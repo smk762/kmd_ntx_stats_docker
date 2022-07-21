@@ -1,0 +1,8 @@
+
+	<div class="row">
+		<div class="card-deck d-flex justify-content-around col-12 m-0">
+			{% for button, params in buttons.items %}
+				{% include "components/buttons/action_button.html" with action=params.action width_pct=params.width_pct text=params.text btn_id=button %}
+			{% endfor %}
+		</div>
+	</div>

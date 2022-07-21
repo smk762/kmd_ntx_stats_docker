@@ -5,6 +5,8 @@
 {{ dpow_coins|json_script:"dpow_coins-data" }}
 {{ notaries|json_script:"notaries-data" }}
 <script>
+	// TODO: explorers and coin_icons are data heavy.
+	// Should not load these unless needed, and use params to constrain when only dpow related required.
 	var explorers = JSON.parse(document.getElementById('explorers-data').textContent);
 	var coin_icons = JSON.parse(document.getElementById('coin_icons-data').textContent);
 	var dpow_coins = JSON.parse(document.getElementById('dpow_coins-data').textContent);
@@ -13,6 +15,15 @@
 	function pad(num, size) {
 	    num = num.toString();
 	    while (num.length < size) num = "0" + num;
+	    return num;
+	}
+
+	function pad_decimal(num, size) {
+		split = num.toString().split(".")
+	    dec = split[1] ? split[1] : 0
+	    num = split[0] + "." + dec
+	    size = split[0].length + size + 1
+	    while (num.length < size) num = num + "0";
 	    return num;
 	}
 
@@ -98,10 +109,17 @@
 		});
 	}
 
-	function get_time_since(timestamp, until=false, format='text') {
+	function get_time_since(ts, until=false, format='text', precalc=false) {
+		timestamp = parseInt(ts)
+		if (isNaN(timestamp)) return ts
 
-		var time_now = Date.now() / 1000;
-		until ? totalSeconds = timestamp - time_now : totalSeconds = time_now - timestamp
+		if (!precalc) {
+			var time_now = Date.now() / 1000;
+			until ? totalSeconds = timestamp - time_now : totalSeconds = time_now - timestamp
+		}
+		else {
+			totalSeconds = timestamp
+		}
 		
 		if (totalSeconds < 0) return 0
 
@@ -129,24 +147,24 @@
 	    	timesince = seconds + " sec";
 	    } else if (days == 0 & hours == 0) {
 	    	if (minutes > 1) {
-	    		timesince = minutes + " mins, " + seconds + " sec";
+	    		timesince = minutes + " mins, " + pad(seconds,2) + " sec";
 	    	}
 	    	else {
-	    		timesince = minutes + " min, " + seconds + " sec";
+	    		timesince = minutes + " min, " + pad(seconds,2) + " sec";
 	    	}
 	    } else if (days == 0) {
 	    	if (hours > 1) {
-	    		timesince = hours + " hrs, " + minutes + " min";
+	    		timesince = hours + " hrs, " + pad(minutes,2) + " min";
 	    	}
 	    	else {
-	    		timesince = hours + " hr, " + minutes + " min";
+	    		timesince = hours + " hr, " + pad(minutes,2) + " min";
 	    	}
 	    } else {
 	    	if (days > 1) {
-	    		timesince = days + " days, " + hours + " hrs";
+	    		timesince = days + " days, " + pad(hours,2) + " hrs";
 	    	}
 	    	else {
-	    		timesince = days + " day, " + hours + " hrs";
+	    		timesince = days + " day, " + pad(hours,2) + " hrs";
 	    	}
 	    }
 	    return timesince
@@ -164,6 +182,7 @@
 	}
 
 	function get_coin_icon(coin, url) {
+		if (coin == "TKL") coin = "TOKEL"
 		if (dpow_coins.includes(coin)) {
 			url = "/coin_profile/" + coin
 		}
@@ -217,6 +236,12 @@
 		}	
 	}
 
+	function get_richlist_url(address) {
+		return "<a href='https://dexstats.info/richlistlookup.php?address="
+			+ address + "&bootstrap-data-table-1_length=-1'>"
+			+ address + "</a>"
+	}
+
 	function get_address_url(coin, address, label) {
 		let explorer = get_explorer(coin)
 		if (!label) {
@@ -237,7 +262,111 @@
     	}
 	}
 
+
+	function make_graph(graphtype, url, id) {
+	    $.ajax({ 
+			method: "GET", 
+			url: '//{{ request.get_host }}/api/graph_json/balances/?coin={{ coin }}', 
+			success: function(data) { 
+				//document.getElementById('graph_title').innerHTML = data.chartLabel;
+				if (graphtype == 'line') {
+					drawLineGraph(data, 'myChartline');
+				}
+				else if (graphtype == 'bar') {
+					drawBarGraph(data, 'myChartBar');
+				}
+			}, 
+			error: function(error_data) { 
+				console.log(error_data); 
+			} 
+	    }) 
+	}
+
+	function switch_combos(a,b) {
+		val_a = $(a).val()
+		val_b = $(b).val()
+		$(a).val(val_b)
+    	$(a).trigger('change')
+		$(b).val(val_a)
+    	$(b).trigger('change')
+	}
+	
+    function add_dropdown_options(options, id, selected='') {
+		var newOption = new Option('All', 'All', true, true);
+		$(id).append(newOption).trigger('change');
+		if (selected == 'All') {
+    		$(id).val(selected)
+    		$(id).trigger('change')				
+		}
+		$.each(options, function(i, p) {
+			if (selected == p) {
+				var newOption = new Option(p, p, true, true);
+				$(id).append(newOption).trigger('change');
+	    		$(id).val(selected)
+	    		$(id).trigger('change')
+	    	}
+		    else {
+				var newOption = new Option(p, p, false, false);
+				$(id).append(newOption).trigger('change');
+		    }				    
+		});
+	}
+
+	function build_dropdowns(table, json, listtype) {
+    	let distinct = json.distinct
+    	let selected = json.selected
+    	let required = json.required
+
+        for (let cat of Object.keys(distinct)) {
+			var options = distinct[cat];
+			dropdown = '#'+table+'-'+cat+'-input'
+			$(dropdown).empty();
+			if (!Object.keys(required).includes(cat)) {
+				if (!selected[cat]) {
+					$(dropdown).append($('<option></option>').val('All').html('All'));
+				}
+				else {
+					$(dropdown).append($('<option selected></option>').val('All').html('All'));
+				}
+			}
+			if (cat == 'month' && selected[cat]) {
+				let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+							  'August', 'September', 'October', 'November', 'December']
+				selected[cat] = months[selected[cat]+1]
+			}
+			$.each(options, function(i, p) {
+				let label = format_notary(p)
+				if (selected[cat]) {
+					if (selected[cat] == p) {
+			    		$(dropdown).append($('<option selected></option>').val(p).html(label));
+			    	}
+				    else {
+				    	$(dropdown).append($('<option></option>').val(p).html(label));
+				    }
+			    }
+			    else if (Object.keys(required).includes(cat)) {
+			    	$(dropdown).append($('<option selected></option>').val(p).html(label));
+			    }
+			    else {
+			    	$(dropdown).append($('<option></option>').val(p).html(label));
+			    }
+			});
+		}
+	}
+
+	function get_richlist_celldata(addresses) {
+		let linked_addresses = []
+		$.each(addresses, function(i, p) {
+			linked_addresses.push(
+				get_richlist_url(addresses[i])
+			)
+		})
+		return linked_addresses.join("<br />")
+	}
+
 	function get_region_scoreboard_table(season, region, url, title='') {
+
+		const dom = '<"row mx-0 p-0 my-2 "<"row '+region+'_notarisations-tbl-title col-md-6 p-0 m-0"><"col-sm-12 col-md-6"f>>tr<"row mx-0 p-0 my-2 d-flex justify-content-between"<"'+region+'_notarisations-api-link">ip>'
 	    table = $('#'+region+'_notarisations').DataTable({
 	    	"paging": false,
 	        "orderClasses": false,
@@ -264,18 +393,16 @@
 				{
 		            "targets": 7,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html(Math.round(oData.score*100, 2)/100);
+			            $(nTd).html((Math.round(oData.score*100, 2)/100).toFixed(2));
 			        }
 		        }
 			],
-			dom: '<"row mx-0 mt-3 "<"'+region+'_scoreboard_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"'+region+'_scoreboard_api_link">ip>',
+			dom: dom,
 			fnInitComplete: function(){
-				// $('#loading-spinner').css('display', 'none');
-				// $('#notary_mining_card').css('visibility', 'visible');
-	            $('.'+region+'_scoreboard_title').html('<h5 class="text-left">'+title+'</h5>');
+	            $('.'+region+'_notarisations-tbl-title').html('<h5 class="text-left">'+title+'</h5>');
 	            if (url != '') {
-	    	        let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="notary_mining" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
-		            $('.'+region+'_scoreboard_api_link').html(api_btn);
+	    	        let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="'+region+'_notarisations" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+		            $('.'+region+'_notarisations-api-link').html(api_btn);
 		        }
 			}
 	    });
@@ -293,24 +420,380 @@
 		return table
 	}
 
-	function make_graph(graphtype, url, id) {
-	    $.ajax({ 
-			method: "GET", 
-			url: '//{{ request.get_host }}/api/graph_json/balances/?coin={{ coin }}', 
-			success: function(data) { 
-				//document.getElementById('graph_title').innerHTML = data.chartLabel;
-				if (graphtype == 'line') {
-					drawLineGraph(data, 'myChartline');
+	function get_className(header) {
+		switch(header) {
+
+			case 'Ntx Count %':
+			case 'Ntx Score %':
+			case 'Ntx Score':
+			case 'Biggest Block':
+			case 'Score':
+			case 'Total Count':
+			case 'Ntx Count':
+		    case 'Since':
+			case 'Since Updated':
+		    case 'Updated':
+			case 'Last Block':
+			case 'Block Height':
+			case 'Ntx Height':
+			case 'SC Height':
+		    case 'Balance':
+			case 'USD Value':
+			case 'Category':
+			case 'Fees':
+			case 'Inputs':
+			case 'Input Index':
+			case 'Sent':
+			case 'Outputs':
+			case 'Output Index':
+			case 'Received':
+			case 'Rewards':
+			case 'KMD Value':
+			case 'KMD Mined':
+			case 'Blocks Mined':
+			case 'Time Since':
+			    return "text-right text-nowrap"
+
+			case 'Mined By':
+			case 'Notary':
+			case 'Coin':
+			case 'Season':
+			case 'Server':
+			case 'Epoch':
+		    case 'Name':
+			    return "text-left text-nowrap"
+
+		    // Function derived cells //
+		    
+			case 'Epoch Coins':
+			    return "fixed-width-28"
+
+			case 'Ntx Txid':
+			case 'Notaries':
+			case 'OP Return':
+			    return "text-center text-nowrap fw-14pct"
+
+		    default:
+		    	return "text-center text-nowrap"
+		}
+	}
+	
+	function isNotary(name) {
+		{% autoescape off %}
+			return ({{ notaries }}).includes(name)
+		{% endautoescape %}
+	}
+	
+	function isMiningPool(name) {
+		return (name).includes("Mining Pool")
+	}
+
+	function get_miningpool_url(name) {
+		switch(name) {
+			case "k1pool (Mining Pool)":
+				url = "https://k1pool.com/pool/kmd"
+				break
+
+			case "ZPool (Mining Pool)":
+				url = "https://zpool.ca/coins"
+				break
+
+			case "LuckPool (Mining Pool)":
+				url = "https://luckpool.net/"
+				break
+
+			case "Mining-Dutch (Mining Pool)":
+				url = "https://www.mining-dutch.nl/"
+				break
+
+			case "MiningFool (Mining Pool)":
+				url = "https://kmd.miningfool.com/"
+				break
+
+			case "ZergPool (Mining Pool)":
+				url = "https://zergpool.com/site/block?coin=KMD"
+				break
+
+			case "CoolMine (Mining Pool)":
+				url = "https://coolmine.top/?coin=4"
+				break
+
+			case "Luxor (Mining Pool)":
+				url = "https://mining.luxor.tech/"
+				break
+
+			case "ProHashing (Mining Pool)":
+				url = "https://prohashing.com/"
+				break
+
+			case "SoloPool (Mining Pool)":
+				url = "https://kmd.solopool.org/"
+				break
+
+		    default:
+		    	return name
+
+		}
+   		return "<a class='' href='"+url+"'>\
+   			<span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Go to "+url+"'>"+name+"</span></a>";
+	}
+
+	function get_columnDefs(columns) {
+		
+		columnDefs = []
+		let i = 0
+	    for (let [key,header] of Object.entries(columns)) {
+	    	visible = header == "" ? false : true
+			columnDefs.push({
+	            "targets": i,
+	            "data": key,
+	            "visible": visible,
+	            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+
+			    	switch(header) {
+
+						case 'KMD to LTC':
+						case 'Main to KMD':
+						case '3P to KMD':
+							val = "<a href='/table/notarised/?hide_filters=1&date="+oData.notarised_date+"&notary="+oData.notary+"'>"+parseInt(oData[key])+"</a>"
+					    	break
+
+						case 'Season Count':
+						case 'Season Score':
+							text = header =='Season Count' ? parseInt(oData[key]) : parseFloat(oData[key]).toFixed(3)
+							if (oData.server) {
+								val = "<a href='/table/notarised_coin_daily/?hide_filters=1&season="+oData.season+"&server="+oData.server+"'>"+text+"</a>"
+							}
+							else if (oData.notary) {
+								val = "<a href='/table/notarised_count_daily/?hide_filters=1&season="+oData.season+"&notary="+oData.notary+"'>"+text+"</a>"
+							}
+							else if (oData.coin) {
+								val = "<a href='/table/notarised_coin_daily/?hide_filters=1&season="+oData.season+"&coin="+oData.coin+"'>"+text+"</a>"
+							}
+							else {
+								 val = text
+							}
+					    	break
+
+						case 'Ntx Count %':
+						case 'Ntx Score %':
+						    val = parseFloat(oData[key]).toFixed(3) + "%"
+					    	break
+
+						case 'Ntx Count':
+						case 'Ntx Score':
+							text = header =='Ntx Count' ? parseInt(oData[key]) : parseFloat(oData[key]).toFixed(8)
+							if (oData.notary) {
+								val = "<a href='/table/notarised/?hide_filters=1&coin="+oData.coin+"&date="+oData.notarised_date+"'>"+text+"</a>"
+							}
+							else if (oData.coin) {
+								val = "<a href='/table/notarised/?hide_filters=1&coin="+oData.coin+"&date="+oData.notarised_date+"'>"+text+"</a>"
+							}
+							else {
+								 val = text
+							}
+					    	break
+					    
+						case 'Address':
+						case 'Address / Pubkey':
+					    case 'Name':
+					    case 'Balance':
+					    	coin = oData.coin
+					    		? oData.coin : "KMD"
+
+					    	if (oData.output_addresses) {
+					    		val = get_richlist_celldata(oData.output_addresses)
+					    	}
+					    	else {
+					    		text = oData.balance && header != "Address"
+							    	? parseFloat(oData.balance).toFixed(4) : oData.name
+							    	? oData.name : oData.address
+						    	val = get_address_url(coin, oData.address, text)
+						    	val = oData.pubkey 
+							    	? val+"<br /><span style='font-size:0.8em; font-style: italic;'>"+oData.pubkey+"</span>" : val
+					    	}
+					    	break
+
+						case 'Blocks Mined':
+						case 'Sum Mined':
+							text = header =='Sum Mined' ? parseFloat(oData[key]).toFixed(8) : parseInt(oData[key])
+							val = oData.last_mined_block
+							? "<a href='/table/mined/?hide_filters=1&season="+oData.season+"&name="+oData.name+"'>"+text+"</a>" : oData.mined_date && oData.notary
+							? "<a href='/table/mined/?date="+oData.mined_date+"&name="+oData.notary+"'>"+text+"</a>" : text
+					    	break
+
+						case 'Mined By':
+						case 'Notary':
+							let name = oData.name ? oData.name : oData.notary ? oData.notary : ""
+							val = isNotary(name)
+								? get_notary_url(oData.season, name) : isMiningPool(name)
+								? get_miningpool_url(name) : oData.address && oData.coin 
+			            		? get_address_url(oData.coin, oData.address, name) : oData.address && oData.name 
+			            		? get_address_url("KMD", oData.address, name) : oData.input_sats
+			            		? get_address_url("LTC", oData.address, name) : get_notary_url(oData.season, name)
+					    	break
+
+						case 'Last Block':
+						case 'Block Height':
+						case 'Ntx Height':
+						case 'SC Height':
+						    coin = header == 'SC Height'
+						    	? oData.coin : oData.output_sats
+						    	? "LTC" : "KMD"
+					    	val = get_block_url(coin, oData[key])
+					    	break
+
+						case 'Ntx Txid':
+						case 'Biggest Block':
+						    val = oData.max_value_txid
+						    	? get_txid_url("KMD", oData.max_value_txid, parseFloat(oData[key]).toFixed(8)) : oData.kmd_ntx_txid
+						    	? get_txid_url("KMD", oData[key]) : parseFloat(oData[key]).toFixed(8)
+					    	break
+
+						case 'USD Value':
+					    	val = oData.value
+					    		? oData.value : oData.rewards_value
+					    		? oData.rewards_value : oData.sum_value_mined
+					    		? oData.sum_value_mined : 1
+							val = "$USD " + (oData.usd_price * val).toFixed(2)
+					    	break
+
+						case 'Rewards':
+						case 'Sent':
+						case 'Fees':
+						case 'Received':
+						case 'KMD Mined':
+						case 'KMD Value':
+						    val = ["KMD Mined", "Rewards"].includes(header)
+						    	? parseFloat(oData[key]) : parseInt(oData[key])
+					    	val = isNaN(val)
+					    		? val
+					    		: val >= 0 && ["KMD Mined", "Rewards"].includes(header)
+					    		? "<a href='https://komodod.com/t/"+oData.txid+"'>"+(val).toFixed(8)+"</a>"
+					 		   		: val >= 0 && ["Sent", "Received", "Fees", "KMD Value"].includes(header)
+					    		? "<a href='https://komodod.com/t/"+oData.txid+"'>"+(val/10000000).toFixed(8)+"</a>"
+					    		: "-"
+					    	break
+
+						case 'Inputs':
+						case 'Input Index':
+						case 'Outputs':
+						case 'Output Index':
+			    			val = parseInt(oData[key])
+			    			val = val < 0 ? "-" : val
+					    	break
+
+					    case 'Time Since':
+					    case 'Since Updated':
+					    	val = get_time_since(oData[key])
+					    	break
+
+						case 'Time UTC':
+						    val = oData[key].split("T")[1].replace("Z", "")
+					    	break
+
+						case 'Total Count':
+						    val = parseInt(oData[key])
+					    	break
+
+						case 'OP Return':
+					    	val = get_opret_link(oData[key])
+					    	break
+
+			    		case 'Season':
+					    	val = get_season_styled(oData[key])
+					    	break
+
+						case 'Server':
+					    	val = get_server_styled(oData[key])
+					    	break
+
+						case 'Epoch': 
+					    	val = get_epoch_styled(oData[key])
+					    	break
+
+						case 'Epoch Coins':
+					    	val = get_epoch_coins(oData[key])
+					    	break
+
+						case 'Coin':
+					    	val = get_coin_icon(oData[key])
+					    	break
+
+						case 'Notaries':
+					    	val = get_notaries_symbol(oData.notaries, oData.txid)
+					    	break
+
+					    default:
+			    			val = oData[key]
+					    	break
+			        }
+					$(nTd).html(val)
+    			},
+    			"className": get_className(header)
+		    })
+    		i++;			
+	    }
+
+	    return columnDefs
+	}
+
+	function get_opret_link(opret) {
+		let op_return = (opret.split(" ").length > 1) ? opret.split(" ")[1] : opret
+		let icon = "<i class='fas fa-arrow-right'></i>"
+		let tooltip = "Decode OP_RETURN: "+op_return
+		let url = "{% url 'decode_op_return_view' %}?OP_RETURN="+op_return+"&season={{ season }}"
+		return get_detail_link_icon(icon, tooltip, url)
+	}
+
+	function refresh_table(table, endpoint, filters, required) {
+	    let params = get_params(table, filters, required)
+	    let url = endpoint+params
+		window.tables[table+"_table"].ajax.url(url).load();
+        let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="{{ table }}" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+        $('.{{ table }}_api_link').html(api_btn);
+	}
+
+	function get_params(table, param_list, required, selected, no_filter) {
+		let params = {}
+		if (selected) {
+			for (let x of Object.keys(selected)) {
+				if (!["All", undefined, null, ""].includes(selected[x])) params[x] = selected[x]
+			}
+		}
+		if (!no_filter) {
+			
+			for (let x of param_list) {
+				if (!Object.keys(params).includes(x)) {
+					val = $("#"+table+"-"+x+"-input").val()
+					if (!["All", undefined, null, ""].includes(val)) params[x] = val
 				}
-				else if (graphtype == 'bar') {
-					drawBarGraph(data, 'myChartBar');
+			}
+			
+			for (let x of Object.keys(required)) {
+				if (!Object.keys(params).includes(x)) {
+					if (!["All", undefined, null, ""].includes(required[x])) params[x] = required[x]
 				}
-				console.log("drawing "+id+" graph");
-			}, 
-			error: function(error_data) { 
-				console.log(error_data); 
-			} 
-	    }) 
+			}
+		}
+		param_list = []
+		for (let x of Object.keys(params)) {
+			param_list.push(x+"="+params[x])
+		}
+		
+		return "?" + param_list.join("&")
+	}
+
+	function reset_inputs(table, param_list, required) {
+		for (let x of param_list) {
+			if (Object.keys(required).includes(x)) {
+				$("#"+table+"-"+x+"-input").val(required[x])
+			}
+			else if ($("#"+table+"-"+x+"-input").val() != "All") {
+				$("#"+table+"-"+x+"-input").val("All")
+			}
+		}
+		$("#"+table+"-"+param_list[0]+"-input").trigger('change');
 	}
 
 	function get_block_url(coin, blockheight, extra_class) {
@@ -400,8 +883,24 @@
         }
 	}
 
+	function titlecase(string) {
+	  return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+
+	function format_notary(notary) {
+		if (notary) {
+			x = notary.split("_")
+			if (x.length > 1) {
+				return titlecase(x.slice(0,-1).join("_")) + " " + x.slice(-1)
+			}
+			return titlecase(notary)
+		}
+		return notary
+	}
+
 	function get_notary_url(season, notary) {
-		return "<a href=\"{% url 'notary_profile_index_view' %}"+notary+"/?season="+season+"\">"+notary+"</a>"
+		notary_txt = format_notary(notary)
+		return "<a href=\"{% url 'notary_profile_index_view' %}"+notary+"/?season="+season+"\">"+notary_txt+"</a>"
 	}
 
 	function get_season_styled(season) {
@@ -532,7 +1031,6 @@
 	    	var row = table.row(index);
 		    var d = row.data();
 		    if (d.rank <= 3) {
-		    	console.log(d.notary)
 		    	row
 		    	.nodes()
 			    .to$()    // Convert to a jQuery object
@@ -543,7 +1041,6 @@
 	    	var row = table.row(index);
 		    var d = row.data();
 		    if ((d.rank == 4) || (d.rank == 5)) {
-		    	console.log(d.notary)
 		    	row
 		    	.nodes()
 			    .to$()    // Convert to a jQuery object
@@ -650,10 +1147,18 @@
 		$('#qrcode-modal-subtitle').html(subtitle)
 	}
 
+	function get_rewards_tables() {
+		let address = $('#address').val()
+		let url = "/api/source/rewards_tx/?address={"+address+"}"
+ 		rewards_history_table.ajax.url(url).load();
+	}
+
     // Custom DataTables search filter input styling
     function update_dt_search(id) {
-        filter_div = '<div class="col-6 input-group-prepend px-0 ml-auto"><span class="input-group-text col-4">Search: </span><input type="search" class="col-8 ml-0 mr-3 form-control form-control-sm" placeholder="" aria-controls="'+id+'"></div>'
+        filter_div = `{% include "components/form/dt_search.html" %}`
+        //<div class="col-6 input-group-prepend px-0 ml-auto"><span class="input-group-text col-4">Search: </span><input type="search" class="col-8 ml-0 mr-3 form-control form-control-sm" placeholder="" aria-controls="'+id+'"></div>'
         $("#"+id+"_filter").html(filter_div)
+        $("#"+id+"_filter").addClass('ml-auto')
         $("#"+id+"_filter").on("keyup", 'input', function() {
             $("#"+id).DataTable().search(this.value.trim(), false, false).draw();
         });
@@ -682,4 +1187,63 @@
              }
         }, 1000 );
     }
+    		function floorRound (num, num_dec) {
+		    var dp = parseInt("1" + "0".repeat(num_dec));
+		    num = parseFloat(num)
+			num = Math.floor(num * dp);
+		    return num / dp;
+		}
+
+		function get_fees(coin='KMD', size=80, sat_per_byte=10) {
+			return 0.0001
+		}
+
+		function get_unallocated(address_rows) {
+			sum_selected = floorRound(parseFloat($("#sum_selected").html()), 5)
+			sum_outputs = get_sum_outputs(address_rows)
+			fees = get_fees()
+			unallocated = sum_selected - sum_outputs - fees
+			return unallocated
+		}
+
+		function spendMax(id) {
+			unallocated = get_unallocated($(id).parent())
+			output_amount = parseFloat($(id).val())
+			$(id).val(floorRound(output_amount+unallocated,5))
+			sanitize_outputs()
+		}
+
+		function get_sum_outputs(address_rows) {
+			num_rows = $(address_rows).children().length;
+			sum_outputs = 0
+			for (var i = 0; i < num_rows; i++) {
+				output_amount = $("#output_amount_"+i).val()
+				if (!($.isNumeric(output_amount))) {
+					output_amount = 0
+					$("#output_amount_"+i).val(0)
+				}
+				sum_outputs += parseFloat(output_amount)
+			}
+			return floorRound(sum_outputs,5)
+		}
+
+    	function zero_NaN(num) {
+			if (!($.isNumeric(output_amount))) {
+				return 0
+			}
+			else {
+				return parseFloat(num)
+			}
+
+    	}
+
+		function sanitize_outputs(address_rows='#output_addresses') {
+			sum_selected = floorRound(parseFloat($("#sum_selected").html()),5)
+			sum_outputs = get_sum_outputs(address_rows)
+			fee_val = sum_selected - sum_outputs
+			$("#fee_val").html(floorRound(fee_val,5))
+			$("#total_val").html(sum_outputs+fee_val)
+			/* if fees > 0.001 , red text warning, disable submit */
+			/* if remaining < 0 , red text warning, disable submit */		
+		}
 </script>

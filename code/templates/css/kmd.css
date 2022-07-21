@@ -1,7 +1,12 @@
 
         <style>
             /* Style Guide Reference - https://komodoplatform.com/wp-content/uploads/2019/07/Komodo_Style_Guide_2019-V2.pdf */
-
+            ::selection {
+              background: #094e00; /* WebKit/Blink Browsers */
+            }
+            ::-moz-selection {
+              background: #094e00; /* Gecko Browsers */
+            }
             a {
                 color: #52a197;
                 transition: color 0.3s ease-in-out;
@@ -94,15 +99,15 @@
             /* Scrollbar */
 
             ::-webkit-scrollbar {
-              width: 10px;
+              width: 4px;
             }
 
             ::-webkit-scrollbar-track {
-              background: #1a2939;
+              background: #000000;
             }
 
             ::-webkit-scrollbar-thumb {
-              background: #888;
+              background: #303030;
             }
 
             ::-webkit-scrollbar-thumb:hover {
@@ -494,8 +499,8 @@
                 border-left: 0 !important;
             }
             .form-control:focus {
-                background-color: #748dab;
-                border-color: #8ad4ee;
+                background-color: #1e3348;
+                border-color: #303030;
                 color: #ffebcd !important;
                 outline: 0;
                 box-shadow: 0 0 0 0.2rem rgba(24, 51, 83, 0.25);
@@ -547,6 +552,17 @@
                 border-top-right-radius: 0 !important;
             }
 
+            /* ref:  https://stackoverflow.com/questions/2338102/override-browser-form-filling-and-input-highlighting-with-html-css */
+            input:-webkit-autofill {
+                -webkit-box-shadow:0 0 0 50px #181a1c inset; /* Change the color to your own background color */
+                -webkit-text-fill-color: #8ba7ca;
+            }
+
+            input:-webkit-autofill:focus {
+                -webkit-box-shadow: 0 0 0 50px #181a1c inset;/*your box-shadow*/
+                -webkit-text-fill-color: #8ba7ca;
+            } 
+
             .input-group {
             }
             .input-group-prepend, .input-group-append {
@@ -562,7 +578,7 @@
             .input-group-text {
                 color: #8ba7ca;
                 border: none;
-                background:transparent;
+                background: transparent;
                 height: 1.3rem !important;
                 padding: 1rem !important;
 
@@ -576,6 +592,7 @@
                 border-bottom-left-radius: 0;
             }
             .prepend-label-left {
+                z-index: 2;
                 background-color: #0d0f1c;
                 border: solid 1px #303030 !important;
                 border-top-left-radius: 0.25rem;
@@ -585,11 +602,6 @@
             }
             .append-label-right {
                 background-color: #0d0f1c;
-                border: solid 1px #303030 !important;
-                border-top-left-radius: 0;
-                border-bottom-left-radius: 0;
-                border-top-right-radius: 0.25rem;
-                border-bottom-right-radius: 0.25rem;
             }
             .coin-params-field {
                 background-color: #172331;
@@ -600,12 +612,12 @@
 
             /* Select 2 Plugin Style Overrides */
             .select2-results__option {
-                background-color: #334352 !important;
+                background-color: #000000 !important;
                 color: #aeaeae !important;
                 border: none;
             }
             .select2-results__option:hover {
-                background-color: #11253e !important;
+                background-color: #1c1c1c !important;
                 color: #aeaeae !important;
                 border: none;
             }
@@ -614,13 +626,20 @@
 
             }
             .select2-search__field {
-                background-color: #172331 !important;                
+                background-color: #1c1c1c !important;                
+            }
+            .select2-dropdown {
+                background-color: #1c1c1c !important;
+                border: solid #303030 1px !important;
             }
             .select2-selection, .select2-search  {
-                background-color: #334352 !important;
+                background-color: #000000 !important;
                 color: #aeaeae !important;
             }
+            .select2-selection__rendered {
+                margin-top: 0.2em;
 
+            }
 
 
             /* SIDEBAR */
@@ -744,6 +763,39 @@
                 border: solid #3cddd4aa 1px !important;
                 text-decoration: none;
             }
+            .txt-08 {
+                font-size: 0.8em;
+            }
+            .txt-09 {
+                font-size: 0.9em;
+            }
+            .square-btn {
+                line-height: 1rem;
+                color: #b9b5b5 !important;
+                border: solid #303030 1px !important;
+                border-top-left-radius: 0 !important;
+                border-bottom-left-radius: 0 !important;
+                border-top-right-radius: 0.1rem;
+                border-bottom-right-radius: 0.1rem;
+                background-color:#11253e !important;
+                padding: 4px;
+            }
+            .square-btn:hover {
+                line-height: 1rem;
+                color: #aeaeae !important;
+                border: solid #303030 1px !important;
+                background-color:#0957a5 !important;
+            }
+            .square-btn:active {
+                line-height: 1rem;
+                color: #aeaeae !important;
+                border: solid #303030 1px !important;
+                background-color:#0957a5 !important;
+            }
+            .square-btn:focus {
+                outline: #11253e !important;
+            }
+
             .std-btn  {
                 line-height: 1rem;
                 color: #b9b5b5 !important;
@@ -959,9 +1011,22 @@
                 -ms-flex: 0 0 50%;
                 flex: 0 0 50%;
                 max-width: 50%;
+                align-self: self-end;
+
             }
             .api_link {
                 padding-top: 0.85em;
+            }
+
+            .fixed-center {
+                height: 200px;
+                width: 260px;
+                top: 50%;
+                left: 50%;
+                margin-top: -100px;
+                margin-left: -130px;
+                position: fixed;
+                z-index: 7;
             }
 
 

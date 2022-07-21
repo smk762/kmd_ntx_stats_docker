@@ -25,10 +25,6 @@ frontend_mining_urls = [
     ]
 
 api_mining_urls = [
-    path('api/mining/notary_last_mined_table/',
-          api_mining.notary_last_mined_table,
-          name='notary_last_mined_table'),
-
     path('api/mining/notary_mining/',
           api_mining.notary_mining_api,
           name='notary_mining_api'),
@@ -37,6 +33,10 @@ api_mining_urls = [
           api_mining.nn_mined_4hrs_api,
           name='nn_mined_4hrs_api'),
 
+    path('api/mining/mining_24hrs/',
+          api_mining.mining_24hrs_api,
+          name='mining_24hrs_api'),
+    
     path('api/info/mined_count_daily/',
           api_mining.mined_count_daily_by_name,
           name='mined_count_daily_by_name'),

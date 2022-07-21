@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;">
-		<div class="card m-auto">
-			<div class="card-header flex">
-				<h2>{{ page_title }}</h2>
-			</div>			
-			<div class="card-body flex">
-				<table style="visibility: hidden;" id="last_swaps_tbl" class="table table-striped table-bordered">
+	<div class="row col-12 m-auto">
+		<div class="card table_card floating-card m-auto col-12" id="bids_card" style="font-size: 1.1em;" >
+			<div class="card-header table_card_header col-12">
+			</div>
+			<div class="card-body table_card_body col-12">
+				<table style="" id="failed-swaps-tbl" class="table table-striped table-bordered m-auto" style="width:100%">
 					<thead>
 						<tr>
 							<th data-data="taker_coin">Taker</th>
@@ -24,7 +23,7 @@
 							<td class="text-left text-nowrap" data-data="maker">{{ row.maker_coin }}</td>
 							<td data-data="taker_error_type">{{ row.taker_error_type }}</td>
 							<td data-data="maker_error_type">{{ row.maker_error_type }}</td>
-							<td data-data="timestamp">{{ row.time_stamp }}</td>
+							<td data-data="timestamp">{{ row.timestamp }}</td>
 						</tr>
 					{% endfor %}
 					</tbody>
@@ -35,10 +34,14 @@
 
 	<script type="text/javascript">
 	    $(document).ready(function() {
-	    	$('#last_swaps_tbl').css('visibility', 'visible');
-	        $('#last_swaps_tbl').DataTable({
+	    	let url = "{{ endpoint }}"
+	    	const dom = '{% include "components/tables/dt_dom.html" with table="failed-swaps" %}'
+	    	const dom = '<"row mx-0 p-0 my-2 "<"failed-swaps-tbl-title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"failed-swaps-api-link">ip>'
+
+	        $('#failed-swaps-tbl').DataTable({
   				"pageLength": 50,
-        		order: [[ 4, 'desc' ]],
+	    		"dom": dom,
+        		"order": [[ 4, 'desc' ]],
         		"columnDefs": [
         			{
 			            "data": 'taker_coin',
@@ -67,11 +70,15 @@
 			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	$(nTd).html(get_time_since(oData.timestamp));
-				        }
+				        },
+				    	"className": "text-right text-nowrap"
 			        }
 			    ],
                 // Custom DataTables search filter input styling
 				"initComplete": function (settings, json) {
+		            $('.failed-swaps-tbl-title').html('<h3 class="">{{ page_title }}</h3>');
+		            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="failed_swaps" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+		            $('.failed-swaps-api-link').html(api_btn);
 	            }
 	        });
 	    });

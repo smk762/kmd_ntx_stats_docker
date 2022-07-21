@@ -357,7 +357,7 @@ SEASONS_INFO = {
         "start_block": 2963330,
         "end_block": 4437000,
         "start_time": 1656077853,
-        "end_time": 2773682800,
+        "end_time": 2147483647,
         "notaries": [],
         "coins": [],
         "servers": {}
@@ -387,7 +387,7 @@ SEASONS_INFO = {
                         "coins": ["RICK", "MORTY"]
                     }
                 }
-            }                        
+            }
         }    
     }
 }
@@ -407,7 +407,7 @@ for _server in NEXT_SEASON_COINS["Season_6"]:
                     "start_block": 2963330,
                     "end_block": 4437000,
                     "start_time": 1656077853,
-                    "end_time": 2773682800,
+                    "end_time": 2147483647,
                     "coins": NEXT_SEASON_COINS["Season_6"][_server]
                 }
             },
@@ -799,6 +799,10 @@ for _season in SEASONS_INFO:
             elif SEASONS_INFO[_season]["end_time"] > NOW:
                     SEASON = _season
 
-#print(f"SEASONS_INFO: {SEASONS_INFO}")
+print(f"SEASONS_INFO: {SEASONS_INFO['Season_6']['servers']['Third_Party']}")
+
+SEASONS_INFO['Season_6']['servers']['Third_Party']['epochs']['Epoch_0']['coins'] = ['AYA', 'EMC2', 'MCL', 'SFUSD', 'TOKEL']
+SEASONS_INFO['Season_6']['servers']['Third_Party']['epochs']['Epoch_0']['num_coins'] = 5
+SEASONS_INFO['Season_6']['servers']['Third_Party']['epochs']['Epoch_0']['score_per_ntx'] = calc_epoch_score('Third_Party', 5)
 
 print(f"{int(time.time()) - NOW} sec to complete dpow const")

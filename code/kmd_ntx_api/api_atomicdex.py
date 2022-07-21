@@ -2,10 +2,17 @@
 from django.http import JsonResponse
 import kmd_ntx_api.lib_atomicdex as dex
 import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.lib_table as table
 
 
 def orderbook_api(request):
     return JsonResponse(dex.get_orderbook(request))
+
+
+def orderbook_table_api(request):
+    resp = table.get_orderbook_table(request)
+    filters = ["base", "rel"]
+    return helper.json_resp(resp, filters)
 
 
 def seednode_version_date_table_api(request):
@@ -44,11 +51,6 @@ def last_200_failed_swaps_api(request):
 
 def swaps_gui_stats_api(request):
     resp = dex.get_swaps_gui_stats(request)
-    return JsonResponse(resp)
-
-
-def swaps_pubkey_stats_api(request):
-    resp = dex.get_swaps_pubkey_stats(request)
     return JsonResponse(resp)
 
 

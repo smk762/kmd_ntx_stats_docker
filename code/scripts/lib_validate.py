@@ -290,15 +290,15 @@ def get_coin_server(season, coin):
     return "Unofficial"
 
  
-def get_season(time_stamp=None):
+def get_season(timestamp=None):
 
-    if not time_stamp:
-        time_stamp = int(time.time())
-    time_stamp = int(time_stamp)
+    if not timestamp:
+        timestamp = int(time.time())
+    timestamp = int(timestamp)
 
     # detect & convert js timestamps
-    if round((time_stamp/1000)/time.time()) == 1:
-        time_stamp = time_stamp/1000
+    if round((timestamp/1000)/time.time()) == 1:
+        timestamp = timestamp/1000
 
     for season in SEASONS_INFO:
 
@@ -308,7 +308,7 @@ def get_season(time_stamp=None):
             else:
                 end_time = SEASONS_INFO[season]['end_time']
 
-        if time_stamp >= SEASONS_INFO[season]['start_time'] and time_stamp <= end_time:
+        if timestamp >= SEASONS_INFO[season]['start_time'] and timestamp <= end_time:
             return season
 
     return "Unofficial"
@@ -318,3 +318,14 @@ def get_name_from_address(address):
     if address in KNOWN_ADDRESSES:
         return KNOWN_ADDRESSES[address]
     return address
+
+def get_category_from_name(name):
+    if "Mining Pool" in name:
+        return "Mining Pool"
+    for i in ["_AR", "_EU", "_NA", "_SH", "_DEV"]:
+        if i in name:
+            return "Notary"
+    return "Solo"
+
+def override_ticker(ticker):
+    if ticker == "TKL": ticker = "TOKEL"

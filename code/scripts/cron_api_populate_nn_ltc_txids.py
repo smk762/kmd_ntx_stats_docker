@@ -9,6 +9,7 @@ from datetime import datetime as dt
 import datetime
 import dateutil.parser as dp
 
+import lib_urls as urls
 from lib_helper import *
 from lib_ntx import *
 from lib_update import update_nn_ltc_tx_notary_from_addr
@@ -243,7 +244,7 @@ def detect_split(txid_data, addresses):
     return False
 
 def scan_ltc_transactions(season):
-    season_ltc_addresses_resp = requests.get(f"http://116.203.120.91:8762/api/table/addresses/?season={season}&server=Main&coin=LTC").json()["results"]
+    season_ltc_addresses_resp = requests.get(urls.get_addresses_url(season, server="Main", coin="LTC")).json()["results"]
     season_ltc_addresses = []
     for item in season_ltc_addresses_resp:
         season_ltc_addresses.append(item["address"])

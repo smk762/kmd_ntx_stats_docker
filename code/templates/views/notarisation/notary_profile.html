@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+	<div class="row col-12 m-0" style="color: #b9b5b5;">
+		<div class="card-deck d-flex justify-content-between col-12 m-0">
+            {% include "components/profile_stats/notary_ntx_stats.html" %}
+            {% include "components/cards/notary_profile_card.html" %}
+            {% include "components/profile_stats/mining_stats.html" %}
+		</div>
+	</div>
+
+
+	{% include 'components/buttons/action_buttons_row.html' with buttons=buttons %}
+
+	{% include 'components/tables/notary_profile/notary_season_ntx_table.html' %}
+	{% include 'components/tables/notary_profile/notary_24hr_ntx_table.html' %}
+	
+	{% include 'components/tables/notary_profile/notary_last_coin_ntx_table.html' %}
+	{% include 'components/tables/notary_profile/notary_mined_season_table.html' %}
+<!--	{% include 'components/graphs/notary_balances_bargraph.html' %} -->
+	{% include 'components/tables/notary_profile/notary_balances_table.html' %} 
+
+{% endblock %}

@@ -19,11 +19,6 @@ source_router.register(r'balances',
                 api_viewsets.balancesViewSet,
                 basename='balancesViewSet')
 
-# TODO: Awaiting delegation to crons / db table
-#source_router.register(r'coin_sync',
-#                api_viewsets.coinSyncViewSet,
-#                basename='coinSyncViewSet')
-
 source_router.register(r'coins',
                 api_viewsets.coinsViewSet,
                 basename='coinsViewSet')
@@ -35,11 +30,6 @@ source_router.register(r'coin_ntx_season',
 source_router.register(r'coin_social',
                 api_viewsets.coinSocialViewSet,
                 basename='coinSocialViewSet')
-
-# TODO: Not in use, will implement S5
-#source_router.register(r'funding_transactions',
-#                api_viewsets.fundingTXViewSet,
-#                basename='fundingTXViewSet')
 
 source_router.register(r'coin_last_ntx',
                 api_viewsets.coinLastNtxViewSet,

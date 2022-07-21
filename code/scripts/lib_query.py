@@ -214,7 +214,7 @@ def get_reward_blocks():
 
 def get_reward_input_addresses():
     resp = []
-    CURSOR.execute("SELECT DISTINCT input_addresses FROM rewards_tx WHERE rewards_value > 1;")
+    CURSOR.execute("SELECT DISTINCT address FROM rewards_tx;")
     try:
         results = CURSOR.fetchall()
         for result in results:

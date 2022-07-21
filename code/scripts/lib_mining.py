@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+import json
 import time
 import random
 from decimal import *
@@ -16,42 +17,59 @@ import lib_helper
 
 script_path = os.path.abspath(os.path.dirname(sys.argv[0]))
 
-def get_mined_row(block_height, coin="KMD", prices=dict):
-    row = mined_row()
-    blockinfo = RPC[coin].getblock(str(block_height), 2)
-
-    for tx in blockinfo['tx']:
+def get_mined_row(row, block_tx, coin="KMD", prices=None):
+    for tx in block_tx:
         if len(tx['vin']) > 0:
             if 'coinbase' in tx['vin'][0]:
-                
+
                 if 'addresses' in tx['vout'][0]['scriptPubKey']:
                     address = tx['vout'][0]['scriptPubKey']['addresses'][0]
                 else:
                     address = "N/A"
 
-                row.block_height = block_height
-                row.block_time = blockinfo['time']
                 row.address = address
                 row.txid = tx['txid']
-                row.diff = blockinfo['difficulty']
                 row.value = Decimal(tx['vout'][0]['value'])
-
-                season = lib_validate.get_season(row.block_time)
-                date = f"{dt.fromtimestamp(row.block_time)}".split(" ")[0]
-
-                if season in prices:
-                    if date in prices[season]:
-                        row.usd_price = Decimal(prices[season][date]['usd'])
-                        row.btc_price = Decimal(prices[season][date]['btc'])
-
-                break
     return row
 
 
-def update_mined_row(block_height, coin="KMD", prices=dict):
-    row = get_mined_row(block_height, coin, prices)
-    if row.address not in ['', 'N/A']:
-        row.update()
+def update_mined_rows(rescan_blocks, coin="KMD", prices=None):
+    for block in rescan_blocks:
+        row = mined_row()
+        blockinfo = RPC[coin].getblock(str(block), 2)
+        row.block_time = blockinfo['time']
+        row.diff = blockinfo['difficulty']
+        row.block_height = block
+
+        season = lib_validate.get_season(row.block_time)
+        date = f"{dt.fromtimestamp(row.block_time)}".split(" ")[0]
+        date = date.split("-")
+        date.reverse()
+        date = "-".join(date)
+        print(date)
+
+        if season not in prices:
+            prices.update({season: {}})
+
+        if f"{date}" not in prices[season]:
+            prices[season].update({f"{date}": {}})
+
+        if 'btc' not in prices[season][f"{date}"]:
+            api_prices = api.get_kmd_price(date)
+            if api_prices:
+                price_updated = True
+                prices[season][f"{date}"].update(api_prices)
+                time.sleep(1)
+
+        print(prices[season][date])
+        row.usd_price = Decimal(prices[season][date]['usd'])
+        row.btc_price = Decimal(prices[season][date]['btc'])
+        row = get_mined_row(row, blockinfo['tx'], coin, prices)
+        if row.address not in ['', 'N/A']:
+            row.update()
+
+    with open(f"{script_path}/prices_history.json", "w+") as j:
+        json.dump(prices, j, indent=4)
 
 
 @print_runtime
@@ -59,13 +77,14 @@ def update_mined_table(season, coin="KMD", start_block=None):
 
     tip = int(RPC[coin].getblockcount())
     if not start_block:
-        start_block = tip - 100
+        start_block = tip - 1500
 
-    all_blocks = [*range(1,tip,1)] 
+    all_blocks = [*range(1,tip,1)]
     recorded_blocks = [block[0] for block in select_from_table('mined', 'block_height')]
     unrecorded_blocks = set(all_blocks) - set(recorded_blocks)
-    rescan_blocks = list(set(list(unrecorded_blocks) + [*range(start_block,tip,1)]))
+    rescan_blocks = list(set(list(unrecorded_blocks)))
     random.shuffle(rescan_blocks)
+    rescan_blocks = [*range(start_block,tip,1)] +    rescan_blocks[:1000]
     logger.info(f"[update_mined_table] {len(recorded_blocks)} in mined table in db")
     logger.info(f"[update_mined_table] {len(unrecorded_blocks)} not in mined table in db")
     logger.info(f"[update_mined_table] {len(rescan_blocks)} blocks to scan")
@@ -77,8 +96,7 @@ def update_mined_table(season, coin="KMD", start_block=None):
         print(e)
         prices = {}
 
-    for block in rescan_blocks:
-        update_mined_row(block, "KMD", prices)
+    update_mined_rows(rescan_blocks, "KMD", prices)
 
 
 @print_runtime
@@ -105,16 +123,23 @@ def update_mined_count_daily_table(season, rescan=None):
     print(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
 
     while start <= end:
-        if season in prices:
-            if f"{start}" not in prices[season] or start >= end - delta:
-                prices[season].update({f"{start}":{}})
-                logger.info(f"Updating [kmd_price] for {start}")
-                date = f"{start}".split("-")
-                date.reverse()
-                date = "-".join(date)
-                api_prices = api.get_kmd_price(date)
-                prices[season][f"{start}"].update(api_prices)
+        date = f"{start}".split("-")
+        date.reverse()
+        date = "-".join(date)
+
+        if season not in prices:
+            prices.update({season: {}})
+
+        if f"{date}" not in prices[season]:
+            prices[season].update({f"{date}": {}})
+
+        if 'btc' not in prices[season][f"{date}"]:
+            api_prices = api.get_kmd_price(date)
+            if api_prices:
+                prices[season][f"{date}"].update(api_prices)
                 time.sleep(1)
+            else:
+                break
 
         logger.info(f"[process_mined_aggregates] Aggregating daily mined counts for {start}")
         results = get_mined_date_aggregates(start)
@@ -126,7 +151,9 @@ def update_mined_count_daily_table(season, rescan=None):
                 row.blocks_mined = int(item[1])
                 row.sum_value_mined = float(item[2])
                 row.mined_date = start
-                row.time_stamp = now
+                row.timestamp = now
+                row.usd_price = Decimal(prices[season][date]['usd'])
+                row.btc_price = Decimal(prices[season][date]['btc'])
                 row.update()
                 if row.notary in season_notaries:
                     season_notaries.remove(row.notary)
@@ -137,7 +164,7 @@ def update_mined_count_daily_table(season, rescan=None):
             row.blocks_mined = 0
             row.sum_value_mined = 0
             row.mined_date = start
-            row.time_stamp = now
+            row.timestamp = now
             row.update()
 
         start += delta
@@ -147,6 +174,7 @@ def update_mined_count_daily_table(season, rescan=None):
         json.dump(prices, j, indent=4)
 
 
+#Todo: calc YTD mined btc/usd value
 @print_runtime
 def update_mined_count_season_table(season):
     season_notaries = SEASONS_INFO[season]["notaries"]
@@ -210,7 +238,7 @@ def update_known_address(address):
 def get_daily_mined_counts(day):
     result = 0
     results = get_mined_date_aggregates(day)
-    time_stamp = int(time.time())
+    timestamp = int(time.time())
     for item in results:
         row = daily_mined_count_row()
         row.notary = item[0]

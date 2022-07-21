@@ -2,6 +2,7 @@
 from django_filters.rest_framework import FilterSet, NumberFilter, CharFilter
 from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.models import *
+from kmd_ntx_api.serializers import *
 
 
 ## Custom Filter Sets
@@ -14,9 +15,7 @@ class minedFilter(FilterSet):
 
     class Meta:
         model = mined
-        fields = ['min_block', 'max_block', 'min_blocktime', 'max_blocktime', 
-                  'block_height', 'block_time', 'block_datetime', 
-                  'value', 'address', 'name', 'txid', 'season']
+        fields = minedSerializer.Meta.fields + ['min_block', 'max_block', 'min_blocktime', 'max_blocktime']
 
 
 class notarisedFilter(FilterSet):
@@ -27,16 +26,17 @@ class notarisedFilter(FilterSet):
     min_blocktime = NumberFilter(field_name="block_time", lookup_expr='gte')
     max_blocktime = NumberFilter(field_name="block_time", lookup_expr='lte')
     notary = CharFilter(field_name="notaries", lookup_expr='contains')
+    address = CharFilter(field_name="notary_addresses", lookup_expr='contains')
     exclude_epoch = CharFilter(field_name="epoch", lookup_expr='contains', exclude=True)
 
     class Meta:
         model = notarised
-        fields = ['min_block', 'max_block', 'min_ac_block',
+        fields = notarisedSerializer.Meta.fields[:]
+        fields.remove("notaries")
+        fields.remove("notary_addresses")
+        fields += ['min_block', 'max_block', 'min_ac_block',
                   'max_ac_block', 'min_blocktime', 'max_blocktime', 
-                  'txid', 'coin', 'block_height', 'block_time',
-                  'block_datetime', 'block_hash', 'ac_ntx_blockhash',
-                  'ac_ntx_height', 'opret', 'season', 'server', 'epoch',
-                  'scored', 'exclude_epoch']
+                  'notary', 'address', 'exclude_epoch']
 
 
 class notarisedTenureFilter(FilterSet):
@@ -46,31 +46,26 @@ class notarisedTenureFilter(FilterSet):
     lte_official_end = NumberFilter(field_name="official_end_block_time", lookup_expr='lte')
 
     class Meta:
-        model = notarised
-        fields = ['gte_official_start', 'lte_official_start',
-                  'gte_official_end', 'lte_official_end', 'season', 'coin']
+        model = notarised_tenure
+        fields = notarisedTenureSerializer.Meta.fields + ['gte_official_start', 'lte_official_start',
+                   'gte_official_end', 'lte_official_end']
 
 
 class swapsFilter(FilterSet):
-    from_time = NumberFilter(field_name="time_stamp", lookup_expr='gte')
-    to_time = NumberFilter(field_name="time_stamp", lookup_expr='lte')
+    from_time = NumberFilter(field_name="timestamp", lookup_expr='gte')
+    to_time = NumberFilter(field_name="timestamp", lookup_expr='lte')
     class Meta:
         model = swaps
-        fields = ["uuid", "started_at", "taker_coin", "taker_amount", \
-                 "taker_gui", "taker_version", "taker_pubkey", "maker_coin", \
-                 "maker_amount", "maker_gui", "maker_version", "maker_pubkey"]
+
+        fields = swapsSerializerPub.Meta.fields + ["from_time", "to_time"]
 
 
 class swapsFailedFilter(FilterSet):
-    from_time = NumberFilter(field_name="time_stamp", lookup_expr='gte')
-    to_time = NumberFilter(field_name="time_stamp", lookup_expr='lte')
+    from_time = NumberFilter(field_name="timestamp", lookup_expr='gte')
+    to_time = NumberFilter(field_name="timestamp", lookup_expr='lte')
     class Meta:
         model = swaps_failed
-        fields = ["uuid", "started_at", "taker_coin", "taker_amount", 
-                 "taker_error_type", "taker_error_msg", "taker_gui", 
-                 "taker_version", "taker_pubkey", "maker_coin", 
-                 "maker_amount", "maker_error_type", "maker_error_msg",
-                 "maker_gui", "maker_version", "maker_pubkey"]
+        fields = swapsFailedSerializerPub.Meta.fields + ["from_time", "to_time"]
 
 
 class rewardsFilter(FilterSet):
@@ -80,11 +75,18 @@ class rewardsFilter(FilterSet):
     max_blocktime = NumberFilter(field_name="block_time", lookup_expr='lte')
     min_reward = NumberFilter(field_name="rewards_value", lookup_expr='gte')
     max_reward = NumberFilter(field_name="rewards_value", lookup_expr='lte')
-    vin_address = CharFilter(field_name="input_addresses", lookup_expr='contains')
-    vout_address = CharFilter(field_name="output_addresses", lookup_expr='contains')
 
     class Meta:
         model = rewards_tx
-        fields = [
-            "txid", "block_height", "block_time", "rewards_value"
-        ]
+        fields = rewardsTxSerializer.Meta.fields[:]
+        fields += ["min_block", "max_block", "min_blocktime", "max_blocktime",
+                   "min_reward", "max_reward"]
+
+
+class seednodeVersionStatsFilter(FilterSet):
+    min_score = NumberFilter(field_name="score", lookup_expr='gte')
+    max_score = NumberFilter(field_name="score", lookup_expr='lte')
+
+    class Meta:
+        model = seednode_version_stats
+        fields = seednodeVersionStatsSerializer.Meta.fields + ['min_score', 'max_score']

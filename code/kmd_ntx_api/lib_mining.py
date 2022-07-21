@@ -9,7 +9,7 @@ import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
 
 def get_mined_count_season_by_name(request):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     resp = {}
 
     data = query.get_mined_count_season_data(season).filter(blocks_mined__gte=10).values()
@@ -27,7 +27,7 @@ def get_mined_count_season_by_name(request):
 
 def get_notary_mining(request):
     notary = helper.get_or_none(request, "notary")
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
 
     if not notary:
         notary_list = helper.get_notary_list(season)
@@ -39,7 +39,7 @@ def get_notary_mining(request):
 
 
 def get_mined_count_daily_by_name(request):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     resp = {}
 
     data = query.get_mined_count_season_data(season).filter(blocks_mined__gte=10).values()
@@ -57,6 +57,7 @@ def get_nn_mining_summary(notary, season=None):
         season = SEASON
 
     url = f"{THIS_SERVER}/api/table/mined_count_season/?season={season}&name={notary}"
+    print(url)
     mining_summary = requests.get(url).json()['results']
     if len(mining_summary) > 0:
         mining_summary = mining_summary[0]
@@ -95,20 +96,3 @@ def get_notary_mined_last_24hrs(notary):
     if not sum_mined:
         sum_mined = 0
     return sum_mined
-
-
-def get_notary_last_mined_table(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    season_notary_addresses = query.get_addresses_data(season=season, server="Main", coin="KMD")
-    season_notary_addresses = list(season_notary_addresses.values_list("address", flat=True))
-    print(season_notary_addresses)
-    data = query.get_mined_data(season)
-    data = data.values("season", "name", "address")
-    data = data.annotate(blocktime=Max("block_time"), blockheight=Max("block_height"))
-
-    resp = []
-    for item in data:
-        if item["address"] in season_notary_addresses:
-            resp.append(item)
-    return resp
-

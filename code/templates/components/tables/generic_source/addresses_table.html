@@ -1,75 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="row col-12 m-auto" id="addresses">
-	<div class="card table_card">
-		<div class="card-header table_card_title flex">
-			Source: Notary Addresses & Pubkeys
-		</div>
-		<div class="card-body table_card_body">
-			<table id="table_id" class="table table-striped table-bordered m-auto" style="width:99%"  data-ajax="{% url 'addressesViewSet-list' %}?format=datatables">
-				<thead>
-					<tr>
-						<th data-data="coin">Coin</th>
-						<th data-data="season">Season</th>
-						<th data-data="server">Server</th>
-						<th data-data="notary">Notary</th>
-						<th data-data="address">Address / Pubkey</th>
-					</tr>
-				</thead>
-			</table>
-		</div>
-	</div>
-</div>
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#table_id').DataTable({
-        	"paging": false,
-			deferRender: true,
-            "orderClasses": false,
-    		order: [[ 3, 'desc' ], [ 0, 'asc' ], [ 1, 'asc' ]],
-    		"columnDefs": [
-				{ className: "text-left text-nowrap", "targets": [ 0 ] },
-    			{
-		            "targets": 0,
-		            "data": "coin",
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				        $(nTd).html(get_coin_icon(oData.coin));
-			        }
-    			},
-    			{
-		            "targets": 1,
-		            "data": "season",
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html(get_season_styled(oData.season));
-			        }
-		        },
-    			{
-		            "targets": 2,
-		            "data": "server",
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html(get_server_styled(oData.server));
-			        }
-		        },
-    			{
-		            "targets": 3,
-		            "data": "notary",
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html(get_notary_url(oData.season, oData.notary));
-			        }
-		        },
-    			{
-		            "data": "address",
-		            "targets": 4,
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(
-		            		get_address_url(oData.coin, oData.address)
-		            		+"<br /><span style='font-size:0.9em;'>"+oData.pubkey+"</span>"
-		            	);
-		            }
-		        }
-    		]
-        });
-    });
-</script>
+
+{% include 'components/tables/generic_source/generic_table.html' with table=table filters=filters required=required columns=columns endpoint=endpoint table_title="Source Data: Addresses" %}
+
 {% endblock %}

@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 m-auto">
-		<div class="card table_card floating-card">
-			<div class="card-header table_card_title flex floating-card">
-				Convert Coin Addresses
-			</div>
-			<div class="card-body table_card_body">
-				<form>
+<div class="row col-12 m-auto">
+	<div class="card table_card floating-card m-auto col-12" id="converted-addresses_card" style="font-size: 1.1em;" >
+		<div class="card-header table_card_header col-12">
+			<div class="row col-12 justify-content-center m-auto">
+				<form class="col-10">
 					{% include "components/form/text_input_line.html" with prepend_text="Enter Address" input_id="address" placeholder_text=address append_btn_text="Get Converted Addresses" %}
 				</form>
+			</div>
+			<div class="card-body table_card_body col-12">
 				{% if address %}
 					{% if address_rows %}
-						<table id="converted_addresses" class="table table-striped table-bordered m-auto" style="width:100%; visibility: hidden;">
+						<table id="converted-addresses" class="table table-striped table-bordered m-auto" style="width:100%">
 							<thead>
 								<tr>
 									<th data-data="coin">Coin</th>
@@ -33,16 +33,21 @@
 			</div>
 		</div>	
 	</div>
+</div>
   	{% if address_rows %}
   	<script>
 	    $(document).ready(function() {
-	    	$('#converted_addresses').css('visibility', 'visible');
-	        $('#converted_addresses').DataTable({
+			const dom = '{% include "components/tables/dt_dom.html" with table="converted-addresses" %}'
+
+	    	let url = "{{ endpoint }}?address={{ address }}"
+	    	$('#converted-addresses').css('visibility', 'visible');
+	        $('#converted-addresses').DataTable({
 	        	"paging": true,
-    			deferRender: true,
+    			"dom": dom,
+    			"deferRender": true,
                 "orderClasses": false,
 	            "pageLength": 50,
-        		order: [[ 0, 'asc' ]],
+        		"order": [[ 0, 'asc' ]],
 	        	"columns": [
 			        { "data": "coin" },
 			        { "data": "address" }
@@ -60,7 +65,13 @@
 			            	$(nTd).html(get_address_url(oData.coin, oData.address));
 			            }
 			        }
-        		]
+        		],
+		        fnInitComplete: function(){
+			    	$('#converted-addresses_card').css('opacity', '1');
+		            $('.converted-addresses-tbl-title').html('<h3 class="text-left">Convert Coin Addresses</h3>');
+		            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="converted-addresses" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+		            $('.converted-addresses-api-link').html(api_btn);
+		        }
 	        });
 	    });
     </script> 

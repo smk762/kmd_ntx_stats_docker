@@ -8,6 +8,11 @@ def cut(value, arg):
     return value.replace(arg, '')
 
 @register.filter
+def clean_underscore(value):
+    """Removes all values of arg from the given string"""
+    return value.replace("_", ' ')
+
+@register.filter
 def pretty_json(value):
     return json.dumps(value, indent=4)
 
