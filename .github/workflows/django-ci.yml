@@ -18,20 +18,11 @@ jobs:
         services:
             db:
                 image: postgres
-                restart: always
-                environment:
+                env:
                     - POSTGRES_DB=postgresdb
                     - POSTGRES_USER=postgresuser
                     - POSTGRES_PASSWORD=postgrespw
-                depends_on:
-                    - mm2
-                ports:
-                    - "5432:5432"
-                logging:
-                    driver: "json-file"
-                    options:
-                    max-size: "20m"
-                    max-file: "10"
+                ports: ["5432:5432"]
 
         steps:
             - uses: actions/checkout@v2
