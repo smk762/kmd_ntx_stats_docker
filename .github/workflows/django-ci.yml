@@ -50,7 +50,7 @@ jobs:
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
                     SYSTEM_ENV: GITHUB_WORKFLOW
-                    DJANGO_SETTINGS_MODULE: django_api.settings
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings
                     SECRET_KEY: 'ho2i43pq8asapnqqi02i-'
                     
             - name: Run Tests
