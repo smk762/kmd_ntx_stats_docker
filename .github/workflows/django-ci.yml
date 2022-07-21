@@ -19,9 +19,9 @@ jobs:
             db:
                 image: postgres
                 env:
-                    - POSTGRES_DB=postgresdb
-                    - POSTGRES_USER=postgresuser
-                    - POSTGRES_PASSWORD=postgrespw
+                    POSTGRES_DB: postgresdb
+                    POSTGRES_USER: postgresuser
+                    POSTGRES_PASSWORD: postgrespw
                 ports: ["5432:5432"]
 
         steps:
