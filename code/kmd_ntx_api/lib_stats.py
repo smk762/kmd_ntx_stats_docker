@@ -192,14 +192,20 @@ def get_season_stats_sorted(season, coins_dict=None):
         coins_dict = helper.get_dpow_server_coins_dict(season)
     notary_list = helper.get_notary_list(season)
 
-    mined_season = query.get_mined_count_season_data(season).filter(blocks_mined__gte=10).values()
+    mined_last_24hrs = mining.get_mined_data_24hr().values('name')
+    seednode_season = query.get_seednode_version_stats_data(season=season).values('name').annotate(sum_score=Sum('score'))
+    nn_seednode_season = {}
+    for item in seednode_season:
+        nn_seednode_season.update({item['name']:round(item['sum_score'],2)})
+
+    mined_season = query.get_mined_count_season_data(season).values()
+    
 
     nn_mined_season = {}
     for item in mined_season:
         nn_mined_season.update({item['name']:item['blocks_mined']})
 
     season_stats = {}
-    nn_seed_season = {}
     for notary in notary_list:
 
         region = helper.get_notary_region(notary)
@@ -209,12 +215,12 @@ def get_season_stats_sorted(season, coins_dict=None):
         if notary not in nn_mined_season:
             nn_mined_season.update({notary:0})
 
-        if notary not in nn_seed_season:
-            nn_seed_season.update({notary:0})
+        if notary not in nn_seednode_season:
+            nn_seednode_season.update({notary:0})
 
-    nn_seed_season_data = info.get_seed_stat_season(season)
-    for item in nn_seed_season_data:
-        nn_seed_season.update({item['name']:round(item['sum_score'],2)})
+    nn_seednode_season_data = info.get_seednode_version_season_stats_data(season)
+    for item in nn_seednode_season_data:
+        nn_seednode_season.update({item['name']:round(item['sum_score'],2)})
 
     notary_ntx_season_data = query.get_notary_ntx_season_data(season).values()
     for item in notary_ntx_season_data:
@@ -224,9 +230,9 @@ def get_season_stats_sorted(season, coins_dict=None):
             "master": item["notary_data"]["servers"]["KMD"]["ntx_count"],
             "main": item["notary_data"]["servers"]["Main"]["ntx_count"],
             "third_party": item["notary_data"]["servers"]["Third_Party"]["ntx_count"],
-            "seed": nn_seed_season[item["notary"]],
+            "seed": nn_seednode_season[item["notary"]],
             "mining": nn_mined_season[item["notary"]],
-            "score": float(item["notary_data"]["ntx_score"]) + nn_seed_season[item["notary"]]
+            "score": float(item["notary_data"]["ntx_score"]) + nn_seednode_season[item["notary"]]
         })
 
     # calc scores

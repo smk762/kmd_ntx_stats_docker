@@ -8,7 +8,7 @@ import kmd_ntx_api.serializers as serializers
 
 def notarised_date_api(request):
     season = helper.get_page_season(request)
-    server = helper.get_or_none(request, "server")
+    server = helper.get_page_server(request)
     coin = helper.get_or_none(request, "coin")
     notary = helper.get_or_none(request, "notary")
     last_24hrs = helper.get_or_none(request, "last_24hrs", False) == 'true'

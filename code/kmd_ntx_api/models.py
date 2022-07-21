@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.db.models import JSONField
+from django.contrib.postgres.fields import ArrayField
 from kmd_ntx_api.lib_const import *
 
 # TODO: When updating on conflict, make sure all potentially variable fields are included.
@@ -49,22 +50,6 @@ class balances(models.Model):
             models.UniqueConstraint(
                 fields=['coin', 'address', 'season'],
                 name='unique_coin_address_season_balance'
-            )
-        ]
-
-# Not in use, will implement S5
-class coin_sync(models.Model):
-    coin = models.CharField(max_length=64)
-    block_height = models.PositiveIntegerField(default=0)
-    sync_hash = models.CharField(max_length=64)
-    explorer_hash = models.CharField(max_length=64)
-
-    class Meta:
-        db_table = 'coin_sync'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['coin'],
-                name='unique_coin_sync'
             )
         ]
 
@@ -121,65 +106,6 @@ class coin_social(models.Model):
         ]
 
 
-# Not in use, will implement S5
-class funding_transactions(models.Model):
-    coin = models.CharField(max_length=128)
-    txid = models.CharField(max_length=128)
-    vout = models.PositiveIntegerField(default=0)
-    amount = models.DecimalField(max_digits=18, decimal_places=8)
-
-    address = models.CharField(max_length=128)
-    notary = models.CharField(max_length=128)
-    block_hash = models.CharField(max_length=128)
-    block_height = models.PositiveIntegerField(default=0)
-    block_time = models.PositiveIntegerField(default=0)
-
-    category = models.CharField(max_length=128)
-    fee = models.DecimalField(max_digits=18, decimal_places=8)
-    season = models.CharField(max_length=128)
-
-    class Meta:
-        db_table = 'funding_transactions'
-        indexes = [
-            models.Index(fields=['coin', 'address', 'notary', 'season', 'block_time'])
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=['txid', 'vout', 'category'],
-                name='unique_category_vout_txid_funding'
-            )
-        ]
-
-
-class notary_last_ntx(models.Model):
-    season = models.CharField(max_length=32)
-    server = models.CharField(max_length=32, default='')
-    coin = models.CharField(max_length=32)
-    notary = models.CharField(max_length=64)
-    notaries = ArrayField(models.CharField(max_length=34),size=13)
-    opret = models.CharField(max_length=2048)
-    kmd_ntx_blockheight = models.PositiveIntegerField(default=0)
-    kmd_ntx_blockhash = models.CharField(max_length=64)
-    kmd_ntx_txid = models.CharField(max_length=64)
-    kmd_ntx_blocktime = models.PositiveIntegerField(default=0)
-    ac_ntx_blockhash = models.CharField(max_length=64)
-    ac_ntx_height = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        db_table = 'notary_last_ntx'
-        indexes = [
-            models.Index(fields=['notary']),
-            models.Index(fields=['coin']),
-            models.Index(fields=['season'])
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=['notary','season', 'coin'],
-                name='unique_notary_last_ntx_notary_season_coin'
-            )
-        ]
-
-
 class coin_last_ntx(models.Model):
     season = models.CharField(max_length=34)
     server = models.CharField(max_length=34, default='')
@@ -207,7 +133,26 @@ class coin_last_ntx(models.Model):
         ]
 
 
-# TODO: add category (mining pool, notary, solo)
+class coin_ntx_season(models.Model):
+    season = models.CharField(max_length=34)
+    coin = models.CharField(max_length=64)
+    coin_data = JSONField(default=dict)
+    timestamp = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = 'coin_ntx_season'
+        indexes = [
+            models.Index(fields=['coin']),
+            models.Index(fields=['season'])
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['coin', "season"],
+                name='unique_coin_season'
+            )
+        ]
+
+
 class mined(models.Model):
     block_height = models.PositiveIntegerField(default=0)
     block_time = models.PositiveIntegerField(default=0)
@@ -220,11 +165,13 @@ class mined(models.Model):
     season = models.CharField(max_length=34)
     usd_price = models.DecimalField(max_digits=18, decimal_places=8, default=0)
     btc_price = models.DecimalField(max_digits=18, decimal_places=8, default=0)
+    category = models.CharField(max_length=34 ,default="")
 
     class Meta:
         db_table = 'mined'
         indexes = [
             models.Index(fields=['name']),
+            models.Index(fields=['category']),
             models.Index(fields=['season']),
             models.Index(fields=['-block_height']),
             models.Index(fields=['-block_time'])
@@ -242,7 +189,9 @@ class mined_count_daily(models.Model):
     notary = models.CharField(max_length=64)
     blocks_mined = models.PositiveIntegerField(default=0)
     sum_value_mined = models.DecimalField(max_digits=18, decimal_places=8)
-    time_stamp = models.PositiveIntegerField(default=0)
+    timestamp = models.PositiveIntegerField(default=0)
+    usd_price = models.DecimalField(max_digits=18, decimal_places=8, default=0)
+    btc_price = models.DecimalField(max_digits=18, decimal_places=8, default=0)
 
     class Meta:
         db_table = 'mined_count_daily'
@@ -267,7 +216,7 @@ class mined_count_season(models.Model):
     max_value_txid = models.CharField(max_length=64, default='')
     last_mined_block = models.PositiveIntegerField(default=0)
     last_mined_blocktime = models.PositiveIntegerField(default=0)
-    time_stamp = models.PositiveIntegerField(default=0)
+    timestamp = models.PositiveIntegerField(default=0)
     season = models.CharField(max_length=34)
 
     class Meta:
@@ -283,28 +232,7 @@ class mined_count_season(models.Model):
             )
         ]
 
-
-class seednode_version_stats(models.Model):
-    name = models.CharField(max_length=128)
-    season = models.CharField(max_length=128, default='')
-    version = models.CharField(max_length=128)
-    timestamp = models.PositiveIntegerField(default=0)
-    error = models.CharField(max_length=256)
-    score = models.FloatField(default=0)
-
-    class Meta:
-        db_table = 'seednode_version_stats'
-        indexes = [
-            models.Index(fields=['timestamp'])
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=['name', 'timestamp'],
-                name='unique_mm2_version_stat'
-            )
-        ]
-
-
+# TODO: Archive data and deprecate
 class nn_btc_tx(models.Model):
     txid = models.CharField(max_length=64)
     block_hash = models.CharField(max_length=64)
@@ -453,7 +381,7 @@ class notarised_coin_daily(models.Model):
             )
         ]
 
-
+# Todo: create subtables for json data
 class notarised_count_daily(models.Model):
     season = models.CharField(max_length=34)
     notarised_date = models.DateField()
@@ -465,7 +393,7 @@ class notarised_count_daily(models.Model):
     total_ntx_count = models.PositiveIntegerField(default=0)
     coin_ntx_counts = JSONField(default=dict)
     coin_ntx_pct = JSONField(default=dict)
-    time_stamp = models.PositiveIntegerField(default=0)
+    timestamp = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = 'notarised_count_daily'
@@ -481,22 +409,31 @@ class notarised_count_daily(models.Model):
         ]
 
 
-class coin_ntx_season(models.Model):
-    season = models.CharField(max_length=34)
-    coin = models.CharField(max_length=64)
-    coin_data = JSONField(default=dict)
-    time_stamp = models.PositiveIntegerField(default=0)
+class notary_last_ntx(models.Model):
+    season = models.CharField(max_length=32)
+    server = models.CharField(max_length=32, default='')
+    coin = models.CharField(max_length=32)
+    notary = models.CharField(max_length=64)
+    notaries = ArrayField(models.CharField(max_length=34),size=13)
+    opret = models.CharField(max_length=2048)
+    kmd_ntx_blockheight = models.PositiveIntegerField(default=0)
+    kmd_ntx_blockhash = models.CharField(max_length=64)
+    kmd_ntx_txid = models.CharField(max_length=64)
+    kmd_ntx_blocktime = models.PositiveIntegerField(default=0)
+    ac_ntx_blockhash = models.CharField(max_length=64)
+    ac_ntx_height = models.PositiveIntegerField(default=0)
 
     class Meta:
-        db_table = 'coin_ntx_season'
+        db_table = 'notary_last_ntx'
         indexes = [
+            models.Index(fields=['notary']),
             models.Index(fields=['coin']),
             models.Index(fields=['season'])
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=['coin', "season"],
-                name='unique_coin_season'
+                fields=['notary','season', 'coin'],
+                name='unique_notary_last_ntx_notary_season_coin'
             )
         ]
 
@@ -505,7 +442,7 @@ class notary_ntx_season(models.Model):
     season = models.CharField(max_length=34)
     notary = models.CharField(max_length=64)
     notary_data = JSONField(default=dict)
-    time_stamp = models.PositiveIntegerField(default=0)
+    timestamp = models.PositiveIntegerField(default=0)
 
     class Meta:
         db_table = 'notary_ntx_season'
@@ -521,38 +458,18 @@ class notary_ntx_season(models.Model):
         ]
 
 
-class server_ntx_season(models.Model):
-    season = models.CharField(max_length=34)
-    server = models.CharField(max_length=64)
-    server_data = JSONField(default=dict)
-    time_stamp = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        db_table = 'server_ntx_season'
-        indexes = [
-            models.Index(fields=['server']),
-            models.Index(fields=['season'])
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=['server', "season"],
-                name='unique_server_season'
-            )
-        ]
-
-
 class notarised_tenure(models.Model):
+    server = models.CharField(max_length=32, default="Unofficial")
+    season = models.CharField(max_length=32, default="Unofficial")
     coin = models.CharField(max_length=64)
+    official_start_block_time = models.PositiveIntegerField(default=0)
+    official_end_block_time = models.PositiveIntegerField(default=0)
     first_ntx_block = models.PositiveIntegerField(default=0)
     last_ntx_block = models.PositiveIntegerField(default=0)
     first_ntx_block_time = models.PositiveIntegerField(default=0)
     last_ntx_block_time = models.PositiveIntegerField(default=0)
-    official_start_block_time = models.PositiveIntegerField(default=0)
-    official_end_block_time = models.PositiveIntegerField(default=0)
     unscored_ntx_count = models.PositiveIntegerField(default=0)
     scored_ntx_count = models.PositiveIntegerField(default=0)
-    server = models.CharField(max_length=32, default="Unofficial")
-    season = models.CharField(max_length=32, default="Unofficial")
 
     class Meta:
         db_table = 'notarised_tenure'
@@ -603,7 +520,7 @@ class notary_candidates(models.Model):
                                  name='unique_name_year_candidate')
         ]
 
-
+# todo: add address lookup tool
 class rewards_tx(models.Model):
     txid = models.CharField(max_length=64)
     block_hash = models.CharField(max_length=64)
@@ -611,22 +528,22 @@ class rewards_tx(models.Model):
     block_time = models.PositiveIntegerField(default=0)
     block_datetime = models.DateTimeField()
     sum_of_inputs = models.PositiveIntegerField(default=0)
-    input_addresses = ArrayField(models.CharField(max_length=128), default=list)
-    input_utxos = ArrayField(models.CharField(max_length=128), default=list)
+    address = models.CharField(max_length=128, default='')
     sum_of_outputs = models.PositiveIntegerField(default=0)
-    output_addresses = ArrayField(models.CharField(max_length=128), default=list)
-    output_utxos = ArrayField(models.CharField(max_length=128), default=list)
     rewards_value =  models.FloatField(default=0)
+    usd_price = models.DecimalField(max_digits=18, decimal_places=8, default=0)
+    btc_price = models.DecimalField(max_digits=18, decimal_places=8, default=0)
 
     class Meta:
         db_table = 'rewards_tx'
         indexes = [
+            models.Index(fields=['address']),
             models.Index(fields=['txid']),
             models.Index(fields=['block_hash']),
             models.Index(fields=['block_time']),
         ]
         constraints = [
-            models.UniqueConstraint(fields=['txid'],
+            models.UniqueConstraint(fields=['txid', 'address'],
                                  name='unique_rewards_nn_txid')
         ]
 
@@ -655,10 +572,51 @@ class scoring_epochs(models.Model):
         ]
 
 
+class seednode_version_stats(models.Model):
+    name = models.CharField(max_length=128)
+    season = models.CharField(max_length=128, default='')
+    version = models.CharField(max_length=128)
+    timestamp = models.PositiveIntegerField(default=0)
+    error = models.CharField(max_length=256)
+    score = models.FloatField(default=0)
+
+    class Meta:
+        db_table = 'seednode_version_stats'
+        indexes = [
+            models.Index(fields=['timestamp'])
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'timestamp'],
+                name='unique_mm2_version_stat'
+            )
+        ]
+
+
+class server_ntx_season(models.Model):
+    season = models.CharField(max_length=34)
+    server = models.CharField(max_length=64)
+    server_data = JSONField(default=dict)
+    timestamp = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = 'server_ntx_season'
+        indexes = [
+            models.Index(fields=['server']),
+            models.Index(fields=['season'])
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['server', "season"],
+                name='unique_server_season'
+            )
+        ]
+
+
 class swaps(models.Model):
     uuid = models.CharField(primary_key=True, max_length=36)
     started_at = models.DateTimeField()
-    time_stamp = models.PositiveIntegerField(default=0)
+    timestamp = models.PositiveIntegerField(default=0)
     taker_coin = models.CharField(max_length=12)
     taker_amount = models.FloatField()
     taker_gui = models.CharField(max_length=64, blank=True, null=True)
@@ -693,7 +651,7 @@ class swaps(models.Model):
 class swaps_failed(models.Model):
     uuid = models.CharField(primary_key=True, max_length=36)
     started_at = models.DateTimeField()
-    time_stamp = models.PositiveIntegerField(default=0)
+    timestamp = models.PositiveIntegerField(default=0)
     taker_coin = models.CharField(max_length=12)
     taker_amount = models.FloatField()
     taker_error_type = models.CharField(max_length=32, blank=True, null=True)

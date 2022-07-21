@@ -1,17 +1,17 @@
 
             <ul class="c-header-nav d-md-down-none">
-                <li class="c-header-nav-item px-1"><a href="/"><i class="fa-solid fa-house"></i></a></li>
-            {% for section, options in nav_data.items %}
+            {% for section, key in nav_data.items %}
                 <li class="c-header-nav-item px-1">
-                    <button class="btn btn-secondary dropdown-toggle" id="{{ section }}DropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {{ section }}
+                    <button class="btn btn-secondary dropdown-toggle" id="{{ section }}DropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="{{ key.icon }} mr-2"></i>{{ section }}
                     </button>
                     <div class="dropdown-menu" aria-labelledby="{{ section }}DropdownMenuButton" data-popper-placement="bottom-end">
-                        {% for item, values in options.items %}
+                        {% for item, values in key.options.items %}
                             {% if not values.hide %}
-                                <a class="dropdown-item" href="{{ values.url }}"> {{ item }}</a>
+                                <a class="dropdown-item" href="{{ values.url }}"><i class="{{ values.icon }} mr-2"></i> {{ item }}</a>
                             {% endif %}
                         {% endfor %}
                     </div>
                 </li>
-            {% endfor %}
+            {% endfor %}`
+                <li class="c-header-nav-item pl-2 pr-1"><a href="/"><i class="fa-solid fa-house"></i></a></li>
             </ul>

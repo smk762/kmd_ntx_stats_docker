@@ -35,9 +35,9 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
             if coin in coins_data:
                 coins_data = coins_data[coin]
 
-            coin_balances = wallet.get_balances_rows(request, None, coin)
+            coin_balances = table.get_balances_rows(request)
             max_tick = 0
-            for item in coin_balances:
+            for item in coin_balances["results"]:
                 if float(item['balance']) > max_tick:
                     max_tick = float(item['balance'])
             if max_tick > 0:
@@ -58,7 +58,7 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
                 "coin": coin,
                 "coins_data": coins_data,
                 "notary_icons": notary_icons,
-                "coin_balances": coin_balances, # Balances in table format
+                "coin_balances": coin_balances["results"], # Balances in table format
                 "max_tick": max_tick,
                 "coin_social": info.get_coin_social_info(request),
                 "coin_ntx_summary": info.get_coin_ntx_summary(season, coin),
@@ -105,7 +105,7 @@ def notarised_tenure_view(request):
 def coins_last_ntx(request):
     season = helper.get_page_season(request)
     context = helper.get_base_context(request)
-    server = helper.get_or_none(request, "server")
+    server = helper.get_page_server(request)
     coin = helper.get_or_none(request, "coin")
     context.update({
         "page_title": f"dPoW Last Coin Notarisations",    
@@ -124,15 +124,3 @@ def coin_notarised_24hrs_view(request):
     })
     return render(request, 'views/coin/coin_notarised_24hrs.html', context)
 
-
-def scoring_epochs_view(request):
-    season = helper.get_page_season(request)
-    epochs = requests.get(f"{THIS_SERVER}/api/table/scoring_epochs/?season={season}").json()['results']
-    context = helper.get_base_context(request)
-    context.update({
-        "page_title":f"dPoW Scoring Epochs",
-        "epochs":epochs
-    })
-    return render(request, 'views/ntx/scoring_epochs.html', context)
- 
- 

@@ -46,7 +46,6 @@ if __name__ == "__main__":
     FULL_SCAN = False
     RESCAN_SEASON = False
     seasons = [
-        "Season_5",
         "Season_6"
     ]
     if len(sys.argv) > 1:

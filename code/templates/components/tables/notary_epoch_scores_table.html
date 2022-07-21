@@ -23,7 +23,7 @@
 		</div>	
   	<script>
 	    $(document).ready(function() {
-	    	let url = "//{{ request.get_host }}/api/table/notary_epoch_scores/?notary={{ notary }}&season={{ season }}"
+	    	let url = "{% url 'notary_epoch_scores_view' %}?notary={{ notary }}&season={{ season }}"
 	        $('#epoch_scoring_table').DataTable({
          		ajax: {
 				    url: url,
@@ -105,7 +105,7 @@
 			            "targets": 8,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	let tooltip = '{{ notary }} '+oData.coin+' epoch '+oData.epoch+' score detail'
-			            	let url = '//{{ request.get_host }}/notary_epoch_coin_notarised/?notary={{ notary }}&coin='+oData.coin+'&season={{ season }}&epoch=Epoch_'+oData.epoch+'&server='+oData.server
+			            	let url = '{% url '{% url 'notary_epoch_scores_view' %}' %}?notary={{ notary }}&coin='+oData.coin+'&season={{ season }}&epoch=Epoch_'+oData.epoch+'&server='+oData.server
 			            	let icon = "<i class='fas fa-arrow-right'></i>"
 				            $(nTd).html(get_detail_link_icon(icon, tooltip, url));
 				        }

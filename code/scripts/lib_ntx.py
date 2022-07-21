@@ -415,7 +415,7 @@ class ntx_season_stats():
         row.season = self.season
         row.coin = coin
         row.coin_data = json.dumps(self.season_ntx_dict["coins"][coin])
-        row.time_stamp = time.time()
+        row.timestamp = time.time()
 
         return row
 
@@ -425,7 +425,7 @@ class ntx_season_stats():
         row.season = self.season
         row.notary = notary
         row.notary_data = json.dumps(self.season_ntx_dict["notaries"][notary])
-        row.time_stamp = time.time()
+        row.timestamp = time.time()
 
         return row
 
@@ -435,7 +435,7 @@ class ntx_season_stats():
         row.season = self.season
         row.server = server
         row.server_data = json.dumps(self.season_ntx_dict["servers"][server])
-        row.time_stamp = time.time()
+        row.timestamp = time.time()
 
         return row
 

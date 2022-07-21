@@ -3,20 +3,20 @@ def default_swap_totals():
 	    "taker": {
 	        "swap_total": 0,
 	        "pubkey_total": 0,
-	        "desktop": {"swap_total": 0,"pubkey_total": 0},
-	        "android": {"swap_total": 0,"pubkey_total": 0},
-	        "ios": {"swap_total": 0,"pubkey_total": 0},
-	        "dogedex": {"swap_total": 0,"pubkey_total": 0},
-	        "other": {"swap_total": 0,"pubkey_total": 0}
+	        "desktop": {"swap_total": 0, "swap_pct":0, "pubkey_total": 0},
+	        "android": {"swap_total": 0, "swap_pct":0, "pubkey_total": 0},
+	        "ios": {"swap_total": 0, "swap_pct":0, "pubkey_total": 0},
+	        "dogedex": {"swap_total": 0, "swap_pct":0, "pubkey_total": 0},
+	        "other": {"swap_total": 0, "swap_pct":0, "pubkey_total": 0}
 	    },
 	    "maker": {
 	        "swap_total": 0,
 	        "pubkey_total": 0,
-	        "desktop": {"swap_total": 0,"pubkey_total": 0},
-	        "android": {"swap_total": 0,"pubkey_total": 0},
-	        "ios": {"swap_total": 0,"pubkey_total": 0},
-	        "dogedex": {"swap_total": 0,"pubkey_total": 0},
-	        "other": {"swap_total": 0,"pubkey_total": 0}
+	        "desktop": {"swap_total": 0, "swap_pct":0, "pubkey_total": 0},
+	        "android": {"swap_total": 0, "swap_pct":0, "pubkey_total": 0},
+	        "ios": {"swap_total": 0, "swap_pct":0, "pubkey_total": 0},
+	        "dogedex": {"swap_total": 0, "swap_pct":0, "pubkey_total": 0},
+	        "other": {"swap_total": 0, "swap_pct":0, "pubkey_total": 0}
 	    }
 	}
 

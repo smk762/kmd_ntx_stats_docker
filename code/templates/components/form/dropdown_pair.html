@@ -1,0 +1,12 @@
+
+	<div class="input-group {{ group_classes }} justify-content-start col-12 p-0 m-0">
+		<span class="input-group-prepend prepend-label-left p-0 input-group-text" style="height: 35px !important;" id=""> {{ label_a }} </span>
+		<select class="form-control col" id="{{ id_a }}" name="{{ id_a }}" style="width: {{ width_a }};">
+		</select>
+
+		{% include 'components/buttons/swap_button.html' with action=action %}
+
+		<span class="input-group-prepend prepend-label-left p-0 input-group-text" style="height: 35px !important;" id=""> {{ label_b }} </span>
+		<select class="form-control col" id="{{ id_b }}" name="{{ id_b }}" style="width: {{ width_b }};">
+		</select>
+	</div>

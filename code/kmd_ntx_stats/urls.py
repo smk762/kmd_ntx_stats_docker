@@ -12,7 +12,7 @@ from kmd_ntx_stats.urls_csv import api_csv_urls
 from kmd_ntx_stats.urls_graph import api_graph_urls
 from kmd_ntx_stats.urls_info import api_info_urls
 from kmd_ntx_stats.urls_status import api_status_urls
-from kmd_ntx_stats.urls_table import api_table_urls
+from kmd_ntx_stats.urls_table import frontend_table_urls, api_table_urls
 from kmd_ntx_stats.urls_wallet import api_wallet_urls
 from kmd_ntx_stats.urls_docs import doc_urls
 from kmd_ntx_stats.urls_community import frontend_community_urls
@@ -55,10 +55,6 @@ urlpatterns = [
     # API views (simple)
     # TODO: Deprecate or merge into other url files
 
-    path('api/info/coin_sync/',
-          views_api.api_coin_sync,
-          name='api_coin_sync'),
-
     path('api/info/sidebar_links/',
           views_api.api_sidebar_links,
           name='api_sidebar_links'),
@@ -70,17 +66,18 @@ urlpatterns = [
 ]
 
 url_lists = [
-    frontend_atomicdex_urls, api_atomicdex_urls,
+    frontend_ntx_urls, api_ntx_urls,
+    frontend_tool_urls, api_tool_urls,
+    frontend_coin_urls, api_coins_urls,
+    frontend_table_urls, api_table_urls,
     frontend_mining_urls, api_mining_urls,
     frontend_testnet_urls, api_testnet_urls,
-    frontend_coin_urls, api_coins_urls, 
-    frontend_ntx_urls, api_ntx_urls,
+    frontend_atomicdex_urls, api_atomicdex_urls,
     frontend_page_urls,
-    frontend_tool_urls,
     frontend_community_urls,
     api_csv_urls, api_graph_urls,
-    api_info_urls, api_status_urls, api_table_urls,
-    api_tool_urls, api_wallet_urls, doc_urls    
+    api_info_urls, api_status_urls,
+    api_wallet_urls, doc_urls    
 ]
 
 for i in url_lists:

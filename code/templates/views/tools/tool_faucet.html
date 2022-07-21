@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 m-auto">
-		<div class="card table_card floating-card m-0">
-			<div class="card-header table_card_title flex floating-card">
-				RICK / MORTY Faucet
-			</div>
-			<div class="card-body table_card_body m-0">
+<div class="row col-12 m-auto">
+	<div class="card table_card floating-card m-auto col-12" id="faucet-tx_card" style="font-size: 1.1em;" >
+		<div class="card-header table_card_header col-12">
+			<h3>RICK / MORTY Faucet</h3>
+		</div>
+		<div class="card-body table_card_body col-12" style="opacity: 1;" id="">
+			<div class="row col-12 justify-content-center mx-auto mb-3">
 				<div class="m-auto card-text my-3">
         			{% if result == 'fail' %}
 						<img src="{% static 'img/faucet/drink_fail.gif' %}" alt="Failed" class="faucet-img" />
@@ -20,89 +21,88 @@
 						<img src="{% static 'img/faucet/faucet.png' %}" alt="Faucet"  class="faucet-img" />
         			{% endif %}                            			
 				</div>
-				<div class="card-text">
-					<div class="mt-2"><b>24 hr Drips:</b> {{ count_24hrs }} | <b>24 hr Drip Value:</b> {{ sum_24hrs|floatformat:-4 }}</div>
-					<div class="m-auto"><b>Rick Supply:</b> {{ faucet_supply.RICK|floatformat:-4 }} | <b>Morty Supply:</b> {{ faucet_supply.MORTY|floatformat:-4 }}</div>
-					<form action="#" method="post" class="col-6 m-auto">
-						{% csrf_token %}
-						<div class="input-group my-2" >
-							<div class="input-group-prepend prepend-label-left p-0 col-3">
-							  <span class="input-group-text prepend-span">
-							  	Address
-							  </span>
-							</div>
-							<input type="text" class="form-control col-9" id="address" name="address" placeholder="RTUfq3PgPPMVY1YZa3P18icFNDsHpicKLe">
-						</div>
-						<div class="input-group mb-2">
-						    <div class="input-group-prepend prepend-label-left p-0 col-3">
-						        <span class="input-group-text prepend-span">
-						      	    Coin
-						        </span>
-						    </div>
-							<select class="form-control col-9" id='coin' name="coin" style='width: 160px;'>
-							      <option value="RICK">RICK</option>
-							      <option value="MORTY">MORTY</option>
-							</select>
-							<div class="input-group-append p-0">
-								<button class="append-btn px-4" type="submit">Drip</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>	
+			</div>
 		</div>
-	</div>
+		<div class="card-body table_card_body col-12" style="opacity: 1;" id="">
+			<div class="mt-2">
+				<b>24 hr Drips:</b> {{ count_24hrs }} | <b>24 hr Drip Value:</b> {{ sum_24hrs|floatformat:-4 }}
+			</div>
+			<div class="m-auto">
+				<b>Rick Supply:</b> {{ faucet_supply.RICK|floatformat:-4 }} | <b>Morty Supply:</b> {{ faucet_supply.MORTY|floatformat:-4 }}
+			</div>
+			<form action="#" method="post" class="col-6 m-auto">
+				{% csrf_token %}
+				<div class="input-group my-2" >
+					<div class="input-group-prepend prepend-label-left p-0 col-3">
+					  <span class="input-group-text prepend-span">
+					  	Address
+					  </span>
+					</div>
+					<input type="text" class="form-control col-9" id="address" name="address" placeholder="RTUfq3PgPPMVY1YZa3P18icFNDsHpicKLe">
+				</div>
+				<div class="input-group mb-2 col-9 mx-auto">
+				    <div class="input-group-prepend prepend-label-left p-0 col-3">
+				        <span class="input-group-text prepend-span">
+				      	    Coin
+				        </span>
+				    </div>
+					<select class="form-control col-9" id='coin' name="coin" style='width: 160px;'>
+					      <option value="RICK">RICK</option>
+					      <option value="MORTY">MORTY</option>
+					</select>
+					<div class="input-group-append p-0">
+						<button class="append-btn px-4" type="submit">Drip</button>
+					</div>
+				</div>
+			</form>
+		</div>
 
-	<div class="row col-12 m-auto">
-		<div class="card table_card floating-card m-0">
-			<div class="card-header table_card_title flex floating-card">
-				Last 200 Faucet Transactions
-			</div>
-			<div class="card-body table_card_body pb-0">
-				<table style="visibility: hidden;" id="faucet_tx_tbl" class="table table-striped table-bordered">
-					<thead>
-						<tr>
-							<th data-data="coin">Coin</th>
-							<th data-data="address">Address</th>
-							<th data-data="amount">Amount</th>
-							<th data-data="txid">Transaction</th>
-							<th data-data="status">Status</th>
-							<th data-data="time_sent">Time Sent</th>
-						</tr>
-					</thead>
-					<tbody>
-					{% for row in tx_rows %}
-						<tr>
-							<td data-data="coin" class="px-2 text-left text-nowrap">{{ row.coin }}</td>
-							<td data-data="address">{{ row.address }}</td>
-							<td data-data="amount">{{ row.amount }}</td>
-							<td data-data="txid">{{ row.txid }}</td>
-							<td data-data="status">{{ row.status }}</td>
-							<td data-data="time_sent" class="text-nowrap">{{ row.time_sent }}</td>
-						</tr>
-					{% endfor %}
-					</tbody>
-				</table>
-			</div>
+		<div class="card-body table_card_body col-12" style="opacity: 1;" id="accrued-faucet-tx">
+			<table style="visibility: hidden;" id="faucet-tx_tbl" class="table table-striped table-bordered m-auto" style="width:100%">
+				<thead>
+					<tr>
+						<th data-data="coin">Coin</th>
+						<th data-data="address">Address</th>
+						<th data-data="amount">Amount</th>
+						<th data-data="txid">Transaction</th>
+						<th data-data="status">Status</th>
+						<th data-data="time_sent">Time Sent</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for row in tx_rows %}
+					<tr>
+						<td data-data="coin" class="px-2 text-left text-nowrap">{{ row.coin }}</td>
+						<td data-data="address">{{ row.address }}</td>
+						<td data-data="amount">{{ row.amount }}</td>
+						<td data-data="txid">{{ row.txid }}</td>
+						<td data-data="status">{{ row.status }}</td>
+						<td data-data="time_sent" class="text-nowrap">{{ row.time_sent }}</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
 		</div>
 	</div>
 
 	<script>
 	    $(document).ready(function() {
-	    	$('#faucet_tx_tbl').css('visibility', 'visible');
-	        $('#faucet_tx_tbl').DataTable({
-    			deferRender: true,
-	        	"paging": false,
-	        	"searching": false,
-	        	"info": false,
+	    	const dom = '{% include "components/tables/dt_dom.html" with table="faucet-tx" %}'
+
+	    	$('#faucet-tx_tbl').css('visibility', 'visible');
+	        $('#faucet-tx_tbl').DataTable({
+    			"deferRender": true,
+    			"dom": dom,
                 "orderClasses": false,
-        		order: [[ 4, 'asc' ]],
+        		"order": [[ 5, 'desc' ]],
         		"columnDefs": [
+					{ "className": "text-right text-nowrap", "targets": [ 2, 5 ] },
+					{ "className": "text-left text-nowrap", "targets": [ 0 ] },
         			{
 			            "data": 'coin',
 			            "targets": 0,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	get_coin_icon(oData.coin)
+			            	$(nTd).html(get_coin_icon(oData.coin))
 				        }
 			        },
         			{
@@ -118,10 +118,20 @@
 				        }
 			        },
         			{
+			            "data": 'amount',
+			            "targets": 2,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+			            	$(nTd).html(
+			            		parseFloat(oData.amount) == NaN ? oData.amount :
+			            		parseFloat(oData.amount).toFixed(3)
+			            		);
+				        }
+			        },
+        			{
 			            "data": 'txid',
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(get_faucet_txid(oData.coin, oData.txid));
+			            	$(nTd).html(get_faucet-txid(oData.coin, oData.txid));
 				        }
 			        },
         			{
@@ -131,7 +141,14 @@
 				            $(nTd).html(get_faucet_status(oData.status));
 				        }
 			        }
-			    ]
+			    ],
+		        fnInitComplete: function(oTable, oData){
+		        	let url = ""
+		            let api_btn = ''
+		            $('.faucet-tx-api-link').html(api_btn);
+				    $('.faucet-tx-tbl-title').html('<h4 class="text-left">Last 200 Faucet Transactions</h4>');
+		            
+		        }
 	        });
 	    });
 	</script>

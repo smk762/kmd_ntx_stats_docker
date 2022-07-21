@@ -1,46 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="row col-12 m-auto" id="addresses">
-	<div class="card table_card">
-		<div class="card-header table_card_title flex">
-			Source: Notarised Count Daily Table
-		</div>
-		<div class="card-body table_card_body">
-			<table id="ntx_coin_daily_tbl" class="table table-striped table-bordered  m-auto" style="width:99%; visibility: hidden;" data-ajax="{% url 'notarisedCountDailyViewSet-list' %}?format=datatables">
-				<thead>
-					<tr>
-						<th data-data="notary">NOTARY</th>
-						<th data-data="master_server_count">BTC NTX</th>
-						<th data-data="main_server_count">AC NTX</th>
-						<th data-data="third_party_server_count">3P NTX</th>
-						<th data-data="notarised_date">DATE</th>
-					</tr>
-				</thead>
-			</table>
-		</div>
-	</div>
-</div>
-<script type="text/javascript">
-    $(document).ready(function() {
-    	$('#ntx_coin_daily_tbl').css('visibility', 'visible');
-        $('#ntx_coin_daily_tbl').DataTable({
-        	"paging": true,
-			deferRender: true,
-            "orderClasses": false,
-        	order: [[ 4, 'desc' ], [ 0, 'asc' ]],
-    		"columnDefs": [
-				{ className: "text-right text-nowrap", "targets": [ 4 ] },
-				{ className: "text-left text-nowrap", "targets": [ 0 ] },
-    			{
-		            "targets": 0,
-		            "data": "notary",
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html(get_notary_url('{{ season }}', oData.notary));
-			        }
-		        },
-    		]
-        });
-    });
-</script>
+
+{% include 'components/tables/generic_source/generic_table.html' with table=table filters=filters required=required columns=columns endpoint=endpoint table_title="Source Data: Notarised Date (notary)" %}
+
 {% endblock %}
+

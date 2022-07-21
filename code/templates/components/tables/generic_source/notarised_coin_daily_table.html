@@ -1,46 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="row" id="ntx">
-	<div class="card-deck d-flex justify-content-between col-12 m-auto">
-		<div class="card table_card">
-			<div class="card-header table_card_title">
-				Source: Notarised Coin Daily Table
-			</div>
-			<div class="card-body table_card_body">
-				<table id="ntx_coin_daily_tbl" class="table table-striped table-bordered m-auto"  style="width:99%; visibility: hidden;" data-ajax="{% url 'notarisedCoinDailyViewSet-list' %}?format=datatables">
-					<thead>
-						<tr>
-							<th data-data="coin">Coin</th>
-							<th data-data="ntx_count">NTX Count</th>
-							<th data-data="notarised_date">Date</th>
-						</tr>
-					</thead>
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-<script type="text/javascript">
-    $(document).ready(function() {
-    	$('#ntx_coin_daily_tbl').css('visibility', 'visible');
-        $('#ntx_coin_daily_tbl').DataTable({
-        	"paging": false,
-			deferRender: true,
-            "orderClasses": false,
-    		order: [ 0, 'asc' ],
-    		"columnDefs": [
-				{ className: "text-right text-nowrap", "targets": [ 2 ] },
-				{ className: "text-left text-nowrap", "targets": [ 0 ] },
-    			{
-		            "targets": 0,
-		            "data": "coin",
-		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				        $(nTd).html(get_coin_icon(oData.coin));
-			        }
-    			}
-    		]
-        });
-    });
-</script>
+
+{% include 'components/tables/generic_source/generic_table.html' with table=table filters=filters required=required columns=columns endpoint=endpoint table_title="Source: Notarised Coin (Date)" %}
+
 {% endblock %}

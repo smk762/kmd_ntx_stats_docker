@@ -101,10 +101,6 @@ class coinSocialViewSet(viewsets.ModelViewSet):
     ordering_fields = ['coin']
     ordering = ['coin']
 
-
-# class fundingTransactionsViewSet(viewsets.ModelViewSet):
-
-
 class notaryLastNtxViewSet(viewsets.ModelViewSet):
     """
     API endpoint showing last coin notarisation for each notary
@@ -172,11 +168,12 @@ class mm2VersionStatsViewSet(viewsets.ModelViewSet):
     API endpoint showing mm2 Version Stats table data
     """
     queryset = seednode_version_stats.objects.all()
-    serializer_class = serializers.mm2VersionStatsSerializer
+    serializer_class = serializers.seednodeVersionStatsSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = MassiveResultsSetPagination
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['name', 'season', 'version']
+    filterset_class = filters.seednodeVersionStatsFilter
+    filterset_fields = ['name', 'season', 'version', 'score']
     ordering_fields = ['-timestamp']
     ordering = ['name', 'season']
 
@@ -265,6 +262,7 @@ class notarisedTenureViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.notarisedTenureSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = filters.notarisedTenureFilter
     filterset_fields = ['coin', 'season']
     ordering_fields = ['coin', 'season']
     ordering = ['-season', 'coin']

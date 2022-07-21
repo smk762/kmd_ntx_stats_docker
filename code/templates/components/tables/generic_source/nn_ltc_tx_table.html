@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+{% include 'components/tables/generic_source/generic_table.html' with table=table filters=filters required=required columns=columns endpoint=endpoint table_title="Source Data: Notary Ltc Tx" %}
+
+{% endblock %}

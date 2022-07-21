@@ -17,7 +17,9 @@ def get_api_server(local=True):
 
 def get_ntxid_list_url(season, server, coin, local=True):
     api_server = get_api_server(local)
-    return f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&coin={coin}"
+    url = f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&coin={coin}"
+    print(url)
+    return url
     
 
 def get_notarised_txid_url(txid, local=True):
@@ -105,6 +107,18 @@ def get_source_addresses_url(season=None, server=None, coin=None, notary=None, l
         params.append(f"notary={notary}")
     params_string = "&".join(params)
     return url + params_string
+
+
+def get_addresses_url(season, server=None, coin=None, notary=None, local=True):
+    api_server = get_api_server(local)
+    url = f"{api_server}/api/table/addresses/?season={season}"
+    if server:
+        url += f"&server={server}"
+    if coin:
+        url += f"&coin={coin}"
+    if notary:
+        url += f"&notary={notary}"
+    return url
 
 
 def get_notarised_tenure_table_url(season=None, server=None, coin=None, local=True):

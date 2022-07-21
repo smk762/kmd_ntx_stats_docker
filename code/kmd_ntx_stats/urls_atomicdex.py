@@ -65,6 +65,10 @@ api_atomicdex_urls = [
          api_atomicdex.orderbook_api,
          name='orderbook_api'),
 
+    path('api/table/orderbook/',
+         api_atomicdex.orderbook_table_api,
+         name='orderbook_table_api'),
+
     path('api/atomicdex/bestorders/',
          api_atomicdex.bestorders_api,
          name='bestorders_api'),
@@ -83,9 +87,6 @@ api_atomicdex_urls = [
 
     path('api/atomicdex/swaps_gui_stats/',
           api_atomicdex.swaps_gui_stats_api,
-          name='swaps_gui_stats_api'),
+          name='swaps_gui_stats_api')
 
-    path('api/atomicdex/swaps_pubkey_stats/',
-          api_atomicdex.swaps_pubkey_stats_api,
-          name='swaps_pubkey_stats_api'),
 ]

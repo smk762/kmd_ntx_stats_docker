@@ -16,6 +16,7 @@ def convert_addresses_view(request):
     context = helper.get_base_context(request)
     context.update({
         "page_title":"Address Conversion",
+        "endpoint": "/api/tools/address_conversion/"
     })
 
     if "address" in request.GET:
@@ -263,8 +264,22 @@ def faucet_view(request):
 
 def kmd_rewards_view(request):
     context = helper.get_base_context(request)
+    buttons = ["accrued-rewards", "rewards-history"]
+    button_params = {
+        "accrued-rewards": {
+            "action": f"show_card('accrued-rewards', {buttons})",
+            "width_pct": 19,
+            "text": "Accrued Rewards"
+        },
+        "rewards-history": {
+            "action": f"show_card('rewards-history', {buttons})",
+            "width_pct": 19,
+            "text": "Rewards History"
+        }
+    }
     context.update({
-        "page_title":"KMD Rewards Tool"
+        "page_title":"KMD Rewards Tool",
+        "buttons": button_params,
     })
 
     address = helper.get_or_none(request, "address")
@@ -319,6 +334,7 @@ def pubkey_addresses_view(request):
     context = helper.get_base_context(request)
     context.update({
         "page_title": "Pubkey Addresses",
+        "endpoint": "api/tools/address_from_pubkey/"
     })
     if "pubkey" in request.GET:
         pubkey = request.GET["pubkey"]

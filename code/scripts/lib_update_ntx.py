@@ -159,33 +159,33 @@ def delete_from_notarised_tbl_where(
 
 def update_coin_ntx_season_row(row_data): 
     sql = f"INSERT INTO coin_ntx_season \
-            (season, coin, coin_data, time_stamp) \
+            (season, coin, coin_data, timestamp) \
             VALUES (%s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_coin_season DO UPDATE SET \
             coin_data='{row_data[2]}',\
-            time_stamp={row_data[3]};"
+            timestamp={row_data[3]};"
     CURSOR.execute(sql, row_data)
     CONN.commit()
 
 
 def update_notary_ntx_season_row(row_data): 
     sql = f"INSERT INTO notary_ntx_season \
-            (season, notary, notary_data, time_stamp) \
+            (season, notary, notary_data, timestamp) \
             VALUES (%s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_notary_season DO UPDATE SET \
             notary_data='{row_data[2]}',\
-            time_stamp={row_data[3]};"
+            timestamp={row_data[3]};"
     CURSOR.execute(sql, row_data)
     CONN.commit()
 
 
 def update_server_ntx_season_row(row_data): 
     sql = f"INSERT INTO server_ntx_season \
-            (season, server, server_data, time_stamp) \
+            (season, server, server_data, timestamp) \
             VALUES (%s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_server_season DO UPDATE SET \
             server_data='{row_data[2]}',\
-            time_stamp={row_data[3]};"
+            timestamp={row_data[3]};"
     CURSOR.execute(sql, row_data)
     CONN.commit()
 
@@ -206,13 +206,13 @@ def update_daily_notarised_count_row(row_data):
         (notary, master_server_count, main_server_count, \
         third_party_server_count, other_server_count, \
         total_ntx_count, coin_ntx_counts, \
-        coin_ntx_pct, time_stamp, season, notarised_date) \
+        coin_ntx_pct, timestamp, season, notarised_date) \
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
         ON CONFLICT ON CONSTRAINT unique_notary_date DO UPDATE SET \
         master_server_count="+str(row_data[1])+", main_server_count="+str(row_data[2])+", \
         third_party_server_count="+str(row_data[3])+", other_server_count="+str(row_data[4])+", \
         total_ntx_count="+str(row_data[5])+", coin_ntx_counts='"+str(row_data[6])+"', \
-        coin_ntx_pct='"+str(row_data[7])+"', time_stamp="+str(row_data[8])+",  \
+        coin_ntx_pct='"+str(row_data[7])+"', timestamp="+str(row_data[8])+",  \
         season='"+str(row_data[9])+"', notarised_date='"+str(row_data[10])+"';"
     CURSOR.execute(sql, row_data)
     CONN.commit()

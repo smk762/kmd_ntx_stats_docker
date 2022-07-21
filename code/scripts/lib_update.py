@@ -2,6 +2,7 @@
 import os
 import json
 from psycopg2.extras import execute_values
+from datetime import datetime as dt
 from lib_const import *
 from lib_update_ntx import *
 
@@ -121,8 +122,8 @@ def update_mined_row(row_data):
     try:
         sql = "INSERT INTO mined \
             (block_height, block_time, block_datetime, \
-             value, address, name, txid, diff, season, btc_price, usd_price) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+             value, address, name, txid, diff, season, btc_price, usd_price, category) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_block DO UPDATE SET \
             block_time='"+str(row_data[1])+"', \
             block_datetime='"+str(row_data[2])+"', \
@@ -133,7 +134,8 @@ def update_mined_row(row_data):
             diff='"+str(row_data[7])+"', \
             season='"+str(row_data[8])+"', \
             btc_price='"+str(row_data[9])+"', \
-            usd_price='"+str(row_data[10])+"';"
+            usd_price='"+str(row_data[10])+"', \
+            category='"+str(row_data[11])+"';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
     except Exception as e:
@@ -147,11 +149,11 @@ def update_season_mined_count_row(row_data):
         sql = f"INSERT INTO mined_count_season \
             (name, season, address, blocks_mined, sum_value_mined, \
             max_value_mined, max_value_txid, last_mined_blocktime, last_mined_block, \
-            time_stamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            timestamp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_name_season_mined DO UPDATE SET \
             address='{row_data[2]}', blocks_mined={row_data[3]}, sum_value_mined={row_data[4]}, \
             max_value_mined={row_data[5]}, max_value_txid='{row_data[6]}', last_mined_blocktime={row_data[7]}, \
-            last_mined_block={row_data[8]}, time_stamp={row_data[9]};"
+            last_mined_block={row_data[8]}, timestamp={row_data[9]};"
         CURSOR.execute(sql, row_data)
         CONN.commit()
         return 1
@@ -164,13 +166,16 @@ def update_season_mined_count_row(row_data):
 
 def update_daily_mined_count_row(row_data):
     try:
-        sql = "INSERT INTO mined_count_daily \
-            (notary, blocks_mined, sum_value_mined, \
-            mined_date, time_stamp) VALUES (%s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_notary_daily_mined \
-            DO UPDATE SET \
-            blocks_mined="+str(row_data[1])+", \
-            sum_value_mined='"+str(row_data[2])+"';"
+        sql = f"INSERT INTO mined_count_daily \
+                    (notary, blocks_mined, sum_value_mined, \
+                    mined_date, btc_price, usd_price,timestamp) \
+                    VALUES (%s, %s, %s, %s, %s, %s, %s) \
+                ON CONFLICT ON CONSTRAINT unique_notary_daily_mined DO UPDATE SET \
+                    blocks_mined={row_data[1]}, \
+                    sum_value_mined='{row_data[2]}',\
+                    mined_date='{row_data[3]}',\
+                    btc_price={row_data[4]},\
+                    usd_price={row_data[5]};"
         CURSOR.execute(sql, row_data)
         CONN.commit()
         return 1
@@ -479,7 +484,7 @@ def update_swaps_row(row_data):
         sql = f"INSERT INTO swaps \
                 (uuid, started_at, taker_coin, taker_amount, \
                  taker_gui, taker_version, taker_pubkey, maker_coin, \
-                 maker_amount, maker_gui, maker_version, maker_pubkey, time_stamp) \
+                 maker_amount, maker_gui, maker_version, maker_pubkey, timestamp) \
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
                 ON CONFLICT ON CONSTRAINT unique_swap \
                 DO UPDATE SET \
@@ -488,7 +493,7 @@ def update_swaps_row(row_data):
                  taker_version='{row_data[5]}', taker_pubkey='{row_data[6]}', \
                  maker_coin='{row_data[7]}', maker_amount={row_data[8]}, \
                  maker_gui='{row_data[9]}', maker_version='{row_data[10]}', \
-                 maker_pubkey='{row_data[11]}', time_stamp={row_data[12]};"
+                 maker_pubkey='{row_data[11]}', timestamp={row_data[12]};"
         CURSOR.execute(sql, row_data)
         CONN.commit()
     except Exception as e:
@@ -511,7 +516,7 @@ def update_swaps_failed_row(row_data):
                  taker_error_type, taker_error_msg, \
                  taker_gui, taker_version, taker_pubkey, maker_coin, \
                  maker_amount, maker_error_type, maker_error_msg, \
-                 maker_gui, maker_version, maker_pubkey, time_stamp) \
+                 maker_gui, maker_version, maker_pubkey, timestamp) \
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
                 ON CONFLICT ON CONSTRAINT unique_swaps_failed \
                 DO UPDATE SET \
@@ -522,7 +527,7 @@ def update_swaps_failed_row(row_data):
                  maker_coin='{row_data[9]}', maker_amount={row_data[10]}, \
                  maker_error_type='{row_data[11]}', maker_error_msg='{maker_err_msg}', \
                  maker_gui='{row_data[13]}', maker_version='{row_data[14]}', \
-                 maker_pubkey='{row_data[15]}', time_stamp={row_data[16]};"
+                 maker_pubkey='{row_data[15]}', timestamp={row_data[16]};"
         CURSOR.execute(sql, row_data)
         CONN.commit()
     except Exception as e:
@@ -540,11 +545,15 @@ def delete_rewards_tx_transaction(txid):
 
 
 def update_rewards_tx_row(row_data):
-    sql = "INSERT INTO rewards_tx (txid, block_hash, block_height,    \
-                       block_time, block_datetime, sum_of_inputs,     \
-                       input_addresses, input_utxos, sum_of_outputs,  \
-                       output_addresses, output_utxos, rewards_value) \
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    sql = f"INSERT INTO rewards_tx (txid, block_hash, block_height,\
+                    block_time, block_datetime,\
+                    address, rewards_value,\
+                    sum_of_inputs, sum_of_outputs,\
+                    btc_price, usd_price) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
+            ON CONFLICT ON CONSTRAINT unique_rewards_nn_txid DO UPDATE SET \
+                btc_price={row_data[9]}, usd_price={row_data[10]};"
+        
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()
@@ -569,3 +578,23 @@ def update_notary_candidates_row(row_data):
         logger.error(f"[update_notary_candidates_row] row_data: {row_data}")
         CONN.rollback()
 
+# Price update
+
+
+def update_table_prices(table, date_field, day, btc_price, usd_price, timestamp=False):
+    if timestamp:
+        date = dt.strptime(day, "%d-%m-%Y")
+        start = int(datetime.datetime.timestamp(date))
+        end = start + 86400
+
+        sql = f"UPDATE {table} SET btc_price={btc_price}, usd_price={usd_price} WHERE {date_field}>={start} AND {date_field}<{end} ;"
+    else:
+        date = dt.strptime(day, "%d-%m-%Y")
+        sql = f"UPDATE {table} SET btc_price={btc_price}, usd_price={usd_price} WHERE {date_field}='{date}';"
+    try:
+        CURSOR.execute(sql)
+        CONN.commit()
+        logger.info(f"{table} {day} price: ${usd_price}")
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()

@@ -1,0 +1,22 @@
+{% load coin_filter %}		
+		<div class="p-2 m-1 col-2 btn-dark4" style="min-width: 130px; max-width: 130px;">
+			<label for="{{ table }}-{{ filter }}-input" class="form-label m-0">
+				{{ filter|title|clean_underscore }}
+			</label>
+			{% if hide %}
+			<div id="date_selection" style="display:none; height:34px;">
+			{% else %}
+			<div id="date_selection" style="height:34px;">
+			{% endif %}
+				<form class="" id="datepicker_form">
+				    <div class="form-row justify-content-center">
+				        <div class="form-group">
+						    <div class="input-group">
+								<input class="day_date_picker col-12" type="text" id="{{ table }}-{{ filter }}-input" name="{{ table }}-{{ filter }}-input" value="" autocomplete="off" />				
+								<input type="hidden" id="{{ table }}-{{ filter }}-day_date_ts" name="{{ table }}-{{ filter }}-day_date_ts" value="">
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>

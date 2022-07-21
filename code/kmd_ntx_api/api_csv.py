@@ -9,7 +9,7 @@ import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_helper as helper
 
 def mined_csv(request):
-    season = helper.get_or_none(request, "season")
+    season = helper.get_page_season(request)
     name = helper.get_or_none(request, "name")
     address = helper.get_or_none(request, "address")
 

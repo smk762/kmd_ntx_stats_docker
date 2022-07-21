@@ -7,6 +7,7 @@ from django.shortcuts import render
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_info as info
 import kmd_ntx_api.lib_ntx as ntx
+import kmd_ntx_api.lib_atomicdex as dex
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_stats as stats
 import kmd_ntx_api.lib_graph as graph
@@ -19,7 +20,7 @@ def notary_coin_ntx_detail_view(request):
     context = helper.get_base_context(request)
     notary = helper.get_or_none(request, "notary")
     coin = helper.get_or_none(request, "coin")
-    server = helper.get_or_none(request, "server")
+    server = helper.get_page_server(request)
 
     context.update({
         "page_title":"Notary Profile Index",
@@ -70,6 +71,9 @@ def notary_profile_view(request, notary=None):
 
                 ntx_season_data = notary_profile_summary_table["ntx_season_data"][0]
                 seed_score = 0
+                seed_scores = dex.get_seednode_version_score_total(request)
+                if notary in seed_scores:
+                    seed_score = seed_scores[notary]
                 context.update({
                     "seed_score": seed_score,
                     "ntx_score": ntx_season_data["total_ntx_score"],
@@ -129,7 +133,7 @@ def notary_profile_view(request, notary=None):
                     "mining_summary": mining.get_nn_mining_summary(notary), #  Mining Summary
                 })
 
-                return render(request, 'views/ntx/notary_profile.html', context)
+                return render(request, 'views/notarisation/notary_profile.html', context)
 
     buttons = ["AR", "EU", "NA", "SH", "DEV"]
     button_params = {
@@ -166,7 +170,7 @@ def notary_profile_view(request, notary=None):
         "nn_regions": helper.get_regions_info(season)
     })
 
-    return render(request, 'views/ntx/notary_profile_index.html', context)
+    return render(request, 'views/notarisation/notary_profile_index.html', context)
 
 
 def ntx_scoreboard(request):
@@ -198,7 +202,7 @@ def ntx_scoreboard_24hrs(request):
 def notary_coin_notarised_view(request):
     season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary", random.choice(helper.get_notary_list(season)))
-    server = helper.get_or_none(request, "server", "Main")
+    server = helper.get_page_server(request)
     coin = helper.get_or_none(request, "coin", "MORTY")
 
     context = helper.get_base_context(request)
@@ -234,7 +238,7 @@ def notary_epoch_scores_view(request):
 def notarised_24hrs(request):    
     context = helper.get_base_context(request)
     context.update({
-        "page_title":"dPoW Notarisations (last 200)"
+        "page_title":"dPoW Notarisations (last 24hrs)"
     })
     return render(request, 'views/ntx/notarised_24hrs.html', context)
 
@@ -242,7 +246,7 @@ def notarised_24hrs(request):
 def notary_epoch_coin_notarised_view(request):
     season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary", random.choice(helper.get_notary_list(season)))
-    server = helper.get_or_none(request, "server", "Main")
+    server = helper.get_page_server(request)
     epoch = helper.get_or_none(request, "epoch", "Epoch_0")
     coin = helper.get_or_none(request, "coin", "MORTY")
 

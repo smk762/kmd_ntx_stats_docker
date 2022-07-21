@@ -18,16 +18,9 @@ import kmd_ntx_api.forms as forms
 def activation_commands_view(request):
     context = helper.get_base_context(request)
 
-    activation_data = {}
-    url = f"{context['scheme_host']}api/atomicdex/activation_commands/"
-    data = requests.get(url).json()["commands"]
-    for protocol in data:
-        if len(data[protocol]) != 0:
-            activation_data.update({protocol:data[protocol]})
-
     context.update({
         "page_title": "Generate AtomicDEX-API Enable Command",
-        "activation_data": activation_data
+        "endpoint": "/api/table/coin_activation/"
     })
 
     return render(request, 'views/atomicdex/activation_commands.html', context)
@@ -88,24 +81,10 @@ def batch_activation_form_view(request):
 
 def bestorders_view(request):
     context = helper.get_base_context(request)
-    coin = helper.get_or_none(request, "coin", "KMD")
     context.update({
-        "coin": coin,
+        "page_title": "AtomicDEX Best Orders",
+        "endpoint": f"/api/table/bestorders/",
         "mm2_coins": info.get_mm2_coins_list()
-    })
-
-    rows = []
-    bestorders = dex.get_bestorders(request)["result"]
-    for _coin in bestorders:
-        rows.append({
-            "coin": _coin,
-            "price": bestorders[_coin][0]["price"],
-            "maxvolume": bestorders[_coin][0]["maxvolume"],
-            "min_volume": bestorders[_coin][0]["min_volume"],
-        })
-
-    context.update({
-        "bestorders": rows
     })
 
     return render(request, 'views/atomicdex/bestorders.html', context)
@@ -120,6 +99,7 @@ def gui_stats_view(request):
     swaps_data = query.filter_swaps_timespan(swaps_data, from_time, to_time)
 
     context.update({
+        "page_title": "AtomicDEX GUI Stats",
         "since": since,
         "since_options": list(SINCE_INTERVALS.keys()),
         "from_time": from_time,
@@ -139,9 +119,10 @@ def last_200_swaps_view(request):
 
     context.update({
         "last_200_swaps": last_200_swaps,
+        "endpoint": f"/api/atomicdex/last_200_swaps",
         "mm2_coins": info.get_mm2_coins_list(),
-        "taker_coin": helper.get_or_none(request, "taker_coin"),
-        "maker_coin": helper.get_or_none(request, "maker_coin"),
+        "taker_coin": helper.get_or_none(request, "taker_coin", "All"),
+        "maker_coin": helper.get_or_none(request, "maker_coin", "All"),
         "page_title": "Last 200 Swaps"
     })
 
@@ -261,64 +242,13 @@ def makerbot_config_form_view(request):
 def orderbook_view(request):
     context = helper.get_base_context(request)
     context.update({
+        "page_title": "AtomicDEX Orderbook",
+        "endpoint": "/api/table/orderbook/",
         "mm2_coins": info.get_mm2_coins_list(),
         "base": helper.get_or_none(request, "base", "KMD"),
         "rel": helper.get_or_none(request, "rel", "BTC")
     })
 
-    orderbook = dex.get_orderbook(request)
-
-    if "bids" in orderbook:
-        base = orderbook["base"]
-        rel = orderbook["rel"]
-        context.update({
-            "base": base,
-            "rel": rel
-        })
-        bids = []
-        for bid in orderbook["bids"]:
-            price = bid["price"]
-            maxvolume = bid["maxvolume"]
-            min_volume = bid["min_volume"]
-            bids.append({
-                "base": base,
-                "rel": rel,
-                "price": price,
-                "maxvolume": maxvolume,
-                "min_volume": min_volume,
-                "base_total": float(maxvolume)/float(price)
-            })
-
-        context.update({
-            "bids": bids
-        })
-
-    if "asks" in orderbook:
-        base = orderbook["base"]
-        rel = orderbook["rel"]
-        context.update({
-            "base": base,
-            "page_title": f"AtomicDEX {base}/{rel} Orderbook",
-            "rel": rel
-        })
-
-        asks = []
-        for ask in orderbook["asks"]:
-            price = ask["price"]
-            maxvolume = ask["maxvolume"]
-            min_volume = ask["min_volume"]
-            asks.append({
-                "base": base,
-                "rel": rel,
-                "price": price,
-                "maxvolume": maxvolume,
-                "min_volume": min_volume,
-                "rel_total": float(maxvolume)*float(price)
-            })
-
-        context.update({
-            "asks": asks
-        })
 
     return render(request, 'views/atomicdex/orderbook.html', context)
 
@@ -332,6 +262,7 @@ def seednode_version_view(request):
     month_version_scores = dex.get_seednode_version_month_table(request)
 
     context.update({
+        "page_title": "AtomicDEX Seednode Stats",
         "active_version": active_version,
         "day_date": day_version_scores["date"],
         "day_start": int(day_version_scores["start"]),

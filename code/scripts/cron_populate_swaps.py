@@ -27,7 +27,7 @@ def get_ext_swaps(days_since=1):
         row.maker_gui = x[10]
         row.maker_version = x[11]
         row.maker_pubkey = x[12]
-        row.time_stamp = int(x[2].replace(tzinfo=timezone.utc).timestamp())
+        row.timestamp = int(x[2].replace(tzinfo=timezone.utc).timestamp())
         row.update()
 
 
@@ -52,7 +52,7 @@ def get_ext_swaps_failed(days_since=1):
         row.maker_gui = x[13]
         row.maker_version = x[14]
         row.maker_pubkey = x[15]
-        row.time_stamp = int(x[1].replace(tzinfo=timezone.utc).timestamp())
+        row.timestamp = int(x[1].replace(tzinfo=timezone.utc).timestamp())
         row.update()
 
 

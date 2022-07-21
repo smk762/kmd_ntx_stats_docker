@@ -27,11 +27,11 @@
 
 <script>
     $(document).ready(function() {
-     	let url = "{% url 'notarised_table' %}?notary={{ notary }}&season={{ season }}"
+     	let url = "{% url 'notarisedViewSet-list' %}?notary={{ '{' }}{{ notary }}}&season={{ season }}&format=datatables"
         $('#ntx_24hr_tbl').DataTable({
      		ajax: {
 			    url: url,
-    			dataSrc: 'results',
+    			dataSrc: 'data',
     			"deferRender": true
 			},
     		order: [[ 1, 'desc' ]],

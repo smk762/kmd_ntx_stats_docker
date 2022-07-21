@@ -253,10 +253,11 @@ def get_kmd_rewards(request):
             rewards_info.update({
                 "error": f"{address} has no balance!"
             })
-
+        eligible_utxo_count = 0
         for utxo in utxos:
             balance += utxo['satoshis']/100000000
 
+            utxo_amount = utxo['amount']
             if "height" in utxo:
                 if utxo["height"] < oldest_utxo_block:
                     oldest_utxo_block = utxo['height']
@@ -282,7 +283,7 @@ def get_kmd_rewards(request):
                         rewards_info["results"]["utxos"].update({
                             utxo["txid"]: {
                                 "locktime":locktime,
-                                "utxo_value":utxo['amount'],
+                                "utxo_value": utxo_amount,
                                 "utxo_age":utxo_age,
                                 "sat_rewards":utxo_rewards,
                                 "kmd_rewards":utxo_rewards/100000000,
@@ -292,11 +293,49 @@ def get_kmd_rewards(request):
                         })
 
                         total_rewards += utxo_rewards/100000000
+                        eligible_utxo_count += 1
+
+                    else:
+                        if locktime == 0:
+                            utxo_age = "Locktime not set"
+                        if coinage < ONE_HOUR:
+                            utxo_age = "Less than one hour since tx"
+                        if utxo_amount < 10:
+                            utxo_age = "UTXO too small (<10 KMD)"
+
+                        rewards_info["results"]["utxos"].update({
+                            utxo["txid"]: {
+                                "locktime":locktime,
+                                "utxo_value": utxo_amount,
+                                "utxo_age":utxo_age,
+                                "sat_rewards":0,
+                                "kmd_rewards":0,
+                                "satoshis":utxo["satoshis"],
+                                "block_height":utxo["height"]
+                            }
+                        })
+            else:
+                utxo_age = "Transaction in mempool"
+
+                rewards_info["results"]["utxos"].update({
+                    utxo["txid"]: {
+                        "locktime":0,
+                        "utxo_value": utxo_amount,
+                        "utxo_age":utxo_age,
+                        "sat_rewards":0,
+                        "kmd_rewards":0,
+                        "satoshis":utxo["satoshis"],
+                        "block_height": "in mempool"
+                    }
+                })
+
+
+
 
     rewards_info["results"].update({
         "address": address,
         "utxo_count": utxo_count,
-        "eligible_utxo_count": len(rewards_info["results"]["utxos"]),
+        "eligible_utxo_count": eligible_utxo_count,
         "oldest_utxo_block": oldest_utxo_block,
         "kmd_balance": balance,
         "total_rewards": total_rewards

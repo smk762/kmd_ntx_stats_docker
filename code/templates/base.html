@@ -82,11 +82,12 @@
     </head>
     <body class="c-app">
 
-        <!-- SVG symbol definitions -->
-        <i data-fa-symbol="check" class="fas fa-check-circle"></i>
-        <i data-fa-symbol="hourglass" class="fa-solid fa-hourglass"></i>
-        <i data-fa-symbol="times" class="fas fa-times-circle"></i>
-
+        <span style="display: none;">
+            <!-- SVG symbol definitions -->
+            <i data-fa-symbol="check" class="fas fa-check-circle"></i>
+            <i data-fa-symbol="hourglass" class="fa-solid fa-hourglass"></i>
+            <i data-fa-symbol="times" class="fas fa-times-circle"></i>
+        </span>
         <div class="c-wrapper">
             {% include "base_header.html" %}
             <div class="c-body body_bg">
@@ -157,7 +158,9 @@
 
             // init clipboard buttons
             var btns = document.querySelectorAll('button');
+            
             var clipboard = new ClipboardJS(btns);
+
 
             clipboard.on('success', function (e) {
                 setTooltip(e.trigger, 'Copied!');
@@ -165,6 +168,18 @@
             });
 
             clipboard.on('error', function (e) {
+                console.log(e);
+            });
+
+            // init copy btn
+            var copy_btn = new ClipboardJS('.copy-btn');
+
+            copy_btn.on('success', function (e) {
+                setTooltip(e.trigger, 'Copied!');
+                hideTooltip(e.trigger);
+            });
+
+            copy_btn.on('error', function (e) {
                 console.log(e);
             });
 
@@ -201,7 +216,6 @@
                 });
                 
                 for (i = 0; i < dt_ids.length; i++) {
-                    console.log(dt_ids[i])
                     update_dt_search(dt_ids[i]);
                     update_dt_length(dt_ids[i]);
                 }
@@ -213,10 +227,9 @@
                 $('[data-toggle="tooltip"]').tooltip();
                 
                 // Init Select2 dropdowns
-                $('#since').select2();
-                $('#id_base').select2();
-                $('#id_rel').select2();
-                $('#id_coin').select2();
+                $('select').select2();
+
+                
             })
 
 

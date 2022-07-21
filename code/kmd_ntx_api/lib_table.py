@@ -1,48 +1,485 @@
+#!/usr/bin/env python3
 import time
+import random
+import datetime
+import logging
 from datetime import datetime as dt
 from django.db.models import Max
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_helper as helper
+import kmd_ntx_api.models as models
 import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_atomicdex as dex
 import kmd_ntx_api.serializers as serializers
 
-
-def get_addresses_table(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
-    coin = helper.get_or_none(request, "coin")
-    notary = helper.get_or_none(request, "notary")
-    address = helper.get_or_none(request, "address")
-
-    if not season and not coin and not notary and not address:
-        return {
-            "error": "You need to specify at least one of the following filter parameters: ['season', 'coin', 'notary', 'address']"
-        }
-
-    data = query.get_addresses_data(season, server, coin, notary, address)
-    data = data.values()
-
-    resp = []
-    for item in data:
-
-        resp.append({
-            "season": item['season'],
-            "server": item['server'],
-            "coin": item['coin'],
-            "notary": item['notary'],
-            "address": item['address'],
-            "pubkey": item['pubkey']
-        })
-
-    return resp
+logger = logging.getLogger("mylogger")
 
 
+class TableSettings():
+    def __init__(self, data, serializer, request):
+        self.data = data
+        self.request = request
+        self.serializer = serializer
+        self.required = {"season": SEASON}
+        self.filters = ["season", "server", "notary", "coin"]
+
+        if 'year' in request.GET:
+            request.GET['year']
+        if 'month' in request.GET:
+            request.GET['month']
+
+    def exclude_seasons(self):
+        for s in ["Season_1", "Season_2", "Season_5_Testnet", "VOTE2022_Testnet"]:
+            self.data = self.data.exclude(season=s)
+
+    def get_distinct(self, exclude=None):
+        season = helper.get_page_season(self.request)
+        print(self.filters)
+        if not exclude:
+            exclude = []
+        return query.get_distinct_filters(self.data, self.filters, exclude, season)
+
+    def filter_data(self, table=None):
+        self.data = query.apply_filters_api(self.request, self.serializer, self.data, table)
+
+    def count(self):
+        return self.data.count()
+
+    def serialized(self):
+        return self.serializer(self.data, many=True).data
+
+    def selected(self):
+        selected = {}
+        [selected.update({i: helper.get_or_none(self.request, i)}) for i in self.filters]
+        return selected
+
+
+def get_addresses_rows(request):
+    source = TableSettings(
+        data=models.addresses.objects.all(),
+        serializer=serializers.addressesSerializer,
+        request=request
+    )
+    source.exclude_seasons()
+    source.data = source.data.exclude(coin="BTC")
+    distinct = source.get_distinct()
+    selected = source.selected()
+    source.filter_data()
+    source.required = {
+        "season": SEASON,
+        "server": "Main"
+    }
+    if 'season' in selected:
+        if 'server' in selected:
+            distinct["notary"] = SEASONS_INFO[selected['season']]['notaries']
+    else:
+        distinct["notary"] = SEASONS_INFO[SEASON]['notaries']
+    
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": selected
+    }
+
+
+def get_balances_rows(request):
+    source = TableSettings(
+        data=models.balances.objects.all(),
+        serializer=serializers.balancesSerializer,
+        request=request
+    )
+    source.exclude_seasons()
+    source.data = source.data.exclude(coin="BTC")
+    distinct = source.get_distinct()
+    source.filter_data()
+    source.required = {
+        "season": SEASON,
+        "server": "Main"
+    }
+
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
+
+
+def get_coin_last_ntx_rows(request):
+    source = TableSettings(
+        data=models.coin_last_ntx.objects.all(),
+        serializer=serializers.coinLastNtxSerializer,
+        request=request
+    )
+    source.exclude_seasons()
+    source.filters = ["season", "server"]
+    distinct = source.get_distinct()
+    source.filter_data()
+
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
+
+
+def get_coin_ntx_season_rows(request):
+    source = TableSettings(
+        data=models.coin_ntx_season.objects.all(),
+        serializer=serializers.coinNtxSeasonSerializer,
+        request=request
+    )
+    source.exclude_seasons()
+    source.filters = ["season"]
+    distinct = source.get_distinct()
+    source.filter_data()
+    print(source.data)
+
+    data = source.serialized()
+    results = [{
+        "coin": i["coin"],
+        "season": i["season"],
+        "ntx_count": i["coin_data"]["ntx_count"],
+        "ntx_score": i["coin_data"]["ntx_score"],
+        "pct_of_season_ntx_count": i["coin_data"]["pct_of_season_ntx_count"],
+        "pct_of_season_ntx_score": i["coin_data"]["pct_of_season_ntx_score"],
+        "timestamp": i["timestamp"]
+    } for i in data]
+
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": results,
+        "selected": source.selected()
+    }
+
+
+def get_mined_rows(request):
+    source = TableSettings(
+        data=models.mined.objects.all(),
+        serializer=serializers.minedSerializer,
+        request=request
+    )
+    today = datetime.date.today()
+    source.required = {"season": SEASON, "date": f"{today}"}
+    source.filters = ["category", "name", "date"]
+    source.exclude_seasons()
+    distinct = source.get_distinct(exclude=["date"])
+    source.filter_data('mined')
+    count = source.count()
+    selected = source.selected()
+
+    if 'season' in selected:
+        distinct["name"] = SEASONS_INFO[selected['season']]['notaries']
+    else:
+        distinct["name"] = SEASONS_INFO[SEASON]['notaries']
+
+    serialized = source.serialized()
+
+    return {
+        "distinct": distinct,
+        "count": count,
+        "filters": source.filters,
+        "required": source.required,
+        "results": serialized,
+        "selected": selected
+    }
+
+def get_mined_count_daily_rows(request):
+    source = TableSettings(
+        data=models.mined_count_daily.objects.all(),
+        serializer=serializers.minedCountDailySerializer,
+        request=request
+    )
+    today = datetime.date.today()
+    source.required = {"mined_date": f"{today}"}
+    source.filters = ["mined_date"]
+    distinct = source.get_distinct()
+    source.filter_data()
+    
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
+
+def get_mined_count_season_rows(request):
+    source = TableSettings(
+        data=models.mined_count_season.objects.all(),
+        serializer=serializers.minedCountSeasonSerializer,
+        request=request
+    )
+    source.required = {
+        "season": SEASON
+    }    
+    source.filters = ["season", "name"]
+    distinct = source.get_distinct()
+    source.filter_data()
+    
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
+
+def get_nn_ltc_tx_rows(request):
+    source = TableSettings(
+        data=models.nn_ltc_tx.objects.all(),
+        serializer=serializers.nnLtcTxSerializer,
+        request=request
+    )
+    source.exclude_seasons()
+    source.filters = ["season", "notary", "category"]
+    distinct = source.get_distinct()
+    source.filter_data()
+    source.required = {
+        "season": SEASON,
+        "notary": random.choice(SEASONS_INFO[SEASON]['notaries']),
+    }
+    selected = source.selected()
+    if 'season' in selected:
+        distinct["notary"] = SEASONS_INFO[selected['season']]['notaries']
+    else:
+        distinct["notary"] = SEASONS_INFO[SEASON]['notaries']
+
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": selected
+    }
+
+
+def get_notarised_rows(request):
+    source = TableSettings(
+        data=models.notarised.objects.all(),
+        serializer=serializers.notarisedSerializer,
+        request=request
+    )
+    source.exclude_seasons()
+    source.data = source.data.filter(scored=True)
+    source.filters = ["season", "coin", "date"]
+    distinct = source.get_distinct(exclude=["date"])
+    source.filter_data('notarised')
+    count = source.count()
+    if count > 1000:
+        source.serializer = serializers.notarisedSerializerLite
+
+    today = datetime.date.today()
+    source.required = {
+        "season": SEASON,
+        "coin": "KMD",
+        "date": f"{today}"
+    }
+
+    return {
+        "distinct": distinct,
+        "count": count,
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
+
+
+def get_notarised_coin_daily_rows(request):
+    source = TableSettings(
+        data=models.notarised_coin_daily.objects.all(),
+        serializer=serializers.notarisedCoinDailySerializer,
+        request=request
+    )
+    source.exclude_seasons()
+    source.filters = ['coin', 'year', 'month']
+    distinct = source.get_distinct()
+    source.filter_data("notarised_coin_daily")
+    source.required = {}
+
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
+
+
+def get_notarised_count_daily_rows(request):
+    source = TableSettings(
+        data=models.notarised_count_daily.objects.all(),
+        serializer=serializers.notarisedCountDailySerializer,
+        request=request
+    )
+    source.exclude_seasons()
+    source.required = {"season": SEASON}
+    source.filters = ['season', 'notary', 'year', 'month']
+    distinct = source.get_distinct()
+    source.filter_data("notarised_count_daily")
+
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
+
+
+def get_notary_last_ntx_rows(request, notary=None):
+    source = TableSettings(
+        data=models.notary_last_ntx.objects.all(),
+        serializer=serializers.notaryLastNtxSerializer,
+        request=request
+    )
+    if notary:
+        source.data.filter(notary=notary)
+    source.exclude_seasons()
+    distinct = source.get_distinct()
+    source.filter_data()
+    source.required = {
+        "season": SEASON,
+        "server": "Main"
+    }
+
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
+
+def get_notary_ntx_season_rows(request):
+    source = TableSettings(
+        data=models.notary_ntx_season.objects.all(),
+        serializer=serializers.notaryNtxSeasonSerializer,
+        request=request
+    )
+    source.exclude_seasons()
+    source.filters = ["season"]
+    distinct = source.get_distinct()
+    source.filter_data()
+
+    data = source.serialized()
+    results = [{
+        "notary": i["notary"],
+        "season": i["season"],
+        "ntx_count": i["notary_data"]["ntx_count"],
+        "ntx_score": i["notary_data"]["ntx_score"],
+        "pct_of_season_ntx_count": i["notary_data"]["pct_of_season_ntx_count"],
+        "pct_of_season_ntx_score": i["notary_data"]["pct_of_season_ntx_score"],
+        "timestamp": i["timestamp"]
+    } for i in data]
+    
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": results,
+        "selected": source.selected()
+    }
+
+
+def get_rewards_tx_rows(request):
+    source = TableSettings(
+        data=models.rewards_tx.objects.all(),
+        serializer=serializers.rewardsTxSerializer,
+        request=request
+    )
+    today = datetime.date.today()
+    source.required = {"date": f"{today}"}
+    source.filters = ["date"]
+    distinct = source.get_distinct(exclude=["date"])
+    source.filter_data('rewards_tx')
+    
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
+
+
+def get_server_ntx_season_rows(request):
+    source = TableSettings(
+        data=models.server_ntx_season.objects.all(),
+        serializer=serializers.serverNtxSeasonSerializer,
+        request=request
+    )
+    source.exclude_seasons()
+    source.filters = ["season"]
+    distinct = source.get_distinct()
+    source.filter_data()
+
+    data = source.serialized()
+    results = [{
+        "server": i["server"],
+        "season": i["season"],
+        "ntx_count": i["server_data"]["ntx_count"],
+        "ntx_score": i["server_data"]["ntx_score"],
+        "pct_of_season_ntx_count": i["server_data"]["pct_of_season_ntx_count"],
+        "pct_of_season_ntx_score": i["server_data"]["pct_of_season_ntx_score"],
+        "timestamp": i["timestamp"]
+    } for i in data]
+
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": results,
+        "selected": source.selected()
+    }
+
+def get_scoring_epochs_rows(request):
+    source = TableSettings(
+        data=models.scoring_epochs.objects.all(),
+        serializer=serializers.scoringEpochsSerializer,
+        request=request
+    )
+    source.data = source.data.exclude(server="LTC")
+    source.required = {"season": SEASON}
+    source.filters = ["season"]
+    distinct = source.get_distinct()
+    source.filter_data('scoring_epochs')
+    
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
 
 
 def get_coin_social_table(request):
     coin = helper.get_or_none(request, "coin")
-    season = helper.get_or_none(request, "season")
+    season = helper.get_page_season(request)
 
     data = query.get_coin_social_data(coin, season)
     data = data.order_by('coin').values()
@@ -51,64 +488,24 @@ def get_coin_social_table(request):
     return serializer.data
 
 
-def get_last_mined_table(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    name = helper.get_or_none(request, "name")
-    address = helper.get_or_none(request, "address")
-
-    if not season and not name and not address:
-        return {
-            "error": "You need to specify at least one of the following filter parameters: ['season', 'name', 'address']"
-        }
-
-    data = query.get_mined_data(season, name, address)
-    data = data.order_by('season', 'name')
+def get_notary_last_mined_table_api(request):
+    season = helper.get_page_season(request)
+    season_notary_addresses = query.get_addresses_data(season=season, server="Main", coin="KMD")
+    season_notary_addresses = list(season_notary_addresses.values_list("address", flat=True))
+    data = query.get_mined_data(season)
     data = data.values("season", "name", "address")
-
-
-    data = data.annotate(Max("block_time"), Max("block_height"))
+    data = data.annotate(blocktime=Max("block_time"), blockheight=Max("block_height"))
 
     resp = []
-    # name num sum max last
     for item in data:
-        season = item['season']
-        name = item['name']
-        address = item['address']
-        last_mined_block = item['block_height__max']
-        last_mined_blocktime = item['block_time__max']
-        if name != address:
-            resp.append({
-                "name": name,
-                "address": address,
-                "last_mined_block": last_mined_block,
-                "last_mined_blocktime": last_mined_blocktime,
-                "season": season
-            })
-
+        if item["address"] in season_notary_addresses:
+            resp.append(item)
     return resp
-
-
-def get_notary_last_ntx_table(request, notary=None):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
-    coin = helper.get_or_none(request, "coin")
-    notary = helper.get_or_none(request, "notary", notary)
-
-    if not notary and not coin:
-        return {
-            "error": "You need to specify at least one of the following filter parameters: ['notary', 'coin']"
-        }
-
-    data = query.get_notary_last_ntx_data(season, server, notary, coin)
-    data = data.order_by('season', 'server', 'notary', 'coin').values()
-
-    return data
-
 
 
 # TODO: Handle where coin not notarised
 def get_notary_ntx_season_table_data(request, notary=None):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary", notary)
 
     if not notary or not season:
@@ -117,7 +514,6 @@ def get_notary_ntx_season_table_data(request, notary=None):
         }
 
     ntx_season_data = get_notary_ntx_season_table(request, notary)
-
 
     notary_summary = {}
     for item in ntx_season_data:
@@ -147,7 +543,7 @@ def get_notary_ntx_season_table_data(request, notary=None):
                 })
 
     for notary in notary_summary:
-        last_ntx = get_notary_last_ntx_table(request, notary)
+        last_ntx = get_notary_last_ntx_rows(request, notary)["results"]
         for item in last_ntx:
             coin = item['coin']
             if coin in notary_summary[notary]:
@@ -173,7 +569,7 @@ def get_notary_ntx_season_table_data(request, notary=None):
 
 # TODO: Handle where coin not notarised
 def get_coin_ntx_season_table_data(request, coin=None):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     coin = helper.get_or_none(request, "coin", coin)
 
     if not coin or not season:
@@ -248,7 +644,7 @@ def get_mined_24hrs_table(request):
 
 
 def get_mined_count_season_table(request):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     name = helper.get_or_none(request, "name")
     address = helper.get_or_none(request, "address")
 
@@ -268,8 +664,8 @@ def get_mined_count_season_table(request):
 
 
 def get_coin_last_ntx_table(request, coin=None):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
+    season = helper.get_page_season(request)
+    server = helper.get_page_server(request)
     coin = helper.get_or_none(request, "coin", coin)
 
     if not season and not coin:
@@ -299,7 +695,7 @@ def get_coin_last_ntx_table(request, coin=None):
 
 
 def get_notary_ntx_season_table(request, notary=None):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary", notary)
     data = query.get_notary_ntx_season_data(season, notary)
     data = data.order_by('notary').values()
@@ -316,16 +712,16 @@ def get_notary_ntx_season_table(request, notary=None):
             "total_ntx_score": float(item["notary_data"]['ntx_score']),
             "coin_data": item["notary_data"]['coins'],
             "server_data": item["notary_data"]['servers'],
-            "time_stamp": item['time_stamp']
+            "timestamp": item['timestamp']
         })
 
     return resp
 
 
 def get_server_ntx_season_table(request, server=None):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server", server)
-    data = query.get_servr_ntx_season_data(season, server)
+    season = helper.get_page_season(request)
+    if not server: server = helper.get_page_server(request)
+    data = query.get_server_ntx_season_data(season, server)
     data = data.order_by('server').values()
 
     resp = []
@@ -340,13 +736,13 @@ def get_server_ntx_season_table(request, server=None):
             "total_ntx_score": float(item["server_data"]['ntx_score']),
             "coins_data": item["server_data"]['coins'],
             "notary_data": item["server_data"]['notaries'],
-            "time_stamp": item['time_stamp']
+            "timestamp": item['timestamp']
         })
 
     return resp
 
 def get_coin_ntx_season_table(request, coin=None):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     coin = helper.get_or_none(request, "coin", coin)
     data = query.get_coin_ntx_season_data(season, coin)
     data = data.order_by('coin').values()
@@ -368,7 +764,7 @@ def get_coin_ntx_season_table(request, coin=None):
                 "pct_of_season_ntx_score": coin_data['pct_of_season_ntx_score'],
                 "notary_data": item["coin_data"]['notaries'],
                 "server_data": item["coin_data"]['servers'],
-                "time_stamp": item['time_stamp']
+                "timestamp": item['timestamp']
             })
 
     return resp
@@ -377,8 +773,8 @@ def get_coin_ntx_season_table(request, coin=None):
 
 
 def get_notarised_tenure_table(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
+    season = helper.get_page_season(request)
+    server = helper.get_page_server(request)
     coin = helper.get_or_none(request, "coin")
 
     data = query.get_notarised_tenure_data(season, server, coin)
@@ -389,58 +785,11 @@ def get_notarised_tenure_table(request):
     return serializer.data
 
 
-def get_scoring_epochs_table(request):
-    season = helper.get_or_none(request, "season", SEASON)
-    server = helper.get_or_none(request, "server")
-    epoch = helper.get_or_none(request, "epoch")
-    coin = helper.get_or_none(request, "coin")
-    timestamp = helper.get_or_none(request, "timestamp")
-
-    if not season and not coin and not timestamp:
-        return {
-            "error": "You need to specify at least one of the following filter parameters: ['season', 'coin', 'timestamp']"
-        }
-
-    data = query.get_scoring_epochs_data(
-        season, server, coin, epoch, timestamp)
-    data = data.order_by('season', 'server', 'epoch').values()
-
-    resp = []
-
-    for item in data:
-        if item['epoch'].find("_") > -1:
-            epoch_id = item['epoch'].split("_")[1]
-        else:
-            epoch_id = epoch
-
-        if epoch_id not in ["Unofficial", None]:
-            
-            if item['epoch_end'] > time.time():
-                duration = time.time() - item['epoch_start']
-            else:
-                duration = item['epoch_end'] - item['epoch_start']
-
-            resp.append({
-                "season": item['season'],
-                "server": item['server'],
-                "epoch": epoch_id,
-                "epoch_start": dt.fromtimestamp(item['epoch_start']),
-                "epoch_end": dt.fromtimestamp(item['epoch_end']),
-                "epoch_start_timestamp": item['epoch_start'],
-                "epoch_end_timestamp": item['epoch_end'],
-                "duration": duration,
-                "start_event": item['start_event'],
-                "end_event": item['end_event'],
-                "epoch_coins": item['epoch_coins'],
-                "num_epoch_coins": len(item['epoch_coins']),
-                "score_per_ntx": item['score_per_ntx']
-            })
-    return resp
 
 
 # UPDATE PENDING
 def get_notary_epoch_scores_table(request, notary=None):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary", notary)
 
     epoch_coins_dict = info.get_epoch_coins_dict(season)
@@ -468,7 +817,7 @@ def get_notary_epoch_scores_table(request, notary=None):
         'third_party_server_count', 'other_server_count', 'total_ntx_count',
         'total_ntx_score', 'coin_ntx_counts', 'coin_ntx_scores', 'coin_ntx_count_pct',
         'coin_ntx_score_pct', 'coin_last_ntx', 'server_ntx_counts', 'server_ntx_scores',
-        'server_ntx_count_pct', 'server_ntx_score_pct', 'time_stamp']
+        'server_ntx_count_pct', 'server_ntx_score_pct', 'timestamp']
         '''
         server_data = item["notary_data"]["servers"]
         for server in server_data:
@@ -500,7 +849,7 @@ def get_notary_epoch_scores_table(request, notary=None):
 
 
 def get_split_stats_table(request):
-    season = helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     notary = helper.get_or_none(request, "notary")
 
     category = "Split"
@@ -559,3 +908,76 @@ def get_split_stats_table(request):
         resp.append(row)
     return resp
 
+
+## AtomicDEX Related
+
+def get_coin_activation_table(request):
+    selected_platform = helper.get_or_none(request, 'platform')
+    json_data = dex.get_activation_commands(request)["commands"]
+
+    table_data = []
+    for platform in json_data:
+        if platform == selected_platform or selected_platform is None:
+            for coin in json_data[platform]:
+                table_data.append({
+                    "platform": platform,
+                    "coin": coin,
+                    "command": json_data[platform][coin]
+                })
+    return table_data
+
+
+def get_bestorders_table(request):
+    rows = []
+    bestorders = dex.get_bestorders(request)["result"]
+    
+    for _coin in bestorders:
+        rows.append({
+            "coin": _coin,
+            "price": bestorders[_coin][0]["price"],
+            "maxvolume": bestorders[_coin][0]["maxvolume"],
+            "min_volume": bestorders[_coin][0]["min_volume"],
+        })
+
+    return rows
+
+def get_orderbook_table(request):
+    orderbook = dex.get_orderbook(request)
+
+    base = request.GET["base"]
+    rel = request.GET["rel"]
+
+    orders = []
+    if "bids" in orderbook:
+
+        for bid in orderbook["bids"]:
+            price = bid["price"]
+            maxvolume = bid["maxvolume"]
+            min_volume = bid["min_volume"]
+            orders.append({
+                "type": 'bid',
+                "base": base,
+                "rel": rel,
+                "price": price,
+                "maxvolume": maxvolume,
+                "min_volume": min_volume,
+                "total": float(maxvolume)/float(price)
+            })
+
+    if "asks" in orderbook:
+
+        for ask in orderbook["asks"]:
+            price = ask["price"]
+            maxvolume = ask["maxvolume"]
+            min_volume = ask["min_volume"]
+            orders.append({
+                "type": 'ask',
+                "base": base,
+                "rel": rel,
+                "price": price,
+                "maxvolume": maxvolume,
+                "min_volume": min_volume,
+                "total": float(maxvolume)*float(price)
+            })
+
+    return orders

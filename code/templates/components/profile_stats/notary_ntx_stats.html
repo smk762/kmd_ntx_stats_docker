@@ -52,7 +52,7 @@
 							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
 						    		{% include "components/badges/stats_badge.html" with stat_val=ntx_score|floatformat:-3 stat_label="Notarisation" %}
 					    		</a>
-							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+							    <a href="{% url 'seednode_version_view' %}?season={{ season }}">
 						    		{% include "components/badges/stats_badge.html" with stat_val=seed_score|floatformat:-3 stat_label="Seed Node" %}
 					    		</a>
 							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">

@@ -20,8 +20,4 @@ api_wallet_urls = [
           api_wallet.notary_balances_wallet,
           name='notary_balances_wallet'),
 
-    path('api/wallet/addresses_table/',
-          api_wallet.addresses_table_api,
-          name='addresses_table_api'),
-
 ]

@@ -11,20 +11,9 @@ import kmd_ntx_api.serializers as serializers
 # API views (simple)
 # TODO: Deprecate or merge into other url files
 def api_sidebar_links(request):
-    if 'season' in request.GET:
-        season = request.GET["season"]
-    else:
-        season = SEASON
+    season = helper.get_page_season(request)
     resp = helper.get_sidebar_links(season)
     return JsonResponse(resp)
-
-# TODO: Awaiting delegation to crons / db table
-def api_coin_sync(request):
-    r = requests.get('http://138.201.207.24/show_sync_node_data')
-    try:
-        return JsonResponse(r.json())
-    except Exception as e:
-        return JsonResponse({"error": f"{e}"})
 
 
 #TODO: Deprecate once CHMEX migrates to new endpoint

@@ -45,6 +45,7 @@ def get_bestorders(request):
         "action": helper.get_or_none(request, "action", "buy"),
         "volume": helper.get_or_none(request, "volume", 100),
     }
+    print(params)
     r = mm2_proxy(params)
     return r.json()
 
@@ -65,8 +66,12 @@ def get_last_200_swaps(request):
     data = query.get_swaps_data()
     taker_coin = helper.get_or_none(request, "taker_coin")
     maker_coin = helper.get_or_none(request, "maker_coin")
+    if taker_coin == "All":
+        taker_coin = None
+    if maker_coin == "All":
+        maker_coin = None
     data = query.filter_swaps_coins(data, taker_coin, maker_coin)
-    data = data.order_by('-time_stamp')[:200]
+    data = data.order_by('-timestamp')[:200]
     data = data.values()
     serializer = serializers.swapsSerializer(data, many=True)
     return serializer.data
@@ -83,7 +88,7 @@ def get_failed_swap_by_uuid(request):
 
 
 def get_last_200_failed_swaps(request):
-    data = query.get_swaps_failed_data().order_by('-time_stamp')[:200]
+    data = query.get_swaps_failed_data().order_by('-timestamp')[:200]
     data = data.values()
     serializer = serializers.swapsFailedSerializerPub(data, many=True)
     return serializer.data
@@ -105,11 +110,11 @@ def format_gui_os_version(swaps_data):
 
         maker_gui_version = None
         taker_gui_version = None
-        maker_gui_parts = maker_gui.split(" ")
+        maker_gui_parts = list(set(maker_gui.split(" ")))
         for part in maker_gui_parts:
             if len(part) == 9:
                 maker_gui_version = part
-        taker_gui_parts = taker_gui.split(" ")
+        taker_gui_parts = list(set(taker_gui.split(" ")))
         for part in taker_gui_parts:
             if part.find("0.") > -1:
                 taker_gui_version = part
@@ -190,133 +195,225 @@ def get_swaps_gui_stats(request):
     )
     data = query.get_swaps_data()
     data = query.filter_swaps_timespan(data, from_time, to_time)
-    taker_pubkeys = data.values('taker_pubkey','taker_gui')\
+
+    taker_pubkeys = data.values('taker_pubkey','taker_gui','taker_version')\
                         .annotate(num_swaps=Count('taker_pubkey'))
-    maker_pubkeys = data.values('maker_pubkey', 'maker_gui')\
+    maker_pubkeys = data.values('maker_pubkey', 'maker_gui','maker_version')\
                         .annotate(num_swaps=Count('maker_pubkey'))
-
-    resp = struct.default_swap_totals()
+    # resp = struct.default_swap_totals()
+    
+    taker_data = []
+    taker_dict = {
+        "global": {
+            "num_swaps": 0,
+            "pubkeys": []
+        },
+        "os": {},
+        "interface": {}
+    }
+    # Add pubkey totals
     for item in taker_pubkeys:
-        category = "other"
-        taker_gui = item["taker_gui"]
+        os, interface, gui_version, mm2_version = categorise_trade(item["taker_gui"], item["taker_version"])
 
-        for x in list(resp["taker"].keys()):
-            if taker_gui is not None:
-                if taker_gui.lower().find(x) > -1:
-                    category = x
-
-        taker_cat = resp["taker"][category]
-        if taker_gui not in taker_cat:
-            taker_cat.update({
-                taker_gui: {"swap_total": 0,"pubkey_total": 0}
-            })
-
-        taker_cat[taker_gui].update({
-            item['taker_pubkey']:item['num_swaps'],
+        taker_data.append({
+            "os": os,
+            "interface": interface,
+            "gui_version": gui_version,
+            "mm2_version": mm2_version,
+            "pubkey": item['taker_pubkey'],
+            "num_swaps": item['num_swaps']       
         })
 
-        taker_cat[taker_gui]["pubkey_total"] += 1
-        taker_cat[taker_gui]["swap_total"] += item['num_swaps']
-        taker_cat["pubkey_total"] += 1
-        taker_cat["swap_total"] += item['num_swaps']
-        resp["taker"]["swap_total"] += item['num_swaps']
+        if os not in taker_dict["os"]:
+            taker_dict["os"].update({
+                os: {
+                    "num_swaps": 0,
+                    "pubkeys": [],
+                    "interface": {}
+                }
+            })
 
-    resp["taker"]["pubkey_total"] = len(taker_pubkeys)
+        if interface not in taker_dict["os"][os]["interface"]:
+            taker_dict["os"][os]["interface"].update({
+                interface: {
+                    "num_swaps": 0,
+                    "pubkeys": [],
+                    "versions": {}
+                }
+            })
 
-    for category in resp["taker"]:
-        if category not in ["swap_total", "swap_pct", "pubkey_total"]:
-            pct = taker_cat["swap_total"]/resp["taker"]["swap_total"]*100
-            taker_cat.update({"swap_pct": pct})
+        if gui_version not in taker_dict["os"][os]["interface"][interface]["versions"]:
+            taker_dict["os"][os]["interface"][interface]["versions"].update({
+                gui_version: {
+                    "num_swaps": 0,
+                    "pubkeys": []                
+                }
+            })
 
-            for gui in taker_cat:
-                if gui not in ["swap_total", "swap_pct", "pubkey_total"]:
-                    gui_total = taker_cat[gui]["swap_total"]
-                    pct = gui_total/resp["taker"]["swap_total"]*100
-                    cat_pct = gui_total/taker_cat["swap_total"]*100
+        taker_dict["global"]["num_swaps"] += item['num_swaps']
+        if item['taker_pubkey'] not in taker_dict["global"]["pubkeys"]:
+            taker_dict["global"]["pubkeys"].append(item['taker_pubkey'])
 
-                    taker_cat[gui].update({
-                        "swap_pct": pct,
-                        "swap_category_pct": cat_pct,
-                    })
+        taker_dict["os"][os]["num_swaps"] += item['num_swaps']
+        if item['taker_pubkey'] not in taker_dict["os"][os]["pubkeys"]:
+            taker_dict["os"][os]["pubkeys"].append(item['taker_pubkey'])
 
+        taker_dict["os"][os]["interface"][interface]["num_swaps"] += item['num_swaps']
+        if item['taker_pubkey'] not in taker_dict["os"][os]["interface"][interface]["pubkeys"]:
+            taker_dict["os"][os]["interface"][interface]["pubkeys"].append(item['taker_pubkey'])
+
+        taker_dict["os"][os]["interface"][interface]["versions"][gui_version]["num_swaps"] += item['num_swaps']
+        if item['taker_pubkey'] not in taker_dict["os"][os]["interface"][interface]["versions"][gui_version]["pubkeys"]:
+            taker_dict["os"][os]["interface"][interface]["versions"][gui_version]["pubkeys"].append(item['taker_pubkey'])
+
+
+    maker_data = []
+    maker_dict = {
+        "global": {
+            "num_swaps": 0,
+            "pubkeys": []
+        },
+        "os": {}
+    }
 
     for item in maker_pubkeys:
-        category = "other"
-        maker_gui = item["maker_gui"]
+        os, interface, gui_version, mm2_version = categorise_trade(item["maker_gui"], item["maker_version"])
+    
+        maker_data.append({
+            "os": os,
+            "interface": interface,
+            "gui_version": gui_version,
+            "mm2_version": mm2_version,
+            "pubkey": item['maker_pubkey'],
+            "num_swaps": item['num_swaps']       
+        })
 
-        for x in list(resp["maker"].keys()):
-            if maker_gui is not None:
-                if maker_gui.lower().find(x) > -1:
-                    category = x
-
-        maker_cat = resp["maker"][category]
-        if maker_gui not in maker_cat:
-            maker_cat.update({
-                maker_gui:{"swap_total": 0,"pubkey_total": 0}
+        if os not in maker_dict["os"]:
+            maker_dict["os"].update({
+                os: {
+                    "num_swaps": 0,
+                    "pubkeys": [],
+                    "interface": {}
+                }
             })
 
-        maker_cat[maker_gui].update({
-            item['maker_pubkey']:item['num_swaps'],
+        if interface not in maker_dict["os"][os]["interface"]:
+            maker_dict["os"][os]["interface"].update({
+                interface: {
+                    "num_swaps": 0,
+                    "pubkeys": [],
+                    "versions": {}
+                }
+            })
+
+        if gui_version not in maker_dict["os"][os]["interface"][interface]["versions"]:
+            maker_dict["os"][os]["interface"][interface]["versions"].update({
+                gui_version: {
+                    "num_swaps": 0,
+                    "pubkeys": []                
+                }
+            })
+
+        maker_dict["global"]["num_swaps"] += item['num_swaps']
+        if item['maker_pubkey'] not in maker_dict["global"]["pubkeys"]:
+            maker_dict["global"]["pubkeys"].append(item['maker_pubkey'])
+
+        maker_dict["os"][os]["num_swaps"] += item['num_swaps']
+        if item['maker_pubkey'] not in maker_dict["os"][os]["pubkeys"]:
+            maker_dict["os"][os]["pubkeys"].append(item['maker_pubkey'])
+
+        maker_dict["os"][os]["interface"][interface]["num_swaps"] += item['num_swaps']
+        if item['maker_pubkey'] not in maker_dict["os"][os]["interface"][interface]["pubkeys"]:
+            maker_dict["os"][os]["interface"][interface]["pubkeys"].append(item['maker_pubkey'])
+
+        maker_dict["os"][os]["interface"][interface]["versions"][gui_version]["num_swaps"] += item['num_swaps']
+        if item['maker_pubkey'] not in maker_dict["os"][os]["interface"][interface]["versions"][gui_version]["pubkeys"]:
+            maker_dict["os"][os]["interface"][interface]["versions"][gui_version]["pubkeys"].append(item['maker_pubkey'])
+
+
+    global_swaps = maker_dict["global"]["num_swaps"]
+    global_pubkeys = len(list(set(maker_dict["global"]["pubkeys"])))
+
+
+    for os in taker_dict["os"]:
+        os_swaps = taker_dict["os"][os]["num_swaps"]
+        os_pubkeys = len(taker_dict["os"][os]["pubkeys"])
+
+        taker_dict["os"][os].update({
+            "global_swap_pct": os_swaps / global_swaps,
+            "global_pubkey_pct": os_pubkeys / global_swaps,
         })
 
-        maker_cat[maker_gui]["pubkey_total"] += 1
-        maker_cat[maker_gui]["swap_total"] += item['num_swaps']
-        maker_cat["pubkey_total"] += 1
-        maker_cat["swap_total"] += item['num_swaps']
-        resp["maker"]["swap_total"] += item['num_swaps']
+        for interface in taker_dict["os"][os]["interface"]:
+            interface_swaps = taker_dict["os"][os]["interface"][interface]["num_swaps"]
+            interface_pubkeys = len(taker_dict["os"][os]["interface"][interface]["pubkeys"])
 
-    resp["maker"]["pubkey_total"] = len(maker_pubkeys)
+            taker_dict["os"][os]["interface"][interface].update({
+                "global_swap_pct": interface_swaps / global_swaps,
+                "global_pubkey_pct": interface_pubkeys / global_swaps,
+                "os_swap_pct": interface_swaps / os_swaps,
+                "os_pubkey_pct": interface_pubkeys / os_pubkeys,
+            })
 
-    for category in resp["maker"]:
-        if category  not in ["swap_total", "swap_pct", "pubkey_total"]:
-            pct = maker_cat["swap_total"]/resp["maker"]["swap_total"]*100
-            maker_cat.update({"swap_pct": pct})
-
-            for gui in maker_cat:
-                if gui not in ["swap_total", "swap_pct", "pubkey_total"]: 
-                    gui_total = maker_cat[gui]["swap_total"]
-                    pct = gui_total/resp["maker"]["swap_total"]*100
-                    category_pct = gui_total/maker_cat["swap_total"]*100
-
-                    maker_cat[gui].update({
-                        "swap_pct": pct,
-                        "swap_category_pct": category_pct,
-                    })
-    return resp
+            for version in taker_dict["os"][os]["interface"][interface]["versions"]:
+                version_swaps = taker_dict["os"][os]["interface"][interface]["versions"][version]["num_swaps"]
+                version_pubkeys = len(taker_dict["os"][os]["interface"][interface]["versions"][version]["pubkeys"])
+                
+                taker_dict["os"][os]["interface"][interface]["versions"][version].update({
+                    "global_swap_pct": version_swaps / global_swaps,
+                    "global_pubkey_pct": version_pubkeys / global_swaps,
+                    "os_swap_pct": version_swaps / os_swaps,
+                    "os_pubkey_pct": version_pubkeys / os_pubkeys,
+                    "interface_swap_pct": version_swaps / interface_swaps,
+                    "interface_pubkey_pct": version_pubkeys / interface_pubkeys,
+                })
 
 
-def get_swaps_pubkey_stats(request):
-    now = int(time.time())
-    to_time = helper.get_or_none(request, "to_time", now)
-    from_time = helper.get_or_none(
-        request,
-        "from_time",
-        now - SINCE_INTERVALS["week"]
-    )
+    for os in maker_dict["os"]:
+        os_swaps = maker_dict["os"][os]["num_swaps"]
+        os_pubkeys = len(maker_dict["os"][os]["pubkeys"])
 
-    if "since" in request.GET:
-        if request.GET["since"] in SINCE_INTERVALS:
-            from_time = to_time - SINCE_INTERVALS[request.GET["since"]]
-
-    data = query.get_swaps_data()
-    data = query.filter_swaps_timespan(data, from_time, to_time)
-    taker_pubkeys = data.values('taker_pubkey', 'taker_gui')\
-                        .annotate(num_swaps=Count('taker_pubkey'))
-    maker_pubkeys = data.values('maker_pubkey', 'maker_gui')\
-                        .annotate(num_swaps=Count('maker_pubkey'))
-
-    resp = {}
-    for item in taker_pubkeys:
-        if item["taker_pubkey"] not in resp:
-            resp.update({item["taker_pubkey"]:{"TOTAL": 0}})
-
-        resp[item["taker_pubkey"]].update({
-            item['taker_gui']:item['num_swaps'],
+        maker_dict["os"][os].update({
+            "global_swap_pct": os_swaps / global_swaps,
+            "global_pubkey_pct": os_pubkeys / global_swaps,
         })
 
-        resp[item["taker_pubkey"]]["TOTAL"] += item['num_swaps']
-    return resp
+        for interface in maker_dict["os"][os]["interface"]:
+            interface_swaps = maker_dict["os"][os]["interface"][interface]["num_swaps"]
+            interface_pubkeys = len(maker_dict["os"][os]["interface"][interface]["pubkeys"])
 
+            maker_dict["os"][os]["interface"][interface].update({
+                "global_swap_pct": interface_swaps / global_swaps,
+                "global_pubkey_pct": interface_pubkeys / global_swaps,
+                "os_swap_pct": interface_swaps / os_swaps,
+                "os_pubkey_pct": interface_pubkeys / os_pubkeys,
+            })
+
+            for version in maker_dict["os"][os]["interface"][interface]["versions"]:
+                version_swaps = maker_dict["os"][os]["interface"][interface]["versions"][version]["num_swaps"]
+                version_pubkeys = len(maker_dict["os"][os]["interface"][interface]["versions"][version]["pubkeys"])
+                
+                maker_dict["os"][os]["interface"][interface]["versions"][version].update({
+                    "global_swap_pct": version_swaps / global_swaps,
+                    "global_pubkey_pct": version_pubkeys / global_swaps,
+                    "os_swap_pct": version_swaps / os_swaps,
+                    "os_pubkey_pct": version_pubkeys / os_pubkeys,
+                    "interface_swap_pct": version_swaps / interface_swaps,
+                    "interface_pubkey_pct": version_pubkeys / interface_pubkeys,
+                })
+
+
+    # By OS
+    # By Interface
+    resp = {
+        "to_time": to_time,
+        "from_time": from_time,
+        "maker_dict": maker_dict,
+        "taker_dict": taker_dict,
+        "maker_data": maker_data,
+        "taker_data": taker_data
+    }
+    return resp
 
 #### ACTIVATION 
 
@@ -578,7 +675,7 @@ def is_mm2_version_valid(version, timestamp):
 
 
 def get_seednode_version_date_table(request):
-    season =  helper.get_or_none(request, "season", SEASON)
+    season = helper.get_page_season(request)
     start = int(helper.get_or_none(request, "start", time.time() - SINCE_INTERVALS["day"]))
     end = int(helper.get_or_none(request, "end", time.time()))
 
@@ -589,7 +686,7 @@ def get_seednode_version_date_table(request):
     hour_headers.sort()
     table_headers = ["Notary"] + hour_headers + ["Total"]
 
-    data = query.get_seednode_version_stats_data(start, end)
+    data = query.get_seednode_version_stats_data(start=start, end=end)
     '''
     if is_testnet:
         proposals = testnet.get_candidates_proposals(request)
@@ -656,7 +753,7 @@ def get_seednode_version_date_table(request):
 
 
 def get_seednode_version_month_table(request):
-    season =  helper.get_or_none(request, "season", SEASON)
+    season =  helper.get_page_season(request)
     year = helper.get_or_none(request, "year", None)
     month = helper.get_or_none(request, "month", None)
     start, end, last_day = helper.get_month_epoch_range(year, month)
@@ -674,7 +771,7 @@ def get_seednode_version_month_table(request):
     day_headers.sort()
 
     table_headers = ["Notary"] + day_headers + ["Total"]
-    data = query.get_seednode_version_stats_data(start, end).values()
+    data = query.get_seednode_version_stats_data(start=start, end=end).values()
 
     for item in data:
         notary = item["name"]
@@ -726,14 +823,14 @@ def get_seednode_version_month_table(request):
     }
 
 def get_seednode_version_score_total(request, season=None, start=None, end=None):
-    season =  helper.get_or_none(request, "season", season)
-    if not season: season = SEASON
+    if not season:
+        season = helper.get_page_season(request)
     notary_list = helper.get_notary_list(season)
     start = helper.get_or_none(request, "start", start)
-    if not start: start = time.time() - SINCE_INTERVALS["day"]
+    if not start: start = int(time.time()) - SINCE_INTERVALS["day"]
     end = helper.get_or_none(request, "end", end)
-    if not end: end = time.time()
-    data = query.get_seednode_version_stats_data(int(start), int(end))
+    if not end: end = int(time.time())
+    data = query.get_seednode_version_stats_data(start=start, end=end)
     notary_scores = list(data.values('name').order_by('name').annotate(sum_score=Sum('score')))
     notaries_with_scores = data.distinct('name').values_list('name', flat=True)
 
@@ -749,3 +846,49 @@ def get_seednode_version_score_total(request, season=None, start=None, end=None)
     return resp
 
 
+
+def categorise_trade(gui, version):
+    os = "Unknown"
+    interface = "Unknown"
+    gui_version = "Unknown"
+    mm2_version = "Unknown"
+
+    gui_split = gui.split(" ")
+    version_split = version.split("_")
+    info = gui_split + version_split
+
+    os_list = ["ios", "android", "windows", "darwin", "linux"]
+
+    for gui in gui_split:
+        for version in version_split:
+            if gui.lower() == version.lower() and gui.lower() not in os_list:
+                mm2_version = gui.lower()
+                break
+
+    for i in info:
+        i = i.replace(';','')
+        if i.lower() in os_list:
+            os = i.lower()
+            break
+
+    for i in gui_split:
+        if i.lower().find("beta") > -1:
+            gui_version = i.lower()
+            break
+
+        if i.lower().startswith("0."):
+            gui_version = i.lower()
+            break
+
+    interface_list = ["Firo", "pyMakerbot", "MM2CLI", "dexstats", "BumbleBee", 'None',
+                        "mpm", "BitcoinZ", "dogedex", "AtomicDex", "SwapCase", "SmartDEX",
+                        "air_dex", "shibaDEX", "ColliderDEX"]
+
+    for i in interface_list:
+        for gui in gui_split:
+            i = i.replace(';','')
+            if i.lower() == gui.lower():
+                interface = gui.lower()
+                break
+
+    return os, interface, gui_version, mm2_version
