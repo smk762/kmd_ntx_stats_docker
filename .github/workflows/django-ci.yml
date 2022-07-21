@@ -36,7 +36,7 @@ jobs:
                     python -m pip install --upgrade pip
                     pip install -r code/requirements.txt
             - name: Run Migrations
-              run: python manage.py migrate
+              run: python code/manage.py migrate
               env: 
                     DBENGINE: django.db.backends.mysql
                     DBNAME: postgresdb
