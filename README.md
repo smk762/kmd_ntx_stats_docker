@@ -25,7 +25,7 @@
 `git clone https://github.com/smk762/kmd_ntx_stats_docker`
 
 `cd kmd_ntx_stats_docker`
-
+ 
 Install Python Packages: `pip3 install -r requirements.txt` 
 
 `sudo docker-compose build`  (needs to be run to apply code changes)
