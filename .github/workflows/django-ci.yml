@@ -8,6 +8,10 @@ on:
 
 jobs:
     test:
+        defaults:
+            run:
+                shell: bash
+                working-directory: code
 
         runs-on: ubuntu-latest
         strategy:
@@ -34,9 +38,9 @@ jobs:
               run: |
                     sudo apt-get install python3-dev build-essential libpq-dev libgnutls28-dev gcc default-libmysqlclient-dev build-essential python3-mysql.connector python3-pip libcurl4-openssl-dev libssl-dev -y
                     python -m pip install --upgrade pip
-                    pip install -r code/requirements.txt
+                    pip install -r requirements.txt
             - name: Run Migrations
-              run: python code/manage.py migrate
+              run: python manage.py migrate
               env: 
                     DBENGINE: django.db.backends.mysql
                     DBNAME: postgresdb
