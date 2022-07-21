@@ -37,15 +37,15 @@ jobs:
             - uses: actions/checkout@v2
             - name: Set up Python $
               uses: actions/setup-python@v2
-                  with:
+              with:
                     python-version: $
             - name: Install Dependencies
-                  run: |
+              run: |
                     python -m pip install --upgrade pip
                     pip install -r requirements.txt
             - name: Run Migrations
-                  run: python manage.py migrate
-                  env: 
+              run: python manage.py migrate
+              env: 
                     DBENGINE: django.db.backends.mysql
                     DBNAME: postgresdb
                     DBUSER: postgresuser
@@ -53,9 +53,9 @@ jobs:
                     DBHOST: 127.0.0.1
                     DBPORT: $
             - name: Run Tests
-                  run: |
+              run: |
                     python manage.py test
-                  env: 
+              env: 
                     DBENGINE: django.db.backends.postgresql
                     DBNAME: postgresdb
                     DBUSER: postgresuser
@@ -67,7 +67,7 @@ jobs:
                 # You may pin to the exact commit or the version.
                 # uses: dc740/django-coveragepy-github-action@f8581a749bd8cf75838b120a6aa07dc40a060e61
               uses: dc740/django-coveragepy-github-action@0.9
-                with:
+              with:
                     # Application
                     #django-app: # optional, default is 
                     # Minimum allowed code coverage
