@@ -72,3 +72,13 @@ jobs:
             #django-app: # optional, default is 
             # Minimum allowed code coverage
             minimum-coverage: 10 # optional, default is 10
+
+    - name: Django Security Check
+        # You may pin to the exact commit or the version.
+        # uses: victoriadrake/django-security-check@762dd0ab80194dbded70117daa32bd7d139c6a04
+        uses: victoriadrake/django-security-check@v1.1.0
+        
+    - name: pytest-django-action
+        # You may pin to the exact commit or the version.
+        # uses: samwlms/pytest-django-action@1671ce1d99cb86eb7b76f0e7639150955614162d
+        uses: samwlms/pytest-django-action@1.9
