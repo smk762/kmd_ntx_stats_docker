@@ -31,6 +31,8 @@ def decode_op_return_tool(request):
 def kmd_rewards_tool(request):
     resp = tools.get_kmd_rewards(request)
     filters = ["address"]
+    if 'ignore_errors' in request.GET:
+        return helper.json_resp(resp, filters, None, True)
     return helper.json_resp(resp, filters)
 
 

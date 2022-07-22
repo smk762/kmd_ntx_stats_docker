@@ -429,7 +429,7 @@ def get_rewards_data(season=None, address=None, min_value=None, min_block=None, 
     data = rewards_tx.objects.all()
 
     if address:
-        data = data.filter(input_addresses__contains=[address])
+        data = data.filter(address=address)
 
     if season:
         if season in SEASONS_INFO:
@@ -452,7 +452,7 @@ def get_rewards_data(season=None, address=None, min_value=None, min_block=None, 
         data = data.filter(block_time__lte=max_blocktime)
 
     if exclude_coinbase:
-        data = data.exclude(input_addresses__contains=['coinbase'])
+        data = data.exclude(address='coinbase')
 
     data = data.exclude(block_height=1)
 

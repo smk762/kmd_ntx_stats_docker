@@ -846,123 +846,6 @@ def get_coin_social_info(request):
     return coin_social_info
 
 
-
-
-def get_rewards_by_address_info(request):
-    season = helper.get_page_season(request)
-    address = helper.get_or_none(request, "address")
-    min_value = helper.get_or_none(request, "min_value")
-    min_block = helper.get_or_none(request, "min_block")
-    max_block = helper.get_or_none(request, "max_block")
-    min_blocktime = helper.get_or_none(request, "min_blocktime")
-    max_blocktime = helper.get_or_none(request, "max_blocktime")
-
-    exclude_coinbase = True
-    if "exclude_coinbase" in request.GET:
-        if request.GET["exclude_coinbase"].lower() == 'false':
-            exclude_coinbase = False
-                    
-    data = query.get_rewards_data(
-                    season, address, min_value, min_block, max_block,
-                    min_blocktime, max_blocktime, exclude_coinbase
-                    ).values()
-
-    resp = {
-        "addresses": {},
-        "num_addresses": 0,
-        "num_claims": 0,
-        "sum_claims": 0,
-        "first_claim": 999999999999999,
-        "last_claim": 0,
-        "min_claim": 999999999999999,
-        "max_claim": 0,
-        "average_claim": 0,
-        "claims_per_day": 0,
-        "claims_per_month": 0,
-        "claims_per_year": 0,
-        "claimed_per_day": 0,
-        "claimed_per_month": 0,
-        "claimed_per_year": 0
-    }
-    for i in data:
-        for address in i["input_addresses"]:
-            helper.update_unique(
-                resp["addresses"],
-                address,
-                {
-                    "address_age": 0,
-                    "num_claims": 0,
-                    "sum_claims": 0,
-                    "first_claim": 999999999999999,
-                    "last_claim": 0,
-                    "min_claim": 999999999999999,
-                    "max_claim": 0,
-                    "average_claim": 0,
-                    "claims_per_month": 0,
-                    "claims_per_year": 0
-                }
-            )
-            resp["addresses"][address]["num_claims"] += 1
-            resp["addresses"][address]["sum_claims"] += i['rewards_value'] / len(i["input_addresses"])
-
-            if i["block_time"] < resp["addresses"][address]["first_claim"]:
-                resp["addresses"][address]["first_claim"] = i["block_time"]
-
-            if i["block_time"] > resp["addresses"][address]["last_claim"]:
-                resp["addresses"][address]["last_claim"] = i["block_time"]
-
-            if i["rewards_value"] / len(i["input_addresses"]) < resp["addresses"][address]["min_claim"]:
-                resp["addresses"][address]["min_claim"] = round(i["rewards_value"] / len(i["input_addresses"]),3)
-
-            if i["rewards_value"] / len(i["input_addresses"]) > resp["addresses"][address]["max_claim"]:
-                resp["addresses"][address]["max_claim"] = round(i["rewards_value"] / len(i["input_addresses"]),3)
-
-    addr_count = len(resp["addresses"])
-    for address in resp["addresses"]:
-        resp["addresses"][address]["address_age"] = resp["addresses"][address]["last_claim"]\
-                                                  - resp["addresses"][address]["first_claim"]
-
-        resp["addresses"][address]["average_claim"] = round(resp["addresses"][address]["sum_claims"]\
-                                                    / resp["addresses"][address]["num_claims"],3)
-
-        if resp["addresses"][address]["address_age"] > 0:
-            claims_per_sec = resp["addresses"][address]["num_claims"]\
-                           / resp["addresses"][address]["address_age"]
-            resp["addresses"][address]["claims_per_month"] = round(claims_per_sec * SINCE_INTERVALS["month"],3)
-            resp["addresses"][address]["claims_per_year"] = round(claims_per_sec * SINCE_INTERVALS["year"],3)
-
-        resp["num_claims"] += 1
-        resp["sum_claims"] += resp["addresses"][address]["sum_claims"]
-        resp["addresses"][address]["sum_claims"] = round(resp["addresses"][address]["sum_claims"],3)
-
-        if resp["first_claim"] > resp["addresses"][address]["first_claim"]:
-            resp["first_claim"] = resp["addresses"][address]["first_claim"]
-
-        if resp["last_claim"] < resp["addresses"][address]["last_claim"]:
-            resp["last_claim"] = resp["addresses"][address]["last_claim"]
-
-        if resp["min_claim"] > resp["addresses"][address]["min_claim"]:
-            resp["min_claim"] = resp["addresses"][address]["min_claim"]
-
-        if resp["max_claim"] < resp["addresses"][address]["max_claim"]:
-            resp["max_claim"] = resp["addresses"][address]["max_claim"]
-
-    resp["num_addresses"] = len(resp["addresses"])
-    resp["average_claim"] = round(resp["sum_claims"] / resp["num_claims"],3)
-
-    claim_period = resp["last_claim"] - resp["first_claim"]
-    if claim_period > 0:
-        claims_per_sec = resp["num_claims"] / claim_period
-        claimed_per_sec = resp["sum_claims"] / claim_period
-        resp["claims_per_day"] = round(claims_per_sec * SINCE_INTERVALS["day"],3)
-        resp["claims_per_month"] = round(claims_per_sec * SINCE_INTERVALS["month"],3)
-        resp["claims_per_year"] = round(claims_per_sec * SINCE_INTERVALS["year"],3)
-        resp["claimed_per_day"] = round(claimed_per_sec * SINCE_INTERVALS["day"],3)
-        resp["claimed_per_month"] = round(claimed_per_sec * SINCE_INTERVALS["month"],3)
-        resp["claimed_per_year"] = round(claimed_per_sec * SINCE_INTERVALS["year"],3)
-
-    return resp
-
 def get_notary_seasons():
     ntx_seasons = {}
     pubkeys = get_notary_pubkeys()
@@ -1005,3 +888,6 @@ def get_notarisation_txid_list(request):
 
     resp = list(set(resp))
     return resp
+
+
+

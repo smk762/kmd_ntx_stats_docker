@@ -73,7 +73,7 @@ def create_raw_transaction_view(request):
         else:
             for utxo in utxos:
 
-                if utxo["txid"] in rewards_resp["utxos"]:
+                if utxo["txid"] in rewards_resp["utxo_list"]:
                     txid = utxo["txid"]
                     rewards = rewards_resp["utxos"][txid]["kmd_rewards"]
                     utxo.update({"rewards":rewards})
@@ -292,9 +292,7 @@ def kmd_rewards_view(request):
 
             kmd_rewards_rows = []
             for utxo in resp["results"]["utxos"]:
-                row = {"txid":utxo}
-                row.update(resp["results"]["utxos"][utxo])
-                kmd_rewards_rows.append(row)
+                kmd_rewards_rows.append(utxo)
 
             context.update({
                 "address": address,

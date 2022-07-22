@@ -68,7 +68,7 @@ def qset_values_to_list(qset_vals):
     return table_data
 
 
-def json_resp(resp, filters=None, params=None):
+def json_resp(resp, filters=None, params=None, ignore_errors=False):
 
     data = {}
     if filters:
@@ -77,7 +77,7 @@ def json_resp(resp, filters=None, params=None):
     if params:
         data.update({"params": params})
 
-    if has_error(resp):
+    if has_error(resp) and not ignore_errors:
         data.update({"error": resp["error"]})
 
     if "filters" in resp:
@@ -215,6 +215,7 @@ def get_base_context(request):
     epoch = get_or_none(request, "epoch")
     coin = get_or_none(request, "coin")
     notary = get_or_none(request, "notary")
+    address = get_or_none(request, "address")
     hide_filters = get_or_none(request, "hide_filters", [])
     selected = {}
     [selected.update({i: request.GET[i]}) for i in request.GET]
@@ -226,6 +227,7 @@ def get_base_context(request):
         "epoch": epoch,
         "coin": coin,
         "notary": notary,
+        "address": address,
         "selected": selected,
         "hide_filters": hide_filters,
         "regions": ["AR", "EU", "NA", "SH", "DEV"],
