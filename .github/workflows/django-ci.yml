@@ -63,6 +63,7 @@ jobs:
                     DBPASSWORD: postgrespw
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings_ci
                     SECRET_KEY: 'ho2i43pq8asapnqqi02i-'
                 
             - name: Python Django Coverage GitHub Action
