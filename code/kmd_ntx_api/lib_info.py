@@ -494,13 +494,16 @@ def get_notary_icons(request):
 
 
 def get_mm2_coins_list():
-    data = query.get_coins_data(None, True)
-    data = data.order_by('coin').values('coin')
-
     resp = []
-    for item in data:
-        coin = item['coin']
-        resp.append(coin)
+    try:
+        data = query.get_coins_data(None, True)
+        data = data.order_by('coin').values('coin')
+
+        for item in data:
+            coin = item['coin']
+            resp.append(coin)
+    except:
+        pass
     return resp
 
 

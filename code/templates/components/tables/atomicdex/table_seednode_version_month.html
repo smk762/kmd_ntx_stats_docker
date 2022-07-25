@@ -99,7 +99,7 @@
                 }
             ],
             fnInitComplete: function(){
-                let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="seednode_month" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+                let api_btn = get_api_button("seednode_month", 100, url, "Source Data")
                 $('#month_api_link').html(api_btn);
             }
         });
@@ -122,7 +122,7 @@
                 url = "{% url 'seednode_version_month_table_api' %}"+params
                 last_day = daysInMonth(my[0], my[1])
                 month_seed_table.ajax.url(url).load();
-                let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="seednode_month" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+                let api_btn = get_api_button("seednode_month", 100, url, "Source Data")
                 $('#month_api_link').html(api_btn);
             }
         });

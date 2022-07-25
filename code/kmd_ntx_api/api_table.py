@@ -2,6 +2,7 @@
 import kmd_ntx_api.lib_table as table
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_ntx as ntx
+import kmd_ntx_api.lib_atomicdex as dex
 
 # Source Data Tables
 def addresses_table_api(request):
@@ -176,7 +177,37 @@ def coin_activation_table(request):
     filters = ['platform']
     return helper.json_resp(resp, filters)
 
+
 def bestorders_table(request):
     resp = table.get_bestorders_table(request)
     filters = ['coin']
     return helper.json_resp(resp, filters)
+
+
+def dex_stats_table(request):
+    stats = dex.get_swaps_gui_stats(request)
+    resp = table.get_dex_stats_table(stats)
+    filters = ['from_time', 'to_time']
+    return helper.json_resp(resp, filters)
+
+
+def dex_os_stats_table(request):
+    stats = dex.get_swaps_gui_stats(request)
+    resp = table.get_dex_os_stats_table(stats)
+    filters = ['from_time', 'to_time']
+    return helper.json_resp(resp, filters)
+
+
+def dex_ui_stats_table(request):
+    stats = dex.get_swaps_gui_stats(request)
+    resp = table.get_dex_ui_stats_table(stats)
+    filters = ['from_time', 'to_time']
+    return helper.json_resp(resp, filters)
+
+
+def dex_version_stats_table(request):
+    stats = dex.get_swaps_gui_stats(request)
+    resp = table.get_dex_version_stats_table(stats)
+    filters = ['from_time', 'to_time']
+    return helper.json_resp(resp, filters)
+

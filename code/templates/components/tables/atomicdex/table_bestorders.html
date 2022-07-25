@@ -1,0 +1,94 @@
+
+	<div class="row col-12 m-auto">
+		<div class="card table_card floating-card m-auto col-12" id="bids_card" style="font-size: 1.1em;" >
+			<div class="card-body table_card_body col-12">
+				<table style="" id="bids" class="table table-striped table-bordered m-auto" style="width:100%">
+					<thead>
+						<tr>
+							<th data-data="coin">Coin</th>
+							<th data-data="price">Price</th>
+							<th data-data="min_volume">Min Volume</th>
+							<th data-data="maxvolume">Max Volume</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+	    
+    	function get_url() {
+	    	let coin = $('#coin').val() == undefined ? 'KMD' :  $('#coin').val()
+	    	url = "{{ endpoint }}?coin="+coin
+	    	console.log(url)
+	    	return url
+    	}
+	    $(document).ready(function() {
+
+			{% autoescape off %}
+		    	const dropdown = `{% include 'components/form/coin_selection.html' with selected_coin=coin coins_list=mm2_coins id='coin' label=' Best Orders for ' width='160px' %}`
+				var options = {{ mm2_coins }}
+			{% endautoescape %}
+
+			const dom = '{% include "components/tables/dt_dom.html" with table="bids" %}'
+
+	    	$('#select_base_rel').css('visibility', 'visible');
+	    	$('#bids').css('visibility', 'visible');
+
+	        const bids_table = $('#bids').DataTable({
+	     		"ajax": {
+				    "url": get_url(),
+	    			'dataSrc': 'results',
+	    			"deferRender": true
+				},
+				"pageLength": 50,
+	    		"order": [[ 2, 'desc' ]],
+	    		"dom": dom,
+	    		"columnDefs": [
+					{ "className": "text-right text-nowrap", "targets": [ 1, 2, 3 ] },
+					{ "className": "text-left text-nowrap", "targets": [ 0 ] },
+	    			{
+			            "data": 'coin',
+			            "targets": 0,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					        $(nTd).html(get_coin_icon(oData.coin));
+				        }
+	    			},
+	    			{
+			            "data": 'price',
+			            "targets": 1,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					        $(nTd).html(parseFloat(oData.price).toFixed(8));
+				        }
+	    			},
+	    			{
+			            "data": 'min_volume',
+			            "targets": 2,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					        $(nTd).html(parseFloat(oData.min_volume).toFixed(8));
+				        }
+	    			},
+	    			{
+			            "data": 'maxvolume',
+			            "targets": 3,
+			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+					        $(nTd).html(parseFloat(oData.maxvolume).toFixed(8));
+				        }
+	    			},
+			    ],
+		        fnInitComplete: function(){
+		            $('.bids-tbl-title').html(dropdown);
+					$('#coin').select2();
+				    $('#coin').on('select2:select', function (e) {
+				    	bids_table.ajax.url(get_url()).load()
+					});
+		            let api_btn = get_api_button("bids", 100, get_url(), "Source Data")
+		            $('.bids-api-link').html(api_btn);
+		            add_dropdown_options(options, '#coin', '{{ coin }}')
+
+		        }
+	        });
+            
+	    });
+
+	</script>

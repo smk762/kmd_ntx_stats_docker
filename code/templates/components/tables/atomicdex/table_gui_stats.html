@@ -1,0 +1,555 @@
+
+	<div class="row col-12 m-auto">
+		<div class="card table_card floating-card m-auto col-12" id="os-stats-card" style="font-size: 1.1em;" >
+			<div class="card-body table_card_body col-12">
+				<table style="" id="maker-os-stats-tbl" class="table table-striped table-bordered m-auto" style="width:100%">
+					<thead>
+						<tr>
+							<th data-data="os">OS</th>
+							<th data-data="num_swaps">Swaps</th>
+							<th data-data="num_pubkeys">Pubkeys</th>
+							<th data-data="global_swap_pct">Swaps %</th>
+							<th data-data="global_pubkey_pct">Pubkey %</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div class="card-body table_card_body col-12">
+				<table style="" id="taker-os-stats-tbl" class="table table-striped table-bordered m-auto" style="width:100%">
+					<thead>
+						<tr>
+							<th data-data="os">OS</th>
+							<th data-data="num_swaps">Swaps</th>
+							<th data-data="num_pubkeys">Pubkeys</th>
+							<th data-data="global_swap_pct">Swaps %</th>
+							<th data-data="global_pubkey_pct">Pubkey %</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="row col-12 m-auto">
+		<div class="card table_card floating-card m-auto col-12" id="ui-stats-card" style="font-size: 1.1em;" >
+			<div class="card-body table_card_body col-12">
+				<table style="" id="maker-ui-stats-tbl" class="table table-striped table-bordered m-auto" style="width:100%">
+					<thead>
+						<tr>
+							<th data-data="os">OS</th>
+							<th data-data="ui">UI</th>
+							<th data-data="num_swaps">Swaps</th>
+							<th data-data="num_pubkeys">Pubkeys</th>
+							<th data-data="os_swap_pct">OS Swaps %</th>
+							<th data-data="os_pubkey_pct">OS Pubkey %</th>
+							<th data-data="global_swap_pct">Global Swaps %</th>
+							<th data-data="global_pubkey_pct">Global Pubkey %</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div class="card-body table_card_body col-12">
+				<table style="" id="taker-ui-stats-tbl" class="table table-striped table-bordered m-auto" style="width:100%">
+					<thead>
+						<tr>
+							<th data-data="os">OS</th>
+							<th data-data="ui">UI</th>
+							<th data-data="num_swaps">Swaps</th>
+							<th data-data="num_pubkeys">Pubkeys</th>
+							<th data-data="os_swap_pct">OS Swaps %</th>
+							<th data-data="os_pubkey_pct">OS Pubkey %</th>
+							<th data-data="global_swap_pct">Global Swaps %</th>
+							<th data-data="global_pubkey_pct">Global Pubkey %</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="row col-12 m-auto">
+		<div class="card table_card floating-card m-auto col-12" id="version-stats-card" style="font-size: 1.1em;" >
+			<div class="card-body table_card_body col-12">
+				<table style="" id="maker-version-stats-tbl" class="table table-striped table-bordered m-auto" style="width:100%">
+					<thead>
+						<tr>
+							<th data-data="os">OS</th>
+							<th data-data="ui">UI</th>
+							<th data-data="version">Version</th>
+							<th data-data="num_swaps">Swaps</th>
+							<th data-data="num_pubkeys">Pubkeys</th>
+							<th data-data="ui_swap_pct">UI Swaps %</th>
+							<th data-data="ui_pubkey_pct">UI Pubkey %</th>
+							<th data-data="os_swap_pct">OS Swaps %</th>
+							<th data-data="os_pubkey_pct">OS Pubkey %</th>
+							<th data-data="global_swap_pct">Global Swaps %</th>
+							<th data-data="global_pubkey_pct">Global Pubkey %</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div class="card-body table_card_body col-12">
+				<table style="" id="taker-version-stats-tbl" class="table table-striped table-bordered m-auto" style="width:100%">
+					<thead>
+						<tr>
+							<th data-data="os">OS</th>
+							<th data-data="ui">UI</th>
+							<th data-data="version">Version</th>
+							<th data-data="num_swaps">Swaps</th>
+							<th data-data="num_pubkeys">Pubkeys</th>
+							<th data-data="ui_swap_pct">UI Swaps %</th>
+							<th data-data="ui_pubkey_pct">UI Pubkey %</th>
+							<th data-data="os_swap_pct">OS Swaps %</th>
+							<th data-data="os_pubkey_pct">OS Pubkey %</th>
+							<th data-data="global_swap_pct">Global Swaps %</th>
+							<th data-data="global_pubkey_pct">Global Pubkey %</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+
+  	<script>
+
+	    $(document).ready(function() {
+	  		function get_table_data() {
+			    $.ajax({ 
+					method: "GET", 
+					url: '/api/table/dex_stats/?from_time={{ from_time }}&to_time={{ to_time }}', 
+					success: function(data) { 
+						console.log(data['results']['os']['maker'])
+						data["maker_os_data"] = data['results']['os']['maker']
+						data["taker_os_data"] = data['results']['os']['taker']
+						console.log(data['results']['ui']['maker'])
+						data["maker_ui_data"] = data['results']['ui']['maker']
+						data["taker_ui_data"] = data['results']['ui']['taker']
+						console.log(data['results']['ui']['maker'])
+						data["maker_version_data"] = data['results']['version']['maker']
+						data["taker_version_data"] = data['results']['version']['taker']
+						console.log(data["taker_version_data"])
+						console.log("updating tables")
+
+						const taker_os_dom = '{% include "components/tables/dt_dom.html" with table="taker-os-stats-tbl" %}'
+
+						$('#taker-os-stats-tbl').css('visibility', 'visible');
+				        const taker_os_table = $('#taker-os-stats-tbl').DataTable({
+							"data": data['taker_os_data'],
+							"pageLength": 50,
+				    		"order": [[ 2, 'desc' ]],
+				    		"dom": taker_os_dom,
+			        		"columnDefs": [
+			        			{
+						            "data": "os",
+						            "targets": 0,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(iconify_version(oData.os));
+							        }
+						        },
+			        			{
+						            "data": "num_swaps",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_swaps);
+							        }
+						        },
+			        			{
+						            "data": "num_pubkeys",
+						            "targets": 2,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_pubkeys);
+							        }
+						        },
+			        			{
+						            "data": "global_swap_pct",
+						            "targets": 3,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "global_pubkey_pct",
+						            "targets": 4,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {$(nTd).html((oData.global_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        }
+			        		]
+				        });
+
+						const maker_os_dom = '{% include "components/tables/dt_dom.html" with table="maker-os-stats-tbl" %}'
+
+						$('#maker-os-stats-tbl').css('visibility', 'visible');
+				        const maker_os_table = $('#maker-os-stats-tbl').DataTable({
+							"data": data['maker_os_data'],
+							"pageLength": 50,
+				    		"order": [[ 2, 'desc' ]],
+				    		"dom": maker_os_dom,
+			        		"columnDefs": [
+			        			{
+						            "data": "os",
+						            "targets": 0,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(iconify_version(oData.os));
+							        }
+						        },
+			        			{
+						            "data": "num_swaps",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_swaps);
+							        }
+						        },
+			        			{
+						            "data": "num_pubkeys",
+						            "targets": 2,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_pubkeys);
+							        }
+						        },
+			        			{
+						            "data": "global_swap_pct",
+						            "targets": 3,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "global_pubkey_pct",
+						            "targets": 4,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        }
+			        		]
+				        });
+
+
+						const taker_ui_dom = '{% include "components/tables/dt_dom.html" with table="taker-ui-stats-tbl" %}'
+
+						$('#taker-ui-stats-tbl').css('visibility', 'visible');
+				        const taker_ui_table = $('#taker-ui-stats-tbl').DataTable({
+							"data": data['taker_ui_data'],
+							"pageLength": 50,
+				    		"order": [[ 2, 'desc' ]],
+				    		"dom": taker_ui_dom,
+			        		"columnDefs": [
+			        			{
+						            "data": "os",
+						            "targets": 0,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+						            	console.log(oData.os)
+							            $(nTd).html(iconify_version(oData.os));
+							        }
+						        },
+			        			{
+						            "data": "ui",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(iconify_version(oData.ui));
+							        }
+						        },
+			        			{
+						            "data": "num_swaps",
+						            "targets": 2,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_swaps);
+							        }
+						        },
+			        			{
+						            "data": "num_pubkeys",
+						            "targets": 3,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_pubkeys);
+							        }
+						        },
+			        			{
+						            "data": "os_swap_pct",
+						            "targets": 4,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.os_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "os_pubkey_pct",
+						            "targets": 5,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.os_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "global_swap_pct",
+						            "targets": 6,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "global_pubkey_pct",
+						            "targets": 7,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        }
+			        		]
+				        });
+
+						const maker_ui_dom = '{% include "components/tables/dt_dom.html" with table="maker-ui-stats-tbl" %}'
+
+						$('#maker-ui-stats-tbl').css('visibility', 'visible');
+				        const maker_ui_table = $('#maker-ui-stats-tbl').DataTable({
+							"data": data['maker_ui_data'],
+							"pageLength": 50,
+				    		"order": [[ 2, 'desc' ]],
+				    		"dom": maker_ui_dom,
+			        		"columnDefs": [
+			        			{
+						            "data": "os",
+						            "targets": 0,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(iconify_version(oData.os));
+							        }
+						        },
+			        			{
+						            "data": "ui",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(iconify_version(oData.ui));
+							        }
+						        },
+			        			{
+						            "data": "num_swaps",
+						            "targets": 2,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_swaps);
+							        }
+						        },
+			        			{
+						            "data": "num_pubkeys",
+						            "targets": 3,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_pubkeys);
+							        }
+						        },
+			        			{
+						            "data": "os_swap_pct",
+						            "targets": 4,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.os_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "os_pubkey_pct",
+						            "targets": 5,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.os_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "global_swap_pct",
+						            "targets": 6,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "global_pubkey_pct",
+						            "targets": 7,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        }
+			        		]
+				        });
+
+
+						const taker_version_dom = '{% include "components/tables/dt_dom.html" with table="taker-version-stats-tbl" %}'
+
+						$('#taker-version-stats-tbl').css('visibility', 'visible');
+				        const taker_version_table = $('#taker-version-stats-tbl').DataTable({
+							"data": data['taker_version_data'],
+							"pageLength": 50,
+				    		"order": [[ 2, 'desc' ]],
+				    		"dom": taker_version_dom,
+			        		"columnDefs": [
+			        			{
+						            "data": "os",
+						            "targets": 0,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(iconify_version(oData.os));
+							        }
+						        },
+			        			{
+						            "data": "ui",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(iconify_version(oData.ui));
+							        }
+						        },
+			        			{
+						            "data": "version",
+						            "targets": 2,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+						            	let text = oData.version
+							            $(nTd).html(text.replace(/-beta/ig, ''));
+							        }
+						        },
+			        			{
+						            "data": "num_swaps",
+						            "targets": 3,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_swaps);
+							        }
+						        },
+			        			{
+						            "data": "num_pubkeys",
+						            "targets": 4,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_pubkeys);
+							        }
+						        },
+			        			{
+						            "data": "os_swap_pct",
+						            "targets": 5,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.os_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "os_pubkey_pct",
+						            "targets": 6,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.os_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "ui_swap_pct",
+						            "targets": 7,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.ui_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "ui_pubkey_pct",
+						            "targets": 8,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.ui_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "global_swap_pct",
+						            "targets": 9,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "global_pubkey_pct",
+						            "targets": 10,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        }
+			        		]
+				        });
+
+						const maker_version_dom = '{% include "components/tables/dt_dom.html" with table="maker-version-stats-tbl" %}'
+
+						$('#maker-version-stats-tbl').css('visibility', 'visible');
+				        const maker_version_table = $('#maker-version-stats-tbl').DataTable({
+							"data": data['maker_version_data'],
+							"pageLength": 50,
+				    		"order": [[ 2, 'desc' ]],
+				    		"dom": maker_version_dom,
+			        		"columnDefs": [
+			        			{
+						            "data": "os",
+						            "targets": 0,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(iconify_version(oData.os));
+							        }
+						        },
+			        			{
+						            "data": "ui",
+						            "targets": 1,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(iconify_version(oData.ui));
+							        }
+						        },
+			        			{
+						            "data": "version",
+						            "targets": 2,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+						            	let text = oData.version
+						            	$(nTd).html(text.replace(/-beta/ig, ''));
+							        }
+						        },
+			        			{
+						            "data": "num_swaps",
+						            "targets": 3,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_swaps);
+							        }
+						        },
+			        			{
+						            "data": "num_pubkeys",
+						            "targets": 4,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html(oData.num_pubkeys);
+							        }
+						        },
+			        			{
+						            "data": "os_swap_pct",
+						            "targets": 5,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.os_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "os_pubkey_pct",
+						            "targets": 6,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.os_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "ui_swap_pct",
+						            "targets": 7,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.ui_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "ui_pubkey_pct",
+						            "targets": 8,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.ui_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "global_swap_pct",
+						            "targets": 9,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_swap_pct*100).toFixed(2)+"%");
+							        }
+						        },
+			        			{
+						            "data": "global_pubkey_pct",
+						            "targets": 10,
+						            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							            $(nTd).html((oData.global_pubkey_pct*100).toFixed(2)+"%");
+							        }
+						        }
+			        		]
+				        });
+
+					}, 
+					error: function(error_data) { 
+						console.log(error_data); 
+					} 
+			    }) 
+	  		}
+
+	        console.log("get tables data")
+	    	get_table_data()
+	    });
+    </script> 

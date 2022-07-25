@@ -24,7 +24,7 @@
 					    <input type="text" class="form-control col-10" placeholder="{{ item.daemon_cli }}" value="{{ item.daemon_cli }}" readonly id="{{ item.coin }}_cli">
 					    <div class="input-group-append p-0">
 							<button class="append-btn" data-clipboard-target="#{{ item.coin }}_cli">
-							    <i class="cil-copy"></i>
+							    {% include 'components/icons/copy_icon.html' %}
 							</button>
 					    </div>
 				    </div>

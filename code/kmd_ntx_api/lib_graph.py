@@ -180,6 +180,9 @@ def get_daily_ntx_graph_data(request):
 
 
 def get_mm2gui_piechart(request):
+    resp = {}
+    # TODO: This is broken, realign wth new API output
+    '''
     stats_type = ["swap_total", "swap_pct", "pubkey_total"]
     swaps_gui_stats = dex.get_swaps_gui_stats(request)
     stats = {
@@ -187,7 +190,6 @@ def get_mm2gui_piechart(request):
         "maker": swaps_gui_stats["maker"]
     }
 
-    resp = {}
     for side in ["taker", "maker"]:
         for x in stats_type:
             data = []
@@ -211,5 +213,6 @@ def get_mm2gui_piechart(request):
             resp.update({
                 f"{side}_{x}": helper.get_chart_json(data, axis_labels, chart_label, total)
             })
+    '''
 
     return resp

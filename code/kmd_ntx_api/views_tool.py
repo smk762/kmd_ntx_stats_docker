@@ -147,7 +147,10 @@ def decode_op_return_view(request):
     op_return = helper.get_or_none(request, "OP_RETURN")
 
     if op_return:
-        decoded = b58.decode_opret(op_return)
+        try:
+            decoded = b58.decode_opret(op_return)
+        except Exception as e:
+            decoded = {"error": e}
 
         if not "error" in decoded:
             opret_rows = []
@@ -162,8 +165,6 @@ def decode_op_return_view(request):
 
         else:
             messages.error(request, f"Invalid OP_RETURN: {op_return}")
-    else:
-        messages.error(request, f"No OP_RETURN input!")
 
     return render(request, 'views/tools/tool_decode_opret.html', context)
 
@@ -332,18 +333,19 @@ def pubkey_addresses_view(request):
     context = helper.get_base_context(request)
     context.update({
         "page_title": "Pubkey Addresses",
-        "endpoint": "api/tools/address_from_pubkey/"
+        "endpoint": "/api/tools/address_from_pubkey/"
     })
     if "pubkey" in request.GET:
         pubkey = request.GET["pubkey"]
         if pubkey == "":
             messages.error(request, f"No pubkey input!")
-        elif b58.validate_pubkey(pubkey):
-            base_58_coins = requests.get(f"{THIS_SERVER}/api/info/base_58/").json()["results"]
-            base_58_coins_list = list(base_58_coins.keys())
+        elif not b58.validate_pubkey(pubkey):
+            messages.error(request, f"Invalid pubkey: {pubkey}")
+        else:
+            base_58_coins = info.get_base_58_coin_params(request)
             address_rows = []
             
-            for coin in base_58_coins_list:
+            for coin in base_58_coins:
                 pubtype = base_58_coins[coin]["pubtype"]
                 p2shtype = base_58_coins[coin]["p2shtype"]
                 wiftype = base_58_coins[coin]["wiftype"]
@@ -354,8 +356,6 @@ def pubkey_addresses_view(request):
                 "pubkey": pubkey,
                 "address_rows": address_rows,
             })
-        else:
-            messages.error(request, f"Invalid pubkey: {pubkey}")
 
     return render(request, 'views/tools/tool_pubkey_addresses.html', context)
 

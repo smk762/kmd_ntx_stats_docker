@@ -16,7 +16,7 @@ def mining_24hrs_view(request):
         "page_title":"KMD Mining Last 24hrs",
         "mined_24hrs":mined_24hrs
     })
-    return render(request, 'views/coin/mining_24hrs.html', context)
+    return render(request, 'views/miningtable_/mining_24hrs.html', context)
 
 
 def mining_overview_view(request):
@@ -24,7 +24,7 @@ def mining_overview_view(request):
     context.update({
         "page_title":f"Mining Overview",
     })
-    return render(request, 'views/coin/mining_overview.html', context)
+    return render(request, 'views/mining/mining_overview.html', context)
 
 
 def notary_last_mined_view(request):
@@ -32,7 +32,7 @@ def notary_last_mined_view(request):
     context.update({
         "page_title":f"Notary Last Mined"
     })
-    return render(request, 'views/coin/notary_last_mined.html', context)
+    return render(request, 'views/mining/notary_last_mined.html', context)
 
 
 # TODO: Add Date Form to restrict results returned. merge with "last 24hrs?"

@@ -34,9 +34,13 @@ def get_address_conversion(request):
 def get_decode_op_return(request):
     op_return = helper.get_or_none(request, "OP_RETURN")
     if not op_return:
-        return {"error":"You need to include an OP_RETURN, e.g. '?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400'"}
+        return {"error": "You need to include an OP_RETURN, e.g. '?OP_RETURN=fcfc5360a088f031c753b6b63fd76cec9d3e5f5d11d5d0702806b54800000000586123004b4d4400'"}
     else:
-        return b58.decode_opret(op_return)
+        try:
+            resp = b58.decode_opret(op_return)
+        except Exception as e:
+            resp = {"error": e}
+    return resp
 
 
 def get_pubkey_utxos(request):
@@ -349,31 +353,47 @@ def get_kmd_rewards(request):
 
 
 def get_address_from_pubkey(request):
-    coin = helper.get_or_none(request, "coin", "KMD")
+    coin = helper.get_or_none(request, "coin")
     pubkey = helper.get_or_none(request, "pubkey")
     if not pubkey:
         return {
-            "error": "You need to specify a pubkey and coin, e.g '?coin=KMD&pubkey=03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828' (if coin not specified, it will default to KMD)"
+            "error": "You need to specify a pubkey, e.g '?pubkey=03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828' (if coin not specified, it will default to KMD)"
         }
-    if coin not in b58.COIN_PARAMS:
-        base_58_params = info.get_base_58_coin_params(request)
-        if coin not in base_58_params: 
+    if not b58.validate_pubkey(pubkey):
+        return {
+            "error": f"Invalid pubkey: {pubkey}"
+        }
+
+    address_rows = []
+    base_58_coins = info.get_base_58_coin_params(request)
+
+    if coin:
+        if coin not in base_58_coins: 
             return {
                 "error": f"{coin} does not have locally defined Base 58 Params.",
                 "supported_coins": list(base_58_params.keys())
             }
         else:
-            address = b58.calc_addr_tool(pubkey,
-                                         base_58_params["pubtype"],
-                                         base_58_params["p2shtype"],
-                                         base_58_params["wiftype"])
+            address_row = b58.calc_addr_tool(pubkey,
+                                         base_58_coins[coin]["pubtype"],
+                                         base_58_coins[coin]["p2shtype"],
+                                         base_58_coins[coin]["wiftype"])
+            address_row.update({"coin":coin})
+            address_rows.append(address_row)
     else:
-        address = b58.calc_addr_from_pubkey(coin, pubkey)
+        
+        for coin in base_58_coins:
+            pubtype = base_58_coins[coin]["pubtype"]
+            p2shtype = base_58_coins[coin]["p2shtype"]
+            wiftype = base_58_coins[coin]["wiftype"]
+            address_row = b58.calc_addr_tool(pubkey, pubtype, p2shtype, wiftype)
+            address_row.update({"coin":coin})
+            address_rows.append(address_row)
 
     return {
-        "coin": coin,
         "pubkey": pubkey,
-        "address": b58.calc_addr_from_pubkey(coin, pubkey)
+        "results": address_rows,
+        "count": len(address_rows)
     }
 
 def get_send_raw_tx(request):

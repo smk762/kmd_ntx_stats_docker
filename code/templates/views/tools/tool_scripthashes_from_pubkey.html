@@ -36,5 +36,12 @@
 				{% endif %}
 			</div>
 		</div>	
-	</div>  	
+	</div>  
+	<script type="text/javascript">
+		$(document).ready(function() {
+			if ('{{ pubkey }}' == '') {
+				$('#pubkey').attr("placeholder", "Enter your pubkey")
+			}
+		})
+	</script>	
 {% endblock %}

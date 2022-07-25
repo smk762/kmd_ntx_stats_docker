@@ -981,3 +981,72 @@ def get_orderbook_table(request):
             })
 
     return orders
+
+
+def get_dex_stats_table(gui_stats):
+    return {
+        "os": get_dex_os_stats_table(gui_stats),
+        "ui": get_dex_ui_stats_table(gui_stats),
+        "version": get_dex_version_stats_table(gui_stats)
+    }
+
+def get_dex_os_stats_table(gui_stats):
+    os_stats = {}
+    for i in ["maker_dict", "taker_dict"]:
+        j = i.split("_")[0]
+        os_stats.update({j: []})
+        for os in gui_stats[i]["os"]:
+            os_stats[j].append({
+                "os": os,
+                "num_swaps": gui_stats[i]["os"][os]["num_swaps"],
+                "num_pubkeys": len(gui_stats[i]["os"][os]["pubkeys"]),
+                "global_swap_pct": gui_stats[i]["os"][os]["global_swap_pct"],
+                "global_pubkey_pct": gui_stats[i]["os"][os]["global_pubkey_pct"]
+            })
+    return os_stats
+
+
+def get_dex_ui_stats_table(gui_stats):
+    ui_stats = {}
+    for i in ["maker_dict", "taker_dict"]:
+        j = i.split("_")[0]
+        ui_stats.update({j: []})
+        for os in gui_stats[i]["os"]:
+            for ui in gui_stats[i]["os"][os]["ui"]:
+
+                ui_stats[j].append({
+                    "os": os,
+                    "ui": ui,
+                    "num_swaps": gui_stats[i]["os"][os]["ui"][ui]["num_swaps"],
+                    "num_pubkeys": len(gui_stats[i]["os"][os]["ui"][ui]["pubkeys"]),
+                    "os_swap_pct": gui_stats[i]["os"][os]["ui"][ui]["os_swap_pct"],
+                    "os_pubkey_pct": gui_stats[i]["os"][os]["ui"][ui]["os_pubkey_pct"],
+                    "global_swap_pct": gui_stats[i]["os"][os]["ui"][ui]["global_swap_pct"],
+                    "global_pubkey_pct": gui_stats[i]["os"][os]["ui"][ui]["global_pubkey_pct"]
+                })
+    return ui_stats
+
+
+def get_dex_version_stats_table(gui_stats):
+    ui_stats = {}
+    for i in ["maker_dict", "taker_dict"]:
+        j = i.split("_")[0]
+        ui_stats.update({j: []})
+        for os in gui_stats[i]["os"]:
+            for ui in gui_stats[i]["os"][os]["ui"]:
+                for v in gui_stats[i]["os"][os]["ui"][ui]["versions"]:
+                    ui_stats[j].append({
+                        "os": os,
+                        "ui": ui,
+                        "version": v,
+                        "num_swaps": gui_stats[i]["os"][os]["ui"][ui]["versions"][v]["num_swaps"],
+                        "num_pubkeys": len(gui_stats[i]["os"][os]["ui"][ui]["versions"][v]["pubkeys"]),
+                        "ui_swap_pct": gui_stats[i]["os"][os]["ui"][ui]["versions"][v]["ui_swap_pct"],
+                        "ui_pubkey_pct": gui_stats[i]["os"][os]["ui"][ui]["versions"][v]["ui_pubkey_pct"],
+                        "num_swaps": gui_stats[i]["os"][os]["ui"][ui]["versions"][v]["num_swaps"],
+                        "os_swap_pct": gui_stats[i]["os"][os]["ui"][ui]["versions"][v]["os_swap_pct"],
+                        "os_pubkey_pct": gui_stats[i]["os"][os]["ui"][ui]["versions"][v]["os_pubkey_pct"],
+                        "global_swap_pct": gui_stats[i]["os"][os]["ui"][ui]["versions"][v]["global_swap_pct"],
+                        "global_pubkey_pct": gui_stats[i]["os"][os]["ui"][ui]["versions"][v]["global_pubkey_pct"]
+                    })
+    return ui_stats

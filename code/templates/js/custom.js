@@ -27,9 +27,44 @@
 	    return num;
 	}
 
+	function iconify_version(gui) {
+    	gui = gui.replace(/-beta/ig, '')
+    	gui = gui.replace(/0.5.5/ig, '')
+    	gui = gui.replace(/0.5.4/ig, '')
+    	gui = gui.replace(/pyMakerbot/ig, '<i class="fa-brands fa-python"></i>')
+    	gui = gui.replace(/WASMTEST/ig, '<i class="fa-brands fa-weebly"></i>')
+
+    	gui = gui.replace(/MM2CLI/ig, '<i class="fa-brands fa-steam-square"></i>')
+    	gui = gui.replace(/mpm/ig, '<i class="fa-brands fa-mandalorian"></i> ')
+    	gui = gui.replace(/SwapCase Desktop/ig, '<i class="fa-solid fa-circle-question"></i>')
+    	gui = gui.replace(/ColliderDEX Desktop/ig, '<i class="fa-solid fa-circle-question"></i>')
+    	gui = gui.replace(/SwapCase/ig, '<i class="fa-solid fa-circle-question"></i>')
+    	gui = gui.replace(/ColliderDEX/ig, '<i class="fa-solid fa-circle-question"></i>')
+    	gui = gui.replace(/Android/ig, '<i class="fa-brands fa-android"></i>')
+    	gui = gui.replace(/iOS/ig, '<i class="fa-brands fa-apple"></i>')
+    	gui = gui.replace(/Darwin/ig, '<i class="fa-brands fa-apple"></i>')
+    	gui = gui.replace(/Windows/ig, '<i class="fa-brands fa-windows"></i>')
+    	gui = gui.replace(/Linux/ig, '<i class="fa-brands fa-linux"></i>')
+    	gui = gui.replace(/AtomicDEX/ig, get_coin_icon_only('DEX', '', 18, 'm-0'))
+    	gui = gui.replace(/DogeDEX/ig, get_coin_icon_only('DOGE', '', 18, 'm-0'))
+    	gui = gui.replace(/SmartDEX/ig, get_coin_icon_only('SMTF', '', 18, 'm-0'))
+    	gui = gui.replace(/GleecDEX/ig, get_coin_icon_only('GLEEC', '', 18, 'm-0'))
+    	gui = gui.replace(/FiroDEX/ig, get_coin_icon_only('FIRO', '', 18, 'm-0'))
+    	gui = gui.replace(/ShibaDEX/ig, get_coin_icon_only('SHIB-BEP20', '', 18, 'm-0'))
+    	gui = gui.replace(/BitcoinZ Dex/ig, get_coin_icon_only('BTCZ', '', 18, 'm-0'))
+    	gui = gui.replace(/BitcoinZ/ig, get_coin_icon_only('BTCZ', '', 18, 'm-0'))
+    	gui = gui.replace(/Unknown/ig, '?')
+    	gui = gui.replace(/None/ig, '?')
+    	return gui
+	}
+
 	function show_region(region) {
 		const options = ["AR", "EU", "NA", "SH", "DEV"];
 		show_card(region, options)
+	}
+
+	function get_api_button(id, width, url, text) {
+		return '{% include "components/buttons/api_link_button.html" with btn_id="'+id+'" width_pct="'+width+'" btn_url="'+url+'" btn_text="'+text+'" %}'
 	}
 
 	function show_card(card_id, cards_list) {
@@ -751,7 +786,7 @@
 	    let url = endpoint+params
 		window.tables[table+"_table"].ajax.url(url).load();
         let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="{{ table }}" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
-        $('.{{ table }}_api_link').html(api_btn);
+        $('.{{ table }}-api-link').html(api_btn);
 	}
 
 	function get_params(table, param_list, required, selected, no_filter) {

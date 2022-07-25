@@ -12,7 +12,7 @@
     <input type="text" class="form-control col-10" value="{{ input_value }}" readonly id="x_{{ input_id }}">
     <div class="input-group-append p-0">
 		<button class="append-btn" data-clipboard-target="#x_{{ input_id }}">
-		    <i class="cil-copy"></i>
+                {% include 'components/icons/copy_icon.html' %}
 		</button>
     </div>
 </div>

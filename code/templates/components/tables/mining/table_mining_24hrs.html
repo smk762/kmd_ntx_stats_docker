@@ -1,15 +1,13 @@
-{% extends "base.html" %}
-{% load static %}
-{% block content %}
+
 <div class="text-center" id="loading-spinner" style="height: 100%">
 	<div class="spinner-border m-10" role="status">
 	</div>
 	<div class="m-3">Loading Last 24hrs of KMD Mining...</div>
 </div>
 	<div class="row col-12 m-auto">
-		<div class="card table_card floating-card m-auto col-12" id="mined_24hr_card" style="visibility: hidden; font-size: 1.1em;" >
+		<div class="card table_card floating-card m-auto col-12" id="mined-24hr-card" style="visibility: hidden; font-size: 1.1em;" >
 			<div class="card-body table_card_body">
-				<table id="mined_24hr_tbl" class="table table-striped table-bordered">
+				<table id="mined-24hr-tbl" class="table table-striped table-bordered">
 					<thead>
 						<tr>
 							<th data-data="name">MINED BY</th>
@@ -27,7 +25,8 @@
 	<script>
 	    $(document).ready(function() {
 	    	let url = '/api/mining/mining_24hrs/'
-	        $('#mined_24hr_tbl').DataTable({
+			const dom = '{% include "components/tables/dt_dom.html" with table="mined-24hr" %}'
+	        $('#mined-24hr-tbl').DataTable({
          		ajax: {
 				    url: url,
         			dataSrc: 'results',
@@ -86,16 +85,15 @@
 				        }
 			        }
 			    ],
-        		dom: '<"row mx-0 mt-3 "<"mining_24hr_tbl_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"mining_24hr_api_link">ip>',
+        		dom: dom,
 		        fnInitComplete: function(){
 			    	$('#loading-spinner').css('display', 'none');
-			    	$('#mined_24hr_card').css('visibility', 'visible');
-		            $('.mining_24hr_tbl_title').html('<h3 class="">KMD Mined Last 24hrs</h3>');
-		            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="mining_24hr" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
-		            $('.mining_24hr_api_link').html(api_btn);
+			    	$('#mined-24hr-card').css('visibility', 'visible');
+		            $('.mined-24hr-tbl-title').html('<h3 class="">KMD Mined Last 24hrs</h3>');
+		            let api_btn = get_api_button("mined-24hr", 100, url, "Source Data")
+		            $('.mined-24hr-api-link').html(api_btn);
 
 		        }
 	        });
 	    });
 	</script>
-{% endblock %}
