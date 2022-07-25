@@ -26,7 +26,7 @@
 				    	<input type="text" class="form-control m-auto" id="{{ item.coin }}_params" value="{{ item.launch_params }}" readonly>
 					    <div class="input-group-append p-0">
 							<button class="append-btn" data-clipboard-target="#{{ item.coin }}_params">
-							    <i class="cil-copy"></i>
+							    {% include 'components/icons/copy_icon.html' %}
 							</button>
 					    </div>
 					</div>

@@ -1,7 +1,7 @@
 <div class="row col-12 m-auto" id="addresses">
 	<div class="card table_card floating-card">
 		<div class="card-body table_card_body">
-			<table id="balances_table" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
+			<table id="balances-table" class="table table-striped table-bordered" style="width:100%; visibility: hidden;">
 				<thead>
 					<tr>
 						<th data-data="coin">Coin</th>
@@ -20,9 +20,10 @@
 
 <script>
     $(document).ready(function() {
-    	$('#balances_table').css('visibility', 'visible');
+    	$('#balances-table').css('visibility', 'visible');
     	let balances_url = "{% url 'balancesViewSet-list' %}?format=datatables&coin={{ coin }}&season={{ season }}"
-        $('#balances_table').DataTable({
+		const dom = '{% include "components/tables/dt_dom.html" with table="balances-table" %}'
+        $('#balances-table').DataTable({
      		ajax: {
 			    url: balances_url,
     			dataSrc: 'data',
@@ -97,12 +98,12 @@
 			        }
 		        }
     		],
-    		dom: '<"row mx-0 mt-3 "<"balances_tbl_title col-md-6 text-left">f>tr<"row mx-0 my-2 d-flex justify-content-between"<"balances_api_link">ip>',
+	    	dom: dom,
 	        fnInitComplete: function(){
-	           $('.balances_tbl_title').html('<h3 class="">{{ season_clean }} {{ coin }} Addresses & Balances</h3>');
+	           $('.balances-tbl-title').html('<h3 class="">{{ season_clean }} {{ coin }} Addresses & Balances</h3>');
     			let balances_url = "{% url 'balancesViewSet-list' %}?format=datatables&coin={{ coin }}&season={{ season }}"
-		        let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="coin_balances" width_pct="100" btn_url="'+balances_url+'" btn_text="Source Data" %}'
-		        $('.balances_api_link').html(api_btn);
+		        let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="coin-balances" width_pct="100" btn_url="'+balances_url+'" btn_text="Source Data" %}'
+		        $('.balances-api-link').html(api_btn);
 	        }
         });
     });

@@ -1,0 +1,232 @@
+{% load static %}
+{% load coin_filter %}
+
+<form action="" method="get"> 
+	<div class="row d-flex justify-content-around col-12">
+		<div class="col-12">
+			{{ form.price_url.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:25%" >
+			      	<span class="input-group-text">
+			      		{{ form.price_url.label }}
+			      	</span>
+				</div>
+				{{ form.price_url }}
+			</div>
+		</div>
+	</div>
+	<div class="row d-flex justify-content-around col-12">
+		<div class="col-6">
+			{{ form.base.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.base.label }}
+			      	</span>
+				</div>
+				{{ form.base }}
+			</div>
+		</div>
+
+		<div class="col-6">
+			{{ form.rel.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.rel.label }}
+			      	</span>
+				</div>
+				{{ form.rel }}
+			</div>
+		</div>
+	</div>
+	<div class="row d-flex justify-content-around col-12">
+		<div class="col-6">
+			{{ form.base_confs.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.base_confs.label }}
+			      	</span>
+				</div>
+				{{ form.base_confs }}
+			</div>
+		</div>
+
+		<div class="col-6">
+			{{ form.rel_confs.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.rel_confs.label }}
+			      	</span>
+				</div>
+				{{ form.rel_confs }}
+			</div>
+		</div>
+	</div>
+	<div class="row d-flex justify-content-around col-12">
+		<div class="col-6">
+			{{ form.base_nota.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.base_nota.label }}
+			      	</span>
+				</div>
+				{{ form.base_nota }}
+			</div>
+		</div>
+
+		<div class="col-6">
+			{{ form.rel_nota.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.rel_nota.label }}
+			      	</span>
+				</div>
+				{{ form.rel_nota }}
+			</div>
+		</div>
+	</div>
+	<div class="row d-flex justify-content-around col-12">
+		<div class="col-6">
+			{{ form.min_trade.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+						{{ form.min_trade_type }}
+			      	</span>
+				</div>
+				{{ form.min_trade }}
+			</div>
+		</div>
+
+		<div class="col-6">
+			{{ form.max_trade.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+						{{ form.max_trade_type }}
+			      	</span>
+				</div>
+				{{ form.max_trade }}
+			</div>
+		</div>
+	</div>
+	<div class="row d-flex justify-content-around col-12">
+		<div class="col-6">
+			{{ form.spread.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.spread.label }}
+			      	</span>
+				</div>
+				{{ form.spread }}
+			</div>
+		</div>
+
+		<div class="col-6">
+			{{ form.price_elipsed_validity.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.price_elipsed_validity.label }}
+			      	</span>
+				</div>
+				{{ form.price_elipsed_validity }}
+			</div>
+		</div>
+	</div>
+	<div class="row d-flex justify-content-around col-12">
+		<div class="col-6">
+			{{ form.enable.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.enable.label }}
+			      	</span>
+				</div>
+				{{ form.enable }}
+			</div>
+		</div>
+
+		<div class="col-6">
+			{{ form.check_last_bidirectional_trade_thresh_hold.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.check_last_bidirectional_trade_thresh_hold.label }}
+			      	</span>
+				</div>
+				{{ form.check_last_bidirectional_trade_thresh_hold }}
+			</div>
+		</div>
+	</div>
+	<div class="row d-flex justify-content-around col-12">
+		<div class="col-6">
+			{{ form.create_bidirectional_config.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.create_bidirectional_config.label }}
+			      	</span>
+				</div>
+				{{ form.create_bidirectional_config }}
+			</div>
+		</div>
+
+		<div class="col-6">
+			{{ form.add_to_existing_config.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.add_to_existing_config.label }}
+			      	</span>
+				</div>
+				{{ form.add_to_existing_config }}
+			</div>
+		</div>
+	</div>
+	<div class="row d-flex justify-content-between col-12">
+		<div class="col-6">
+			{{ form.bot_refresh_rate.errors }}
+		    <div class="input-group mb-2">
+			    <div class="input-group-prepend prepend-label-left" style="width:66%" >
+			      	<span class="input-group-text">
+			      		{{ form.bot_refresh_rate.label }}
+			      	</span>
+				</div>
+				{{ form.bot_refresh_rate }}
+			</div>
+		</div>
+
+		<div class="col-6 justify-content-between">
+			<a class='btn-dark4 p-2 mb-2' href="https://developers.komodoplatform.com/basic-docs/atomicdex-api-20-dev/start_simple_market_maker_bot.html"  style="width:35%; vertical-align: text-bottom;">View Docs</a>
+			<button type="submit" class='btn-dark4 btn mx-2 mb-2' value="Generate Makerbot Config" style="width:65%">Generate Makerbot</button>
+		</div>
+	</div>
+
+	{% if form_resp %}
+	<div class="d-flex justify-content-around col-10 p-3 m-3 mx-auto" style="background-color: #0d0f1b; border: solid #303030 1px; border-radius:0.5em;">
+		<pre style="text-align:left; color:white;" id="conf_str">
+	curl --location --request POST 'http://127.0.0.1:7783' --header 'Content-Type: application/json' --data-raw '{
+	    "userpass": "'${userpass}'",
+	    "mmrpc": "2.0",
+	    "method": "start_simple_market_maker_bot",
+	    "params": {
+	        "price_url": "{{ price_url }}",
+	        "bot_refresh_rate": {{ bot_refresh_rate }},
+	        "cfg": {{ form_resp|pretty_json }} }, "id": 0 }'
+		</pre>
+		<button type='button' class="append-btn" data-clipboard-target="#conf_str" style="line-height: 1em; position: absolute; top:10px; right: 10px;">
+		    <i class="cil-copy"></i>
+		</button>
+	</div>
+	{% endif %}
+
+	<input type="hidden" name="existing_config" value="{{ form_resp }}">
+
+</form>

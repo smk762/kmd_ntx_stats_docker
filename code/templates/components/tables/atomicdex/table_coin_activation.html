@@ -72,7 +72,7 @@
 		        fnInitComplete: function(){
 			    	$('#activation-card').css('opacity', '1');
 		            $('.activation-tbl-title').html('<h3 class="text-left">AtomicDEX API Coin Activation</h3>');
-		            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="activation" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+		            let api_btn = get_api_button("activation", 100, url, "Source Data")
 		            $('.activation-api-link').html(api_btn);
 		        }
 	        });

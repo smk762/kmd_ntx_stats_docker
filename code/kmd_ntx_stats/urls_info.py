@@ -120,8 +120,4 @@ api_info_urls = [
           api_info.notary_ltc_transactions,
           name='notary_ltc_transactions'),
 
-    path('api/info/rewards_by_address/',
-          api_info.rewards_by_address,
-          name='rewards_by_address'),
-
 ]

@@ -24,12 +24,6 @@
 			</div>
 		</div>
 		<div class="card-body table_card_body col-12" style="opacity: 1;" id="">
-			<div class="mt-2">
-				<b>24 hr Drips:</b> {{ count_24hrs }} | <b>24 hr Drip Value:</b> {{ sum_24hrs|floatformat:-4 }}
-			</div>
-			<div class="m-auto">
-				<b>Rick Supply:</b> {{ faucet_supply.RICK|floatformat:-4 }} | <b>Morty Supply:</b> {{ faucet_supply.MORTY|floatformat:-4 }}
-			</div>
 			<form action="#" method="post" class="col-6 m-auto">
 				{% csrf_token %}
 				<div class="input-group my-2" >
@@ -55,6 +49,12 @@
 					</div>
 				</div>
 			</form>
+			<div class="mt-2">
+				<b>24 hr Drips:</b> {{ count_24hrs }} | <b>24 hr Drip Value:</b> {{ sum_24hrs|floatformat:-4 }}
+			</div>
+			<div class="m-auto">
+				<b>Rick Supply:</b> {{ faucet_supply.RICK|floatformat:-4 }} | <b>Morty Supply:</b> {{ faucet_supply.MORTY|floatformat:-4 }}
+			</div>
 		</div>
 
 		<div class="card-body table_card_body col-12" style="opacity: 1;" id="accrued-faucet-tx">
@@ -122,16 +122,16 @@
 			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	$(nTd).html(
-			            		parseFloat(oData.amount) == NaN ? oData.amount :
+			            		isNaN(oData.amount) ? "N/A" :
 			            		parseFloat(oData.amount).toFixed(3)
-			            		);
+			            	);
 				        }
 			        },
         			{
 			            "data": 'txid',
 			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(get_faucet-txid(oData.coin, oData.txid));
+			            	$(nTd).html(get_faucet_txid(oData.coin, oData.txid));
 				        }
 			        },
         			{

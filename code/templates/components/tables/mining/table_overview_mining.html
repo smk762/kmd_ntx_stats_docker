@@ -1,10 +1,8 @@
-{% extends "base.html" %}
-{% load static %}
-{% block content %}
+
 	<div class="row col-12 m-auto">
-		<div class="card table_card floating-card m-0" id="mined_overview_card" style="visibility: hidden;">
+		<div class="card table_card floating-card m-0" id="mined-overview_card" style="visibility: hidden;">
 			<div class="card-body table_card_body">
-				<table style="font-size: 1.1em;" id="mined_overview_tbl" class="table table-striped table-bordered">
+				<table style="font-size: 1.1em;" id="mined-overview-tbl" class="table table-striped table-bordered">
 					<thead>
 						<tr>
 							<th class="px-4" data-data="name">Miner Name</th>
@@ -23,8 +21,9 @@
 	</div>
 	<script>
 	    $(document).ready(function() {
+			const dom = '{% include "components/tables/dt_dom.html" with table="mined-overview" %}'
 	    	let url = "/api/table/mined_count_season/?season={{ season }}"
-	        $('#mined_overview_tbl').DataTable({
+	        $('#mined-overview-tbl').DataTable({
          		ajax: {
 				    url: url,
         			dataSrc: 'results',
@@ -105,15 +104,14 @@
 				        }
 			        }
 			    ],
-        		dom: '<"row mx-0 mt-3 "<"mining_overview_tbl_title text-left col-md-6 text-left">f>tr<"row mx-0 mb-2 d-flex justify-content-between"<"mining_overview_api_link">ip>',
+        		dom: dom,
 		        fnInitComplete: function(){
-	    			$('#mined_overview_card').css('visibility', 'visible');
-		            $('.mining_overview_tbl_title').html('<h3 class="">{{ season_clean }} Mining Overview</h3>');
-		            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="mining_overview" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
-		            $('.mining_overview_api_link').html(api_btn);
+	    			$('#mined-overview_card').css('visibility', 'visible');
+		            $('.mined-overview-tbl-title').html('<h3 class="">{{ season_clean }} Mining Overview</h3>');
+		            let api_btn = get_api_button("mined-overview", 100, url, "Source Data")
+		            $('.mined-overview-api-link').html(api_btn);
 		        }
 	        });
     		
 	    });
 	</script>
-{% endblock %}

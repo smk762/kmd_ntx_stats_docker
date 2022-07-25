@@ -19,7 +19,7 @@ NAV_DATA = {
                 "url": "/ntx_scoreboard_24hrs"
             },
             "Seednode Version": {
-                "icon": "bi bi-egg-fill",
+                "icon": "fa-solid fa-egg",
                 "url": "/atomicdex/seednode_version"
             },
             " Last Notarisation (Coin)": {
@@ -37,7 +37,7 @@ NAV_DATA = {
         }
     },
     "Mining": {
-        "icon": "",
+        "icon": "bi bi-minecart-loaded",
         "options": {
             "Season Overview": {
                 "icon": "bi bi-minecart-loaded",
@@ -54,7 +54,7 @@ NAV_DATA = {
         }
     },
     "Tools": {
-        "icon": "",
+        "icon": "bi bi-tools",
         "options": {
             "Address from Pubkey": {
                 "icon": "fa-solid fa-address-card",
@@ -99,7 +99,7 @@ NAV_DATA = {
         }
     },
     "Source": {
-        "icon": "",
+        "icon": "bi bi-file-earmark-binary-fill",
         "options": {
             "Addresses": {
                 "icon": "fa-solid fa-address-card",
@@ -168,7 +168,7 @@ NAV_DATA = {
         }
     },
     "Resources": {
-        "icon": "",
+        "icon": "bi bi-bookmark-heart-fill",
         "options": {
             "DexStats": {
                 "icon": "fa-solid fa-chart-column",

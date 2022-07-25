@@ -8,7 +8,7 @@
 			</div>
 			<div class="card-body table_card_body">
 				<form>
-					{% include "components/form/text_input_line.html" with prepend_text="Enter Address" input_id="address" placeholder_text=address append_btn_text="Get Scripthashes" %}
+					{% include "components/form/text_input_line.html" with prepend_text="Enter Address" input_id="address" placeholder_text="Enter an address..." input_value=address append_btn_text="Get Scripthashes" %}
 				</form>
 				{% if resp_rows %}
 					{% for item in resp_rows %}
@@ -28,4 +28,8 @@
 			</div>	
 		</div>	
 	</div>  	
+<script>
+	    $(document).ready(function() {
+	    })
+</script>
 {% endblock %}

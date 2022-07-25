@@ -142,10 +142,21 @@ api_table_urls = [
           api_table.notary_last_mined_table_api,
           name='notary_last_mined_table_api'),
 
+    path('api/table/dex_stats/',
+          api_table.dex_stats_table,
+          name='dex_stats_table'),
 
+    path('api/table/dex_os_stats/',
+          api_table.dex_os_stats_table,
+          name='dex_os_stats_table'),
 
+    path('api/table/dex_ui_stats/',
+          api_table.dex_ui_stats_table,
+          name='dex_ui_stats_table'),
 
-
+    path('api/table/dex_version_stats/',
+          api_table.dex_version_stats_table,
+          name='dex_version_stats_table'),
 
 
     path('api/table/bestorders/',

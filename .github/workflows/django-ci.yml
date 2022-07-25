@@ -2,47 +2,44 @@ name: Django CI
 
 on:
     push:
-        branches: [ main ]
+        branches: [ master ]
     pull_request:
-        branches: [ main ]
+        branches: [ master ]
 
 jobs:
     test:
+        defaults:
+            run:
+                shell: bash
+                working-directory: code
 
         runs-on: ubuntu-latest
         strategy:
           max-parallel: 4
           matrix:
-            python-version: [3.7]
+            python-version: [3.8]
             
         services:
             db:
                 image: postgres
-                restart: always
-                environment:
-                    - POSTGRES_DB=postgresdb
-                    - POSTGRES_USER=postgresuser
-                    - POSTGRES_PASSWORD=postgrespw
-                depends_on:
-                    - mm2
-                ports:
-                    - "5432:5432"
-                logging:
-                    driver: "json-file"
-                    options:
-                    max-size: "20m"
-                    max-file: "10"
+                env:
+                    POSTGRES_DB: postgresdb
+                    POSTGRES_USER: postgresuser
+                    POSTGRES_PASSWORD: postgrespw
+                ports: ["5432:5432"]
 
         steps:
             - uses: actions/checkout@v2
-            - name: Set up Python $
+            - name: Set up Python 3.8
               uses: actions/setup-python@v2
               with:
-                    python-version: $
+                    python-version: 3.8
             - name: Install Dependencies
               run: |
+                    sudo apt-get install python3-dev build-essential libpq-dev libgnutls28-dev gcc default-libmysqlclient-dev build-essential python3-mysql.connector python3-pip libcurl4-openssl-dev libssl-dev -y
                     python -m pip install --upgrade pip
                     pip install -r requirements.txt
+                    
             - name: Run Migrations
               run: python manage.py migrate
               env: 
@@ -51,7 +48,11 @@ jobs:
                     DBUSER: postgresuser
                     DBPASSWORD: postgrespw
                     DBHOST: 127.0.0.1
-                    DBPORT: $
+                    DBPORT: 5432
+                    SYSTEM_ENV: GITHUB_WORKFLOW
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings_ci
+                    SECRET_KEY: 'ho2i43pq8asapnqqi02i-'
+                    
             - name: Run Tests
               run: |
                     python manage.py test
@@ -61,7 +62,8 @@ jobs:
                     DBUSER: postgresuser
                     DBPASSWORD: postgrespw
                     DBHOST: 127.0.0.1
-                    DBPORT: $
+                    DBPORT: 5432
+                    SECRET_KEY: 'ho2i43pq8asapnqqi02i-'
                 
             - name: Python Django Coverage GitHub Action
                 # You may pin to the exact commit or the version.
