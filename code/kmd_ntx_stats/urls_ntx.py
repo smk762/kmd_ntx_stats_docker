@@ -56,4 +56,8 @@ api_ntx_urls = [
     path('api/ntx/notarised_tenure/',
           api_ntx.ntx_tenture_api,
           name='ntx_tenture_api'),
+
+    path('api/ntx/notary_fee_efficiency/',
+          api_ntx.notary_fee_efficiency_api,
+          name='notary_fee_efficiency_api'),
 ]

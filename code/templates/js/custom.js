@@ -693,9 +693,13 @@
 							val = "$USD " + (oData.usd_price * val).toFixed(2)
 					    	break
 
-						case 'Rewards':
+						
 						case 'Sent':
 						case 'Fees':
+							val = get_txid_url("LTC", oData['txid'], oData[key]/100000000)
+							break
+
+						case 'Rewards':
 						case 'Received':
 						case 'KMD Mined':
 						case 'KMD Value':

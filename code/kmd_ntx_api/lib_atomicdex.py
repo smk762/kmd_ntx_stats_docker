@@ -75,14 +75,14 @@ def get_last_200_swaps(request):
     data = query.filter_swaps_coins(data, taker_coin, maker_coin)
     data = data.order_by('-timestamp')[:200]
     data = data.values()
-    serializer = serializers.swapsSerializer(data, many=True)
+    serializer = serializers.swapsSerializerPub(data, many=True)
     return serializer.data
 
 
 def get_failed_swap_by_uuid(request):
     if 'uuid' in request.GET:
         data = query.get_swaps_failed_data(request.GET['uuid']).values()
-        serializer = serializers.swapsFailedSerializer(data, many=True)
+        serializer = serializers.swapsFailedSerializerPub(data, many=True)
         data = serializer.data     
     else:
         data = {}
@@ -404,7 +404,6 @@ def get_swaps_gui_stats(request):
                     "ui_swap_pct": helper.safe_div(version_swaps, ui_swaps),
                     "ui_pubkey_pct": helper.safe_div(version_pubkeys, ui_pubkeys),
                 })
-
 
     # By ui
     resp = {
