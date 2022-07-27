@@ -365,7 +365,7 @@ def get_page_server(request):
         if request.GET['server'] == "3P": return "Third_Party"
         if request.GET["server"].title() in ["Main", "Third_Party", "LTC", "KMD"]:
             return request.GET["server"].title()
-    return "Main"
+    return None
 
 
 def day_hr_min_sec(seconds, granularity=2):

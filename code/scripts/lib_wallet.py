@@ -26,6 +26,7 @@ def get_balances(season):
     if "Third_Party" in SEASONS_INFO[season]["servers"]:
         dpow_3p_coins = SEASONS_INFO[season]["servers"]["Third_Party"]["coins"]
     else:
+        input(SEASONS_INFO[season]["servers"])
         dpow_3p_coins = []
 
     if len(dpow_main_coins + dpow_3p_coins) > 0:

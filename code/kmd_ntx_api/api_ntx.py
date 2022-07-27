@@ -36,3 +36,10 @@ def daily_stats_sorted_api(request):
     data = stats.get_daily_stats_sorted(season)
     filters = []
     return helper.json_resp(data, filters)
+
+
+def notary_fee_efficiency_api(request):
+    season = helper.get_page_season(request)
+    data = ntx.get_notary_fee_efficiency(season)
+    filters = ['season']
+    return helper.json_resp(data, filters)

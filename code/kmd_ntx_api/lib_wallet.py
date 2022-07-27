@@ -7,7 +7,7 @@ import kmd_ntx_api.serializers as serializers
 
 def get_source_addresses(request):
     season = helper.get_page_season(request)
-    server = helper.get_page_server(request)
+    server = None
     coin = helper.get_or_none(request, "coin")
     notary = helper.get_or_none(request, "notary")
     return query.get_addresses_data(season, server, coin, notary)

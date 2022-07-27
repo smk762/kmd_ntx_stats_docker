@@ -72,11 +72,12 @@ def create_raw_transaction_view(request):
 
         else:
             for utxo in utxos:
-
                 if utxo["txid"] in rewards_resp["utxo_list"]:
-                    txid = utxo["txid"]
-                    rewards = rewards_resp["utxos"][txid]["kmd_rewards"]
-                    utxo.update({"rewards":rewards})
+                    for rutxo in rewards_resp["utxos"]:
+                        print(rutxo)
+                        if rutxo["txid"] == utxo["txid"]:
+                            rewards = rutxo["kmd_rewards"]
+                            utxo.update({"rewards":rewards})
 
             context.update({
                 "utxos": utxos
