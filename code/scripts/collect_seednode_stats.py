@@ -199,15 +199,16 @@ def round_ts_to_hour(timestamp):
     return round(int(timestamp)/3600)*3600
 
 
-def get_version_score(version, timestamp, notary, season):
+def get_version_score(version, timestamp, notary, season, wss_detected=False):
     active_versions_at = get_active_mm2_versions(timestamp)
     print(f"mm2 active versions: {active_versions_at}")
     for v in active_versions_at:
         if version.find(v) > -1:
+            if wss_detected:
+                return 0.2
             if test_wss(notary, season):
                 return 0.2
-            else:
-                return 0.01
+            return 0.01
     return 0
 
 
@@ -228,16 +229,29 @@ def test_wss(notary, season):
 
 def migrate_sqlite_to_pgsql(ts):
     print(f"Migrating to pgsql from {ts}")
+    wss_confirmed = []
     rows = get_version_stats_from_sqlite_db()
+
     if ts:
         rows = get_version_stats_from_sqlite_db(ts)
+
     for row in rows:
         print(row)
         if row["version"] != '':
-            hr_timestamp = round_ts_to_hour(row["timestamp"])
+            wss_detected = False
+            hr_timestamp = round_ts_to_hour(row["timestamp"])   
             season = validate.get_season(hr_timestamp)
-            score = get_version_score(row["version"], hr_timestamp, row["name"], season)
+
+            if row["name"] not in wss_confirmed:
+                if test_wss(row["name"], season):
+                    wss_confirmed.append(row["name"])
+
+            if row["name"] in wss_confirmed:
+                wss_detected = True
+            
+            score = get_version_score(row["version"], hr_timestamp, row["name"], season, wss_detected)
             row_data = (row["name"], season, row["version"], hr_timestamp, row["error"], score)
+
             print(row_data)
             update_seednode_version_stats_row(row_data)
 
