@@ -96,6 +96,24 @@ def get_last_200_failed_swaps(request):
     return serializer.data
 
 
+def get_last_200_failed_swaps_private(request):
+    pw = helper.get_or_none(request, 'pw')
+    if pw == BASIC_PW:
+        taker_coin = helper.get_or_none(request, "taker_coin")
+        maker_coin = helper.get_or_none(request, "maker_coin")
+        if taker_coin == "All":
+            taker_coin = None
+        if maker_coin == "All":
+            maker_coin = None
+        data = query.get_swaps_failed_data()
+        data = query.filter_swaps_coins(data, taker_coin, maker_coin)
+        data = data.order_by('-timestamp')[:200].values()
+        serializer = serializers.swapsFailedSerializer(data, many=True)
+        return serializer.data
+    else:
+        return []
+
+
 def format_gui_os_version(swaps_data):
     for item in swaps_data:
 

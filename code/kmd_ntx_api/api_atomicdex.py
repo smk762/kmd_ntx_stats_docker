@@ -49,6 +49,12 @@ def last_200_failed_swaps_api(request):
     return JsonResponse(data, safe=False)
 
 
+def last_200_failed_swaps_private_api(request):
+    data = dex.get_last_200_failed_swaps_private(request)
+    data = dex.format_gui_os_version(data)
+    return JsonResponse(data, safe=False)
+
+
 def swaps_gui_stats_api(request):
     resp = dex.get_swaps_gui_stats(request)
     return JsonResponse(resp)

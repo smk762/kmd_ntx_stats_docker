@@ -11,6 +11,7 @@ from kmd_ntx_api.notary_pubkeys import get_notary_pubkeys
 load_dotenv()
 OTHER_SERVER = os.getenv("OTHER_SERVER") # IP / domain of the remote server
 THIS_SERVER = os.getenv("THIS_SERVER")   # IP / domain of the local server
+BASIC_PW = os.getenv("BASIC_PW")         # Simple pw for restricting views during testing
 
 
 # LOGGING CONST
