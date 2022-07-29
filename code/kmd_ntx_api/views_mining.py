@@ -16,7 +16,7 @@ def mining_24hrs_view(request):
         "page_title":"KMD Mining Last 24hrs",
         "mined_24hrs":mined_24hrs
     })
-    return render(request, 'views/miningtable_/mining_24hrs.html', context)
+    return render(request, 'views/mining/mining_24hrs.html', context)
 
 
 def mining_overview_view(request):

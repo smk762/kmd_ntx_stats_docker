@@ -11,7 +11,11 @@ from notary_candidates import CANDIDATE_ADDRESSES
 
 
 def get_scoring_epoch_data():
-    data = requests.get(urls.get_scoring_epochs_repo_url()).json()
+    
+    url = urls.get_scoring_epochs_repo_url()
+    print(url)
+    data = requests.get(url).json()
+    print(data)
     for _season in data:
         _servers = list(data[_season]["Servers"].keys())[:]
         for _server in _servers:

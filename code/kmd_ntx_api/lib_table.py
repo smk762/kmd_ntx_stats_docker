@@ -97,7 +97,8 @@ def get_balances_rows(request):
     distinct = source.get_distinct()
     source.filter_data()
     source.required = {
-        "season": SEASON
+        "season": SEASON,
+        "server": "Main"
     }
 
     return {

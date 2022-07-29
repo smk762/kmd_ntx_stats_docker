@@ -216,7 +216,8 @@ def get_notary_nodes_repo_elected_nn_social_url(season):
 
 
 def get_scoring_epochs_repo_url(branch='master'):
-    return f"https://raw.githubusercontent.com/KomodoPlatform/dPoW/{branch}/doc/scoring_epochs.json"
+    return f"https://raw.githubusercontent.com/smk762/DragonhoundTools/master/notary/scoring_epochs.json"
+    #return f"https://raw.githubusercontent.com/KomodoPlatform/dPoW/{branch}/doc/scoring_epochs.json"
 
 
 def get_electrums_info_url(local=True):
