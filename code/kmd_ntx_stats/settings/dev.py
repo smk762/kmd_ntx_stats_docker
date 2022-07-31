@@ -9,5 +9,6 @@ DEBUG = True
 INSTALLED_APPS += ['debug_toolbar']
 MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS").split(" ")
 ALLOWED_HOSTS += ['127.0.0.1', 'localhost']
 INTERNAL_IPS = ['127.0.0.1', 'localhost']

@@ -43,7 +43,7 @@ jobs:
             - name: Run Migrations
               run: python manage.py migrate
               env: 
-                    DBENGINE: django.db.backends.mysql
+                    DBENGINE: django.db.backends.postgresql
                     DBNAME: postgresdb
                     DBUSER: postgresuser
                     DBPASSWORD: postgrespw
@@ -51,6 +51,7 @@ jobs:
                     DBPORT: 5432
                     SYSTEM_ENV: GITHUB_WORKFLOW
                     DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
+                    DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
                     SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
                     
             - name: Run Tests
@@ -63,7 +64,9 @@ jobs:
                     DBPASSWORD: postgrespw
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
+                    SYSTEM_ENV: GITHUB_WORKFLOW
                     DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
+                    DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
                     SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
 
             - name: Run Tests 2
@@ -76,5 +79,7 @@ jobs:
                     DBPASSWORD: postgrespw
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
+                    SYSTEM_ENV: GITHUB_WORKFLOW
                     DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
+                    DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
                     SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
