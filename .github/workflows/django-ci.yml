@@ -50,7 +50,7 @@ jobs:
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
                     SYSTEM_ENV: GITHUB_WORKFLOW
-                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.test
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
                     SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
                     
             - name: Run Tests
@@ -63,7 +63,7 @@ jobs:
                     DBPASSWORD: postgrespw
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
-                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.test
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
                     SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
 
             - name: Run Tests 2
@@ -76,5 +76,5 @@ jobs:
                     DBPASSWORD: postgrespw
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
-                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.test
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
                     SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
