@@ -49,7 +49,7 @@ jobs:
             - name: Run Migrations
               run: python manage.py migrate
               env: 
-                    POSTGRES_HOST: localhost
+                    POSTGRES_HOST: db
                     POSTGRES_PORT: 5432
                     POSTGRES_DB: postgres
                     POSTGRES_USER: postgres
@@ -64,7 +64,7 @@ jobs:
               run: |
                     python manage.py test
               env: 
-                    POSTGRES_HOST: localhost
+                    POSTGRES_HOST: db
                     POSTGRES_PORT: 5432
                     POSTGRES_DB: postgres
                     POSTGRES_USER: postgres
@@ -79,7 +79,7 @@ jobs:
               run: |
                     py.test -vvl;
               env: 
-                    POSTGRES_HOST: localhost
+                    POSTGRES_HOST: db
                     POSTGRES_PORT: 5432
                     POSTGRES_DB: postgres
                     POSTGRES_USER: postgres
