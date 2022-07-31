@@ -22,6 +22,8 @@ jobs:
         services:
             db:
                 image: postgres
+                ports:
+                - 5432/tcp
                 env:
                     POSTGRES_DB: postgres
                     POSTGRES_USER: postgres
