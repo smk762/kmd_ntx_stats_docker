@@ -23,10 +23,9 @@ jobs:
             db:
                 image: postgres
                 env:
-                    POSTGRES_DB: postgresdb
-                    POSTGRES_USER: postgresuser
-                    POSTGRES_PASSWORD: postgrespw
-                ports: ["5432:5432"]
+                    POSTGRES_DB: postgres
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
                 options: >-
                   --health-cmd pg_isready
                   --health-interval 10s
@@ -51,9 +50,9 @@ jobs:
                     POSTGRES_HOST: db
                     POSTGRES_PORT: 5432
                     DBENGINE: django.db.backends.postgresql
-                    DBNAME: postgresdb
-                    DBUSER: postgresuser
-                    DBPASSWORD: postgrespw
+                    DBNAME: postgres
+                    DBUSER: postgres
+                    DBPASSWORD: postgres
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
                     SYSTEM_ENV: GITHUB_WORKFLOW
@@ -65,10 +64,12 @@ jobs:
               run: |
                     python manage.py test
               env: 
+                    POSTGRES_HOST: db
+                    POSTGRES_PORT: 5432
                     DBENGINE: django.db.backends.postgresql
-                    DBNAME: postgresdb
-                    DBUSER: postgresuser
-                    DBPASSWORD: postgrespw
+                    DBNAME: postgres
+                    DBUSER: postgres
+                    DBPASSWORD: postgres
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
                     SYSTEM_ENV: GITHUB_WORKFLOW
@@ -80,10 +81,12 @@ jobs:
               run: |
                     py.test -vvl;
               env: 
+                    POSTGRES_HOST: db
+                    POSTGRES_PORT: 5432
                     DBENGINE: django.db.backends.postgresql
-                    DBNAME: postgresdb
-                    DBUSER: postgresuser
-                    DBPASSWORD: postgrespw
+                    DBNAME: postgres
+                    DBUSER: postgres
+                    DBPASSWORD: postgres
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
                     SYSTEM_ENV: GITHUB_WORKFLOW
