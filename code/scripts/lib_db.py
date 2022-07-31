@@ -11,18 +11,18 @@ load_dotenv()
 def connect_db():
     try:
         conn = psycopg2.connect(
-            host='localhost',
+            host=os.getenv("POSTGRES_HOST"),
             user=os.getenv("POSTGRES_USER"),
             password=os.getenv("POSTGRES_PASSWORD"),
-            port = "7654",
+            port = "5432",
             database='postgres'
         )
     except:
         conn = psycopg2.connect(
-            host='db',
+            host='localhost',
             user=os.getenv("POSTGRES_USER"),
             password=os.getenv("POSTGRES_PASSWORD"),
-            port = "5432",
+            port = "7654",
             database='postgres'
         )
 
