@@ -47,14 +47,12 @@ jobs:
             - name: Run Migrations
               run: python manage.py migrate
               env: 
-                    POSTGRES_HOST: db
+                    POSTGRES_HOST: localhost
                     POSTGRES_PORT: 5432
+                    POSTGRES_DB: postgres
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
                     DBENGINE: django.db.backends.postgresql
-                    DBNAME: postgres
-                    DBUSER: postgres
-                    DBPASSWORD: postgres
-                    DBHOST: 127.0.0.1
-                    DBPORT: 5432
                     SYSTEM_ENV: GITHUB_WORKFLOW
                     DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
                     DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
@@ -64,14 +62,12 @@ jobs:
               run: |
                     python manage.py test
               env: 
-                    POSTGRES_HOST: db
+                    POSTGRES_HOST: localhost
                     POSTGRES_PORT: 5432
+                    POSTGRES_DB: postgres
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
                     DBENGINE: django.db.backends.postgresql
-                    DBNAME: postgres
-                    DBUSER: postgres
-                    DBPASSWORD: postgres
-                    DBHOST: 127.0.0.1
-                    DBPORT: 5432
                     SYSTEM_ENV: GITHUB_WORKFLOW
                     DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
                     DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
@@ -81,14 +77,12 @@ jobs:
               run: |
                     py.test -vvl;
               env: 
-                    POSTGRES_HOST: db
+                    POSTGRES_HOST: localhost
                     POSTGRES_PORT: 5432
+                    POSTGRES_DB: postgres
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
                     DBENGINE: django.db.backends.postgresql
-                    DBNAME: postgres
-                    DBUSER: postgres
-                    DBPASSWORD: postgres
-                    DBHOST: 127.0.0.1
-                    DBPORT: 5432
                     SYSTEM_ENV: GITHUB_WORKFLOW
                     DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
                     DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
