@@ -50,8 +50,8 @@ jobs:
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
                     SYSTEM_ENV: GITHUB_WORKFLOW
-                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings_ci
-                    SECRET_KEY: 'ho2i43pq8asapnqqi02i-'
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.test
+                    SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
                     
             - name: Run Tests
               run: |
@@ -63,5 +63,18 @@ jobs:
                     DBPASSWORD: postgrespw
                     DBHOST: 127.0.0.1
                     DBPORT: 5432
-                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings_ci
-                    SECRET_KEY: 'ho2i43pq8asapnqqi02i-'
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.test
+                    SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+
+            - name: Run Tests 2
+              run: |
+                    py.test -vvl;
+              env: 
+                    DBENGINE: django.db.backends.postgresql
+                    DBNAME: postgresdb
+                    DBUSER: postgresuser
+                    DBPASSWORD: postgrespw
+                    DBHOST: 127.0.0.1
+                    DBPORT: 5432
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.test
+                    SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}

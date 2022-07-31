@@ -1,1 +1,6 @@
 rem/
+rest_framework/
+admin/
+debug_toolbar/
+dynamic_rest/
+

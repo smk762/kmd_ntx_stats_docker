@@ -1,7 +1,13 @@
 FROM python:3
-ENV PYTHONUNBUFFERED 1
-ENV PGDATA=/pg-data
+
+ARG requirements=/code/requirements/prod.txt
+ENV DJANGO_SETTINGS_MODULE="kmd_ntx_stats.settings.prod"
+
 RUN mkdir /code
 WORKDIR /code
 COPY ./code/ /code/
-RUN pip install -r requirements.txt
+
+ENV PYTHONUNBUFFERED 1
+ENV PGDATA=/pg-data
+
+RUN  pip install -r $requirements && python manage.py collectstatic --noinput

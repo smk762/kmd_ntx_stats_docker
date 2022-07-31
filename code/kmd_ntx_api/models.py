@@ -700,3 +700,8 @@ class swaps_failed(models.Model):
 # change max_wal_size to 2gb
 # log_rotation_size to 100mb
 
+# Find where colectstatic is looking
+# docker-compose run web python3 manage.py findstatic --verbosity 2 static
+
+# PGSQL access config
+# sudo nano /home/smk762/kmd_ntx_stats_docker/postgres-data/pg_hba.conf

@@ -803,7 +803,7 @@ for _season in SEASONS_INFO:
             elif SEASONS_INFO[_season]["end_time"] > NOW:
                     SEASON = _season
 
-print(f"SEASONS_INFO: {SEASONS_INFO['Season_6']['servers']['Third_Party']}")
+#print(f"SEASONS_INFO: {SEASONS_INFO['Season_6']['servers']['Third_Party']}")
 
 SEASONS_INFO['Season_6']['servers']['Third_Party']['epochs']['Epoch_0']['coins'] = ['AYA', 'EMC2', 'MCL', 'SFUSD', 'TOKEL']
 SEASONS_INFO['Season_6']['servers']['Third_Party']['epochs']['Epoch_0']['num_coins'] = 5
