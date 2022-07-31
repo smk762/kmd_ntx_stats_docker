@@ -11,6 +11,7 @@ COVERAGE_MODULE_EXCLUDES = [
     'migrations', 'fixtures', 'admin$',
 ]
 
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 COVERAGE_REPORT_HTML_OUTPUT_DIR = "coverage"
 
 SECRET_KEY = os.getenv("SECRET_KEY")
