@@ -75,14 +75,12 @@ jobs:
                     DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
                     SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
 
-            - name: Run Tests 2
+            - name: Run Script Tests
               run: |
                     py.test -vvl;
               env: 
                     POSTGRES_HOST: localhost
                     POSTGRES_HOST_AUTH_METHOD: trust
-                    THIS_SERVER: 'http://116.203.120.91:8762'
-                    OTHER_SERVER: 'http://116.203.120.91:8762'
                     POSTGRES_PORT: 5432
                     POSTGRES_DB: postgres
                     POSTGRES_USER: postgres
@@ -91,3 +89,6 @@ jobs:
                     DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
                     DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
                     SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+                    API_PAGE_BREAK: 1
+                    THIS_SERVER: 'http://116.203.120.91:8762'
+                    OTHER_SERVER: 'http://116.203.120.91:8762'
