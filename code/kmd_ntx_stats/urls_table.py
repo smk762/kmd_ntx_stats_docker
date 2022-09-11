@@ -176,6 +176,10 @@ api_table_urls = [
           api_table.notary_profile_summary_table,
           name='notary_profile_summary_table'),
 
+    path('api/table/notary_season_ntx_summary/',
+          api_table.notary_season_ntx_summary_table,
+          name='notary_season_ntx_summary_table'),
+
     path('api/table/notary_epoch_scores/',
           api_table.notary_epoch_scores_table,
           name='notary_epoch_scores_table'),
