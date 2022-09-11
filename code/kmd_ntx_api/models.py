@@ -666,6 +666,7 @@ class swaps_failed(models.Model):
     maker_gui = models.CharField(max_length=64, blank=True, null=True)
     maker_version = models.CharField(max_length=64, blank=True, null=True)
     maker_pubkey = models.CharField(max_length=66, blank=True, null=True)
+    # raw_data = JSONField(default=dict)
 
     class Meta:
         db_table = 'swaps_failed'

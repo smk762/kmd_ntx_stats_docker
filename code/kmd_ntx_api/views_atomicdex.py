@@ -26,6 +26,16 @@ def activation_commands_view(request):
     return render(request, 'views/atomicdex/activation_commands.html', context)
 
 
+def recreate_swap_data_view(request):
+    context = helper.get_base_context(request)
+
+    context.update({
+        "page_title": "Recreate failed swap data"
+    })
+
+    return render(request, 'views/atomicdex/recreate_swap_data.html', context)
+
+
 def batch_activation_form_view(request):
     context = helper.get_base_context(request)
     context.update({

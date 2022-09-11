@@ -88,6 +88,9 @@ DATABASES = {
         'PASSWORD': os.getenv("POSTGRES_PASSWORD"),
         'HOST': os.getenv("POSTGRES_HOST"),
         'PORT': os.getenv("POSTGRES_PORT"),
+        'TEST': {
+            'NAME': 'testdb',
+        }
     }
 }
 

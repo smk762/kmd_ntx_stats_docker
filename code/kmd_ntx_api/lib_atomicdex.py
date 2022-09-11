@@ -38,6 +38,17 @@ def get_orderbook(request):
     return r.json()
 
 
+def recreate_swap_data(swap_data):
+    params = {
+        "method": "recreate_swap_data",
+        "params": {
+            "swap": swap_data
+        }
+    }
+    r = mm2_proxy(params)
+    return r.json()
+
+
 def get_bestorders(request):
     coin = helper.get_or_none(request, "coin", "KMD")
     if coin == 'TOKEL': coin = 'TKL'
