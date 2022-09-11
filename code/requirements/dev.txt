@@ -1,0 +1,4 @@
+-r test.txt
+django-debug-toolbar==3.5.0
+pytest==7.1.2
+pytest-django==4.5.2

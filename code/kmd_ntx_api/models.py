@@ -666,6 +666,7 @@ class swaps_failed(models.Model):
     maker_gui = models.CharField(max_length=64, blank=True, null=True)
     maker_version = models.CharField(max_length=64, blank=True, null=True)
     maker_pubkey = models.CharField(max_length=66, blank=True, null=True)
+    # raw_data = JSONField(default=dict)
 
     class Meta:
         db_table = 'swaps_failed'
@@ -700,3 +701,8 @@ class swaps_failed(models.Model):
 # change max_wal_size to 2gb
 # log_rotation_size to 100mb
 
+# Find where colectstatic is looking
+# docker-compose run web python3 manage.py findstatic --verbosity 2 static
+
+# PGSQL access config
+# sudo nano /home/smk762/kmd_ntx_stats_docker/postgres-data/pg_hba.conf

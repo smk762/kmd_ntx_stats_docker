@@ -1,12 +1,14 @@
+from django.conf import settings
+from django.conf.urls import url
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
+
 from kmd_ntx_api import views_api
 from kmd_ntx_api import api_tools
 from kmd_ntx_api import api_graph
 
 from kmd_ntx_stats.urls_atomicdex import frontend_atomicdex_urls, api_atomicdex_urls
-
 from kmd_ntx_stats.urls_source import source_router
 from kmd_ntx_stats.urls_csv import api_csv_urls
 from kmd_ntx_stats.urls_graph import api_graph_urls
@@ -16,7 +18,6 @@ from kmd_ntx_stats.urls_table import frontend_table_urls, api_table_urls
 from kmd_ntx_stats.urls_wallet import api_wallet_urls
 from kmd_ntx_stats.urls_docs import doc_urls
 from kmd_ntx_stats.urls_community import frontend_community_urls
-
 from kmd_ntx_stats.urls_page import frontend_page_urls
 from kmd_ntx_stats.urls_coin import frontend_coin_urls, api_coins_urls
 from kmd_ntx_stats.urls_ntx import frontend_ntx_urls, api_ntx_urls
@@ -82,3 +83,9 @@ url_lists = [
 
 for i in url_lists:
   urlpatterns += i
+
+if settings.DEBUG:
+    from django.conf.urls.static import static
+    import debug_toolbar
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls))]

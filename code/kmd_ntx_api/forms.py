@@ -196,3 +196,29 @@ class EnableCommandForm(forms.Form):
         )
 
 
+
+
+class RecreateSwapDataForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
+
+    coin = forms.ChoiceField(
+        label='Swap Coin',
+        required=True,
+        widget=forms.Select,
+        choices=COIN_CHOICES
+        )
+
+    address = forms.CharField(
+        label='Address',
+        max_length=100,
+        required=True
+        )
+
+    uuid =forms.CharField(
+        label='Address',
+        max_length=100,
+        required=True
+        )

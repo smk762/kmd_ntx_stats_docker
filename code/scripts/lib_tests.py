@@ -20,6 +20,12 @@ import lib_urls
 import lib_validate
 import lib_wallet
 
+
+# TODO: For CI, these tests need to be separated.
+# - No data in actions, so get from urls while testing them
+# Test non-query functions separately.
+# Test adding to db (limit use of external api)
+
 pubkey = "0366a87a476a09e05560c5aae0e44d2ab9ba56e69701cee24307871ddd37c86258"
 
 explorers_data = lib_github.get_github_folder_contents("KomodoPlatform", "coins", "explorers")
@@ -675,45 +681,6 @@ class TestLibValidate:
         assert lib_validate.get_season(1647480279) == "Season_5"
         assert lib_validate.get_season(1623683000000) == "Season_5"
         assert lib_validate.get_season(5623683000) == "Unofficial"
-
-    def test_get_season_server_from_addresses(self):
-        valid_main_address_list = [
-            "RVrtLPvKrszs7zSggTsXPYsbxc5SwALiEN", "RALiENAgeHExyyEnBARdZdwWbHWokoUbtc",
-            "RDZaLiENRUnckP57oRxLznYmFM5bV9PaZV", "RALienLQZxF5JeJxWyLfFTw5Y3ohmdU4gU",
-            "RP4bAeJGc6b21J6UA4TqNRr6hdiGTALien", "RMmPakZ7R3bap78JeKVcxygpS2fTy6NYxX",
-            "RNyD2yYVzC9Jv3Gqhju62RZmRMZ2n1qaSS", "RLxmmwsjtCsEC6sfjjxsWoTrnpcmgC9cfv",
-            "RLopsvKfmtSgBESeteApG3D1NMudg6XJ8t", "RPEAampRWYacYse3gAud48DsiLttzhAYHV",
-            "RNFTgUWvx8zUsdVL56uuffiKXZTU4q45cr", "RWvfkt8UjbPWXgeZEcgYmKw2vA1bbAx5t2",
-            "RVNQWLPdPG1AabQvzmwGpE5pxd1Yt8SkYL"
-        ]
-
-        valid_3p_address_list = [
-            "RDosr7iNVe26tcErCBGHZ2YwE2JxcALiEN", "RALiENfYqijwdDuKUwtQmXFYWURq27S98S",
-            "RSUALiEnuYzcudwcAxSjeMiB7SwQMRR3Xu", "RALienKsZ36cUVDZSRMtNTGyG5jDtvDDcK",
-            "RQJQY3LTSZZKq4Z2f6rRV4oxvGzZALienb", "RHX2k1DN87BFfEkwGxnV7EhopRiDU8uqvu",
-            "RG9VXFkVYh4BuPWELt7uJrYee77wFmvMYL", "RJEeHP91rc84U5ArfbTQzYQsv4T8GNqNWF",
-            "RB9Tgwdc5oPKVmHMssd7LZvKG44zX7jTWD", "RRMw2A7qeJ61LsT777Z9JuTGWfA1M3Uznx",
-            "RHHzesqTHS8Mi8hT5EyU2hmhJXmNVuPD7S", "REx2EibDGdNZLpLV36AA9duzchDHaC4hSC",
-            "RP8buuL4L1BzrNarKq4aLpWXfVmGWU4HrZ"
-        ]
-
-        too_few_address_list = valid_main_address_list[:-1]
-        too_many_address_list = valid_main_address_list + ["R9iBY1oyt4aMocyMbScxqzC1JtWa1XNn5K"]
-        invalid_address_in_list = too_few_address_list + ["R9iBY1oyt4aMocyMbScxqzC1JtWa1XNn5K"]
-
-        season, server = lib_validate.get_season_server_from_addresses(too_many_address_list, "DEX")
-        assert server == "Unofficial" and season == "Unofficial"
-        season, server = lib_validate.get_season_server_from_addresses(too_few_address_list, "DEX")
-        assert server == "Unofficial" and season == "Unofficial"
-        season, server = lib_validate.get_season_server_from_addresses(invalid_address_in_list, "DEX")
-        assert server == "Unofficial" and season == "Unofficial"
-
-        season, server = lib_validate.get_season_server_from_addresses(valid_main_address_list, "DEX")
-        assert server == "Main" and season == "Season_5"
-        season, server = lib_validate.get_season_server_from_addresses(valid_main_address_list, "KMD")
-        assert server == "KMD" and season == "Season_5"
-        season, server = lib_validate.get_season_server_from_addresses(valid_3p_address_list, "GLEEC-OLD")
-        assert server == "Third_Party" and season == "Season_5"
 
     def test_get_coin_server(self):
         assert lib_validate.get_coin_server("GLEEC-OLD", "Season_5") == "Third_Party"

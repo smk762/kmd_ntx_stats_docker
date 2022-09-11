@@ -1,53 +1,67 @@
 version: '3'
   
 services:
+
   mm2:
+    restart: always
     build: 
       context: mm2
       dockerfile: Dockerfile
+
     volumes:
       - ./mm2:/mm2
 
     environment:
       - userpass=${userpass}
+
     ports:
       - "7783:7783"
+
     logging:
       driver: "json-file"
       options:
         max-size: "20m"
         max-file: "10"
+
+  kmd:
     restart: always
-  kmd: 
+    network_mode: "host"
     image: komodoofficial/komodo:cd_release_fb4b355_master
+
     volumes:
       - ./code:/code
       - /home/smk762/.komodo:/root/.komodo
       - /home/smk762/.zcash-params:/root/.zcash-params
+
     ports:
       - "7770:7770"
       - "7771:7771"
-    network_mode: "host"
-    restart: always
+
     logging:
       driver: "json-file"
       options:
         max-size: "20m"
         max-file: "10"
+
   db:
     image: postgres
+    restart: always
+
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
-    restart: always
+
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+
     depends_on:
       - kmd
       - mm2
+
     ports:
       - "7654:5432"
+
     logging:
       driver: "json-file"
       options:
@@ -55,24 +69,41 @@ services:
         max-file: "10"
     
   web:
-    build: .
+    build: 
+      context: .
+      args:
+        requirements: requirements/dev.txt
+    environment:
+      - DJANGO_SETTINGS_MODULE=kmd_ntx_stats.settings.dev
+
     command: bash -c "python manage.py runserver 0.0.0.0:8762 && /code/scripts/collect_seednode_stats.py start"
     restart: always
+
     volumes:
       - ./code:/code
-      - /var/www/stats.kmd.io/html:/var/www/stats.kmd.io/html
+      - /var/www/stats.kmd.io/html/static:/var/www/stats.kmd.io/html/static
+
     ports:
       - "8762:8762"
+
     depends_on:
       - mm2
       - db
       - kmd
+
     logging:
       driver: "json-file"
       options:
         max-size: "20m"
         max-file: "10"
 
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.17.0.1/16
+        
 # to run migrations, use "docker-compose run web python3 manage.py migrate"
 # to run migrations, use "docker-compose run web python3 makemigrations"
 

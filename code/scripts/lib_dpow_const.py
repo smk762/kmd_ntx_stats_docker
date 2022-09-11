@@ -13,9 +13,7 @@ from notary_candidates import CANDIDATE_ADDRESSES
 def get_scoring_epoch_data():
     
     url = urls.get_scoring_epochs_repo_url()
-    print(url)
     data = requests.get(url).json()
-    print(data)
     for _season in data:
         _servers = list(data[_season]["Servers"].keys())[:]
         for _server in _servers:
@@ -803,7 +801,7 @@ for _season in SEASONS_INFO:
             elif SEASONS_INFO[_season]["end_time"] > NOW:
                     SEASON = _season
 
-print(f"SEASONS_INFO: {SEASONS_INFO['Season_6']['servers']['Third_Party']}")
+#print(f"SEASONS_INFO: {SEASONS_INFO['Season_6']['servers']['Third_Party']}")
 
 SEASONS_INFO['Season_6']['servers']['Third_Party']['epochs']['Epoch_0']['coins'] = ['AYA', 'EMC2', 'MCL', 'SFUSD', 'TOKEL']
 SEASONS_INFO['Season_6']['servers']['Third_Party']['epochs']['Epoch_0']['num_coins'] = 5

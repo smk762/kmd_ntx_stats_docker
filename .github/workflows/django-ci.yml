@@ -22,11 +22,17 @@ jobs:
         services:
             db:
                 image: postgres
+                ports:
+                - "5432:5432"
                 env:
-                    POSTGRES_DB: postgresdb
-                    POSTGRES_USER: postgresuser
-                    POSTGRES_PASSWORD: postgrespw
-                ports: ["5432:5432"]
+                    POSTGRES_DB: postgres
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                options: >-
+                  --health-cmd pg_isready
+                  --health-interval 10s
+                  --health-timeout 5s
+                  --health-retries 5
 
         steps:
             - uses: actions/checkout@v2
@@ -38,30 +44,51 @@ jobs:
               run: |
                     sudo apt-get install python3-dev build-essential libpq-dev libgnutls28-dev gcc default-libmysqlclient-dev build-essential python3-mysql.connector python3-pip libcurl4-openssl-dev libssl-dev -y
                     python -m pip install --upgrade pip
-                    pip install -r requirements.txt
+                    pip install -r requirements/test.txt
                     
             - name: Run Migrations
               run: python manage.py migrate
               env: 
-                    DBENGINE: django.db.backends.mysql
-                    DBNAME: postgresdb
-                    DBUSER: postgresuser
-                    DBPASSWORD: postgrespw
-                    DBHOST: 127.0.0.1
-                    DBPORT: 5432
-                    SYSTEM_ENV: GITHUB_WORKFLOW
-                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings_ci
-                    SECRET_KEY: 'ho2i43pq8asapnqqi02i-'
+                    POSTGRES_HOST: localhost
+                    POSTGRES_HOST_AUTH_METHOD: trust
+                    POSTGRES_PORT: 5432
+                    POSTGRES_DB: postgres
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                    DBENGINE: django.db.backends.postgresql
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
+                    DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
+                    SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
                     
             - name: Run Tests
               run: |
                     python manage.py test
               env: 
+                    POSTGRES_HOST: localhost
+                    POSTGRES_HOST_AUTH_METHOD: trust
+                    POSTGRES_PORT: 5432
+                    POSTGRES_DB: postgres
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
                     DBENGINE: django.db.backends.postgresql
-                    DBNAME: postgresdb
-                    DBUSER: postgresuser
-                    DBPASSWORD: postgrespw
-                    DBHOST: 127.0.0.1
-                    DBPORT: 5432
-                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings_ci
-                    SECRET_KEY: 'ho2i43pq8asapnqqi02i-'
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
+                    DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
+                    SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+
+            - name: Run Script Tests
+              run: |
+                    py.test -vvl;
+              env: 
+                    POSTGRES_HOST: localhost
+                    POSTGRES_HOST_AUTH_METHOD: trust
+                    POSTGRES_PORT: 5432
+                    POSTGRES_DB: postgres
+                    POSTGRES_USER: postgres
+                    POSTGRES_PASSWORD: postgres
+                    DBENGINE: django.db.backends.postgresql
+                    DJANGO_SETTINGS_MODULE: kmd_ntx_stats.settings.test
+                    DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
+                    SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+                    API_PAGE_BREAK: 1
+                    THIS_SERVER: 'http://116.203.120.91:8762'
+                    OTHER_SERVER: 'http://116.203.120.91:8762'
