@@ -1,3 +1,4 @@
+<!-- START components/tables/notary_profile/notary_season_ntx_table.html -->
 <div class="text-center" id="ntx-loading-spinner" style="height: 100%">
 	<div class="spinner-border m-10" role="status">
 	</div>
@@ -11,29 +12,17 @@
 					<thead>
 						<tr>
 							<th data-data="coin">Coin</th>
-							<th data-data="ntx_server">Server</th>
-							<th data-data="ntx_count">Notarisations</th>
-							<th data-data="ntx_pct">Participation</th>
-							<th data-data="ntx_score">Score</th>
-							<th data-data="ntx_block">Last ntx block</th>
-							<th data-data="ntx_time">Since last ntx</th>
+							<th data-data="server">Server</th>
+							<th data-data="coin_ntx_count">Notarisations</th>
+							<th data-data="coin_ntx_count_pct">Participation</th>
+							<th data-data="coin_ntx_score">Score</th>
+							<th data-data="last_ntx_blockhash">Last NTX Blockhash</th>
+							<th data-data="last_ntx_blockheight">Last NTX Height</th>
+							<th data-data="last_ntx_txid">Last nTxid</th>
+							<th data-data="opret">Op Return</th>
+							<th data-data="last_ntx_blocktime">Since last ntx</th>
 						</tr>
 					</thead>
-					<tbody>
-						{% for coin, data in notary_ntx_summary_table.items %}
-							<tr class="py-0">
-								<td data-data="coin">{{ coin }}</td>
-								<td data-data="ntx_server">{{ data.server }}</td>
-								<td data-data="ntx_count">{{ data.coin_ntx_count }}</td>
-								<td data-data="ntx_pct">{{ data.coin_ntx_count_pct }}</td>
-								<td data-data="ntx_score">{{ data.coin_ntx_score|floatformat:-3 }}</td>
-								<td data-data="ntx_block">{{ data.last_ntx_blockheight }}</td>
-								<td data-data="ntx_time" data-order="{{ data.last_block_height }}">
-									{{ data.since_last_block_time }}
-								</td>
-							</tr>
-						{% endfor %}
-					</tbody>
 				</table>
 			</div>
 		</div>	
@@ -42,23 +31,33 @@
 <script>  
     $(document).ready(function() {
 
-     	let url = "{% url 'notary_profile_summary_table' %}?notary={{ notary }}&season={{ season }}"
+     	let url = "{% url 'notary_season_ntx_summary_table' %}?notary={{ notary }}&season={{ season }}"
+     	console.log(url)
         var ntxTable = $('#ntx_table').DataTable({
-    		order: [ 5, 'desc' ],
+     		"ajax": {
+                "serverSide": true,
+			    "url": url,
+	    		"dataSrc": 'results',
+    			"deferRender": true
+			},
+    		"order": [[ 6, 'desc' ], [ 0, 'asc' ]],
             "orderClasses": false,
         	"paging": false,
         	"columns": [
 		        { "data": "coin" },
-		        { "data": "ntx_server" },
-		        { "data": "ntx_count" },
-		        { "data": "ntx_pct" },
-		        { "data": "ntx_score" },
-		        { "data": "ntx_block" },
-		        { "data": "ntx_time" }
+		        { "data": "server" },
+		        { "data": "coin_ntx_count" },
+		        { "data": "coin_ntx_count_pct" },
+		        { "data": "coin_ntx_score" },
+		        { "data": "last_ntx_blockhash" },
+		        { "data": "last_ntx_blockheight" },
+		        { "data": "last_ntx_txid" },
+		        { "data": "opret" },
+		        { "data": "last_ntx_blocktime" }
 		    ], 
     		"columnDefs": [
 				{ className: "text-left text-nowrap fw-14pct", "targets": [ 0 ] },
-    			{ className: "text-right text-nowrap fw-14pct", "targets": [ 2, 3, 4, 6 ] },
+    			{ className: "text-right text-nowrap fw-14pct", "targets": [ 2, 3, 4, 6, 9 ] },
     			{
 		            "targets": 0,
 		            "data": "coin",
@@ -67,45 +66,72 @@
 			        }
     			},
     			{
-		            "data": "ntx_server",
+		            "data": "server",
 		            "targets": 1,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				        $(nTd).html(get_server_styled(oData.ntx_server));
+				        $(nTd).html(get_server_styled(oData.server));
 		        	}
 		        },
     			{
-		            "data": "ntx_count",
+		            "data": "coin_ntx_count",
 		            "targets": 2,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html("<a href='{% url 'notary_coin_notarised_view' %}?season={{ season }}&server={{ data.server }}&notary={{ notary }}&coin={{ data.coin }}'>"+oData.ntx_count+"")
+		            	$(nTd).html("<a href='{% url 'notary_coin_notarised_view' %}?season={{ season }}&server={{ data.server }}&notary={{ notary }}&coin={{ data.coin }}'>"+oData.coin_ntx_count+"")
 		            }			            
 		        },
     			{
-		            "data": "ntx_pct",
+		            "data": "coin_ntx_count_pct",
 		            "targets": 3,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(parseFloat(oData.ntx_pct).toFixed(3) + ' %')
+		            	$(nTd).html(parseFloat(oData.coin_ntx_count_pct).toFixed(3) + ' %')
 		            }			            
 		        },
     			{
-		            "data": "ntx_score",
+		            "data": "coin_ntx_score",
 		            "targets": 4,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html("<a href='{% url 'notary_epoch_scores_view' %}?notary={{ notary }}&server={{ data.server }}&coin={{ data.coin }}&season={{ season }}'>"+parseFloat(oData.ntx_score).toFixed(3)+"</a>")
+		            	$(nTd).html("<a href='{% url 'notary_epoch_scores_view' %}?notary={{ notary }}&server={{ data.server }}&coin={{ data.coin }}&season={{ season }}'>"+parseFloat(oData.coin_ntx_score).toFixed(3)+"</a>")
 		            }			            
 		        },
     			{
-		            "data": 'ntx_block',
+		            "data": 'last_ntx_blockhash',
 		            "targets": 5,
+	                "visible": false,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(get_block_url("KMD", oData.ntx_block))
 			        }
 		        },
     			{
-		            "data": 'ntx_time',
+		            "data": 'last_ntx_blockheight',
 		            "targets": 6,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(oData.ntx_time);
+		            	if (oData.coin == "KMD") $(nTd).html(get_block_url("LTC", oData.last_ntx_blockheight))
+		            	else $(nTd).html(get_block_url("KMD", oData.last_ntx_blockheight))
+			        }
+		        },
+    			{
+		            "data": 'last_ntx_txid',
+		            "targets": 7,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+						if (oData.coin == "KMD") $(nTd).html(get_txid_url("LTC", oData.last_ntx_txid))
+						else $(nTd).html(get_txid_url("KMD", oData.last_ntx_txid))
+			        }
+		        },
+    			{
+		            "data": 'opret',
+		            "targets": 8,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	let op_return = (oData.opret.split(" ").length > 1) ? oData.opret.split(" ")[1] : oData.opret
+						let icon = "<i class='fas fa-arrow-right'></i>"
+						let tooltip = "Decode OP_RETURN: "+op_return
+						let url = "{% url 'decode_op_return_view' %}?OP_RETURN="+op_return+"&season={{ season }}"
+			            $(nTd).html(get_detail_link_icon(icon, tooltip, url));
+			        }
+		        },
+    			{
+		            "data": 'last_ntx_blocktime',
+		            "targets": 9,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	$(nTd).html(get_time_since(oData.last_ntx_blocktime));
 			        }
 		        }
     		],
@@ -116,8 +142,8 @@
 	            $('.season_ntx_tbl_title').html('<h4 class="">{{ notary_clean }} NTX Summary</h3>');
 	            let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="season_ntx" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
 	            $('.season_ntx_api_link').html(api_btn);
-
 	        }
         });
     });
 </script> 
+<!-- END components/tables/notary_profile/notary_season_ntx_table.html -->

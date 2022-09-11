@@ -120,6 +120,15 @@ def notary_profile_summary_table(request):
     return helper.json_resp(resp, filters)
 
 
+def notary_season_ntx_summary_table(request):
+    resp = table.get_notary_ntx_season_table_data(request)['notary_ntx_summary_table']
+    table_data = []
+    for coin in resp[0]:
+        table_data.append(resp[0][coin])
+    filters = ["season", "server", "notary"]
+    return helper.json_resp(table_data, filters)
+
+
 def mined_24hrs_table(request):
     resp = table.get_mined_24hrs_table(request)
     filters = ['name', 'address']
