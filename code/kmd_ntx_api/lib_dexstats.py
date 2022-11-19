@@ -12,6 +12,10 @@ DEXSTATS_COINS = ["BET", "BOTS", "CCL", "CHIPS", "CLC", "CRYPTO", "DEX",
 def get_base_endpoint(coin):
     if coin == "MIL":
         return f"https://mil.kmdexplorer.io/api"
+
+    if coin == "MCL":
+        return f"https://explorer.marmara.io/insight-api-komodo"
+
     return f"https://{coin.lower()}.explorer.dexstats.info/insight-api-komodo"
 
 
@@ -19,7 +23,9 @@ def get_dexstats_utxos(coin, address):
     try:
         subdomain = get_base_endpoint(coin)
         endpoint = f"addr/{address}/utxo"
-        return requests.get(f"{subdomain}/{endpoint}").json()
+        url = f"{subdomain}/{endpoint}"
+        print(url)
+        return requests.get(url).json()
     except Exception as e:
         return f"{e}"
 

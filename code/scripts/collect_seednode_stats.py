@@ -25,9 +25,18 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/smk762/DragonhoundTools/master/atomicdex/seednode_version.json"
+VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/master/doc/seed_version_epochs.json"
 
 SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
+
+# Date:   Mon Nov 14 13:40:18 2022 +0300 6e4de5d21
+# Date:   Wed Aug 10 18:42:54 2022 +0700 0f6c72615
+# Date:   Mon Jul 11 11:11:34 2022 +0300 ce32ab8da
+# Date:   Tue Jun 21 15:04:00 2022 +0700 b8598439a
+
+
+
+
 
 # ENV VARS
 load_dotenv()
@@ -39,6 +48,24 @@ conn = sqlite3.connect(DB_PATH)
 conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
 
+VERSION_DATA = {
+    "b8598439a": {
+      "start": 1656077853,
+      "end": 1659006671
+    },
+    "ce32ab8da": {
+      "start": 1656077853,
+      "end": 1666271160
+    },
+    "0f6c72615": {
+      "start": 1656077853,
+      "end": 1668898800
+    },
+    "6e4de5d21": {
+      "start": 1656077853,
+      "end": 1777777777
+    }
+}
 
 def mm2_proxy(method, params=None):
     if not params:
@@ -179,11 +206,40 @@ def update_seednode_version_stats_row(row_data):
         logger.error(f"[update_seednode_version_stats_row] row_data: {row_data}")
         CONN.rollback()
 
+def rectify_scores():
+    for commithash in VERSION_DATA:
+        start_time = VERSION_DATA[commithash]["start"]
+        end_time = VERSION_DATA[commithash]["end"]
+        print(f"commithash: {commithash}")
+        print(f"start_time: {start_time}")
+        print(f"end_time: {end_time}")
+
+        sql = f"SELECT * FROM seednode_version_stats WHERE version LIKE '%{commithash}%' AND timestamp > {end_time};"
+        CURSOR.execute(sql)
+        print(CURSOR.rowcount)
+        sql = f"UPDATE seednode_version_stats SET score = 0 WHERE version LIKE '%{commithash}%' AND timestamp > {end_time};"
+        CURSOR.execute(sql)
+        CONN.commit()
+
+        sql = f"SELECT * FROM seednode_version_stats WHERE version LIKE '%{commithash}%' AND timestamp < {end_time} AND timestamp > {start_time};"
+        CURSOR.execute(sql)
+        print(CURSOR.rowcount)
+        sql = f"UPDATE seednode_version_stats SET score = 0.2 WHERE version LIKE '%{commithash}%' AND timestamp < {end_time} AND timestamp > {start_time};"
+        CURSOR.execute(sql)
+        CONN.commit()
+
 
 def get_version_stats_from_pgsql_db():
     sql = f"SELECT * FROM seednode_version_stats;"
     CURSOR.execute(sql)
     return get_results_or_none(CURSOR)
+
+
+def get_version_list_from_pgsql_db():
+    sql = f"SELECT DISTINCT version FROM seednode_version_stats;"
+    CURSOR.execute(sql)
+    return get_results_or_none(CURSOR)
+
 
 def get_pgsql_latest():
     sql = f"SELECT MAX(timestamp) FROM seednode_version_stats;"
@@ -256,9 +312,7 @@ def migrate_sqlite_to_pgsql(ts):
             update_seednode_version_stats_row(row_data)
 
 def import_seednode_stats(season):
-    url = get_seednode_stats_url(season)
-    print(url)
-    resp = requests.get(url).json()
+    resp = requests.get("http://stats.kmd.io/api/source/seednode_version_stats/").json()
 
     for i in resp["results"]:
         row_data = (i["name"], i["season"], i["version"], i["timestamp"], i["error"], i["score"])
@@ -317,8 +371,18 @@ if __name__ == '__main__':
 
         # outputs pgSQL data
         elif sys.argv[1] == 'pgsql_data':
-            pgsql_version_stats = get_version_stats_from_pgsql_db(0)
+            pgsql_version_stats = get_version_stats_from_pgsql_db()
             print(f"pgsql_version_stats: {pgsql_version_stats}")
+
+        # outputs pgSQL data
+        elif sys.argv[1] == 'versions_list':
+            pgsql_version_list = get_version_list_from_pgsql_db()
+            print(f"pgsql_version_list: {pgsql_version_list}")
+
+        # outputs pgSQL data
+        elif sys.argv[1] == 'rectify_scores':
+            result = rectify_scores()
+            print(f"{result} scores recitified")
 
         # tests WSS connection
         elif sys.argv[1] == 'wss_test':

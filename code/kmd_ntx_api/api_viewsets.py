@@ -174,8 +174,8 @@ class mm2VersionStatsViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = filters.seednodeVersionStatsFilter
     filterset_fields = ['name', 'season', 'version', 'score']
-    ordering_fields = ['-timestamp']
-    ordering = ['name', 'season']
+    ordering_fields = ['name', 'season', '-timestamp']
+    ordering = ['name', 'season', '-timestamp']
 
 
 class nnBtcTxViewSet(viewsets.ModelViewSet):
