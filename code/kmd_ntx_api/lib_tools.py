@@ -80,6 +80,7 @@ def get_utxos(coin, pubkey):
         address = b58.calc_addr_from_pubkey(coin, pubkey)
         block_tip = dexstats.get_sync(coin)["height"]
         resp = dexstats.get_dexstats_utxos(coin, address)
+        print(resp)
 
         utxos = []
         utxo_count = 0

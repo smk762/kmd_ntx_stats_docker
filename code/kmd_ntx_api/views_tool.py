@@ -66,11 +66,16 @@ def create_raw_transaction_view(request):
     if address:
         rewards_resp = tools.get_kmd_rewards(request)["results"]
         utxos = dexstats.get_dexstats_utxos(coin, address)
+        has_error = False
+        if isinstance(utxos, str):
+            has_error = True
+            messages.error(request, f"Error getting utxos: {utxos}")
 
         if helper.has_error(rewards_resp):
-            messages.error(request, rewards_resp["error"])
+            has_error = True
+            messages.error(request, f"Error getting utxos: {rewards_resp['error']}")
 
-        else:
+        if not has_error:
             for utxo in utxos:
                 if utxo["txid"] in rewards_resp["utxo_list"]:
                     for rutxo in rewards_resp["utxos"]:

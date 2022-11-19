@@ -60,7 +60,10 @@ def get_run_branch(run_url):
         return r.json()['head_branch']
     return None
 
-def get_github_folder_contents(owner, repo, path):
-    r = gh.get(f"https://api.github.com/repos/{owner}/{repo}/contents/{path}")
+def get_github_folder_contents(owner, repo, path, branch=None):
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
+    if branch:
+        url += f"?ref={branch}"
+    r = gh.get(url)
     return r.json()
     
