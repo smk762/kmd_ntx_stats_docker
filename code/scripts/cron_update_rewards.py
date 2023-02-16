@@ -26,6 +26,11 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "rescan":
             START_AT = 1
+        if sys.argv[1] == "import":
+            print("Importing rewards data...")
+            lib_wallet.import_rewards()
+            print("Rewards data import complete...")
+            sys.exit()
 
     lib_wallet.scan_rewards(TIP)
 

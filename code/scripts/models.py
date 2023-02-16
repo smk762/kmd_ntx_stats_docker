@@ -1318,11 +1318,14 @@ class rewards_tx_row():
 
 
     def validated(self):
-        for i in [self.txid, self.block_hash, self.block_height,
+        row_list = [self.txid, self.block_hash, self.block_height,
                   self.block_time, self.block_datetime,
                   self.sum_of_inputs, self.sum_of_outputs, self.address,
-                  self.rewards_value, self.btc_price, self.usd_price]:
+                  self.rewards_value, self.btc_price, self.usd_price]
+        for i in row_list:
             if i == '':
+                logger.warning(f"Row list index {row_list.index(i)} is empty!")
+
                 return False
         return True
 
