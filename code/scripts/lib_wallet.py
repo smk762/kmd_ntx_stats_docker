@@ -99,7 +99,23 @@ def delete_stale_balances():
 def import_rewards():
     existing_rewards_txids = lib_query.get_reward_txids()
     print(f"rewards txids in DB: {len(reward_blocks)}")
-    external_rewards_txids = requests.get("http://stats.kmd.io/api/wallet/rewards_txids/").json()
+    external_rewards_txids = requests.get("http://stats.kmd.io/api/wallet/rewards_txids/").json()["results"]
+    txids_to_import = set(external_rewards_txids) - set(external_rewards_txids)
+    for txid in txids_to_import:
+        data = requests.get("http://stats.kmd.io/api/wallet/rewards_txids/").json()["results"]
+
+        row = rewards_tx_row()
+        row.txid = data["txid"]
+        row.block_hash = data["block_hash"]
+        row.block_height = data["block_height"]
+        row.block_time = data["block_time"]
+        row.sum_of_inputs = data["sum_of_inputs"]
+        row.address = data["address"]
+        row.sum_of_outputs = data["sum_of_outputs"]
+        row.rewards_value = data["rewards_value"]
+        row.usd_price = data["usd_price"]
+        row.btc_price = data["btc_price"]
+        row.update()
     
 
 def scan_rewards(TIP, coin="KMD"):

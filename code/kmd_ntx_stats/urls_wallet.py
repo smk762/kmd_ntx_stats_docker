@@ -22,5 +22,9 @@ api_wallet_urls = [
 
     path('api/wallet/rewards_txids/',
           api_wallet.rewards_txids_wallet,
-          name='rewards_txids_wallet')
+          name='rewards_txids_wallet'),
+
+    path('api/wallet/rewards_txid/',
+          api_wallet.rewards_txid_wallet,
+          name='rewards_txid_wallet')
 ]

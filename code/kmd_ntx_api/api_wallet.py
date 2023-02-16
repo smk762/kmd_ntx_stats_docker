@@ -14,6 +14,14 @@ def rewards_txids_wallet(request):
 
     return JsonResponse(resp, safe=False)
 
+def rewards_txid_wallet(request):
+    data = wallet.get_rewards_txid(request).values()
+    resp = {}
+    for i in data:
+        resp.update({"results":i})
+
+    return JsonResponse(resp, safe=False)
+
 def notary_addresses_wallet(request):
     data = wallet.get_source_addresses(request).values()
     resp = {}
