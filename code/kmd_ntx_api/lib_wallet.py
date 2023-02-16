@@ -23,3 +23,8 @@ def get_source_balances(request):
 def get_distinct_rewards_txids(request):
     q = models.rewards_tx.objects.all()
     return query.get_distinct_filters(q, ["txid"])
+
+def get_rewards_txid(request):
+    if 'txid' in request.GET:
+        return models.rewards_tx.objects.filter(txid=request.GET['txid'])
+    return {"error": "No txid param!"}
