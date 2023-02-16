@@ -98,24 +98,15 @@ def delete_stale_balances():
 
 def import_rewards():
     existing_rewards_txids = lib_query.get_reward_txids()
-    print(f"rewards txids in DB: {len(reward_blocks)}")
+    logger.info(f"Rewards txids in local DB: {len(existing_rewards_txids)}")
     external_rewards_txids = requests.get("http://stats.kmd.io/api/wallet/rewards_txids/").json()["results"]
-    txids_to_import = set(external_rewards_txids) - set(external_rewards_txids)
+    logger.info(f"Rewards txids in remote DB: {len(external_rewards_txids)}")
+    txids_to_import = set(external_rewards_txids) - set(existing_rewards_txids)
+    logger.info(f"Rewards txids to import: {len(txids_to_import)}")
     for txid in txids_to_import:
-        data = requests.get("http://stats.kmd.io/api/wallet/rewards_txids/").json()["results"]
-
-        row = rewards_tx_row()
-        row.txid = data["txid"]
-        row.block_hash = data["block_hash"]
-        row.block_height = data["block_height"]
-        row.block_time = data["block_time"]
-        row.sum_of_inputs = data["sum_of_inputs"]
-        row.address = data["address"]
-        row.sum_of_outputs = data["sum_of_outputs"]
-        row.rewards_value = data["rewards_value"]
-        row.usd_price = data["usd_price"]
-        row.btc_price = data["btc_price"]
-        row.update()
+        url = f"http://stats.kmd.io/api/wallet/rewards_txid/?txid={txid}"
+        data = requests.get(url).json()["results"]
+        check_tx_for_rewards_info("KMD", txid)
     
 
 def scan_rewards(TIP, coin="KMD"):
@@ -123,31 +114,31 @@ def scan_rewards(TIP, coin="KMD"):
         with open(f"{script_path}/prices_history.json", "r") as j:
             prices = json.load(j)
     except Exception as e:
-        print(e)
+        logger.warning(e)
         prices = {}
 
     try:
         with open(f"{script_path}/scanned_blocks.json", "r") as j:
             scanned_blocks = json.load(j)
     except Exception as e:
-        print(e)
+        logger.warning(e)
         scanned_blocks = {}
     if "scanned_blocks" not in scanned_blocks: scanned_blocks.update({"scanned_blocks": []})
 
-    print(f"Previously Scanned Blocks: {len(scanned_blocks['scanned_blocks'])}")
+    logger.info(f"Previously Scanned Blocks: {len(scanned_blocks['scanned_blocks'])}")
     reward_blocks = lib_query.get_reward_blocks()
-    print(f"Blocks in DB: {len(reward_blocks)}")
+    logger.info(f"Blocks in DB: {len(reward_blocks)}")
     scan_blocks = list(set([*range(1, TIP)]) - set(reward_blocks) - set(scanned_blocks['scanned_blocks']))
-    print(f"Blocks left to scan: {len(scan_blocks)}")
+    logger.info(f"Blocks left to scan: {len(scan_blocks)}")
     scan_blocks.sort()
     chunk_starts_at = choice(scan_blocks)
     # shuffle(scan_blocks)
     review_blocks = []
     # get random subset to process
     scan_blocks = scan_blocks[chunk_starts_at:chunk_starts_at+50]
-    print(f"Scanning these blocks now: {scan_blocks}")
+    logger.info(f"Scanning these blocks now: {scan_blocks}")
     for block_height in scan_blocks:
-        print(f"Block Height: {block_height}")
+        logger.info(f"Block Height: {block_height}")
 
         block = RPC[coin].getblock(str(block_height))
         block_time = block["time"]
@@ -172,68 +163,12 @@ def scan_rewards(TIP, coin="KMD"):
                 prices[season][f"{date}"].update({"btc":0,"usd":0})
 
         for txid in block["tx"]:
-            tx_data = RPC[coin].getrawtransaction(txid, 1)
-            sum_of_inputs = 0
-            sum_of_outputs = 0
-            rewards_value = 0
-
-            
-            output_addresses = []
-            address_inputs = {}
-
-            for vin in tx_data["vin"]:
-                coinbase = False
-                
-                if "coinbase" in vin:
-                    coinbase = True
-                    break
-
-                if "value" in vin:
-                    sum_of_inputs += float(vin["value"])
-                    if vin["address"] not in address_inputs:
-                        address_inputs.update({vin["address"]:0})
-
-                    address_inputs[vin["address"]] += float(vin["value"])
-
-            input_addresses = list(address_inputs.keys())
-            for vout in tx_data["vout"]:
-                sum_of_outputs += float(vout["value"])
-
-                if "scriptPubKey" in vout:
-                    if "addresses" in vout["scriptPubKey"]:
-                        output_addresses = vout["scriptPubKey"]["addresses"]
-
-            for address in output_addresses:
-                if address in input_addresses:
-
-                    # If coinbase, anything over 3 is an unclaimed reward, gained by miner.
-                    if coinbase:
-                        rewards_value = sum_of_outputs - 3
-                    elif len(output_addresses) == 1  and len(input_addresses) == 1 and output_addresses[0] == input_addresses[0]:
-                        rewards_value = float(vout["value"]) - address_inputs[address]
-                    else:
-                        rewards_value = sum_of_outputs - sum_of_inputs
-                        outputs_in_inputs = list(set(output_addresses).intersection(set(input_addresses)))
-                        address = outputs_in_inputs[-1]
-
-                    if rewards_value > 0:
-                        row = rewards_tx_row()
-                        row.txid = txid
-                        row.block_hash = block["hash"]
-                        row.block_height = block_height
-                        row.block_time = block_time
-                        row.sum_of_inputs = sum_of_inputs
-                        row.address = address
-                        row.sum_of_outputs = sum_of_outputs
-                        row.rewards_value = rewards_value
-                        row.usd_price = Decimal(prices[season][date]['usd'])
-                        row.btc_price = Decimal(prices[season][date]['btc'])
-                        row.update()
+            check_tx_for_rewards_info(coin, txid, block, prices)
 
         if block_height not in review_blocks:
             scanned_blocks["scanned_blocks"].append(block_height)
 
-    logger.info("[process_mined_aggregates] Finished!")
+    logger.info("[scan_rewards] Finished!")
     logger.info(f"review_blocks: {review_blocks}")
 
     with open(f"{script_path}/prices_history.json", "w+") as j:
@@ -244,12 +179,122 @@ def scan_rewards(TIP, coin="KMD"):
         json.dump(scanned_blocks, j, indent=4)
 
 
+def check_tx_for_rewards_info(coin, txid, block=None, prices=None):
+    # logger.info(f"Checking {txid} for rewards...")
+    tx_data = RPC[coin].getrawtransaction(txid, 1)
+    if not block:
+        if "blocktime" in tx_data:
+            block_hash = tx_data["blockhash"]
+            block_time = tx_data["blocktime"]
+            block_height = tx_data["height"]
+        else:
+            # logger.info(f"txid {txid} is unconfirmed...")
+            return
+    else:
+        block_hash = block["hash"]
+        block_time = block["time"]
+        block_height = block["height"]
+    season = lib_validate.get_season(block_time)
+    date = str(dt.utcfromtimestamp(block_time)).split(" ")[0]
+    date = f"{date}".split("-")
+    date.reverse()
+    date = "-".join(date)      
+    sum_of_inputs = 0
+    sum_of_outputs = 0
+    rewards_value = 0
+
+    if not prices:
+        try:
+            with open(f"{script_path}/prices_history.json", "r") as j:
+                prices = json.load(j)
+        except Exception as e:
+            logger.warning(e)
+            prices = {}
+
+        if season not in prices:
+            prices.update({season: {}})
+
+        if f"{date}" not in prices[season]:
+            prices[season].update({f"{date}": {}})
+
+        if 'btc' not in prices[season][f"{date}"]:
+            api_prices = api.get_kmd_price(date)
+            if api_prices:
+                prices[season][f"{date}"].update(api_prices)
+
+                with open(f"{script_path}/prices_history.json", "w+") as j:
+                    json.dump(prices, j, indent=4)
+
+                time.sleep(1)
+            else:
+                prices[season][f"{date}"].update({"btc":0,"usd":0})
+
+
+    output_addresses = []
+    address_inputs = {}
+
+    for vin in tx_data["vin"]:
+        coinbase = False
+
+        # We can include coinbase tx, but need another coumn to tag them
+        if "coinbase" in vin:
+            coinbase = True
+            # logger.info(f"{txid} is a coinbase tx, skipping...")
+            return            
+
+        if "value" in vin:
+            sum_of_inputs += float(vin["value"])
+            if vin["address"] not in address_inputs:
+                address_inputs.update({vin["address"]:0})
+
+            address_inputs[vin["address"]] += float(vin["value"])
+
+    input_addresses = list(address_inputs.keys())
+    for vout in tx_data["vout"]:
+        sum_of_outputs += float(vout["value"])
+
+        if "scriptPubKey" in vout:
+            if "addresses" in vout["scriptPubKey"]:
+                output_addresses = vout["scriptPubKey"]["addresses"]
+
+    for address in output_addresses:
+        if address in input_addresses:
+
+            # If coinbase, anything over 3 is an unclaimed reward, gained by miner.
+            if coinbase:
+                rewards_value = sum_of_outputs - 3
+            elif len(output_addresses) == 1  and len(input_addresses) == 1 and output_addresses[0] == input_addresses[0]:
+                rewards_value = float(vout["value"]) - address_inputs[address]
+            else:
+                rewards_value = sum_of_outputs - sum_of_inputs
+                outputs_in_inputs = list(set(output_addresses).intersection(set(input_addresses)))
+                address = outputs_in_inputs[-1]
+
+            if rewards_value > 0:
+                row = rewards_tx_row()
+                row.txid = txid
+                row.block_hash = block["hash"]
+                row.block_height = block_height
+                row.block_time = block_time
+                row.sum_of_inputs = sum_of_inputs
+                row.address = address
+                row.sum_of_outputs = sum_of_outputs
+                row.rewards_value = rewards_value
+                row.usd_price = Decimal(prices[season][date]['usd'])
+                row.btc_price = Decimal(prices[season][date]['btc'])
+                row.update()
+                logger.info(f"Row for {txid} rewards added...")
+                return
+    # logger.info(f"No rewards for {txid}...")
+
+
+
 def populate_prices(table, date_field, timestamp=False):
     try:
         with open(f"{script_path}/prices_history.json", "r") as j:
             prices = json.load(j)
     except Exception as e:
-        print(e)
+        logger.warning(e)
         prices = {}
 
     for season in prices:
