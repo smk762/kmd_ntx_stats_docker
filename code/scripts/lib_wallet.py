@@ -99,17 +99,18 @@ def delete_stale_balances():
 def import_rewards():
     existing_rewards_txids = lib_query.get_reward_txids()
     logger.info(f"Rewards txids in local DB: {len(existing_rewards_txids)}")
-    external_rewards_txids = requests.get("http://stats.kmd.io/api/wallet/rewards_txids/").json()["results"]
+    url = get_rewards_txids_url()
+    external_rewards_txids = requests.get(url).json()["results"]
     logger.info(f"Rewards txids in remote DB: {len(external_rewards_txids)}")
     txids_to_import = set(external_rewards_txids) - set(existing_rewards_txids)
     logger.info(f"Rewards txids to import: {len(txids_to_import)}")
     for txid in txids_to_import:
-        url = f"http://stats.kmd.io/api/wallet/rewards_txid/?txid={txid}"
+        url = url = get_rewards_txid_url(txid)
         data = requests.get(url).json()["results"]
         check_tx_for_rewards_info("KMD", txid)
     
 
-def scan_rewards(TIP, coin="KMD"):
+def scan_rewards(TIP, coin="KMD", rescan=False):
     try:
         with open(f"{script_path}/prices_history.json", "r") as j:
             prices = json.load(j)
@@ -131,11 +132,16 @@ def scan_rewards(TIP, coin="KMD"):
     scan_blocks = list(set([*range(1, TIP)]) - set(reward_blocks) - set(scanned_blocks['scanned_blocks']))
     logger.info(f"Blocks left to scan: {len(scan_blocks)}")
     scan_blocks.sort()
-    chunk_starts_at = choice(scan_blocks)
+    scan_blocks.reverse()
+    if rescan:
+        chunk_starts_at = choice(scan_blocks)
+        scan_blocks = scan_blocks[chunk_starts_at:chunk_starts_at+50]
+    else:
+        scan_blocks = scan_blocks[:50]
     # shuffle(scan_blocks)
     review_blocks = []
     # get random subset to process
-    scan_blocks = scan_blocks[chunk_starts_at:chunk_starts_at+50]
+    
     logger.info(f"Scanning these blocks now: {scan_blocks}")
     for block_height in scan_blocks:
         logger.info(f"Block Height: {block_height}")
