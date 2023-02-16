@@ -20,7 +20,15 @@ def get_ntxid_list_url(season, server, coin, local=True):
     url = f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&coin={coin}"
     print(url)
     return url
+
+def get_rewards_txids_url(local=False):
+    api_server = get_api_server(local)
+    return f"{api_server}/api/wallet/rewards_txids"
     
+def get_rewards_txid_url(txid, local=False):
+    api_server = get_api_server(local)
+    return f"{api_server}/api/wallet/rewards_txids/?txid={txid}"
+
 
 def get_notarised_txid_url(txid, local=True):
     api_server = get_api_server(local)
