@@ -20,4 +20,7 @@ api_wallet_urls = [
           api_wallet.notary_balances_wallet,
           name='notary_balances_wallet'),
 
+    path('api/wallet/rewards_txids/',
+          api_wallet.rewards_txids_wallet,
+          name='rewards_txids_wallet')
 ]

@@ -16,15 +16,19 @@ Tables updated:
 
 @print_runtime
 def run_updates(seasons):
-    for season in seasons:
-        print(f"Getting mined blocks for {season}")
-        if RESCAN_SEASON:
-            update_mined_table(season, "KMD", SEASONS_INFO[season]["start_block"])
-            update_mined_count_daily_table(season, True)
-        else:
-            update_mined_table(season)
-            update_mined_count_daily_table(season)
-        update_mined_count_season_table(season)
+    if seasons == "since_genesis":
+        update_mined_table("since_genesis", "KMD", 1)
+        update_mined_count_daily_table("since_genesis", True, True)
+    else:
+        for season in seasons:
+            print(f"Getting mined blocks for {season}")
+            if RESCAN_SEASON:
+                update_mined_table(season, "KMD", SEASONS_INFO[season]["start_block"])
+                update_mined_count_daily_table(season, True)
+            else:
+                update_mined_table(season)
+                update_mined_count_daily_table(season)
+            update_mined_count_season_table(season)
 
 if __name__ == "__main__":
         
@@ -35,5 +39,8 @@ if __name__ == "__main__":
 
         if sys.argv[1] == "all":
             seasons = SEASONS_INFO.keys()
+
+        if sys.argv[1] == "since_genesis":
+            seasons = "since_genesis"
 
     run_updates(seasons)

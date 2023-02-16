@@ -13,6 +13,33 @@ def get_mined_date_aggregates(day):
     CURSOR.execute(sql)
     return helper.get_results_or_none(CURSOR)
 
+
+def get_mined_year_aggregates(year):
+    sql = "SELECT COUNT(*), SUM(value) FROM mined WHERE \
+           DATE_PART('year', block_datetime) = '"+str(year)+"';"
+    CURSOR.execute(sql)
+    return helper.get_results_or_none(CURSOR)
+
+
+def get_rewards_year_aggregates(year):
+    sql = "SELECT COUNT(*), SUM(rewards_value) FROM rewards_tx WHERE \
+           DATE_PART('year', block_datetime) = '"+str(year)+"';"
+    CURSOR.execute(sql)
+    return helper.get_results_or_none(CURSOR)
+
+
+def get_mined_since_genesis():
+    sql = "SELECT COUNT(*), SUM(value) FROM mined;"
+    CURSOR.execute(sql)
+    return helper.get_results_or_none(CURSOR)
+
+
+def get_rewards_since_genesis():
+    sql = "SELECT COUNT(*), SUM(rewards_value) FROM rewards_tx;"
+    CURSOR.execute(sql)
+    return helper.get_results_or_none(CURSOR)
+
+
 def get_epochs(season=None, server=None, epoch=None):
     sql = "SELECT season, server, epoch, epoch_start, epoch_end, \
                     start_event, end_event, epoch_coins,  score_per_ntx \
@@ -208,6 +235,22 @@ def get_reward_blocks():
         
     except Exception as e:
         logger.warning(f"No [get_reward_blocks] results? {e}")
+
+    return resp
+
+
+def get_reward_txids():
+    resp = []
+    CURSOR.execute("SELECT DISTINCT txid FROM rewards_tx;")
+    try:
+        results = CURSOR.fetchall()
+        for result in results:
+            resp.append(result[0])
+        resp.sort()
+        resp.reverse()
+        
+    except Exception as e:
+        logger.warning(f"No [get_reward_txids] results? {e}")
 
     return resp
 

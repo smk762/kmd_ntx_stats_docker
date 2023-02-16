@@ -6,6 +6,13 @@ import kmd_ntx_api.lib_helper as helper
 
 # Season > Server > Notary > Coin
 
+def rewards_txids_wallet(request):
+    data = wallet.get_distinct_rewards_txids(request).values()
+    resp = {}
+    for i in data:
+        resp.update({"results":i})
+
+    return JsonResponse(resp, safe=False)
 
 def notary_addresses_wallet(request):
     data = wallet.get_source_addresses(request).values()

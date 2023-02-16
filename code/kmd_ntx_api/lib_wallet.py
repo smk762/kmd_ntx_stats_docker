@@ -19,3 +19,7 @@ def get_source_balances(request):
     coin = helper.get_or_none(request, "coin")
     notary = helper.get_or_none(request, "notary")
     return query.get_balances_data(season, server, coin, notary)
+
+def get_distinct_rewards_txids(request):
+    q = models.rewards_tx.objects.all()
+    return query.get_distinct_filters(q, ["txid"])

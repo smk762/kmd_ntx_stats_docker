@@ -66,23 +66,29 @@ def get_p2pkh_scripthash_from_pubkey(pubkey):
 
 
 def get_full_electrum_balance(url, port, address=None, pubkey=None):
+    p2pkh_confirmed_balance = 0
+    p2pkh_unconfirmed_balance = 0
+    p2pk_confirmed_balance = 0
+    p2pk_unconfirmed_balance = 0
     if pubkey:
         p2pk_scripthash = get_p2pk_scripthash_from_pubkey(pubkey)
         p2pkh_scripthash = get_p2pkh_scripthash_from_pubkey(pubkey)
         p2pkh_resp = get_from_electrum(
             url, port, 'blockchain.scripthash.get_balance', p2pkh_scripthash)
-        p2pkh_confirmed_balance = p2pkh_resp['result']['confirmed']
-        p2pkh_unconfirmed_balance = p2pkh_resp['result']['unconfirmed']
+        if 'result' in p2pkh_resp:
+            if 'confirmed' in p2pkh_resp['result']:
+                p2pkh_confirmed_balance = p2pkh_resp['result']['confirmed']
+                p2pkh_unconfirmed_balance = p2pkh_resp['result']['unconfirmed']
     elif address:
         p2pk_scripthash = get_p2pkh_scripthash_from_address(address)
-        p2pkh_confirmed_balance = 0
-        p2pkh_unconfirmed_balance = 0
     else:
         return -1
     p2pk_resp = get_from_electrum(
         url, port, 'blockchain.scripthash.get_balance', p2pk_scripthash)
-    p2pk_confirmed_balance = p2pk_resp['result']['confirmed']
-    p2pk_unconfirmed_balance = p2pk_resp['result']['unconfirmed']
+    if 'result' in p2pk_resp:
+        if not isinstance(p2pk_resp['result'], int):
+            p2pk_confirmed_balance = p2pk_resp['result']['confirmed']
+            p2pk_unconfirmed_balance = p2pk_resp['result']['unconfirmed']
 
     total_confirmed = p2pk_confirmed_balance + p2pkh_confirmed_balance
     total_unconfirmed = p2pk_unconfirmed_balance + p2pkh_unconfirmed_balance
