@@ -34,4 +34,4 @@ def puzzles_view(request):
         "page_title":"Cryptopuzzles!",
         "puzzles": puzzles
     })
-    return render(request, 'community/cryptopuzzles.html', context)
+    return render(request, 'views/community/cryptopuzzles.html', context)

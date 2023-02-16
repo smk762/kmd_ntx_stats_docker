@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
   
 services:
 
@@ -7,6 +7,8 @@ services:
     build: 
       context: mm2
       dockerfile: Dockerfile
+      shm_size: '2gb'
+
 
     volumes:
       - ./mm2:/mm2
@@ -27,6 +29,7 @@ services:
     restart: always
     network_mode: "host"
     image: komodoofficial/komodo:cd_release_fb4b355_master
+    shm_size: '2gb'
 
     volumes:
       - ./code:/code
@@ -46,6 +49,7 @@ services:
   db:
     image: postgres
     restart: always
+    shm_size: '2gb'
 
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
@@ -71,6 +75,7 @@ services:
   web:
     build: 
       context: .
+      shm_size: '2gb'
       args:
         requirements: requirements/dev.txt
     environment:

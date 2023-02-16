@@ -31,6 +31,19 @@ def connect_db():
 CONN = connect_db()
 CURSOR = CONN.cursor()
 
+
+def get_table_names(cursor):
+    sql = "SELECT tablename FROM pg_catalog.pg_tables \
+           WHERE schemaname != 'pg_catalog' \
+           AND schemaname != 'information_schema';"
+    cursor.execute(sql)
+    tables = cursor.fetchall()
+    tables_list = []
+    for table in tables:
+        tables_list.append(table[0])
+    return tables_list
+
+
 try:
     ext_mydb = mysql.connector.connect(
       host=os.getenv("ext_hostname"),

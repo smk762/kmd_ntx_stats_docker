@@ -3,6 +3,7 @@ import os
 import time
 import json
 from decimal import *
+from random import shuffle, choice
 from datetime import datetime as dt
 import lib_api as api
 import lib_validate
@@ -95,6 +96,12 @@ def delete_stale_balances():
     CONN.commit()
 
 
+def import_rewards():
+    existing_rewards_txids = lib_query.get_reward_txids()
+    print(f"rewards txids in DB: {len(reward_blocks)}")
+    external_rewards_txids = requests.get("http://stats.kmd.io/api/wallet/rewards_txids/").json()
+    
+
 def scan_rewards(TIP, coin="KMD"):
     try:
         with open(f"{script_path}/prices_history.json", "r") as j:
@@ -111,13 +118,18 @@ def scan_rewards(TIP, coin="KMD"):
         scanned_blocks = {}
     if "scanned_blocks" not in scanned_blocks: scanned_blocks.update({"scanned_blocks": []})
 
-    print(f"Scanned: {len(scanned_blocks['scanned_blocks'])}")
+    print(f"Previously Scanned Blocks: {len(scanned_blocks['scanned_blocks'])}")
     reward_blocks = lib_query.get_reward_blocks()
+    print(f"Blocks in DB: {len(reward_blocks)}")
     scan_blocks = list(set([*range(1, TIP)]) - set(reward_blocks) - set(scanned_blocks['scanned_blocks']))
+    print(f"Blocks left to scan: {len(scan_blocks)}")
     scan_blocks.sort()
-    scan_blocks.reverse()
+    chunk_starts_at = choice(scan_blocks)
+    # shuffle(scan_blocks)
     review_blocks = []
-    scan_blocks = scan_blocks[:3500]
+    # get random subset to process
+    scan_blocks = scan_blocks[chunk_starts_at:chunk_starts_at+50]
+    print(f"Scanning these blocks now: {scan_blocks}")
     for block_height in scan_blocks:
         print(f"Block Height: {block_height}")
 
@@ -141,7 +153,7 @@ def scan_rewards(TIP, coin="KMD"):
                 prices[season][f"{date}"].update(api_prices)
                 time.sleep(1)
             else:
-                break
+                prices[season][f"{date}"].update({"btc":0,"usd":0})
 
         for txid in block["tx"]:
             tx_data = RPC[coin].getrawtransaction(txid, 1)

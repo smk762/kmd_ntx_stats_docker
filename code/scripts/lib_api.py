@@ -33,7 +33,7 @@ def get_kmd_price(date):
     try:
         return r.json()["market_data"]["current_price"]
     except:
-        print (r.text)
+        print (f"get_kmd_price: {r.text}")
         return False
   
 

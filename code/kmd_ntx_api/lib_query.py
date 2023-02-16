@@ -102,10 +102,9 @@ def get_distinct_filters(queryset, filters=None, exclude=None, season=None):
         distinct.update({'season': y})
         queryset = queryset.filter(season=season)
 
-    print(distinct)
     for x in filters:
         if x not in exclude and x != 'season':
-            print(x)
+            logger.debug(f"Distinct filter: {x}")
             if x == "year":
                 y = ['2022', "2021", "2020", "2019", "2018", "2017", "2016"]
             elif x == "month":
