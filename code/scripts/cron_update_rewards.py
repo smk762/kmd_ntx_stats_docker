@@ -23,16 +23,23 @@ if __name__ == "__main__":
     TIP = int(lib_rpc.RPC["KMD"].getblockcount())
 
     if len(sys.argv) > 1:
+        if sys.argv[1] == "ascending":
+            lib_wallet.scan_rewards(TIP, "KMD", False, True)
         if sys.argv[1] == "rescan":
-            lib_wallet.scan_rewards(TIP, "KMD", True)
+            lib_wallet.scan_rewards(TIP, "KMD", True, False)
+        if sys.argv[1] == "rescan_ascending":
+            lib_wallet.scan_rewards(TIP, "KMD", True, True)
+        elif sys.argv[1] == "rescan_existing":
+            print("Recanning existing rewards data...")
+            lib_wallet.rescan_rewards_blocks()
         elif sys.argv[1] == "import":
             print("Importing rewards data...")
             lib_wallet.import_rewards()
             print("Rewards data import complete...")
         else:
-            print(f"Unrecogised param {sys.argv[1]}. Use 'rescan' or 'import'")
+            print(f"Unrecogised param {sys.argv[1]}. Use 'ascending', 'rescan', 'rescan_existing', 'rescan_ascending', or 'import'")
     else:
-        lib_wallet.scan_rewards(TIP)
+        lib_wallet.scan_rewards(TIP, "KMD", False, False)
 
     # print(f"Unique reward claiming addresses in db: {len(analyse_reward_input_addresses())}")
 

@@ -688,6 +688,14 @@ def get_activation_commands(request):
         return resp_json
 
 
+def get_coin_activation_commands(request):
+    coin_commands = {}
+    protocol_commands = get_activation_commands(request)["commands"]
+    for protocol in protocol_commands:
+        for coin in protocol_commands[protocol]:
+            coin_commands.update({coin: protocol_commands[protocol][coin]})
+    return coin_commands
+
 #### SEEDNODES 
 
 def get_active_mm2_versions(ts):

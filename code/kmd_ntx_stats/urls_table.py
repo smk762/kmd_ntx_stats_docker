@@ -74,6 +74,10 @@ frontend_table_urls = [
 api_table_urls = [
 
     # API TABLES V2
+    path('api/table/kmd_supply/',
+          api_table.kmd_supply_table_api,
+          name='kmd_supply_table_api'),
+
     path('api/table/addresses/',
           api_table.addresses_table_api,
           name='addresses_table_api'),

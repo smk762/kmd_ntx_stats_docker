@@ -21,9 +21,11 @@ def get_ntxid_list_url(season, server, coin, local=True):
     print(url)
     return url
 
+
 def get_rewards_txids_url(local=False):
     api_server = get_api_server(local)
     return f"{api_server}/api/wallet/rewards_txids"
+
     
 def get_rewards_txid_url(txid, local=False):
     api_server = get_api_server(local)

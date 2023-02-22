@@ -61,6 +61,10 @@ api_atomicdex_urls = [
           api_atomicdex.activation_commands_api,
           name='activation_commands_api'),
 
+    path('api/atomicdex/coin_activation_commands/',
+          api_atomicdex.coin_activation_commands_api,
+          name='coin_activation_commands_api'),
+
     path('api/atomicdex/orderbook/',
          api_atomicdex.orderbook_api,
          name='orderbook_api'),

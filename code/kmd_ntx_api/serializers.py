@@ -222,6 +222,12 @@ class serverNtxSeasonSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['season', 'server', 'server_data', 'timestamp']
 
 
+class kmdSupplySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = kmd_supply
+        fields = ['block_time', 'block_height', 'total_supply']
+
+
 class swapsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = swaps

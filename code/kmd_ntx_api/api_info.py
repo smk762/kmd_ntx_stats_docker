@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import kmd_ntx_api.lib_info as info
+import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_helper as helper
 
 
@@ -12,6 +13,20 @@ def api_index(request):
 def pages_index(request):
     resp = info.get_pages_index(request)
     filters = ['category', 'sidebar']
+    return helper.json_resp(resp, filters)
+
+
+def mined_between_blocks(request):
+    resp = info.get_mined_between_blocks(request)
+    filters = ['min_block', 'max_block']
+    print(f"======================================  {resp}")
+    return helper.json_resp(resp, filters)
+
+
+def mined_between_blocktimes(request):
+    resp = info.get_mined_between_blocktimes(request)
+    filters = ['min_blocktime', 'max_blocktime']
+    print(f"======================================  {resp}")
     return helper.json_resp(resp, filters)
 
 
@@ -148,6 +163,13 @@ def notary_btc_transactions(request):
     return helper.json_resp(resp, filters)
 
     
+def notarised_txid(request):
+    resp = info.get_notarised_txid(request)
+    print(resp)
+    filters = ['txid']
+    return helper.json_resp(resp, filters)
+
+
 def notary_btc_txid(request):
     resp = info.get_notary_btc_txid(request)
     filters = ['txid']

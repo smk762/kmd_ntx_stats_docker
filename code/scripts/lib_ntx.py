@@ -22,19 +22,22 @@ class notarised():
         self.season = season
         self.rescan = rescan
         self.start_block = SEASONS_INFO[self.season]["start_block"]
+        self.chain_tip = int(RPC["KMD"].getblockcount())
+        self.existing_txids = query.get_existing_notarised_txids()
+
+        # Set end block for season
         if "post_season_end_block" in SEASONS_INFO[self.season]:
             self.end_block = SEASONS_INFO[self.season]["post_season_end_block"]
         else:    
             self.end_block = SEASONS_INFO[self.season]["end_block"]
-        self.chain_tip = int(RPC["KMD"].getblockcount())
 
         if not self.rescan:
-            self.start_block = self.chain_tip - 24 * 60 * 3
-        else:
-            self.end_block = self.start_block + 15* 24 * 60
+            # scan last hour's worth of blocks by default
+            self.start_block = self.chain_tip - 24 * 60
 
         if self.end_block <= self.chain_tip:
             self.chain_tip = self.end_block
+
 
 
     @print_runtime
@@ -56,6 +59,8 @@ class notarised():
                 unrecorded_KMD_txids = self.get_missing_txids_list(window[0], window[1])
                 self.update_notarisations(unrecorded_KMD_txids)
                 windows.remove(window)
+                self.existing_txids += unrecorded_KMD_txids
+                time.sleep(0.1)
 
 
     @print_runtime
@@ -64,13 +69,14 @@ class notarised():
 
         all_txids = []
         while self.chain_tip - start > RESCAN_CHUNK_SIZE:
-            logger.info(f"{self.start_block} to {self.start_block + RESCAN_CHUNK_SIZE}...")
+            logger.info(f"Adding {self.start_block} to {self.start_block + RESCAN_CHUNK_SIZE} ntx address txids...")
             all_txids += rpc.get_ntx_txids(start, start + RESCAN_CHUNK_SIZE)
             start += RESCAN_CHUNK_SIZE
+            time.sleep(0.1)
 
         all_txids += rpc.get_ntx_txids(start, self.chain_tip)
-        existing_txids = query.get_existing_notarised_txids()
-        new_txids = list(set(all_txids) - set(existing_txids))
+
+        new_txids = list(set(all_txids) - set(self.existing_txids))
         logger.info(f"New TXIDs: {len(new_txids)}")
         random.shuffle(new_txids)
         return new_txids
@@ -176,8 +182,8 @@ class notarised():
                                 #  This ignores them)
                                 if coin.upper() == coin:
                                     row_data = (coin, this_block_height, block_time, block_datetime,
-                                                block_hash, notary_list, address_list, ac_ntx_blockhash, ac_ntx_height,
-                                                txid, opret, "N/A")
+                                                block_hash, notary_list, address_list, ac_ntx_blockhash,
+                                                ac_ntx_height, txid, opret, "N/A")
                                     return row_data
 
         except Exception as e:
@@ -218,18 +224,19 @@ class notarised():
 
     @print_runtime
     def import_ntx(self, server, coin):
-        existing_txids = query.get_existing_notarised_txids(self.season, server, coin)
 
         import_txids_url = urls.get_ntxid_list_url(self.season, server, coin, False)
+        print(import_txids_url)
         import_txids = requests.get(import_txids_url).json()["results"]
 
-        new_txids = list(set(import_txids)-set(existing_txids))
+        new_txids = list(set(import_txids)-set(self.existing_txids))
         logger.info(f"NTX TXIDs to import: {len(new_txids)}")
         logger.info(f"Processing ETA: {0.03*len(new_txids)} sec")
         
         for txid in new_txids:
             time.sleep(0.02)
             txid_url = urls.get_notarised_txid_url(txid, False)
+            print(txid_url)
             r = requests.get(txid_url)
 
             for txid_info in r.json()["results"]:
@@ -1571,61 +1578,6 @@ def import_nn_ltc_txids(season):
                 logger.error(f"Something wrong with API? {txid_url}")
 
 
-def get_new_nn_btc_txids(
-        existing_txids, notary_address, page_break=None, stop_block=None
-    ):
-    before_block=None
-    stop_block = 634774
-    page = 1
-    exit_loop = False
-    api_txids = []
-    new_txids = []
-    
-    if not page_break:
-        page_break = API_PAGE_BREAK
-    
-    if not stop_block:
-        stop_block = 634774
-
-    while True:
-        # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
-        if page > page_break:
-            break
-        logger.info(f"Getting TXIDs from API Page {page}...")
-        resp = api.get_btc_address_txids(notary_address, before_block)
-        if "error" in resp:
-            logger.info(f"Error in resp: {resp}")
-            exit_loop = api.api_sleep_or_exit(resp, exit=True)
-        else:
-            page += 1
-            if 'txrefs' in resp:
-                tx_list = resp['txrefs']
-                before_block = tx_list[-1]['block_height']
-
-                for tx in tx_list:
-                    api_txids.append(tx['tx_hash'])
-                    if tx['tx_hash'] not in new_txids and tx['tx_hash'] not in existing_txids:
-                        new_txids.append(tx['tx_hash'])
-                        logger.info(f"appended tx {tx}")
-
-                # exit loop if earlier than s4
-                if before_block < stop_block:
-                    logger.info("No more for s4!")
-                    exit_loop = True
-            else:
-                # exit loop if no more tx for address at api
-                logger.info("No more for address!")
-                exit_loop = True
-
-        if exit_loop:
-            logger.info("exiting address txid loop!")
-            break
-
-    num_api_txids = list(set((api_txids)))
-    logger.info(f"{len(num_api_txids)} DISTINCT TXIDs counted from API")
-
-    return new_txids
-
 
 def get_new_nn_ltc_txids(existing_txids, notary_address):
     before_block=None
@@ -1720,3 +1672,60 @@ def get_extra_ntx_data(coin, scriptPubKey_asm):
         except Exception as e:
             logger.debug(e)
     return 
+
+
+
+# Deprecated. Kept here for rescanning prior seasons where notarising to BTC
+
+def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None, stop_block=None):
+    before_block=None
+    stop_block = 634774
+    page = 1
+    exit_loop = False
+    api_txids = []
+    new_txids = []
+    
+    if not page_break:
+        page_break = API_PAGE_BREAK
+    
+    if not stop_block:
+        stop_block = 634774
+
+    while True:
+        # To avoid API limits when running on cron, we dont want to go back too many pages. Set this to 99 when back filling, otherwise 2 pages should be enough.
+        if page > page_break:
+            break
+        logger.info(f"Getting TXIDs from API Page {page}...")
+        resp = api.get_btc_address_txids(notary_address, before_block)
+        if "error" in resp:
+            logger.info(f"Error in resp: {resp}")
+            exit_loop = api.api_sleep_or_exit(resp, exit=True)
+        else:
+            page += 1
+            if 'txrefs' in resp:
+                tx_list = resp['txrefs']
+                before_block = tx_list[-1]['block_height']
+
+                for tx in tx_list:
+                    api_txids.append(tx['tx_hash'])
+                    if tx['tx_hash'] not in new_txids and tx['tx_hash'] not in existing_txids:
+                        new_txids.append(tx['tx_hash'])
+                        logger.info(f"appended tx {tx}")
+
+                # exit loop if earlier than s4
+                if before_block < stop_block:
+                    logger.info("No more for s4!")
+                    exit_loop = True
+            else:
+                # exit loop if no more tx for address at api
+                logger.info("No more for address!")
+                exit_loop = True
+
+        if exit_loop:
+            logger.info("exiting address txid loop!")
+            break
+
+    num_api_txids = list(set((api_txids)))
+    logger.info(f"{len(num_api_txids)} DISTINCT TXIDs counted from API")
+
+    return new_txids

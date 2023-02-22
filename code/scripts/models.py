@@ -122,6 +122,34 @@ class coins_row():
         logger.info(f"Deleted {self.coin} from [coins] ")
   
 
+class kmd_supply_row():
+    def __init__(self, block_height='', block_time='', total_supply='', delta=''):
+        self.block_time = block_time
+        self.block_height = block_height
+        self.total_supply = total_supply
+        self.delta = delta
+
+    def validated(self):
+        return True
+
+    def update(self):
+        row_data = (self.block_height, self.block_time, self.total_supply, self.delta)
+        if self.validated():
+            logger.info(f"Updating [kmd_supply_row] {self.total_supply} at height {self.block_height} with delta {self.delta}")
+            update_kmd_supply_row(row_data)
+        else:
+            logger.warning(f"[kmd_supply_row] Row data invalid!")
+            logger.warning(f"{row_data}")
+
+    def delete(self, block=None):
+        if block:
+            CURSOR.execute(f"DELETE FROM kmd_supply WHERE block_height = {self.block_height};")
+        else:
+            CURSOR.execute(f"DELETE FROM kmd_supply;")
+        CONN.commit()
+        logger.info(f"Deleted {self.block_height} from [kmd_supply] ")
+  
+
 # TODO: DEPRECATE in S5, no more BTC
 class tx_row():
     def __init__(self, txid='', block_hash='', block_height='',

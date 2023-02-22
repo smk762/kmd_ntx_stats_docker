@@ -20,4 +20,28 @@ def mm2gui_piechart(request):
     filters = ['since', 'from_time', 'to_time']
     resp = graph.get_mm2gui_piechart(request)
     return helper.json_resp(resp, filters)
+
+
+def rewards_xy_data(request):
+    filters = ['since', 'from_time', 'to_time']
+    resp = graph.get_rewards_xy_data(request)
+    return helper.json_resp(resp, raw=True)
+
+
+def mined_xy_data(request):
+    filters = ['since', 'from_time', 'to_time']
+    resp = graph.get_mined_xy_data(request)
+    return helper.json_resp(resp, raw=True)
+    
+
+def production_xy_data(request):
+    filters = ['since', 'from_time', 'to_time']
+    resp = graph.get_production_xy_data(request)
+    return helper.json_resp(resp, raw=True)
+
+
+def supply_xy_data(request):
+    filters = ['since', 'from_time', 'to_time']
+    resp = graph.get_supply_xy_data(request)
+    return helper.json_resp(resp, raw=True)
     

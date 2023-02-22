@@ -424,6 +424,28 @@ def get_rewards_tx_rows(request):
     }
 
 
+def get_kmd_supply_rows(request):
+    source = TableSettings(
+        data=models.kmd_supply.objects.all().order_by('block_height'),
+        serializer=serializers.kmdSupplySerializer,
+        request=request
+    )
+    today = datetime.date.today()
+    source.required = {"date": f"{today}"}
+    source.filters = ["date"]
+    distinct = source.get_distinct(exclude=["date"])
+    source.filter_data('rewards_tx')
+    
+    return {
+        "distinct": distinct,
+        "count": source.count(),
+        "filters": source.filters,
+        "required": source.required,
+        "results": source.serialized(),
+        "selected": source.selected()
+    }
+
+
 def get_server_ntx_season_rows(request):
     source = TableSettings(
         data=models.server_ntx_season.objects.all(),

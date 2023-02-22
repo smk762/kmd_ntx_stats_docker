@@ -8,6 +8,14 @@ api_info_urls = [
           api_info.api_index,
           name='api_index'),
 
+    path('info/mined_between_blocks/',
+         api_info.mined_between_blocks,
+         name='mined_between_blocks_api'),
+
+    path('info/mined_between_blocktimes/',
+         api_info.mined_between_blocktimes,
+         name='mined_between_blocktimes_api'),
+
     path('api/pages_index/',
           api_info.pages_index,
           name='api_index'),
@@ -71,6 +79,10 @@ api_info_urls = [
     path('api/info/notarisation_txid_list/',
           api_info.notarisation_txid_list,
           name='notarisation_txid_list'),
+
+    path('api/info/notarised_txid/',
+          api_info.notarised_txid,
+          name='notarised_txid'),
 
     path('api/info/notarised_coins/',
           api_info.notarised_coins,

@@ -11,6 +11,20 @@ import kmd_ntx_api.lib_dexstats as dexstats
 import kmd_ntx_api.serializers as serializers
 
 
+def get_notarised_txid(request):
+    txid = helper.get_or_none(request, "txid")
+
+    if not txid:
+        return {
+            "error": "You need to specify the following filter parameter: ['txid']"
+        }
+    data = query.get_notarised_data(txid=request.GET["txid"]).values()
+    data = data.values()
+    serializer = serializers.notarisedSerializer(data, many=True)
+    return serializer.data
+
+
+
 def get_coin_ntx_summary(season, coin):
     server = None
 
@@ -79,6 +93,46 @@ def get_btc_txid_data(category=None):
         resp[address].append(item)
 
     return resp
+
+
+def get_mined_between_blocks(request):
+    min_block = 0
+    max_block = 9999999
+    if "min_block" in request.GET:
+        min_block = int(request.GET["min_block"])
+    if "max_block" in request.GET:
+        max_block = int(request.GET["max_block"])
+    return query.get_mined_data(
+            min_block=min_block,
+            max_block=max_block
+        ).aggregate(
+            sum_mined=Sum('value'),
+            blocks_mined=Count('value'),
+            max_block=Max('block_height'),
+            min_block=Min('block_height'),
+            max_blocktime=Max('block_time'),
+            min_blocktime=Min('block_time')
+        )
+
+
+def get_mined_between_blocktimes(request):
+    min_blocktime = 0
+    max_blocktime = 9999999999
+    if "min_blocktime" in request.GET:
+        min_blocktime = int(request.GET["min_blocktime"])
+    if "max_blocktime" in request.GET:
+        max_blocktime = int(request.GET["max_blocktime"])
+    return query.get_mined_data(
+            min_blocktime=min_blocktime,
+            max_blocktime=max_blocktime
+        ).aggregate(
+            sum_mined=Sum('value'),
+            blocks_mined=Count('value'),
+            max_block=Max('block_height'),
+            min_block=Min('block_height'),
+            max_blocktime=Max('block_time'),
+            min_blocktime=Min('block_time')
+        )
 
 
 def get_seednode_version_season_stats_data(season, notary=None):

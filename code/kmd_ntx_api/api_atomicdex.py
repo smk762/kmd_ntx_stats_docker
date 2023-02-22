@@ -63,3 +63,7 @@ def swaps_gui_stats_api(request):
 def activation_commands_api(request):
     resp = dex.get_activation_commands(request)
     return JsonResponse(resp)
+
+def coin_activation_commands_api(request):
+    resp = dex.get_coin_activation_commands(request)
+    return JsonResponse(resp)

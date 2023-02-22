@@ -96,6 +96,12 @@ def coin_social_table_api(request):
 def notary_social_table_api(request):
 '''
 
+
+def kmd_supply_table_api(request):
+    data = table.get_kmd_supply_rows(request)
+    return helper.json_resp(data)
+
+
 def notary_last_mined_table_api(request):
     resp = table.get_notary_last_mined_table_api(request)
     filters = ['season']
