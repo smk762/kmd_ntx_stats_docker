@@ -1,7 +1,290 @@
+import time
+import datetime as dt
+from bokeh.models import AjaxDataSource, CustomJS, Range1d
+from bokeh.plotting import figure
+from bokeh.embed import components
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_atomicdex as dex
+
+GENESIS = 1479333240
+
+def est_blocks(time):
+    return (time - GENESIS) / 60
+
+def est_mined(time):
+    return est_blocks(time) * 3
+
+def get_rewards_xy_data(request):
+    data = query.get_rewards_data().order_by("block_height")
+    x_axis = [1473724800000]
+    y_axis = [100000000]
+    cumulative = 0
+    grouped = {}
+    for i in data.values():
+        day = dt.date(*i["block_datetime"].timetuple()[:3])
+        if day not in grouped:
+            grouped.update({day:0})
+        grouped[day] += i["rewards_value"]
+
+    for day in grouped:
+        timestamp = int(dt.datetime(*day.timetuple()[:-4]).timestamp())
+        cumulative += grouped[day]
+        x_axis.append(timestamp*1000)
+        y_axis.append(cumulative+100000000+est_mined(timestamp))
+        
+    return {
+        "x": x_axis,
+        "y": y_axis
+    }
+
+def get_supply_xy_data(request):
+    data = query.get_kmd_supply_data().order_by("block_height")
+    x_axis = [1473724800000]
+    y_axis = [100000000]
+    for i in data.values():
+        if i["block_height"] % 1000 == 0:
+            x_axis.append(i["block_time"]*1000)
+            y_axis.append(i["total_supply"])
+        
+    return {
+        "x": x_axis,
+        "y": y_axis
+    }
+
+
+def get_rewards_scatterplot(request):
+    
+    source = AjaxDataSource(
+        data_url='http://116.203.120.91:8762/api/graph/rewards_xy_data/',
+        polling_interval=60000, method="GET"
+    )
+    
+    # use the AjaxDataSource just like a ColumnDataSource
+    #p.circle('x', 'y', source=source)
+
+    #create a plot
+    plot = figure(width=800, height=600,
+        title="Active User Rewards", x_axis_type="datetime")
+
+    # add a circle renderer with a size, color, and alpha
+    plot.circle(
+        'x',
+        'y',
+        source=source,
+        size=2,
+        color="navy",
+        alpha=0.5
+    )
+    plot.x_range = Range1d(GENESIS*1000, 1676600000000)
+
+    plot.xaxis[0].axis_label = 'Date'
+    plot.yaxis[0].axis_label = 'KMD value'
+    plot.yaxis[0].formatter.use_scientific = False
+    plot.xaxis[0].axis_label_text_font_size = "16pt"
+    plot.yaxis[0].axis_label_text_font_size = "16pt"
+ 
+    script, div = components(plot)
+ 
+    return {'bokeh_script': script, 'bokeh_div': div}
+
+
+def get_mined_xy_data(request):
+    data = query.get_mined_count_daily_data()
+    x_axis = [1473724800000]
+    y_axis = [100000000]
+    cumulative = 0
+    grouped = {}
+    for i in data.order_by("mined_date").values():
+        if i["mined_date"] not in grouped:
+            grouped.update({i["mined_date"]: 0})
+        grouped[i["mined_date"]] += float(i["sum_value_mined"])
+
+    for day in grouped:
+        cumulative += grouped[day]
+        x_axis.append(int(dt.datetime(*day.timetuple()[:-4]).timestamp())*1000)
+        y_axis.append(cumulative)
+    
+    return {
+        "x": x_axis,
+        "y": y_axis
+    }
+
+def get_production_xy_data(request):
+
+    data = query.get_rewards_data().order_by("block_height")
+    x_axis = [1473724800000]
+    y_axis = [100000000]
+    cumulative = 0
+    aur = {}
+    for i in data.values():
+        day = dt.date(*i["block_datetime"].timetuple()[:3])
+        timestamp = int(dt.datetime(*day.timetuple()[:-4]).timestamp())*1000
+        if timestamp not in aur:
+            aur.update({timestamp:0})
+        aur[timestamp] += i["rewards_value"]
+        
+    mined = get_mined_xy_data(request)
+    total = {
+        "x":[1473724800000],
+        "y":[100000000]
+    }
+    cumulative = 0
+    for x in mined["x"]:
+        v = mined["y"][mined["x"].index(x)]
+        if x in aur:
+            cumulative += aur[x]
+        v += cumulative
+        total["x"].append(x)
+        total["y"].append(v)
+    return total
+
+def get_block_production(request):
+    
+    source = AjaxDataSource(
+        data_url='http://116.203.120.91:8762/api/graph/mined_xy_data/',
+        polling_interval=60000, method="GET"
+    )
+    source2 = AjaxDataSource(
+        data_url='http://116.203.120.91:8762/api/graph/rewards_xy_data/',
+        polling_interval=60000, method="GET"
+    )
+    source3 = AjaxDataSource(
+        data_url='http://116.203.120.91:8762/api/graph/production_xy_data/',
+        polling_interval=60000, method="GET"
+    )
+    source4 = AjaxDataSource(
+        data_url='http://116.203.120.91:8762/api/graph/supply_xy_data/',
+        polling_interval=60000, method="GET"
+    )
+    
+    # use the AjaxDataSource just like a ColumnDataSource
+    #p.circle('x', 'y', source=source)
+
+    tooltips = [
+        ("Name", "$name"),
+        ("Timestamp", "$x{int}"),
+        ("KMD value", "$y{int}")
+    ]
+    #create a plot
+    plot = figure(width=800, height=600,
+        title="Block Production", x_axis_type="datetime", tooltips=tooltips)
+    #plot.hover.mode = 'vline'
+
+    # add a circle renderer with a size, color, and alpha
+    plot.line(
+        'x',
+        'y',
+        source=source,
+        line_width=2,
+        line_color="blue",
+        legend_label="Actual Mining",
+        name="Actual Mining",
+        alpha=0.5
+    )
+    plot.line(
+        'x',
+        'y',
+        source=source2,
+        line_width=2,
+        line_color="green",
+        legend_label="Rewards Claims",
+        name="Rewards Claims",
+        alpha=0.5
+    )
+    plot.line(
+        'x',
+        'y',
+        source=source3,
+        line_width=2,
+        line_color="red",
+        legend_label="Combined Mining / Rewards",
+        name="Combined Mining / Rewards",
+        alpha=0.5
+    )
+    plot.line(
+        'x',
+        'y',
+        source=source4,
+        line_width=2,
+        line_color="magenta",
+        legend_label="Coin Supply",
+        name="Coin Supply",
+        alpha=0.5
+    )
+    plot.line(
+        x=[1473724800000, 1676600000000],
+        y=[100000000, 109863337],
+        line_width=2,
+        line_color="grey",
+        line_dash=(4, 4),
+        legend_label="3 KMD per block",
+        alpha=0.5
+    )
+    plot.line(
+        x=[1473724800000, 1676600000000],
+        y=[100000000, 113151116],
+        line_width=2,
+        line_color="grey",
+        line_dash=(3, 3),
+        legend_label="4 KMD per block",
+        alpha=0.5
+    )
+    plot.line(
+        x=[1473724800000, 1676600000000],
+        y=[100000000, 116438895],
+        line_width=2,
+        line_color="grey",
+        line_dash=(2, 2),
+        legend_label="5 KMD per block",
+        alpha=0.5
+    )
+    plot.line(
+        x=[1473724800000, 1676600000000],
+        y=[100000000, 119726674],
+        line_width=2,
+        line_color="grey",
+        line_dash=(1, 1),
+        legend_label="6 KMD per block",
+        alpha=0.5
+    )
+    plot.x_range = Range1d(1473724800000, 1676600000000)
+    plot.y_range = Range1d(100000000, 125000000)
+
+    plot.xaxis[0].axis_label = 'Date'
+    plot.yaxis[0].axis_label = 'KMD value'
+    plot.yaxis[0].formatter.use_scientific = False
+    plot.xaxis[0].axis_label_text_font_size = "16pt"
+    plot.yaxis[0].axis_label_text_font_size = "16pt"
+
+    #plot.legend.orientation = "horizontal"
+    #plot.legend.location = "top_center"
+    plot.legend.location = "top_left"
+
+    script, div = components(plot)
+ 
+    return {'bokeh_script': script, 'bokeh_div': div, "page_title": "KMD Production"}
+
+
+def get_bokeh_example(request):
+ 
+    #create a plot
+    plot = figure(width=800, height=900)
+    data = query.get_rewards_data()[:1000]
+
+    x_axis = []
+    y_axis = []
+    for i in data.values():
+        x_axis.append(i["block_height"])
+        y_axis.append(i["rewards_value"])
+
+    # add a circle renderer with a size, color, and alpha
+    plot.circle(x_axis, y_axis, size=2, color="navy", alpha=0.5)
+ 
+    script, div = components(plot)
+ 
+    return {'bokeh_script': script, 'bokeh_div': div}
 
 
 def get_balances_graph_data(request, notary=None, coin=None):

@@ -107,7 +107,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.17.0.1/16
+        - subnet: 172.18.1.1/16
         
 # to run migrations, use "docker-compose run web python3 manage.py migrate"
 # to run migrations, use "docker-compose run web python3 makemigrations"

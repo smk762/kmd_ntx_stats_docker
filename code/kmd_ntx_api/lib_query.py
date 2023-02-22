@@ -45,7 +45,7 @@ def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=N
     if 'to_timestamp' in request.GET:
         filter_kwargs.update({'block_time__lte':request.GET['to_timestamp']})
 
-    if table in ['mined', 'rewards_tx', 'notarised']:
+    if table in ['mined', 'rewards_tx', 'notarised' 'kmd_supply']:
         if 'date' in request.GET:
             date = request.GET['date']
             if not date or date == 'Today':
@@ -309,6 +309,17 @@ def get_mined_count_season_data(season=None, name=None, address=None):
     return data
 
 
+def get_kmd_supply_data(season=None, name=None, address=None):
+    data = kmd_supply.objects.all()
+    if season:
+        data = data.filter(season=season)
+    if name:
+        data = data.filter(name=name)
+    if address:
+        data = data.filter(address=address)
+    return data
+
+
 def get_mined_data(season=None, name=None, address=None, min_block=None,
                    max_block=None, min_blocktime=None, max_blocktime=None):
     data = mined.objects.all()
@@ -368,6 +379,9 @@ def get_notary_vote_data(year=None, candidate=None, block=None, txid=None,
 
     if mined_by:
         data = data.filter(mined_by=mined_by)
+
+    if min_block:
+        data = data.filter(block_height__gte=min_block)
 
     if max_block:
         data = data.filter(block_height__lte=max_block)

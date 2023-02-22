@@ -17,4 +17,19 @@ api_graph_urls = [
          api_graph.mm2gui_piechart,
          name='mm2gui_piechart'),
 
+    path('api/graph/rewards_xy_data/',
+         api_graph.rewards_xy_data,
+         name='rewards_xy_data'),
+
+    path('api/graph/mined_xy_data/',
+         api_graph.mined_xy_data,
+         name='mined_xy_data'),
+
+    path('api/graph/production_xy_data/',
+         api_graph.production_xy_data,
+         name='production_xy_data'),
+
+    path('api/graph/supply_xy_data/',
+         api_graph.supply_xy_data,
+         name='supply_xy_data')
 ]

@@ -142,6 +142,22 @@ def get_all_coins():
     return coins
 
 
+def get_supply_blocks():
+    blocks = []
+    CURSOR.execute("SELECT DISTINCT block_height FROM kmd_supply;")
+    try:
+        results = CURSOR.fetchall()
+        for result in results:
+            blocks.append(result[0])
+        blocks.sort()
+        blocks.reverse()
+        
+    except Exception as e:
+        logger.warning(f"No [get_supply_blocks] results? {e}")
+
+    return blocks
+
+
 @print_runtime
 def get_notary_last_ntx():
     sql = f"SELECT notary, coin, kmd_ntx_blockheight from notary_last_ntx;"

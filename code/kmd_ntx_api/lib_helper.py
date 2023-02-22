@@ -68,7 +68,10 @@ def qset_values_to_list(qset_vals):
     return table_data
 
 
-def json_resp(resp, filters=None, params=None, ignore_errors=False):
+def json_resp(resp, filters=None, params=None, ignore_errors=False, raw=False):
+
+    if raw:
+        return JsonResponse(resp)
 
     data = {}
     if filters:

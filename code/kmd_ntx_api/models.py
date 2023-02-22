@@ -520,6 +520,7 @@ class notary_candidates(models.Model):
                                  name='unique_name_year_candidate')
         ]
 
+
 # todo: add address lookup tool
 class rewards_tx(models.Model):
     txid = models.CharField(max_length=64)
@@ -545,6 +546,22 @@ class rewards_tx(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['txid', 'address'],
                                  name='unique_rewards_nn_txid')
+        ]
+
+class kmd_supply(models.Model):
+    block_height = models.PositiveIntegerField(default=0)
+    block_time = models.PositiveIntegerField(default=0)
+    total_supply = models.PositiveIntegerField(default=0)
+    delta = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'kmd_supply'
+        indexes = [
+            models.Index(fields=['block_height']),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['block_height'],
+                                 name='unique_blockheight_supply')
         ]
 
 

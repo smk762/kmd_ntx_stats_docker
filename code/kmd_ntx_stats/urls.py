@@ -21,6 +21,7 @@ from kmd_ntx_stats.urls_community import frontend_community_urls
 from kmd_ntx_stats.urls_page import frontend_page_urls
 from kmd_ntx_stats.urls_coin import frontend_coin_urls, api_coins_urls
 from kmd_ntx_stats.urls_ntx import frontend_ntx_urls, api_ntx_urls
+from kmd_ntx_stats.urls_stats import frontend_stats_urls, api_stats_urls
 from kmd_ntx_stats.urls_tool import frontend_tool_urls, api_tool_urls
 from kmd_ntx_stats.urls_mining import frontend_mining_urls, api_mining_urls
 from kmd_ntx_stats.urls_testnet import frontend_testnet_urls, api_testnet_urls
@@ -38,8 +39,6 @@ handler502 = 'kmd_ntx_api.views_error.error_502'
 # /api/source/{endpoint} returns paginated full list of data
 # /api/{category}/{endpoint} returns formated data dict
 
-
-# Graphs
 
 urlpatterns = [
 
@@ -75,6 +74,7 @@ url_lists = [
     frontend_testnet_urls, api_testnet_urls,
     frontend_atomicdex_urls, api_atomicdex_urls,
     frontend_page_urls,
+    frontend_stats_urls,
     frontend_community_urls,
     api_csv_urls, api_graph_urls,
     api_info_urls, api_status_urls,

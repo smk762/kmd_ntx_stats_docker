@@ -6,6 +6,19 @@ from datetime import datetime as dt
 from lib_const import *
 from lib_update_ntx import *
 
+#### KMD SUPPLY TABLE
+
+def update_kmd_supply_row(row_data):
+    try:
+        sql = f"INSERT INTO kmd_supply (block_height, block_time, total_supply, delta) VALUES (%s, %s, %s, %s);"
+        CURSOR.execute(sql, row_data)
+        CONN.commit()
+    except Exception as e:
+        logger.error(f"Exception in [update_kmd_supply_row]: {e}")
+        logger.error(f"[update_kmd_supply_row] sql: {sql}")
+        logger.error(f"[update_kmd_supply_row] row_data: {row_data}")
+        CONN.rollback()
+
 #### ADRESSES TABLE
 
 def update_addresses_row(row_data):

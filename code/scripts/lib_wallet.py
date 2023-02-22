@@ -5,6 +5,8 @@ import json
 from decimal import *
 from random import shuffle, choice
 from datetime import datetime as dt
+from filelock import Timeout, FileLock
+
 import lib_api as api
 import lib_validate
 from lib_urls import *
@@ -14,7 +16,7 @@ from decorators import *
 from lib_rpc import RPC
 import lib_query
 from lib_helper import get_pubkeys
-from models import addresses_row, rewards_tx_row
+from models import addresses_row, rewards_tx_row, kmd_supply_row
 from lib_threads import update_notary_balances_thread
 
 
@@ -96,6 +98,36 @@ def delete_stale_balances():
     CONN.commit()
 
 
+def update_supply_for_block(coin, blockheight):
+    blocktime = RPC[coin].getblock(str(blockheight))["time"]
+    logger.info(f"Getting supply for {blockheight} at {blocktime}...")
+    data = RPC[coin].coinsupply(str(blockheight))
+    total = data["total"]
+    if blockheight > 1:
+        last_data = RPC[coin].coinsupply(str(blockheight-1))
+        last_total = last_data["total"]
+        delta = total - last_total
+    else:
+        delta = total
+    row = kmd_supply_row()
+    row.block_height = blockheight
+    row.block_time = blocktime
+    row.total_supply = total
+    row.delta = delta
+    row.update()
+    logger.info(f"Row for kmd block {blockheight} supply {total} added...")
+    return
+
+def update_supply(coin="KMD"):
+    TIP = int(RPC[coin].getblockcount())
+    existing_blocks = lib_query.get_supply_blocks()
+    scan_blocks = list(set([*range(1, TIP, 1)]) - set(existing_blocks))
+    scan_blocks.sort()
+    for block in scan_blocks:
+        print(block)
+        update_supply_for_block(coin, block)
+
+
 def import_rewards():
     existing_rewards_txids = lib_query.get_reward_txids()
     logger.info(f"Rewards txids in local DB: {len(existing_rewards_txids)}")
@@ -108,22 +140,28 @@ def import_rewards():
         url = url = get_rewards_txid_url(txid)
         data = requests.get(url).json()["results"]
         check_tx_for_rewards_info("KMD", txid)
-    
 
-def scan_rewards(TIP, coin="KMD", rescan=False):
-    try:
-        with open(f"{script_path}/prices_history.json", "r") as j:
-            prices = json.load(j)
-    except Exception as e:
-        logger.warning(e)
-        prices = {}
 
-    try:
-        with open(f"{script_path}/scanned_blocks.json", "r") as j:
-            scanned_blocks = json.load(j)
-    except Exception as e:
-        logger.warning(e)
-        scanned_blocks = {}
+def rescan_rewards_blocks(coin="KMD"):
+    reward_blocks = lib_query.get_reward_blocks()
+    reward_blocks.sort()
+    reward_blocks.reverse()
+    logger.info(f"Rescanning Blocks in DB: {len(reward_blocks)}")
+    scan_blocks_for_rewards(reward_blocks, coin)
+
+
+def scan_rewards(TIP, coin="KMD", rescan=False, ascending=False):
+
+    file_path = f"{script_path}/scanned_blocks.json"
+    lock_path = f"{script_path}/scanned_blocks.json.lock"
+    lock = FileLock(lock_path, timeout=10)
+    with lock:
+        try:
+            with open(f"{script_path}/scanned_blocks.json", "r") as j:
+                scanned_blocks = json.load(j)
+        except Exception as e:
+            logger.warning(f"error getting scanned blocks json: {e}")
+            scanned_blocks = {}
     if "scanned_blocks" not in scanned_blocks: scanned_blocks.update({"scanned_blocks": []})
 
     logger.info(f"Previously Scanned Blocks: {len(scanned_blocks['scanned_blocks'])}")
@@ -132,20 +170,50 @@ def scan_rewards(TIP, coin="KMD", rescan=False):
     scan_blocks = list(set([*range(1, TIP)]) - set(reward_blocks) - set(scanned_blocks['scanned_blocks']))
     logger.info(f"Blocks left to scan: {len(scan_blocks)}")
     scan_blocks.sort()
-    scan_blocks.reverse()
+    if not ascending:
+        scan_blocks.reverse()
+    chunksize = 1500
+    if len(scanned_blocks['scanned_blocks']) == 0:
+        chunksize = 50
     if rescan:
-        chunk_starts_at = choice(scan_blocks)
-        scan_blocks = scan_blocks[chunk_starts_at:chunk_starts_at+50]
+        chunk_starts_at = choice(range(len(scan_blocks)))
+        scan_blocks = scan_blocks[chunk_starts_at:chunk_starts_at+chunksize]
     else:
-        scan_blocks = scan_blocks[:50]
-    # shuffle(scan_blocks)
-    review_blocks = []
-    # get random subset to process
+        scan_blocks = scan_blocks[:chunksize]
     
     logger.info(f"Scanning these blocks now: {scan_blocks}")
-    for block_height in scan_blocks:
-        logger.info(f"Block Height: {block_height}")
+    new_scanned_blocks = scan_blocks_for_rewards(scan_blocks, coin)
 
+
+    with lock:
+        with open(f"{script_path}/scanned_blocks.json", "r") as j:
+            scanned_blocks = json.load(j) 
+            scanned_blocks["scanned_blocks"].extend(new_scanned_blocks)
+            scanned_blocks["scanned_blocks"] = list(set(scanned_blocks["scanned_blocks"]))
+
+        scanned_blocks["scanned_blocks"].sort()
+
+        with open(file_path, "w+") as j:
+            json.dump(scanned_blocks, j, indent=4)
+
+
+def scan_blocks_for_rewards(scan_blocks, coin="KMD"):
+    file_path = f"{script_path}/prices_history.json"
+    lock_path = f"{script_path}/prices_history.json.lock"
+    lock = FileLock(lock_path, timeout=10)
+
+    with lock:
+        try:
+            with open(f"{script_path}/prices_history.json", "r") as j:
+                prices = json.load(j)
+        except Exception as e:
+            logger.warning(f"error getting prices json: {e}")
+            prices = {}
+
+    review_blocks = []
+    new_scanned_blocks = []
+
+    for block_height in scan_blocks:
         block = RPC[coin].getblock(str(block_height))
         block_time = block["time"]
         season = lib_validate.get_season(block_time)
@@ -153,6 +221,7 @@ def scan_rewards(TIP, coin="KMD", rescan=False):
         date = f"{date}".split("-")
         date.reverse()
         date = "-".join(date)
+        logger.info(f"Block Height: {block_height} at {date}")
 
         if season not in prices:
             prices.update({season: {}})
@@ -161,28 +230,36 @@ def scan_rewards(TIP, coin="KMD", rescan=False):
             prices[season].update({f"{date}": {}})
 
         if 'btc' not in prices[season][f"{date}"]:
-            api_prices = api.get_kmd_price(date)
-            if api_prices:
-                prices[season][f"{date}"].update(api_prices)
-                time.sleep(1)
-            else:
-                prices[season][f"{date}"].update({"btc":0,"usd":0})
+            update_prices(season, date, prices)
+        elif prices[season][f"{date}"]["btc"] == 0:
+            update_prices(season, date, prices)
+
 
         for txid in block["tx"]:
             check_tx_for_rewards_info(coin, txid, block, prices)
 
         if block_height not in review_blocks:
-            scanned_blocks["scanned_blocks"].append(block_height)
+            new_scanned_blocks.append(block_height)
 
     logger.info("[scan_rewards] Finished!")
-    logger.info(f"review_blocks: {review_blocks}")
+    return new_scanned_blocks
 
-    with open(f"{script_path}/prices_history.json", "w+") as j:
-        json.dump(prices, j, indent=4)
+def update_prices(season, date, prices):
+    api_prices = api.get_kmd_price(date)
+    if api_prices:
+        prices[season][f"{date}"].update(api_prices)
 
-    scanned_blocks["scanned_blocks"].sort()
-    with open(f"{script_path}/scanned_blocks.json", "w+") as j:
-        json.dump(scanned_blocks, j, indent=4)
+        file_path = f"{script_path}/prices_history.json"
+        lock_path = f"{script_path}/prices_history.json.lock"
+        lock = FileLock(lock_path, timeout=10)
+
+        with lock:
+            with open(file_path, "w+") as j:
+                json.dump(prices, j, indent=4)
+
+    else:
+        prices[season][f"{date}"].update({"btc":0,"usd":0})
+    return prices
 
 
 def check_tx_for_rewards_info(coin, txid, block=None, prices=None):
@@ -210,30 +287,35 @@ def check_tx_for_rewards_info(coin, txid, block=None, prices=None):
     rewards_value = 0
 
     if not prices:
-        try:
-            with open(f"{script_path}/prices_history.json", "r") as j:
-                prices = json.load(j)
-        except Exception as e:
-            logger.warning(e)
-            prices = {}
 
-        if season not in prices:
-            prices.update({season: {}})
+        file_path = f"{script_path}/prices_history.json"
+        lock_path = f"{script_path}/prices_history.json.lock"
+        lock = FileLock(lock_path, timeout=10)
+        with lock:
+            try:
+                with open(f"{script_path}/prices_history.json", "r") as j:
+                    prices = json.load(j)
+            except Exception as e:
+                logger.warning(e)
+                prices = {}
 
-        if f"{date}" not in prices[season]:
-            prices[season].update({f"{date}": {}})
+            if season not in prices:
+                prices.update({season: {}})
 
-        if 'btc' not in prices[season][f"{date}"]:
-            api_prices = api.get_kmd_price(date)
-            if api_prices:
-                prices[season][f"{date}"].update(api_prices)
+            if f"{date}" not in prices[season]:
+                prices[season].update({f"{date}": {}})
 
-                with open(f"{script_path}/prices_history.json", "w+") as j:
-                    json.dump(prices, j, indent=4)
+            if 'btc' not in prices[season][f"{date}"]:
+                api_prices = api.get_kmd_price(date)
+                if api_prices:
+                    prices[season][f"{date}"].update(api_prices)
 
-                time.sleep(1)
-            else:
-                prices[season][f"{date}"].update({"btc":0,"usd":0})
+                    with open(file_path, "w+") as j:
+                        json.dump(prices, j, indent=4)
+
+                    time.sleep(1)
+                else:
+                    prices[season][f"{date}"].update({"btc":0,"usd":0})
 
 
     output_addresses = []

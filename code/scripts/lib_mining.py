@@ -130,7 +130,6 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
     delta = datetime.timedelta(days=1)
     now = int(time.time())
 
-        
     if not rescan:
         start = end - datetime.timedelta(days=30)
 
@@ -166,7 +165,7 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
                 row.blocks_mined = int(item[1])
                 row.sum_value_mined = float(item[2])
                 row.mined_date = start
-                row.timestamp = now
+                row.timestamp = datetime.datetime(*start.timetuple()[:-4]).timestamp()
 
                 if season != "since_genesis":
                     row.usd_price = Decimal(prices[season][date]['usd'])

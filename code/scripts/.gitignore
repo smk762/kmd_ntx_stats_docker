@@ -1,6 +1,8 @@
 *.log
 .env
 *.json
+*.json.lock
+*.json.bk
 *_7776
 *.tar.gz
 *.csv
