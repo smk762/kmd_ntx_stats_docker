@@ -11,6 +11,7 @@ def import_notarised():
     for season in ["Season_6"]:
         
             season_notaries = helper.get_season_notaries(season)
+            ntx_tbl = lib_ntx.notarised(season)
             servers = helper.get_season_servers(season)
             while len(servers) > 0:
                 server = random.choice(servers)
@@ -23,7 +24,6 @@ def import_notarised():
                     coin = random.choice(coins)
                     coins.remove(coin)
                     logger.info(f">>> Importing {coin} for {season} {server} ({i} processed, {len(coins)} remaining)")
-                    ntx_tbl = lib_ntx.notarised(season)
                     ntx_tbl.import_ntx(server, coin)
 
 if __name__ == "__main__":
@@ -31,6 +31,3 @@ if __name__ == "__main__":
     import_notarised()
     CURSOR.close()
     CONN.close()
-
-
-                    
