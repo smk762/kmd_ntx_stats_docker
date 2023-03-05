@@ -470,6 +470,7 @@ def is_testnet(coin):
 
 
 def get_activation_commands(request):
+    logger.info("Running get_activation_commands")
     protocols = []
     platforms = []
     other_platforms = []
@@ -480,7 +481,7 @@ def get_activation_commands(request):
     resp_json = {}
 
     selected_coin = helper.get_or_none(request, "coin")
-    coin_info = query.get_coins_data(selected_coin, 1)
+    coin_info = query.get_coins_data(selected_coin, 1).order_by("coin")
     serializer = serializers.coinsSerializer(coin_info, many=True)
 
     for item in serializer.data:
@@ -512,7 +513,7 @@ def get_activation_commands(request):
             resp_json.update(get_contracts(coin))
         else:
             other_platforms.append(platform)
-
+        logger.info(protocol)
         if protocol == "UTXO":
             platform = 'UTXO'
             if len(electrums) > 0:
@@ -657,7 +658,7 @@ def get_activation_commands(request):
                         coin: helper.sort_dict(resp_json)
                     })
                 else:
-                    print(f"Unknown platform for {coin}")
+                    logger.info(f"Unknown platform for {coin}")
                     '''
                     if "Unknown" not in enable_commands["commands"]:
                         enable_commands["commands"].update({
@@ -672,6 +673,10 @@ def get_activation_commands(request):
                         coin: helper.sort_dict(resp_json)
                     })
         else:
+            logger.info(f"==================== {coin} is incompatible!")
+            logger.info(f"==================== {compatible} is incompatible!")
+            logger.info(f"==================== {resp_json} is incompatible!")
+            logger.info(item)
             incompatible_coins.append(coin)
 
     if selected_coin is None:
@@ -690,6 +695,7 @@ def get_activation_commands(request):
 
 def get_coin_activation_commands(request):
     coin_commands = {}
+    logger.info("Running get_coin_activation_commands")
     protocol_commands = get_activation_commands(request)["commands"]
     for protocol in protocol_commands:
         for coin in protocol_commands[protocol]:

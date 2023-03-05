@@ -16,6 +16,7 @@ def update_coins_tables():
     # remove_old_coins(coins_data)
 
     update_coins(coins_data)
+    remove_delisted_coins()
 
 if __name__ == "__main__":
 

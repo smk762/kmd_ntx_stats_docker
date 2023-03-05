@@ -1,6 +1,6 @@
 NAV_DATA = {
     "Notarisation": {
-        "icon": "",
+        "icon": "fa-solid fa-gavel",
         "options": {
             "Notary Profiles": {
                 "icon": "fa-solid fa-gavel",
