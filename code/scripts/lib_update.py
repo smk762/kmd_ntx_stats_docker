@@ -107,6 +107,18 @@ def update_rewards_row(row_data):
         return 0
 
 
+def delist_coin(coin):
+    try:
+        sql = f"UPDATE coins SET mm2_compatible = 0 WHERE coin = '{coin}';"
+        CURSOR.execute(sql)
+        CONN.commit()
+        return 1
+    except Exception as e:
+        logger.debug(e)
+        CONN.rollback()
+        return 0
+
+
 def update_coins_row(row_data):
     try:
         sql = "INSERT INTO coins \
@@ -130,7 +142,8 @@ def update_coins_row(row_data):
             logger.debug(row_data)
         CONN.rollback()
         return 0
-        
+
+
 def update_mined_row(row_data):
     try:
         sql = "INSERT INTO mined \
@@ -157,6 +170,7 @@ def update_mined_row(row_data):
             logger.debug(row_data)
         CONN.rollback()
 
+
 def update_season_mined_count_row(row_data):
     try:
         sql = f"INSERT INTO mined_count_season \
@@ -176,6 +190,7 @@ def update_season_mined_count_row(row_data):
             logger.debug(row_data)
         CONN.rollback()
         return 0
+
 
 def update_daily_mined_count_row(row_data):
     try:
@@ -214,6 +229,7 @@ def update_table(table, update_str, condition):
         CONN.rollback()
         return 0
 
+
 def update_sync_tbl(row_data):
     try:
         sql = "INSERT INTO coin_sync \
@@ -232,6 +248,7 @@ def update_sync_tbl(row_data):
             logger.debug(row_data)
         CONN.rollback()
         return 0
+
 
 def update_nn_social_row(row_data):
     try:
@@ -254,6 +271,7 @@ def update_nn_social_row(row_data):
             logger.debug(row_data)
         CONN.rollback()
         return 0
+
 
 def update_coin_social_row(row_data):
     try:
@@ -299,6 +317,7 @@ def update_btc_address_deltas_tbl(row_data):
         CONN.rollback()
         return 0
 
+
 def update_funding_row(row_data):
     try:
         sql = "INSERT INTO  funding_transactions \
@@ -334,6 +353,7 @@ def ts_col_to_dt_col(ts_col, dt_col, table):
 def delete_nn_btc_tx_transaction(txid):
     CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
     CONN.commit()
+
 
 def update_nn_btc_tx_row(row_data):
     sql = "INSERT INTO nn_btc_tx (txid, block_hash, block_height, \
@@ -395,6 +415,7 @@ def update_nn_btc_tx_outindex_from_txid(outindex, txid):
         logger.debug(e)
         CONN.rollback()
 
+
 def delete_nn_btc_tx_row(txid, notary):
     sql = "DELETE FROM nn_btc_tx WHERE txid='"+str(txid)+"' and notary='"+str(notary)+"';"
     try:
@@ -405,8 +426,6 @@ def delete_nn_btc_tx_row(txid, notary):
         CONN.rollback()
 
 
-#### LTC
-
 def update_nn_ltc_tx_notary_from_addr(notary, addr):
     sql = f"UPDATE nn_ltc_tx SET notary='{notary}' WHERE address='{addr}';"
     try:
@@ -416,6 +435,7 @@ def update_nn_ltc_tx_notary_from_addr(notary, addr):
     except Exception as e:
         logger.debug(e)
         CONN.rollback()
+
 
 def update_nn_ltc_tx_row(row_data):
     sql = "INSERT INTO nn_ltc_tx (txid, block_hash, block_height, \
@@ -516,6 +536,7 @@ def update_swaps_row(row_data):
         # input()
         CONN.rollback()
 
+
 def update_swaps_failed_row(row_data):
     taker_err_msg = row_data[5]
     maker_err_msg = row_data[12]
@@ -547,7 +568,6 @@ def update_swaps_failed_row(row_data):
         logger.error(f"Exception in [update_swaps_failed_row]: {e}")
         logger.error(f"[update_swaps_failed_row] sql: {sql}")
         logger.error(f"[update_swaps_failed_row] row_data: {row_data}")
-        # input()
         CONN.rollback()
 
 
@@ -566,7 +586,7 @@ def update_rewards_tx_row(row_data):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_rewards_nn_txid DO UPDATE SET \
                 btc_price={row_data[9]}, usd_price={row_data[10]};"
-        
+
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()

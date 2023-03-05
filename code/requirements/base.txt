@@ -14,7 +14,6 @@ django-crispy-forms
 djangorestframework-datatables
 numpy
 django-mathfilters==1.0.0
-python-dateutil==2.8.1
 base58==2.1.0
 mysqlclient==2.0.3
 coverage==6.4.2

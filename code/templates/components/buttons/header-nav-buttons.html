@@ -1,6 +1,6 @@
 
             <ul class="c-header-nav d-md-down-none">
-            {% for section, key in nav_data.items %}
+                {% for section, key in nav_data.items %}
                 <li class="c-header-nav-item px-1">
                     <button class="btn btn-secondary dropdown-toggle" id="{{ section }}DropdownMenuButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="{{ key.icon }} mr-2"></i>{{ section }}
                     </button>
@@ -12,6 +12,6 @@
                         {% endfor %}
                     </div>
                 </li>
-            {% endfor %}`
+                {% endfor %}
                 <li class="c-header-nav-item pl-2 pr-1"><a href="/"><i class="fa-solid fa-house"></i></a></li>
             </ul>

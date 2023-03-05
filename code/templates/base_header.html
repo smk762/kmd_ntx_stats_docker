@@ -12,7 +12,7 @@
         <div class="pl-auto ml-auto my-auto d-lg-none">
             <!-- Hamburger Menu Button-->
             <button class="c-header-toggler c-class-toggler d-lg-none mfe-auto" type="button" data-target="#sidebar" data-class="c-sidebar-show">
-                <i class="cil-menu" data-toggle='modal' data-target='#menu-modal'></i>
+                <i class="fa fa-bars" data-toggle='modal' data-target='#menu-modal'></i>
             </button>
         </div>
         <div>
@@ -27,14 +27,15 @@
         <div class="modal-content">
             <div class="modal-body">
                 <ul class="c-sidebar-nav">
-                {% for section, options in nav_data.items %}
+                {% for section, key in nav_data.items %}
                     <li class="c-header-nav-item show">
-                        <button class="btn btn-secondary shown-dropdown col-12" id="{{ section }}DropdownMenuButton" type="button" aria-haspopup="true" aria-expanded="true"> {{ section }}
+                        <button class="btn btn-secondary shown-dropdown col-12" id="{{ section }}DropdownMenuButton" type="button" aria-haspopup="true" aria-expanded="true">
+                            <i class="{{ key.icon }} mr-2"></i> {{ section }}
                         </button>
                         <div class="dropdown-menu col-12 show" aria-labelledby="{{ section }}DropdownMenuButton" data-popper-placement="bottom-end">
-                            {% for item, values in options.items %}
+                            {% for item, values in key.options.items %}
                                 {% if not values.hide %}
-                                     <a class="dropdown-item" href="{{ values.url }}"><i class="{{ values.icon }} mr-2"></i> {{ item }}</a>
+                                    <a class="dropdown-item" href="{{ values.url }}"><i class="{{ values.icon }} mr-2"></i> {{ item }}</a>
                                 {% endif %}
                             {% endfor %}
                         </div>

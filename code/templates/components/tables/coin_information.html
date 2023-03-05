@@ -1,91 +1,91 @@
-	<div class="row col-12 mx-auto my-2" style="color: #b9b5b5;" id="information">
-		<div class="input-group mb-2">
-		    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
-		        <span class="input-group-text col-12 m-auto">
-		        	Launch Params
-				</span>
-		    </div>
-		    <input type="text" class="form-control col-10 " style=" font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.launch_params }}" value="{{ coins_data.coins_info.launch_params }}" readonly id="{{ coin }}_params">
-		    <div class="input-group-append p-0">
-				<button class="append-btn" data-clipboard-target="#{{ coin }}_params" style="line-height: 1em;">
-				    <i class="cil-copy"></i>
-				</button>
-		    </div>
-		</div>
+    <div class="row col-12 mx-auto my-2" style="color: #b9b5b5;" id="information">
+        <div class="input-group mb-2">
+            <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+                <span class="input-group-text col-12 m-auto">
+                    Launch Params
+                </span>
+            </div>
+            <input type="text" class="form-control col-10 " style=" font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.launch_params }}" value="{{ coins_data.coins_info.launch_params }}" readonly id="{{ coin }}_params">
+            <div class="input-group-append p-0">
+                <button class="append-btn" data-clipboard-target="#{{ coin }}_params" style="line-height: 1em;">
+                    {% include 'components/icons/copy_icon.html' %}
+                </button>
+            </div>
+        </div>
 
-		<div class="input-group mb-2">
-		    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
-		        <span class="input-group-text col-12 m-auto">
-		        	CLI
-				</span>
-		    </div>
-		    <input type="text" class="form-control col-10 " style="font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.cli }}" value="{{ coins_data.coins_info.cli }}" readonly id="{{ coin }}_cli">
-		    <div class="input-group-append p-0">
-				<button class="append-btn" data-clipboard-target="#{{ coin }}_cli" style="line-height: 1em;">
-				    <i class="cil-copy"></i>
-				</button>
-		    </div>
-		</div>
+        <div class="input-group mb-2">
+            <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+                <span class="input-group-text col-12 m-auto">
+                    CLI
+                </span>
+            </div>
+            <input type="text" class="form-control col-10 " style="font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.cli }}" value="{{ coins_data.coins_info.cli }}" readonly id="{{ coin }}_cli">
+            <div class="input-group-append p-0">
+                <button class="append-btn" data-clipboard-target="#{{ coin }}_cli" style="line-height: 1em;">
+                    {% include 'components/icons/copy_icon.html' %}
+                </button>
+            </div>
+        </div>
 
-		<div class="input-group mb-2">
-		    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
-		        <span class="input-group-text col-12 m-auto">
-		        	Config
-				</span>
-		    </div>
-		    <input type="text" class="form-control col-10" style="font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.conf_path }}" value="{{ coins_data.coins_info.conf_path }}" readonly id="{{ coin }}_conf">
-		    <div class="input-group-append p-0">
-				<button class="append-btn" data-clipboard-target="#{{ coin }}_conf" style="line-height: 1em;">
-				    <i class="cil-copy"></i>
-				</button>
-		    </div>
-		</div>
-		{% if coins_data.explorers|length > 0 %}
-			<div class="input-group mb-2">
-		    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
-		        <span class="input-group-text col-12 m-auto">
-			        	Explorers
-					</span>
-			    </div>
-				<div class="justify-content-between col-10 coin-params-field">
-				    {% for x in coins_data.explorers %}
-						<span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
-							<a href="{{ x }}">{{ x }}</a>
-						</span>
-					{% endfor %}
-				</div>
-			</div>
-		{% endif %}
-		{% if coins_data.electrums|length > 0 %}
-			<div class="input-group mb-2">
-			    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
-			        <span class="input-group-text col-12 m-auto">
-			        	Electrums
-					</span>
-			    </div>
-				<div class="justify-content-between col-10 coin-params-field">
-				    {% for x in coins_data.electrums %}
-						<span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
-							{{ x }}
-						</span>
-					{% endfor %}
-				</div>
-			</div>
-		{% endif %}
-		{% if coins_data.electrums_ssl|length > 0 %}
-			<div class="input-group mb-2">
-			    <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
-			        <span class="input-group-text col-12 m-auto">
-			        	Electrums (SSL)
-					</span>
-			    </div>
-				<div class="justify-content-between col-10 coin-params-field">
-				    {% for x in coins_data.electrums_ssl %}
-						<span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
-							{{ x }}
-						</span>
-					{% endfor %}
-				</div>
-			</div>
-		{% endif %}
-	</div>
+        <div class="input-group mb-2">
+            <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+                <span class="input-group-text col-12 m-auto">
+                    Config
+                </span>
+            </div>
+            <input type="text" class="form-control col-10" style="font-size: 1em; line-height: 1em;" placeholder="{{ coins_data.coins_info.conf_path }}" value="{{ coins_data.coins_info.conf_path }}" readonly id="{{ coin }}_conf">
+            <div class="input-group-append p-0">
+                <button class="append-btn" data-clipboard-target="#{{ coin }}_conf" style="line-height: 1em;">
+                    {% include 'components/icons/copy_icon.html' %}
+                </button>
+            </div>
+        </div>
+        {% if coins_data.explorers|length > 0 %}
+            <div class="input-group mb-2">
+            <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+                <span class="input-group-text col-12 m-auto">
+                        Explorers
+                    </span>
+                </div>
+                <div class="justify-content-between col-10 coin-params-field">
+                    {% for x in coins_data.explorers %}
+                        <span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
+                            <a href="{{ x }}">{{ x }}</a>
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        {% if coins_data.electrums|length > 0 %}
+            <div class="input-group mb-2">
+                <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+                    <span class="input-group-text col-12 m-auto">
+                        Electrums
+                    </span>
+                </div>
+                <div class="justify-content-between col-10 coin-params-field">
+                    {% for x in coins_data.electrums %}
+                        <span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
+                            {{ x }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        {% if coins_data.electrums_ssl|length > 0 %}
+            <div class="input-group mb-2">
+                <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+                    <span class="input-group-text col-12 m-auto">
+                        Electrums (SSL)
+                    </span>
+                </div>
+                <div class="justify-content-between col-10 coin-params-field">
+                    {% for x in coins_data.electrums_ssl %}
+                        <span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
+                            {{ x }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>

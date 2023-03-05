@@ -6,6 +6,8 @@ from lib_api import *
 from lib_const import *
 from lib_helper import *
 from lib_validate import *
+from lib_query import *
+from lib_update import *
 from lib_urls import *
 from models import coins_row
 from lib_crypto import SMARTCHAIN_BASE_58
@@ -27,13 +29,18 @@ def get_assetchain_cli(ac_name):
 
 
 def get_coins_repo_electrums(electrums, coins_data):
+
     for coin in coins_data:
 
         if coin == "TOKEL":
             _coin = "TKL"
         else:
-            _coin = coin
+            _coin = coin.replace("-segwit", "")
+        logger.info(coin)
+        logger.info(_coin)
         if _coin in electrums:
+            logger.info(electrums[_coin])
+
             data = requests.get(electrums[_coin]).json()
             for item in data:
                 if "protocol" in item:
@@ -56,7 +63,7 @@ def get_coins_repo_explorers(explorers, coins_data):
         elif coin == "TOKEL":
             _coin = "TKL"
         else:
-            _coin = coin
+            _coin = coin.replace("-segwit", "")
 
         if _coin in explorers:
             data = requests.get(explorers[_coin]).json()
@@ -198,6 +205,20 @@ def parse_assetchains(coins_data):
     return coins_data
 
 
+def remove_delisted_coins():
+    r = requests.get(get_coins_repo_coins_url())
+    coins_repo = r.json()
+    coins_repo_coins = []
+    for item in coins_repo:
+        coins_repo_coins.append(item["coin"])
+    db_coins = get_all_coins()
+    delisted_coins = list(set(db_coins) - set(coins_repo_coins))
+    for coin in delisted_coins:
+        print(f"Delisting {coin}")
+        delist_coin(coin)
+
+
+
 @print_runtime
 def parse_coins_repo():
 
@@ -211,6 +232,8 @@ def parse_coins_repo():
         item['coin'] = coin
 
         logger.info(f"[parse_coins_repo] Getting info for {coin}")
+        if "derivation_path" in item:
+            item["derivation_path"] = item["derivation_path"].replace("'", "-")
         coins_data.update({coin:{"coins_info":item}})
 
         if 'asset' in item:
@@ -222,7 +245,8 @@ def parse_coins_repo():
         coins_data[coin].update({
                     "mm2_compatible": coins_data[coin]["coins_info"]["mm2"]
                 })
-
+        if coin.find("-segwit") > -1:
+            print(coins_data[coin])
     return coins_data
 
 

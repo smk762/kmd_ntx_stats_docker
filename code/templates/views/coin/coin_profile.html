@@ -1,27 +1,27 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	<div class="row col-12 mx-auto my-1" style="color: #b9b5b5;">
-		<div class="card-deck d-flex justify-content-between col-12 m-0">
+    <div class="row col-12 mx-auto my-1" style="color: #b9b5b5;">
+        <div class="card-deck d-flex justify-content-between col-12 m-0">
             {% include "components/profile_stats/coin_ntx_stats_left.html" %}
             {% include "components/cards/coin_profile_card.html" %}
             {% include "components/profile_stats/coin_ntx_stats_right.html" %}
-		</div>
-	</div>	
+        </div>
+    </div>    
 
-	<div class="row mb-4">
-		<div class="card-deck d-flex justify-content-around col-12 m-0">
-			{% include "components/buttons/anchor_button.html" with btn_url="#information" width_pct="15" btn_text="Information" %}
-			{% include "components/buttons/anchor_button.html" with btn_url="#ntx" width_pct="15" btn_text="Notarisations" %}
-			{% include "components/buttons/anchor_button.html" with btn_url="#balances" width_pct="15" btn_text="Balances" %}
-			{% include "components/buttons/anchor_button.html" with btn_url="#addresses" width_pct="15" btn_text="Addresses" %}
-		</div>
-	</div>
+    <div class="row mb-4">
+        <div class="card-deck d-flex justify-content-around col-12 m-0">
+            {% include "components/buttons/anchor_button.html" with btn_url="#information" width_pct="15" btn_text="Information" %}
+            {% include "components/buttons/anchor_button.html" with btn_url="#ntx" width_pct="15" btn_text="Notarisations" %}
+            {% include "components/buttons/anchor_button.html" with btn_url="#balances" width_pct="15" btn_text="Balances" %}
+            {% include "components/buttons/anchor_button.html" with btn_url="#addresses" width_pct="15" btn_text="Addresses" %}
+        </div>
+    </div>
 
-	{% include "components/region_leaders/top_coin_notarisers.html" %}
-	{% include 'components/tables/coin_information.html' %}
-	{% include 'components/tables/coin_season_ntx_summary.html' %}
-	{% include 'components/graphs/coin_balances_bargraph.html' %}
-	{% include 'components/tables/coin_balances_table.html' %}
+    {% include "components/region_leaders/top_coin_notarisers.html" %}
+    {% include 'components/tables/coin_information.html' %}
+    {% include 'components/tables/coin_season_ntx_summary.html' %}
+    {% include 'components/graphs/coin_balances_bargraph.html' %}
+    {% include 'components/tables/coin_balances_table.html' %}
 
 {% endblock %}
