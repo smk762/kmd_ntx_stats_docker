@@ -226,7 +226,6 @@ class notarised():
     def import_ntx(self, server, coin):
 
         import_txids_url = urls.get_ntxid_list_url(self.season, server, coin, False)
-        print(import_txids_url)
         import_txids = requests.get(import_txids_url).json()["results"]
 
         new_txids = list(set(import_txids)-set(self.existing_txids))
@@ -236,7 +235,6 @@ class notarised():
         for txid in new_txids:
             time.sleep(0.02)
             txid_url = urls.get_notarised_txid_url(txid, False)
-            print(txid_url)
             r = requests.get(txid_url)
 
             for txid_info in r.json()["results"]:

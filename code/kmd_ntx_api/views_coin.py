@@ -26,7 +26,9 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
     })
     
     if coin:
+        logger.info(coin)
         coin_profile_summary_table = table.get_coin_ntx_season_table_data(request, coin)
+        logger.info(coin_profile_summary_table)
         if len(coin_profile_summary_table["coin_ntx_summary_table"]) == 1:
 
             coin_ntx_summary_table = coin_profile_summary_table["coin_ntx_summary_table"][0]

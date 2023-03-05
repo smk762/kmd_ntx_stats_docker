@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 from lib_const import *
-from lib_helper import is_postseason
+import lib_helper as helper
 from decorators import print_runtime
 import lib_ntx
 
@@ -45,9 +45,8 @@ if __name__ == "__main__":
     CLEAN_UP = False
     FULL_SCAN = False
     RESCAN_SEASON = False
-    seasons = [
-        "Season_6"
-    ]
+    seasons = helper.get_active_seasons()
+
     if len(sys.argv) > 1:
         if "rescan" in sys.argv:
             RESCAN_SEASON = True

@@ -87,6 +87,16 @@ def is_notary_ltc_address(addr):
     return False
 
 
+def get_active_seasons(timestamp=None):
+    active_seasons = []
+    if not timestamp: timestamp = int(time.time())
+    for season in SEASONS_INFO:
+        if "end_time" in SEASONS_INFO[season]:
+            if timestamp <= SEASONS_INFO[season]["end_time"] and timestamp >= SEASONS_INFO[season]["start_time"]:
+                active_seasons.append(season)
+    return active_seasons
+
+
 def is_postseason(timestamp=None, block=None):
     if block:
         for season in SEASONS_INFO:
