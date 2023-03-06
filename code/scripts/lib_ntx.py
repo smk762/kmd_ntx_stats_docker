@@ -28,7 +28,7 @@ class notarised():
         # Set end block for season
         if "post_season_end_block" in SEASONS_INFO[self.season]:
             self.end_block = SEASONS_INFO[self.season]["post_season_end_block"]
-        else:    
+        else:
             self.end_block = SEASONS_INFO[self.season]["end_block"]
 
         if not self.rescan:
@@ -42,7 +42,7 @@ class notarised():
 
     @print_runtime
     def update_table(self):
-        logger.info(f"Processing notarisations for {self.season}, blocks {self.start_block} - {self.end_block}")        
+        logger.info(f"Processing notarisations for {self.season}, blocks {self.start_block} - {self.end_block}")
         if not self.rescan:
             unrecorded_KMD_txids = self.get_missing_txids_list(self.start_block, self.end_block)
             self.update_notarisations(unrecorded_KMD_txids)
@@ -140,7 +140,7 @@ class notarised():
             else:
                 row_data = get_notarised_data(txid, coins_list)
                 ntx_row.notary_addresses = row_data[6]
-                
+
         else:
             ntx_row.notary_addresses = txid_info["notary_addresses"]
             ntx_row.season = txid_info["season"]
@@ -166,7 +166,7 @@ class notarised():
                             if opret.find("OP_RETURN") != -1:
                                 scriptPubKey_asm = opret.replace("OP_RETURN ","")
                                 ac_ntx_blockhash = crypto.lil_endian(scriptPubKey_asm[:64])
-                                ac_ntx_height = int(crypto.lil_endian(scriptPubKey_asm[64:72]),16) 
+                                ac_ntx_height = int(crypto.lil_endian(scriptPubKey_asm[64:72]),16)
 
                                 coin = crypto.get_opret_ticker(scriptPubKey_asm)
                                 # extra_data = get_extra_ntx_data(scriptPubKey_asm)
@@ -231,7 +231,7 @@ class notarised():
         new_txids = list(set(import_txids)-set(self.existing_txids))
         logger.info(f"NTX TXIDs to import: {len(new_txids)}")
         logger.info(f"Processing ETA: {0.03*len(new_txids)} sec")
-        
+
         for txid in new_txids:
             time.sleep(0.02)
             txid_url = urls.get_notarised_txid_url(txid, False)
@@ -282,7 +282,6 @@ class ntx_daily_stats():
 
     def update_daily_coin_ntx(self):
         logger.info(f"Getting daily ntx coin counts for {self.day}")
-        
         for item in self.coins_aggr_resp:
             row = notarised_coin_daily_row()
             row.season = self.season
@@ -395,8 +394,6 @@ class ntx_season_stats():
         }
 
         # {'KMD': {'KMD': 0.0325}, 'LTC': {'LTC': 0}, 'Main': {'Epoch_0': 0.03781739, 'Epoch_1': 0.03953636, 'Epoch_2': 0.03781739}, 'Third_Party': {'Epoch_0': 0.01628333, 'Epoch_1': 0.01395714, 'Epoch_2': 0.0122125, 'Epoch_3': 0.01395714, 'Epoch_4': 0.0122125}}
-        
-
 
     @print_runtime
     def update_ntx_season_stats_tables(self):
@@ -461,7 +458,7 @@ class ntx_season_stats():
         self.season_servers = list(set(helper.get_season_servers(self.season)).difference({"Unofficial", "LTC", "BTC"}))
         self.season_notaries = helper.get_season_notaries(self.season)
         self.epoch_scores_dict = validate.get_epoch_scores_dict(self.season)
-        
+
         # Prefill Coins Dicts
         for coin in self.season_coins:
             self.season_ntx_dict["coins"].update(self.get_default_ntx_item_dict(coin))
@@ -543,7 +540,7 @@ class ntx_season_stats():
                 self.season_ntx_dict["servers"][server]["epochs"][epoch].update({"notaries": {}})
                 self.season_ntx_dict["servers"][server]["epochs"][epoch]["score_per_ntx"] = float(self.epoch_scores_dict[server][epoch])
 
-                for coin in epoch_coins:                                
+                for coin in epoch_coins:
                     self.season_ntx_dict["servers"][server]["epochs"][epoch]["coins"].update(self.get_default_ntx_item_dict(coin))
                     self.season_ntx_dict["servers"][server]["epochs"][epoch]["coins"][coin].update({"notaries": {}})
 
@@ -598,6 +595,7 @@ class ntx_season_stats():
                         self.season_ntx_dict["coins"][coin]["servers"][server]["notaries"][notary]["ntx_count"] += server_epoch_coin_count
                         self.season_ntx_dict["coins"][coin]["servers"][server]["notaries"][notary]["ntx_score"] += float(server_epoch_coin_score)
 
+                        logger.info(f"{coin} {self.season} {server} {epoch}")
                         # Global Coin Server Epoch Score and Count Totals
                         self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["ntx_count"] += server_epoch_coin_count
                         self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["ntx_score"] += float(server_epoch_coin_score)
@@ -678,7 +676,7 @@ class ntx_season_stats():
                 for epoch in self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"]:
                     self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["ntx_count"]\
                         = round(self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["ntx_count"] / 13)
-        
+
         for server in self.season_ntx_dict["servers"]:
             self.season_ntx_dict["servers"][server]["ntx_count"]\
                 = round(self.season_ntx_dict["servers"][server]["ntx_count"] / 13)
@@ -878,7 +876,7 @@ class ntx_season_stats():
             self.season_ntx_dict["coins"][coin]["pct_of_season_ntx_count"] = round(
                 safe_div(self.season_ntx_dict["coins"][coin]["ntx_count"],
                          self.season_ntx_dict["ntx_count"])*100,6)
-            
+
             # Coin Percentage of Global Score
             self.season_ntx_dict["coins"][coin]["ntx_score"] = round(self.season_ntx_dict["coins"][coin]["ntx_score"],8)
             self.season_ntx_dict["coins"][coin]["pct_of_season_ntx_score"] = round(
@@ -1212,7 +1210,7 @@ class ntx_season_stats():
 
 
                 for coin in self.season_ntx_dict["notaries"][notary]["servers"][server]["coins"]:
-                    
+
                     # Notary Server Coin Percentage of Server Count
                     self.season_ntx_dict["notaries"][notary]["servers"][server]["coins"][coin]["pct_of_server_ntx_count"] = round(
                         safe_div(self.season_ntx_dict["notaries"][notary]["servers"][server]["coins"][coin]["ntx_count"],
@@ -1226,7 +1224,7 @@ class ntx_season_stats():
 
 
                 for epoch in self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"]:
-                    
+
                     # Notary Server Epoch Percentage of Server Count
                     self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["pct_of_server_ntx_count"] = round(
                         safe_div(self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["ntx_count"],
@@ -1240,7 +1238,7 @@ class ntx_season_stats():
 
 
                     for coin in self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["coins"]:
-                        
+
                         # Notary Server Epoch Coin Percentage of Server Count
                         self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["coins"][coin]["pct_of_server_ntx_count"] = round(
                             safe_div(self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["coins"][coin]["ntx_count"],
@@ -1318,10 +1316,10 @@ class ntx_season_stats():
                     self.season_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["pct_of_server_ntx_score"] = round(
                         safe_div(self.season_ntx_dict["servers"][server]["epochs"][epoch]["notaries"][notary]["ntx_score"],
                                  self.season_ntx_dict["servers"][server]["ntx_score"])*100,6)
-        
 
 
     def build_season_ntx_dict(self):
+        logger.info(f"Building season ntx dict for {self.season}")
         self.prepopulate()
         self.add_scores_counts()
         self.add_global_percentages()
@@ -1335,7 +1333,6 @@ class ntx_season_stats():
         coin_ntx_season_row().delete(self.season)
         notary_ntx_season_row().delete(self.season)
         server_ntx_season_row().delete(self.season)
-        
 
 
 # Last Notarised tables
@@ -1391,7 +1388,7 @@ class last_notarisations():
                 row.kmd_ntx_blocktime = last_ntx_data[5]
                 row.kmd_ntx_txid = last_ntx_data[6]
                 row.ac_ntx_blockhash = last_ntx_data[7]
-                row.ac_ntx_height = last_ntx_data[8]       
+                row.ac_ntx_height = last_ntx_data[8]
                 return row
 
             else:
@@ -1524,7 +1521,7 @@ def import_nn_btc_txids(season):
 
 
 def import_nn_ltc_txids(season):
-    
+
     if season not in NOTARY_LTC_ADDRESSES:
         logger.warning(f"{season} not in NOTARY_LTC_ADDRESSES")
         return
@@ -1570,7 +1567,7 @@ def import_nn_ltc_txids(season):
                     txid_data.num_inputs = row["num_inputs"]
                     txid_data.num_outputs = row["num_outputs"]
                     txid_data.update()
-                    
+
             except Exception as e:
                 logger.error(e)
                 logger.error(f"Something wrong with API? {txid_url}")
@@ -1630,12 +1627,12 @@ def get_new_master_server_txids(notary_address, coin, season):
         existing_txids = query.get_existing_nn_btc_txids(notary_address, None, season)
         url = f"{OTHER_SERVER}/api/info/btc_txid_list/?address={notary_address}&season={season}"
         logger.info(f"{len(existing_txids)} existing txids in local DB detected for {notary_address} {season}")
-           
+
     elif coin == "LTC":
         existing_txids = query.get_existing_nn_ltc_txids(notary_address, None, season)
         url = f"{OTHER_SERVER}/api/info/ltc_txid_list/?notary={notary_address}&season={season}"
         logger.info(f"{len(existing_txids)} existing txids in local DB detected for {notary_address} {season}")
-     
+
     logger.info(url)
     r = requests.get(url)
     resp = r.json()
@@ -1649,7 +1646,7 @@ def get_new_master_server_txids(notary_address, coin, season):
 
     if coin == "BTC":
         logger.info(f"{len(new_txids)} extra txids detected for notary_address {notary_address} {season}")
-    
+
     if coin == "LTC":
         logger.info(f"{len(new_txids)} extra txids detected for notary_address {notary_address} {season}")
 
@@ -1669,7 +1666,7 @@ def get_extra_ntx_data(coin, scriptPubKey_asm):
             MoM_depth = int(crypto.lil_endian(scriptPubKey_asm[end:]),16)
         except Exception as e:
             logger.debug(e)
-    return 
+    return
 
 
 
@@ -1682,10 +1679,10 @@ def get_new_nn_btc_txids(existing_txids, notary_address, page_break=None, stop_b
     exit_loop = False
     api_txids = []
     new_txids = []
-    
+
     if not page_break:
         page_break = API_PAGE_BREAK
-    
+
     if not stop_block:
         stop_block = 634774
 
