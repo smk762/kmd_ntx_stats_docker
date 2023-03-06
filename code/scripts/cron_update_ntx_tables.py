@@ -11,7 +11,7 @@ After updaing the "notarised" table, aggregations are performed to get counts fo
 It is intended to be run as a cronjob every 15-30 min
 Script runtime is around 5-10 mins, except for initial population which is up to 1 day per season
 '''
-
+#logger.info(SEASONS_INFO)
 
 @print_runtime
 def update_ntx_tables(seasons, rescan=False):
@@ -21,22 +21,26 @@ def update_ntx_tables(seasons, rescan=False):
 
         notarised_table = lib_ntx.notarised(season, rescan)
         if CLEAN_UP:
-            notarised_table.clean_up(season)
+            notarised_table.clean_up()
             rescan = True
+
         notarised_table.update_table()
-
-        if SEASONS_INFO[season]["end_time"] > time.time() + 2 * 86400 and not FULL_SCAN:
-            ntx_daily_tables = lib_ntx.ntx_daily_stats(season, rescan)
-            ntx_daily_tables.update_daily_ntx_tables()
-
-            ntx_season_tables = lib_ntx.ntx_season_stats(season)
-            if CLEAN_UP:
-                ntx_season_tables.clean_up(season)
-            ntx_season_tables.update_ntx_season_stats_tables()
 
         last_ntx_tables = lib_ntx.last_notarisations(season)
         last_ntx_tables.update_coin_table()
         last_ntx_tables.update_notary_table()
+
+        if SEASONS_INFO[season]["end_time"] > time.time() + 2 * 86400 and not FULL_SCAN:
+
+            ntx_season_tables = lib_ntx.ntx_season_stats(season)
+            if CLEAN_UP:
+                ntx_season_tables.clean_up()
+            ntx_season_tables.update_ntx_season_stats_tables()
+
+            ntx_daily_tables = lib_ntx.ntx_daily_stats(season, rescan)
+            ntx_daily_tables.update_daily_ntx_tables()
+
+
 
 if __name__ == "__main__":
 
@@ -46,7 +50,7 @@ if __name__ == "__main__":
     FULL_SCAN = False
     RESCAN_SEASON = False
     seasons = helper.get_active_seasons()
-
+    logger.info(f"Active season: {seasons}")
     if len(sys.argv) > 1:
         if "rescan" in sys.argv:
             RESCAN_SEASON = True
