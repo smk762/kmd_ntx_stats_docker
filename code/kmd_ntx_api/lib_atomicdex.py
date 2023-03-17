@@ -58,7 +58,6 @@ def get_bestorders(request):
         "action": helper.get_or_none(request, "action", "buy"),
         "volume": helper.get_or_none(request, "volume", 100),
     }
-    print(params)
     r = mm2_proxy(params)
     return r.json()
 
@@ -489,6 +488,7 @@ def get_activation_commands(request):
         platform = None
         coin = item["coin"]
         electrums = item["electrums"]
+        lightwallets = item["lightwallets"]
         compatible = item["mm2_compatible"] == 1
         
         if coin == "TOKEL":
@@ -513,8 +513,28 @@ def get_activation_commands(request):
             resp_json.update(get_contracts(coin))
         else:
             other_platforms.append(platform)
-        logger.info(protocol)
-        if protocol == "UTXO":
+
+        if lightwallets:
+            resp_json.update({
+                "method": "task::enable_z_coin::init",
+                "mmrpc": "2.0",
+                "userpass":"'$userpass'",
+                "params": {
+                    "ticker": coin,
+                    "activation_params": {
+                        "mode": {
+                            "rpc": "Light",
+                            "rpc_data": {
+                                "electrum_servers": [{"url": i} for i in electrums],
+                                "light_wallet_d_servers": lightwallets
+                            }
+                        }
+                    }
+                }
+            })
+            platform = "UTXO"
+
+        elif protocol == "UTXO":
             platform = 'UTXO'
             if len(electrums) > 0:
                 resp_json.update({
@@ -648,8 +668,8 @@ def get_activation_commands(request):
         if compatible and len(resp_json) > 0:
             is_valid_enable = (resp_json['method'] == 'enable' and 'urls' in resp_json)
             is_valid_electrum = (resp_json['method'] == 'electrum' and 'servers' in resp_json)
-            if is_valid_enable or is_valid_electrum:
-                if platform:
+            if is_valid_enable or is_valid_electrum or lightwallets:
+                if platform or lightwallets:
                     if platform not in enable_commands["commands"]:
                         enable_commands["commands"].update({
                             platform: {}
@@ -892,7 +912,6 @@ def get_seednode_version_score_total(request, season=None, start=None, end=None)
     return resp
 
 
-
 def categorise_trade(gui, version):
     os = "Unknown"
     ui = "Unknown"
@@ -943,3 +962,9 @@ def categorise_trade(gui, version):
                 break
 
     return os, ui, gui_version, mm2_version
+
+
+def get_electrum_status():
+    return requests.get("https://electrum-status.dragonhound.info/api/v1/electrums_status").json()
+
+

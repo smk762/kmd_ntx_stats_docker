@@ -19,6 +19,11 @@ This script scans the komodo, coins and dpow repositories and updates contexual 
 It should be run as a cronjob every 12-24 hours
 '''
 
+def get_alt_name(coin):
+    coin = handle_translate_coins(coin)
+    coin = coin.replace("-segwit", "")
+    return coin
+
 
 def get_assetchain_conf_path(ac_name):
     return f"~/.komodo/{ac_name}/{ac_name}.conf"
@@ -28,20 +33,35 @@ def get_assetchain_cli(ac_name):
     return f"~/komodo/src/komodo-cli -ac_name={ac_name}"
 
 
+def get_coins_repo_lightwallets(lightwallets, coins_data):
+    for coin in coins_data:
+        data = None
+        _coin = get_alt_name(coin)
+        if _coin in lightwallets:
+            data = requests.get(lightwallets[_coin]).json()
+        elif coin in lightwallets:
+            data = requests.get(lightwallets[coin]).json()
+        if data:
+            logger.info(f"[get_coins_repo_lightwallets] {coin} {data}")
+            coins_data[coin]['lightwallets'] = data
+        else:
+            pass
+            # logger.warning(f"[get_coins_repo_lightwallets] No electrum for {coin}")
+
+    return coins_data
+
+
 def get_coins_repo_electrums(electrums, coins_data):
 
     for coin in coins_data:
-
-        if coin == "TOKEL":
-            _coin = "TKL"
-        else:
-            _coin = coin.replace("-segwit", "")
-        logger.info(coin)
-        logger.info(_coin)
+        data = None
+        _coin = get_alt_name(coin)
         if _coin in electrums:
-            logger.info(electrums[_coin])
-
             data = requests.get(electrums[_coin]).json()
+        elif coin in electrums:
+            data = requests.get(electrums[coin]).json()
+        if data:
+            logger.info(f"[get_coins_repo_explorers] {coin} {data[0]}")
             for item in data:
                 if "protocol" in item:
                     if item['protocol'] == "SSL":
@@ -50,41 +70,40 @@ def get_coins_repo_electrums(electrums, coins_data):
                         coins_data[coin]['electrums'].append(item['url'])
                 else:
                     coins_data[coin]['electrums'].append(item['url'])
+        else:
+            pass
+            # logger.warning(f"[get_coins_repo_explorers] No electrum for {coin}")
 
     return coins_data
 
 
 def get_coins_repo_explorers(explorers, coins_data):
     for coin in coins_data:
-        if coin == "COQUICASH":
-            _coin = "COQUI"
-        elif coin == "WLC21":
-            _coin = "WLC"
-        elif coin == "TOKEL":
-            _coin = "TKL"
-        else:
-            _coin = coin.replace("-segwit", "")
-
+        data = None
+        _coin = get_alt_name(coin)
         if _coin in explorers:
             data = requests.get(explorers[_coin]).json()
+        elif coin in explorers:
+            data = requests.get(explorers[coin]).json()
+        if data:
+            # logger.info(f"[get_coins_repo_explorers] {coin} {data}")
             for explorer in data:
                 coins_data[coin]['explorers'].append(explorer.replace("/tx/", "/").replace("/tx.dws?", "/"))
+        else:
+            pass
+            # logger.warning(f"[get_coins_repo_explorers] No explorers for {coin}")
              
     return coins_data
 
 
 def get_coins_repo_icons(icons, coins_data):
-    for coin in coins_data:    
-        if coin == "COQUICASH":
-            _coin = "COQUI"
-        elif coin == "GLEEC-OLD":
+    logger.info(icons)
+    for coin in coins_data:
+        data = None
+        _coin = get_alt_name(coin)
+
+        if coin == "GLEEC-OLD":
             _coin = "GLEEC"
-        elif coin == "TOKEL":
-            _coin = "TKL"
-        elif coin == "WLC21":
-            _coin = "WLC"
-        elif coin == "PIRATE":
-            _coin = "ARRR"
         elif coin.endswith("-AVX20") or coin.endswith("-BEP20") or coin.endswith("-ERC20")\
                                      or coin.endswith("-HRC20") or coin.endswith("-KRC20")\
                                      or coin.endswith("-PLG20") or coin.endswith("-FTM20")\
@@ -93,10 +112,18 @@ def get_coins_repo_icons(icons, coins_data):
             _coin = coin.split("-")[0]
         else:
             _coin = coin
-        _coin = f"{_coin.lower()}.png"
-        
-        if _coin in icons:
-            coins_data[coin]["coins_info"].update({"icon":icons[_coin]})
+
+        if f"{_coin.lower()}.png" in icons:
+            data = icons[f"{_coin.lower()}.png"]
+        elif f"{coin.lower()}.png" in icons:
+            data = icons[f"{coin.lower()}.png"]
+
+        if data:
+            logger.info(f"[get_coins_repo_icons] {coin} {data}")
+            coins_data[coin]["coins_info"].update({"icon": data})
+        else:
+            logger.warning(f"[get_coins_repo_icons] No icon for {coin}")
+            pass
 
     return coins_data
 
@@ -214,7 +241,6 @@ def remove_delisted_coins():
     db_coins = get_all_coins()
     delisted_coins = list(set(db_coins) - set(coins_repo_coins))
     for coin in delisted_coins:
-        print(f"Delisting {coin}")
         delist_coin(coin)
 
 
@@ -245,8 +271,6 @@ def parse_coins_repo():
         coins_data[coin].update({
                     "mm2_compatible": coins_data[coin]["coins_info"]["mm2"]
                 })
-        if coin.find("-segwit") > -1:
-            print(coins_data[coin])
     return coins_data
 
 
@@ -265,6 +289,11 @@ def parse_electrum_explorer(coins_data):
     for item in electrums_data:
         electrums.update({item["name"]:item["download_url"]})
 
+    lightwallets_data = get_github_folder_contents("KomodoPlatform", "coins", "light_wallet_d")
+    lightwallets = {}
+    for item in lightwallets_data:
+        lightwallets.update({item["name"]:item["download_url"]})
+
     icons_data = get_github_folder_contents("KomodoPlatform", "coins", "icons")
     icons = {}
     for item in icons_data:
@@ -274,6 +303,7 @@ def parse_electrum_explorer(coins_data):
         coin = handle_translate_coins(coin)
         coins_data = pre_populate_coins_data(coins_data, coin)
 
+    coins_data = get_coins_repo_lightwallets(lightwallets, coins_data)
     coins_data = get_coins_repo_electrums(electrums, coins_data)
     coins_data = get_coins_repo_explorers(explorers, coins_data)
     coins_data = get_coins_repo_icons(icons, coins_data)
@@ -298,6 +328,30 @@ def pre_populate_coins_data(coins_data, coin):
         coins_data[coin].update({"electrums_ssl": []})
     if "explorers" not in coins_data[coin]:
         coins_data[coin].update({"explorers": []})
+    if "lightwallets" not in coins_data[coin]:
+        coins_data[coin].update({"lightwallets": []})
+    if "mm2_compatible" not in coins_data[coin]:
+        coins_data[coin].update({"mm2_compatible": 0})
+
+    coin = get_alt_name(coin)
+    if coin not in coins_data:
+        coins_data.update({coin: {}})
+    if "coins_info" not in coins_data[coin]:
+        coins_data[coin].update({"coins_info": {}})
+    if "dpow" not in coins_data[coin]:
+        coins_data[coin].update({"dpow": {}})
+    if "dpow_tenure" not in coins_data[coin]:
+        coins_data[coin].update({"dpow_tenure": {}})
+    if "dpow_active" not in coins_data[coin]:
+        coins_data[coin].update({"dpow_active": 0})
+    if "electrums" not in coins_data[coin]:
+        coins_data[coin].update({"electrums": []})
+    if "electrums_ssl" not in coins_data[coin]:
+        coins_data[coin].update({"electrums_ssl": []})
+    if "explorers" not in coins_data[coin]:
+        coins_data[coin].update({"explorers": []})
+    if "lightwallets" not in coins_data[coin]:
+        coins_data[coin].update({"lightwallets": []})
     if "mm2_compatible" not in coins_data[coin]:
         coins_data[coin].update({"mm2_compatible": 0})
     return coins_data
@@ -315,7 +369,6 @@ def remove_old_coins(coins_data):
 
 def update_coins(coins_data):
     for coin in coins_data:
-        coin = handle_translate_coins(coin)
         logger.info(f"[update_coins] Updating {coin}")
         coin_data = coins_row()
         coin_data.coin = coin
@@ -323,8 +376,15 @@ def update_coins(coins_data):
         coin_data.electrums = json.dumps(coins_data[coin]['electrums'])
         coin_data.electrums_ssl = json.dumps(coins_data[coin]['electrums_ssl'])
         coin_data.explorers = json.dumps(coins_data[coin]['explorers'])
+        coin_data.lightwallets = json.dumps(coins_data[coin]['lightwallets'])
         coin_data.dpow = json.dumps(coins_data[coin]['dpow'])
         coin_data.dpow_tenure = json.dumps(coins_data[coin]['dpow_tenure'])
         coin_data.dpow_active = coins_data[coin]['dpow_active']
         coin_data.mm2_compatible = coins_data[coin]['mm2_compatible']
         coin_data.update()
+
+        coin = handle_translate_coins(coin)
+        if coin != coin_data.coin:
+            logger.warning(f"Creating second entry for {coin} / {coin_data.coin}")
+            coin_data.coin = coin
+            coin_data.update()

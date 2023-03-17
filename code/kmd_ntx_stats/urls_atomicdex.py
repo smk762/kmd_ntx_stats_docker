@@ -40,6 +40,10 @@ frontend_atomicdex_urls = [
     path('atomicdex/seednode_version/',
          views_atomicdex.seednode_version_view,
          name='seednode_version_view'),
+
+    path('atomicdex/electrum_status/',
+         views_atomicdex.electrum_status_view,
+         name='electrum_status_view'),
 ]
 
 # AtomicDEX API V2

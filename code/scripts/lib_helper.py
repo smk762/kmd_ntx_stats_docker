@@ -17,6 +17,10 @@ def handle_translate_coins(coin):
         return TRANSLATE_COINS[coin]
     return coin
 
+def handle_translate_coins_reverse(coin):
+    if coin in REVERSE_TRANSLATE_COINS:
+        return REVERSE_TRANSLATE_COINS[coin]
+    return coin
 
 def get_dpow_coin_src(src):
     try:

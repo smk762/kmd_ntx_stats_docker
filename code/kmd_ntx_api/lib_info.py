@@ -395,11 +395,11 @@ def get_coins(request, coin=None):
                 "explorers": item["explorers"],
                 "electrums": item["electrums"],
                 "electrums_ssl": item["electrums_ssl"],
+                "lightwallets": item["lightwallets"],
                 "mm2_compatible": item["mm2_compatible"],
                 "dpow_active": item["dpow_active"]
             },
         })
-
     return resp
 
 
