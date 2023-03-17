@@ -40,7 +40,7 @@ class coinsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = coins
         fields = ['coin', 'coins_info', 'electrums', 'electrums_ssl',
-                  'explorers', 'dpow', 'dpow_tenure', 'dpow_active',
+                  'explorers', 'lightwallets', 'dpow', 'dpow_tenure', 'dpow_active',
                   'mm2_compatible']
 
 

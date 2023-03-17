@@ -59,6 +59,7 @@ class coins(models.Model):
     coins_info = JSONField(default=dict)
     electrums = JSONField(default=dict)
     electrums_ssl = JSONField(default=dict)
+    lightwallets = JSONField(default=dict)
     explorers = JSONField(default=dict)
     dpow = JSONField(default=dict)
     dpow_tenure = JSONField(default=dict)

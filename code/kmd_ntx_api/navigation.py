@@ -255,6 +255,10 @@ NAV_DATA = {
                 "icon": "fa-solid fa-atom",
                 "url": "/atomicdex/bestorders"
             },
+            "Electrum Status": {
+                "icon": "fa-solid fa-atom",
+                "url": "/atomicdex/electrum_status"
+            },
             "GUI Stats": {
                 "icon": "fa-solid fa-atom",
                 "hide": True,

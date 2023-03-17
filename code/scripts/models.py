@@ -89,13 +89,14 @@ class balance_row():
    
 class coins_row():
     def __init__(self, coin='', coins_info='',
-     electrums='', electrums_ssl='', explorers='',
+     electrums='', electrums_ssl='', explorers='', lightwallets='',
      dpow='', dpow_tenure=dict, dpow_active='', mm2_compatible=''):
         self.coin = coin
         self.coins_info = coins_info
         self.electrums = electrums
         self.electrums_ssl = electrums_ssl
         self.explorers = explorers
+        self.lightwallets = lightwallets
         self.dpow = dpow
         self.dpow_tenure = dpow_tenure
         self.dpow_active = dpow_active
@@ -107,10 +108,9 @@ class coins_row():
     def update(self):
         self.coin = handle_translate_coins(self.coin)
         row_data = (self.coin, self.coins_info, self.electrums,
-            self.electrums_ssl, self.explorers, self.dpow,
+            self.electrums_ssl, self.explorers, self.lightwallets, self.dpow,
             self.dpow_tenure, self.dpow_active, self.mm2_compatible)
         if self.validated():
-            logger.info(f"Updating [coins] {self.coin} ")
             update_coins_row(row_data)
         else:
             logger.warning(f"[coins] Row data invalid!")

@@ -291,4 +291,15 @@ def seednode_version_view(request):
     return render(request, 'views/atomicdex/seednode_version_stats.html', context)
 
 
+## 2023 Updates
+
+def electrum_status_view(request):
+    context = helper.get_base_context(request)
+    context.update({
+        "page_title": "Electrum Status",
+        "source": "https://electrum-status.dragonhound.info/api/v1/electrums_status"
+    })
+
+    return render(request, 'components/tables/atomicdex/table_electrum_status.html', context)
+
 
