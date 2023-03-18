@@ -22,6 +22,7 @@
 						<th data-data="ssl">SSL</th>
 						<th data-data="status">Status</th>
 						<th data-data="response">Response</th>
+						<th data-data="last_connection">Last</th>
 					</tr>
 				</thead>
 			</table>
@@ -53,6 +54,7 @@
     		"order": [ 0, 'asc' ],
     		"responsive": true,
     		"columnDefs": [
+                { className: "text-nowrap", "targets": [ 5 ] },
     			{
 		            "data": "coin",
 		            "targets": 0,
@@ -73,10 +75,10 @@
 
 		            	}
 		            	if (oData.status == "Failing") {
-		            		content = tooltip + '<span style="color: #d72222; font-size: 1em;"> ' + content + '</i></span>';
+		            		content = tooltip + '<span style="color: #d72222; font-size: 0.9em;"> ' + content + '</i></span>';
 		            	}
 		            	else {
-		            		content = tooltip + '<span style="color: #5ce35c; font-size: 1em;"> ' + content + '</i></span>';
+		            		content = tooltip + '<span style="color: #5ce35c; font-size: 0.9em;"> ' + content + '</i></span>';
 		            	}
 		            	$(nTd).html(content);
 		            }
@@ -111,6 +113,15 @@
 		            	}
 		            	$(nTd).html(content);
 		            }
+		        },
+    			{
+		            "data": "last_connection",
+		            "targets": 5,
+		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+		            	if (parseInt(oData.last_connection) > 0) {
+		            		$(nTd).html('<span style="color: #5ce35c; font-size: 0.9em;"> ' + get_time_since(parseInt(oData.last_connection))) + '</i></span>';
+		            	}
+		            }		            
 		        }
 	        ]
         });
