@@ -600,6 +600,15 @@
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
             }
+            .link-row {
+                z-index: 2;
+                background-color: #0d0f1c;
+                border: solid 1px #303030 !important;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
             .append-label-right {
                 background-color: #0d0f1c;
             }

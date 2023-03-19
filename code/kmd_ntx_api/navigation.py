@@ -33,6 +33,10 @@ NAV_DATA = {
             "Coin dPoW Tenure": {
                 "icon": "fa-solid fa-coins",
                 "url": "/notarised_tenure"
+            },
+            "View Notarisation TXID": {
+                "icon": "bi bi-shield-check",
+                "url": "/notarisation"
             }
         }
     },
