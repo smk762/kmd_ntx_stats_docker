@@ -106,7 +106,6 @@ class coins_row():
         return True
 
     def update(self):
-        self.coin = handle_translate_coins(self.coin)
         row_data = (self.coin, self.coins_info, self.electrums,
             self.electrums_ssl, self.explorers, self.lightwallets, self.dpow,
             self.dpow_tenure, self.dpow_active, self.mm2_compatible)

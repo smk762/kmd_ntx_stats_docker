@@ -124,7 +124,6 @@ noMoM = ['CHIPS', 'GAME', 'HUSH3', 'EMC2', 'GIN', 'GLEEC-OLD', 'AYA', 'MCL', 'VR
 
 OTHER_LAUNCH_PARAMS = {
     "BTC": "~/bitcoin/src/bitcoind",
-    "SFUSD": "~/sfusd-core/src/smartusdd",
     "LTC": "~/litecoin/src/litecoind",
     "KMD": "~/komodo/src/komodod", 
     "AYA": "~/AYAv2/src/aryacoind",
@@ -134,7 +133,7 @@ OTHER_LAUNCH_PARAMS = {
     "TOKEL": "~/tokelkomodo/src/komodod -ac_name=TOKEL -ac_supply=100000000 -ac_eras=2 -ac_cbmaturity=1 -ac_reward=100000000,4250000000 -ac_end=80640,0 -ac_decay=0,77700000 -ac_halving=0,525600 -ac_cc=555 -ac_ccenable=236,245,246,247 -ac_adaptivepow=6 -addnode=135.125.204.169 -addnode=192.99.71.125 -addnode=144.76.140.197 -addnode=135.181.92.123 ",
     "VRSC": "~/VerusCoin/src/verusd",
     "GLEEC": "~/komodo/src/komodod -ac_name=GLEEC -ac_supply=210000000 -ac_public=1 -ac_staked=100 -addnode=95.217.161.126",
-    "VOTE2021": "~/komodo/src/komodod  -ac_name=VOTE2021 -ac_public=1 -ac_supply=129848152 -addnode=77.74.197.115",
+    "KIP0001": "~/komodo/src/komodod -ac_public=1 -ac_name=KIP0001 -ac_supply=139419284 -ac_staked=10 -addnode=178.159.2.6",
     "GLEEC-OLD": "~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",
     "MCL": "~/marmara/src/komodod -ac_name=MCL -ac_supply=2000000 -ac_cc=2 -addnode=5.189.149.242 -addnode=161.97.146.150 -addnode=149.202.158.145 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000 -daemon"
 }
@@ -142,13 +141,12 @@ OTHER_LAUNCH_PARAMS = {
 
 OTHER_CONF_FILE = {
     "BTC": "~/.bitcoin/bitcoin.conf",
-    "SFUSD": "~/.smartusd/smartusd.conf",
     "LTC": "~/.litecoin/litecoin.conf",
     "KMD": "~/.komodo/komodo.conf",
     "MCL": "~/.komodo/MCL/MCL.conf", 
     "MIL": "~/.mil/mil.conf", 
     "TOKEL": "~/.komodo/TOKEL/TOKEL.conf", 
-    "VOTE2021": "~/.komodo/VOTE2021/VOTE2021.conf",
+    "KIP0001": "~/.komodo/KIP0001/KIP0001.conf",
     "AYA": "~/.aryacoin/aryacoin.conf",
     "CHIPS": "~/.chips/chips.conf",
     "EMC2": "~/.einsteinium/einsteinium.conf",
@@ -169,14 +167,13 @@ OTHER_PREFIXES = {
 
 OTHER_CLI = {
     "BTC": "~/bitcoin/src/bitcoin-cli",
-    "SFUSD": "~/sfusd-core/src/smartusd-cli",
     "LTC": "~/litecoin/src/litecoin-cli",
     "KMD": "~/komodo/src/komodo-cli",
     "MIL": "~/mil-1/src/mil-cli",
     "MCL": "~/komodo/src/komodo-cli -ac_name=MCL",
     "TOKEL": "~/komodo/src/komodo-cli -ac_name=TOKEL", 
     "GLEEC": "~/komodo/src/komodo-cli -ac_name=GLEEC",
-    "VOTE2021": "~/komodo/src/komodo-cli -ac_name=VOTE2021",
+    "KIP0001": "~/komodo/src/komodo-cli -ac_name=KIP0001",
     "AYA": "~/AYAv2/src/aryacoin-cli",
     "CHIPS": "~/chips/src/chips-cli",
     "EMC2": "~/einsteinium/src/einsteinium-cli",
