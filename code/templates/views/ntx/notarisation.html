@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row" id="">
+	<div class="card-deck d-flex justify-content-between col-12 m-auto">
+		<div class="card table_card floating-card m-0">
+			<div class="card-header table_card_title floating-card">
+				<h2>Notarisation Transaction Detail</h2>
+			</div>
+			<div class="card-body table_card_body">
+				<form>
+					{% include "components/form/text_input_line.html" with prepend_text="Enter TXID" input_id="txid" placeholder_text="" append_btn_text="Get" %}
+				</form>
+				{% if ntx_data %}
+					{% for k, v in ntx_data.items %}
+						{% include "components/form/key_link_row.html" with prepend_text=k|title input_value=v input_id=k|slugify %}
+					{% endfor %}
+				{% endif %}
+			</div>
+		</div>	
+	</div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			if ('{{ txid }}' == '') {
+				$('#txid').attr("placeholder", "Enter TXID")
+			}
+			$('#x_txid').html(get_txid_url("KMD", $('#x_txid').text(), $('#x_txid').text()))
+			$('#x_coin').html(get_coin_icon($('#x_coin').text(), ''))
+			$('#x_block_height').html(get_block_url("KMD", $('#x_block_height').text()))
+			$('#x_ac_ntx_height').html(get_block_url($('#x_coin').text(), $('#x_block_height').text()))
+
+			
+		})
+	</script>
+</div>
+{% endblock %}

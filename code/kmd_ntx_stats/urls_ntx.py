@@ -34,10 +34,14 @@ frontend_ntx_urls = [
     path('notary_coin_notarised/',
           views_ntx.notary_coin_notarised_view,
           name='notary_coin_notarised_view'),
-    
+
     path('notarised_24hrs/',
           views_ntx.notarised_24hrs,
           name='notarised_24hrs_view'),
+
+    path('notarisation/',
+          views_ntx.notarisation_view,
+          name='notarisation_view'),
 ]
 
 api_ntx_urls = [

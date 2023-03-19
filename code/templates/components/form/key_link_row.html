@@ -1,0 +1,18 @@
+<div class="input-group mb-1 ">
+    <div class="input-group-prepend prepend-label-left p-0 col-2" >
+        <span class="input-group-text col-12">
+        	{% if prepend_href %}<a href="{{ prepend_href }}">{% endif %}
+        		{{ prepend_text }}
+        	{% if prepend_tooltip %}
+		      	<i data-toggle="tooltip" data-placement="top" title="" data-original-title="{{ prepend_tooltip }}" class="fas fa-info-circle ml-1 py-0"></i>
+			{% endif %}
+        	{% if prepend_href %}</a>{% endif %}
+        </span>
+    </div>
+    <div class="form-control col-10 link-row" id="x_{{ input_id }}" style="font-size: 0.9em; overflow: overlay;">{{ input_value }}</div>
+    <div class="input-group-append p-0">
+		<button class="append-btn" data-clipboard-target="#x_{{ input_id }}">
+                {% include 'components/icons/copy_icon.html' %}
+		</button>
+    </div>
+</div>

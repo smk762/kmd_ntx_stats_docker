@@ -14,6 +14,7 @@ import kmd_ntx_api.lib_graph as graph
 import kmd_ntx_api.lib_query as query
 import kmd_ntx_api.lib_mining as mining
 import kmd_ntx_api.lib_table as table
+import kmd_ntx_api.serializers as serializers
 
 
 def notary_coin_ntx_detail_view(request):
@@ -263,3 +264,14 @@ def notary_epoch_coin_notarised_view(request):
     })
 
     return render(request, 'views/ntx/notary_epoch_coin_notarised.html', context)
+
+
+def notarisation_view(request):
+    txid = helper.get_or_none(request, "txid", "5507e4fb484e51e6d748585e7e08dcda4bb17bfb420c9ccd2c43c0481e265bf6")
+    ntx_data = query.get_notarised_data(txid=txid)
+    context = helper.get_base_context(request)
+    serializer = serializers.notarisedSerializer(ntx_data, many=True)
+    context.update({"ntx_data": dict(serializer.data[0])})
+
+    return render(request, 'views/ntx/notarisation.html', context)
+

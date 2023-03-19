@@ -277,7 +277,7 @@ def get_notarised_rows(request):
     )
     source.exclude_seasons()
     source.data = source.data.filter(scored=True)
-    source.filters = ["season", "coin", "date"]
+    source.filters = ["season", "coin", "date", "txid"]
     distinct = source.get_distinct(exclude=["date"])
     source.filter_data('notarised')
     count = source.count()

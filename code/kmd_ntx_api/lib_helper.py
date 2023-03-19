@@ -215,14 +215,13 @@ def get_base_context(request):
     print("getting context")
     season = get_page_season(request)
     server = get_page_server(request)
-    epoch = get_or_none(request, "epoch")
-    coin = get_or_none(request, "coin")
-    notary = get_or_none(request, "notary")
+    epoch = get_or_none(request, "epoch", "Epoch_0")
+    coin = get_or_none(request, "coin", "KMD")
+    notary = get_or_none(request, "notary", random.choice(get_notary_list(season)))
     address = get_or_none(request, "address")
     hide_filters = get_or_none(request, "hide_filters", [])
     selected = {}
     [selected.update({i: request.GET[i]}) for i in request.GET]
-        
 
     context = {
         "season": season,
@@ -236,6 +235,7 @@ def get_base_context(request):
         "regions": ["AR", "EU", "NA", "SH", "DEV"],
         "notary_clean": get_notary_clean(notary),
         "season_clean": season.replace("_"," "),
+        "epoch_clean": epoch.replace("_"," "),
         "explorers": get_explorers(), 
         "coin_icons": get_coin_icons(),
         "dpow_coins": get_dpow_server_coins_list(season),
@@ -247,6 +247,7 @@ def get_base_context(request):
         "eco_data_link": get_eco_data_link()
     }
     return context
+
 
 def get_notary_clean(notary):
     if notary:
