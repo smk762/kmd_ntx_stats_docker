@@ -359,7 +359,8 @@ def get_notary_candidates_data(year=None, season=None, name=None):
 
 def get_notary_vote_data(year=None, candidate=None, block=None, txid=None,
                       max_block=None, max_blocktime=None,
-                      max_locktime=None, mined_by=None, valid=None):
+                      max_locktime=None, mined_by=None, valid=None,
+                      min_block=None, min_blocktime=None, min_locktime=None):
     data = notary_vote.objects.all()
 
     if year:
@@ -382,6 +383,12 @@ def get_notary_vote_data(year=None, candidate=None, block=None, txid=None,
 
     if min_block:
         data = data.filter(block_height__gte=min_block)
+
+    if min_blocktime:
+        data = data.filter(block_time__gte=min_blocktime)
+
+    if min_locktime:
+        data = data.filter(lock_time__gte=min_locktime)
 
     if max_block:
         data = data.filter(block_height__lte=max_block)
