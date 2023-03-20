@@ -193,6 +193,9 @@ def get_notary_vote_stats_info(request):
     candidate = helper.get_or_none(request, "candidate")
     block = helper.get_or_none(request, "block")
     txid = helper.get_or_none(request, "txid")
+    min_block = helper.get_or_none(request, "min_block")
+    min_blocktime = helper.get_or_none(request, "min_blocktime")
+    min_locktime = helper.get_or_none(request, "min_locktime")
     max_block = helper.get_or_none(request, "max_block")
     max_blocktime = helper.get_or_none(request, "max_blocktime")
     max_locktime = helper.get_or_none(request, "max_locktime")
@@ -212,13 +215,20 @@ def get_notary_vote_stats_info(request):
             item["candidate"]: item["sum_votes"]
         })
 
-    resp = {}
-    region_scores = {}
+    resp = {
+        "AR": [],
+        "EU": [],
+        "NA": [],
+        "SH": []
+    }
+    region_scores = {
+        "AR": [],
+        "EU": [],
+        "NA": [],
+        "SH": []
+    }
     for item in data:
         region = item["candidate"].split("_")[-1]
-        if region not in resp:
-            resp.update({region:[]})
-            region_scores.update({region:[]})
 
         ghost_votes = 0
         if region in unverified_resp:

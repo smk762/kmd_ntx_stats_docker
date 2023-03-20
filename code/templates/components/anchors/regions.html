@@ -1,9 +1,9 @@
 	<div class="d-flex justify-content-around align-items-center">
-		{% include "components/buttons/show_button.html" with btn_text="Asia and Russia" btn_url="#AR" width_pct="19" btn_id='AR' extra_class='btn-selected' toggle_category="region" %}
-		{% include "components/buttons/show_button.html" with btn_text="Europe" btn_url="#EU" width_pct="19" btn_id='EU' toggle_category="region" %}
-		{% include "components/buttons/show_button.html" with btn_text="North America" btn_url="#NA" width_pct="19" btn_id='NA' toggle_category="region" %}
-		{% include "components/buttons/show_button.html" with btn_text="Southern Hemisphere" btn_url="#SH" width_pct="19" btn_id='SH' toggle_category="region" %}
+		{% include "components/buttons/show_button.html" with btn_text="Asia and Russia" btn_url="AR" width_pct="19" btn_id='AR' extra_class='btn-selected' toggle_category="region" %}
+		{% include "components/buttons/show_button.html" with btn_text="Europe" btn_url="EU" width_pct="19" btn_id='EU' toggle_category="region" %}
+		{% include "components/buttons/show_button.html" with btn_text="North America" btn_url="NA" width_pct="19" btn_id='NA' toggle_category="region" %}
+		{% include "components/buttons/show_button.html" with btn_text="Southern Hemisphere" btn_url="SH" width_pct="19" btn_id='SH' toggle_category="region" %}
 		{% if not vote %}
-		{% include "components/buttons/show_button.html" with btn_text="Developers" btn_url="#DEV" width_pct="19" btn_id='DEV' toggle_category="region" %}
+		{% include "components/buttons/show_button.html" with btn_text="Developers" btn_url="DEV" width_pct="19" btn_id='DEV' toggle_category="region" %}
 		{% endif %}
 	</div>
