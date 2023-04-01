@@ -105,9 +105,11 @@ def update_rewards_row(row_data):
 
 def delist_coin(coin):
     try:
-        sql = f"UPDATE coins SET mm2_compatible = 0 WHERE coin = '{coin}';"
+        if coin in ["PIRATE", "TOKEL"]: return
+        sql = f"DELETE FROM coins WHERE coin = '{coin}';"
         CURSOR.execute(sql)
         CONN.commit()
+        #print(sql)
         return 1
     except Exception as e:
         logger.debug(e)

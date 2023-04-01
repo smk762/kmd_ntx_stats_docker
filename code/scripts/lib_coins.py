@@ -84,12 +84,12 @@ def parse_dpow_coins(coins_data):
     r = requests.get(get_dpow_readme_url())
     dpow_readme = r.text
     lines = dpow_readme.splitlines()
-
+    dpow_coins = []
     for line in lines:
         info = [i.strip() for i in line.split("|")]
 
         if len(info) > 4 and info[0].lower() not in ['coin', '--------']:
-
+            dpow_coins.append(coin)
             coins_data[coin].update({
                 "dpow":{
                     "src": get_dpow_coin_src(info[1]),
@@ -99,7 +99,7 @@ def parse_dpow_coins(coins_data):
                 "dpow_active":1
             })
 
-    return coins_data
+    return coins_data, dpow_coins
 
 
 def get_coins_repo_lightwallets(lightwallets, coins_data):
@@ -256,7 +256,7 @@ def parse_assetchains(coins_data):
     return coins_data
 
 
-def remove_delisted_coins():
+def remove_delisted_coins(dpow_coins):
     '''
     Removes old coins from database
     '''
@@ -268,7 +268,9 @@ def remove_delisted_coins():
     db_coins = get_all_coins()
     delisted_coins = list(set(db_coins) - set(coins_repo_coins))
     for coin in delisted_coins:
-        delist_coin(coin)
+        if coin not in dpow_coins:
+            print(f"delisting {coin}")
+            delist_coin(coin)
 
 
 @print_runtime
