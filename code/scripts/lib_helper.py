@@ -98,6 +98,9 @@ def get_active_seasons(timestamp=None):
         if "end_time" in SEASONS_INFO[season]:
             if timestamp <= SEASONS_INFO[season]["end_time"] and timestamp >= SEASONS_INFO[season]["start_time"]:
                 active_seasons.append(season)
+        if "post_season_end_time" in SEASONS_INFO[season]:
+            if timestamp <= SEASONS_INFO[season]["post_season_end_time"] and timestamp >= SEASONS_INFO[season]["start_time"]:
+                active_seasons.append(season)
     return active_seasons
 
 

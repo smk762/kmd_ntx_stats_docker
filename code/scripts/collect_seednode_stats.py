@@ -25,8 +25,8 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/master/doc/seed_version_epochs.json"
-
+VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/vote2023/doc/seed_version_epochs.json"
+VERSION_DATA = requests.get(VERSION_TIMESPANS_URL).json()
 SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 # Date:   Mon Nov 14 13:40:18 2022 +0300 6e4de5d21
@@ -34,9 +34,10 @@ SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 # Date:   Mon Jul 11 11:11:34 2022 +0300 ce32ab8da
 # Date:   Tue Jun 21 15:04:00 2022 +0700 b8598439a
 
-
-
-
+'''
+This script collects seednode stats for notaries using the correct version.
+At the end of the season, or after an update, run with the `rectify_scores` param to update the scores.
+'''
 
 # ENV VARS
 load_dotenv()
@@ -48,24 +49,6 @@ conn = sqlite3.connect(DB_PATH)
 conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
 
-VERSION_DATA = {
-    "b8598439a": {
-      "start": 1656077853,
-      "end": 1659006671
-    },
-    "ce32ab8da": {
-      "start": 1656077853,
-      "end": 1668898800
-    },
-    "0f6c72615": {
-      "start": 1656077853,
-      "end": 1668898800
-    },
-    "6e4de5d21": {
-      "start": 1656077853,
-      "end": 1777777777
-    }
-}
 
 def mm2_proxy(method, params=None):
     if not params:
@@ -80,10 +63,9 @@ def mm2_proxy(method, params=None):
 
 
 def get_active_mm2_versions(ts):
-    data = requests.get(VERSION_TIMESPANS_URL).json()
     active_versions = []
-    for version in data:
-        if int(ts) > data[version]["start"] and int(ts) < data[version]["end"]:
+    for version in VERSION_DATA:
+        if int(ts) > VERSION_DATA[version]["start"] and int(ts) < VERSION_DATA[version]["end"]:
             active_versions.append(version)
     return active_versions
 
@@ -210,23 +192,24 @@ def rectify_scores():
     for commithash in VERSION_DATA:
         start_time = VERSION_DATA[commithash]["start"]
         end_time = VERSION_DATA[commithash]["end"]
-        print(f"commithash: {commithash}")
+        print(f"\n======= commithash: {commithash} =======")
         print(f"start_time: {start_time}")
         print(f"end_time: {end_time}")
 
+        sql = f"SELECT * FROM seednode_version_stats WHERE version LIKE '%{commithash}%' AND timestamp < {end_time} AND timestamp > {start_time};"
+        CURSOR.execute(sql)
+        print(f"Records valid for scoring: {CURSOR.rowcount}")
+        sql = f"UPDATE seednode_version_stats SET score = 0.2 WHERE version LIKE '%{commithash}%' AND timestamp < {end_time} AND timestamp > {start_time};"
+        CURSOR.execute(sql)
+        CONN.commit()
+
         sql = f"SELECT * FROM seednode_version_stats WHERE version LIKE '%{commithash}%' AND timestamp > {end_time};"
         CURSOR.execute(sql)
-        print(CURSOR.rowcount)
+        print(f"Records after end time: {CURSOR.rowcount}")
         sql = f"UPDATE seednode_version_stats SET score = 0 WHERE version LIKE '%{commithash}%' AND timestamp > {end_time};"
         CURSOR.execute(sql)
         CONN.commit()
 
-        sql = f"SELECT * FROM seednode_version_stats WHERE version LIKE '%{commithash}%' AND timestamp < {end_time} AND timestamp > {start_time};"
-        CURSOR.execute(sql)
-        print(CURSOR.rowcount)
-        sql = f"UPDATE seednode_version_stats SET score = 0.2 WHERE version LIKE '%{commithash}%' AND timestamp < {end_time} AND timestamp > {start_time};"
-        CURSOR.execute(sql)
-        CONN.commit()
 
 
 def get_version_stats_from_pgsql_db():
@@ -382,7 +365,6 @@ if __name__ == '__main__':
         # outputs pgSQL data
         elif sys.argv[1] == 'rectify_scores':
             result = rectify_scores()
-            print(f"{result} scores recitified")
 
         # tests WSS connection
         elif sys.argv[1] == 'wss_test':

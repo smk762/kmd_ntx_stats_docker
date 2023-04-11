@@ -145,7 +145,6 @@ def get_coins_repo_explorers(explorers, coins_data):
         logger.info(f"[get_coins_repo_explorers] {coin}")
         for explorer in data:
             coins_data[coin]['explorers'].append(explorer.replace("/tx/", "/").replace("/tx.dws?", "/"))
-             
     return coins_data
 
 
@@ -245,13 +244,16 @@ def parse_assetchains(coins_data):
         })
 
     for coin in OTHER_CLI:
-        coins_data[coin]["coins_info"].update({"cli":OTHER_CLI[coin]})
+        if coin in coins_data:
+            coins_data[coin]["coins_info"].update({"cli":OTHER_CLI[coin]})
 
     for coin in OTHER_CONF_FILE:
-        coins_data[coin]["coins_info"].update({"conf_path":OTHER_CONF_FILE[coin]})
+        if coin in coins_data:
+            coins_data[coin]["coins_info"].update({"conf_path":OTHER_CONF_FILE[coin]})
 
     for coin in OTHER_LAUNCH_PARAMS:
-        coins_data[coin]["coins_info"].update({"launch_params":OTHER_LAUNCH_PARAMS[coin]})
+        if coin in coins_data:
+            coins_data[coin]["coins_info"].update({"launch_params":OTHER_LAUNCH_PARAMS[coin]})
 
     return coins_data
 
@@ -299,7 +301,7 @@ def parse_electrum_explorer(coins_data):
         if item["name"] not in ["deprecated"]:
             lightwallets.update({item["name"]:item["download_url"]})
 
-    icons_data = get_github_folder_contents("KomodoPlatform", "coins", "icons")
+    icons_data = get_github_folder_contents("KomodoPlatform", "coins", "icons_original")
     icons = {}
     for item in icons_data:
         if item["name"] not in ["deprecated"]:

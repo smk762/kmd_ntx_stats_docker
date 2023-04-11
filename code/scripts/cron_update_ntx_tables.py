@@ -5,6 +5,8 @@ import lib_helper as helper
 from decorators import print_runtime
 import lib_ntx
 
+print(SEASONS_INFO)
+
 '''
 This script scans the blockchain for notarisation txids that are not already recorded in the database.
 After updaing the "notarised" table, aggregations are performed to get counts for notaries and coins within each season.
