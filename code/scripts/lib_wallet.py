@@ -66,29 +66,30 @@ def get_balances(season):
 
 
 def populate_addresses(season, server):
-    if server in SEASONS_INFO[season]["servers"]:
-        coins = SEASONS_INFO[season]["servers"][server]["coins"]
-        coins += ["BTC", "KMD", "LTC"]
-        coins.sort()
+    if season in SEASONS_INFO:
+        if server in SEASONS_INFO[season]["servers"]:
+            coins = SEASONS_INFO[season]["servers"][server]["coins"]
+            coins += ["BTC", "KMD", "LTC"]
+            coins.sort()
 
-        if len(coins) > 0:
-            i = 0
-            pubkeys = get_pubkeys(season, server)
+            if len(coins) > 0:
+                i = 0
+                pubkeys = get_pubkeys(season, server)
 
-            for notary in pubkeys:
-                pubkey = pubkeys[notary]
+                for notary in pubkeys:
+                    pubkey = pubkeys[notary]
 
-                for coin in coins:
-                    row = addresses_row()
-                    row.season = season
-                    row.server = server
-                    row.coin = coin
-                    row.notary_id = i
-                    row.notary = notary
-                    row.pubkey = pubkey
-                    row.update()
+                    for coin in coins:
+                        row = addresses_row()
+                        row.season = season
+                        row.server = server
+                        row.coin = coin
+                        row.notary_id = i
+                        row.notary = notary
+                        row.pubkey = pubkey
+                        row.update()
 
-                i += 1
+                    i += 1
 
 @print_runtime
 def delete_stale_balances():
