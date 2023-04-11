@@ -323,7 +323,7 @@ def update_notarised_epoch(actual_epoch, season=None, server=None, coin=None, tx
         CONN.rollback()
 
 
-def update_notarised_epoch_scores(coin, season, server, epoch, epoch_start, epoch_end, score_per_ntx, scored):
+def update_notarised_epoch_scores(coin=None, season=None, server=None, epoch=None, epoch_start=None, epoch_end=None, score_per_ntx=None, scored=None):
     sql = f"UPDATE notarised SET epoch='{epoch}', score_value={score_per_ntx}, scored={scored}"
     conditions = []
     if coin:
