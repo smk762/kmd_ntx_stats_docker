@@ -48,6 +48,7 @@ class notarised():
             self.update_notarisations(unrecorded_KMD_txids)
 
         else:
+            logger.info(f"Recanning notarisations for {self.season}, blocks {self.start_block} - {self.end_block}")
             windows = [(i, i + RESCAN_CHUNK_SIZE) for i in range(self.start_block, self.end_block, RESCAN_CHUNK_SIZE)]
             if OTHER_SERVER.find("stats") == -1:
                 windows.reverse()
