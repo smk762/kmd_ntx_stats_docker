@@ -10,29 +10,25 @@ from notary_pubkeys import NOTARY_PUBKEYS
 from notary_candidates import CANDIDATE_ADDRESSES
 
 
-def get_scoring_epoch_data(branch='master'):
-    
+def get_scoring_epochs_repo_data(branch='master'):
     url = urls.get_scoring_epochs_repo_url(branch)
-    data = requests.get(url).json()
-    for _season in data:
-        _servers = list(data[_season]["Servers"].keys())[:]
+    repo_data = requests.get(url).json()
+    for _season in repo_data:
+        _servers = list(repo_data[_season]["Servers"].keys())[:]
         for _server in _servers:
-
+            # Rename the dict keys. 
             if _server == "dPoW-Mainnet":
-                data[_season]["Servers"].update({
-                    "Main": data[_season]["Servers"]["dPoW-Mainnet"]
+                repo_data[_season]["Servers"].update({
+                    "Main": repo_data[_season]["Servers"]["dPoW-Mainnet"]
                 })
-                del data[_season]["Servers"]["dPoW-Mainnet"]
+                del repo_data[_season]["Servers"]["dPoW-Mainnet"]
 
             elif _server == "dPoW-3P":
-                data[_season]["Servers"].update({
-                    "Third_Party": data[_season]["Servers"]["dPoW-3P"]
+                repo_data[_season]["Servers"].update({
+                    "Third_Party": repo_data[_season]["Servers"]["dPoW-3P"]
                 })
-                del data[_season]["Servers"]["dPoW-3P"]
-        if _season in SEASONS_INFO:
-            if data[_season]["season_end"] > SEASONS_INFO[_season]["end_time"]:
-                data[_season]["season_end"] = SEASONS_INFO[_season]["end_time"]
-    return data
+                del repo_data[_season]["Servers"]["dPoW-3P"]
+    return repo_data
 
 
 def get_dpow_active_info(seasons):
@@ -58,7 +54,7 @@ def get_dpow_active_info(seasons):
 
 
 def populate_epochs():
-    scoring_epochs_data = get_scoring_epoch_data()
+    scoring_epochs_data = get_scoring_epochs_repo_data()
     '''Get epoch data from local'''
     epoch_dict = {}
     url = urls.get_season_scoring_epochs_url()
@@ -93,6 +89,7 @@ def populate_epochs():
 
 
 def calc_epoch_score(server, num_coins):
+    logger.info(f"[calc_epoch_score] {server} {num_coins}")
     if num_coins == 0:
         return 0
     if server == "Main":
@@ -260,7 +257,7 @@ DPOW_EXCLUDED_COINS = {
 VALID_SERVERS = ["Main", "Third_Party", "KMD", "BTC", "LTC"]
 
 
-NEXT_SEASON_COINS = {
+SEASON_START_COINS = {
     "Season_6": {
         "LTC": ["LTC"],
         "KMD": ["KMD"],
@@ -405,36 +402,6 @@ for _season in SEASONS_INFO:
     if SEASONS_INFO[_season]["start_time"] > NOW - 96 * 60 * 60:
         EXCLUDED_SEASONS.append(_season)
 
-'''
-for _server in NEXT_SEASON_COINS["Season_6"]:
-    SEASONS_INFO["Season_6"]["coins"] += NEXT_SEASON_COINS["Season_6"][_server]
-    SEASONS_INFO["Season_6"]["servers"].update({
-        _server: {
-            "epochs": {
-                "Epoch_0": {
-                    "start_event": "Season start",
-                    "end_event": "Season end",
-                    "start_block": 2963330,
-                    "end_block": 4437000,
-                    "start_time": 1656077853,
-                    "end_time": 2147483647,
-                    "coins": NEXT_SEASON_COINS["Season_6"][_server]
-                }
-            },
-            "coins": NEXT_SEASON_COINS["Season_6"][_server],
-            "addresses": {}
-        }
-    })
-
-    for coin in NEXT_SEASON_COINS["Season_6"][_server]:
-        SEASONS_INFO["Season_6"]["servers"][_server]["addresses"].update({
-            coin: {}
-        })
-'''
-
-
-#print(f"SCORING_EPOCHS_REPO_DATA: {SCORING_EPOCHS_REPO_DATA[_season]}")
-
 # Get notaries for each season
 for _season in SEASONS_INFO:
     if _season in NOTARY_PUBKEYS:
@@ -442,9 +409,9 @@ for _season in SEASONS_INFO:
         SEASONS_INFO[_season]["notaries"].sort()
 print("******************* Collected notaries data **************************")
 
-SCORING_EPOCHS_REPO_DATA = get_scoring_epoch_data()
+SCORING_EPOCH_REPO_DATA = get_scoring_epochs_repo_data()
 print("******************* Collected scoring epochs data ********************")
-#print(f"EPOCHS: {SCORING_EPOCHS_REPO_DATA}")
+#print(f"EPOCHS: {SCORING_EPOCH_REPO_DATA}")
 
 EPOCHS = populate_epochs()
 print("******************* Collected epochs data ****************************")
@@ -456,8 +423,8 @@ print("******************* Collected dpow repo coins data *******************")
 
 for _season in SEASONS_INFO.keys():
     # Check if ended and update timestamp
-    if _season in SCORING_EPOCHS_REPO_DATA:
-        SEASONS_INFO[_season]["end_time"] = SCORING_EPOCHS_REPO_DATA[_season]["season_end"]
+    if _season in SCORING_EPOCH_REPO_DATA:
+        SEASONS_INFO[_season]["end_time"] = SCORING_EPOCH_REPO_DATA[_season]["season_end"]
     # For new seasons, will prepopulate from dPoW repo
     if NOW - SEASONS_INFO[_season]["start_time"] < 48 * 60 * 60:
         print(f"Using DPOW repo to populate {_season} early")
@@ -536,11 +503,11 @@ for _season in SEASONS_INFO.keys():
                     if _server in CURRENT_DPOW_COINS[_season]:
                         current_dpow_coins = CURRENT_DPOW_COINS[_season][_server]
 
-            # Get coins from SCORING_EPOCHS_REPO_DATA
+            # Get coins from SCORING_EPOCH_REPO_DATA
             scoring_epoch_repo_coins = []
-            if _season in SCORING_EPOCHS_REPO_DATA:
-                if _server in SCORING_EPOCHS_REPO_DATA[_season]["Servers"]:
-                    scoring_epoch_repo_coins += list(SCORING_EPOCHS_REPO_DATA[_season]["Servers"][_server].keys())
+            if _season in SCORING_EPOCH_REPO_DATA:
+                if _server in SCORING_EPOCH_REPO_DATA[_season]["Servers"]:
+                    scoring_epoch_repo_coins += list(SCORING_EPOCH_REPO_DATA[_season]["Servers"][_server].keys())
 
             _coins = list(set(
                 server_epoch_coins + current_dpow_coins
@@ -694,19 +661,19 @@ for _season in SEASONS_INFO:
 print("Collected addresses data...")
 
 # Populate season epochs info
-for _season in SCORING_EPOCHS_REPO_DATA:
+for _season in SCORING_EPOCH_REPO_DATA:
     if _season in SEASONS_INFO:
-        for _server in SCORING_EPOCHS_REPO_DATA[_season]["Servers"]:
+        for _server in SCORING_EPOCH_REPO_DATA[_season]["Servers"]:
 
             epoch_times = []
-            epoch_times.append(SCORING_EPOCHS_REPO_DATA[_season]["season_start"])
-            epoch_times.append(SCORING_EPOCHS_REPO_DATA[_season]["season_end"])
+            epoch_times.append(SCORING_EPOCH_REPO_DATA[_season]["season_start"])
+            epoch_times.append(SCORING_EPOCH_REPO_DATA[_season]["season_end"])
 
-            for _coin in SCORING_EPOCHS_REPO_DATA[_season]["Servers"][_server]:
-                if "start_time" in SCORING_EPOCHS_REPO_DATA[_season]["Servers"][_server][_coin]:
-                    epoch_times.append(SCORING_EPOCHS_REPO_DATA[_season]["Servers"][_server][_coin]["start_time"])
-                if "end_time" in SCORING_EPOCHS_REPO_DATA[_season]["Servers"][_server][_coin]:
-                    epoch_times.append(SCORING_EPOCHS_REPO_DATA[_season]["Servers"][_server][_coin]["end_time"])
+            for _coin in SCORING_EPOCH_REPO_DATA[_season]["Servers"][_server]:
+                if "start_time" in SCORING_EPOCH_REPO_DATA[_season]["Servers"][_server][_coin]:
+                    epoch_times.append(SCORING_EPOCH_REPO_DATA[_season]["Servers"][_server][_coin]["start_time"])
+                if "end_time" in SCORING_EPOCH_REPO_DATA[_season]["Servers"][_server][_coin]:
+                    epoch_times.append(SCORING_EPOCH_REPO_DATA[_season]["Servers"][_server][_coin]["end_time"])
 
             epoch_times = list(set(epoch_times))
             epoch_times.sort()
@@ -725,19 +692,19 @@ for _season in SCORING_EPOCHS_REPO_DATA:
                     }
                 })
 
-                if SCORING_EPOCHS_REPO_DATA[_season]["season_start"] == epoch_start:
+                if SCORING_EPOCH_REPO_DATA[_season]["season_start"] == epoch_start:
                     SEASONS_INFO[_season]["servers"][_server]["epochs"][_epoch]["start_event"].append("Season start")
 
-                if SCORING_EPOCHS_REPO_DATA[_season]["season_end"] == epoch_end:
+                if SCORING_EPOCH_REPO_DATA[_season]["season_end"] == epoch_end:
                     SEASONS_INFO[_season]["servers"][_server]["epochs"][_epoch]["end_event"].append("Season end")
 
                 for _coin in SEASONS_INFO[_season]["servers"][_server]["coins"]:
                     if _season in DPOW_EXCLUDED_COINS:
                         if _coin not in DPOW_EXCLUDED_COINS[_season]:
-                            if _coin in SCORING_EPOCHS_REPO_DATA[_season]["Servers"][_server]:
+                            if _coin in SCORING_EPOCH_REPO_DATA[_season]["Servers"][_server]:
 
                                 in_epoch = False
-                                partial_coin_info = SCORING_EPOCHS_REPO_DATA[_season]["Servers"][_server][_coin]
+                                partial_coin_info = SCORING_EPOCH_REPO_DATA[_season]["Servers"][_server][_coin]
 
                                 if "start_time" in partial_coin_info and "end_time" in partial_coin_info:
                                     coin_start = partial_coin_info["start_time"]
@@ -811,17 +778,15 @@ for _season in SEASONS_INFO:
             elif SEASONS_INFO[_season]["end_time"] > NOW:
                     SEASON = _season
 
-#print(f"SEASONS_INFO: {SEASONS_INFO['Season_6']['servers']['Third_Party']}")
-
-SEASONS_INFO['Season_6']['servers']['Third_Party']['epochs']['Epoch_0']['coins'] = ['AYA', 'EMC2', 'MCL', 'SFUSD', 'TOKEL']
-SEASONS_INFO['Season_6']['servers']['Third_Party']['epochs']['Epoch_0']['num_coins'] = 5
-SEASONS_INFO['Season_6']['servers']['Third_Party']['epochs']['Epoch_0']['score_per_ntx'] = calc_epoch_score('Third_Party', 5)
 
 print(f"{int(time.time()) - NOW} sec to complete dpow const")
 
 
 if __name__ == '__main__':
-
-    print(f"EPOCHS: {EPOCHS['Season_6']}")
+    print(get_scoring_epochs_repo_data())
+    print("============================")
+    #print(populate_epochs())
+    print("============================")
+    # print(f"EPOCHS: {EPOCHS['Season_6']}")
     print(f"SEASONS_INFO: {SEASONS_INFO['Season_6']}")
-    print(f"SCORING_EPOCHS_REPO_DATA: {SCORING_EPOCHS_REPO_DATA['Season_6']}")
+    # print(f"SCORING_EPOCH_REPO_DATA: {SCORING_EPOCH_REPO_DATA['Season_6']}")
