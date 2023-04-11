@@ -363,7 +363,7 @@ SEASONS_INFO = {
     },
     "Season_6": {
         "start_block": 2963330,
-        "end_block": 4437000,
+        "end_block": 3368762,
         "start_time": 1656077853,
         "end_time": 1680911999,
         "post_season_end_time": 1688169599,

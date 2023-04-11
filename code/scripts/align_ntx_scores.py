@@ -12,9 +12,15 @@ This script will do that.
 '''
 
 scoring_epochs = get_scoring_epoch_data()
+print("==============[scoring_epochs]==================")
+print(scoring_epochs)
+print("================================================")
 
 coin_ranges = {}
 epochs = populate_epochs()
+print("==============[populate_epochs]=================")
+print(epochs)
+print("================================================")
 for season in ["Season_6"]:
     print(season)
     for server in epochs[season]:
@@ -43,19 +49,35 @@ for season in ["Season_6"]:
                     })
             print(f"{season} {server} {epoch} {score}")
 
-            lib_update_ntx.update_notarised_epoch_scores(coin, season, server, epoch, start, end, score, True)
+        for coin in coin_ranges[server]:
+            if "end" not in coin_ranges[server][coin]:
+                coin_ranges[server][coin].update({
+                    "end": 1680911999
+                })
 
+        for epoch in epochs[season][server]:
+            for coin in epochs[season][server][epoch]['coins']:
+                score = epochs[season][server][epoch]['score_per_ntx']
+                start = epochs[season][server][epoch]['epoch_start']
+                end = epochs[season][server][epoch]['epoch_end']
+                if end > 1680911999: end = 1680911999
+                lib_update_ntx.update_notarised_epoch_scores(coin, season, server, epoch, start, end, score, True)
+    
+
+
+print("================[coin_ranges]===================")
 print(coin_ranges)
+print("================================================")
+
 for server in coin_ranges:
     for coin in coin_ranges[server]:
         print(f"{coin}: {coin_ranges[server][coin]}")
         start = coin_ranges[server][coin]["start"]
-        if "end" in coin_ranges[server][coin]:
-            end = coin_ranges[server][coin]["end"]
-        else:
-            end = 1680911999
-        lib_update_ntx.update_notarised_epoch_scores(coin=coin, epoch_start=end, epoch_end=1688169599, score_per_ntx=0, scored=False)
+        end = coin_ranges[server][coin]["end"]
+        # zero out the scores where before season coin tenure
         lib_update_ntx.update_notarised_epoch_scores(coin=coin, epoch_start=0, epoch_end=start, score_per_ntx=0, scored=False)
+        # zero out the scores where after season coin tenure
+        lib_update_ntx.update_notarised_epoch_scores(coin=coin, epoch_start=end, epoch_end=9988169599, score_per_ntx=0, scored=False)
 
 
 if __name__ == '__main__':
