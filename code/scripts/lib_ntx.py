@@ -456,7 +456,7 @@ class ntx_season_stats():
 
     def prepopulate(self):
         self.season_coins = helper.get_season_coins(self.season)
-        self.season_servers = list(set(helper.get_season_servers(self.season)).difference({"Unofficial", "LTC", "BTC"}))
+        self.season_servers = list(set(helper.get_season_servers(self.season)).difference({"Unofficial", "LTC", "BTC", "None"}))
         self.season_notaries = helper.get_season_notaries(self.season)
         self.epoch_scores_dict = validate.get_epoch_scores_dict(self.season)
 
@@ -467,15 +467,15 @@ class ntx_season_stats():
             self.season_ntx_dict["coins"][coin].update({"notaries": {}})
 
             for server in self.season_servers:
-                if coin in get_season_coins(self.season, server):
+                if coin in helper.get_season_coins(self.season, server):
                     self.season_ntx_dict["coins"][coin]["servers"].update(self.get_default_ntx_item_dict(server))
                     self.season_ntx_dict["coins"][coin]["servers"][server].update({"epochs": {}})
                     self.season_ntx_dict["coins"][coin]["servers"][server].update({"notaries": {}})
 
-                    server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial"}))
+                    server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial", "None"}))
 
                     for epoch in server_epochs:
-                        if coin in get_season_coins(self.season, server, epoch):
+                        if coin in helper.get_season_coins(self.season, server, epoch):
                             self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"].update(self.get_default_ntx_item_dict(epoch))
                             self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch].update({"notaries": {}})
                             self.season_ntx_dict["coins"][coin]["servers"][server]["epochs"][epoch]["score_per_ntx"] = float(self.epoch_scores_dict[server][epoch])
@@ -501,17 +501,17 @@ class ntx_season_stats():
                 self.season_ntx_dict["notaries"][notary]["servers"][server].update({"coins": {}})
                 self.season_ntx_dict["notaries"][notary]["servers"][server].update({"epochs": {}})
 
-                server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial"}))
+                server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial", "None"}))
 
                 for epoch in server_epochs:
                     self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"].update(self.get_default_ntx_item_dict(epoch))
                     self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch].update({"coins": {}})
                     self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["score_per_ntx"] = float(self.epoch_scores_dict[server][epoch])
 
-                    for coin in get_season_coins(self.season, server, epoch):
+                    for coin in helper.get_season_coins(self.season, server, epoch):
                         self.season_ntx_dict["notaries"][notary]["servers"][server]["epochs"][epoch]["coins"].update(self.get_default_ntx_item_dict(coin))
 
-                for coin in get_season_coins(self.season, server):
+                for coin in helper.get_season_coins(self.season, server):
                     self.season_ntx_dict["notaries"][notary]["servers"][server]["coins"].update(self.get_default_ntx_item_dict(coin))
 
             for coin in self.season_coins:
@@ -525,17 +525,17 @@ class ntx_season_stats():
             self.season_ntx_dict["servers"][server].update({"epochs": {}})
             self.season_ntx_dict["servers"][server].update({"notaries": {}})
 
-            for coin in get_season_coins(self.season, server):
+            for coin in helper.get_season_coins(self.season, server):
                 self.season_ntx_dict["servers"][server]["coins"].update(self.get_default_ntx_item_dict(coin))
                 self.season_ntx_dict["servers"][server]["coins"][coin].update({"notaries": {}})
 
                 for notary in self.season_notaries:
                     self.season_ntx_dict["servers"][server]["coins"][coin]["notaries"].update(self.get_default_ntx_item_dict(notary))
 
-            server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial"}))
+            server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial", "None"}))
             for epoch in server_epochs:
 
-                epoch_coins = get_season_coins(self.season, server, epoch)
+                epoch_coins = helper.get_season_coins(self.season, server, epoch)
                 self.season_ntx_dict["servers"][server]["epochs"].update(self.get_default_ntx_item_dict(epoch))
                 self.season_ntx_dict["servers"][server]["epochs"][epoch].update({"coins": {}})
                 self.season_ntx_dict["servers"][server]["epochs"][epoch].update({"notaries": {}})
@@ -572,8 +572,9 @@ class ntx_season_stats():
                 coin = item[2]
                 server_epoch_coin_count = item[3]
                 server_epoch_coin_score = item[4]
+                print(item)
 
-                if len({server, epoch}.intersection({"Unofficial", "LTC", "BTC"})) == 0:
+                if len({server, epoch}.intersection({"Unofficial", "LTC", "BTC", "None"})) == 0:
 
                     if coin != 'KMD' or (coin == server and server == epoch):
                         # Global Season Score and Count Totals
@@ -726,7 +727,7 @@ class ntx_season_stats():
 
 
             for server in self.season_servers:
-                if server not in ["Unofficial", "BTC", "Unofficial"]:
+                if server not in ["Unofficial", "BTC", "Unofficial", "None"]:
                     # Notary Server Percentage of Global Count
                     self.season_ntx_dict["notaries"][notary]["servers"][server]["pct_of_season_ntx_count"] = round(
                         safe_div(self.season_ntx_dict["notaries"][notary]["servers"][server]["ntx_count"],
@@ -899,7 +900,7 @@ class ntx_season_stats():
 
 
             for server in self.season_servers:
-                if coin in get_season_coins(self.season, server):
+                if coin in helper.get_season_coins(self.season, server):
                     # Coin Server Percentage of Global Count
                     self.season_ntx_dict["coins"][coin]["servers"][server]["pct_of_season_ntx_count"] = round(
                         safe_div(self.season_ntx_dict["coins"][coin]["servers"][server]["ntx_count"],
@@ -970,7 +971,7 @@ class ntx_season_stats():
 
 
             for server in self.season_servers:
-                if coin in get_season_coins(self.season, server):
+                if coin in helper.get_season_coins(self.season, server):
                     for notary in self.season_notaries:
                         # Coin Server Notary Percentage of Coins Count
                         self.season_ntx_dict["coins"][coin]["servers"][server]["notaries"][notary]["pct_of_coin_ntx_count"] = round(
@@ -1143,7 +1144,7 @@ class ntx_season_stats():
         for coin in self.season_ntx_dict["coins"]:
 
             for server in self.season_servers:
-                if coin in get_season_coins(self.season, server):
+                if coin in helper.get_season_coins(self.season, server):
                     # Coin Server Percentage of Server Count
                     self.season_ntx_dict["coins"][coin]["servers"][server]["pct_of_server_ntx_count"] = round(
                         safe_div(self.season_ntx_dict["coins"][coin]["servers"][server]["ntx_count"],

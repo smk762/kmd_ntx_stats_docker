@@ -5,7 +5,6 @@ import lib_helper as helper
 from decorators import print_runtime
 import lib_ntx
 
-print(SEASONS_INFO)
 
 '''
 This script scans the blockchain for notarisation txids that are not already recorded in the database.
@@ -23,6 +22,7 @@ def update_ntx_tables(seasons, rescan=False):
 
         notarised_table = lib_ntx.notarised(season, rescan)
         if CLEAN_UP:
+            ntx_season_tables.clean_up()
             notarised_table.clean_up()
             rescan = True
 
@@ -31,16 +31,12 @@ def update_ntx_tables(seasons, rescan=False):
         last_ntx_tables = lib_ntx.last_notarisations(season)
         last_ntx_tables.update_coin_table()
         last_ntx_tables.update_notary_table()
+        ntx_season_tables = lib_ntx.ntx_season_stats(season)
+        ntx_season_tables.update_ntx_season_stats_tables()
+        ntx_daily_tables = lib_ntx.ntx_daily_stats(season, rescan)
+        ntx_daily_tables.update_daily_ntx_tables()
 
-        if SEASONS_INFO[season]["end_time"] > time.time() + 2 * 86400 and not FULL_SCAN:
 
-            ntx_season_tables = lib_ntx.ntx_season_stats(season)
-            if CLEAN_UP:
-                ntx_season_tables.clean_up()
-            ntx_season_tables.update_ntx_season_stats_tables()
-
-            ntx_daily_tables = lib_ntx.ntx_daily_stats(season, rescan)
-            ntx_daily_tables.update_daily_ntx_tables()
 
 
 
