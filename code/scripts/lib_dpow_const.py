@@ -541,7 +541,8 @@ SEASONS_INFO = {
                         "end_block": 2923160,
                         "start_time": 1651622400,
                         "end_time": 1653436800,
-                        "coins": ["RICK", "MORTY"]
+                        "coins": ["RICK", "MORTY"],
+                        'score_per_ntx': 1
                     }
                 }
             }
@@ -566,20 +567,14 @@ for _season in SEASONS_INFO:
     _ranges = get_coin_time_ranges(_season)
     for _server in _ranges:
         if _server in EPOCHS[_season]:
-            _epochs = EPOCHS[_season][_server]
             SEASONS_INFO[_season]["servers"].update({
                 _server: {
                     "addresses": {},
                     "coins": get_season_server_coins(_season, _server),
-                    "epochs": _epochs
+                    "epochs": EPOCHS[_season][_server],
+                    "teunre": _ranges[_server]
                 }
             })
-
-# Populate season epochs info
-for _season in EPOCHS:
-    for _server in EPOCHS[_season]:
-        if _server in SEASONS_INFO[_season]["servers"]:
-            SEASONS_INFO[_season]["servers"][_server]["epochs"].update(EPOCHS[_season][_server])
 
 
 CURRENT_SEASON, DPOW_COINS_ACTIVE, CURRENT_DPOW_COINS = get_dpow_active_info(SEASONS_INFO.keys())
@@ -671,9 +666,10 @@ print(f"{int(time.time()) - NOW} sec to complete dpow const")
 
 if __name__ == '__main__':
     #print(get_scoring_epochs_repo_data())
-    print("============================")
+    #print("============================")
     # print(get_season_epochs('Season_6'))
-    print("============================")
+    #print("============================")
     #print(f"EPOCHS: {EPOCHS['Season_6']}")
-    print(f"SEASONS_INFO: {SEASONS_INFO['Season_6']}")
+    #print(f"SEASONS_INFO: {SEASONS_INFO['Season_6']}")
     # print(f"SCORING_EPOCHS_REPO_DATA: {SCORING_EPOCHS_REPO_DATA['Season_6']}")
+    pass

@@ -163,8 +163,8 @@ def get_notarised_coin_epoch_scores(
 
     sql = "SELECT DISTINCT score_value FROM notarised"
     sql = get_notarised_conditions_filter(
-        season=season, server=server, epoch=epoch,
-        lowest_blocktime=lowest_blocktime,
+        sql, season=season, server=server,
+        epoch=epoch, lowest_blocktime=lowest_blocktime,
         highest_blocktime=highest_blocktime
     )
     CURSOR.execute(sql)

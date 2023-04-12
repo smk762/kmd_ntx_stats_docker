@@ -70,7 +70,7 @@ class notarised():
 
         all_txids = []
         while self.chain_tip - start > RESCAN_CHUNK_SIZE:
-            logger.info(f"Adding {self.start_block} to {self.start_block + RESCAN_CHUNK_SIZE} ntx address txids...")
+            logger.info(f"Adding {start} to {start + RESCAN_CHUNK_SIZE} ntx address txids...")
             all_txids += rpc.get_ntx_txids(start, start + RESCAN_CHUNK_SIZE)
             start += RESCAN_CHUNK_SIZE
             time.sleep(0.1)
