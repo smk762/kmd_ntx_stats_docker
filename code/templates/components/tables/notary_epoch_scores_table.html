@@ -1,125 +1,129 @@
 
-		<div class="card table_card floating-card m-0">
-			<div class="card-body table_card_body">
-				<table id="epoch-scoring-table" class="table table-striped table-bordered">
-					<thead>
-						<tr>
-							<th class="py-2 px-4" data-data="coin">Coin</th>
-							<th class="py-2 px-4" data-data="server">Server</th>
-							<th class="py-2 px-4" data-data="epoch">Epoch</th>
-							<th class="py-2 px-4" data-data="epoch_coin_count">NTX Count</th>
-							<th class="py-2 px-4" data-data="score_per_ntx">Per NTX</th>
-							<th class="py-2 px-4" data-data="epoch_coin_score">Score</th>
-							<th class="py-2 px-4" data-data="epoch_coin_count_self_pct">NN Count %</th>
-							<th class="py-2 px-4" data-data="epoch_coin_score_self_pct">NN Score %</th>
-							<th class="py-2 px-4" data-data="">Detail</th>
-						</tr>
-					</thead>
-				</table>
-			</div>
-			<div class="card-footer table_card_footer flex">
-				Note: Unofficial Epoch (postseason or before / after official epochs) are not displayed.
-			</div>
-		</div>	
-  	<script>
-	    $(document).ready(function() {
-			const dom = '{% include "components/tables/dt_dom.html" with table="epoch-scoring" %}'
+<div class="row col-12 m-auto">
+    <div class="card table_card floating-card m-auto col-12" id="{{ table }}_card" style="opacity: 1; font-size: 1em;" >
+        <div class="card-body table_card_body">
+            <table id="{{ table }}-table" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4" data-data="coin">Coin</th>
+                        <th class="py-2 px-4" data-data="server">Server</th>
+                        <th class="py-2 px-4" data-data="epoch">Epoch</th>
+                        <th class="py-2 px-4" data-data="epoch_coin_count">NTX Count</th>
+                        <th class="py-2 px-4" data-data="score_per_ntx">Per NTX</th>
+                        <th class="py-2 px-4" data-data="epoch_coin_score">Score</th>
+                        <th class="py-2 px-4" data-data="epoch_coin_count_self_pct">NN Count %</th>
+                        <th class="py-2 px-4" data-data="epoch_coin_score_self_pct">NN Score %</th>
+                        <th class="py-2 px-4" data-data="">Detail</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="card-footer table_card_footer flex">
+            Note: Unofficial Epoch (postseason or before / after official epochs) are not displayed.
+        </div>
+    </div>
+</div>
+      <script>
+        window.tables = []
+        $(document).ready(function() {
+            const dom = '{% include "components/tables/dt_dom.html" %}'
 
-	    	let url = "{% url 'notary_epoch_scores_view' %}?notary={{ notary }}&season={{ season }}"
-	        $('#epoch-scoring-table').DataTable({
-         		ajax: {
-				    url: url,
-        			dataSrc: 'results',
-        			"deferRender": true
-				},
-	        	"paging": false,
-	            "orderClasses": false,
-        		order: [[ 0, 'asc' ],[ 1, 'asc' ],[ 2, 'asc' ]],
-	        	"columns": [
-			        { "data": "coin" },
-			        { "data": "server" },
-			        { "data": "epoch" },
-			        { "data": "epoch_coin_count" },
-			        { "data": "score_per_ntx" },
-			        { "data": "epoch_coin_score" },
-			        { "data": "epoch_coin_count_self_pct" },
-			        { "data": "epoch_coin_score_self_pct" },
-			        { "data": null }
-			    ],
-        		"columnDefs": [
-        			{ className: "text-left text-nowrap", "targets": [ 0 ] },
-        			{ className: "text-right", "targets": [ 4, 5, 6, 7 ] },
-        			{
-			            "data": 'coin',
-			            "targets": 0,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-					        $(nTd).html(get_coin_icon(oData.coin));
-				        }
-        			},
-        			{
-			            "data": 'server',
-			            "targets": 1,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(get_server_styled(oData.server))
-				        }	
-			        },
-        			{
-			            "data": 'epoch',
-			            "targets": 2,
-			        },
-        			{
-			            "data": 'epoch_coin_count',
-			            "targets": 3,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(oData.epoch_coin_count)
-			            }
-			        },
-        			{
-			            "data": 'score_per_ntx',
-			            "targets": 4,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(oData.score_per_ntx.toFixed(8))
-			            }
-			        },
-        			{
-			            "data": 'epoch_coin_score',
-			            "targets": 5,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(oData.epoch_coin_score.toFixed(8))
-			            }
-			        },
-        			{
-			            "data": 'epoch_coin_count_self_pct',
-			            "targets": 6,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(oData.epoch_coin_count_self_pct.toFixed(3) + '%')
-			            }
-			        },
-        			{
-			            "data": 'epoch_coin_score_self_pct',
-			            "targets": 7,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(oData.epoch_coin_score_self_pct.toFixed(3) + '%')
-			            }
-			        },
-        			{
-			            "data": null,
-			            "targets": 8,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	let tooltip = '{{ notary }} '+oData.coin+' epoch '+oData.epoch+' score detail'
-			            	let url = '{% url "notary_epoch_scores_view" %}?notary={{ notary }}&coin='+oData.coin+'&season={{ season }}&epoch=Epoch_'+oData.epoch+'&server='+oData.server
-			            	let icon = "<i class='fas fa-arrow-right'></i>"
-				            $(nTd).html(get_detail_link_icon(icon, tooltip, url));
-				        }
-			        }
-        		],
-	    		dom: dom,
-		        fnInitComplete: function(){
-		           $('.epoch-scores-tbl-title').html('<h3>{{ page_title }}</h3><h6>Total score: {{ total_score|floatformat:-3 }}</h6>');
-	    			let url = "{% url 'balancesViewSet-list' %}?format=datatables&coin={{ coin }}&season={{ season }}"
-			        let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="epoch_scores_balances" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
-			        $('.epoch-scores-api-link').html(api_btn);
-		        }
-	        })
-		});
+            let url = "{% url 'notary_epoch_scores_table' %}?notary={{ notary }}&season={{ season }}"
+            const {{ table }}_table = $('#{{ table }}-table').DataTable({
+                 "ajax": {
+                    "url": url,
+                    "dataSrc": 'results',
+                    "deferRender": true
+                },
+                "paging": false,
+                "orderClasses": false,
+                "dom": dom,
+                "order": [[ 0, 'asc' ],[ 1, 'asc' ],[ 2, 'asc' ]],
+                "columns": [
+                    { "data": "coin" },
+                    { "data": "server" },
+                    { "data": "epoch" },
+                    { "data": "epoch_coin_count" },
+                    { "data": "score_per_ntx" },
+                    { "data": "epoch_coin_score" },
+                    { "data": "epoch_coin_count_self_pct" },
+                    { "data": "epoch_coin_score_self_pct" },
+                    { "data": null }
+                ],
+                "columnDefs": [
+                    { className: "text-left text-nowrap", "targets": [ 0 ] },
+                    { className: "text-right", "targets": [ 4, 5, 6, 7 ] },
+                    {
+                        "data": 'coin',
+                        "targets": 0,
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html(get_coin_icon(oData.coin));
+                        }
+                    },
+                    {
+                        "data": 'server',
+                        "targets": 1,
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html(get_server_styled(oData.server))
+                        }    
+                    },
+                    {
+                        "data": 'epoch',
+                        "targets": 2,
+                    },
+                    {
+                        "data": 'epoch_coin_count',
+                        "targets": 3,
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html(oData.epoch_coin_count)
+                        }
+                    },
+                    {
+                        "data": 'score_per_ntx',
+                        "targets": 4,
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html(oData.score_per_ntx.toFixed(8))
+                        }
+                    },
+                    {
+                        "data": 'epoch_coin_score',
+                        "targets": 5,
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html(oData.epoch_coin_score.toFixed(8))
+                        }
+                    },
+                    {
+                        "data": 'epoch_coin_count_self_pct',
+                        "targets": 6,
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html(oData.epoch_coin_count_self_pct.toFixed(3) + '%')
+                        }
+                    },
+                    {
+                        "data": 'epoch_coin_score_self_pct',
+                        "targets": 7,
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            $(nTd).html(oData.epoch_coin_score_self_pct.toFixed(3) + '%')
+                        }
+                    },
+                    {
+                        "data": null,
+                        "targets": 8,
+                        "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                            let tooltip = '{{ notary }} '+oData.coin+' epoch '+oData.epoch+' score detail'
+                            let url = '{% url "notary_epoch_scores_table" %}?notary={{ notary }}&coin='+oData.coin+'&season={{ season }}&epoch=Epoch_'+oData.epoch+'&server='+oData.server
+                            let icon = "<i class='fas fa-arrow-right'></i>"
+                            $(nTd).html(get_detail_link_icon(icon, tooltip, url));
+                        }
+                    }
+                ],
+                fnInitComplete: function(){
+                    $('#{{ table }}_card').css('opacity', '1');
+                   $('.{{ table }}-tbl-title').html('<h4>{{ table_title }} total score: {{ total_score|floatformat:-3 }}</h4>');
+                    let url = "{% url 'notary_epoch_scores_table' %}?notary={{ notary }}&season={{ season }}"
+                    let api_btn = '{% include "components/buttons/api_link_button.html" with btn_id="{{ table }}" width_pct="100" btn_url="'+url+'" btn_text="Source Data" %}'
+                    $('.{{ table }}-api-link').html(api_btn);
+                }
+            })
+        });
     </script> 

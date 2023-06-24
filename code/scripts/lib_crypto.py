@@ -88,6 +88,8 @@ COIN_PARAMS = {
     "MIL": MIL_CoinParams,
     "VOTE2021": KMD_CoinParams,
     "VOTE2022": KMD_CoinParams,
+    "VOTE2023": KMD_CoinParams,
+    "KIP0001": KMD_CoinParams,
     "WLC21": KMD_CoinParams,
     "MCL": KMD_CoinParams,
     "RFOX": KMD_CoinParams,

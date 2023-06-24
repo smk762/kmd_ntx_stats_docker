@@ -224,15 +224,19 @@ def notary_epoch_scores_view(request):
     scoring_table, totals = table.get_notary_epoch_scores_table(request, notary)
     notary_clean = helper.get_notary_clean(notary)
     context = helper.get_base_context(request)
-    context.update({
-        "page_title":f"{notary_clean} dPoW Notarisation Epoch Scores",
-        "notary":notary,
-        "notary_clean": notary_clean,
-        "scoring_table": scoring_table,
-        "total_count":totals["counts"][notary],
-        "total_score":totals["scores"][notary],
-        "nn_social": info.get_nn_social_info(request)
-    })
+    try:
+        context.update({
+            "table_title": notary_clean,
+            "notary":notary,
+            "notary_clean": notary_clean,
+            "scoring_table": scoring_table,
+            "total_count":totals["counts"][notary],
+            "total_score":totals["scores"][notary],
+            "nn_social": info.get_nn_social_info(request),
+            "table": "epoch_scoring"            
+        })
+    except Exception as e:
+        messages.error(request, f"Error: {e}")
     return render(request, 'views/ntx/notary_epoch_scores_view.html', context)
 
 
