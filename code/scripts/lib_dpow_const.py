@@ -34,21 +34,21 @@ def get_scoring_epochs_repo_data(branch='master'):
 def get_dpow_active_info(seasons):
     '''Get current dpow coins from repo'''
     data = requests.get(urls.get_dpow_active_coins_url()).json()["results"]
-    for _season in seasons:
-        if _season.find("Testnet") == -1:
-            start_time, end_time = get_season_start_end(_season)
+    for season in seasons:
+        if season.find("Testnet") == -1:
+            start_time, end_time = get_season_start_end(season)
 
             if NOW >= start_time and NOW <= end_time:
-                current_season = _season
-                current_dpow_coins = {_season: {}}
+                current_season = season
+                current_dpow_coins = {season: {}}
 
                 for _coin in data:
-                    if data[_coin]["dpow"]["server"] not in current_dpow_coins[_season]:
-                        current_dpow_coins[_season].update({
+                    if data[_coin]["dpow"]["server"] not in current_dpow_coins[season]:
+                        current_dpow_coins[season].update({
                             data[_coin]["dpow"]["server"]: []
                         })
 
-                    current_dpow_coins[_season][data[_coin]["dpow"]["server"]].append(_coin)
+                    current_dpow_coins[season][data[_coin]["dpow"]["server"]].append(_coin)
 
     return current_season, data, current_dpow_coins
 
