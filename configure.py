@@ -24,3 +24,6 @@ def update_dotenv():
                     q = input(f"Enter {i}: ")
 
                 f.write(f"{i}={q}\n")
+
+if __name__ == "__main__":
+    update_dotenv()
