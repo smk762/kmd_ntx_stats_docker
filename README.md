@@ -47,6 +47,9 @@ Apply migrations: `"docker-compose run web python3 manage.py migrate"`
 
 Collect static files: `"docker-compose run web python3 manage.py collectstatic"`
 
+# Create superuser:
+ `docker-compose run web python3 manage.py createsuperuser --email brian@spam.ni --username messiah`
+
 See https://docs.djangoproject.com/en/3.0/ref/django-admin/ for more django admin commands.
 
 # Applying code changes
