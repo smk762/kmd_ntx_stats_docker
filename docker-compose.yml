@@ -43,9 +43,6 @@ services:
       timeout: 60s
       retries: 3
       start_period: 15m
-    networks:
-      customnetwork:
-        ipv4_address: 172.18.1.7
 
   mm2:
     restart: always
