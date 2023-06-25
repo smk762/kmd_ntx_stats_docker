@@ -706,21 +706,3 @@ class swaps_failed(models.Model):
                 name='unique_swaps_failed'
             )
         ]
-
-
-# to make migrations, use "docker compose run web python3 manage.py makemigrations"
-# to apply migrations, use "docker compose run web python3 manage.py migrate"
-# to update static files, use "docker compose run web python3 manage.py collectstatic"
-# Editing pg.conf
-# docker exec -it <pgsql_container_name> bash
-# apt update & apt install nano
-# nano  ./var/lib/postgresql/data/postgresql.conf
-# change max_connections to 1000
-# change max_wal_size to 2gb
-# log_rotation_size to 100mb
-
-# Find where colectstatic is looking
-# docker compose run web python3 manage.py findstatic --verbosity 2 static
-
-# PGSQL access config
-# sudo nano /home/smk762/kmd_ntx_stats_docker/postgres-data/pg_hba.conf
