@@ -77,22 +77,25 @@ Check web pages to confirm display / no errors.
 
 
 ## Reference
-- to make migrations, use "docker compose run web python3 manage.py makemigrations"
-- to apply migrations, use "docker compose run web python3 manage.py migrate"
-- to update static files, use "docker compose run web python3 manage.py collectstatic"
+- to make migrations, use `docker compose run web python3 manage.py makemigrations`
+- to apply migrations, use `docker compose run web python3 manage.py migrate`
+- to update static files, use `docker compose run web python3 manage.py collectstatic`
 #### Editing pg.conf
-- docker exec -it <pgsql_container_name> bash
-- apt update & apt install nano
-- nano  ./var/lib/postgresql/data/postgresql.conf
+- `docker exec -it <pgsql_container_name> bash`
+- `apt update & apt install nano`
+- `nano  ./var/lib/postgresql/data/postgresql.conf`
 - change max_connections to 1000
 - change max_wal_size to 2gb
 - log_rotation_size to 100mb
 
 #### Find where colectstatic is looking
-- docker compose run web python3 manage.py findstatic --verbosity 2 static
+- `docker compose run web python3 manage.py findstatic --verbosity 2 static`
 
 #### PGSQL access config
-- sudo nano /home/$USER/kmd_ntx_stats_docker/postgres-data/pg_hba.conf
+- `sudo nano /home/$USER/kmd_ntx_stats_docker/postgres-data/pg_hba.conf`
 
 #### Fix permissions
-- sudo chown $USER:$USER /home/$USER/kmd_ntx_stats_docker/postgres-data -R
+- `sudo chown $USER:$USER /home/$USER/kmd_ntx_stats_docker/postgres-data -R`
+
+#### Prune old docker images (do while container is running so active containers are not removed)
+- `docker system prune -a --volumes`
