@@ -6,7 +6,8 @@ def update_dotenv():
         data = {}
         for line in f.readlines():
             item = line.split("=")
-            data.update({item[0].strip(): item[1].strip()})
+            if len(item) == 2:
+                data.update({item[0].strip(): item[1].strip()})
 
     for i in ["MM2_USERPASS", "userpass", "SECRET_KEY", "DJANGO_ALLOWED_HOSTS",
         "NAME", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT",
