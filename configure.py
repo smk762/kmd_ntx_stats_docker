@@ -7,6 +7,8 @@ def update_dotenv():
         for line in f.readlines():
             item = line.split("=")
             k = item[0].strip()
+            if len(item) == 1:
+                continue
             if len(item) > 2:
                 v = ''.join(item[1:]).strip()
             else:
