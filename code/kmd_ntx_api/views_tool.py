@@ -182,7 +182,7 @@ def faucet_view(request):
         "RICK": 0,
         "MORTY": 0
     }
-    faucet_supply_resp = requests.get(f"https://faucet.komodo.live/rm_faucet_balances").json()
+    faucet_supply_resp = requests.get(f"https://faucet.komodo.earth/rm_faucet_balances").json()
 
     for node in faucet_supply_resp:
 
@@ -192,7 +192,7 @@ def faucet_view(request):
         except Exception as e:
             logger.info(e)
 
-    pending_tx_resp = requests.get(f"https://faucet.komodo.live/show_pending_tx").json()
+    pending_tx_resp = requests.get(f"https://faucet.komodo.earth/show_pending_tx").json()
     pending_tx_list = []
     tx_rows = []
     pending_index = []
@@ -212,7 +212,7 @@ def faucet_view(request):
         pending_index.append(item[0])
         if len(tx_rows) >= 250:
             break
-    sent_tx_resp = requests.get(f"https://faucet.komodo.live/show_faucet_db").json()
+    sent_tx_resp = requests.get(f"https://faucet.komodo.earth/show_faucet_db").json()
     sent_tx_list = []
     now = time.time()
     sum_24hrs = 0
@@ -250,7 +250,7 @@ def faucet_view(request):
             coin = request.POST['coin'].strip()
         if 'address' in request.POST:
             address = request.POST['address'].strip()
-        url = f'https://faucet.komodo.live/faucet/{coin}/{address}'
+        url = f'https://faucet.komodo.earth/faucet/{coin}/{address}'
         r = requests.get(url)
         try:
             resp = r.json()
