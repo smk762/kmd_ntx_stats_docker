@@ -708,9 +708,9 @@ class swaps_failed(models.Model):
         ]
 
 
-# to make migrations, use "docker-compose run web python3 manage.py makemigrations"
-# to apply migrations, use "docker-compose run web python3 manage.py migrate"
-# to update static files, use "docker-compose run web python3 manage.py collectstatic"
+# to make migrations, use "docker compose run web python3 manage.py makemigrations"
+# to apply migrations, use "docker compose run web python3 manage.py migrate"
+# to update static files, use "docker compose run web python3 manage.py collectstatic"
 # Editing pg.conf
 # docker exec -it <pgsql_container_name> bash
 # apt update & apt install nano
@@ -720,7 +720,7 @@ class swaps_failed(models.Model):
 # log_rotation_size to 100mb
 
 # Find where colectstatic is looking
-# docker-compose run web python3 manage.py findstatic --verbosity 2 static
+# docker compose run web python3 manage.py findstatic --verbosity 2 static
 
 # PGSQL access config
 # sudo nano /home/smk762/kmd_ntx_stats_docker/postgres-data/pg_hba.conf

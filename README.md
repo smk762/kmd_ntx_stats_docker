@@ -28,9 +28,9 @@
 
 Install Python Packages: `pip3 install -r requirements.txt` 
 
-`sudo docker-compose build`  (needs to be run to apply code changes)
+`sudo docker compose build`  (needs to be run to apply code changes)
 
-`sudo docker-compose up` (run to launch containers)
+`sudo docker compose up` (run to launch containers)
 
 # Setup .env files (scripts pending...)
 - pgsql credentials
@@ -41,25 +41,25 @@ Install Python Packages: `pip3 install -r requirements.txt`
 
 # Create Database Tables
 
-Make migrations: `"docker-compose run web python3 manage.py makemigrations"`
+Make migrations: `"docker compose run web python3 manage.py makemigrations"`
 
-Apply migrations: `"docker-compose run web python3 manage.py migrate"`
+Apply migrations: `"docker compose run web python3 manage.py migrate"`
 
-Collect static files: `"docker-compose run web python3 manage.py collectstatic"`
+Collect static files: `"docker compose run web python3 manage.py collectstatic"`
 
 # Create superuser:
- `docker-compose run web python3 manage.py createsuperuser --email brian@spam.ni --username messiah`
+ `docker compose run web python3 manage.py createsuperuser --email brian@spam.ni --username messiah`
 
 See https://docs.djangoproject.com/en/3.0/ref/django-admin/ for more django admin commands.
 
 # Applying code changes
 `cd ~/kmd_ntx_stats_docker`
 
-`docker-compose build`
+`docker compose build`
 
 `sudo chown $USER:$USER /home/$USER/kmd_ntx_stats_docker/postgres-data -R`
 
-`docker-compose build`
+`docker compose build`
 
 `sudo cp -R static /var/www/stats.kmd.io/html`
 
