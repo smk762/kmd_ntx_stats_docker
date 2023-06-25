@@ -12,7 +12,8 @@ def update_dotenv():
         "NAME", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT",
         "SKIP_PAST_SEASONS", "SKIP_UNTIL_YESTERDAY", "OTHER_SERVER", "THIS_SERVER",
         "API_PAGE_BREAK", "TELEGRAM_TOKEN", "TELEGRAM_CHAT_ID", "ext_hostname",
-        "ext_username", "ext_password", "ext_db", "DB_PATH", "GH_USER", "GH_TOKEN"]:
+        "ext_username", "ext_password", "ext_db", "DB_PATH", "GH_USER", "GH_TOKEN",
+        "USER_ID", "GROUP_ID"]:
         with open(".env", "a+") as f:
             if i not in data:
                 if i == "USER_ID":
@@ -21,5 +22,5 @@ def update_dotenv():
                     q = os.getegid()
                 else:
                     q = input(f"Enter {i}: ")
-                
-                f.write(f"{i}={q}\n")        
+
+                f.write(f"{i}={q}\n")
