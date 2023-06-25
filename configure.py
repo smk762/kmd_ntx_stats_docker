@@ -13,8 +13,7 @@ def update_dotenv():
                 v = ''.join(item[1:]).strip()
             else:
                 v = item[1].strip()
-            if len(item) == 2:
-                data.update({k: v})
+            data.update({k: v})
 
     for i in ["MM2_USERPASS", "userpass", "SECRET_KEY", "DJANGO_ALLOWED_HOSTS",
         "NAME", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT",
