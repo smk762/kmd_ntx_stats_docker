@@ -131,9 +131,8 @@ def get_coin_epoch_score_at(season, server, coin, timestamp, testnet=False):
 
 
 def calc_epoch_score(server, num_coins):
+    logger.info(f"[calc_epoch_score] {server} {num_coins}")
     if num_coins == 0:
-        print("zero num coins")
-        print(server, num_coins)
         return 0
     if server == "Main":
         return round(0.8698/num_coins, 8)
