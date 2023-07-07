@@ -6,6 +6,8 @@ from lib_const import *
 
 
 def update_ntx_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"INSERT INTO notarised (coin, block_height, \
                                 block_time, block_datetime, block_hash, \
                                 notaries, notary_addresses, ac_ntx_blockhash, ac_ntx_height, \
@@ -26,6 +28,8 @@ def update_ntx_row(row_data):
 
 
 def update_ntx_row_epoch_scores(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE notarised SET \
             scored='{scored}', score_value={score_value} \
             WHERE season='{season}' AND server='{server}' \
@@ -41,6 +45,8 @@ def update_ntx_row_epoch_scores(row_data):
 
 
 def update_server_notarised_tbl(old_server, server):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE notarised SET \
           server='{server}' \
           WHERE server='{old_server}';"
@@ -53,6 +59,8 @@ def update_server_notarised_tbl(old_server, server):
         CONN.rollback()
 
 def update_coin_server_season_notarised_tbl(server, season, coin):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE notarised SET \
           server='{server}' \
           WHERE season='{season}'\
@@ -66,6 +74,8 @@ def update_coin_server_season_notarised_tbl(server, season, coin):
         CONN.rollback()
 
 def update_unofficial_coin_notarised_tbl(season, coin):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE notarised SET \
           season='Unofficial', server='Unofficial', epoch='Unofficial' \
           WHERE season='{season}'\
@@ -79,6 +89,8 @@ def update_unofficial_coin_notarised_tbl(season, coin):
         CONN.rollback()
 
 def update_coin_score_notarised_tbl(coin, score_value, scored, min_time=None, max_time=None, season=None, server=None, epoch=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE notarised SET scored={scored}, score_value={score_value}"
     conditions = []
     if coin:
@@ -107,6 +119,8 @@ def update_coin_score_notarised_tbl(coin, score_value, scored, min_time=None, ma
         CONN.rollback()
 
 def update_txid_score_notarised_tbl(txid, scored, score_value):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE notarised SET \
           scored={scored}, score_value={score_value} \
           WHERE txid='{txid}';"
@@ -119,6 +133,8 @@ def update_txid_score_notarised_tbl(txid, scored, score_value):
         CONN.rollback()
 
 def update_season_server_addresses_notarised_tbl(txid, season, server, addresses=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     if addresses:
         sql = f"UPDATE notarised SET \
               notary_addresses=ARRAY{addresses},  \
@@ -139,6 +155,8 @@ def update_season_server_addresses_notarised_tbl(txid, season, server, addresses
 
 
 def delete_txid_from_notarised_tbl(txid):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     CURSOR.execute(f"DELETE FROM notarised WHERE txid = '{txid}';")
     CONN.commit()
 
@@ -147,6 +165,8 @@ def delete_from_notarised_tbl_where(
         season=None, server=None, epoch=None, coin=None,
         include_coins=None, exclude_coins=None
     ):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"DELETE FROM notarised"
     sql = get_notarised_conditions_filter(
         sql, season=season, server=server, epoch=epoch,
@@ -158,6 +178,8 @@ def delete_from_notarised_tbl_where(
 
 
 def update_coin_ntx_season_row(row_data): 
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"INSERT INTO coin_ntx_season \
             (season, coin, coin_data, timestamp) \
             VALUES (%s, %s, %s, %s) \
@@ -169,6 +191,8 @@ def update_coin_ntx_season_row(row_data):
 
 
 def update_notary_ntx_season_row(row_data): 
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"INSERT INTO notary_ntx_season \
             (season, notary, notary_data, timestamp) \
             VALUES (%s, %s, %s, %s) \
@@ -180,6 +204,8 @@ def update_notary_ntx_season_row(row_data):
 
 
 def update_server_ntx_season_row(row_data): 
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"INSERT INTO server_ntx_season \
             (season, server, server_data, timestamp) \
             VALUES (%s, %s, %s, %s) \
@@ -192,6 +218,8 @@ def update_server_ntx_season_row(row_data):
 
 
 def update_daily_notarised_coin_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"INSERT INTO notarised_coin_daily \
           (season, server, coin, ntx_count, notarised_date) \
           VALUES (%s, %s, %s, %s, %s) \
@@ -202,6 +230,8 @@ def update_daily_notarised_coin_row(row_data):
 
 
 def update_daily_notarised_count_row(row_data): 
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "INSERT INTO notarised_count_daily \
         (notary, master_server_count, main_server_count, \
         third_party_server_count, other_server_count, \
@@ -219,6 +249,8 @@ def update_daily_notarised_count_row(row_data):
 
 
 def update_coin_last_ntx_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = F"INSERT INTO coin_last_ntx \
                     (season, server, coin,\
@@ -246,6 +278,8 @@ def update_coin_last_ntx_row(row_data):
 
 
 def update_notary_last_ntx_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = F"INSERT INTO notary_last_ntx \
                     (season, server, coin, notary,\
@@ -276,6 +310,8 @@ def update_notary_last_ntx_row(row_data):
 
 
 def update_notarised_tenure_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = "INSERT INTO notarised_tenure (coin, first_ntx_block, \
             last_ntx_block, first_ntx_block_time, last_ntx_block_time, \
@@ -300,6 +336,8 @@ def update_notarised_tenure_row(row_data):
 
 
 def update_notarised_epoch(actual_epoch, season=None, server=None, coin=None, txid=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE notarised SET epoch='{actual_epoch}'"
     conditions = []
     if season:
@@ -324,6 +362,8 @@ def update_notarised_epoch(actual_epoch, season=None, server=None, coin=None, tx
 
 
 def update_notarised_epoch_scores(coin=None, season=None, server=None, epoch=None, epoch_start=None, epoch_end=None, score_per_ntx=None, scored=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE notarised SET epoch='{epoch}', score_value={score_per_ntx}, scored={scored}"
     conditions = []
     if coin:

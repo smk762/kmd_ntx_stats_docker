@@ -487,11 +487,14 @@ def get_activation_commands(request):
         protocol = None
         platform = None
         coin = item["coin"]
+        if coin.endswith("-segwit"):
+            coin = coin.replace("-segwit", "")
         electrums = item["electrums"]
         lightwallets = item["lightwallets"]
         compatible = item["mm2_compatible"] == 1
         
         if coin == "TOKEL":
+            item["coin"] = "TKL"
             coin = "TKL"
 
         resp_json = {} 
@@ -520,7 +523,7 @@ def get_activation_commands(request):
                 "mmrpc": "2.0",
                 "userpass":"'$userpass'",
                 "params": {
-                    "ticker": coin,
+                    "ticker": item["coin"],
                     "activation_params": {
                         "mode": {
                             "rpc": "Light",
@@ -540,7 +543,7 @@ def get_activation_commands(request):
                 resp_json.update({
                     "userpass":"'$userpass'",
                     "method":"electrum",
-                    "coin":coin,
+                    "coin":item["coin"],
                     "servers": []
                 })
                 if "UTXO" not in enable_commands["commands"]:

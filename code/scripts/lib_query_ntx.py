@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from lib_const import *
 from lib_filter import *
-from lib_db import CONN, CURSOR
+from lib_db import connect_db
 import lib_helper as helper
 from decorators import print_runtime
 
@@ -23,11 +23,15 @@ def select_from_notarised_tbl_where(
         lowest_ac_blockheight=lowest_ac_blockheight, highest_ac_blockheight=highest_ac_blockheight,
         not_season=not_season, not_server=not_server, not_epoch=not_epoch, order_by=order_by
     )
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     CURSOR.execute(sql)
     return helper.get_results_or_none(CURSOR)
 
 @print_runtime
 def get_notarised_servers(season=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "SELECT DISTINCT server FROM notarised"
     sql = get_notarised_conditions_filter(sql, season=season)
     CURSOR.execute(sql)
@@ -39,6 +43,8 @@ def get_notarised_servers(season=None):
 
 @print_runtime
 def get_notarised_epochs(season=None, server=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "SELECT DISTINCT epoch FROM notarised"
     sql = get_notarised_conditions_filter(sql, season=season, server=server)
     CURSOR.execute(sql)
@@ -50,6 +56,8 @@ def get_notarised_epochs(season=None, server=None):
 
 @print_runtime
 def get_notarised_server_epochs(season, server=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "SELECT DISTINCT server, epoch FROM notarised"
     sql = get_notarised_conditions_filter(
         sql, season=season, server=server
@@ -66,6 +74,8 @@ def get_notarised_server_epochs(season, server=None):
 
 @print_runtime
 def get_notarised_server_epoch_coins(season, server=None, epoch=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "SELECT DISTINCT server, epoch, coin FROM notarised"
     sql = get_notarised_conditions_filter(
         sql, season=season, server=server, epoch=epoch
@@ -90,6 +100,8 @@ def get_notarised_server_epoch_coins(season, server=None, epoch=None):
 
 @print_runtime
 def get_notarised_coins(season=None, server=None, epoch=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "SELECT DISTINCT coin FROM notarised"
     sql = get_notarised_conditions_filter(sql, season=season, server=server, epoch=epoch)
     CURSOR.execute(sql)
@@ -100,6 +112,8 @@ def get_notarised_coins(season=None, server=None, epoch=None):
 
 
 def get_notarised_data_for_season(season):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"SELECT coin, block_height, block_time, block_datetime, \
             block_hash, notaries, notary_addresses, ac_ntx_blockhash, \
             ac_ntx_height, txid, opret, season,\
@@ -122,6 +136,8 @@ def get_official_ntx_results(
         season, group_by, server=None,
         epoch=None, coin=None, notary=None
     ):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     group_by = ", ".join(group_by)
     sql = f"SELECT {group_by}, \
             COALESCE(COUNT(*), 0), \
@@ -141,6 +157,8 @@ def get_notarised_server_epoch_scores(season, server=None, epoch=None):
     sql = get_notarised_conditions_filter(
         sql, season=season, server=server, epoch=epoch
     )
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     CURSOR.execute(sql)
     results = CURSOR.fetchall()
     resp = {}
@@ -161,6 +179,8 @@ def get_notarised_coin_epoch_scores(
         lowest_blocktime=None, highest_blocktime=None
     ):
 
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "SELECT DISTINCT score_value FROM notarised"
     sql = get_notarised_conditions_filter(
         sql, season=season, server=server,
@@ -179,6 +199,8 @@ def get_notarised_last_data_by_coin():
                 MAX(block_time), COALESCE(COUNT(*), 0) \
                 FROM notarised WHERE \
                 server != 'Unofficial' GROUP BY coin;"
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     CURSOR.execute(sql)
     last_ntx = CURSOR.fetchall()
     coin_last_ntx = {}
@@ -201,6 +223,8 @@ def get_notarised_coin_date_aggregates(season, day):
            WHERE season = '{season}' AND epoch != 'Unofficial' \
            AND DATE_TRUNC('day', block_datetime) = '{day}' \
            GROUP BY coin;"
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     CURSOR.execute(sql)
     try:
         results = CURSOR.fetchall()
@@ -217,6 +241,8 @@ def get_notarised_for_day(season, day):
            FROM notarised WHERE season='{season}' \
            AND epoch != 'Unofficial' \
            AND DATE_TRUNC('day', block_datetime) = '{day}';"
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     CURSOR.execute(sql)
     return helper.get_results_or_none(CURSOR)
 
@@ -228,12 +254,16 @@ def get_ntx_min_max(season, server=None, epoch=None, coin=None):
     sql = get_notarised_conditions_filter(
         sql, season=season, server=server, epoch=epoch, coin=coin
     )
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
 
     CURSOR.execute(sql)
     return CURSOR.fetchone()
 
 
 def get_notary_coin_last_nota(season, notary):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "SELECT coin, MAX(block_height), COUNT(*) \
            FROM notarised  WHERE season = '"+str(season)+"' \
            AND server != 'Unofficial' \
@@ -259,6 +289,8 @@ def get_notary_coin_last_nota(season, notary):
 
 
 def get_ntx_scored(season, server, coin, lowest_blocktime, highest_blocktime):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     scored_list = []
     unscored_list = []
 
@@ -318,6 +350,8 @@ def get_ntx_scored(season, server, coin, lowest_blocktime, highest_blocktime):
 
 
 def get_existing_notarised_txids(season=None, server=None, coin=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
 
     logger.info("Getting existing TXIDs from [notarised]...")
     sql = f"SELECT DISTINCT txid from notarised"

@@ -9,6 +9,8 @@ from lib_update_ntx import *
 #### KMD SUPPLY TABLE
 
 def update_kmd_supply_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = f"INSERT INTO kmd_supply (block_height, block_time, total_supply, delta) VALUES (%s, %s, %s, %s);"
         CURSOR.execute(sql, row_data)
@@ -22,6 +24,8 @@ def update_kmd_supply_row(row_data):
 #### ADRESSES TABLE
 
 def update_addresses_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = f"INSERT INTO addresses \
                     (season, server, notary, notary_id, \
@@ -42,6 +46,8 @@ def update_addresses_row(row_data):
 
 
 def delete_addresses_row(season, coin, address):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     CURSOR.execute(f"DELETE FROM addresses WHERE \
         season = '{season}', \
         coin = '{coin}', \
@@ -53,6 +59,8 @@ def delete_addresses_row(season, coin, address):
 #### BALANCES TABLE
 
 def update_balances_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = f"INSERT INTO balances \
                 (season, server, notary, \
@@ -72,6 +80,8 @@ def update_balances_row(row_data):
 
 
 def delete_balances_row(coin, address, season):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = f"DELETE FROM balances WHERE coin='{coin}' and address='{address}' and season={season};"
         CURSOR.execute(sql)
@@ -82,6 +92,8 @@ def delete_balances_row(coin, address, season):
 
 
 def update_rewards_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = "INSERT INTO rewards \
             (address, notary, utxo_count, eligible_utxo_count, \
@@ -104,6 +116,8 @@ def update_rewards_row(row_data):
 
 
 def delist_coin(coin):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         if coin in ["PIRATE", "TOKEL"]: return
         sql = f"DELETE FROM coins WHERE coin = '{coin}';"
@@ -118,6 +132,8 @@ def delist_coin(coin):
 
 
 def update_coins_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = "INSERT INTO coins \
             (coin, coins_info, electrums, electrums_ssl, explorers, lightwallets, dpow, dpow_tenure, dpow_active, mm2_compatible) \
@@ -144,6 +160,8 @@ def update_coins_row(row_data):
 
 
 def update_mined_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = "INSERT INTO mined \
             (block_height, block_time, block_datetime, \
@@ -171,6 +189,8 @@ def update_mined_row(row_data):
 
 
 def update_season_mined_count_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = f"INSERT INTO mined_count_season \
             (name, season, address, blocks_mined, sum_value_mined, \
@@ -192,6 +212,8 @@ def update_season_mined_count_row(row_data):
 
 
 def update_daily_mined_count_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = f"INSERT INTO mined_count_daily \
                     (notary, blocks_mined, sum_value_mined, \
@@ -215,6 +237,8 @@ def update_daily_mined_count_row(row_data):
 
 
 def update_table(table, update_str, condition):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = "UPDATE "+table+" \
                SET "+update_str+" WHERE "+condition+";"
@@ -230,6 +254,8 @@ def update_table(table, update_str, condition):
 
 
 def update_sync_tbl(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = "INSERT INTO coin_sync \
             (coin, block_height, sync_hash, explorer_hash) \
@@ -250,6 +276,8 @@ def update_sync_tbl(row_data):
 
 
 def update_nn_social_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = "INSERT INTO  nn_social \
             (notary, twitter, youtube, email, discord, \
@@ -273,6 +301,8 @@ def update_nn_social_row(row_data):
 
 
 def update_coin_social_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = f"INSERT INTO  coin_social \
             (coin, discord, email, explorers, github, icon, linkedin, \
@@ -301,6 +331,8 @@ def update_coin_social_row(row_data):
 
 
 def update_btc_address_deltas_tbl(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = "INSERT INTO  btc_address_deltas \
             (notary, address, category, txid, block_time, \
@@ -318,6 +350,8 @@ def update_btc_address_deltas_tbl(row_data):
 
 
 def update_funding_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = "INSERT INTO  funding_transactions \
             (coin, txid, vout, amount, \
@@ -344,17 +378,23 @@ def update_funding_row(row_data):
         return 0
 
 def ts_col_to_dt_col(ts_col, dt_col, table):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "UPDATE "+table+" SET "+dt_col+"=to_timestamp("+ts_col+");"
     CURSOR.execute(sql)
     CONN.commit()
 
 
 def delete_nn_btc_tx_transaction(txid):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     CURSOR.execute(f"DELETE FROM nn_btc_tx WHERE txid='{txid}';")
     CONN.commit()
 
 
 def update_nn_btc_tx_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "INSERT INTO nn_btc_tx (txid, block_hash, block_height, \
                                 block_time, block_datetime, \
                                 address, notary, season, category, \
@@ -375,6 +415,8 @@ def update_nn_btc_tx_row(row_data):
 
 
 def update_nn_btc_tx_notary_from_addr(notary, addr):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE nn_btc_tx SET notary='{notary}' WHERE address='{addr}';"
     try:
         CURSOR.execute(sql)
@@ -385,6 +427,8 @@ def update_nn_btc_tx_notary_from_addr(notary, addr):
         CONN.rollback()
 
 def update_nn_btc_tx_notary_category_from_addr(notary, category, addr):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE nn_btc_tx SET notary='{notary}', category='{category}' WHERE address='{addr}';"
     try:
         CURSOR.execute(sql)
@@ -395,6 +439,8 @@ def update_nn_btc_tx_notary_category_from_addr(notary, category, addr):
         CONN.rollback()
 
 def update_nn_btc_tx_category_from_txid(category, txid):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE nn_btc_tx SET category='{category}' WHERE txid='{txid}';"
     try:
         CURSOR.execute(sql)
@@ -405,6 +451,8 @@ def update_nn_btc_tx_category_from_txid(category, txid):
         CONN.rollback()
 
 def update_nn_btc_tx_outindex_from_txid(outindex, txid):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE nn_btc_tx SET output_index='{outindex}' WHERE txid='{txid}';"
     try:
         CURSOR.execute(sql)
@@ -416,6 +464,8 @@ def update_nn_btc_tx_outindex_from_txid(outindex, txid):
 
 
 def delete_nn_btc_tx_row(txid, notary):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "DELETE FROM nn_btc_tx WHERE txid='"+str(txid)+"' and notary='"+str(notary)+"';"
     try:
         CURSOR.execute(sql)
@@ -426,6 +476,8 @@ def delete_nn_btc_tx_row(txid, notary):
 
 
 def update_nn_ltc_tx_notary_from_addr(notary, addr):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"UPDATE nn_ltc_tx SET notary='{notary}' WHERE address='{addr}';"
     try:
         CURSOR.execute(sql)
@@ -437,6 +489,8 @@ def update_nn_ltc_tx_notary_from_addr(notary, addr):
 
 
 def update_nn_ltc_tx_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = "INSERT INTO nn_ltc_tx (txid, block_hash, block_height, \
                                 block_time, block_datetime, \
                                 address, notary, season, category, \
@@ -458,6 +512,8 @@ def update_nn_ltc_tx_row(row_data):
 
 
 def update_scoring_epoch_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"INSERT INTO scoring_epochs \
                 (season, server, epoch, epoch_start, epoch_end, \
                 start_event, end_event, epoch_coins, score_per_ntx) \
@@ -480,6 +536,8 @@ def update_scoring_epoch_row(row_data):
 
 
 def update_notary_vote_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"INSERT INTO notary_vote \
                 (txid, block_hash, block_time, \
                 lock_time, block_height, votes, \
@@ -512,6 +570,8 @@ def update_notary_vote_row(row_data):
 
 
 def update_swaps_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     try:
         sql = f"INSERT INTO swaps \
                 (uuid, started_at, taker_coin, taker_amount, \
@@ -537,6 +597,8 @@ def update_swaps_row(row_data):
 
 
 def update_swaps_failed_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     taker_err_msg = row_data[5]
     maker_err_msg = row_data[12]
     if row_data[5]:
@@ -571,12 +633,16 @@ def update_swaps_failed_row(row_data):
 
 
 def delete_rewards_tx_transaction(txid):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     CURSOR.execute(f"DELETE FROM rewards_tx WHERE \
         txid = '{txid}';")
     CONN.commit()
 
 
 def update_rewards_tx_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"INSERT INTO rewards_tx (txid, block_hash, block_height,\
                     block_time, block_datetime,\
                     address, rewards_value,\
@@ -596,6 +662,8 @@ def update_rewards_tx_row(row_data):
         CONN.rollback()
 
 def update_notary_candidates_row(row_data):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     sql = f"INSERT INTO notary_candidates (year, season, name,\
                        proposal_url) \
                 VALUES (%s, %s, %s, %s)\
@@ -614,6 +682,8 @@ def update_notary_candidates_row(row_data):
 
 
 def update_table_prices(table, date_field, day, btc_price, usd_price, timestamp=False):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
     if timestamp:
         date = dt.strptime(day, "%d-%m-%Y")
         start = int(datetime.datetime.timestamp(date))

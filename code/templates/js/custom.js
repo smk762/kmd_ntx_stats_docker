@@ -115,7 +115,7 @@
 	}
 
 	function show_season(season) {
-		const options = ["Season_4", "Season_5", "Season_6"];
+		const options = ["Season_4", "Season_5", "Season_6", "Season_7"];
 		show_card(season, options)
 	}
 
