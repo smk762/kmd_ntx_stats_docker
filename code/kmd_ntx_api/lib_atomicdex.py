@@ -731,7 +731,7 @@ def get_active_mm2_versions(ts):
     data = requests.get(VERSION_TIMESPANS_URL).json()
     active_versions = []
     for version in data:
-        if int(ts) > data[version]["start"] and int(ts) < data[version]["end"]:
+        if int(ts) < data[version]["end"]:
             active_versions.append(version)
     return active_versions
 

@@ -163,8 +163,8 @@ def get_registered_nodes_from_db():
 def deregister_nodes_from_db(notary_seeds):
     for season in notary_seeds:
         for notary in notary_seeds[season]:
-	        cursor.execute(f"DELETE FROM nodes where name = '{notary}';")
-	        cursor.commit()
+            cursor.execute(f"DELETE FROM nodes where name = '{notary}';")
+            cursor.commit()
 
 def update_seednode_version_stats_row(row_data):
     try:
@@ -209,7 +209,6 @@ def rectify_scores():
         sql = f"UPDATE seednode_version_stats SET score = 0 WHERE version LIKE '%{commithash}%' AND timestamp > {end_time};"
         CURSOR.execute(sql)
         CONN.commit()
-
 
 
 def get_version_stats_from_pgsql_db():
@@ -376,7 +375,6 @@ if __name__ == '__main__':
         elif sys.argv[1] == 'import':
             for season in notary_seeds:
                 import_seednode_stats(season)
-                
 
         else:
             print("invalid param, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test, import]")
