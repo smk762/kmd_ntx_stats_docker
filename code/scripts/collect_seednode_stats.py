@@ -91,25 +91,25 @@ def get_active_mm2_versions(ts):
     return active_versions
 
 
-def add_notaries(notary_seeds):
+def add_notaries():
     # Add to tracking
-    for season in notary_seeds:
-        for notary in notary_seeds[season]:
+    for season in seednodes:
+        for notary in seednodes[season]:
             params = {
                 "mmrpc": "2.0",
                 "params": {
                     "name": notary,
-                    "address": notary_seeds[season][notary]["IP"],
-                    "peer_id": notary_seeds[season][notary]["PeerID"]
+                    "address": seednodes[season][notary]["IP"],
+                    "peer_id": seednodes[season][notary]["PeerID"]
                 }
             }
             print(notary)
             r = mm2_proxy('add_node_to_version_stat', params)
 
-def remove_notaries(notary_seeds):
+def remove_notaries():
     # Add to tracking
-    for season in notary_seeds:
-        for notary in notary_seeds[season]:
+    for season in seednodes:
+        for notary in seednodes[season]:
             params = {
                 "mmrpc": "2.0",
                 "params": {
@@ -174,9 +174,9 @@ def get_registered_nodes_from_db():
         print(dict(row))    
     print("---------")
 
-def deregister_nodes_from_db(notary_seeds):
-    for season in notary_seeds:
-        for notary in notary_seeds[season]:
+def deregister_nodes_from_db():
+    for season in seednodes:
+        for notary in seednodes[season]:
             cursor.execute(f"DELETE FROM nodes where name = '{notary}';")
             cursor.commit()
 
@@ -266,9 +266,9 @@ def get_version_score(version, timestamp, notary, season, wss_detected=False):
 
 def test_wss(notary, season):
     
-    if season in notary_seeds:
-        url = notary_seeds[season][notary]["IP"]
-        peer_id = notary_seeds[season][notary]["PeerID"]
+    if season in seednodes:
+        url = seednodes[season][notary]["IP"]
+        peer_id = seednodes[season][notary]["PeerID"]
         data = {"userpass": "userpass"}
         resp = electrum.get_from_electrum_ssl(url, 38900, "version", data)
         if str(resp).find("read operation timed out") > -1:
@@ -350,8 +350,8 @@ if __name__ == '__main__':
 
         # Run manually to register nodes via JSON file
         elif sys.argv[1] == 'register':
-            remove_notaries(seednodes)
-            add_notaries(seednodes)
+            remove_notaries()
+            add_notaries()
 
         # This is what gets cron'd
         elif sys.argv[1] == 'migrate':
