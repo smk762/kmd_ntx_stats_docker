@@ -45,6 +45,27 @@ MM2_USERPASS = os.getenv("MM2_USERPASS")
 MM2_IP = "http://127.0.0.1:7783"
 DB_PATH = os.getenv("DB_PATH")
 
+seednodes = {
+    "Season_7": {
+        "dragonhound_AR": {
+            "IP": "ar.smk.dog",
+            "PeerID": "12D3KooWSUABQ2beSQW2nXLiqn4DtfXyqbJQDd2SvmgoVwXjrd9c"
+        },
+        "dragonhound_EU": {
+            "IP": "eu.smk.dog",
+            "PeerID": "12D3KooWDgFfyAzbuYNLMzMaZT9zBJX9EHd38XLQDRbNDYAYqMzd"
+        },
+        "dragonhound_NA": {
+            "IP": "na.smk.dog",
+            "PeerID": "12D3KooWSmizY35qrfwX8qsuo8H8qrrvDjXBTMRBfeYsRQoybHaA"
+        },
+        "dragonhound_DEV": {
+            "IP": "dev.smk.dog",
+            "PeerID": "12D3KooWNGGBfPWQbubupECdkYhj1VomMLUUAYpsR2Bo3R4NzHju"
+        }
+    }
+}
+
 conn = sqlite3.connect(DB_PATH)
 conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
@@ -65,16 +86,9 @@ def mm2_proxy(method, params=None):
 def get_active_mm2_versions(ts):
     active_versions = []
     for version in VERSION_DATA:
-        if int(ts) > VERSION_DATA[version]["start"] and int(ts) < VERSION_DATA[version]["end"]:
+        if int(ts) < VERSION_DATA[version]["end"]:
             active_versions.append(version)
     return active_versions
-
-
-def get_seedinfo_from_json():
-    file = f'{SCRIPT_PATH}/notary_seednodes.json'
-    print(file)
-    with open(file, 'r') as f:
-        return json.load(f)
 
 
 def add_notaries(notary_seeds):
@@ -315,7 +329,6 @@ def import_seednode_stats(season):
 
 if __name__ == '__main__':
 
-    notary_seeds = get_seedinfo_from_json()
     active_versions = get_active_mm2_versions(time.time())
     logger.info(f"Local MM2 version: {get_local_version().json()}")
     print(f"active_versions: {active_versions}")
@@ -337,8 +350,8 @@ if __name__ == '__main__':
 
         # Run manually to register nodes via JSON file
         elif sys.argv[1] == 'register':
-            remove_notaries(notary_seeds)
-            add_notaries(notary_seeds)
+            remove_notaries(seednodes)
+            add_notaries(seednodes)
 
         # This is what gets cron'd
         elif sys.argv[1] == 'migrate':
@@ -367,13 +380,13 @@ if __name__ == '__main__':
 
         # tests WSS connection
         elif sys.argv[1] == 'wss_test':
-            for season in notary_seeds:
-                for notary in notary_seeds[season]:
+            for season in seednodes:
+                for notary in seednodes[season]:
                     test_wss(notary, season)
                 
         # import data from other server
         elif sys.argv[1] == 'import':
-            for season in notary_seeds:
+            for season in seednodes:
                 import_seednode_stats(season)
 
         else:
