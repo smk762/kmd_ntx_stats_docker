@@ -299,18 +299,18 @@ def get_active_mm2_versions(ts):
 
 def add_notaries():
     # Add to tracking
-    for season in seednodes:
-        for notary in seednodes[season]:
-            params = {
-                "mmrpc": "2.0",
-                "params": {
-                    "name": notary,
-                    "address": seednodes[season][notary]["IP"],
-                    "peer_id": seednodes[season][notary]["PeerID"]
-                }
+    season = "Season_7"
+    for notary in seednodes[season]:
+        params = {
+            "mmrpc": "2.0",
+            "params": {
+                "name": notary,
+                "address": seednodes[season][notary]["IP"],
+                "peer_id": seednodes[season][notary]["PeerID"]
             }
-            print(notary)
-            r = mm2_proxy('add_node_to_version_stat', params)
+        }
+        print(notary)
+        r = mm2_proxy('add_node_to_version_stat', params)
 
 def remove_notaries():
     # Add to tracking
