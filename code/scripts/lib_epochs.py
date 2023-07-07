@@ -7,6 +7,7 @@ from models import ntx_tenure_row, scoring_epoch_row
 from decorators import print_runtime
 from lib_helper import get_season_coins
 
+
 @print_runtime
 def preseason_populate_ntx_tenure(season):
     now = int(time.time())

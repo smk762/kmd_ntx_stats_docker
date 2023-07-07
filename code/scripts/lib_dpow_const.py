@@ -10,7 +10,6 @@ from notary_pubkeys import NOTARY_PUBKEYS
 from notary_candidates import CANDIDATE_ADDRESSES
 
 
-
 def get_scoring_epochs_repo_data(branch='master'):
     url = urls.get_scoring_epochs_repo_url(branch)
     repo_data = requests.get(url).json()
@@ -700,7 +699,7 @@ for _season in SEASONS_INFO:
 
 print(f"{int(time.time()) - NOW} sec to complete dpow const")
 
-
+NEXT_SEASON_COINS = []
 
 
 if __name__ == '__main__':
