@@ -101,7 +101,7 @@ def populate_coins_social(season):
 if __name__ == "__main__":
 
     logger.info(f"Preparing to populate [social_coins] table...")
-    for season in ["Season_6"]:
+    for season in ["Season_7"]:
         generate_social_coins_template(season)
         populate_coins_social(season)
     

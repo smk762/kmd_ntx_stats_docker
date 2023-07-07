@@ -299,7 +299,6 @@ OTHER_LAUNCH_PARAMS = {
     "VRSC": "~/VerusCoin/src/verusd",
     "GLEEC": "~/komodo/src/komodod -ac_name=GLEEC -ac_supply=210000000 -ac_public=1 -ac_staked=100 -addnode=95.217.161.126",
     "KIP0001": "~/komodo/src/komodod -ac_public=1 -ac_name=KIP0001 -ac_supply=139419284 -ac_staked=10 -addnode=178.159.2.6",
-    "GLEEC-OLD": "~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtcd",
     "MCL": "~/marmara/src/komodod -ac_name=MCL -ac_supply=2000000 -ac_cc=2 -addnode=5.189.149.242 -addnode=161.97.146.150 -addnode=149.202.158.145 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000 -daemon"
 }
 
@@ -315,8 +314,7 @@ OTHER_CONF_FILE = {
     "CHIPS": "~/.chips/chips.conf",
     "EMC2": "~/.einsteinium/einsteinium.conf",
     "VRSC": "~/.komodo/VRSC/VRSC.conf",   
-    "GLEEC": "~/.komodo/GLEEC/GLEEC.conf",
-    "GLEEC-OLD": "~/.gleecbtc/gleecbtc.conf",   
+    "GLEEC": "~/.komodo/GLEEC/GLEEC.conf" 
 }
 
 OTHER_PREFIXES = {
@@ -339,8 +337,7 @@ OTHER_CLI = {
     "AYA": "~/AYAv2/src/aryacoin-cli",
     "CHIPS": "~/chips/src/chips-cli",
     "EMC2": "~/einsteinium/src/einsteinium-cli",
-    "VRSC": "~/VerusCoin/src/verus",   
-    "GLEEC-OLD": "~/GleecBTC-FullNode-Win-Mac-Linux/src/gleecbtc-cli",   
+    "VRSC": "~/VerusCoin/src/verus"  
 }
 
 DPOW_EXCLUDED_COINS = {
@@ -398,6 +395,14 @@ DPOW_EXCLUDED_COINS = {
         "ZILLA",
         "GLEEC-OLD"
     ],
+    "Season_7": [
+        "BLUR",
+        "LABS",
+        "BTC",
+        "MESH",
+        "ZILLA",
+        "GLEEC-OLD"
+    ],
     "VOTE2022_Testnet": [
         "BLUR",
         "LABS",
@@ -437,6 +442,32 @@ SEASON_START_COINS = {
             "MCL",
             "SFUSD",
             "TOKEL"
+        ]
+    },
+    "Season_7": {
+        "LTC": ["LTC"],
+        "KMD": ["KMD"],
+        "Main": [
+            "CLC",
+            "CCL",
+            "DOC",
+            "GLEEC",
+            "ILN",
+            "KOIN",
+            "MARTY",
+            "NINJA",
+            "PIRATE",
+            "SUPERNET",
+            "THC"
+        ],
+        "Third_Party": [
+            "AYA",
+            "CHIPS",
+            "EMC2",
+            "MCL",
+            "MIL",
+            "TOKEL",
+            "VRSC"
         ]
     },
     "VOTE2023_Testnet": {
@@ -491,6 +522,14 @@ SEASONS_INFO = {
         "start_time": 1656077853,
         "end_time": 1680911999,
         "post_season_end_time": 1688169599,
+        "servers": {}
+    },
+    "Season_7": {
+        "start_block": 3484958,
+        "end_block": 4484958,
+        "start_time": 1688132253,
+        "end_time": 1988132253,
+        "post_season_end_time": 1988132253,
         "servers": {}
     },
     "VOTE2022_Testnet": {
@@ -665,11 +704,4 @@ print(f"{int(time.time()) - NOW} sec to complete dpow const")
 
 
 if __name__ == '__main__':
-    #print(get_scoring_epochs_repo_data())
-    #print("============================")
-    # print(get_season_epochs('Season_6'))
-    #print("============================")
-    #print(f"EPOCHS: {EPOCHS['Season_6']}")
-    #print(f"SEASONS_INFO: {SEASONS_INFO['Season_6']}")
-    # print(f"SCORING_EPOCHS_REPO_DATA: {SCORING_EPOCHS_REPO_DATA['Season_6']}")
     pass

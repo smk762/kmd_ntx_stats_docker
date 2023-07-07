@@ -2,12 +2,12 @@
 import csv
 import json
 
-seednodes = {"Season_6": {}}
-with open('s6_seednodes.csv', 'r') as file:
+seednodes = {"Season_7": {}}
+with open('s7_seednodes.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
         print(row)
-        seednodes["Season_6"].update({
+        seednodes["Season_7"].update({
 	        row[0]: {
 	            "IP": row[2],
 	            "PeerID": row[1]

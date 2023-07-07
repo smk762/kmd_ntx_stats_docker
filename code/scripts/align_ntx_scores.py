@@ -16,7 +16,7 @@ scoring_epochs = get_scoring_epochs_repo_data()
 
 coin_ranges = {}
 epochs = populate_epochs()
-for season in ["Season_6"]:
+for season in ["Season_7"]:
     for server in epochs[season]:
         if server not in coin_ranges:
             coin_ranges.update({
@@ -70,8 +70,6 @@ for server in coin_ranges:
 
 
 if __name__ == '__main__':
-    #print(scoring_epochs['Season_6'])
-    #print(epochs['Season_6'])
     print(coin_ranges)
 
 

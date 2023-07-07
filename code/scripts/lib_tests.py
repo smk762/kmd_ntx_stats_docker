@@ -450,7 +450,7 @@ class TestLibHelper:
 
     def test_has_season_started(self):
         assert lib_helper.has_season_started("Season_5") == True
-        assert lib_helper.has_season_started("Season_6") == False
+        assert lib_helper.has_season_started("Season_6") == True
         assert lib_helper.has_season_started("Season_12") == False
 
 
@@ -462,7 +462,7 @@ class TestLibHelper:
 
     def test_get_pubkeys(self):
         assert len(lib_helper.get_pubkeys("Season_5", "Third_Party")) == 64
-        assert len(lib_helper.get_pubkeys("Season_5", "Main")) == 64
+        assert len(lib_helper.get_pubkeys("Season_7", "Main")) == 64
         assert len(lib_helper.get_pubkeys("Season_777", "Main")) == 0
         assert len(lib_helper.get_pubkeys("Season_5", "Minecraft")) == 0
 

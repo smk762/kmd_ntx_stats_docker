@@ -129,7 +129,13 @@ SEASONS_INFO = {
         "start_block": 2963330,
         "end_block": 4437000,
         "start_time": 1656077853,
-        "end_time": 2147483647,
+        "end_time": 2147483647
+    },
+    "Season_7": {
+        "start_block": 3484958,
+        "end_block": 4484958,
+        "start_time": 1688132253,
+        "end_time": 1988132253
     },
     "VOTE2022_Testnet": {
         "start_block": 2903777,

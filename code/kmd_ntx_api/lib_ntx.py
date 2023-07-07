@@ -32,7 +32,7 @@ def get_ntx_tenure_table(request):
         data.append(item)
     return data
 
-def get_notary_fee_efficiency(season = 'Season_6', datatables=True):    
+def get_notary_fee_efficiency(season = 'Season_7', datatables=True):    
     data = query.get_nn_ltc_tx_data(season=season)
     consolidate_data = data.filter(category='Consolidate').values('notary', 'txid').annotate(sum_fees=Avg('fees'))
     split_data = data.filter(category='Split').values('notary').annotate(sum_fees=Sum('fees'))

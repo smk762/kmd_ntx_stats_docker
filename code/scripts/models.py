@@ -865,7 +865,7 @@ class ntx_tenure_row():
             logger.warning(f" [notarised_tenure] Invalid server {server}")
             return False
 
-        if self.season not in ['Season_5', 'Season_5_Testnet', 'Season_4', 'Season_6']:
+        if self.season not in ['Season_5', 'Season_5_Testnet', 'Season_4', 'Season_6', 'Season_7']:
             logger.warning(f"[notarised_tenure] Invalid season {season}")
             
             return False
