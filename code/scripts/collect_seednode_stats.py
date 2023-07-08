@@ -494,7 +494,7 @@ def migrate_sqlite_to_pgsql(ts):
             season = validate.get_season(hr_timestamp)
 
             if row["name"] not in wss_confirmed:
-                if test_wss(row["name"], season):
+                if test_wss(row["name"]):
                     wss_confirmed.append(row["name"])
 
             if row["name"] in wss_confirmed:
