@@ -102,7 +102,7 @@ PLATFORM_URLS = {
 }
 
 
-VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/master/doc/seed_version_epochs.json"
+VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/seednode-update/doc/seed_version_epochs.json"
 MM2_USERPASS = os.getenv("MM2_USERPASS")
 MM2_IP = "http://mm2:7783"
 TESTNET_COINS = ["BNBT", "ETHR", "AVAXT", "tQTUM", "MATICTEST", "AVAXT", "FTMT"]
