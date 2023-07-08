@@ -75,14 +75,14 @@
                             let maxTime = new Date().valueOf()
                             let maxHour = new Date(maxTime).getUTCHours()
                             if (typeof(sData) != 'number') {
-                                if (sData.search("WSS") > -1) {
+                                if (sData.search("WSS connection failing") > -1) {
                                     $(nTd).html('<span data-toggle="tooltip" data-placement="top" title="'+sData+'"><svg style="width: 0.9em; height: 0.9em; color: #039bd7;"><use xlink:href="#times"></use></svg>');
                                 }
                                 else if (sData.search("Wrong version") > -1) {
-                                    $(nTd).html('<span data-toggle="tooltip" data-placement="top" title="'+sData+'"><svg style="width: 0.9em; height: 0.9em; color: #373f48;"><use xlink:href="#times"></use></svg>');
+                                    $(nTd).html('<span data-toggle="tooltip" data-placement="top" title="'+sData+'"><svg style="width: 0.9em; height: 0.9em; color: #8842ab;"><use xlink:href="#times"></use></svg>');
                                 }
                                 else {
-                                    $(nTd).html('<span data-toggle="tooltip" data-placement="top" title="unknown error"><svg style="width: 0.9em; height: 0.9em; color: #895050;"><use xlink:href="#times"></use></svg>');
+                                    $(nTd).html('<span data-toggle="tooltip" data-placement="top" title="'+sData+'"><svg style="width: 0.9em; height: 0.9em; color: #895050;"><use xlink:href="#times"></use></svg>');
                                 }
                             }
                             else {
