@@ -7,5 +7,5 @@ echo $userpass
 sleep 5
 ./version.sh
 echo "Starting stats collection.sh"
-./start_stats.sh 900
+./start_stats.sh 300
 tail -f mm2.log
