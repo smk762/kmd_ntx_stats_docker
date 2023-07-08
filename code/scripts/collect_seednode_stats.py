@@ -243,7 +243,7 @@ seednodes = {
         "PeerID": "12D3KooWDubAUWDP2PgUXHjEdN3SGnkszcyUgahALFvaxgp9Jcyt"
     },
     "dragonhound_AR": {
-        "IP": "15.235.204.174",
+        "IP": "ar.smk.dog",
         "PeerID": "12D3KooWSUABQ2beSQW2nXLiqn4DtfXyqbJQDd2SvmgoVwXjrd9c"
     },
     "dragonhound_EU": {
