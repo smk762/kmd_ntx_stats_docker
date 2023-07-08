@@ -350,7 +350,7 @@ def empty_pg_table():
 
 def empty_sqlite_table(table):
     rows = cursor.execute(f"DELETE FROM {table};")
-    conn.commit()
+    CONN.commit()
     print('Deleted', cursor.rowcount, 'records from the table.')
 
 
@@ -375,6 +375,14 @@ def get_version_stats_from_db():
 
 def get_registered_nodes_from_db():
     rows = cursor.execute("SELECT * FROM nodes;").fetchall()
+    print("---------")
+    for row in rows:
+        print(dict(row))    
+    print("---------")
+    
+def delete_registered_nodes_from_db():
+    rows = cursor.execute("DELETE FROM nodes;")
+    CONN.commit()
     print("---------")
     for row in rows:
         print(dict(row))    

@@ -44,22 +44,30 @@ services:
       start_period: 15m
 
   mm2:
-    restart: always
-    build: 
-      context: mm2
-      dockerfile: Dockerfile
-      shm_size: '2gb'
-    volumes:
-      - ./mm2:/home/komodian/mm2
+    container_name: mm2
+    env_file:
+      - .env
     environment:
       - userpass=${userpass}
+    build:
+      context: ./mm2
+      dockerfile: Dockerfile
+      args:
+        - USER_ID=$USER_ID
+        - GROUP_ID=$GROUP_ID
+    volumes:
+      - ./:/mm2
     ports:
-      - "7783:7783"
+      - 127.0.0.1:7783:7783
+      - 127.0.0.1:38890:38890
+      - 127.0.0.1:38900:38900
     logging:
       driver: "json-file"
       options:
         max-size: "20m"
         max-file: "10"
+    restart: always
+    command: ["./init.sh"]
 
   db:
     image: postgres
