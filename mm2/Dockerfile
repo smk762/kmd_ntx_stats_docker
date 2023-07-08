@@ -19,12 +19,11 @@ ENV MM_COINS_PATH=/home/komodian/mm2/coins
 ENV MM_LOG=/home/komodian/mm2/mm2.log
 ENV USERPASS=${userpass}
 ENV userpass=${userpass}
-COPY entrypoint.sh /entrypoint.sh
-COPY entrypoint.sh /init.sh
+COPY ./ /home/komodian/mm2
+COPY init.sh /init.sh
 
 ENV PATH=/app:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Setup user and working directory
 RUN chown -R komodian:notarygroup /home/komodian
 USER komodian
-ENTRYPOINT ["/entrypoint.sh"]
