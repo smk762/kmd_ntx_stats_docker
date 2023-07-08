@@ -254,7 +254,7 @@ seednodes = {
     },
     "Season_7": {
         "dragonhound_AR": {
-            "IP": "ar.smk.dog",
+            "IP": "15.235.204.174",
             "PeerID": "12D3KooWSUABQ2beSQW2nXLiqn4DtfXyqbJQDd2SvmgoVwXjrd9c"
         },
         "dragonhound_EU": {
