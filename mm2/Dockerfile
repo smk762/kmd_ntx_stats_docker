@@ -19,7 +19,6 @@ ENV MM_COINS_PATH=/home/komodian/mm2/coins
 ENV MM_LOG=/home/komodian/mm2/mm2.log
 ENV USERPASS=${userpass}
 ENV userpass=${userpass}
-COPY ./ /home/komodian/mm2/
 COPY entrypoint.sh /entrypoint.sh
 COPY entrypoint.sh /init.sh
 
