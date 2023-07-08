@@ -331,7 +331,7 @@ def get_local_version():
 
 
 def start_stats_collection():
-    # set to every 30 minutes
+    # set to every 15 minutes
     params = {
         "mmrpc": "2.0",
         "params": {
@@ -480,7 +480,7 @@ def get_version_score(version, timestamp, notary, season, wss_detected=False):
 
 def test_wss(notary, season):
     
-    if season in seednodes:
+    if season in ["Season_7"]:
         url = seednodes[season][notary]["IP"]
         peer_id = seednodes[season][notary]["PeerID"]
         data = {"userpass": "userpass"}
