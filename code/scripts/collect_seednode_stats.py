@@ -500,7 +500,7 @@ def migrate_sqlite_to_pgsql(ts):
             if row["name"] in wss_confirmed:
                 wss_detected = True
             
-            score = get_version_score(row["version"], hr_timestamp, row["name"], season, wss_detected)
+            score = get_version_score(row["version"], hr_timestamp, row["name"], wss_detected)
             row_data = (row["name"], season, row["version"], hr_timestamp, row["error"], score)
 
             print(row_data)
