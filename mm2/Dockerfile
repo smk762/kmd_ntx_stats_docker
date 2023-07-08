@@ -12,7 +12,7 @@ WORKDIR /home/komodian/mm2
 
 # Install dependencies
 ARG DEBIAN_FRONTEND=noninteractive 
-RUN apt update && apt install curl nano -y
+RUN apt update && apt install curl nano htop sqlite3 -y
 
 ENV MM2_CONF_PATH=/home/komodian/mm2/MM2.json
 ENV MM_COINS_PATH=/home/komodian/mm2/coins
