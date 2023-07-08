@@ -25,7 +25,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/master/doc/seed_version_epochs.json"
+VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/seednode-update/doc/seed_version_epochs.json"
 VERSION_DATA = requests.get(VERSION_TIMESPANS_URL).json()
 SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 
