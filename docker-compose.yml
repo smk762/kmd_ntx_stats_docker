@@ -56,7 +56,7 @@ services:
         - USER_ID=$USER_ID
         - GROUP_ID=$GROUP_ID
     volumes:
-      - ./:/home/komodian/mm2
+      - ./mm2:/home/komodian/mm2
     ports:
       - 127.0.0.1:7783:7783
     logging:
