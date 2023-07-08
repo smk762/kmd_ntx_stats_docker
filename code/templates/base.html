@@ -41,9 +41,6 @@
         
         <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 
-        <link href="http://cdn.pydata.org/bokeh/release/bokeh-3.0.3.min.css" rel="stylesheet" type="text/css">
-        <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-3.0.3.min.css" rel="stylesheet" type="text/css">
-
         <!-- Datatables -->
             <!-- Bootstrap -->
             <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.css"/>
@@ -144,19 +141,7 @@
         <!-- DateTimePicker -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha512-AIOTidJAcHBH2G/oZv9viEGXRqDNmfdPVPYOYKGy3fti0xIplnlgMHUGfuNRzC6FkzIo0iIxgFnr9RikFxK+sw==" crossorigin="anonymous" referrerpolicy="no-referrer" ></script>
 
-        <!-- Bokeh graphing -->
         <script>
-            {% include "js/bokeh-3.0.3.js" %}
-            {% include "js/bokeh-widgets-3.0.3.js" %}
-            {% include "js/bokeh-tables-3.0.3.js" %}
-            {% include "js/bokeh-api-3.0.3.js" %}
-        </script>
-        {{bokeh_script| safe}}
-
-        <script>
-            
-            
-
             // init bootstrap tooltips
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip({
@@ -169,9 +154,7 @@
 
             // init clipboard buttons
             var btns = document.querySelectorAll('button');
-            
             var clipboard = new ClipboardJS(btns);
-
 
             clipboard.on('success', function (e) {
                 setTooltip(e.trigger, 'Copied!');
