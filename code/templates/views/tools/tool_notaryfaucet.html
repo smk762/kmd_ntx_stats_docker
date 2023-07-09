@@ -108,7 +108,7 @@
 			            "data": 'txid',
 			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	$(nTd).html(get_faucet_txid(oData.coin, oData.txid));
+			            	$(nTd).html('<span style="0.8em">'+get_faucet_txid(oData.coin, oData.txid)+"</span>");
 				        }
 			        },
         			{

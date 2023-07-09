@@ -248,6 +248,8 @@ def faucet_view(request):
     if request.method == 'POST':
         if 'coin' in request.POST:
             coin = request.POST['coin'].strip()
+            if coin == "TKL":
+                coin = "TOKEL"
         if 'address' in request.POST:
             address = request.POST['address'].strip()
         url = f'https://faucet.komodo.earth/faucet/{coin}/{address}'
