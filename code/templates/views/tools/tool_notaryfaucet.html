@@ -84,16 +84,8 @@
 				        }
 			        },
         			{
-			            "data": 'address',
-			            "targets": 1,
-			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            	if (oData.address == 'GalacticFederationPrison') {
-				            	$(nTd).html("<a href='https://www.galacticfederation.org.uk/'>"+oData.address+"</a></span>");			            		
-			            	}
-			            	else {
-				            	$(nTd).html(get_address_url(oData.coin, oData.address));
-				        	}	
-				        }
+			            "data": 'pubkey',
+			            "targets": 1
 			        },
         			{
 			            "data": 'amount',
@@ -106,15 +98,22 @@
 				        }
 			        },
         			{
-			            "data": 'txid',
+			            "data": 'notary',
 			            "targets": 3,
+						"fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							$(nTd).html(get_notary_url('{{ season }}', oData.notary));
+						}
+			        },
+        			{
+			            "data": 'txid',
+			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	$(nTd).html(get_faucet_txid(oData.coin, oData.txid));
 				        }
 			        },
         			{
 			            "data": 'status',
-			            "targets": 4,
+			            "targets": 5,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            $(nTd).html(get_faucet_status(oData.status));
 				        }
