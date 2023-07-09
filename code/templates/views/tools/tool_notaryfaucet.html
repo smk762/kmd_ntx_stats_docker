@@ -91,14 +91,8 @@
 						}
 			        },
         			{
-			            "data": 'pubkey',
-			            "targets": 2,
-		                "visible": false
-
-			        },
-        			{
 			            "data": 'amount',
-			            "targets": 3,
+			            "targets": 2,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	$(nTd).html(
 			            		isNaN(oData.amount) ? "N/A" :
@@ -108,14 +102,14 @@
 			        },
         			{
 			            "data": 'txid',
-			            "targets": 4,
+			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	$(nTd).html('<span style="0.8em">'+get_faucet_txid(oData.coin, oData.txid)+"</span>");
 				        }
 			        },
         			{
 			            "data": 'status',
-			            "targets": 5,
+			            "targets": 4,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 				            $(nTd).html(get_faucet_status(oData.status));
 				        }
