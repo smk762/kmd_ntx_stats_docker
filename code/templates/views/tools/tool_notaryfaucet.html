@@ -9,7 +9,7 @@
 		<div class="card-body table_card_body col-12" style="opacity: 1;" id="">
 			<form action="#" method="post" class="col-6 m-auto">
 				{% csrf_token %}
-				<div class="input-group my-2" >
+				<div class="input-group my-1" >
 					<div class="input-group-prepend prepend-label-left p-0 col-3">
 					  <span class="input-group-text prepend-span">
 					  	Pubkey
@@ -24,8 +24,9 @@
 				        </span>
 				    </div>
 					<select class="form-control col-9" id='coin' name="coin" style='width: 160px;'>
-					      <option value="RICK">RICK</option>
-					      <option value="MORTY">MORTY</option>
+						{% for coin in coins_list %}
+					      <option value="{{ coin }}">{{ coin }}</option>
+						{% endfor %}
 					</select>
 					<div class="input-group-append p-0">
 						<button class="append-btn px-4" type="submit">Drip</button>

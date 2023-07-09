@@ -271,20 +271,13 @@ def faucet_view(request):
 def notaryfaucet_view(request):
     season = helper.get_page_season(request)
     notary_list = helper.get_notary_list(season)
-    notaryfaucet_supply = {
-        "RICK": 0,
-        "MORTY": 0
-    }
-    notaryfaucet_supply_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/rm_notaryfaucet_balances").json()
-
-    for node in notaryfaucet_supply_resp:
-
-        try:
-            notaryfaucet_supply["RICK"] += notaryfaucet_supply_resp[node]["RICK"]
-            notaryfaucet_supply["MORTY"] += notaryfaucet_supply_resp[node]["MORTY"]
-        except Exception as e:
-            logger.info(e)
-
+    coins_list = []
+    try:
+        faucet_coins = requests.get(f"https://notaryfaucet.dragonhound.tools/faucet_coins").json()["result"]
+        coins_list = faucet_coins["Main"] + faucet_coins["3P"]
+    except:
+        pass
+    
     pending_tx_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_pending_tx").json()
     pending_tx_list = []
     tx_rows = []
@@ -330,11 +323,11 @@ def notaryfaucet_view(request):
 
     context = helper.get_base_context(request)
     context.update({
-        "page_title":"Rick / Morty notaryfaucet",
-        "explorers":info.get_explorers(request),
-        "notaryfaucet_supply":notaryfaucet_supply,
-        "count_24hrs":count_24hrs,
-        "sum_24hrs":sum_24hrs,
+        "page_title": "Notary Faucet",
+        "explorers": info.get_explorers(request),
+        "count_24hrs": count_24hrs,
+        "sum_24hrs": sum_24hrs,
+        "coins_list": coins_list,
         "tx_rows": tx_rows
     })
 
