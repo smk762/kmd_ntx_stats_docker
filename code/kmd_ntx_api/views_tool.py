@@ -275,7 +275,7 @@ def notaryfaucet_view(request):
         "RICK": 0,
         "MORTY": 0
     }
-    notaryfaucet_supply_resp = requests.get(f"https://notaryfaucet.komodo.earth/rm_notaryfaucet_balances").json()
+    notaryfaucet_supply_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/rm_notaryfaucet_balances").json()
 
     for node in notaryfaucet_supply_resp:
 
@@ -285,7 +285,7 @@ def notaryfaucet_view(request):
         except Exception as e:
             logger.info(e)
 
-    pending_tx_resp = requests.get(f"https://notaryfaucet.komodo.earth/show_pending_tx").json()
+    pending_tx_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_pending_tx").json()
     pending_tx_list = []
     tx_rows = []
     pending_index = []
@@ -305,7 +305,7 @@ def notaryfaucet_view(request):
         pending_index.append(item[0])
         if len(tx_rows) >= 250:
             break
-    sent_tx_resp = requests.get(f"https://notaryfaucet.komodo.earth/show_notaryfaucet_db").json()
+    sent_tx_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_notaryfaucet_db").json()
     sent_tx_list = []
     now = time.time()
     sum_24hrs = 0
@@ -343,7 +343,7 @@ def notaryfaucet_view(request):
             coin = request.POST['coin'].strip()
         if 'address' in request.POST:
             address = request.POST['address'].strip()
-        url = f'https://notaryfaucet.komodo.earth/notaryfaucet/{coin}/{address}'
+        url = f'https://notaryfaucet.dragonhound.tools/notaryfaucet/{coin}/{address}'
         r = requests.get(url)
         try:
             resp = r.json()
