@@ -268,6 +268,99 @@ def faucet_view(request):
 
     return render(request, 'views/tools/tool_faucet.html', context)
 
+def notaryfaucet_view(request):
+    season = helper.get_page_season(request)
+    notary_list = helper.get_notary_list(season)
+    notaryfaucet_supply = {
+        "RICK": 0,
+        "MORTY": 0
+    }
+    notaryfaucet_supply_resp = requests.get(f"https://notaryfaucet.komodo.earth/rm_notaryfaucet_balances").json()
+
+    for node in notaryfaucet_supply_resp:
+
+        try:
+            notaryfaucet_supply["RICK"] += notaryfaucet_supply_resp[node]["RICK"]
+            notaryfaucet_supply["MORTY"] += notaryfaucet_supply_resp[node]["MORTY"]
+        except Exception as e:
+            logger.info(e)
+
+    pending_tx_resp = requests.get(f"https://notaryfaucet.komodo.earth/show_pending_tx").json()
+    pending_tx_list = []
+    tx_rows = []
+    pending_index = []
+    if "Result" in pending_tx_resp:
+        if "Message" in pending_tx_resp["Result"]:
+            pending_tx_list = pending_tx_resp["Result"]["Message"]
+    for item in pending_tx_list:
+        tx_rows.append({
+            "index": item[0],    
+            "coin": item[1], 
+            "address": item[2], 
+            "time_sent": "n/a",   
+            "amount": "n/a",  
+            "txid": "n/a",
+            "status": item[6]
+        })
+        pending_index.append(item[0])
+        if len(tx_rows) >= 250:
+            break
+    sent_tx_resp = requests.get(f"https://notaryfaucet.komodo.earth/show_notaryfaucet_db").json()
+    sent_tx_list = []
+    now = time.time()
+    sum_24hrs = 0
+    count_24hrs = 0
+    if "Result" in sent_tx_resp:
+        if "Message" in sent_tx_resp["Result"]:
+            sent_tx_list = sent_tx_resp["Result"]["Message"]
+    for item in sent_tx_list:
+        if item[0] not in pending_index:
+            if item[3] > SINCE_INTERVALS['day']:
+                sum_24hrs += item[4]
+                count_24hrs += 1
+            tx_rows.append({
+                "index":item[0],
+                "coin":item[1],
+                "address":item[2],
+                "time_sent":dt.fromtimestamp(item[3]),
+                "amount":item[4],
+                "txid":item[5],
+                "status":item[6]
+            })
+
+    context = helper.get_base_context(request)
+    context.update({
+        "page_title":"Rick / Morty notaryfaucet",
+        "explorers":info.get_explorers(request),
+        "notaryfaucet_supply":notaryfaucet_supply,
+        "count_24hrs":count_24hrs,
+        "sum_24hrs":sum_24hrs,
+        "tx_rows": tx_rows
+    })
+
+    if request.method == 'POST':
+        if 'coin' in request.POST:
+            coin = request.POST['coin'].strip()
+        if 'address' in request.POST:
+            address = request.POST['address'].strip()
+        url = f'https://notaryfaucet.komodo.earth/notaryfaucet/{coin}/{address}'
+        r = requests.get(url)
+        try:
+            resp = r.json()
+            messages.success(request, resp["Result"]["Message"])
+            if resp['Status'] == "Success":
+                context.update({"result":coin+"_success"})
+            elif resp['Status'] == "Error":
+                context.update({"result":"disqualified"})
+            else:
+                context.update({"result":"fail"})
+        except Exception as e:
+            logger.error(f"[notaryfaucet] Exception: {e}")
+            messages.success(request, f"Something went wrong... {e}")
+            context.update({"result":"fail"})
+
+    return render(request, 'views/tools/tool_notaryfaucet.html', context)
+
 
 def kmd_rewards_view(request):
     context = helper.get_base_context(request)

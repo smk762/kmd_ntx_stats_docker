@@ -25,6 +25,10 @@ frontend_tool_urls = [
     path('tools/faucet/',
           views_tool.faucet_view,
           name='faucet_view'),
+    
+    path('tools/notaryfaucet/',
+          views_tool.notaryfaucet_view,
+          name='notaryfaucet_view'),
 
     path('tools/kmd_rewards/',
           views_tool.kmd_rewards_view,

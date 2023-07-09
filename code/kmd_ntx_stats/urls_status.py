@@ -21,4 +21,19 @@ api_status_urls = [
           api_status.faucet_address_payments_status,
           name='faucet_address_payments_status'),
 
+    path('api/status/notaryfaucet_balance/',
+          api_status.notaryfaucet_balance_status,
+          name='notaryfaucet_balance_status'),
+
+    path('api/status/notaryfaucet_pending_tx/',
+          api_status.notaryfaucet_pending_tx_status,
+          name='notaryfaucet_pending_tx_status'),
+
+    path('api/status/notaryfaucet_db/',
+          api_status.notaryfaucet_show_db_status,
+          name='notaryfaucet_show_db_status'),
+
+    path('api/status/notaryfaucet_address_payments/',
+          api_status.notaryfaucet_address_payments_status,
+          name='notaryfaucet_address_payments_status'),
 ]
