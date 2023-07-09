@@ -337,7 +337,7 @@ def notaryfaucet_view(request):
                 coin = request.POST['coin'].strip()
             if 'pubkey' in request.POST:
                 pubkey = request.POST['pubkey'].strip()
-            url = f'https://notaryfaucet.dragonhound.tools/faucet/{coin}/{pubkey}'
+            url = f'https://notaryfaucet.dragonhound.tools/faucet/{pubkey}/{coin}'
             r = requests.get(url)
             resp = r.json()
             messages.success(request, resp["Result"]["Message"])
