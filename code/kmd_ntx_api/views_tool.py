@@ -332,13 +332,13 @@ def notaryfaucet_view(request):
     })
 
     if request.method == 'POST':
-        if 'coin' in request.POST:
-            coin = request.POST['coin'].strip()
-        if 'address' in request.POST:
-            address = request.POST['address'].strip()
-        url = f'https://notaryfaucet.dragonhound.tools/notaryfaucet/{coin}/{address}'
-        r = requests.get(url)
         try:
+            if 'coin' in request.POST:
+                coin = request.POST['coin'].strip()
+            if 'pubkey' in request.POST:
+                pubkey = request.POST['pubkey'].strip()
+            url = f'https://notaryfaucet.dragonhound.tools/notaryfaucet/{coin}/{pubkey}'
+            r = requests.get(url)
             resp = r.json()
             messages.success(request, resp["Result"]["Message"])
             if resp['Status'] == "Success":
