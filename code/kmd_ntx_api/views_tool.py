@@ -298,7 +298,7 @@ def notaryfaucet_view(request):
         pending_index.append(item[0])
         if len(tx_rows) >= 250:
             break
-    sent_tx_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_notaryfaucet_db").json()
+    sent_tx_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_faucet_db").json()
     sent_tx_list = []
     now = time.time()
     sum_24hrs = 0
@@ -337,7 +337,7 @@ def notaryfaucet_view(request):
                 coin = request.POST['coin'].strip()
             if 'pubkey' in request.POST:
                 pubkey = request.POST['pubkey'].strip()
-            url = f'https://notaryfaucet.dragonhound.tools/notaryfaucet/{coin}/{pubkey}'
+            url = f'https://notaryfaucet.dragonhound.tools/faucet/{coin}/{pubkey}'
             r = requests.get(url)
             resp = r.json()
             messages.success(request, resp["Result"]["Message"])
