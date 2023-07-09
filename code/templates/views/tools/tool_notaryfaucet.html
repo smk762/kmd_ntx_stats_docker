@@ -74,7 +74,7 @@
                 "orderClasses": false,
         		"order": [[ 5, 'desc' ]],
         		"columnDefs": [
-					{ "className": "text-right text-nowrap", "targets": [ 2, 5 ] },
+					{ "className": "text-right text-nowrap", "targets": [ 2 ] },
 					{ "className": "text-left text-nowrap", "targets": [ 0 ] },
         			{
 			            "data": 'coin',
@@ -84,27 +84,27 @@
 				        }
 			        },
         			{
-			            "data": 'pubkey',
+			            "data": 'notary',
 			            "targets": 1,
+						"fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							$(nTd).html(get_notary_url('{{ season }}', oData.notary));
+						}
+			        },
+        			{
+			            "data": 'pubkey',
+			            "targets": 2,
 		                "visible": false
 
 			        },
         			{
 			            "data": 'amount',
-			            "targets": 2,
+			            "targets": 3,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
 			            	$(nTd).html(
 			            		isNaN(oData.amount) ? "N/A" :
 			            		parseFloat(oData.amount).toFixed(3)
 			            	);
 				        }
-			        },
-        			{
-			            "data": 'notary',
-			            "targets": 3,
-						"fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-							$(nTd).html(get_notary_url('{{ season }}', oData.notary));
-						}
 			        },
         			{
 			            "data": 'txid',
