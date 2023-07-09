@@ -278,6 +278,8 @@ def notaryfaucet_view(request):
     except:
         pass
     
+    faucet_balances = requests.get(f"https://notaryfaucet.dragonhound.tools/faucet_balances").json()
+    
     pending_tx_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_pending_tx").json()
     pending_tx_list = []
     tx_rows = []
@@ -307,6 +309,7 @@ def notaryfaucet_view(request):
         if "Message" in sent_tx_resp["Result"]:
             sent_tx_list = sent_tx_resp["Result"]["Message"]
     for item in sent_tx_list:
+        logger.info(item)
         if item[0] not in pending_index:
             if item[3] > SINCE_INTERVALS['day']:
                 sum_24hrs += item[4]
@@ -328,7 +331,8 @@ def notaryfaucet_view(request):
         "count_24hrs": count_24hrs,
         "sum_24hrs": sum_24hrs,
         "coins_list": coins_list,
-        "tx_rows": tx_rows
+        "tx_rows": tx_rows,
+        "faucet_balances": faucet_balances
     })
 
     if request.method == 'POST':
