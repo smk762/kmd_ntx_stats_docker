@@ -335,6 +335,19 @@ def notaryfaucet_view(request):
                 "status":item[7]
             })
 
+    buttons = ["faucet_balances", "faucet_history"]
+    button_params = {
+        "faucet_balances": {
+            "action": f"show_card('faucet_balances', {buttons})",
+            "width_pct": 17,
+            "text": "Faucet Balances"
+        },
+        "faucet_history": {
+            "action": f"show_card('faucet_history', {buttons})",
+            "width_pct": 17,
+            "text": "Faucet History"
+        }
+    }
     context = helper.get_base_context(request)
     context.update({
         "page_title": "Notary Faucet",
@@ -343,6 +356,7 @@ def notaryfaucet_view(request):
         "sum_24hrs": sum_24hrs,
         "coins_list": coins_list,
         "tx_rows": tx_rows,
+        "buttons": button_params,
         "faucet_balances": faucet_balances
     })
 

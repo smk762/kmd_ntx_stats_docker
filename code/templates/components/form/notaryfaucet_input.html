@@ -1,0 +1,25 @@
+
+<form action="#" method="post" class="col-12 m-auto p-0">
+    {% csrf_token %}
+    <div class="input-group my-1" >
+        <div class="input-group-prepend prepend-label-left p-0 col-1">
+          <span class="input-group-text prepend-span">
+              Pubkey
+          </span>
+        </div>
+        <input type="text" class="form-control col-7 mr-auto" id="pubkey" name="pubkey" placeholder="02f9a7b49282885cd03969f1f5478287497bc8edfceee9eac676053c107c5fcdaf">
+        <div class="ml-auto input-group-prepend prepend-label-left p-0 col-1">
+            <span class="input-group-text prepend-span">
+                  Coin
+            </span>
+        </div>
+        <select class="form-control col-1" id='coin' name="coin" style='width: 160px;'>
+            {% for coin in coins_list %}
+              <option value="{{ coin }}">{{ coin }}</option>
+            {% endfor %}
+        </select>
+        <div class="input-group-append p-0">
+            <button class="append-btn px-4" type="submit">Drip</button>
+        </div>
+    </div>
+</form>
