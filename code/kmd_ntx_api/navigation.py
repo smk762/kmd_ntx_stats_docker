@@ -37,7 +37,11 @@ NAV_DATA = {
             "View Notarisation TXID": {
                 "icon": "bi bi-shield-check",
                 "url": "/notarisation"
-            }
+            },
+            "Notary Faucet": {
+                "icon": "fa-solid fa-faucet-drip",
+                "url": "/tools/notaryfaucet"
+            },
         }
     },
     "Mining": {

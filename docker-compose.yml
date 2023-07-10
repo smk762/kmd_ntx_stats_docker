@@ -9,6 +9,7 @@ x-zcash-params-volume:
 
 services:
   kmd:
+    container_name: kmd
     init: true
     network_mode: "host"
     stop_signal: SIGTERM
@@ -70,6 +71,7 @@ services:
     command: ["/init.sh"]
 
   db:
+    container_name: db
     image: postgres
     restart: always
     shm_size: '2gb'
@@ -91,6 +93,7 @@ services:
         max-file: "10"
     
   web:
+    container_name: web
     build: 
       context: .
       shm_size: '2gb'

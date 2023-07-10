@@ -796,9 +796,7 @@
 	}
 
 	function get_faucet_txid(coin, txid) {
-    	if (address == 'GalacticFederationPrison') {
-        	return "<a href='https://www.galacticfederation.org.uk/'><span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Galactic Federation Prison'><i class='fab fa-galactic-senate'></i></span></a>";
-    	} else if (txid == 'n/a') {
+		if (txid == 'n/a') {
         	return "<span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Awaiting drip...'><i class='fas fa-hourglass-half' style='color:white'></i></i></span>";
     	} else {
         	return get_txid_url(coin, txid);

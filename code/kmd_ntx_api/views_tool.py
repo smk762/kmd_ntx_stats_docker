@@ -248,6 +248,8 @@ def faucet_view(request):
     if request.method == 'POST':
         if 'coin' in request.POST:
             coin = request.POST['coin'].strip()
+            if coin == "TKL":
+                coin = "TOKEL"
         if 'address' in request.POST:
             address = request.POST['address'].strip()
         url = f'https://faucet.komodo.earth/faucet/{coin}/{address}'
@@ -267,6 +269,105 @@ def faucet_view(request):
             context.update({"result":"fail"})
 
     return render(request, 'views/tools/tool_faucet.html', context)
+
+def notaryfaucet_view(request):
+    season = helper.get_page_season(request)
+    notary_list = helper.get_notary_list(season)
+    coins_list = []
+    try:
+        faucet_coins = requests.get("https://notaryfaucet.dragonhound.tools/faucet_coins").json()["result"]
+        coins_list = faucet_coins["Main"] + faucet_coins["3P"]
+    except:
+        pass
+    
+    faucet_balances = requests.get("https://notaryfaucet.dragonhound.tools/faucet_balances").json()
+    
+    pending_tx_resp = requests.get("https://notaryfaucet.dragonhound.tools/show_pending_tx").json()
+    pending_tx_list = []
+    tx_rows = []
+    pending_index = []
+    if "result" in pending_tx_resp:
+        if "message" in pending_tx_resp["result"]:
+            pending_tx_list = pending_tx_resp["result"]["message"]
+    for item in pending_tx_list:
+        try:
+            logger.info(item)
+            
+            tx_rows.append({
+                "index": item[0],    
+                "coin": item[1], 
+                "pubkey": item[2], 
+                "notary": item[3], 
+                "time_sent": "n/a",   
+                "amount": "n/a",  
+                "txid": "n/a",
+                "status": item[7]
+            })
+            pending_index.append(item[0])
+        except Exception as e:
+            logger.info(f"Error: {e}")
+        if len(tx_rows) >= 250:
+            break
+    sent_tx_resp = requests.get("https://notaryfaucet.dragonhound.tools/show_faucet_db").json()
+    sent_tx_list = []
+    now = time.time()
+    sum_24hrs = 0
+    count_24hrs = 0
+    if "result" in sent_tx_resp:
+        if "message" in sent_tx_resp["result"]:
+            sent_tx_list = sent_tx_resp["result"]["message"]
+    for item in sent_tx_list:
+        logger.info(item)
+        [1, 'MARTY', '0306476ea5fb67aec667172a9bb30646dbff195b84c30ac958175af9b475987802', 'dragonhound_NA', 1688944753, 0.5, '59c6b40de2b5eb482d0e9c0309d868a1a0bb00b2349952c784e8ae3dc5f2f338', 'sent']
+
+        if item[0] not in pending_index:
+            if item[4] > SINCE_INTERVALS['day']:
+                sum_24hrs += item[5]
+                count_24hrs += 1
+            tx_rows.append({
+                "index":item[0],
+                "coin":item[1],
+                "pubkey":item[2],
+                "notary": item[3],
+                "time_sent":dt.fromtimestamp(item[4]),
+                "amount":item[5],
+                "txid":item[6],
+                "status":item[7]
+            })
+
+    context = helper.get_base_context(request)
+    context.update({
+        "page_title": "Notary Faucet",
+        "explorers": info.get_explorers(request),
+        "count_24hrs": count_24hrs,
+        "sum_24hrs": sum_24hrs,
+        "coins_list": coins_list,
+        "tx_rows": tx_rows,
+        "faucet_balances": faucet_balances
+    })
+
+    if request.method == 'POST':
+        try:
+            if 'coin' in request.POST:
+                coin = request.POST['coin'].strip()
+            if 'pubkey' in request.POST:
+                pubkey = request.POST['pubkey'].strip()
+            url = f'https://notaryfaucet.dragonhound.tools/faucet/{pubkey}/{coin}'
+            r = requests.get(url)
+            resp = r.json()
+            messages.success(request, resp["result"]["message"])
+            if resp['status'] == "success":
+                context.update({"result":coin+"_success"})
+            elif resp['status'] == "error":
+                context.update({"result":"disqualified"})
+            else:
+                context.update({"result":"fail"})
+        except Exception as e:
+            logger.error(f"[notaryfaucet] Exception: {e}")
+            messages.success(request, f"Something went wrong... {e} {url}")
+            context.update({"result":"fail"})
+
+    return render(request, 'views/tools/tool_notaryfaucet.html', context)
 
 
 def kmd_rewards_view(request):
