@@ -290,17 +290,22 @@ def notaryfaucet_view(request):
         if "message" in pending_tx_resp["result"]:
             pending_tx_list = pending_tx_resp["result"]["message"]
     for item in pending_tx_list:
-        tx_rows.append({
-            "index": item[0],    
-            "coin": item[1], 
-            "pubkey": item[2], 
-            "notary": item[3], 
-            "time_sent": "n/a",   
-            "amount": "n/a",  
-            "txid": "n/a",
-            "status": item[7]
-        })
-        pending_index.append(item[0])
+        try:
+            logger.info(item)
+            
+            tx_rows.append({
+                "index": item[0],    
+                "coin": item[1], 
+                "pubkey": item[2], 
+                "notary": item[3], 
+                "time_sent": "n/a",   
+                "amount": "n/a",  
+                "txid": "n/a",
+                "status": item[7]
+            })
+            pending_index.append(item[0])
+        except Exception as e:
+            logger.info(f"Error: {e}")
         if len(tx_rows) >= 250:
             break
     sent_tx_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_faucet_db").json()
