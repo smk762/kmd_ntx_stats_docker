@@ -286,9 +286,9 @@ def notaryfaucet_view(request):
     pending_tx_list = []
     tx_rows = []
     pending_index = []
-    if "Result" in pending_tx_resp:
-        if "Message" in pending_tx_resp["Result"]:
-            pending_tx_list = pending_tx_resp["Result"]["Message"]
+    if "result" in pending_tx_resp:
+        if "message" in pending_tx_resp["result"]:
+            pending_tx_list = pending_tx_resp["result"]["message"]
     for item in pending_tx_list:
         tx_rows.append({
             "index": item[0],    
@@ -308,9 +308,9 @@ def notaryfaucet_view(request):
     now = time.time()
     sum_24hrs = 0
     count_24hrs = 0
-    if "Result" in sent_tx_resp:
-        if "Message" in sent_tx_resp["Result"]:
-            sent_tx_list = sent_tx_resp["Result"]["Message"]
+    if "result" in sent_tx_resp:
+        if "message" in sent_tx_resp["result"]:
+            sent_tx_list = sent_tx_resp["result"]["message"]
     for item in sent_tx_list:
         logger.info(item)
         [1, 'MARTY', '0306476ea5fb67aec667172a9bb30646dbff195b84c30ac958175af9b475987802', 'dragonhound_NA', 1688944753, 0.5, '59c6b40de2b5eb482d0e9c0309d868a1a0bb00b2349952c784e8ae3dc5f2f338', 'sent']
@@ -350,10 +350,10 @@ def notaryfaucet_view(request):
             url = f'https://notaryfaucet.dragonhound.tools/faucet/{pubkey}/{coin}'
             r = requests.get(url)
             resp = r.json()
-            messages.success(request, resp["Result"]["Message"])
-            if resp['Status'] == "Success":
+            messages.success(request, resp["result"]["message"])
+            if resp['status'] == "success":
                 context.update({"result":coin+"_success"})
-            elif resp['Status'] == "Error":
+            elif resp['status'] == "error":
                 context.update({"result":"disqualified"})
             else:
                 context.update({"result":"fail"})
