@@ -106,7 +106,7 @@
 			            "data": 'address',
 			            "targets": 1,
 						"fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-							if (oData.balance == -1) {
+							if (oData.balance != -1) {
 								$(nTd).html(get_address_url(oData.coin, oData.address));
 							} else {
 								$(nTd).html("<span>Insight API endpoint unresponsive!</span>");
