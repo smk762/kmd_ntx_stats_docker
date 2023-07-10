@@ -106,7 +106,11 @@
 			            "data": 'address',
 			            "targets": 1,
 						"fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-							$(nTd).html(get_address_url(oData.coin, oData.address));
+							if (oData.balance > 0) {
+								$(nTd).html(get_address_url(oData.coin, oData.address));
+							} else {
+								$(nTd).html(<span>Insight API endpoint unresponsive!</span>);
+							}
 						}
 			        },
         			{
