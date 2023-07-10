@@ -15,13 +15,13 @@
 					  	Pubkey
 					  </span>
 					</div>
-					<input type="text" class="form-control col-6 mr-auto" id="pubkey" name="pubkey" placeholder="02f9a7b49282885cd03969f1f5478287497bc8edfceee9eac676053c107c5fcdaf">
+					<input type="text" class="form-control col-7 mr-auto" id="pubkey" name="pubkey" placeholder="02f9a7b49282885cd03969f1f5478287497bc8edfceee9eac676053c107c5fcdaf">
 				    <div class="ml-auto input-group-prepend prepend-label-left p-0 col-1">
 				        <span class="input-group-text prepend-span">
 				      	    Coin
 				        </span>
 				    </div>
-					<select class="form-control col-2" id='coin' name="coin" style='width: 160px;'>
+					<select class="form-control col-1" id='coin' name="coin" style='width: 160px;'>
 						{% for coin in coins_list %}
 					      <option value="{{ coin }}">{{ coin }}</option>
 						{% endfor %}
