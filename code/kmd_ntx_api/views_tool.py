@@ -359,7 +359,7 @@ def notaryfaucet_view(request):
                 context.update({"result":"fail"})
         except Exception as e:
             logger.error(f"[notaryfaucet] Exception: {e}")
-            messages.success(request, f"Something went wrong... {e} | {resp}")
+            messages.success(request, f"Something went wrong... {e} {url}")
             context.update({"result":"fail"})
 
     return render(request, 'views/tools/tool_notaryfaucet.html', context)
