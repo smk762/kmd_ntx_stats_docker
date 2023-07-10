@@ -275,14 +275,14 @@ def notaryfaucet_view(request):
     notary_list = helper.get_notary_list(season)
     coins_list = []
     try:
-        faucet_coins = requests.get(f"https://notaryfaucet.dragonhound.tools/faucet_coins").json()["result"]
+        faucet_coins = requests.get("https://notaryfaucet.dragonhound.tools/faucet_coins").json()["result"]
         coins_list = faucet_coins["Main"] + faucet_coins["3P"]
     except:
         pass
     
-    faucet_balances = requests.get(f"https://notaryfaucet.dragonhound.tools/faucet_balances").json()
+    faucet_balances = requests.get("https://notaryfaucet.dragonhound.tools/faucet_balances").json()
     
-    pending_tx_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_pending_tx").json()
+    pending_tx_resp = requests.get("https://notaryfaucet.dragonhound.tools/show_pending_tx").json()
     pending_tx_list = []
     tx_rows = []
     pending_index = []
@@ -308,7 +308,7 @@ def notaryfaucet_view(request):
             logger.info(f"Error: {e}")
         if len(tx_rows) >= 250:
             break
-    sent_tx_resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_faucet_db").json()
+    sent_tx_resp = requests.get("https://notaryfaucet.dragonhound.tools/show_faucet_db").json()
     sent_tx_list = []
     now = time.time()
     sum_24hrs = 0

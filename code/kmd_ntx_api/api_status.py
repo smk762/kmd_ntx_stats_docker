@@ -30,17 +30,17 @@ def faucet_address_payments_status(request):
 
 
 def notaryfaucet_balance_status(request):
-    resp = requests.get(f"https://notaryfaucet.dragonhound.tools/rm_notaryfaucet_balances").json()
+    resp = requests.get("https://notaryfaucet.dragonhound.tools/rm_notaryfaucet_balances").json()
     return JsonResponse(resp)
 
 
 def notaryfaucet_pending_tx_status(request):
-    resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_pending_tx").json()
+    resp = requests.get("https://notaryfaucet.dragonhound.tools/show_pending_tx").json()
     return JsonResponse(resp)
 
 
 def notaryfaucet_show_db_status(request):
-    resp = requests.get(f"https://notaryfaucet.dragonhound.tools/show_notaryfaucet_db").json()
+    resp = requests.get("https://notaryfaucet.dragonhound.tools/show_notaryfaucet_db").json()
     return JsonResponse(resp)
 
 
