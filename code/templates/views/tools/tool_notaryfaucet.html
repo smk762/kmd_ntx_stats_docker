@@ -7,23 +7,22 @@
 			<h3>Notary Faucet</h3>
 		</div>
 		<div class="card-body table_card_body col-12" style="opacity: 1;" id="">
-			<form action="#" method="post" class="col-9 m-auto">
+			<form action="#" method="post" class="col-12 m-auto">
 				{% csrf_token %}
 				<div class="input-group my-1" >
-					<div class="input-group-prepend prepend-label-left p-0 col-2">
+					<div class="input-group-prepend prepend-label-left p-0 col-1">
 					  <span class="input-group-text prepend-span">
 					  	Pubkey
 					  </span>
 					</div>
-					<input type="text" class="form-control col-9" id="pubkey" name="pubkey" placeholder="02f9a7b49282885cd03969f1f5478287497bc8edfceee9eac676053c107c5fcdaf">
-				</div>
-				<div class="input-group mb-2 col-6 mx-auto">
-				    <div class="input-group-prepend prepend-label-left p-0 col-2">
+					&nbsp;&nbsp;
+					<input type="text" class="form-control col-6" id="pubkey" name="pubkey" placeholder="02f9a7b49282885cd03969f1f5478287497bc8edfceee9eac676053c107c5fcdaf">
+				    <div class="input-group-prepend prepend-label-left p-0 col-1">
 				        <span class="input-group-text prepend-span">
 				      	    Coin
 				        </span>
 				    </div>
-					<select class="form-control col-9" id='coin' name="coin" style='width: 160px;'>
+					<select class="form-control col-2" id='coin' name="coin" style='width: 160px;'>
 						{% for coin in coins_list %}
 					      <option value="{{ coin }}">{{ coin }}</option>
 						{% endfor %}
