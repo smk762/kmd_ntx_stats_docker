@@ -1,4 +1,7 @@
 import os
+import os
+import sys
+from os.path import expanduser, dirname, realpath
 import time
 import json
 import logging
@@ -56,12 +59,10 @@ ONE_YEAR = 365 * 24 * 60
 DEVISOR = 10512000
 
 
-DISQUALIFIED = ["etszombi_AR", "etszombi_EU",
-                "fullmoon_AR", "fullmoon_NA", "fullmoon_SH",
-                "chainmakers_NA", "jorian_EU", "phba2061_EU", "peer2cloud_AR",
-                "pungocloud_SH", "starfleet_EU", "swisscertifiers_EU",
-                "titomane_AR", "titomane_EU", "titomane_SH", "uer2_NA"]
-
+HOME = expanduser('~')
+SCRIPT_PATH = dirname(realpath(sys.argv[0]))
+COINS_CONFIG_URL = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/utils/coins_config.json"
+COINS_CONFIG_PATH = f"{SCRIPT_PATH}/coins_config.json"
 
 # COLORS
 COLORS = {
