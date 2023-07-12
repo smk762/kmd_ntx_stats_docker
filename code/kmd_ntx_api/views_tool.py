@@ -247,11 +247,11 @@ def faucet_view(request):
             resp = r.json()
             messages.success(request, resp["Result"]["Message"])
             if resp['Status'] == "Success":
-                context.update({"result":coin+"_success"})
+                context.update({"result": coin+"_success"})
             elif resp['Status'] == "Error":
-                context.update({"result":"disqualified"})
+                context.update({"result": "disqualified"})
             else:
-                context.update({"result":"fail"})
+                context.update({"result": "fail"})
         except Exception as e:
             logger.error(f"[faucet] Exception: {e}")
             messages.success(request, f"Something went wrong... {e}")
