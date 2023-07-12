@@ -4,7 +4,7 @@
         <thead>
             <tr>
                 <th data-data="coin">Coin</th>
-                <th data-data="address">Address</th>
+                <th data-data="notary">Notary</th>
                 <th data-data="amount">Amount</th>
                 <th data-data="txid">Transaction</th>
                 <th data-data="status">Status</th>
@@ -15,7 +15,7 @@
         {% for row in tx_rows %}
             <tr>
                 <td data-data="coin" class="px-2 text-left text-nowrap">{{ row.coin }}</td>
-                <td data-data="address">{{ row.address }}</td>
+                <td data-data="notary">{{ row.notary }}</td>
                 <td data-data="amount">{{ row.amount }}</td>
                 <td data-data="txid">{{ row.txid }}</td>
                 <td data-data="status">{{ row.status }}</td>
@@ -25,6 +25,7 @@
         </tbody>
     </table>
 </div>
+
 
 <script>
     $(document).ready(function() {
@@ -37,7 +38,7 @@
             "orderClasses": false,
             "order": [[ 5, 'desc' ]],
             "columnDefs": [
-                { "className": "text-right text-nowrap", "targets": [ 2, 5 ] },
+                { "className": "text-right text-nowrap", "targets": [ 2 ] },
                 { "className": "text-left text-nowrap", "targets": [ 0 ] },
                 {
                     "data": 'coin',
@@ -47,15 +48,10 @@
                     }
                 },
                 {
-                    "data": 'address',
+                    "data": 'notary',
                     "targets": 1,
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        if (oData.address == 'GalacticFederationPrison') {
-                            $(nTd).html("<a href='https://www.galacticfederation.org.uk/'>"+oData.address+"</a></span>");			            		
-                        }
-                        else {
-                            $(nTd).html(get_address_url(oData.coin, oData.address));
-                        }	
+                        $(nTd).html(get_notary_url('{{ season }}', oData.notary));
                     }
                 },
                 {
@@ -72,7 +68,7 @@
                     "data": 'txid',
                     "targets": 3,
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        $(nTd).html(get_faucet_txid(oData.coin, oData.txid));
+                        $(nTd).html('<span style="0.8em">'+get_faucet_txid(oData.coin, oData.txid)+"</span>");
                     }
                 },
                 {
