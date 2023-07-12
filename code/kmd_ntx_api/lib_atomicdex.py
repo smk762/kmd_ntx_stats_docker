@@ -564,14 +564,14 @@ def get_activation_command(coins_config, coin):
                 "method": "enable",
                 "coin": coin
             })
-        resp_json.update({PLATFORM_URLS[platform]})
+        resp_json.update(PLATFORM_URLS[platform])
     elif coin in PLATFORM_URLS:
         resp_json.update({
                 "userpass": "'$userpass'",
                 "method": "enable",
                 "coin": coin
             })
-        resp_json.update({PLATFORM_URLS[coin]})
+        resp_json.update(PLATFORM_URLS[coin])
     else:
         logger.error("No platform found for coin: {}".format(coin))
         
