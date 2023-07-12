@@ -66,8 +66,8 @@
         if (!label) {
             label = address
         }
-        if (address.length > max_length) {
-            address = address.substring(0, max_length) + "..."
+        if (label.length > max_length) {
+            label = address.substring(0, max_length) + "..."
         }
         // TODO: Using the explorer suffix data from coins_config.json would expland coverage here.
         if (explorer) {
