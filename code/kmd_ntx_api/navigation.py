@@ -88,7 +88,7 @@ NAV_DATA = {
                 "icon": "fa-solid fa-gift",
                 "url": "/tools/kmd_rewards"
             },
-            "RICK / MORTY Faucet": {
+            "Testcoin Faucet": {
                 "icon": "fa-solid fa-faucet-drip",
                 "url": "/tools/faucet"
             },
