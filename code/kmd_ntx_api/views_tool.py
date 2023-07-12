@@ -178,7 +178,7 @@ def decode_op_return_view(request):
 def faucet_view(request):
     season = helper.get_page_season(request)
     notary_list = helper.get_notary_list(season)
-    faucet_supply = requests.get(f"https://faucet.komodo.earth/rm_faucet_balances").json()
+    faucet_supply = requests.get(f"https://faucet.komodo.earth/faucet_balances").json()
     pending_tx_resp = requests.get(f"https://faucet.komodo.earth/show_pending_tx").json()
     pending_tx_list = []
     tx_rows = []
