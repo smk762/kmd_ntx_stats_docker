@@ -19,6 +19,25 @@ This script scans the komodo, coins and dpow repositories and updates contexual 
 It should be run as a cronjob every 12-24 hours
 '''
 
+def refresh_external_data(file, url):
+    if not os.path.exists(file):
+        data = requests.get(url).json()
+        with open(file, "w") as f:
+            json.dump(data, f, indent=4)
+    now = int(time.time())
+    mtime = os.path.getmtime(file)
+    if now - mtime > 86400 * 7: # 7 days
+        data = requests.get(url).json()
+        with open(file, "w") as f:
+            json.dump(data, f, indent=4)
+    with open(file, "r") as f:
+        return json.load(f)
+
+
+def get_coins_config():
+    return refresh_external_data(COINS_CONFIG_PATH, COINS_CONFIG_URL)
+
+
 def get_alt_name(coin):
     coin = handle_translate_coins(coin)
     coin = coin.replace("-segwit", "")
