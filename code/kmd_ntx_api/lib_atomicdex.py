@@ -557,7 +557,7 @@ def get_activation_command(coins_config, coin):
         resp_json.update(get_tendermint_activation(coins_config, coin))
     elif protocol == "TENDERMINTTOKEN":
         platform = 'TENDERMINTTOKEN'
-        resp_json.update(get_tendermint_token_activation(coins_config, coin))
+        resp_json.update(get_tendermint_token_activation(coin))
     elif platform in PLATFORM_URLS:
         resp_json.update({
                 "userpass": "'$userpass'",
