@@ -468,251 +468,134 @@ def is_testnet(coin):
     return False
 
 
-def get_activation_commands(request):
-    logger.info("Running get_activation_commands")
-    protocols = []
-    platforms = []
-    other_platforms = []
-    incompatible_coins = []
-    coins_without_electrum = []
-    enable_commands = {"commands":{}}
-    invalid_configs = {}
-    resp_json = {}
-
-    selected_coin = helper.get_or_none(request, "coin")
-    coin_info = query.get_coins_data(selected_coin, 1).order_by("coin")
-    serializer = serializers.coinsSerializer(coin_info, many=True)
-
-    for item in serializer.data:
-        protocol = None
-        platform = None
-        coin = item["coin"]
-        if coin.endswith("-segwit"):
-            coin = coin.replace("-segwit", "")
-        electrums = item["electrums"]
-        lightwallets = item["lightwallets"]
-        compatible = item["mm2_compatible"] == 1
-        
-        if coin == "TOKEL":
-            item["coin"] = "TKL"
-            coin = "TKL"
-
-        resp_json = {} 
-        if "protocol" in item["coins_info"]:
-            protocol = item["coins_info"]["protocol"]["type"]
-            protocols.append(protocol)
-
-            if "protocol_data" in item["coins_info"]["protocol"]:
-                if "platform" in item["coins_info"]["protocol"]["protocol_data"]:
-                    platform = item["coins_info"]["protocol"]["protocol_data"]["platform"]
-                    platforms.append(platform)
-
-                    if platform not in enable_commands["commands"]:
-                        enable_commands["commands"].update({platform: {}})
-
-        if platform in SWAP_CONTRACTS:
-            resp_json.update(get_contracts(platform))
-        elif coin in SWAP_CONTRACTS:
-            resp_json.update(get_contracts(coin))
-        else:
-            other_platforms.append(platform)
-
-        if lightwallets:
-            resp_json.update({
-                "method": "task::enable_z_coin::init",
-                "mmrpc": "2.0",
-                "userpass":"'$userpass'",
-                "params": {
-                    "ticker": item["coin"],
-                    "activation_params": {
-                        "mode": {
-                            "rpc": "Light",
-                            "rpc_data": {
-                                "electrum_servers": [{"url": i} for i in electrums],
-                                "light_wallet_d_servers": lightwallets
-                            }
-                        }
+def get_zhtlc_activation(coins_config, coin):
+    return {
+        "method": "task::enable_z_coin::init",
+        "mmrpc": "2.0",
+        "userpass":"'$userpass'",
+        "params": {
+            "ticker": coin,
+            "activation_params": {
+                "mode": {
+                    "rpc": "Light",
+                    "rpc_data": {
+                        "electrum_servers": coins_config[coin]["electrum"],
+                        "light_wallet_d_servers": coins_config[coin]["light_wallet_d_servers"]
                     }
                 }
+            }
+        }
+    }
+
+
+def get_utxo_activation(coins_config, coin):
+    return {
+        "userpass": "'$userpass'",
+        "method": "electrum",
+        "coin": coin,
+        "servers": coins_config[coin]["electrum"],
+    }
+
+
+def get_tendermint_activation(coins_config, coin):
+    return {
+        "method": "enable_tendermint_with_assets",
+        "mmrpc": "2.0",
+        "params": {
+            "ticker": coin,
+            "tokens_params": [],
+            "rpc_urls": coins_config[coin]["rpc_urls"]
+        },
+        "userpass": "'$userpass'"
+    }
+
+
+def get_tendermint_token_activation(coin):
+    return {
+        "userpass": "'$userpass'",
+        "method": "enable_tendermint_token",
+        "mmrpc": "2.0",
+        "params": {
+            "ticker": coin,
+            "activation_params": {
+            "required_confirmations": 3
+            }
+        }
+    }
+
+
+def get_activation_command(coins_config, coin):
+    resp_json = {}
+    compatible = coins_config[coin]["mm2"] == 1
+    if not compatible:
+        resp_json
+    protocol = coins_config[coin]["protocol"]["type"]
+    platform = None
+
+    for i in ["swap_contract_address", "fallback_swap_contract"]:
+        if i in coins_config[coin]:
+            resp_json.update({i: coins_config[coin][i]})
+
+    if "protocol_data" in coins_config[coin]["protocol"]:
+        if "platform" in coins_config[coin]["protocol"]["protocol_data"]:
+            platform = coins_config[coin]["protocol"]["protocol_data"]["platform"]
+
+    if protocol == "ZHTLC":
+        platform = "UTXO"
+        resp_json.update(get_zhtlc_activation(coins_config, coin))
+    elif protocol == "UTXO":
+        platform = 'UTXO'
+        resp_json.update(get_utxo_activation(coins_config, coin))
+    elif protocol == "QRC20" or coin in ['QTUM', 'QTUM-segwit']:
+        platform = 'QRC20'
+        resp_json.update(get_utxo_activation(coins_config, coin))
+    elif protocol == "tQTUM" or coin in ['tQTUM', 'tQTUM-segwit']:
+        platform = 'tQTUM'
+        resp_json.update(get_utxo_activation(coins_config, coin))
+    elif protocol == "TENDERMINT":
+        platform = 'TENDERMINT'
+        resp_json.update(get_tendermint_activation(coins_config, coin))
+    elif protocol == "TENDERMINTTOKEN":
+        platform = 'TENDERMINTTOKEN'
+        resp_json.update(get_tendermint_token_activation(coins_config, coin))
+    elif platform in PLATFORM_URLS:
+        resp_json.update({
+                "userpass": "'$userpass'",
+                "method": "enable",
+                "coin": coin
             })
-            platform = "UTXO"
-
-        elif protocol == "UTXO":
-            platform = 'UTXO'
-            if len(electrums) > 0:
-                resp_json.update({
-                    "userpass":"'$userpass'",
-                    "method":"electrum",
-                    "coin":item["coin"],
-                    "servers": []
-                })
-                if "UTXO" not in enable_commands["commands"]:
-                    enable_commands["commands"].update({
-                        "UTXO": {}
-                    })   
-                for electrum in electrums:
-                    resp_json["servers"].append({"url":electrum})
-
-        elif protocol == "QRC20" or coin in ['QTUM', 'QTUM-segwit']:
-            platform = 'QRC20'
-
-            resp_json.update({
-                "userpass":"'$userpass'"
-                ,"method":"electrum",
-                "coin":coin,
-                "servers": [
-                    {"url":"electrum1.cipig.net:10050"},
-                    {"url":"electrum2.cipig.net:10050"},
-                    {"url":"electrum3.cipig.net:10050"}
-                ]
+        resp_json.update({PLATFORM_URLS[platform]})
+    elif coin in PLATFORM_URLS:
+        resp_json.update({
+                "userpass": "'$userpass'",
+                "method": "enable",
+                "coin": coin
             })
-            if "QTUM" not in enable_commands["commands"]:
-                enable_commands["commands"].update({
-                    "QTUM": {}
-                })    
+        resp_json.update({PLATFORM_URLS[coin]})
+    else:
+        logger.error("No platform found for coin: {}".format(coin))
+        
 
-        elif protocol == "tQTUM" or coin in ['tQTUM', 'tQTUM-segwit']:
-            platform = 'tQTUM'
-            resp_json.update({
-                "userpass":"'$userpass'",
-                "method":"electrum",
-                "coin":coin,
-                "servers": [
-                    {"url":"electrum1.cipig.net:10071"},
-                    {"url":"electrum2.cipig.net:10071"},
-                    {"url":"electrum3.cipig.net:10071"}
-                ]
-            })
-            if "QRC20" not in enable_commands["commands"]:
-                enable_commands["commands"].update({
-                    "QRC20": {}
-                })    
+    return platform, resp_json
 
-        else:
 
-            resp_json.update({
-                "userpass":"'$userpass'",
-                "method":"enable",
-                "coin":coin,
-            })
 
-            if platform == 'BNB' or coin == 'BNB':
-                platform = 'BNB'
-                resp_json.update(PLATFORM_URLS["BNB"])
+def get_activation_commands(request):
+    logger.info("Running get_activation_commands")
+    enable_commands = {"commands":{}}
+    resp_json = {}
 
-            elif platform == 'ETHR' or coin == 'ETHR':
-                platform = 'ETHR'
-                resp_json.update(PLATFORM_URLS["ETHR"])
-
-            elif platform == 'ETH' or coin == 'ETH':
-                platform = 'ETH'
-                resp_json.update(PLATFORM_URLS["ETH"])
-
-            elif platform == 'ETH-ARB20' or coin == 'ETH-ARB20':
-                platform = 'ETH-ARB20'
-                resp_json.update(PLATFORM_URLS["ETH-ARB20"])
-
-            elif platform == 'ONE' or coin == 'ONE':
-                platform = 'ONE'
-                resp_json.update(PLATFORM_URLS["ONE"])
-
-            elif platform == 'MATIC' or coin == 'MATIC':
-                platform = 'MATIC'
-                resp_json.update(PLATFORM_URLS["MATIC"])
-
-            elif platform == 'MATICTEST' or coin == 'MATICTEST':
-                platform = 'MATICTEST'
-                resp_json.update(PLATFORM_URLS["MATICTEST"])
-
-            elif platform == 'AVAX' or coin == 'AVAX':
-                platform = 'AVAX'
-                resp_json.update(PLATFORM_URLS["AVAX"])
-
-            elif platform == 'AVAXT' or coin == 'AVAXT':
-                platform = 'AVAXT'
-                resp_json.update(PLATFORM_URLS["AVAXT"])
-
-            elif platform == 'BNBT' or coin == 'BNBT':
-                platform = 'BNBT'
-                resp_json.update(PLATFORM_URLS["BNBT"])
-
-            elif platform == 'MOVR' or coin == 'MOVR':
-                platform = 'MOVR'
-                resp_json.update(PLATFORM_URLS["MOVR"])
-                
-            elif platform == 'FTM' or coin == 'FTM':
-                platform = 'FTM'
-                resp_json.update(PLATFORM_URLS["FTM"])
-
-            elif platform == 'FTMT' or coin == 'FTMT':
-                platform = 'FTMT'
-                resp_json.update(PLATFORM_URLS["FTMT"])
-
-            elif platform == 'KCS' or coin == 'KCS':
-                platform = 'KCS'
-                resp_json.update(PLATFORM_URLS["KCS"])
-
-            elif platform == 'HT' or coin == 'HT':
-                platform = 'HT'
-                resp_json.update(PLATFORM_URLS["HT"])
-
-            elif coin == 'UBQ':
-                platform = 'Ubiq'
-                resp_json.update(PLATFORM_URLS["UBQ"])
-
-            elif platform == 'ETC' or coin == 'ETC':
-                platform = 'ETC'
-                resp_json.update(PLATFORM_URLS["ETC"])
-
-            elif platform == 'OPT20' or coin == 'ETHK-OPT20':
-                platform = 'OPT20'
-                resp_json.update(PLATFORM_URLS["OPT20"])
-
-        if compatible and len(resp_json) > 0:
-            is_valid_enable = (resp_json['method'] == 'enable' and 'urls' in resp_json)
-            is_valid_electrum = (resp_json['method'] == 'electrum' and 'servers' in resp_json)
-            if is_valid_enable or is_valid_electrum or lightwallets:
-                if platform or lightwallets:
-                    if platform not in enable_commands["commands"]:
-                        enable_commands["commands"].update({
-                            platform: {}
-                        })    
-                    enable_commands["commands"][platform].update({
-                        coin: helper.sort_dict(resp_json)
-                    })
-                else:
-                    logger.info(f"Unknown platform for {coin}")
-                    '''
-                    if "Unknown" not in enable_commands["commands"]:
-                        enable_commands["commands"].update({
-                            "Unknown": {}
-                        })    
-                    enable_commands["commands"]["Unknown"].update({
-                        coin:sort_dict(resp_json)
-                    })
-                    '''
-            else:
-                invalid_configs.update({
-                        coin: helper.sort_dict(resp_json)
-                    })
-        else:
-            logger.info(f"==================== {coin} is incompatible!")
-            logger.info(f"==================== {compatible} is incompatible!")
-            logger.info(f"==================== {resp_json} is incompatible!")
-            logger.info(item)
-            incompatible_coins.append(coin)
-
+    coins_config = helper.get_coins_config()
+    selected_coin = helper.get_or_none(request, "coin")
     if selected_coin is None:
-        enable_commands.update({
-            "invalid_configs": invalid_configs,
-            "incompatible_coins": incompatible_coins,
-            "protocols": list(set(protocols)),
-            "platforms": list(set(platforms)),
-            "other_platforms": list(set(other_platforms)),
-            "coins_without_electrum": coins_without_electrum
-            })
+        for coin in coins_config:
+            platform, resp_json = get_activation_command(coins_config, coin)
+            if platform not in enable_commands["commands"]:
+                enable_commands["commands"].update({platform: {}})
+            enable_commands["commands"][platform].update({coin: helper.sort_dict(resp_json)})
         return enable_commands
-    else: 
+    else:
+        platform, resp_json = get_activation_command(coins_config, selected_coin)
         return resp_json
 
 

@@ -35,6 +35,24 @@ def has_error(_dict):
         return True
     return False
 
+def refresh_external_data(file, url):
+    if not os.path.exists(file):
+        data = requests.get(url).json()
+        with open(file, "w") as f:
+            json.dump(data, f, indent=4)
+    now = int(time.time())
+    mtime = os.path.getmtime(file)
+    if now - mtime > 86400 * 7: # 7 days
+        data = requests.get(url).json()
+        with open(file, "w") as f:
+            json.dump(data, f, indent=4)
+    with open(file, "r") as f:
+        return json.load(f)
+
+
+def get_coins_config():
+    return refresh_external_data(COINS_CONFIG_PATH, COINS_CONFIG_URL)
+
 
 def get_month_epoch_range(year=None, month=None):
     if not year or not month:
