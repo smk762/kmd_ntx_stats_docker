@@ -61,11 +61,15 @@
             + address + "</a>"
     }
 
-    function get_address_url(coin, address, label) {
+    function get_address_url(coin, address, label, max_length=34) {
         let explorer = get_explorer(coin)
         if (!label) {
             label = address
         }
+        if (label.length > max_length) {
+            label = address.substring(0, max_length-3) + "..."
+        }
+        // TODO: Using the explorer suffix data from coins_config.json would expland coverage here.
         if (explorer) {
             if (explorer.search("cryptoid") > -1) {
                 return "<a class='' href='"+explorer+'address.dws?'+address+".htm'>\

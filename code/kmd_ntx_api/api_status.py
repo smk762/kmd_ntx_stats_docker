@@ -4,7 +4,7 @@ from django.http import JsonResponse
 
 
 def faucet_balance_status(request):
-    resp = requests.get(f"https://faucet.komodo.earth/rm_faucet_balances").json()
+    resp = requests.get(f"https://faucet.komodo.earth/faucet_balances").json()
     return JsonResponse(resp)
 
 

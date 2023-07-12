@@ -178,20 +178,7 @@ def decode_op_return_view(request):
 def faucet_view(request):
     season = helper.get_page_season(request)
     notary_list = helper.get_notary_list(season)
-    faucet_supply = {
-        "RICK": 0,
-        "MORTY": 0
-    }
-    faucet_supply_resp = requests.get(f"https://faucet.komodo.earth/rm_faucet_balances").json()
-
-    for node in faucet_supply_resp:
-
-        try:
-            faucet_supply["RICK"] += faucet_supply_resp[node]["RICK"]
-            faucet_supply["MORTY"] += faucet_supply_resp[node]["MORTY"]
-        except Exception as e:
-            logger.info(e)
-
+    faucet_balances = requests.get(f"https://faucet.komodo.earth/faucet_balances").json()
     pending_tx_resp = requests.get(f"https://faucet.komodo.earth/show_pending_tx").json()
     pending_tx_list = []
     tx_rows = []
@@ -235,14 +222,16 @@ def faucet_view(request):
                 "status":item[6]
             })
 
+    coins_list = ["RICK", "MORTY", "DOC", "MARTY", "ZOMBIE"]
     context = helper.get_base_context(request)
     context.update({
-        "page_title":"Rick / Morty Faucet",
+        "page_title":"Testcoin Faucet",
         "explorers":info.get_explorers(request),
-        "faucet_supply":faucet_supply,
+        "faucet_balances":faucet_balances,
         "count_24hrs":count_24hrs,
         "sum_24hrs":sum_24hrs,
-        "tx_rows": tx_rows
+        "tx_rows": tx_rows,
+        "coins_list": coins_list
     })
 
     if request.method == 'POST':
@@ -335,6 +324,19 @@ def notaryfaucet_view(request):
                 "status":item[7]
             })
 
+    buttons = ["faucet_balances", "faucet_history"]
+    button_params = {
+        "faucet_balances": {
+            "action": f"show_card('faucet_balances', {buttons})",
+            "width_pct": 17,
+            "text": "Faucet Balances"
+        },
+        "faucet_history": {
+            "action": f"show_card('faucet_history', {buttons})",
+            "width_pct": 17,
+            "text": "Faucet History"
+        }
+    }
     context = helper.get_base_context(request)
     context.update({
         "page_title": "Notary Faucet",
@@ -343,6 +345,7 @@ def notaryfaucet_view(request):
         "sum_24hrs": sum_24hrs,
         "coins_list": coins_list,
         "tx_rows": tx_rows,
+        "buttons": button_params,
         "faucet_balances": faucet_balances
     })
 

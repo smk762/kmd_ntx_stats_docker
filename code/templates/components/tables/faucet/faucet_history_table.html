@@ -1,0 +1,95 @@
+
+<div class="card-body table_card_body col-12 px-0 py-2" style="opacity: 1;" id="accrued-faucet-tx">
+    <table style="visibility: hidden;" id="faucet-tx_tbl" class="table table-striped table-bordered m-auto" style="width:100%">
+        <thead>
+            <tr>
+                <th data-data="coin">Coin</th>
+                <th data-data="address">Address</th>
+                <th data-data="amount">Amount</th>
+                <th data-data="txid">Transaction</th>
+                <th data-data="status">Status</th>
+                <th data-data="time_sent">Time Sent</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in tx_rows %}
+            <tr>
+                <td data-data="coin" class="px-2 text-left text-nowrap">{{ row.coin }}</td>
+                <td data-data="address">{{ row.address }}</td>
+                <td data-data="amount">{{ row.amount }}</td>
+                <td data-data="txid">{{ row.txid }}</td>
+                <td data-data="status">{{ row.status }}</td>
+                <td data-data="time_sent" class="text-nowrap">{{ row.time_sent }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+        const dom = '{% include "components/tables/dt_dom.html" with table="faucet-tx" %}'
+
+        $('#faucet-tx_tbl').css('visibility', 'visible');
+        $('#faucet-tx_tbl').DataTable({
+            "deferRender": true,
+            "dom": dom,
+            "orderClasses": false,
+            "order": [[ 5, 'desc' ]],
+            "columnDefs": [
+                { "className": "text-right text-nowrap", "targets": [ 2, 5 ] },
+                { "className": "text-left text-nowrap", "targets": [ 0 ] },
+                {
+                    "data": 'coin',
+                    "targets": 0,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html(get_coin_icon(oData.coin))
+                    }
+                },
+                {
+                    "data": 'address',
+                    "targets": 1,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        if (oData.address == 'GalacticFederationPrison') {
+                            $(nTd).html("<a href='https://www.galacticfederation.org.uk/'>"+oData.address+"</a></span>");			            		
+                        }
+                        else {
+                            $(nTd).html(get_address_url(oData.coin, oData.address));
+                        }	
+                    }
+                },
+                {
+                    "data": 'amount',
+                    "targets": 2,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html(
+                            isNaN(oData.amount) ? "N/A" :
+                            parseFloat(oData.amount).toFixed(3)
+                        );
+                    }
+                },
+                {
+                    "data": 'txid',
+                    "targets": 3,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html(get_faucet_txid(oData.coin, oData.txid));
+                    }
+                },
+                {
+                    "data": 'status',
+                    "targets": 4,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html(get_faucet_status(oData.status));
+                    }
+                }
+            ],
+            fnInitComplete: function(oTable, oData){
+                let url = ""
+                let api_btn = ''
+                $('.faucet-tx-api-link').html(api_btn);
+                $('.faucet-tx-tbl-title').html('<h4 class="text-left">Last 200 Faucet Transactions</h4>');
+                
+            }
+        });
+    });
+</script>
