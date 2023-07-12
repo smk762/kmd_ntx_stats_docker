@@ -178,7 +178,7 @@ def decode_op_return_view(request):
 def faucet_view(request):
     season = helper.get_page_season(request)
     notary_list = helper.get_notary_list(season)
-    faucet_supply = requests.get(f"https://faucet.komodo.earth/faucet_balances").json()
+    faucet_balances = requests.get(f"https://faucet.komodo.earth/faucet_balances").json()
     pending_tx_resp = requests.get(f"https://faucet.komodo.earth/show_pending_tx").json()
     pending_tx_list = []
     tx_rows = []
@@ -227,7 +227,7 @@ def faucet_view(request):
     context.update({
         "page_title":"Testcoin Faucet",
         "explorers":info.get_explorers(request),
-        "faucet_supply":faucet_supply,
+        "faucet_balances":faucet_balances,
         "count_24hrs":count_24hrs,
         "sum_24hrs":sum_24hrs,
         "tx_rows": tx_rows,
