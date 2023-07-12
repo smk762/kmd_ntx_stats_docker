@@ -19,7 +19,7 @@
                 <td data-data="amount">{{ row.amount }}</td>
                 <td data-data="txid">{{ row.txid }}</td>
                 <td data-data="status">{{ row.status }}</td>
-                <td data-data="time_sent" class="text-nowrap">{{ row.time_sent }}</td>
+                <td data-data="time_sent" data-order="{{ row.timestamp }}" class="text-nowrap">{{ row.time_sent }}</td>
             </tr>
         {% endfor %}
         </tbody>
