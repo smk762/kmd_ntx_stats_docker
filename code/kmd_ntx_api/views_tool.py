@@ -191,7 +191,8 @@ def faucet_view(request):
             "index": item[0],    
             "coin": item[1], 
             "address": item[2], 
-            "time_sent": "n/a",   
+            "time_sent": "n/a",
+            "timestamp": 99999999999999,
             "amount": "n/a",  
             "txid": "n/a",
             "status": item[6]
@@ -213,13 +214,14 @@ def faucet_view(request):
                 sum_24hrs += item[4]
                 count_24hrs += 1
             tx_rows.append({
-                "index":item[0],
-                "coin":item[1],
-                "address":item[2],
-                "time_sent":dt.fromtimestamp(item[3]),
-                "amount":item[4],
-                "txid":item[5],
-                "status":item[6]
+                "index": item[0],
+                "coin": item[1],
+                "address": item[2],
+                "timestamp": item[3],
+                "time_sent": dt.fromtimestamp(item[3]),
+                "amount": item[4],
+                "txid": item[5],
+                "status": item[6]
             })
 
     coins_list = ["RICK", "MORTY", "DOC", "MARTY", "ZOMBIE"]
@@ -247,11 +249,11 @@ def faucet_view(request):
             resp = r.json()
             messages.success(request, resp["Result"]["Message"])
             if resp['Status'] == "Success":
-                context.update({"result":coin+"_success"})
+                context.update({"result": coin+"_success"})
             elif resp['Status'] == "Error":
-                context.update({"result":"disqualified"})
+                context.update({"result": "disqualified"})
             else:
-                context.update({"result":"fail"})
+                context.update({"result": "fail"})
         except Exception as e:
             logger.error(f"[faucet] Exception: {e}")
             messages.success(request, f"Something went wrong... {e}")
@@ -283,12 +285,13 @@ def notaryfaucet_view(request):
             logger.info(item)
             
             tx_rows.append({
-                "index": item[0],    
-                "coin": item[1], 
-                "pubkey": item[2], 
-                "notary": item[3], 
-                "time_sent": "n/a",   
-                "amount": "n/a",  
+                "index": item[0],
+                "coin": item[1],
+                "pubkey": item[2],
+                "notary": item[3],
+                "time_sent": "n/a",
+                "timestamp": 99999999999999,
+                "amount": "n/a",
                 "txid": "n/a",
                 "status": item[7]
             })
@@ -307,8 +310,6 @@ def notaryfaucet_view(request):
             sent_tx_list = sent_tx_resp["result"]["message"]
     for item in sent_tx_list:
         logger.info(item)
-        [1, 'MARTY', '0306476ea5fb67aec667172a9bb30646dbff195b84c30ac958175af9b475987802', 'dragonhound_NA', 1688944753, 0.5, '59c6b40de2b5eb482d0e9c0309d868a1a0bb00b2349952c784e8ae3dc5f2f338', 'sent']
-
         if item[0] not in pending_index:
             if item[4] > SINCE_INTERVALS['day']:
                 sum_24hrs += item[5]
@@ -318,6 +319,7 @@ def notaryfaucet_view(request):
                 "coin":item[1],
                 "pubkey":item[2],
                 "notary": item[3],
+                "timestamp": item[4],
                 "time_sent":dt.fromtimestamp(item[4]),
                 "amount":item[5],
                 "txid":item[6],
