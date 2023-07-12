@@ -45,8 +45,9 @@ urlpatterns = [
     path('api/source/',
          include(source_router.urls)),
 
-    path('admin/',
-          admin.site.urls),
+    # We dont really need or use this
+    #path('admin/',
+    #      admin.site.urls),
 
     path('api-auth/',
          include('rest_framework.urls',
