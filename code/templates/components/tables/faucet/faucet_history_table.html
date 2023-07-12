@@ -21,7 +21,7 @@
                 <td data-data="txid">{{ row.txid }}</td>
                 <td data-data="status">{{ row.status }}</td>
                 <td data-data="time_sent" class="text-nowrap">{{ row.time_sent }}</td>
-                <td data-data="time_sent" data-order="{{ row.timestamp }}" class="text-nowrap">{{ row.time_sent }}</td>
+                <td data-data="timestamp" class="text-nowrap" style="display: none">{{ row.timestamp }}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -37,6 +37,7 @@
             "deferRender": true,
             "dom": dom,
             "orderClasses": false,
+            "orderData": { "orderData":[ 6 ],   "targets": [ 5 ] },
             "order": [[ 5, 'desc' ]],
             "columnDefs": [
                 { "className": "text-right text-nowrap", "targets": [ 2, 5 ] },
