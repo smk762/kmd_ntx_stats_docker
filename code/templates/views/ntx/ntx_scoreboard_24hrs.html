@@ -1,10 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-
 	<!-- Season Region Leaders (24hrs) -->
-	{% include "components/region_leaders/region_ntx_leaders.html" with stats_data=daily_stats_sorted heading='Top Region Notarisation Scores' period='day' %}
+	{% include "components/region_leaders/region_ntx_leaders.html" with stats_data=daily_stats_sorted heading='Top Region Notarisation Scores (24hr)' period='day' %}
 	<!-- Region NTX Ranks Table -->
-	{% include "components/tables/ntx/region_ntx_rank_tables.html" with stats_data=daily_stats_sorted heading='Top Region Notarisation Scores' period='season' %}
-
+	{% include "components/tables/ntx/region_ntx_rank_tables.html" with stats_data=daily_stats_sorted %}
 {% endblock %}
