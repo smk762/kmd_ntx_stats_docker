@@ -21,6 +21,7 @@ def refresh_external_data(file, url):
 
 HOME = expanduser('~')
 SCRIPT_PATH = dirname(realpath(sys.argv[0]))
+os.makedirs(f"{SCRIPT_PATH}/cache", exist_ok=True)
 
 # Unified coins config
 COINS_CONFIG_URL = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/utils/coins_config.json"
