@@ -263,34 +263,6 @@ def orderbook_view(request):
     return render(request, 'views/atomicdex/orderbook.html', context)
 
 
-############################################
-
-def seednode_version_view(request):
-    context = helper.get_base_context(request)
-    active_version = " & ".join(dex.get_active_mm2_versions(time.time()))
-    day_version_scores = dex.get_seednode_version_date_table(request)
-    month_version_scores = dex.get_seednode_version_month_table(request)
-
-    context.update({
-        "page_title": "AtomicDEX Seednode Stats",
-        "active_version": active_version,
-        "day_date": day_version_scores["date"],
-        "day_start": int(day_version_scores["start"]),
-        "day_end": int(day_version_scores["end"]),
-        "day_date_ts": int(day_version_scores["start"]*1000),
-        "day_table_data": day_version_scores["table_data"],
-        "day_headers": day_version_scores["headers"],
-        "day_scores": day_version_scores["scores"],
-        "month_date": month_version_scores["date"],
-        "month_date_ts": month_version_scores["date_ts"],
-        "month_table_data": month_version_scores["table_data"],
-        "month_headers": month_version_scores["headers"],
-        "month_scores": month_version_scores["scores"]
-    })
-
-    return render(request, 'views/atomicdex/seednode_version_stats.html', context)
-
-
 ## 2023 Updates
 
 def electrum_status_view(request):

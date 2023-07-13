@@ -35,19 +35,7 @@ def has_error(_dict):
         return True
     return False
 
-def refresh_external_data(file, url):
-    if not os.path.exists(file):
-        data = requests.get(url).json()
-        with open(file, "w") as f:
-            json.dump(data, f, indent=4)
-    now = int(time.time())
-    mtime = os.path.getmtime(file)
-    if now - mtime > 86400 * 7: # 7 days
-        data = requests.get(url).json()
-        with open(file, "w") as f:
-            json.dump(data, f, indent=4)
-    with open(file, "r") as f:
-        return json.load(f)
+
 
 
 def get_coins_config():
@@ -243,16 +231,16 @@ def get_base_context(request):
 
     context = {
         "season": season,
+        "season_clean": season.replace("_"," "),
         "server": server,
         "epoch": epoch,
         "coin": coin,
         "notary": notary,
+        "notary_clean": get_notary_clean(notary),
         "address": address,
         "selected": selected,
         "hide_filters": hide_filters,
         "regions": ["AR", "EU", "NA", "SH", "DEV"],
-        "notary_clean": get_notary_clean(notary),
-        "season_clean": season.replace("_"," "),
         "epoch_clean": epoch.replace("_"," "),
         "explorers": get_explorers(), 
         "coin_icons": get_coin_icons(),

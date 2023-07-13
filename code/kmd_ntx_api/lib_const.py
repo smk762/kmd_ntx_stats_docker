@@ -1,7 +1,6 @@
 import os
 import os
 import sys
-from os.path import expanduser, dirname, realpath
 import time
 import json
 import logging
@@ -10,6 +9,7 @@ from dotenv import load_dotenv
 from django.contrib import messages
 import kmd_ntx_api.lib_struct as struct
 from kmd_ntx_api.notary_pubkeys import get_notary_pubkeys
+from os.path import expanduser, dirname, realpath
 
 load_dotenv()
 OTHER_SERVER = os.getenv("OTHER_SERVER") # IP / domain of the remote server
@@ -61,8 +61,6 @@ DEVISOR = 10512000
 
 HOME = expanduser('~')
 SCRIPT_PATH = dirname(realpath(sys.argv[0]))
-COINS_CONFIG_URL = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/utils/coins_config.json"
-COINS_CONFIG_PATH = f"{SCRIPT_PATH}/coins_config.json"
 
 # COLORS
 COLORS = {
