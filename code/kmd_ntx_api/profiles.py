@@ -2,6 +2,8 @@
 
 # S7 refactoring
 import kmd_ntx_api.buttons as buttons
+from kmd_ntx_api.seednodes import get_seednode_version_month_table, \
+    get_seednode_version_score_total, get_seednode_version_date_table
 
 # Older
 import kmd_ntx_api.lib_info as info
@@ -46,7 +48,7 @@ def get_notary_profile_context(request, season, notary):
             "last_ntx_coin": last_ntx_coin
         }
 
-        seed_scores = dex.get_seednode_version_score_total(request)
+        seed_scores = get_seednode_version_score_total(request)
         notarised_data_24hr = ntx.get_notarised_date(season, None, None, notary, True)
         region = helper.get_notary_region(notary)
         season_stats_sorted = stats.get_season_stats_sorted(season)
