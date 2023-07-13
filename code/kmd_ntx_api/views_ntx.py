@@ -34,12 +34,11 @@ def notary_profile_view(request):
 
 
 def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY PROFILE
-    season = helper.get_page_season(request)
-    coin = helper.get_or_none(request, "coin", coin)
-    server = helper.get_coin_server(season, coin)
     context = helper.get_base_context(request)
+    season = context["season"]
+    coin = helper.get_or_none(request, "coin", coin)
     context.update({
-        "server": server,
+        "server": helper.get_coin_server(season, coin),
         "page_title": "Coin Profile Index"
     })
     
@@ -51,9 +50,8 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
 
 
 def ntx_scoreboard_view(request):
-    season = helper.get_page_season(request)
-    season_stats_sorted = stats.get_season_stats_sorted(season)
     context = helper.get_base_context(request)
+    season_stats_sorted = stats.get_season_stats_sorted(context["season"])
     context.update({
         "page_title": f"Notarisation Scoreboard",
         "anchored": True,
@@ -65,12 +63,11 @@ def ntx_scoreboard_view(request):
 
 
 def ntx_scoreboard_24hrs_view(request):
-    season = helper.get_page_season(request)
     context = helper.get_base_context(request)
     context.update({
         "page_title": f"Last 24hrs Notarisation Scoreboard",
         "anchored": True,
-        "daily_stats_sorted": stats.get_daily_stats_sorted(season),
+        "daily_stats_sorted": stats.get_daily_stats_sorted(context["season"]),
         "nn_social": info.get_nn_social_info(request)
     })
     return render(request, 'views/ntx/ntx_scoreboard_24hrs.html', context)
@@ -81,20 +78,17 @@ def seednode_version_view(request):
     context.update({seednode_version_context(request)})
     return render(request, 'views/atomicdex/seednode_version_stats.html', context)
 
- 
 
 def notary_coin_notarised_view(request):
-    season = helper.get_page_season(request)
-    notary = helper.get_or_none(request, "notary", random.choice(helper.get_notary_list(season)))
-    server = helper.get_page_server(request)
-    coin = helper.get_or_none(request, "coin", "MORTY")
-
     context = helper.get_base_context(request)
+    season = context["season"]
+    notary = context["notary"]
+    server = context["server"]
+    coin = context["coin"]
     context.update({
         "server": server,
         "coin": coin,
         "notary": notary, 
-        "notary_clean": notary.replace("_"," "),
         "filter_params": f"&notary={{{notary}}}&coin={coin}&season={season}&server={server}"
     })
 
@@ -102,16 +96,12 @@ def notary_coin_notarised_view(request):
 
 
 def notary_epoch_scores_view(request):
-    season = helper.get_page_season(request)
-    notary = helper.get_or_none(request, "notary", random.choice(helper.get_notary_list(season)))
-    scoring_table, totals = table.get_notary_epoch_scores_table(request, notary)
-    notary_clean = helper.get_notary_clean(notary)
     context = helper.get_base_context(request)
+    notary = context["notary"]
+    scoring_table, totals = table.get_notary_epoch_scores_table(request, notary)
     try:
         context.update({
-            "table_title": notary_clean,
-            "notary":notary,
-            "notary_clean": notary_clean,
+            "table_title": context["notary_clean"],
             "scoring_table": scoring_table,
             "total_count":totals["counts"][notary],
             "total_score":totals["scores"][notary],
@@ -132,24 +122,7 @@ def notarised_24hrs_view(request):
 
 
 def notary_epoch_coin_notarised_view(request):
-    season = helper.get_page_season(request)
-    notary = helper.get_or_none(request, "notary", random.choice(helper.get_notary_list(season)))
-    server = helper.get_page_server(request)
-    epoch = helper.get_or_none(request, "epoch", "Epoch_0")
-    coin = helper.get_or_none(request, "coin", "MORTY")
-
     context = helper.get_base_context(request)
-    context.update({
-        "notary": notary,
-        "notary_clean": notary.replace("_"," "),
-        "server": server,
-        "server_clean": server.replace("_"," "),
-        "epoch": epoch,
-        "epoch_clean": epoch.replace("_"," "),
-        "coin": coin,
-        "season_clean": season.replace("_"," ")
-    })
-
     return render(request, 'views/ntx/notary_epoch_coin_notarised.html', context)
 
 
