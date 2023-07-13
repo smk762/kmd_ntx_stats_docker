@@ -5,7 +5,7 @@ from datetime import datetime as dt
 from django.db.models import Sum
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
-from external_data import VERSION_TIMESPANS
+from kmd_ntx_api.external_data import VERSION_TIMESPANS
 from kmd_ntx_api.lib_const import SINCE_INTERVALS
 from kmd_ntx_api.lib_atomicdex import get_active_mm2_versions, \
     get_seednode_version_date_table, get_seednode_version_month_table
