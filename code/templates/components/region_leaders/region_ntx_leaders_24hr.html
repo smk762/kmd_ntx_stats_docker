@@ -4,18 +4,18 @@
 			<div class="card text-center kmd_ui_light3 col-12" style="border:none !important; background-color: #101721 !important; box-shadow: none; margin-top:0 !important;">
 		    	<h2>{{ season_clean }} Top Region Notarisation Scores (Last 24hrs)</h2>
 			    <div class="justify-content-between align-items-center">
-					{% for _region, region_data in daily_stats_sorted.items %}
+					{% for selected_region, region_data in daily_stats_sorted.items %}
 						{% for item in region_data %}
 							{% if item.rank == 1 %}
-						    	{% if _region == 'AR' %}
+						    	{% if selected_region == 'AR' %}
 									{% include "components/region_leaders/region_24hr_leader_scores.html" with region_name="Asia & Russia" alt_text=item.notary %}
-								{% elif _region == 'EU' %}
+								{% elif selected_region == 'EU' %}
 									{% include "components/region_leaders/region_24hr_leader_scores.html" with region_name="European Union" alt_text=item.notary %}
-								{% elif _region == 'NA' %}
+								{% elif selected_region == 'NA' %}
 									{% include "components/region_leaders/region_24hr_leader_scores.html" with region_name="North America" alt_text=item.notary %}
-								{% elif _region == 'SH' %}
+								{% elif selected_region == 'SH' %}
 									{% include "components/region_leaders/region_24hr_leader_scores.html" with region_name="Sth Hemisphere" alt_text=item.notary %}
-								{% elif _region == 'DEV' %}
+								{% elif selected_region == 'DEV' %}
 									{% include "components/region_leaders/region_24hr_leader_scores.html" with region_name="Development" alt_text=item.notary %}
 								{% endif %}	
 							{% endif %}

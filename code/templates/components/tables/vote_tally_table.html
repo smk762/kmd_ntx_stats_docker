@@ -1,15 +1,15 @@
-{% if region == _region %}
-<div class="row" id="{{ _region }}">
+{% if region == selected_region %}
+<div class="row" id="{{ selected_region }}">
 {% else %}
-<div class="row" id="{{ _region }}" style="display: none;">
+<div class="row" id="{{ selected_region }}" style="display: none;">
 {% endif %}
     <div class="card-deck d-flex justify-content-between col-12 m-auto">
         <div class="card table_card floating-card m-0">
             <div class="card-header table_card_title floating-card">
-                <h2>{{ _region }} Region</h2>
+                <h2>{{ selected_region }} Region</h2>
             </div>
             <div class="card-body table_card_body">
-                <table id="{{ _region }}_table" class="table table-striped table-bordered" style="width:100%; font-size: 1.15em;">
+                <table id="{{ selected_region }}_table" class="table table-striped table-bordered" style="width:100%; font-size: 1.15em;">
                     <thead>
                         <tr>
                             <th data-data="region_rank">Rank</th>
@@ -30,11 +30,11 @@
 
 <script>
     $(document).ready(function() {
-        {{ _region }}_table = $('#{{ _region }}_table').DataTable({    
+        {{ selected_region }}_table = $('#{{ selected_region }}_table').DataTable({    
         
             ajax: {
                 url: "{% url 'notary_vote_stats_info' %}",
-                dataSrc: 'results.{{ _region }}',
+                dataSrc: 'results.{{ selected_region }}',
                 "deferRender": true
             },
             "rowCallback": function( row, data ) {
@@ -44,9 +44,9 @@
                 else {
                     $(row).addClass( 'kmd_gray' );    
                 }
-                if (vote_data.{{ _region }}.length > 0) {
+                if (vote_data.{{ selected_region }}.length > 0) {
                     let tr_class = $(row).attr('class').split(" ")
-                    let candidate_data = vote_data.{{ _region }}.filter(checkCandidate, data.candidate)
+                    let candidate_data = vote_data.{{ selected_region }}.filter(checkCandidate, data.candidate)
 
                     if (data.sum_votes > candidate_data[0].sum_votes) { 
                         
@@ -98,7 +98,7 @@
                     }
                 }
             },
-            "caption": '{{ _region }} Region',
+            "caption": '{{ selected_region }} Region',
             "paging": false,
             "searching": false,
             "info": false,
@@ -165,10 +165,10 @@
             return data.region_rank == this;
         }
 
-        {{ _region }}_table.on( 'xhr', function () {
-            json = {{ _region }}_table.ajax.json();
+        {{ selected_region }}_table.on( 'xhr', function () {
+            json = {{ selected_region }}_table.ajax.json();
             setTimeout( function () {
-                vote_data.{{ _region }} = json.results.{{ _region }}    
+                vote_data.{{ selected_region }} = json.results.{{ selected_region }}    
             }, 300);
             
         });

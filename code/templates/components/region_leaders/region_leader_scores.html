@@ -17,12 +17,12 @@
 
 	
 	{% if anchored %}
-		{% if region == _region %}
+		{% if region == selected_region %}
 		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button btn-selected py-1 px-4 m-0" onclick="show_region('{{ region }}')">{{ region_name }}</div></a>
 		{% else %}
-		<div id="{{ _region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0" onclick="show_region('{{ _region }}')">{{ region_name }}</div></a>
+		<div id="{{ selected_region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0" onclick="show_region('{{ selected_region }}')">{{ region_name }}</div></a>
 		{% endif %}
 	{% else %}
-		<a href="{% url 'ntx_scoreboard_view' %}{{ _region }}"><div id="{{ _region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0">{{ region_name }}</div></a>
+		<a href="{% url 'ntx_scoreboard_view' %}{{ selected_region }}"><div id="{{ selected_region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0">{{ region_name }}</div></a>
 	{% endif %}
 </div>
