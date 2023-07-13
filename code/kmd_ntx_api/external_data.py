@@ -8,13 +8,13 @@ from os.path import expanduser, dirname, realpath
 def refresh_external_data(file, url):
     if not os.path.exists(file):
         data = requests.get(url).json()
-        with open(file, "w") as f:
+        with open(file, "w+") as f:
             json.dump(data, f, indent=4)
     now = int(time.time())
     mtime = os.path.getmtime(file)
     if now - mtime > 86400 * 7: # 7 days
         data = requests.get(url).json()
-        with open(file, "w") as f:
+        with open(file, "w+") as f:
             json.dump(data, f, indent=4)
     with open(file, "r") as f:
         return json.load(f)
