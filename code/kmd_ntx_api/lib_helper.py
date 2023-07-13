@@ -234,6 +234,7 @@ def get_base_context(request):
         "address": get_or_none(request, "address"),
         "selected": selected,
         "hide_filters": get_or_none(request, "hide_filters", []),
+        "region": get_or_none(request, "region", "EU"),
         "regions": ["AR", "EU", "NA", "SH", "DEV"],
         "epoch_clean": epoch.replace("_"," "),
         "explorers": get_explorers(), 
@@ -403,6 +404,7 @@ def get_eco_data_link():
 
 
 def get_dpow_server_coins_dict(season=None):
+    # This is messy, and should be moved to cache
     if not season:
         season = SEASON
     url = f"{THIS_SERVER}/api/info/dpow_server_coins"
@@ -412,17 +414,17 @@ def get_dpow_server_coins_dict(season=None):
         "Main": dpow_main_coins.json()['results'],
         "Third_Party": dpow_3p_coins.json()['results']
     }
-    
     return coins_dict
 
+
 def get_dpow_server_coins_list(season=None):
+    # This is messy, and should be moved to cache
     if not season:
         season = SEASON
     url = f"{THIS_SERVER}/api/info/dpow_server_coins"
     dpow_main_coins = requests.get(f"{url}/?season={season}&server=Main")
     dpow_3p_coins = requests.get(f"{url}/?season={season}&server=Third_Party")
     coins_list = dpow_main_coins.json()['results'] + dpow_3p_coins.json()['results']
-    
     return coins_list
 
 

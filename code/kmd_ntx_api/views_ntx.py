@@ -132,6 +132,5 @@ def notarisation_view(request):
     context = helper.get_base_context(request)
     serializer = serializers.notarisedSerializer(ntx_data, many=True)
     context.update({"ntx_data": dict(serializer.data[0])})
-
     return render(request, 'views/ntx/notarisation.html', context)
 
