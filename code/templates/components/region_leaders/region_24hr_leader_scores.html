@@ -23,6 +23,6 @@
 		{% endif %}
 
 	{% else %}
-		<a href="{% url 'ntx_scoreboard_24hrs_view' %}{{ selected_region }}"><div id="{{ selected_region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0">{{ region_name }}</div></a>
+		<a href="{% url 'ntx_scoreboard_24hrs_view' region=selected_region %}"><div id="{{ selected_region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0">{{ region_name }}</div></a>
 	{% endif %}
 </div>
