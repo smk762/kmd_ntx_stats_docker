@@ -20,11 +20,11 @@ frontend_ntx_urls = [
           name='coin_profile_view'),
 
     path('ntx_scoreboard/',
-          views_ntx.ntx_scoreboard,
+          views_ntx.ntx_scoreboard_view,
           name='ntx_scoreboard_view'),
 
     path('ntx_scoreboard_24hrs/',
-          views_ntx.ntx_scoreboard_24hrs,
+          views_ntx.ntx_scoreboard_24hrs_view,
           name='ntx_scoreboard_24hrs_view'),
 
     path('atomicdex/seednode_version/',
@@ -44,7 +44,7 @@ frontend_ntx_urls = [
           name='notary_coin_notarised_view'),
 
     path('notarised_24hrs/',
-          views_ntx.notarised_24hrs,
+          views_ntx.notarised_24hrs_view,
           name='notarised_24hrs_view'),
 
     path('notarisation/',

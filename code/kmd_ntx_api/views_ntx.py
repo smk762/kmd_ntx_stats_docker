@@ -19,7 +19,7 @@ import kmd_ntx_api.serializers as serializers
 
 # In order of appearance within the "Notarisation" drop down menu
 
-def notary_profiles(request):
+def notary_profile_view(request):
     context = helper.get_base_context(request)
     # TODO: This is not currently used, but can be added for prior season stats given fully populated databases
     context.update({"notary_seasons": info.get_notary_seasons()})
@@ -50,7 +50,7 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
     return render(request, 'views/coin/coin_profile_index.html', context)
 
 
-def ntx_scoreboard(request):
+def ntx_scoreboard_view(request):
     season = helper.get_page_season(request)
     season_stats_sorted = stats.get_season_stats_sorted(season)
     context = helper.get_base_context(request)
@@ -64,7 +64,7 @@ def ntx_scoreboard(request):
     return render(request, 'views/ntx/ntx_scoreboard.html', context)
 
 
-def ntx_scoreboard_24hrs(request):
+def ntx_scoreboard_24hrs_view(request):
     season = helper.get_page_season(request)
     context = helper.get_base_context(request)
     context.update({
@@ -123,7 +123,7 @@ def notary_epoch_scores_view(request):
     return render(request, 'views/ntx/notary_epoch_scores_view.html', context)
 
 
-def notarised_24hrs(request):    
+def notarised_24hrs_view(request):    
     context = helper.get_base_context(request)
     context.update({
         "page_title":"dPoW Notarisations (last 24hrs)"
