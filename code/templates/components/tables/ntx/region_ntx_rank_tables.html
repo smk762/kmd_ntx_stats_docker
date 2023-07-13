@@ -60,6 +60,7 @@
 $(document).ready(function() {
     {% if period == 'season' %}
         let url = "{% url 'season_stats_sorted_api' %}?season={{ season }}"
+        let suffix = ""
     {% else %}
         let url = "{% url 'daily_stats_sorted_api' %}?season={{ season }}"
         let suffix = " (24hr)"
