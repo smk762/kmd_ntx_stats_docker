@@ -11,6 +11,14 @@ frontend_ntx_urls = [
           views_ntx.notary_profile_view,
           name='notary_profile_view'),
 
+    path('coin_profile/',
+          views_ntx.coin_profile_view,
+          name='coin_profile_index_view'),
+
+    path('coin_profile/<str:coin>/',
+          views_ntx.coin_profile_view,
+          name='coin_profile_view'),
+
     path('ntx_scoreboard/',
           views_ntx.ntx_scoreboard,
           name='ntx_scoreboard_view'),
