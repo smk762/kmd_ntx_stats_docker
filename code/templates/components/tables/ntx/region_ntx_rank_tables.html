@@ -57,28 +57,27 @@
 {% endfor %}
 
 <script>
-
-{% if period == 'season' %}
-    let url = "{% url 'season_stats_sorted_api' %}?season={{ season }}"
-{% else %}
-    let url = "{% url 'daily_stats_sorted_api' %}?season={{ season }}"
-{% endif %}
-  
-  $(document).ready(function() {
-      AR_table = get_region_scoreboard_table(
-          '{{ season }}', 'AR', url, "{{ season_clean }} AR Notarisation Ranks (24hr)"
-      )
-      EU_table = get_region_scoreboard_table(
-          '{{ season }}', 'EU', url, "{{ season_clean }} EU Notarisation Ranks (24hr)"
-      )
-      NA_table = get_region_scoreboard_table(
-          '{{ season }}', 'NA', url, "{{ season_clean }} NA Notarisation Ranks (24hr)"
-      )
-      SH_table = get_region_scoreboard_table(
-          '{{ season }}', 'SH', url, "{{ season_clean }} SH Notarisation Ranks (24hr)"
-      )
-      DEV_table = get_region_scoreboard_table(
-          '{{ season }}', 'DEV', url, "{{ season_clean }} DEV Notarisation Ranks (24hr)"
-      )
-  });
+$(document).ready(function() {
+    {% if period == 'season' %}
+        let url = "{% url 'season_stats_sorted_api' %}?season={{ season }}"
+    {% else %}
+        let url = "{% url 'daily_stats_sorted_api' %}?season={{ season }}"
+        let suffix = " (24hr)"
+    {% endif %}
+    AR_table = get_region_scoreboard_table(
+        '{{ season }}', 'AR', url, "{{ season_clean }} AR Notarisation Ranks" + suffix
+    )
+    EU_table = get_region_scoreboard_table(
+        '{{ season }}', 'EU', url, "{{ season_clean }} EU Notarisation Ranks" + suffix
+    )
+    NA_table = get_region_scoreboard_table(
+        '{{ season }}', 'NA', url, "{{ season_clean }} NA Notarisation Ranks" + suffix
+    )
+    SH_table = get_region_scoreboard_table(
+        '{{ season }}', 'SH', url, "{{ season_clean }} SH Notarisation Ranks" + suffix
+    )
+    DEV_table = get_region_scoreboard_table(
+        '{{ season }}', 'DEV', url, "{{ season_clean }} DEV Notarisation Ranks" + suffix
+    )
+});
 </script>

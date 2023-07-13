@@ -7,7 +7,6 @@
 	<!-- Region NTX Ranks Table -->
 	{% include "components/tables/ntx/region_ntx_rank_tables.html" with stats_data=season_stats_sorted %}
 
-
 	{% for selected_region, region_data in season_stats_sorted.items %}
 		{% if region == selected_region %}
 		<div class="row" id="{{ selected_region }}">
