@@ -5,7 +5,7 @@ from datetime import datetime as dt
 from django.db.models import Sum
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
-from kmd_ntx_api.external_data import VERSION_TIMESPANS
+import kmd_ntx_api.external_data as external_data
 from kmd_ntx_api.lib_const import SINCE_INTERVALS
 
 
@@ -34,8 +34,9 @@ def seednode_version_context(request):
 
 def get_active_mm2_versions(ts):
     active_versions = []
-    for version in VERSION_TIMESPANS:
-        if int(ts) < VERSION_TIMESPANS[version]["end"]:
+    versions = external_data.version_timespans()
+    for version in versions:
+        if int(ts) < versions[version]["end"]:
             active_versions.append(version)
     return active_versions
 

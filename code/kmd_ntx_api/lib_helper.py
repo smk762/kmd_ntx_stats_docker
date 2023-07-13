@@ -15,7 +15,7 @@ from django.http import JsonResponse
 from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.navigation import NAV_DATA
 import kmd_ntx_api.lib_struct as struct
-from kmd_ntx_api.external_data import COINS_CONFIG
+import kmd_ntx_api.external_data as external_data
 
 
 def keys_to_list(_dict):
@@ -37,7 +37,7 @@ def has_error(_dict):
     return False
 
 def get_coins_config():
-    return COINS_CONFIG
+    return external_data.coins_config()
 
 
 def get_month_epoch_range(year=None, month=None):
@@ -389,12 +389,13 @@ def sort_dict(item: dict):
     
 
 def get_eco_data_link():
-    if len(ECOSYSTEM_LINKS) == 0:
+    ecosystem_links = external_data.ecosystem_links()
+    if len(ecosystem_links) == 0:
         return ""
-    item = random.choice(ECOSYSTEM_LINKS)
+    item = random.choice(ecosystem_links)
     ad = random.choice(item['ads'])
     while ad['frequency'] == "never": 
-        item = random.choice(ECOSYSTEM_LINKS)
+        item = random.choice(ecosystem_links)
         ad = random.choice(item['ads'])
     link = ad['data']['string1']+" <a href="+ad['data']['link']+"> " \
           +ad['data']['anchorText']+"</a> "+ad['data']['string2']

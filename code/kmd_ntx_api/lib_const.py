@@ -10,7 +10,6 @@ from django.contrib import messages
 from os.path import expanduser, dirname, realpath
 
 import kmd_ntx_api.lib_struct as struct
-import kmd_ntx_api.external_data as ECOSYSTEM_LINKS
 from kmd_ntx_api.notary_pubkeys import get_notary_pubkeys
 
 load_dotenv()
