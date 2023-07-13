@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 from django.http import JsonResponse
+
+from kmd_ntx_api.seednodes import get_seednode_version_month_table, \
+    get_seednode_version_score_total
+
 import kmd_ntx_api.lib_atomicdex as dex
 import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_table as table
@@ -20,7 +24,7 @@ def seednode_version_date_table_api(request):
 
 
 def seednode_version_month_table_api(request):
-    return JsonResponse(dex.get_seednode_version_month_table(request), safe=False)
+    return JsonResponse(get_seednode_version_month_table(request), safe=False)
 
 
 def seednode_version_score_total_api(request):

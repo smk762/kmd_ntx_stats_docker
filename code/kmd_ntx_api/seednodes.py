@@ -7,8 +7,7 @@ import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
 from kmd_ntx_api.external_data import VERSION_TIMESPANS
 from kmd_ntx_api.lib_const import SINCE_INTERVALS
-from kmd_ntx_api.lib_atomicdex import get_active_mm2_versions, \
-    get_seednode_version_date_table, get_seednode_version_month_table
+from kmd_ntx_api.lib_atomicdex import get_seednode_version_month_table
 
 def seednode_version_context(request):
     active_version = " & ".join(get_active_mm2_versions(time.time()))
