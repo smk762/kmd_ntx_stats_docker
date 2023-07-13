@@ -7,15 +7,16 @@ import logging
 import requests
 from dotenv import load_dotenv
 from django.contrib import messages
-import kmd_ntx_api.lib_struct as struct
-from kmd_ntx_api.notary_pubkeys import get_notary_pubkeys
 from os.path import expanduser, dirname, realpath
+
+import kmd_ntx_api.lib_struct as struct
+import kmd_ntx_api.external_data as ECOSYSTEM_LINKS
+from kmd_ntx_api.notary_pubkeys import get_notary_pubkeys
 
 load_dotenv()
 OTHER_SERVER = os.getenv("OTHER_SERVER") # IP / domain of the remote server
 THIS_SERVER = os.getenv("THIS_SERVER")   # IP / domain of the local server
 BASIC_PW = os.getenv("BASIC_PW")         # Simple pw for restricting views during testing
-
 
 # LOGGING CONST
 logger = logging.getLogger("mylogger")
@@ -153,8 +154,6 @@ SEASONS_INFO = {
     }
 }
 
-NOW = time.time()
-print(f"building regions info {NOW}")
 for _season in SEASONS_INFO:
     pubkeys = get_notary_pubkeys()
     if _season in pubkeys:
@@ -172,28 +171,20 @@ for _season in SEASONS_INFO:
                 _region = "DEV"
             SEASONS_INFO[_season]["regions"][_region]['nodes'].append(_notary)
 
-NOW = time.time()
-print(f"building seasons info {NOW}")
 POSTSEASON = False
 
 for _season in SEASONS_INFO:
     if _season.find("Testnet") == -1:
-        if SEASONS_INFO[_season]["start_time"] < NOW:
+        if SEASONS_INFO[_season]["start_time"] < time.time():
             if "post_season_end_time" in SEASONS_INFO[_season]:
-                if SEASONS_INFO[_season]["post_season_end_time"] > NOW:
+                if SEASONS_INFO[_season]["post_season_end_time"] > time.time():
                     POSTSEASON = True
                     SEASON = _season
-            elif SEASONS_INFO[_season]["end_time"] > NOW:
+            elif SEASONS_INFO[_season]["end_time"] > time.time():
                     SEASON = _season
 
 
-NOW = time.time()
-print(f"building ecodata info {NOW}")
 POSTSEASON = False
-# Links to ecosystem sites
-_url = "https://raw.githubusercontent.com/"
-_url += "gcharang/data/master/info/ecosystem.json"
-ECO_DATA = {} # requests.get(_url).json()
 
 VOTE_YEAR = "VOTE2022"
 

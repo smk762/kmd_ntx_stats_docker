@@ -15,6 +15,7 @@ from django.http import JsonResponse
 from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.navigation import NAV_DATA
 import kmd_ntx_api.lib_struct as struct
+from kmd_ntx_api.external_data import COINS_CONFIG
 
 
 def keys_to_list(_dict):
@@ -35,11 +36,8 @@ def has_error(_dict):
         return True
     return False
 
-
-
-
 def get_coins_config():
-    return refresh_external_data(COINS_CONFIG_PATH, COINS_CONFIG_URL)
+    return COINS_CONFIG
 
 
 def get_month_epoch_range(year=None, month=None):
@@ -218,28 +216,24 @@ def get_sidebar_links(season):
 
 
 def get_base_context(request):
-    print("getting context")
     season = get_page_season(request)
-    server = get_page_server(request)
-    epoch = get_or_none(request, "epoch", "Epoch_0")
-    coin = get_or_none(request, "coin", "KMD")
     notary = get_or_none(request, "notary", random.choice(get_notary_list(season)))
-    address = get_or_none(request, "address")
-    hide_filters = get_or_none(request, "hide_filters", [])
+    epoch = get_or_none(request, "epoch", "Epoch_0")
     selected = {}
     [selected.update({i: request.GET[i]}) for i in request.GET]
-
     context = {
         "season": season,
         "season_clean": season.replace("_"," "),
-        "server": server,
+        "server": get_page_server(request),
         "epoch": epoch,
-        "coin": coin,
+        "coin": get_or_none(request, "coin", "KMD"),
         "notary": notary,
         "notary_clean": get_notary_clean(notary),
-        "address": address,
+        "year": get_or_none(request, "year"),
+        "month": get_or_none(request, "month"),
+        "address": get_or_none(request, "address"),
         "selected": selected,
-        "hide_filters": hide_filters,
+        "hide_filters": get_or_none(request, "hide_filters", []),
         "regions": ["AR", "EU", "NA", "SH", "DEV"],
         "epoch_clean": epoch.replace("_"," "),
         "explorers": get_explorers(), 
@@ -395,12 +389,12 @@ def sort_dict(item: dict):
     
 
 def get_eco_data_link():
-    if len(ECO_DATA) == 0:
+    if len(ECOSYSTEM_LINKS) == 0:
         return ""
-    item = random.choice(ECO_DATA)
+    item = random.choice(ECOSYSTEM_LINKS)
     ad = random.choice(item['ads'])
     while ad['frequency'] == "never": 
-        item = random.choice(ECO_DATA)
+        item = random.choice(ECOSYSTEM_LINKS)
         ad = random.choice(item['ads'])
     link = ad['data']['string1']+" <a href="+ad['data']['link']+"> " \
           +ad['data']['anchorText']+"</a> "+ad['data']['string2']
@@ -457,11 +451,14 @@ def get_notary_region(notary):
     return notary.split("_")[-1]
 
 
+def now():
+    return int(time.time())
+
+
 def get_time_since(timestamp):
     if timestamp == 0:
         return -1, "Never"
-    now = int(time.time())
-    sec_since = now - int(timestamp)
+    sec_since = now() - int(timestamp)
     dms_since = day_hr_min_sec(sec_since)
     return sec_since, dms_since
 

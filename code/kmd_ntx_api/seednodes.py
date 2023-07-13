@@ -7,7 +7,7 @@ import kmd_ntx_api.lib_helper as helper
 import kmd_ntx_api.lib_query as query
 from kmd_ntx_api.external_data import VERSION_TIMESPANS
 from kmd_ntx_api.lib_const import SINCE_INTERVALS
-from kmd_ntx_api.lib_atomicdex import get_seednode_version_month_table
+
 
 def seednode_version_context(request):
     active_version = " & ".join(get_active_mm2_versions(time.time()))
@@ -51,20 +51,12 @@ def get_seednode_version_date_table(request):
     season = helper.get_page_season(request)
     start = int(helper.get_or_none(request, "start", time.time() - SINCE_INTERVALS["day"]))
     end = int(helper.get_or_none(request, "end", time.time()))
-
     notary_list = helper.get_notary_list(season)
     default_scores = helper.prepopulate_seednode_version_date(notary_list)
-
     hour_headers = list(default_scores.keys())
     hour_headers.sort()
     table_headers = ["Notary"] + hour_headers + ["Total"]
-
     data = query.get_seednode_version_stats_data(start=start, end=end)
-    '''
-    if is_testnet:
-        proposals = testnet.get_candidates_proposals(request)
-    '''
-
     scores = data.values()
     for item in scores:
         notary = item["name"]
@@ -81,7 +73,6 @@ def get_seednode_version_date_table(request):
     for notary in notary_list:
         notary_row = {"Notary": notary}
         total = 0
-
         for hour in hour_headers:
             if default_scores[hour][notary]["score"] == 0.2:
                 total += default_scores[hour][notary]["score"]
@@ -92,24 +83,10 @@ def get_seednode_version_date_table(request):
             notary_row.update({
                 hour: default_scores[hour][notary]["score"]
             })
-
         notary_row.update({
             "Total": round(total,1)
         })
-
-        '''
-        if is_testnet:
-            notary = testnet.translate_candidate_to_proposal_name(notary)
-
-            if notary.lower() in proposals: proposal = proposals[notary.lower()]
-            else: proposal = ""
-
-            notary_row.update({
-                "proposal": proposal
-            })                          
-        '''
         table_data.append(notary_row)
-
     return {
         "start": start,
         "date": dt.utcfromtimestamp(end).strftime('%a %-d %B %Y'),
@@ -119,36 +96,17 @@ def get_seednode_version_date_table(request):
         "scores": default_scores
     }
 
-    # TODO: Views for day (by hour), month (by day), season (by month)
-    # Season view: click on month, goes to month view
-    # Month view: click on day, goes to day view
-    # TODO: Incorporate these scores into overall NN score, and profile stats.
 
-
-def get_seednode_version_month_table(request):
-    season =  helper.get_page_season(request)
-    year = helper.get_or_none(request, "year", None)
-    month = helper.get_or_none(request, "month", None)
+def get_seednode_version_month_table(season, year, month):
     start, end, last_day = helper.get_month_epoch_range(year, month)
-
-    '''
-    if is_testnet:
-        proposals = testnet.get_candidates_proposals(request)
-        print(proposals)
-    '''
-
     notary_list = helper.get_notary_list(season)
     default_scores = helper.prepopulate_seednode_version_month(notary_list)
-
     day_headers = list(default_scores.keys())
     day_headers.sort()
-
     table_headers = ["Notary"] + day_headers + ["Total"]
     data = query.get_seednode_version_stats_data(start=start, end=end).values()
-
     for item in data:
         notary = item["name"]
-
         if notary in notary_list:
             score = item["score"]
             if score == 0.2:
@@ -157,36 +115,19 @@ def get_seednode_version_month_table(request):
                 default_scores[day][notary]["score"] += score
                 if item["version"] not in default_scores[day][notary]["versions"]:
                     default_scores[day][notary]["versions"].append(item["version"])
-
     table_data = []
     for notary in notary_list:
         notary_row = {"Notary": notary}
         total = 0
-
         for day in day_headers:
             total += default_scores[day][notary]["score"]
             notary_row.update({
                 day: default_scores[day][notary]["score"]
             })
-
         notary_row.update({
             "Total": round(total,1)
         })
-
-
-        '''
-        if is_testnet:
-            notary = testnet.translate_candidate_to_proposal_name(notary)
-            if notary.lower() in proposals: proposal = proposals[notary.lower()]
-            else: proposal = ""
-
-            notary_row.update({
-                "proposal": proposal
-            })
-        '''
-
         table_data.append(notary_row)
-
     return {
         "date_ts": dt.utcfromtimestamp(end).strftime('%m-%Y'),
         "date": dt.utcfromtimestamp(end).strftime('%b %Y'),
@@ -206,14 +147,11 @@ def get_seednode_version_score_total(request, season=None, start=None, end=None)
     data = query.get_seednode_version_stats_data(start=start, end=end)
     notary_scores = list(data.values('name').order_by('name').annotate(sum_score=Sum('score')))
     notaries_with_scores = data.distinct('name').values_list('name', flat=True)
-
     for notary in notary_list:
         if notary not in notaries_with_scores:
             notary_scores.append({"name": notary, "sum_score": 0})
-
     resp = {}
     for i in notary_scores:
         if i["name"] in notary_list:
             resp.update({i["name"]: round(i["sum_score"],2)})
-
     return resp

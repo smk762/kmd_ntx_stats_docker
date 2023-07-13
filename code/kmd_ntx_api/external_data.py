@@ -22,10 +22,17 @@ def refresh_external_data(file, url):
 HOME = expanduser('~')
 SCRIPT_PATH = dirname(realpath(sys.argv[0]))
 
+# Unified coins config
 COINS_CONFIG_URL = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/utils/coins_config.json"
 COINS_CONFIG_PATH = f"{SCRIPT_PATH}/coins_config.json"
 VERSION_TIMESPANS = refresh_external_data(COINS_CONFIG_PATH, COINS_CONFIG_URL)
 
+# Seed node version epochs
 VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/seednode-update/doc/seed_version_epochs.json"
 VERSION_TIMESPANS_PATH = f"{SCRIPT_PATH}/seed_version_epochs.json"
 VERSION_TIMESPANS = refresh_external_data(VERSION_TIMESPANS_PATH, VERSION_TIMESPANS_URL)
+
+# Links to ecosystem sites
+ECOSYSTEM_LINKS_URL = "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json"
+ECOSYSTEM_LINKS_PATH = f"{SCRIPT_PATH}/ecosystem.json"
+ECOSYSTEM_LINKS = refresh_external_data(ECOSYSTEM_LINKS_URL, ECOSYSTEM_LINKS_PATH)
