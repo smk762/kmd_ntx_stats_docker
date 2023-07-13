@@ -6,7 +6,7 @@ from django.shortcuts import render
 
 # S7 refactoring
 import kmd_ntx_api.profiles as profiles
-from seednodes import seednode_version_context
+from kmd_ntx_api.seednodes import seednode_version_context
 
 # Older
 from kmd_ntx_api.lib_const import *
