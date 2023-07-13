@@ -77,7 +77,7 @@ def ntx_scoreboard_24hrs_view(request, region=None):
  
 def seednode_version_view(request):
     context = helper.get_base_context(request)
-    context.update({seednode_version_context(request)})
+    context.update(seednode_version_context(request))
     return render(request, 'views/atomicdex/seednode_version_stats.html', context)
 
 

@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 from django.db.models import Sum, Max, Count
 from datetime import datetime, timezone
+
+# S7 refactoring
+from kmd_ntx_api.seednodes import get_seednode_version_month_table, \
+    get_seednode_version_score_total, get_seednode_version_date_table
+
+# Older
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_ntx as ntx
 import kmd_ntx_api.lib_info as info
@@ -26,11 +32,11 @@ def get_testnet_scoreboard(request):
     testnet_coins = ["RICK", "MORTY"]
     testnet_stats_dict = get_testnet_stats_dict(season, testnet_coins)
 
-    seednode_scores = dex.get_seednode_version_score_total(request, "VOTE2022_Testnet", 1653091199, 1653436800)
+    seednode_scores = get_seednode_version_score_total(request, "VOTE2022_Testnet", 1653091199, 1653436800)
     for notary in seednode_scores:
         testnet_stats_dict[notary].update({"seednode_score": seednode_scores[notary]})
 
-    seednode_scores_24hr = dex.get_seednode_version_score_total(request, "VOTE2022_Testnet")
+    seednode_scores_24hr = get_seednode_version_score_total(request, "VOTE2022_Testnet")
     for notary in seednode_scores_24hr:
         testnet_stats_dict[notary].update({"24hr_seednode_score": seednode_scores_24hr[notary]})
 

@@ -2,7 +2,7 @@
 from django.http import JsonResponse
 
 from kmd_ntx_api.seednodes import get_seednode_version_month_table, \
-    get_seednode_version_score_total
+    get_seednode_version_score_total, get_seednode_version_date_table
 
 import kmd_ntx_api.lib_atomicdex as dex
 import kmd_ntx_api.lib_helper as helper
@@ -20,7 +20,7 @@ def orderbook_table_api(request):
 
 
 def seednode_version_date_table_api(request):
-    return JsonResponse(dex.get_seednode_version_date_table(request), safe=False)
+    return JsonResponse(get_seednode_version_date_table(request), safe=False)
 
 
 def seednode_version_month_table_api(request):
@@ -29,7 +29,7 @@ def seednode_version_month_table_api(request):
 
 def seednode_version_score_total_api(request):
     filters = ["season", "start", "end"]
-    resp = dex.get_seednode_version_score_total(request)
+    resp = get_seednode_version_score_total(request)
     return helper.json_resp(resp, filters)
     
 
