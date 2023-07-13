@@ -3,14 +3,6 @@ from kmd_ntx_api import views_coin
 
 frontend_coin_urls = [
 
-    path('coin_profile/',
-          views_coin.coin_profile_view,
-          name='coin_profile_index_view'),
-
-    path('coin_profile/<str:coin>/',
-          views_coin.coin_profile_view,
-          name='coin_profile_view'),
-
     path('coins_last_ntx/',
           views_coin.coins_last_ntx,
           name='coins_last_ntx_view'),

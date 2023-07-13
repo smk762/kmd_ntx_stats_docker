@@ -15,6 +15,7 @@ from django.http import JsonResponse
 from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.navigation import NAV_DATA
 import kmd_ntx_api.lib_struct as struct
+import kmd_ntx_api.external_data as external_data
 
 
 def keys_to_list(_dict):
@@ -35,23 +36,8 @@ def has_error(_dict):
         return True
     return False
 
-def refresh_external_data(file, url):
-    if not os.path.exists(file):
-        data = requests.get(url).json()
-        with open(file, "w") as f:
-            json.dump(data, f, indent=4)
-    now = int(time.time())
-    mtime = os.path.getmtime(file)
-    if now - mtime > 86400 * 7: # 7 days
-        data = requests.get(url).json()
-        with open(file, "w") as f:
-            json.dump(data, f, indent=4)
-    with open(file, "r") as f:
-        return json.load(f)
-
-
 def get_coins_config():
-    return refresh_external_data(COINS_CONFIG_PATH, COINS_CONFIG_URL)
+    return external_data.coins_config()
 
 
 def get_month_epoch_range(year=None, month=None):
@@ -230,29 +216,26 @@ def get_sidebar_links(season):
 
 
 def get_base_context(request):
-    print("getting context")
     season = get_page_season(request)
-    server = get_page_server(request)
-    epoch = get_or_none(request, "epoch", "Epoch_0")
-    coin = get_or_none(request, "coin", "KMD")
     notary = get_or_none(request, "notary", random.choice(get_notary_list(season)))
-    address = get_or_none(request, "address")
-    hide_filters = get_or_none(request, "hide_filters", [])
+    epoch = get_or_none(request, "epoch", "Epoch_0")
     selected = {}
     [selected.update({i: request.GET[i]}) for i in request.GET]
-
     context = {
         "season": season,
-        "server": server,
-        "epoch": epoch,
-        "coin": coin,
-        "notary": notary,
-        "address": address,
-        "selected": selected,
-        "hide_filters": hide_filters,
-        "regions": ["AR", "EU", "NA", "SH", "DEV"],
-        "notary_clean": get_notary_clean(notary),
         "season_clean": season.replace("_"," "),
+        "server": get_page_server(request),
+        "epoch": epoch,
+        "coin": get_or_none(request, "coin", "KMD"),
+        "notary": notary,
+        "notary_clean": get_notary_clean(notary),
+        "year": get_or_none(request, "year"),
+        "month": get_or_none(request, "month"),
+        "address": get_or_none(request, "address"),
+        "selected": selected,
+        "hide_filters": get_or_none(request, "hide_filters", []),
+        "region": get_or_none(request, "region", "EU"),
+        "regions": ["AR", "EU", "NA", "SH", "DEV"],
         "epoch_clean": epoch.replace("_"," "),
         "explorers": get_explorers(), 
         "coin_icons": get_coin_icons(),
@@ -407,12 +390,13 @@ def sort_dict(item: dict):
     
 
 def get_eco_data_link():
-    if len(ECO_DATA) == 0:
+    ecosystem_links = external_data.ecosystem_links()
+    if len(ecosystem_links) == 0:
         return ""
-    item = random.choice(ECO_DATA)
+    item = random.choice(ecosystem_links)
     ad = random.choice(item['ads'])
     while ad['frequency'] == "never": 
-        item = random.choice(ECO_DATA)
+        item = random.choice(ecosystem_links)
         ad = random.choice(item['ads'])
     link = ad['data']['string1']+" <a href="+ad['data']['link']+"> " \
           +ad['data']['anchorText']+"</a> "+ad['data']['string2']
@@ -420,6 +404,7 @@ def get_eco_data_link():
 
 
 def get_dpow_server_coins_dict(season=None):
+    # This is messy, and should be moved to cache
     if not season:
         season = SEASON
     url = f"{THIS_SERVER}/api/info/dpow_server_coins"
@@ -429,17 +414,17 @@ def get_dpow_server_coins_dict(season=None):
         "Main": dpow_main_coins.json()['results'],
         "Third_Party": dpow_3p_coins.json()['results']
     }
-    
     return coins_dict
 
+
 def get_dpow_server_coins_list(season=None):
+    # This is messy, and should be moved to cache
     if not season:
         season = SEASON
     url = f"{THIS_SERVER}/api/info/dpow_server_coins"
     dpow_main_coins = requests.get(f"{url}/?season={season}&server=Main")
     dpow_3p_coins = requests.get(f"{url}/?season={season}&server=Third_Party")
     coins_list = dpow_main_coins.json()['results'] + dpow_3p_coins.json()['results']
-    
     return coins_list
 
 
@@ -469,11 +454,14 @@ def get_notary_region(notary):
     return notary.split("_")[-1]
 
 
+def now():
+    return int(time.time())
+
+
 def get_time_since(timestamp):
     if timestamp == 0:
         return -1, "Never"
-    now = int(time.time())
-    sec_since = now - int(timestamp)
+    sec_since = now() - int(timestamp)
     dms_since = day_hr_min_sec(sec_since)
     return sec_since, dms_since
 

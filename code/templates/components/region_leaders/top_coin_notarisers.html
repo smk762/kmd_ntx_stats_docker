@@ -1,18 +1,18 @@
-
+<!-- Top Coin Notarisation Scores -->
 	<div class="row mx-auto" style="color: #b9b5b5;">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto">
 			<div class="card text-center kmd_ui_light3" style="border:none !important; background-color: #101721 !important; box-shadow: none; margin-top:0 !important;">
 			    <div class="justify-content-between align-items-center">
-				    {% for region, data in top_coin_notarisers.items %}
-				    	{% if region == 'AR' %}
+				    {% for selected_region, data in top_coin_notarisers.items %}
+				    	{% if selected_region == 'AR' %}
 							{% include "components/region_leaders/region_leader.html" with region_name="Asia & Russia" alt_text=data.top_notary %}
-						{% elif region == 'EU' %}
+						{% elif selected_region == 'EU' %}
 							{% include "components/region_leaders/region_leader.html" with region_name="European Union" alt_text=data.top_notary %}
-						{% elif region == 'NA' %}
+						{% elif selected_region == 'NA' %}
 							{% include "components/region_leaders/region_leader.html" with region_name="North America" alt_text=data.top_notary %}
-						{% elif region == 'SH' %}
+						{% elif selected_region == 'SH' %}
 							{% include "components/region_leaders/region_leader.html" with region_name="Sth Hemisphere" alt_text=data.top_notary %}
-						{% elif region == 'DEV' %}
+						{% elif selected_region == 'DEV' %}
 							{% include "components/region_leaders/region_leader.html" with region_name="Development" alt_text=data.top_notary %}
 						{% endif %}	
 					{% endfor %}

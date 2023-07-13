@@ -104,7 +104,7 @@ def get_daily_stats_sorted(season=None, coins_dict=None):
 
         daily_stats[region].append({
             "notary": notary_name,
-            "btc": notary_ntx_24hr_summary["btc_ntx"],
+            "master": notary_ntx_24hr_summary["master_ntx"],
             "main": notary_ntx_24hr_summary["main_ntx"],
             "third_party": notary_ntx_24hr_summary["third_party_ntx"],
             "seed": notary_ntx_24hr_summary["seed_node_status"],
