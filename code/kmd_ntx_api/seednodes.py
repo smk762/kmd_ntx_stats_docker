@@ -98,7 +98,10 @@ def get_seednode_version_date_table(request):
     }
 
 
-def get_seednode_version_month_table(season, year, month):
+def get_seednode_version_month_table(request):
+    season = helper.get_page_season(request)
+    year = helper.get_or_none(request, "year", dt.utcnow().year)
+    month = helper.get_or_none(request, "month", dt.utcnow().month)
     start, end, last_day = helper.get_month_epoch_range(year, month)
     notary_list = helper.get_notary_list(season)
     default_scores = helper.prepopulate_seednode_version_month(notary_list)
