@@ -49,8 +49,9 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
     return render(request, 'views/coin/coin_profile_index.html', context)
 
 
-def ntx_scoreboard_view(request):
+def ntx_scoreboard_view(request, region=None):
     context = helper.get_base_context(request)
+    context["region"] = helper.get_or_none(request, "region", region)
     season_stats_sorted = stats.get_season_stats_sorted(context["season"])
     context.update({
         "page_title": f"Notarisation Scoreboard",
@@ -62,8 +63,9 @@ def ntx_scoreboard_view(request):
     return render(request, 'views/ntx/ntx_scoreboard.html', context)
 
 
-def ntx_scoreboard_24hrs_view(request):
+def ntx_scoreboard_24hrs_view(request, region=None):
     context = helper.get_base_context(request)
+    context["region"] = helper.get_or_none(request, "region", region)
     context.update({
         "page_title": f"Last 24hrs Notarisation Scoreboard",
         "anchored": True,
