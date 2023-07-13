@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+
 	<!-- Season Region Leaders -->
 	{% include "components/region_leaders/region_ntx_leaders.html" with stats_data=season_stats_sorted heading='Top Region Notarisation Scores' period='season' %}
 	<!-- Region NTX Ranks Table -->
-	{% include "components/tables/ntx/region_ntx_rank_tables.html" with stats_data=season_stats_sorted %}
+	{% include "components/tables/ntx/region_ntx_rank_tables.html" with stats_data=season_stats_sorted period='season' %}
+
+
 {% endblock %}

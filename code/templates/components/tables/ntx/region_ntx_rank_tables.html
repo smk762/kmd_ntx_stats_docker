@@ -57,7 +57,13 @@
 {% endfor %}
 
 <script>
-  let url = "{% url 'daily_stats_sorted_api' %}?season={{ season }}"
+
+{% if period == 'season' %}
+    let url = "{% url 'season_stats_sorted_api' %}?season={{ season }}"
+{% else %}
+    let url = "{% url 'daily_stats_sorted_api' %}?season={{ season }}"
+{% endif %}
+  
   $(document).ready(function() {
       AR_table = get_region_scoreboard_table(
           '{{ season }}', 'AR', url, "{{ season_clean }} AR Notarisation Ranks (24hr)"
