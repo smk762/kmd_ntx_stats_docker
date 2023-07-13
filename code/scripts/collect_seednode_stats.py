@@ -127,12 +127,16 @@ seednodes = {
 		'PeerID': '12D3KooWCSidNncnbDXrX5G6uWdFdCBrMpaCAqtNxSyfUcZgwF7t'
 	},
 	'gcharang_DEV': {
-		'IP': '3p.dev.lordofthechains.com',
-		'PeerID': '12D3KooWH3p4ysSPRK6t12HpMkQkwXHtXbjwyKstAst4CRBjrJXe'
+		'IP': 'mm-dev.lordofthechains.com',
+		'PeerID': '12D3KooWMEwnQMPUHcGw65xMmhs1Aoc8WSEfCqTa9fFx2Y3PM9xg'
 	},
 	'gcharang_SH': {
-		'IP': '3p.sh.lordofthechains.com',
-		'PeerID': '12D3KooWK9nDcy9EYQEKedsZd749RKQ1SWJ9v34aDMKvdBjJfZTF'
+		'IP': 'mm-sh.lordofthechains.com',
+		'PeerID': '12D3KooWHAk9eJ78pwbopZMeHMhCEhXbph3CJ8Hbz5L1KWTmPf8C'
+	},
+	'gcharang_AR': {
+		'IP': 'mm-ar.lordofthechains.com',
+		'PeerID': '12D3KooWDsFMoRoL5A4ii3UonuQZ9Ti2hrc7PpytRrct2Fg8GRq9'
 	},
 	'mcrypt_SH': {
 		'IP': 'mcrypt2.v6.rocks',
