@@ -2,9 +2,7 @@
 {% load static %}
 {% block content %}
 
-	{% include "components/region_leaders/region_ntx_leaders.html" %}
-
-
+	{% include "components/region_leaders/region_ntx_leaders.html" with stats_data=season_stats_sorted %}
 	{% for selected_region, region_data in season_stats_sorted.items %}
 		{% if region == selected_region %}
 		<div class="row" id="{{ selected_region }}">
