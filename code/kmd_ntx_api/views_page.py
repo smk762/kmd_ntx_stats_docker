@@ -28,7 +28,6 @@ def dash_view(request, dash_name=None):
     ntx_season = data.count()
     ntx_24hr = data.filter(block_time__gt=str(day_ago)).count()
 
-
     # Get Mining Stats
     try:
         mined_data = query.get_mined_data(season=season)
@@ -49,7 +48,6 @@ def dash_view(request, dash_name=None):
         print(e)
         biggest_block = 0
     
-
     coins_dict = helper.get_dpow_server_coins_dict(season)
     coins_list = []
     for server in coins_dict: 

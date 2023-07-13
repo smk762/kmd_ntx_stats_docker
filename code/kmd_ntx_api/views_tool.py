@@ -3,6 +3,10 @@ import requests
 from django.shortcuts import render
 from datetime import datetime as dt
 
+# S7 refactoring
+import kmd_ntx_api.buttons as buttons
+
+# Older
 from kmd_ntx_api.lib_const import *
 import kmd_ntx_api.lib_base58 as b58
 import kmd_ntx_api.lib_info as info
@@ -326,19 +330,7 @@ def notaryfaucet_view(request):
                 "status":item[7]
             })
 
-    buttons = ["faucet_balances", "faucet_history"]
-    button_params = {
-        "faucet_balances": {
-            "action": f"show_card('faucet_balances', {buttons})",
-            "width_pct": 17,
-            "text": "Faucet Balances"
-        },
-        "faucet_history": {
-            "action": f"show_card('faucet_history', {buttons})",
-            "width_pct": 17,
-            "text": "Faucet History"
-        }
-    }
+
     context = helper.get_base_context(request)
     context.update({
         "page_title": "Notary Faucet",
@@ -347,7 +339,7 @@ def notaryfaucet_view(request):
         "sum_24hrs": sum_24hrs,
         "coins_list": coins_list,
         "tx_rows": tx_rows,
-        "buttons": button_params,
+        "buttons": buttons.get_faucet_buttons(),
         "faucet_balances": faucet_balances
     })
 
@@ -377,22 +369,9 @@ def notaryfaucet_view(request):
 
 def kmd_rewards_view(request):
     context = helper.get_base_context(request)
-    buttons = ["accrued-rewards", "rewards-history"]
-    button_params = {
-        "accrued-rewards": {
-            "action": f"show_card('accrued-rewards', {buttons})",
-            "width_pct": 19,
-            "text": "Accrued Rewards"
-        },
-        "rewards-history": {
-            "action": f"show_card('rewards-history', {buttons})",
-            "width_pct": 19,
-            "text": "Rewards History"
-        }
-    }
     context.update({
         "page_title":"KMD Rewards Tool",
-        "buttons": button_params,
+        "buttons": buttons.get_rewards_buttons(),
     })
 
     address = helper.get_or_none(request, "address")

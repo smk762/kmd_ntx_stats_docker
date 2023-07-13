@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-	
-		{% include "components/region_leaders/region_ntx_leaders.html" %}
-		{% include "components/region_leaders/region_ntx_leaders_24hr.html" %}
+	<!-- Season Region Leaders -->
+	{% include "components/region_leaders/region_ntx_leaders.html" with stats_data=season_stats_sorted heading='Top Region Notarisation Scores' period='season' %}
+	<!-- Season Region Leaders (24hrs) -->
+	{% include "components/region_leaders/region_ntx_leaders.html" with stats_data=daily_stats_sorted heading='Top Region Notarisation Scores (24hr)' period='day' %}
 
 	<div class="row my-4">
 		<div class="card-deck d-flex justify-content-between col-12 m-auto shadow-none">

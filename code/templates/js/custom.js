@@ -409,6 +409,7 @@
 
 	function get_region_scoreboard_table(season, region, url, title='') {
 
+
 		const dom = '<"row mx-0 p-0 my-2 "<"row '+region+'_notarisations-tbl-title col-md-6 p-0 m-0"><"col-sm-12 col-md-6"f>>tr<"row mx-0 p-0 my-2 d-flex justify-content-between"<"'+region+'_notarisations-api-link">ip>'
 	    table = $('#'+region+'_notarisations').DataTable({
 	    	"paging": false,

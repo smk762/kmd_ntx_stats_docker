@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import os
+import sys
+from os.path import expanduser, dirname, realpath
 import time
 import requests
 import logging
@@ -96,5 +98,10 @@ KNOWN_NOTARIES = list(set(KNOWN_NOTARIES))
 KNOWN_NOTARIES.sort()
 
 CLEAN_UP = False
+
+HOME = expanduser('~')
+SCRIPT_PATH = dirname(realpath(sys.argv[0]))
+COINS_CONFIG_URL = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/utils/coins_config.json"
+COINS_CONFIG_PATH = f"{SCRIPT_PATH}/coins_config.json"
 
 print(f"{int(time.time()) - NOW} sec to complete const")

@@ -12,19 +12,19 @@
 			{% endfor %}
 	</div>
 	<div class="">
-		<a class="badge stat_badge my-1 p-2 mx-auto" style="font-size: 1.3em" href="{% url 'notary_profile_index_view' %}{{ item.notary }}/?season={{ season }}"> {{ item.notary }} <br /><span style="font-size: 1.3em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
+		<a class="badge stat_badge my-1 p-2 mx-auto" style="font-size: 1.3em" href="{% url 'notary_profile_view' notary=item.notary %}/?season={{ season }}"> {{ item.notary }} <br /><span style="font-size: 1.3em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
 	</div>
 
 	
 	{% if anchored %}
-
-		{% if region == 'AR' %}
+		{% if region == selected_region %}
 		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button btn-selected py-1 px-4 m-0" onclick="show_region('{{ region }}')">{{ region_name }}</div></a>
 		{% else %}
-		<div id="{{ region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0" onclick="show_region('{{ region }}')">{{ region_name }}</div></a>
+		<div id="{{ selected_region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0" onclick="show_region('{{ selected_region }}')">{{ region_name }}</div></a>
 		{% endif %}
-
+	{% elif period == 'day' %}
+		<a href="{% url 'ntx_scoreboard_view' %}?region={{ selected_region }}"><div id="{{ selected_region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0">{{ region_name }}</div></a>
 	{% else %}
-		<a href="{% url 'ntx_scoreboard_view' %}"><div id="{{ region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0">{{ region_name }}</div></a>
+		<a href="{% url 'ntx_scoreboard_24hrs_view' %}?region={{ selected_region }}"><div id="{{ selected_region }}_btn" class="list-group-item btn badge-footer-button py-1 px-4 m-0">{{ region_name }}</div></a>
 	{% endif %}
 </div>

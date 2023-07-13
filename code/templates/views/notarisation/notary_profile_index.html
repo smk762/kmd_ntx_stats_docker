@@ -5,11 +5,11 @@
 
 	{% include 'components/buttons/action_buttons_row.html' with buttons=buttons %}
 	
-	{% for region, info in nn_regions.items %}
-		{% if region == 'AR' %}
-			<div id="{{region}}" class="section-anchor">
+	{% for selected_region, info in nn_regions.items %}
+		{% if region == selected_region %}
+			<div id="{{ selected_region }}" class="section-anchor">
 		{% else %}
-			<div id="{{region}}" class="section-anchor"	 style="display: none;">
+			<div id="{{ selected_region }}" class="section-anchor"	 style="display: none;">
 		{% endif %}
 				<div class="row m-1 d-flex justify-content-between">	
 			    	{% for node in info.nodes %}

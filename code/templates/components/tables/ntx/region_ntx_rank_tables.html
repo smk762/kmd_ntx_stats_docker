@@ -1,0 +1,84 @@
+<!-- Region NTX Rank tables -->
+{% for selected_region, region_data in stats_data.items %}
+    {% if region == selected_region %}
+        <div class="row" id="{{ selected_region }}">
+    {% else %}
+        <div class="row" id="{{ selected_region }}" style="display: none;">
+    {% endif %}
+        <div class="card table_card floating-card m-auto col-12">
+            <div class="card-body table_card_body">
+                <table id="{{ selected_region }}_notarisations" class="table table-striped table-bordered" style="font-size:1.2em;">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4">Rank</th>
+                            <th class="py-2 px-4">Notary</th>
+                            <th class="py-2 px-4">LTC</th>
+                            <th class="py-2 px-4">Main</th>
+                            <th class="py-2 px-4">3P</th>
+                            <th class="py-2 px-4">Seed</th>
+                            <th class="py-2 px-4">Mined</th>
+                            <th class="py-2 px-4">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in region_data %}
+                        <tr>
+                            <td data-data="rank" class="px-2">
+                                {{ item.rank }}
+                            </td>
+                            <td data-data="notary" class="px-4">
+                                {{ item.notary }}
+                            </td>
+                            <td data-data="master" class="px-4">
+                                {{ item.master }}
+                            </td>
+                            <td data-data="main" class="px-4">
+                                {{ item.main }}
+                            </td>
+                            <td data-data="third_party" class="px-4">
+                                {{ item.third_party }}
+                            </td>
+                            <td data-data="seed" class="px-4">
+                                <a href="{% url 'seednode_version_view' %}">{{ item.seed }}</a>
+                            </td>
+                            <td data-data="mining" class="px-4">
+                                <a href="{% url 'notary_mining_view' %}{{ item.notary }}">{{ item.mining }}</a>
+                            </td>
+                            <td data-data="score" class="px-4">
+                                {{ item.score|floatformat:-3 }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>	
+    </div>
+{% endfor %}
+
+<script>
+$(document).ready(function() {
+    {% if period == 'season' %}
+        let url = "{% url 'season_stats_sorted_api' %}?season={{ season }}"
+        let suffix = ""
+    {% else %}
+        let url = "{% url 'daily_stats_sorted_api' %}?season={{ season }}"
+        let suffix = " (24hr)"
+    {% endif %}
+    AR_table = get_region_scoreboard_table(
+        '{{ season }}', 'AR', url, "{{ season_clean }} AR Notarisation Ranks" + suffix
+    )
+    EU_table = get_region_scoreboard_table(
+        '{{ season }}', 'EU', url, "{{ season_clean }} EU Notarisation Ranks" + suffix
+    )
+    NA_table = get_region_scoreboard_table(
+        '{{ season }}', 'NA', url, "{{ season_clean }} NA Notarisation Ranks" + suffix
+    )
+    SH_table = get_region_scoreboard_table(
+        '{{ season }}', 'SH', url, "{{ season_clean }} SH Notarisation Ranks" + suffix
+    )
+    DEV_table = get_region_scoreboard_table(
+        '{{ season }}', 'DEV', url, "{{ season_clean }} DEV Notarisation Ranks" + suffix
+    )
+});
+</script>

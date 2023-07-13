@@ -7,21 +7,29 @@ frontend_ntx_urls = [
           views_ntx.notary_profile_view,
           name='notary_profile_index_view'),
 
-    path('notary/notary_coin_ntx_detail/',
-          views_ntx.notary_coin_ntx_detail_view,
-          name='notary_coin_ntx_detail_view'),    
-
     path('notary_profile/<str:notary>/',
           views_ntx.notary_profile_view,
           name='notary_profile_view'),
 
+    path('coin_profile/',
+          views_ntx.coin_profile_view,
+          name='coin_profile_index_view'),
+
+    path('coin_profile/<str:coin>/',
+          views_ntx.coin_profile_view,
+          name='coin_profile_view'),
+
     path('ntx_scoreboard/',
-          views_ntx.ntx_scoreboard,
+          views_ntx.ntx_scoreboard_view,
           name='ntx_scoreboard_view'),
 
     path('ntx_scoreboard_24hrs/',
-          views_ntx.ntx_scoreboard_24hrs,
+          views_ntx.ntx_scoreboard_24hrs_view,
           name='ntx_scoreboard_24hrs_view'),
+
+    path('atomicdex/seednode_version/',
+         views_ntx.seednode_version_view,
+         name='seednode_version_view'),
 
     path('notary_epoch_scores/',
           views_ntx.notary_epoch_scores_view,
@@ -36,7 +44,7 @@ frontend_ntx_urls = [
           name='notary_coin_notarised_view'),
 
     path('notarised_24hrs/',
-          views_ntx.notarised_24hrs,
+          views_ntx.notarised_24hrs_view,
           name='notarised_24hrs_view'),
 
     path('notarisation/',

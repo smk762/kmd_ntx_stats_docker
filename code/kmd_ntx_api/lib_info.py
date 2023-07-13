@@ -162,7 +162,7 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
         coins_dict = helper.get_dpow_server_coins_dict(season)
 
     notary_ntx_24hr = {
-            "btc_ntx": 0,
+            "master_ntx": 0,
             "main_ntx": 0,
             "third_party_ntx": 0,
             "seed_node_status": 0,
@@ -192,7 +192,7 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
             notary_ntx_24hr["score"] += ntx_score
 
     max_ntx_count = 0
-    btc_ntx_count = 0
+    master_ntx_count = 0
     main_ntx_count = 0
     third_party_ntx_count = 0
 
@@ -202,7 +202,7 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
             max_coin = coin
             max_ntx_count = coin_ntx_count
         if coin == "KMD": 
-            btc_ntx_count += coin_ntx_count
+            master_ntx_count += coin_ntx_count
         elif coin in main_coins:
             main_ntx_count += coin_ntx_count
         elif coin in third_party_coins:
@@ -219,7 +219,7 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=None, coins_dict=None):
 
     if max_ntx_count > 0:
         notary_ntx_24hr.update({
-                "btc_ntx": btc_ntx_count,
+                "master_ntx": master_ntx_count,
                 "main_ntx": main_ntx_count,
                 "third_party_ntx": third_party_ntx_count,
                 "seed_node_status": round(seed_node_score, 2),
