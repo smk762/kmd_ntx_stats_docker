@@ -5,6 +5,24 @@
         return "<a href='"+url+"'>"+text+"</a>"
     }
 
+	function get_faucet_txid(coin, txid) {
+		if (txid == 'n/a') {
+        	return "<span class='p-0' style='border-radius: 50%;' data-toggle='tooltip' data-placement='top' title='Awaiting drip...'><i class='fas fa-hourglass-half' style='color:white'></i></i></span>";
+    	} else {
+        	return get_txid_url(coin, txid);
+        }
+	}
+
+	function get_richlist_celldata(addresses) {
+		let linked_addresses = []
+		$.each(addresses, function(i, p) {
+			linked_addresses.push(
+				get_richlist_url(addresses[i])
+			)
+		})
+		return linked_addresses.join("<br />")
+	}
+
     function get_miningpool_url(name) {
         switch(name) {
             case "k1pool (Mining Pool)":
@@ -165,5 +183,22 @@
         notary_txt = format_notary(notary)
         return "<a href=\"{% url 'notary_profile_index_view' %}"+notary+"/?season="+season+"\">"+notary_txt+"</a>"
     }
+
+	function get_explorer(coin) {
+		if (!(explorers.hasOwnProperty(coin))) {
+			return false
+		}
+		else {
+			for (let x of explorers[coin]) {
+				if (explorers.length == 1) {
+					return x
+				}
+				if (x.search("dexstats") > -1) {
+					return x
+				}
+			}
+			return explorers[coin][0]
+		}	
+	}
 
 </script>
