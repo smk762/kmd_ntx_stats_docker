@@ -1,5 +1,5 @@
 {% block content %}
-
+    <!-- table_coin_activation.html -->
     <div class="row col-12 m-auto">
         <div class="card table_card floating-card m-auto col-12" id="activation-card" style=" font-size: 1.1em;" >
             <div class="card-header table_card_header col-12">
@@ -17,14 +17,14 @@
             </div>
             <div class="card-footer table_card_footer col-12">
                 <p>
-                    To generate a batch activation command, you can <a href="//{{ request.get_host }}/atomicdex/batch_activation_form/">use the form</a>
+                    To generate a batch activation command, you can <a href="/atomicdex/batch_activation_form/">use the form</a>
                 </p>
             </div>
         </div>
     </div>
       <script>
         $(document).ready(function() {
-            let url = "{{ endpoint }}"
+            let url = "/api/table/coin_activation/"
             const dom = '{% include "components/tables/dt_dom.html" with table="activation" %}'
             $('#activation-table').DataTable({
                  "ajax": {
@@ -56,10 +56,14 @@
                         "data": "command",
                         "targets": 2,
                         "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                            let copy_button = '<button type="button" class="append-btn copy-btn" data-clipboard-target="#x_'+oData.coin+'_command" style="line-height: 1em;">\
-                                    {% include 'components/icons/copy_icon.html' %}\
+                            let copy_button = '<button type="button" class="append-btn copy-btn" data-clipboard-target="#x_'
+                                + oData.coin
+                                + '_command" style="line-height: 1em;"> \
+                                  {% include 'components/icons/copy_icon.html' %} \
                                 </button>'
-                            $(nTd).html("<div class='row'><div class='' id='x_"+oData.coin+"_command' style='font-size: 0.8em; color:#969696;  width: 92%;'>"
+                            $(nTd).html("<div class='row'><div class='' id='x_"
+                                + oData.coin
+                                + "_command' style='font-size: 0.8em; color:#969696;  width: 92%;'>"
                                 + JSON.stringify(oData.command).replaceAll(",", ", ")
                                 + "</div>"
                                 + "<div style='width: 8%; align-self:center'>"

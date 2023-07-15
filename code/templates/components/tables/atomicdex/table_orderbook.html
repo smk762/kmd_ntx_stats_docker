@@ -1,4 +1,4 @@
-
+<!-- table_orderbook.html -->
 	<div class="row col-12 m-auto">
 		<div class="card table_card floating-card m-auto col-12" id="last-swaps-card" style="font-size: 1.1em;" >
 			<div class="card-body table_card_body col-12">
@@ -19,34 +19,17 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-
-    	function get_url() {
-	    	let base = $('#base').val() == undefined ? '{{ base }}' :  $('#base').val()
-	    	let rel = $('#rel').val() == undefined ? '{{ rel }}' :  $('#rel').val()
-	    	let url = "{{ endpoint }}?base="+base+"&rel="+rel
-	    	/*
-	    	$('#price-lbl').html(base+' Price')
-	    	$('#min-volume-lbl').html(base+' Min Volume')
-	    	$('#maxvolume-lbl').html(base+' Max Volume')
-	    	$('#total-lbl').html(rel+' Total')
-	    	*/
-	    	return url
-    	}
-
-    	// Load json into var
-    	// connect bid / ask data to their tables
 		    
 	    $(document).ready(function() {
 	    	const orderbook_dom = '{% include "components/tables/dt_dom.html" with table="orderbook" %}'
 
 			{% autoescape off %}	
 		    	const dropdown_pair = `{% include 'components/form/dropdown_pair.html' with id_a='base' label_a='Base ' width_a='125px' id_b='rel' label_b='Rel ' width_b='125px' action="switch_combos('#base', '#rel')" %}`
-				var options = {{ mm2_coins }}
 			{% endautoescape %}
 
 	        const orderbook_table = $('#orderbook').DataTable({
 	     		"ajax": {
-				    "url": get_url(),
+				    "url": get_orderbook_table_url(),
 	    			'dataSrc': 'results',
 	    			"deferRender": true
 				},
@@ -101,22 +84,22 @@
 			    ],
 		        fnInitComplete: function(){
 		            $('.orderbook-tbl-title').html(dropdown_pair);
-		            let api_btn = get_api_button("orderbook", 100, get_url(), "Source Data")
+		            let api_btn = get_api_button("orderbook", 100, get_orderbook_table_url(), "Source Data")
 		            $('.orderbook-api-link').html(api_btn);
 		    		$('#base').select2();
 		    		$('#rel').select2();
 
-		            add_dropdown_options(options, '#base', '{{ base }}')
-		            add_dropdown_options(options, '#rel', '{{ rel }}')
+		            add_dropdown_options(mm2_coins, '#base', '{{ base }}')
+		            add_dropdown_options(mm2_coins, '#rel', '{{ rel }}')
 
 				    $('#rel').on('select2:select', function (e) {
-				    	orderbook_table.ajax.url(get_url()).load()
+				    	orderbook_table.ajax.url(get_orderbook_table_url()).load()
 					});
 				    $('#rel').on('change', function (e) {
-				    	orderbook_table.ajax.url(get_url()).load()
+				    	orderbook_table.ajax.url(get_orderbook_table_url()).load()
 					});
 				    $('#base').on('select2:select', function (e) {
-				    	orderbook_table.ajax.url(get_url()).load()
+				    	orderbook_table.ajax.url(get_orderbook_table_url()).load()
 					});
 		        }
 	        });
