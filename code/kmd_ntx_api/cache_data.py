@@ -4,8 +4,6 @@ import time
 import json
 import requests
 from os.path import expanduser, dirname, realpath
-
-import kmd_ntx_api.notary_seasons as notary_seasons
 from kmd_ntx_api.logger import logger
 
 
