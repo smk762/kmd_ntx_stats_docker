@@ -31,7 +31,7 @@ def get_base_context(request):
         "explorers": explorers_cache(), 
         "coin_icons": coin_icons_cache(),
         "dpow_coins": get_dpow_coins(season, True),
-        "notary_icons": notary_icons_cache(season),
+        "notary_icons": notary_icons_cache(),
         "notaries": get_notary_list(season),
         "sidebar_links": get_sidebar_links(season),
         "nav_data": navigation_cache(),
