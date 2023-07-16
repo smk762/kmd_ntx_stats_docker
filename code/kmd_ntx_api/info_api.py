@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from kmd_ntx_api.info import get_api_index, get_pages_index, get_mined_between_blocks, \
+from kmd_ntx_api.info import get_pages_index, get_mined_between_blocks, \
     get_mined_between_blocktimes, get_base_58_coin_params, get_balances, get_coins, \
     get_coin_prefixes, get_daemon_cli, get_dpow_server_coins_info, get_explorers, \
     get_coin_icons, get_electrums, get_electrums_ssl, get_launch_params, \
@@ -11,11 +11,6 @@ from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.helper import json_resp, get_page_server, get_time_since
 from kmd_ntx_api.notary_seasons import get_page_season, get_season, get_seasons_info
 
-
-def api_index(request):
-    resp = get_api_index(request)
-    filters = ['category', 'sidebar']
-    return json_resp(resp, filters)
 
 
 def pages_index(request):

@@ -3,11 +3,6 @@ from kmd_ntx_api import info_api
 
 api_info_urls = [
 
-    # API INFO V2
-    path('api/index/',
-          info_api.api_index,
-          name='api_index'),
-
     path('info/mined_between_blocks/',
          info_api.mined_between_blocks,
          name='mined_between_blocks_api'),
