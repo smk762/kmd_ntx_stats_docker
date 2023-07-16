@@ -28,10 +28,10 @@ SCRIPT_PATH = dirname(realpath(sys.argv[0]))
 
 
 # OPCODES CONST
-OP_DUP = b'76'
-OP_HASH160 = b'a9'
-OP_EQUALVERIFY = b'88'
-OP_CHECKSIG = b'ac'
+OP_DUP = '76'
+OP_HASH160 = 'a9'
+OP_EQUALVERIFY = '88'
+OP_CHECKSIG = 'ac'
 
 
 # DPOW CONST
