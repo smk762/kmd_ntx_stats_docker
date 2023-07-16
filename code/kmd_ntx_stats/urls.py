@@ -1,12 +1,7 @@
 from django.conf import settings
 from django.conf.urls import url
-from django.contrib import admin
 from django.urls import include, path
-from rest_framework import routers
 
-from kmd_ntx_api import views_api
-from kmd_ntx_api import tools_api
-from kmd_ntx_api import graph_api
 
 from kmd_ntx_stats.urls_atomicdex import frontend_atomicdex_urls, api_atomicdex_urls
 
@@ -20,7 +15,7 @@ from kmd_ntx_stats.urls_docs import doc_urls
 from kmd_ntx_stats.urls_community import frontend_community_urls
 from kmd_ntx_stats.urls_page import frontend_page_urls
 from kmd_ntx_stats.urls_ntx import frontend_ntx_urls, api_ntx_urls
-from kmd_ntx_stats.urls_stats import frontend_stats_urls, api_stats_urls
+from kmd_ntx_stats.urls_stats import frontend_stats_urls
 from kmd_ntx_stats.urls_tool import frontend_tool_urls, api_tool_urls
 from kmd_ntx_stats.urls_mining import frontend_mining_urls, api_mining_urls
 from kmd_ntx_stats.urls_testnet import frontend_testnet_urls, api_testnet_urls
