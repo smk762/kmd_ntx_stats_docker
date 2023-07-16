@@ -22,7 +22,7 @@ def get_seasons_info() -> dict:
                     region = "DEV"
                 if notary not in seasons[season]["regions"][region]['nodes']:
                     seasons[season]["regions"][region]['nodes'].append(notary)
-    refresh_cache_data(SEASONS_PATH, data=seasons)
+    refresh_cache_data(SEASONS_PATH, data=seasons, True)
     logger.info(seasons)
     return seasons
 get_seasons_info()

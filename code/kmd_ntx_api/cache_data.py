@@ -7,12 +7,12 @@ from os.path import expanduser, dirname, realpath
 from kmd_ntx_api.logger import logger
 
 
-def refresh_cache_data(file, url=None, data=None):
+def refresh_cache_data(file, url=None, data=None, force=False):
     if not os.path.exists(file):
         update_cache_data(file, url, data)
     now = int(time.time())
     mtime = os.path.getmtime(file)
-    if now - mtime > 86400: # 24 hrs
+    if now - mtime > 86400 or force: # 24 hrs
         update_cache_data(file, url, data)
     return get_cache_data(file)
 
@@ -27,14 +27,14 @@ def get_cache_data(file):
 
 def update_cache_data(file, url=None, data=None):
     try:
-        if not data:
+        if url and not data:
             data = requests.get(url).json()
         if "results" in data:
             data = data["results"]
         with open(file, "w+") as f:
             json.dump(data, f, indent=4)
     except Exception as e:
-        logger.warning(f"Failed to {file} from {url}: {e}")
+        logger.warning(f"Failed to update {file} from {url}: {e}")
 
 
 
