@@ -222,21 +222,27 @@ class notarised():
     @print_runtime
     def import_ntx(self, server, coin):
 
-        import_txids_url = urls.get_ntxid_list_url(self.season, server, coin, False)
-        import_txids = requests.get(import_txids_url).json()["results"]
+        url = urls.get_ntxid_list_url(self.season, server, coin, False)
+        import_txids = requests.get(url)
+        if requests.status_codes == 429:
+            time.sleep(0.5)
+            return
+        import_txids = r.json()["results"]
 
         new_txids = list(set(import_txids)-set(self.existing_txids))
         logger.info(f"NTX TXIDs to import: {len(new_txids)}")
         logger.info(f"Processing ETA: {0.03*len(new_txids)} sec")
 
         for txid in new_txids:
-            time.sleep(0.02)
+            time.sleep(0.05)
             txid_url = urls.get_notarised_txid_url(txid, False)
             r = requests.get(txid_url)
-
-            for txid_info in r.json()["results"]:
-                ntx_row = self.get_import_row(txid_info)
-                ntx_row.update()
+            try:
+                for txid_info in r.json()["results"]:
+                    ntx_row = self.get_import_row(txid_info)
+                    ntx_row.update()
+            except Exception as e:
+                logger.error(f"Error importing {txid}: {e} | r.text: {r.text}")
 
 
 # Daily Notarised tables
