@@ -29,12 +29,10 @@ def get_seasons_info() -> dict:
 
 def get_season(timestamp: int=int(time.time())) -> str:
     seasons = notary_seasons_cache()
+    print(seasons)
     for season in seasons:
-        if seasons:
-            if 'post_season_end_time' in seasons[season]:
-                end_time = seasons[season]['post_season_end_time']
-            else:
-                end_time = seasons[season]['end_time']
+        if 'post_season_end_time' in seasons[season]:
+            end_time = seasons[season]['post_season_end_time']
         else:
             end_time = seasons[season]['end_time']
         if timestamp >= seasons[season]['start_time'] and timestamp <= end_time:

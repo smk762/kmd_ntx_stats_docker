@@ -106,7 +106,9 @@ def get_mainnet_coins(coins_dict):
 
 def get_regions_info(season):
     seasons_info = get_seasons_info()
-    return seasons_info[season]["regions"]
+    if season in seasons_info:
+        return seasons_info[season]["regions"]
+    return {}
 
 
 def get_page_server(request):
