@@ -20,11 +20,11 @@ from kmd_ntx_stats.urls_tool import frontend_tool_urls, api_tool_urls
 from kmd_ntx_stats.urls_mining import frontend_mining_urls, api_mining_urls
 from kmd_ntx_stats.urls_testnet import frontend_testnet_urls, api_testnet_urls
 
-handler400 = 'kmd_ntx_api.views_error.error_400'
-handler403 = 'kmd_ntx_api.views_error.error_403'
-handler404 = 'kmd_ntx_api.views_error.error_404'
-handler500 = 'kmd_ntx_api.views_error.error_500'
-handler502 = 'kmd_ntx_api.views_error.error_502'
+handler400 = 'kmd_ntx_api.error_views.error_400'
+handler403 = 'kmd_ntx_api.error_views.error_403'
+handler404 = 'kmd_ntx_api.error_views.error_404'
+handler500 = 'kmd_ntx_api.error_views.error_500'
+handler502 = 'kmd_ntx_api.error_views.error_502'
 
 
 # /api/info/{endpoint} will be deprecated
