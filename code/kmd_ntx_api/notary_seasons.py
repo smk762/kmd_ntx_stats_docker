@@ -24,6 +24,7 @@ def get_seasons_info() -> dict:
                 if region not in seasons[season]["regions"].keys():
                     region = "DEV"
                 seasons[season]["regions"][region]['nodes'].append(notary)
+    return seasons
 
 
 def get_season(timestamp: int=int(time.time())) -> str:
