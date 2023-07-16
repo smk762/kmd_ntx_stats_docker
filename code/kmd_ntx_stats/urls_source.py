@@ -1,108 +1,108 @@
 from rest_framework import routers
-from kmd_ntx_api import api_viewsets
+from kmd_ntx_api import viewsets_api
 
 source_router = routers.DefaultRouter()
 
 #admin
-source_router.register(r'users', api_viewsets.UserViewSet,
+source_router.register(r'users', viewsets_api.UserViewSet,
                 basename='UserViewSet')
 
-source_router.register(r'groups', api_viewsets.GroupViewSet,
+source_router.register(r'groups', viewsets_api.GroupViewSet,
                 basename='GroupViewSet')
 
 # API MODEL VIEWSETS (Paginated Source)
 source_router.register(r'addresses',
-                api_viewsets.addressesViewSet,
+                viewsets_api.addressesViewSet,
                 basename='addressesViewSet')
 
 source_router.register(r'balances',
-                api_viewsets.balancesViewSet,
+                viewsets_api.balancesViewSet,
                 basename='balancesViewSet')
 
 source_router.register(r'coins',
-                api_viewsets.coinsViewSet,
+                viewsets_api.coinsViewSet,
                 basename='coinsViewSet')
 
 source_router.register(r'coin_ntx_season',
-                api_viewsets.coinNtxSeasonViewSet,
+                viewsets_api.coinNtxSeasonViewSet,
                 basename='coinNtxSeasonViewSet')
 
 source_router.register(r'coin_social',
-                api_viewsets.coinSocialViewSet,
+                viewsets_api.coinSocialViewSet,
                 basename='coinSocialViewSet')
 
 source_router.register(r'coin_last_ntx',
-                api_viewsets.coinLastNtxViewSet,
+                viewsets_api.coinLastNtxViewSet,
                 basename='coinLastNtxViewSet')
 
 source_router.register(r'notary_last_ntx',
-                api_viewsets.notaryLastNtxViewSet,
+                viewsets_api.notaryLastNtxViewSet,
                 basename='notaryLastNtxViewSet')
 
 source_router.register(r'mined',
-                api_viewsets.minedViewSet,
+                viewsets_api.minedViewSet,
                 basename='minedViewSet') 
 
 source_router.register(r'seednode_version_stats',
-                api_viewsets.mm2VersionStatsViewSet,
+                viewsets_api.mm2VersionStatsViewSet,
                 basename='mm2VersionStatsViewSet')
 
 source_router.register(r'mined_count_daily',
-                api_viewsets.minedCountDailyViewSet,
+                viewsets_api.minedCountDailyViewSet,
                 basename='minedCountDailyViewSet')
 
 source_router.register(r'mined_count_season',
-                api_viewsets.minedCountSeasonViewSet,
+                viewsets_api.minedCountSeasonViewSet,
                 basename='minedCountSeasonViewSet')
 
 source_router.register(r'nn_btc_tx',
-                api_viewsets.nnBtcTxViewSet,
+                viewsets_api.nnBtcTxViewSet,
                 basename='nnBtcTxViewSet')
 
 source_router.register(r'nn_ltc_tx',
-                api_viewsets.nnLtcTxViewSet,
+                viewsets_api.nnLtcTxViewSet,
                 basename='nnLtcTxViewSet')
 
 source_router.register(r'nn_social',
-                api_viewsets.nnSocialViewSet,
+                viewsets_api.nnSocialViewSet,
                 basename='nnSocialViewSet')
 
 source_router.register(r'notarised',
-                api_viewsets.notarisedViewSet,
+                viewsets_api.notarisedViewSet,
                 basename='notarisedViewSet') # doc
 
 source_router.register(r'notarised_coin_daily',
-                api_viewsets.notarisedCoinDailyViewSet,
+                viewsets_api.notarisedCoinDailyViewSet,
                 basename='notarisedCoinDailyViewSet')
 
 source_router.register(r'notarised_count_daily',
-                api_viewsets.notarisedCountDailyViewSet,
+                viewsets_api.notarisedCountDailyViewSet,
                 basename='notarisedCountDailyViewSet')
 
 source_router.register(r'notary_ntx_season',
-                api_viewsets.notaryNtxSeasonViewSet,
+                viewsets_api.notaryNtxSeasonViewSet,
                 basename='notaryNtxSeasonViewSet')
 
 source_router.register(r'notarised_tenure',
-                api_viewsets.notarisedTenureViewSet,
+                viewsets_api.notarisedTenureViewSet,
                 basename='notarisedTenureViewSet')
 
 source_router.register(r'scoring_epochs',
-                api_viewsets.scoringEpochsViewSet,
+                viewsets_api.scoringEpochsViewSet,
                 basename='scoringEpochsViewSet')
 
 source_router.register(r'server_ntx_season',
-                api_viewsets.serverNtxSeasonViewSet,
+                viewsets_api.serverNtxSeasonViewSet,
                 basename='serverNtxSeasonViewSet')
 
 source_router.register(r'rewards_tx',
-                api_viewsets.rewardsTxViewSet,
+                viewsets_api.rewardsTxViewSet,
                 basename='rewardsTxViewSet')
 
 source_router.register(r'notary_vote',
-                api_viewsets.notaryVoteViewSet,
+                viewsets_api.notaryVoteViewSet,
                 basename='notaryVoteViewSet')
 
 source_router.register(r'notary_candidates',
-                api_viewsets.notaryCandidatesViewSet,
+                viewsets_api.notaryCandidatesViewSet,
                 basename='notaryCandidatesSerializer')

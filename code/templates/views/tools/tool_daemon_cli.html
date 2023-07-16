@@ -11,7 +11,7 @@
 				    <div class="input-group mb-1 ">
 					    <div class="input-group-prepend prepend-label-left p-0 col-2 text-left">
 					        <span class="input-group-text col-12">
-						      	<a class="" href='//{{ request.get_host }}/coin_profile/{{ item.coin }}'>
+						      	<a class="" href='/coin_profile/{{ item.coin }}'>
 									{% for coin, icon in coin_icons.items %}
 										{% if coin == item.coin %}
 			                        		<img height="16px" class="mr-2" src="{{ icon }}" />

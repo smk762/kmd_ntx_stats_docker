@@ -343,7 +343,7 @@
 	function make_graph(graphtype, url, id) {
 	    $.ajax({ 
 			method: "GET", 
-			url: '//{{ request.get_host }}/api/graph_json/balances/?coin={{ coin }}', 
+			url: '/api/graph_json/balances/?coin={{ coin }}', 
 			success: function(data) { 
 				//document.getElementById('graph_title').innerHTML = data.chartLabel;
 				if (graphtype == 'line') {

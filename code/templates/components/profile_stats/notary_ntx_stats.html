@@ -19,13 +19,13 @@
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    <div class="px-2 py-1 stat-li-div col-12 d-flex justify-content-between align-items-center">
 					    	Notarised Season
-							<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+							<a href="/ntx_scoreboard/?season={{ season }}">
 						    	{% include "components/badges/stats_badge.html" with stat_val=master_server_count stat_label="LTC" %}
 						    </a>
-							<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+							<a href="/ntx_scoreboard/?season={{ season }}">
 						    	{% include "components/badges/stats_badge.html" with stat_val=main_server_count stat_label="Main" %}
 						    </a>
-							<a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+							<a href="/ntx_scoreboard/?season={{ season }}">
 						    	{% include "components/badges/stats_badge.html" with stat_val=third_party_server_count stat_label="3rd Party" %}
 						    </a>
 						</div>									    
@@ -33,7 +33,7 @@
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    <div class="px-2 py-1 stat-li-div col-12 d-flex justify-content-between align-items-center">
 						    Last Notarisation
-							<a href="//{{ request.get_host }}/coins_last_ntx/?season={{ season }}">
+							<a href="/coins_last_ntx/?season={{ season }}">
    						    	{% include "components/badges/stats_badge.html" with stat_val=last_ntx_time stat_label=last_ntx_coin %}
 						    </a>
 						</div>
@@ -41,7 +41,7 @@
 					  <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    <div class="px-2 py-1 stat-li-div col-12 d-flex justify-content-between align-items-center">
 					    	Last LTC Notarisation
-							<a href="//{{ request.get_host }}/coins_last_ntx/?season={{ season }}">
+							<a href="/coins_last_ntx/?season={{ season }}">
    						    	{% include "components/badges/stats_badge.html" with stat_val=last_ltc_ntx_time stat_label="" %}
 						    </a>
 						</div>
@@ -49,13 +49,13 @@
 					    <li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					    	<div class="px-2 py-1 stat-li-div col-12 d-flex justify-content-between align-items-center">
 							    Score
-							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+							    <a href="/ntx_scoreboard/?season={{ season }}">
 						    		{% include "components/badges/stats_badge.html" with stat_val=ntx_score|floatformat:-3 stat_label="Notarisation" %}
 					    		</a>
 							    <a href="{% url 'seednode_version_view' %}?season={{ season }}">
 						    		{% include "components/badges/stats_badge.html" with stat_val=seed_score|floatformat:-3 stat_label="Seed Node" %}
 					    		</a>
-							    <a href="//{{ request.get_host }}/ntx_scoreboard/?season={{ season }}">
+							    <a href="/ntx_scoreboard/?season={{ season }}">
 						    		{% include "components/badges/stats_badge.html" with stat_val=season_score|floatformat:-3 stat_label="Total" %}
 					    		</a>
 							</div>

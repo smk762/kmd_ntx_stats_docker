@@ -11,7 +11,7 @@ import dateutil.parser as dp
 
 import lib_urls as urls
 from lib_helper import *
-from lib_ntx import *
+from ntx import *
 from lib_update import update_nn_ltc_tx_notary_from_addr
 from lib_query import get_existing_nn_ltc_txids, get_existing_notarised_txids
 from lib_api import get_ltc_tx_info

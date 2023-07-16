@@ -3,7 +3,8 @@ import json
 from django.contrib import messages
 from django.shortcuts import render
 from kmd_ntx_api.cache_data import activation_commands_cache
-from kmd_ntx_api.helper import get_base_context, get_or_none
+from kmd_ntx_api.helper import get_or_none
+from kmd_ntx_api.context import get_base_context
 from kmd_ntx_api.forms import EnableCommandForm, MakerbotForm
 from kmd_ntx_api.atomicdex import get_last_200_swaps, format_gui_os_version
 

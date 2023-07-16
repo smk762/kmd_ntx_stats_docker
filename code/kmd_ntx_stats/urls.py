@@ -5,21 +5,20 @@ from django.urls import include, path
 from rest_framework import routers
 
 from kmd_ntx_api import views_api
-from kmd_ntx_api import api_tools
-from kmd_ntx_api import api_graph
+from kmd_ntx_api import tools_api
+from kmd_ntx_api import graph_api
 
 from kmd_ntx_stats.urls_atomicdex import frontend_atomicdex_urls, api_atomicdex_urls
+
 from kmd_ntx_stats.urls_source import source_router
 from kmd_ntx_stats.urls_csv import api_csv_urls
 from kmd_ntx_stats.urls_graph import api_graph_urls
 from kmd_ntx_stats.urls_info import api_info_urls
-from kmd_ntx_stats.urls_status import api_status_urls
 from kmd_ntx_stats.urls_table import frontend_table_urls, api_table_urls
 from kmd_ntx_stats.urls_wallet import api_wallet_urls
 from kmd_ntx_stats.urls_docs import doc_urls
 from kmd_ntx_stats.urls_community import frontend_community_urls
 from kmd_ntx_stats.urls_page import frontend_page_urls
-from kmd_ntx_stats.urls_coin import frontend_coin_urls, api_coins_urls
 from kmd_ntx_stats.urls_ntx import frontend_ntx_urls, api_ntx_urls
 from kmd_ntx_stats.urls_stats import frontend_stats_urls, api_stats_urls
 from kmd_ntx_stats.urls_tool import frontend_tool_urls, api_tool_urls
@@ -44,32 +43,18 @@ urlpatterns = [
 
     path('api/source/',
          include(source_router.urls)),
+    path('api-auth/',
+      include('rest_framework.urls',
+        namespace='rest_framework')),
 
     # We dont really need or use this
-    #path('admin/',
+    # path('admin/',
     #      admin.site.urls),
-
-    path('api-auth/',
-         include('rest_framework.urls',
-            namespace='rest_framework')),
-
-    # API views (simple)
-    # TODO: Deprecate or merge into other url files
-
-    path('api/info/sidebar_links/',
-          views_api.api_sidebar_links,
-          name='api_sidebar_links'),
-
-    path('api/info/split_summary_api/',
-          views_api.split_summary_api,
-          name='split_summary_api'),
-    
 ]
 
 url_lists = [
     frontend_ntx_urls, api_ntx_urls,
     frontend_tool_urls, api_tool_urls,
-    frontend_coin_urls, api_coins_urls,
     frontend_table_urls, api_table_urls,
     frontend_mining_urls, api_mining_urls,
     frontend_testnet_urls, api_testnet_urls,
@@ -78,8 +63,7 @@ url_lists = [
     frontend_stats_urls,
     frontend_community_urls,
     api_csv_urls, api_graph_urls,
-    api_info_urls, api_status_urls,
-    api_wallet_urls, doc_urls    
+    api_info_urls, api_wallet_urls, doc_urls
 ]
 
 for i in url_lists:

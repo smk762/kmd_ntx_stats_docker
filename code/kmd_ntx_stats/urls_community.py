@@ -1,11 +1,11 @@
 from django.urls import path
-from kmd_ntx_api import views_community
+from code.kmd_ntx_api import community_views
 
 # TOOL VIEWS
 frontend_community_urls = [
 
     path('community/cryptopuzzles/',
-          views_community.puzzles_view,
+          community_views.puzzles_view,
           name='puzzles_view'),
 
 ]

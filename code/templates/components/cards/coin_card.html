@@ -2,7 +2,7 @@
 {% load static %}
     	<div class="card coin_card" style="width: 150px;">
     		<div class="card-header coin_card_header coin_card_name">
-    			<a href="//{{ request.get_host }}/coin_profile/{{ coin }}">
+    			<a href="/coin_profile/{{ coin }}">
     				{{ coin }}
 				{% for ticker, site_links in coin_social.items %}
 					{% if ticker == coin %}

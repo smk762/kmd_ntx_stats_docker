@@ -5,18 +5,18 @@
     <ul class="c-sidebar-nav ">
         {% for page, item in pages.items %}
             {% if item.review %}
-                <li class="c-sidebar-nav-item"><a href="//{{ request.get_host }}/{{page}}"> {{page}} (review)</a></li>
+                <li class="c-sidebar-nav-item"><a href="/{{page}}"> {{page}} (review)</a></li>
             {% else %}
-                <li class="c-sidebar-nav-item"><a href="//{{ request.get_host }}/{{page}}"> {{page}}</a></li>
+                <li class="c-sidebar-nav-item"><a href="/{{page}}"> {{page}}</a></li>
             {% endif %}
         {% endfor %}
     </ul>
         <br />
         {% for endpoint, item in endpoints.items %}
             {% if item.review %}
-                <li class="c-sidebar-nav-item"><a href="//{{ request.get_host }}/api/{{endpoint}}"> {{endpoint}} (review)</a></li>
+                <li class="c-sidebar-nav-item"><a href="/api/{{endpoint}}"> {{endpoint}} (review)</a></li>
             {% else %}
-                <li class="c-sidebar-nav-item"><a href="//{{ request.get_host }}/api/{{endpoint}}"> {{endpoint}}</a></li>
+                <li class="c-sidebar-nav-item"><a href="/api/{{endpoint}}"> {{endpoint}}</a></li>
             {% endif %}
         {% endfor %}
 

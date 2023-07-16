@@ -4,7 +4,8 @@ from django.shortcuts import render
 from datetime import datetime as dt
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.query import get_swaps_data, filter_swaps_timespan, get_swaps_counts
-from kmd_ntx_api.helper import get_base_context, get_or_none
+from kmd_ntx_api.helper import get_or_none
+from kmd_ntx_api.context import get_base_context
 from kmd_ntx_api.atomicdex import get_last_200_failed_swaps, format_gui_os_version
 
 

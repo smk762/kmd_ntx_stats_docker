@@ -21,7 +21,7 @@
 					  	<li class="list-group-item border-0 d-flex justify-content-between align-items-center">
 					        <div class="p-2 stat-li-div col-12 d-flex justify-content-between align-items-center">
 							    Time Since Last Notarisation
-							    <a href="//{{ request.get_host }}/coins_last_ntx/?season={{ season }}">
+							    <a href="/coins_last_ntx/?season={{ season }}">
    					    			{% include "components/badges/stats_badge.html" with stat_val=coin_ntx_summary.time_since_ntx stat_label="" %}
    					    		</a>
 							</div>
