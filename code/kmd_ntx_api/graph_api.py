@@ -28,11 +28,6 @@ def mined_xy_data(request):
     return json_resp(resp, raw=True)
     
 
-def production_xy_data(request):
-    filters = ['since', 'from_time', 'to_time']
-    resp = get_production_xy_data(request)
-    return json_resp(resp, raw=True)
-
 
 def supply_xy_data(request):
     filters = ['since', 'from_time', 'to_time']
