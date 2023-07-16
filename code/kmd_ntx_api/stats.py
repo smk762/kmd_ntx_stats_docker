@@ -4,7 +4,7 @@ from django.db.models import Sum, Count
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.helper import get_notary_region, \
     get_notary_list, get_dpow_coins, safe_div, \
-    get_mainnet_coins, get_third_party_coins
+    get_mainnet_coins, get_third_party_coins, days_ago
 from kmd_ntx_api.mining import get_mined_data_24hr
 from kmd_ntx_api.notary_seasons import get_season
 from kmd_ntx_api.ntx import get_notarised_date
@@ -193,8 +193,7 @@ def get_daily_stats_sorted(season=get_season(), coins_dict=None):
         coins_dict = get_dpow_coins(season)
     notary_list = get_notary_list(season)
 
-    day_ago = int(time.time()) - SINCE_INTERVALS['day']
-    data = get_mined_data().filter(block_time__gt=str(day_ago()))
+    data = get_mined_data().filter(block_time__gt=str(days_ago(1)))
     mined_last_24hrs = get_mined_data_24hr().values('name').annotate(mined_24hrs=Sum('value'), blocks_24hrs=Count('value'))
     nn_mined_last_24hrs = {}
     for item in mined_last_24hrs:

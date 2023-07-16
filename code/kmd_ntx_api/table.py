@@ -8,9 +8,8 @@ from django.db.models import Max
 import kmd_ntx_api.models as models
 from kmd_ntx_api.info import get_epoch_coins_dict
 from kmd_ntx_api.const import SINCE_INTERVALS
-from kmd_ntx_api.helper import get_or_none, get_page_server, get_time_since
+from kmd_ntx_api.helper import get_or_none, get_page_server, get_time_since, days_ago
 from kmd_ntx_api.notary_seasons import get_page_season, get_season, get_seasons_info
-
 from kmd_ntx_api.serializers import addressesSerializer, balancesSerializer, \
     coinLastNtxSerializer, coinNtxSeasonSerializer, minedSerializer, \
     minedCountSeasonSerializer, minedCountDailySerializer, nnLtcTxSerializer, \
@@ -647,9 +646,8 @@ def get_coin_ntx_season_table_data(request, coin=None):
 def get_mined_24hrs_table(request):
     name = get_or_none(request, "name")
     address = get_or_none(request, "address")
-    day_ago = int(time.time()) - SINCE_INTERVALS['day']
     data = get_mined_data(None, name, address).filter(
-        block_time__gt=str(day_ago()))
+        block_time__gt=str(days_ago(1)))
     data = data.values()
 
     serializer = minedSerializer(data, many=True)

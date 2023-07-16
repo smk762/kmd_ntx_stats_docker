@@ -12,7 +12,7 @@ from kmd_ntx_api.query import get_notarised_data, get_mined_data
 from kmd_ntx_api.stats import get_season_stats_sorted, get_region_score_stats, get_daily_stats_sorted
 from kmd_ntx_api.info import get_nn_social_info
 from kmd_ntx_api.context import get_base_context
-from kmd_ntx_api.helper import get_dpow_coins, day_ago
+from kmd_ntx_api.helper import get_dpow_coins, days_ago
 from kmd_ntx_api.logger import logger
 
 
@@ -21,7 +21,7 @@ def dash_view(request):
     context = get_base_context(request)
     data = get_notarised_data(season=season, exclude_epoch="Unofficial")
     ntx_season = data.count()
-    ntx_24hr = data.filter(block_time__gt=str(day_ago())).count()
+    ntx_24hr = data.filter(block_time__gt=str(days_ago(1))).count()
     # Get Mining Stats
     try:
         mined_data = get_mined_data(season=season)
@@ -31,7 +31,7 @@ def dash_view(request):
         mined_season = 0
 
     try:
-        mined_24hr = mined_data.filter(block_time__gt=str(day_ago())).aggregate(Sum('value'))['value__sum']        
+        mined_24hr = mined_data.filter(block_time__gt=str(days_ago(1))).aggregate(Sum('value'))['value__sum']        
     except Exception as e:
         logger.error(e)
         mined_24hr = 0

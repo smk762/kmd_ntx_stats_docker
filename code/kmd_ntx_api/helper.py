@@ -19,8 +19,8 @@ def now():
     return int(time.time())
 
 
-def day_ago():
-    return now() - SINCE_INTERVALS['day']
+def days_ago(days=1):
+    return now() - SINCE_INTERVALS['day'] * days
 
 
 def get_time_since(timestamp):

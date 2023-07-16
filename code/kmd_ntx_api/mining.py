@@ -2,14 +2,14 @@
 import requests
 from random import choice
 from django.db.models import Sum
-from kmd_ntx_api.helper import day_ago, get_time_since, get_or_none, get_notary_list
+from kmd_ntx_api.helper import days_ago, get_time_since, get_or_none, get_notary_list
 from kmd_ntx_api.query import get_mined_data, get_mined_count_season_data
 from kmd_ntx_api.notary_seasons import get_season, get_page_season
 from kmd_ntx_api.serializers import minedSerializer
 
 
 def get_mined_data_24hr():
-    data = get_mined_data().filter(block_time__gt=str(day_ago()))
+    data = get_mined_data().filter(block_time__gt=str(days_ago(1)))
     return data
 
 
