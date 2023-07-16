@@ -83,7 +83,4 @@ api_ntx_urls = [
           ntx_api.ntx_tenture_api,
           name='ntx_tenture_api'),
 
-    path('api/ntx/notary_fee_efficiency/',
-          ntx_api.notary_fee_efficiency_api,
-          name='notary_fee_efficiency_api'),
 ]
