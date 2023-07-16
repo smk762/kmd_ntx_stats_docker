@@ -2,7 +2,8 @@
 import time
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.struct import default_regions_info
-from kmd_ntx_api.cache_data import notary_pubkeys_cache, notary_seasons_cache
+from kmd_ntx_api.cache_data import notary_pubkeys_cache, \
+    notary_seasons_cache, refresh_cache_data, SEASONS_PATH
 from kmd_ntx_api.logger import logger
 
 
@@ -23,7 +24,9 @@ def get_seasons_info() -> dict:
                 region = notary.split("_")[-1]
                 if region not in seasons[season]["regions"].keys():
                     region = "DEV"
-                seasons[season]["regions"][region]['nodes'].append(notary)
+                if notary not in seasons[season]["regions"][region]['nodes']:
+                    seasons[season]["regions"][region]['nodes'].append(notary)
+    refresh_cache_data(SEASONS_PATH, data=seasons)
     return seasons
 
 

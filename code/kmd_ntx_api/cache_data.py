@@ -7,13 +7,13 @@ from os.path import expanduser, dirname, realpath
 from kmd_ntx_api.logger import logger
 
 
-def refresh_cache_data(file, url):
+def refresh_cache_data(file, url=None, data=None):
     if not os.path.exists(file):
-        update_cache_data(file, url)
+        update_cache_data(file, url, data)
     now = int(time.time())
     mtime = os.path.getmtime(file)
     if now - mtime > 86400: # 24 hrs
-        update_cache_data(file, url)
+        update_cache_data(file, url, data)
     return get_cache_data(file)
 
 
@@ -25,10 +25,10 @@ def get_cache_data(file):
         return json.load(f)
 
 
-def update_cache_data(file, url):
+def update_cache_data(file, url=None, data=None):
     try:
-        
-        data = requests.get(url).json()
+        if not data:
+            data = requests.get(url).json()
         if "results" in data:
             data = data["results"]
         with open(file, "w+") as f:
@@ -137,4 +137,5 @@ VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/s
 VERSION_TIMESPANS_PATH = f"{CACHE_PATH}/version_timespans.json"
 def version_timespans_cache():
     return refresh_cache_data(VERSION_TIMESPANS_PATH, VERSION_TIMESPANS_URL)
+
 
