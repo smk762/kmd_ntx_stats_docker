@@ -9,9 +9,9 @@ from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.context import get_base_context
 from kmd_ntx_api.helper import get_or_none, get_notary_list, \
     get_coin_server, get_page_server
-from kmd_ntx_api.info import get_notary_seasons, get_nn_social_info
+from kmd_ntx_api.info import get_nn_social_info
 from kmd_ntx_api.logger import logger
-from kmd_ntx_api.notary_seasons import get_page_season
+from kmd_ntx_api.notary_seasons import get_page_season, get_notary_seasons
 from kmd_ntx_api.profiles import get_notary_profile_context, \
     get_notary_profile_index_context, get_coin_profile_context, \
     get_coin_profile_index_context
