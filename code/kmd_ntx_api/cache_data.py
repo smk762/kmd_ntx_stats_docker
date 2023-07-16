@@ -44,14 +44,14 @@ os.makedirs(CACHE_PATH, exist_ok=True)
 
 
 # Activation commands
-ACTIVATION_COMMANDS_URL = "/api/atomicdex/activation_commands/"
+ACTIVATION_COMMANDS_URL = "http://127.0.0.1:8762/api/atomicdex/activation_commands/"
 ACTIVATION_COMMANDS_PATH = f"{CACHE_PATH}/activation_commands.json"
 def activation_commands_cache():
     return refresh_cache_data(ACTIVATION_COMMANDS_PATH, ACTIVATION_COMMANDS_URL)
 
 
 # Base58 Params
-B58_PARAMS_URL = "/api/info/base_58/"
+B58_PARAMS_URL = "http://127.0.0.1:8762/api/info/base_58/"
 B58_PARAMS_PATH = f"{CACHE_PATH}/b58_params.json"
 def b58_params_cache():
     return refresh_cache_data(B58_PARAMS_PATH, B58_PARAMS_URL)
@@ -65,14 +65,14 @@ def coins_config_cache():
 
 
 # Coin icons
-COIN_ICONS_URL = f"/api/info/coin_icons"
+COIN_ICONS_URL = f"http://127.0.0.1:8762/api/info/coin_icons"
 COIN_ICONS_PATH = f"{CACHE_PATH}/coins_icons.json"
 def coin_icons_cache():
     return refresh_cache_data(COIN_ICONS_PATH, COIN_ICONS_URL)
 
 
 # Coins info
-COIN_INFO_URL = f"/api/info/coin"
+COIN_INFO_URL = f"http://127.0.0.1:8762/api/info/coin"
 COIN_INFO_PATH = f"{CACHE_PATH}/coins_info.json"
 def coins_info_cache():
     return refresh_cache_data(COIN_ICONS_PATH, COIN_ICONS_URL)
@@ -93,14 +93,14 @@ def get_electrum_status_cache():
 
 
 # Block Explorers
-EXPLORERS_URL = "/api/info/explorers/"
+EXPLORERS_URL = "http://127.0.0.1:8762/api/info/explorers/"
 EXPLORERS_PATH = f"{CACHE_PATH}/explorers.json"
 def explorers_cache():
     return refresh_cache_data(EXPLORERS_URL, EXPLORERS_PATH)
 
 
 # Launch Params
-LAUNCH_PARAMS_URL = "/api/info/launch_params/"
+LAUNCH_PARAMS_URL = "http://127.0.0.1:8762/api/info/launch_params/"
 LAUNCH_PARAMS_PATH = f"{CACHE_PATH}/launch_params.json"
 def launch_params_cache():
     return refresh_cache_data(LAUNCH_PARAMS_URL, LAUNCH_PARAMS_PATH)
@@ -113,7 +113,7 @@ def navigation_cache():
 
 
 # Notary Icons
-NOTARY_ICONS_URL = f"/api/info/notary_icons/"
+NOTARY_ICONS_URL = f"http://127.0.0.1:8762/api/info/notary_icons/"
 NOTARY_ICONS_PATH = f"{CACHE_PATH}/notary_icons.json"
 def notary_icons_cache():
     return refresh_cache_data(NOTARY_ICONS_PATH, NOTARY_ICONS_URL)
