@@ -7,7 +7,7 @@ from kmd_ntx_api.helper import get_notary_list, get_or_none, get_notary_list, \
     date_hour, get_month_epoch_range, prepopulate_seednode_version_month, \
     prepopulate_seednode_version_date
 from kmd_ntx_api.notary_seasons import get_page_season
-from kmd_ntx_api.cache_data import version_timespans
+from kmd_ntx_api.cache_data import version_timespans_cache
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.query import get_seednode_version_stats_data
 
@@ -36,7 +36,7 @@ def seednode_version_context(request):
 
 def get_active_mm2_versions(ts):
     active_versions = []
-    versions = version_timespans()
+    versions = version_timespans_cache()
     for version in versions:
         if int(ts) < versions[version]["end"]:
             active_versions.append(version)

@@ -11,7 +11,7 @@ from kmd_ntx_api.mining import get_mined_data
 from kmd_ntx_api.explorers import get_sync
 from kmd_ntx_api.ntx import get_notarised_date
 from kmd_ntx_api.notary_seasons import get_page_season, get_season
-from kmd_ntx_api.cache_data import notary_pubkeys
+from kmd_ntx_api.cache_data import notary_pubkeys_cache
 from kmd_ntx_api.serializers import balancesSerializer, notarisedSerializer, \
     coinsSerializer, notarisedCoinDailySerializer, notarisedCountDailySerializer, \
     nnLtcTxSerializer

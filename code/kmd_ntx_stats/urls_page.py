@@ -1,5 +1,5 @@
 from django.urls import path
-from code.kmd_ntx_api import page_views
+from kmd_ntx_api import page_views
 
 frontend_page_urls = [
 

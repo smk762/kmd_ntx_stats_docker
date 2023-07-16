@@ -2,7 +2,7 @@ import random
 from kmd_ntx_api.helper import get_or_none, get_notary_list, get_page_server, \
     get_notary_clean, get_dpow_coins, get_notary_list, get_eco_data_link, get_sidebar_links
 from kmd_ntx_api.notary_seasons import get_page_season
-from kmd_ntx_api.cache_data import explorers, coin_icons, notary_icons, navigation
+from kmd_ntx_api.cache_data import explorers_cache, coin_icons_cache, notary_icons_cache, navigation_cache
 
 
 
@@ -28,13 +28,13 @@ def get_base_context(request):
         "region": get_or_none(request, "region", "EU"),
         "regions": ["AR", "EU", "NA", "SH", "DEV"],
         "epoch_clean": epoch.replace("_"," "),
-        "explorers": explorers(), 
-        "coin_icons": coin_icons(),
+        "explorers": explorers_cache(), 
+        "coin_icons": coin_icons_cache(),
         "dpow_coins": get_dpow_coins(season, True),
-        "notary_icons": notary_icons(season),
+        "notary_icons": notary_icons_cache(season),
         "notaries": get_notary_list(season),
         "sidebar_links": get_sidebar_links(season),
-        "nav_data": navigation(),
+        "nav_data": navigation_cache(),
         "eco_data_link": get_eco_data_link()
     }
     return context

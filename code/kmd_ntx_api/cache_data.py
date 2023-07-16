@@ -53,7 +53,7 @@ def activation_commands_cache():
 # Base58 Params
 B58_PARAMS_URL = "/api/info/base_58/"
 B58_PARAMS_PATH = f"{CACHE_PATH}/b58_params.json"
-def b58_params():
+def b58_params_cache():
     return refresh_cache_data(B58_PARAMS_PATH, B58_PARAMS_URL)
 
 
@@ -67,35 +67,35 @@ def coins_config_cache():
 # Coin icons
 COIN_ICONS_URL = f"/api/info/coin_icons"
 COIN_ICONS_PATH = f"{CACHE_PATH}/coins_icons.json"
-def coins_icons():
+def coins_icons_cache():
     return refresh_cache_data(COIN_ICONS_PATH, COIN_ICONS_URL)
 
 
 # Coins info
 COIN_INFO_URL = f"/api/info/coin"
 COIN_INFO_PATH = f"{CACHE_PATH}/coins.json"
-def coins_info():
+def coins_info_cache():
     return refresh_cache_data(COIN_ICONS_PATH, COIN_ICONS_URL)
 
 
 # Links to ecosystem sites
 ECOSYSTEM_LINKS_URL = "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json"
 ECOSYSTEM_LINKS_PATH = f"{CACHE_PATH}/ecosystem.json"
-def ecosystem_links():
+def ecosystem_links_cache():
     return refresh_cache_data(ECOSYSTEM_LINKS_PATH, ECOSYSTEM_LINKS_URL)
 
 
 # Electrum Status
 ELECTRUM_STATUS_URL = "https://electrum-status.dragonhound.info/api/v1/electrums_status"
 ELECTRUM_STATUS_PATH = f"{CACHE_PATH}/electrum_status.json"
-def get_electrum_status():
+def get_electrum_status_cache():
     return refresh_cache_data(ELECTRUM_STATUS_PATH, ELECTRUM_STATUS_URL)
 
 
 # Block Explorers
 EXPLORERS_URL = "/api/info/explorers/"
 EXPLORERS_PATH = f"{CACHE_PATH}/explorers.json"
-def explorers():
+def explorers_cache():
     return refresh_cache_data(EXPLORERS_URL, EXPLORERS_PATH)
 
 
@@ -108,20 +108,20 @@ def launch_params_cache():
 
 # Navigation
 NAVIGATION_PATH = f"{CACHE_PATH}/navigation.json"
-def navigation():
+def navigation_cache():
     return get_cache_data(NAVIGATION_PATH)
 
 
 # Notary Icons
 NOTARY_ICONS_URL = f"/api/info/notary_icons/"
 NOTARY_ICONS_PATH = f"{CACHE_PATH}/notary_icons.json"
-def notary_icons():
+def notary_icons_cache():
     return refresh_cache_data(NOTARY_ICONS_PATH, NOTARY_ICONS_URL)
 
 
 # Notary Pubkeys
 NOTARY_PUBKEYS_PATH = f"{CACHE_PATH}/notary_pubkeys.json"
-def notary_pubkeys():
+def notary_pubkeys_cache():
     return get_cache_data(EXPLORERS_PATH)
 
 
@@ -134,6 +134,6 @@ def notary_seasons_cache():
 # Seed node version epochs
 VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/seednode-update/doc/seed_version_epochs.json"
 VERSION_TIMESPANS_PATH = f"{CACHE_PATH}/seed_version_epochs.json"
-def version_timespans():
+def version_timespans_cache():
     return refresh_cache_data(VERSION_TIMESPANS_PATH, VERSION_TIMESPANS_URL)
 

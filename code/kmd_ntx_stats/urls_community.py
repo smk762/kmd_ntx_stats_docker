@@ -1,5 +1,5 @@
 from django.urls import path
-from code.kmd_ntx_api import community_views
+from kmd_ntx_api import community_views
 
 # TOOL VIEWS
 frontend_community_urls = [

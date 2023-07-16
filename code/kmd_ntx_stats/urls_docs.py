@@ -1,5 +1,5 @@
 from django.urls import path
-from code.kmd_ntx_api import doc_views
+from kmd_ntx_api import doc_views
 
 # DOC VIEWS
 doc_urls = [

@@ -2,14 +2,14 @@
 import time
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.struct import default_regions_info
-from kmd_ntx_api.cache_data import notary_pubkeys, notary_seasons_cache
+from kmd_ntx_api.cache_data import notary_pubkeys_cache, notary_seasons_cache
 from kmd_ntx_api.logger import logger
 
 
 def get_seasons_info() -> dict:
     seasons = notary_seasons_cache()
     for season in seasons:
-        pubkeys = notary_pubkeys()
+        pubkeys = notary_pubkeys_cache()
         if season in pubkeys:
             seasons[season].update({
                 "regions": default_regions_info()
@@ -64,7 +64,7 @@ def get_page_season(request):
 
 def get_notary_seasons():
     ntx_seasons = {}
-    pubkeys = notary_pubkeys()
+    pubkeys = notary_pubkeys_cache()
     for season in pubkeys:
         for server in pubkeys[season]:
             for notary in pubkeys[season][server]:
