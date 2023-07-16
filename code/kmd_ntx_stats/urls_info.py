@@ -99,18 +99,6 @@ api_info_urls = [
           info_api.notary_nodes_info,
           name='notary_nodes_info'),
 
-    path('api/info/btc_txid_list/',
-          info_api.btc_txid_list,
-          name='btc_txid_list'),
-
-    path('api/info/notary_btc_txid/',
-          info_api.notary_btc_txid,
-          name='notary_btc_txid'),
-
-    path('api/info/notary_btc_transactions/',
-          info_api.notary_btc_transactions,
-          name='notary_btc_transactions'),
-
     path('api/info/ltc_txid_list/',
           info_api.ltc_txid_list,
           name='ltc_txid_list'),

@@ -1625,12 +1625,7 @@ def get_new_nn_ltc_txids(existing_txids, notary_address):
 def get_new_master_server_txids(notary_address, coin, season):
 
     existing_txids = []
-    if coin == "BTC":
-        existing_txids = query.get_existing_nn_btc_txids(notary_address, None, season)
-        url = f"{OTHER_SERVER}/api/info/btc_txid_list/?address={notary_address}&season={season}"
-        logger.info(f"{len(existing_txids)} existing txids in local DB detected for {notary_address} {season}")
-
-    elif coin == "LTC":
+    if coin == "LTC":
         existing_txids = query.get_existing_nn_ltc_txids(notary_address, None, season)
         url = f"{OTHER_SERVER}/api/info/ltc_txid_list/?notary={notary_address}&season={season}"
         logger.info(f"{len(existing_txids)} existing txids in local DB detected for {notary_address} {season}")

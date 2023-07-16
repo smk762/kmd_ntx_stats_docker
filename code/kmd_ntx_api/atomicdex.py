@@ -19,7 +19,7 @@ def get_orderbook(request):
     params = {
         "method": "orderbook",
         "base": get_or_none(request, "base", "KMD"),
-        "rel": get_or_none(request, "rel", "BTC")
+        "rel": get_or_none(request, "rel", "DGB")
     }
     r = mm2_proxy(params)
     return r.json()
