@@ -11,7 +11,7 @@ from datetime import timezone as tz
 from django.http import JsonResponse
 from kmd_ntx_api.const import SINCE_INTERVALS, INTERVALS
 from kmd_ntx_api.notary_seasons import get_seasons_info, get_season
-from kmd_ntx_api.cache_data import coins_config
+from kmd_ntx_api.cache_data import coins_config_cache
 
 
 # Time related functions

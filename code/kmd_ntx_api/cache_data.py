@@ -66,7 +66,7 @@ def coins_config_cache():
 
 # Coin icons
 COIN_ICONS_URL = f"/api/info/coin_icons"
-COIN_ICONS_PATH = f"{CACHE_PATH}/coins_config.json"
+COIN_ICONS_PATH = f"{CACHE_PATH}/coins_icons.json"
 def coins_icons():
     return refresh_cache_data(COIN_ICONS_PATH, COIN_ICONS_URL)
 
