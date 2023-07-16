@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 import time
 from django.http import JsonResponse
-from kmd_ntx_api.notary_seasons import SEASON
 from kmd_ntx_api.mining import get_mined_data_24hr, get_mined_count_daily_by_name, \
     get_notary_mining, get_mined_count_season_by_name
 from kmd_ntx_api.helper import json_resp, get_notary_list
-from kmd_ntx_api.notary_seasons import get_page_season
+from kmd_ntx_api.notary_seasons import get_page_season, get_season
 from kmd_ntx_api.query import get_mined_data
 from kmd_ntx_api.serializers import minedSerializer
 
@@ -42,8 +41,7 @@ def nn_mined_4hrs_api(request):
         block_time__gt=str(int(time.time()-4*60*60))
         ).values()
     serializer = minedSerializer(mined_4hrs, many=True)
-    season = SEASON
-    notary_list = get_notary_list(season)
+    notary_list = get_notary_list(get_season())
     mined_counts_4hr = {}
     for nn in notary_list:
         mined_counts_4hr.update({nn:0})
