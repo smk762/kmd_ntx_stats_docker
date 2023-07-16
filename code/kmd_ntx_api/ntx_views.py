@@ -23,12 +23,14 @@ from kmd_ntx_api.serializers import notarisedSerializer
 from kmd_ntx_api.table import get_notary_epoch_scores_table
 
 
-def notary_profile_view(request):
+def notary_profile_view(request, notary=None):
     context = get_base_context(request)
     # TODO: This is not currently used, but can be added for prior season stats given fully populated databases
-    context.update({"notary_seasons": get_notary_seasons()})
+    context.update({
+        "notary_seasons": get_notary_seasons(),
+        "notary": notary
+    })
     # Base context will return a random notary if one is not specified. For this view, we prefer 'None'.
-    notary = notary = get_or_none(request, "notary")
     season = context["season"]
     if notary in get_notary_list(season):
         context.update(get_notary_profile_context(request, season, notary))
