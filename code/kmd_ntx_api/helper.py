@@ -65,7 +65,7 @@ def get_notary_list(season):
 
 
 def get_dpow_coins(season=get_season(), list=False):
-    url = f"/api/info/dpow_server_coins"
+    url = f"http://127.0.0.1:8762/api/info/dpow_server_coins"
     dpow_main_coins = requests.get(f"{url}/?season={season}&server=Main")
     dpow_3p_coins = requests.get(f"{url}/?season={season}&server=Third_Party")
     if list:
