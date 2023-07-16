@@ -95,20 +95,20 @@ def get_bch_activation(coins_config, coin):
             },
             "tx_history": True,
             "slp_tokens_requests": [],
-            "required_confirmations": 5,
+            "required_confirmations": 3,
             "requires_notarization": False,
             "address_format": coins_config[coin]["address_format"]
         }
     }
     
 
-def get_slp_activation(coins_config, coin):
+def get_slp_activation(coin):
     return {
-        "userpass": "MM2_RPC_PASSWORD",
+        "userpass": "'$userpass'",
         "method": "enable_slp",
         "mmrpc": "2.0",
         "params": {
-            "ticker": "SPICE-SLP",
+            "ticker": coin,
             "activation_params": {
                 "required_confirmations": 3
             }

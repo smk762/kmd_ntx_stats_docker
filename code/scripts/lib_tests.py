@@ -12,8 +12,8 @@ import lib_electrum
 import lib_epochs
 import lib_github
 import lib_helper
-import mining
-import ntx
+import lib_mining
+import lib_ntx
 import lib_query
 import lib_rpc
 import lib_urls
@@ -524,7 +524,7 @@ class TestLibHelper:
 
 class TestLibMining:
     def test_get_mined_row(self):
-        row = mining.get_mined_row(2824869)
+        row = lib_mining.get_mined_row(2824869)
         assert row.block_height == 2824869
         assert row.block_time == 1647487930
         assert row.address == "RKytuA1ubrCD66hNNemcsvyDhDbcR2S1sU"
@@ -552,11 +552,11 @@ class TestLibNtx:
                     'OP_RETURN ab7a0202322a2124c0ceadf15ba2a2a6b1f2838587319ac92cfa3111617b0e029e9d0e00484f444c00e1956043b84a6fe3c8db130ab43d75d26d84b1e681de90e4f3a2b57676cf1b510c000000',\
                     'N/A')
 
-        actual = ntx.get_notarised_data("2e8732b608a37b47307a67abce11922db968435552f2ea6ad0b5b4fda82123d5")
+        actual = lib_ntx.get_notarised_data("2e8732b608a37b47307a67abce11922db968435552f2ea6ad0b5b4fda82123d5")
         assert actual == expected
 
     def test_get_season_ntx_dict(season):
-        season_ntx_dict = ntx.get_season_ntx_dict("Season_5")
+        season_ntx_dict = lib_ntx.get_season_ntx_dict("Season_5")
         season_count = season_ntx_dict["season_ntx_count"]
         season_score = season_ntx_dict["season_ntx_score"]
         assert len(season_ntx_dict["notaries"]) == 64

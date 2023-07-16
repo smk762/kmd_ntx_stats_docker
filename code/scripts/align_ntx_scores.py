@@ -3,7 +3,7 @@ import sys
 from lib_const import *
 import lib_helper as helper
 from decorators import print_runtime
-import ntx
+import lib_ntx
 import lib_update_ntx
 
 '''

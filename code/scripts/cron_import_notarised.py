@@ -3,7 +3,7 @@ import random
 from lib_const import *
 from decorators import *
 import lib_helper as helper
-import ntx
+import lib_ntx
 
 
 @print_runtime
@@ -11,7 +11,7 @@ def import_notarised():
     for season in ["Season_7"]:
         
             season_notaries = helper.get_season_notaries(season)
-            ntx_tbl = ntx.notarised(season)
+            ntx_tbl = lib_ntx.notarised(season)
             servers = helper.get_season_servers(season)
             while len(servers) > 0:
                 server = random.choice(servers)

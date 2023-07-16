@@ -71,7 +71,8 @@ def generate_social_notaries_template(season):
 @print_runtime
 def populate_social_notaries(season):
     try:
-        r = requests.get(get_notary_nodes_repo_elected_nn_social_url(season))
+        url = get_notary_nodes_repo_elected_nn_social_url(season)
+        r = requests.get(url)
         elected_nn_social = r.json()
 
         for notary in SEASONS_INFO[season]["notaries"]:

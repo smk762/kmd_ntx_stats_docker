@@ -426,9 +426,6 @@ class ltc_tx_row():
             logger.warning(f"{row_data}")
 
 
-    def delete(self):
-        delete_nn_ltc_tx_transaction(self.txid)
-
 
 ######### NTX Related ##########
 class notarised_row():
