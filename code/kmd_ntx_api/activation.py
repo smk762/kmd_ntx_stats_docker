@@ -135,7 +135,7 @@ def get_activation_command(coins_config, coin):
     if coin in ["BCH", "tBCH"]:
         platform = "UTXO"
         resp_json.update(get_bch_activation(coins_config, coin))
-    if protocol == "ZHTLC":
+    elif protocol == "ZHTLC":
         platform = "UTXO"
         resp_json.update(get_zhtlc_activation(coins_config, coin))
     elif protocol == "UTXO":
@@ -153,8 +153,8 @@ def get_activation_command(coins_config, coin):
     elif protocol == "TENDERMINTTOKEN":
         platform = 'TENDERMINTTOKEN'
         resp_json.update(get_tendermint_token_activation(coin))
-    elif protocol == "SLP":
-        platform = 'SLP'
+    elif protocol == "SLPTOKEN":
+        platform = 'SLPTOKEN'
         resp_json.update(get_slp_activation(coin))
     elif coin in coins_config:
         resp_json.update(get_emv_activation(coins_config, coin))

@@ -247,10 +247,6 @@
                 "icon": "fa-solid fa-atom",
                 "url": "/atomicdex/activation_commands"
             },
-            "Batch Activation": {
-                "icon": "fa-solid fa-atom",
-                "url": "/atomicdex/batch_activation_form"
-            },
             "Bestorders": {
                 "icon": "fa-solid fa-atom",
                 "url": "/atomicdex/bestorders"
