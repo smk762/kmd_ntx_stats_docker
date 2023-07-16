@@ -6,7 +6,7 @@ import requests
 from os.path import expanduser, dirname, realpath
 
 import kmd_ntx_api.notary_seasons as notary_seasons
-from logger import logger
+from kmd_ntx_api.logger import logger
 
 
 def refresh_cache_data(file, url):
@@ -128,8 +128,8 @@ def notary_pubkeys():
 
 
 # Notary Pubkeys
-SEASONS_PATH = f"{CACHE_PATH}/seasons.json"
-def notary_seasons():
+SEASONS_PATH = f"{CACHE_PATH}/notary_seasons.json"
+def notary_seasons_cache():
     return get_cache_data(SEASONS_PATH)
 
 

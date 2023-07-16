@@ -23,7 +23,7 @@ from kmd_ntx_api.query import get_distinct_filters, apply_filters_api, get_mined
     get_mined_count_season_data, get_notary_last_ntx_data, get_notary_ntx_season_data, \
     get_addresses_data, get_coin_ntx_season_data, get_coin_social_data, get_notarised_tenure_data, \
     get_server_ntx_season_data
-from logger import logger
+from kmd_ntx_api.logger import logger
 
 
 class TableSettings():

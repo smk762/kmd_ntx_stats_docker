@@ -2,7 +2,7 @@
 import datetime
 import random
 from django.shortcuts import render
-from logger import logger
+from kmd_ntx_api.logger import logger
 from kmd_ntx_api.context import get_base_context
 
 def addresses_table_view(request):

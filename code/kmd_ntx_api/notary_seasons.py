@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 import time
-import struct
-from logger import logger
-import cache_data
-import kmd_ntx_api.const as const
-from kmd_ntx_api.cache_data import notary_pubkeys
+from kmd_ntx_api.const import SINCE_INTERVALS
+from kmd_ntx_api.struct import default_regions_info
+from kmd_ntx_api.cache_data import notary_pubkeys, notary_seasons_cache
+from kmd_ntx_api.logger import logger
 
 
 def get_seasons_info() -> dict:
-    seasons = cache_data.seasons()
+    seasons = notary_seasons_cache()
     for season in seasons:
-        pubkeys = cache_data.notary_pubkeys()
+        pubkeys = notary_pubkeys()
         if season in pubkeys:
             seasons[season].update({
-                "regions": struct.default_regions_info()
+                "regions": default_regions_info()
             })
             notaries = list(pubkeys[season]["Main"].keys())
             notaries.sort()
@@ -28,7 +27,7 @@ def get_seasons_info() -> dict:
 
 
 def get_season(timestamp: int=int(time.time())) -> str:
-    seasons = cache_data.seasons()
+    seasons = notary_seasons_cache()
     for season in seasons:
         if seasons:
             if 'post_season_end_time' in seasons[season]:
@@ -45,7 +44,7 @@ def get_season(timestamp: int=int(time.time())) -> str:
 def get_timespan_season(start, end):
     season = get_season()
     if not start:
-        start = time.time() - const.SINCE_INTERVALS['day']
+        start = time.time() - SINCE_INTERVALS['day']
     if not end:
         end = time.time()
     else:

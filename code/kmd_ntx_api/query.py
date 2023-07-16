@@ -12,7 +12,7 @@ from kmd_ntx_api.models import notarised, kmd_supply, mined_count_daily, \
     coin_last_ntx, coin_ntx_season, swaps, swaps_failed, seednode_version_stats
 from kmd_ntx_api.serializers import seednodeVersionStatsSerializer
 from kmd_ntx_api.notary_seasons import get_seasons, get_seasons_info
-from logger import logger
+from kmd_ntx_api.logger import logger
 
 def filter_data_basic(data, **kwargs):
     for i in kwargs:
