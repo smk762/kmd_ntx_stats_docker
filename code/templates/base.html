@@ -73,51 +73,22 @@
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
         {% include "css/kmd.css" %}
         {% include "css/jquery-ui.css" %}
-        {% if graphs %}
-            {% include "css/graphs.css" %}
-        {% endif %}
-        {% if tables %}
-            {% include "css/tables.css" %}
-        {% endif %}
-        {% if buttons %}
-            {% include "js/buttons.js" %}
-        {% endif %}
-        {% if cells %}
-            {% include "js/cells.js" %}
-        {% endif %}
-        {% if charts %}
-            {% include "js/charts.js" %}
-        {% endif %}
-        {% if chrono %}
-            {% include "js/chrono.js" %}
-        {% endif %}
-        {% if components %}
-            {% include "js/components.js" %}
-        {% endif %}
-        {% if explorers %}
-            {% include "js/explorers.js" %}
-        {% endif %}
-        {% if helper %}
-            {% include "js/helper.js" %}
-        {% endif %}
-        {% if icons %}
-            {% include "js/icons.js" %}
-        {% endif %}
-        {% if mm2_coins %}
-            {% include "js/mm2_coins.js" %}
-        {% endif %}
-        {% if rawtransaction %}
-            {% include "js/rawtransaction.js" %}
-        {% endif %}
-        {% if styles %}
-            {% include "js/styles.js" %}
-        {% endif %}
-        {% if tables %}
-            {% include "js/tables.js" %}
-        {% endif %}
-        {% if urls %}
-            {% include "js/urls.js" %}
-        {% endif %}
+        {% include "css/graphs.css" %}
+        {% include "css/tables.css" %}
+        <!-- TODO: Not all this is needed for every page. It should be made more selective -->
+        {% include "js/buttons.js" %}
+        {% include "js/cells.js" %}
+        {% include "js/charts.js" %}
+        {% include "js/chrono.js" %}
+        {% include "js/components.js" %}
+        {% include "js/explorers.js" %}
+        {% include "js/helper.js" %}
+        {% include "js/icons.js" %}
+        {% include "js/mm2_coins.js" %}
+        {% include "js/rawtransaction.js" %}
+        {% include "js/styles.js" %}
+        {% include "js/tables.js" %}
+        {% include "js/urls.js" %}
     </head>
     <body class="c-app">
 
