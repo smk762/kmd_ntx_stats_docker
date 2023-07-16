@@ -206,7 +206,7 @@ def faucet_view(request):
                 "coin": item[1],
                 "address": item[2],
                 "timestamp": item[3],
-                "time_sent": dt.fromtimestamp(item[3]),
+                "time_sent": dt.utcfromtimestamp(item[3]),
                 "amount": item[4],
                 "txid": item[5],
                 "status": item[6]

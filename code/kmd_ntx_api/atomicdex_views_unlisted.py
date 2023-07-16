@@ -30,9 +30,9 @@ def gui_stats_view(request):
         "since": since,
         "since_options": list(SINCE_INTERVALS.keys()),
         "from_time": from_time,
-        "from_time_dt": dt.fromtimestamp(from_time),
+        "from_time_dt": dt.utcfromtimestamp(from_time),
         "to_time": to_time,
-        "to_time_dt": dt.fromtimestamp(to_time),
+        "to_time_dt": dt.utcfromtimestamp(to_time),
         "swaps_counts": get_swaps_counts(swaps_data)
     })
 

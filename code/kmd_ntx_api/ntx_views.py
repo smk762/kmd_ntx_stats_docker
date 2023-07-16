@@ -171,7 +171,7 @@ def notaryfaucet_view(request):
                 "pubkey":item[2],
                 "notary": item[3],
                 "timestamp": item[4],
-                "time_sent":dt.fromtimestamp(item[4]),
+                "time_sent":dt.utcfromtimestamp(item[4]),
                 "amount":item[5],
                 "txid":item[6],
                 "status":item[7]

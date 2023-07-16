@@ -1,4 +1,4 @@
-from datetime import fromtimestamp
+from datetime import datetime as dt
 from django.db.models import Sum, Count
 from kmd_ntx_api.helper import get_or_none
 from kmd_ntx_api.query import get_notary_vote_data, get_notary_candidates_data
@@ -68,7 +68,7 @@ def get_notary_vote_detail_table(request):
         notary_vote_detail_table = notary_vote_detail_table["results"]
 
     for item in notary_vote_detail_table:
-        date_time = fromtimestamp(item["block_time"])
+        date_time = dt.utcfromtimestamp(item["block_time"])
 
         item.update({"block_time_human":date_time.strftime("%m/%d/%Y, %H:%M:%S")})
     return notary_vote_detail_table

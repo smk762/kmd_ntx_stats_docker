@@ -42,7 +42,7 @@ def update_mined_rows(rescan_blocks, coin="KMD", prices=None):
         row.block_height = block
 
         season = lib_validate.get_season(row.block_time)
-        date = f"{dt.fromtimestamp(row.block_time)}".split(" ")[0]
+        date = f"{dt.utcfromtimestamp(row.block_time)}".split(" ")[0]
         date = date.split("-")
         date.reverse()
         date = "-".join(date)
@@ -121,7 +121,7 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
 
     if season != "since_genesis":
         season_notaries = SEASONS_INFO[season]["notaries"]
-        season_start_dt = dt.fromtimestamp(SEASONS_INFO[season]["start_time"])
+        season_start_dt = dt.utcfromtimestamp(SEASONS_INFO[season]["start_time"])
         start = season_start_dt.date()
     else:
         start = datetime.date(2016, 9, 13)

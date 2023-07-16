@@ -250,8 +250,8 @@ class ntx_daily_stats():
             self.dpow_3p_coins = SEASONS_INFO[self.season]["servers"]["Third_Party"]["coins"]
 
     def update_daily_ntx_tables(self):
-        season_start_dt = dt.fromtimestamp(SEASONS_INFO[self.season]["start_time"])
-        season_end_dt = dt.fromtimestamp(SEASONS_INFO[self.season]["end_time"])
+        season_start_dt = dt.utcfromtimestamp(SEASONS_INFO[self.season]["start_time"])
+        season_end_dt = dt.utcfromtimestamp(SEASONS_INFO[self.season]["end_time"])
         start = season_start_dt.date()
         end = datetime.date.today()
 
