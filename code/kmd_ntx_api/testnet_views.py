@@ -4,7 +4,7 @@ import datetime as dt
 from datetime import datetime, timezone
 from django.shortcuts import render
 from kmd_ntx_api.helper import get_or_none
-from kmd_ntx_api.testnet import VOTE_YEAR, VOTE_PERIODS
+from kmd_ntx_api.vote import VOTE_YEAR, VOTE_PERIODS
 from kmd_ntx_api.context import get_base_context
 
 
