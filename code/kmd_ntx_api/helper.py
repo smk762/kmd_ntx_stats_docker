@@ -51,6 +51,11 @@ def get_nn_region_split(notary):
     nn = notary.replace(f"_{region}", "")
     return nn, region
 
+def get_random_notary(season):
+    if get_notary_list(season):
+        return random.choice(get_notary_list(season))
+    return None
+
 
 def get_notary_list(season):
     seasons_info = get_seasons_info()

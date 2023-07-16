@@ -1,6 +1,7 @@
 import random
 from kmd_ntx_api.helper import get_or_none, get_notary_list, get_page_server, \
-    get_notary_clean, get_dpow_coins, get_notary_list, get_eco_data_link, get_sidebar_links
+    get_notary_clean, get_dpow_coins, get_notary_list, get_eco_data_link, \
+    get_sidebar_links, get_random_notary
 from kmd_ntx_api.notary_seasons import get_page_season
 from kmd_ntx_api.cache_data import explorers_cache, coin_icons_cache, notary_icons_cache, navigation_cache
 
@@ -8,7 +9,7 @@ from kmd_ntx_api.cache_data import explorers_cache, coin_icons_cache, notary_ico
 
 def get_base_context(request):
     season = get_page_season(request)
-    notary = get_or_none(request, "notary", random.choice(get_notary_list(season)))
+    notary = get_or_none(request, "notary", get_random_notary(season))
     epoch = get_or_none(request, "epoch", "Epoch_0")
     selected = {}
     [selected.update({i: request.GET[i]}) for i in request.GET]
