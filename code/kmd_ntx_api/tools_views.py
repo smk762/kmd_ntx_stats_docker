@@ -12,11 +12,12 @@ from kmd_ntx_api.based_58 import convert_addresses, decode_opret, \
     validate_pubkey, calc_addr_tool
 from kmd_ntx_api.context import get_base_context
 from kmd_ntx_api.explorers import get_explorers, get_dexstats_utxos
-from kmd_ntx_api.helper import get_or_none, get_page_season, \
+from kmd_ntx_api.helper import get_or_none, \
     has_error, get_notary_list
 from kmd_ntx_api.raw_transaction import send_raw_tx, raw_tx
 from kmd_ntx_api.info import get_base_58_coin_params, get_coin_icons, \
     get_daemon_cli
+from kmd_ntx_api.notary_seasons import get_page_season
 
 
 def convert_addresses_view(request):
