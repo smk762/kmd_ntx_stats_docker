@@ -130,7 +130,6 @@ def apply_filters_api(request, serializer, queryset, table=None, filter_kwargs=N
         if filter_kwargs["season"].isnumeric():
             filter_kwargs["season"] = f"Season_{filter_kwargs['season']}"
 
-    print(filter_kwargs)
     if len(filter_kwargs) > 0:
         queryset = queryset.filter(**filter_kwargs)
     return queryset
@@ -146,7 +145,6 @@ def get_distinct_filters(queryset, filters=None, exclude=None, season=None):
 
     # Get distinct season values before filtering out other seasons
     if season and 'season' in filters:
-        print("getting distinct seasons")
         y = list(queryset.values_list('season', flat=True).distinct())
         distinct.update({'season': y})
         queryset = queryset.filter(season=season)

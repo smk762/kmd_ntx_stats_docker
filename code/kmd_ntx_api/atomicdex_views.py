@@ -164,11 +164,11 @@ def makerbot_config_form_view(request):
                             form_resp.update(existing_cfg)
                 except Exception as e:
                     messages.error(request, 'e')
-                    print(e)
+                    logger.info(e)
                 context.update({"form_resp":form_resp})
             return render(request, 'views/atomicdex/makerbot_config_form.html', context)
         except Exception as e:
-            print(e)
+            logger.info(e)
         
     form = MakerbotForm() 
     context.update({"form": form})

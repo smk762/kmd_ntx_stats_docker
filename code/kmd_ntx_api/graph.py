@@ -246,11 +246,6 @@ def get_mm2gui_piechart(request):
 
             for category in stats[side]:
                 if category not in stats_type:
-                    print("-----------------------")
-                    print(side)
-                    print(category)
-                    print(x)
-                    print(stats[side][category][x])
                     data.append(stats[side][category][x])
                     axis_labels.append(f"{category}")
                     total += stats[side][category][x]

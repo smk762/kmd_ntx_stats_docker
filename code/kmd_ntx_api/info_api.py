@@ -146,7 +146,6 @@ def notarisation_txid_list(request):
     
 def notarised_txid(request):
     resp = get_notarised_txid(request)
-    print(resp)
     filters = ['txid']
     return json_resp(resp, filters)
 

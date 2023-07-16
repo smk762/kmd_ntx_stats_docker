@@ -6,7 +6,6 @@ from kmd_ntx_api.notary_seasons import get_page_season
 from kmd_ntx_api.cache_data import explorers_cache, coin_icons_cache, notary_icons_cache, navigation_cache
 
 
-
 def get_base_context(request):
     season = get_page_season(request)
     notary = get_or_none(request, "notary", get_random_notary(season))

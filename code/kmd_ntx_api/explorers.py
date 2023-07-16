@@ -37,7 +37,6 @@ def get_dexstats_utxos(coin, address):
         subdomain = get_base_endpoint(coin)
         endpoint = f"addr/{address}/utxo"
         url = f"{subdomain}/{endpoint}"
-        print(url)
         return requests.get(url).json()
     except Exception as e:
         return f"{e}"

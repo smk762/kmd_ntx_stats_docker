@@ -46,7 +46,6 @@ class TableSettings():
 
     def get_distinct(self, exclude=None):
         season = get_page_season(self.request)
-        print(self.filters)
         if not exclude:
             exclude = []
         return get_distinct_filters(self.data, self.filters, exclude, season)
@@ -154,7 +153,6 @@ def get_coin_ntx_season_rows(request):
     source.filters = ["season"]
     distinct = source.get_distinct()
     source.filter_data()
-    print(source.data)
 
     data = source.serialized()
     results = [{

@@ -24,7 +24,6 @@ def get_notary_mined_last_24hrs(notary):
 def get_nn_mining_summary(notary, season=get_season()):
 
     url = f"/api/table/mined_count_season/?season={season}&name={notary}"
-    print(url)
     mining_summary = requests.get(url).json()['results']
     if len(mining_summary) > 0:
         mining_summary = mining_summary[0]
