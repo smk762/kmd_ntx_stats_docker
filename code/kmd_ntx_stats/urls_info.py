@@ -11,10 +11,6 @@ api_info_urls = [
          info_api.mined_between_blocktimes,
          name='mined_between_blocktimes_api'),
 
-    path('api/pages_index/',
-          info_api.pages_index,
-          name='api_index'),
-
     path('api/info/balances/',
           info_api.balances_info,
           name='balances_info'),
