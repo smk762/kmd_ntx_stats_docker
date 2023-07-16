@@ -96,14 +96,14 @@ def get_electrum_status_cache():
 EXPLORERS_URL = "http://127.0.0.1:8762/api/info/explorers/"
 EXPLORERS_PATH = f"{CACHE_PATH}/explorers.json"
 def explorers_cache():
-    return refresh_cache_data(EXPLORERS_URL, EXPLORERS_PATH)
+    return refresh_cache_data(EXPLORERS_PATH, EXPLORERS_URL)
 
 
 # Launch Params
 LAUNCH_PARAMS_URL = "http://127.0.0.1:8762/api/info/launch_params/"
 LAUNCH_PARAMS_PATH = f"{CACHE_PATH}/launch_params.json"
 def launch_params_cache():
-    return refresh_cache_data(LAUNCH_PARAMS_URL, LAUNCH_PARAMS_PATH)
+    return refresh_cache_data(LAUNCH_PARAMS_PATH, LAUNCH_PARAMS_URL)
 
 
 # Navigation
