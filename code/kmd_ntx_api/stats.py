@@ -211,7 +211,7 @@ def get_daily_stats_sorted(season=get_season(), coins_dict=None):
 
     ntx_24hr = get_notarised_date().values()
     for notary_name in notary_list:
-        notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary_name, season, coins_dict)
+        notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary_name, season)
         region = get_notary_region(notary_name)
 
         daily_stats[region].append({
