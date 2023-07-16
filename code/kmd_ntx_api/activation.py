@@ -70,6 +70,12 @@ def get_emv_activation(coins_config, coin):
         }
     else:
         logger.warning(f"EMV activation for {coin} not possible, no nodes found")
+        logger.warning(coins_config[coin])
+        return {
+            "userpass": "'$userpass'",
+            "method": "METHOD_NOT_FOUND",
+            "coin": coin
+        }
 
 
 def get_activation_command(coins_config, coin):
