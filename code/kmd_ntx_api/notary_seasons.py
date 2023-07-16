@@ -24,11 +24,9 @@ def get_seasons_info() -> dict:
                     seasons[season]["regions"][region]['nodes'].append(notary)
     refresh_cache_data(SEASONS_PATH, data=seasons, force=True)
     return seasons
-get_seasons_info()
 
 def get_season(timestamp: int=int(time.time())) -> str:
     seasons = notary_seasons_cache()
-    logger.debug(seasons)
     for season in seasons:
         if 'post_season_end_time' in seasons[season]:
             end_time = seasons[season]['post_season_end_time']
