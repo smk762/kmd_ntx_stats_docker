@@ -54,6 +54,8 @@ def get_nn_region_split(notary):
 
 def get_notary_list(season):
     seasons_info = get_seasons_info()
+    if season not in seasons_info:
+        return []
     return seasons_info[season]["notaries"]
 
 
