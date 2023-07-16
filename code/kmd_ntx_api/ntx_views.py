@@ -49,8 +49,12 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
     })
 
     if coin:
-        context.update(get_coin_profile_context(request, season, coin))
-        return render(request, 'views/coin/coin_profile.html', context)    
+        profile_data = get_coin_profile_context(request, season, coin)
+        if profile_data is not None:
+            context.update(profile_data)
+            return render(request, 'views/coin/coin_profile.html', context)    
+        else:
+            messages.error(request, f"Coin {coin} not found.")
     context.update(get_coin_profile_index_context(request, season))
     return render(request, 'views/coin/coin_profile_index.html', context)
 
