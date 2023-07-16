@@ -223,8 +223,8 @@ class notarised():
     def import_ntx(self, server, coin):
 
         url = urls.get_ntxid_list_url(self.season, server, coin, False)
-        import_txids = requests.get(url)
-        if requests.status_codes == 429:
+        r = requests.get(url)
+        if r.status_code == 429:
             time.sleep(0.5)
             return
         import_txids = r.json()["results"]
