@@ -73,7 +73,7 @@ def coins_icons_cache():
 
 # Coins info
 COIN_INFO_URL = f"/api/info/coin"
-COIN_INFO_PATH = f"{CACHE_PATH}/coins.json"
+COIN_INFO_PATH = f"{CACHE_PATH}/coins_info.json"
 def coins_info_cache():
     return refresh_cache_data(COIN_ICONS_PATH, COIN_ICONS_URL)
 
@@ -133,7 +133,7 @@ def notary_seasons_cache():
 
 # Seed node version epochs
 VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/seednode-update/doc/seed_version_epochs.json"
-VERSION_TIMESPANS_PATH = f"{CACHE_PATH}/seed_version_epochs.json"
+VERSION_TIMESPANS_PATH = f"{CACHE_PATH}/version_timespans.json"
 def version_timespans_cache():
     return refresh_cache_data(VERSION_TIMESPANS_PATH, VERSION_TIMESPANS_URL)
 
