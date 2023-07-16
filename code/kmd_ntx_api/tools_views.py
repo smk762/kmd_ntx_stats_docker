@@ -307,7 +307,7 @@ def scripthashes_from_pubkey_view(request):
     })
     if "pubkey" in request.GET:
         pubkey = request.GET["pubkey"]
-        url = f"/api/tools/scripthashes_from_pubkey/?pubkey={pubkey}"
+        url = f"http://127.0.0.1:8762/api/tools/scripthashes_from_pubkey/?pubkey={pubkey}"
         resp = requests.get(url).json()
 
         if has_error(resp):
@@ -333,7 +333,7 @@ def scripthash_from_address_view(request):
     })
     if "address" in request.GET:
         address = request.GET["address"]
-        url = f"/api/tools/scripthash_from_address/?address={address}"
+        url = f"http://127.0.0.1:8762/api/tools/scripthash_from_address/?address={address}"
         resp = requests.get(url).json()
 
         if has_error(resp):
