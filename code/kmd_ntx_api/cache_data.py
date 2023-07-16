@@ -19,6 +19,7 @@ def refresh_cache_data(file, url):
 
 def get_cache_data(file):
     if not os.path.exists(file):
+        logger.warning(f"Failed to get {file} from cache")
         return {}
     with open(file, "r") as f:
         return json.load(f)
