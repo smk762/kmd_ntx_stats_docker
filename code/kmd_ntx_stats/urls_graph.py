@@ -21,10 +21,6 @@ api_graph_urls = [
          graph_api.mined_xy_data,
          name='mined_xy_data'),
 
-    path('api/graph/production_xy_data/',
-         graph_api.production_xy_data,
-         name='production_xy_data'),
-
     path('api/graph/supply_xy_data/',
          graph_api.supply_xy_data,
          name='supply_xy_data')
