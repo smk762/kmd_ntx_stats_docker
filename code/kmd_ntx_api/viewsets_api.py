@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from django.contrib.auth.models import User, Group
-from django_rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework import permissions, viewsets
 from rest_framework.pagination import PageNumberPagination
