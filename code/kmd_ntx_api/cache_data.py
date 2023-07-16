@@ -123,7 +123,7 @@ def notary_icons_cache():
 # Notary Pubkeys
 NOTARY_PUBKEYS_PATH = f"{CACHE_PATH}/notary_pubkeys.json"
 def notary_pubkeys_cache():
-    return get_cache_data(EXPLORERS_PATH)
+    return get_cache_data(NOTARY_PUBKEYS_PATH)
 
 
 # Notary Pubkeys

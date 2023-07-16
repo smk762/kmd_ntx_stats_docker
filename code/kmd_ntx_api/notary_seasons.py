@@ -12,14 +12,10 @@ def get_seasons_info() -> dict:
     for season in seasons:
         pubkeys = notary_pubkeys_cache()
         if season in pubkeys:
-            seasons[season].update({
-                "regions": default_regions_info()
-            })
+            seasons[season].update({"regions": default_regions_info()})
             notaries = list(pubkeys[season]["Main"].keys())
             notaries.sort()
-            seasons[season].update({
-                "notaries": notaries
-            })
+            seasons[season].update({"notaries": notaries})
             for notary in notaries:
                 region = notary.split("_")[-1]
                 if region not in seasons[season]["regions"].keys():
