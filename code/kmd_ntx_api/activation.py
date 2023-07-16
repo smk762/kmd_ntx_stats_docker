@@ -61,12 +61,15 @@ def get_tendermint_token_activation(coin):
 
 
 def get_emv_activation(coins_config, coin):
-    return {
-        "userpass": "'$userpass'",
-        "method": "enable",
-        "coin": coin, 
-        "urls": coins_config[coin]["nodes"]
-    }
+    if "nodes" in coins_config[coin]:
+        return {
+            "userpass": "'$userpass'",
+            "method": "enable",
+            "coin": coin, 
+            "urls": coins_config[coin]["nodes"]
+        }
+    else:
+        logger.warning(f"EMV activation for {coin} not possible, no nodes found")
 
 
 def get_activation_command(coins_config, coin):
