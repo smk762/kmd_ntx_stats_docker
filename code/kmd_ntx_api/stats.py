@@ -5,8 +5,6 @@ from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.helper import get_notary_region, \
     get_notary_list, get_dpow_coins, safe_div, \
     get_mainnet_coins, get_third_party_coins
-from kmd_ntx_api.info import get_seednode_version_season_stats_data, \
-    get_notary_ntx_24hr_summary, get_dpow_coins_list
 from kmd_ntx_api.mining import get_mined_data_24hr
 from kmd_ntx_api.notary_seasons import get_season
 from kmd_ntx_api.ntx import get_notarised_date
