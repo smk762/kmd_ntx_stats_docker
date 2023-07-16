@@ -35,11 +35,11 @@ frontend_atomicdex_urls = [
          name='last_200_failed_swaps_view'),
     
     path('atomicdex/makerbot_config_form/',
-          atomicdex_views_unlisted.makerbot_config_form_view,
+          atomicdex_views.makerbot_config_form_view,
           name='makerbot_config_form_view'),
 
     path('atomicdex/orderbook/',
-         atomicdex_views_unlisted.orderbook_view,
+         atomicdex_views.orderbook_view,
          name='orderbook_view'),
 
 ]
