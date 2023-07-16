@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
+import codecs
 import hashlib
 import binascii
 import bitcoin
 from bitcoin.core import x
 from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
+import hashlib
+import binascii
+from base58 import b58decode_check
+from kmd_ntx_api.const import OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG
 from kmd_ntx_api.const import EXCLUDE_DECODE_OPRET_COINS, noMoM, SMARTCHAINS
 from kmd_ntx_api.info import get_all_coins
 from kmd_ntx_api.cache_data import b58_params_cache
@@ -316,3 +321,41 @@ def convert_addresses(address):
         resp["results"].append({f"{coin}": new_address})
 
     return resp
+
+
+def get_p2pkh_scripthash_from_address(address):
+    # remove address prefix
+    addr_stripped = binascii.hexlify(b58decode_check(address)[1:])
+    # Add OP_DUP OP_HASH160 BTYES_PUSHED <ADDRESS> OP_EQUALVERIFY OP_CHECKSIG
+    raw_sig_script = b"".join((b"76a914", addr_stripped, b"88ac"))
+    script_hash = hashlib.sha256(
+        codecs.decode(raw_sig_script, 'hex')
+    ).digest()[::-1].hex()
+    return script_hash
+
+
+def get_p2pk_scripthash_from_pubkey(pubkey):
+    scriptpubkey = f"21{pubkey}ac"
+    scripthex = codecs.decode(scriptpubkey, 'hex')
+    s = hashlib.new('sha256', scripthex).digest()
+    sha256_scripthash = codecs.encode(s, 'hex').decode("utf-8")
+    script_hash = lil_endian(sha256_scripthash)
+    return script_hash
+
+
+def get_p2pkh_scripthash_from_pubkey(pubkey):
+    publickey = codecs.decode(pubkey, 'hex')
+    s = hashlib.new('sha256', publickey).digest()
+    r = hashlib.new('ripemd160', s).digest()
+    scriptpubkey = OP_DUP \
+                 + OP_HASH160 \
+                 + '14' \
+                 + codecs.encode(r, 'hex').decode("utf-8") \
+                 + OP_EQUALVERIFY \
+                 + OP_CHECKSIG 
+    scriptpubkey = "76a914"+codecs.encode(r, 'hex').decode("utf-8")+"88ac"
+    h = codecs.decode(scriptpubkey, 'hex')
+    s = hashlib.new('sha256', h).digest()
+    sha256_scripthash = codecs.encode(s, 'hex').decode("utf-8")
+    script_hash = lil_endian(sha256_scripthash)
+    return script_hash

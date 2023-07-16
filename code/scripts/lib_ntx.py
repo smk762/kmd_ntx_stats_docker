@@ -129,18 +129,14 @@ class notarised():
         if len(txid_info["notary_addresses"]) == 0:
 
             if ntx_row.coin == "BTC":
-                url = urls.get_notary_btc_txid_url(txid, True)
+                url = urls.get_notary_btc_txid_url(ntx_row.txid, True)
                 local_info = requests.get(url).json()["results"]
                 ntx_row.notary_addresses = get_local_addresses(local_info)
 
             elif ntx_row.coin == "LTC":
-                url = urls.get_notary_ltc_txid_url(txid, True)
+                url = urls.get_notary_ltc_txid_url(ntx_row.txid, True)
                 local_info = requests.get(url).json()["results"]
                 ntx_row.notary_addresses = helper.get_local_addresses(local_info)
-
-            else:
-                row_data = get_notarised_data(txid, coins_list)
-                ntx_row.notary_addresses = row_data[6]
 
         else:
             ntx_row.notary_addresses = txid_info["notary_addresses"]
