@@ -18,8 +18,4 @@ frontend_page_urls = [
           page_views.dash_view,
           name='dash_view'),
 
-    path('test_component/',
-          page_views.test_component,
-          name='test_component'),
-
 ]
