@@ -77,6 +77,44 @@ def get_emv_activation(coins_config, coin):
             "coin": coin
         }
 
+def get_bch_activation(coins_config, coin):
+    return {
+        "userpass": "'$userpass'",
+        "method": "enable_bch_with_tokens",
+        "mmrpc": "2.0",
+        "params": {
+            "ticker": coin,
+            "allow_slp_unsafe_conf": False,
+            "slp_prefix": coins_config[coin]["slp_prefix"],
+            "bchd_urls": coins_config[coin]["bchd_urls"],
+            "mode": {
+                "rpc": "Electrum",
+                "rpc_data": {
+                    "servers": coins_config[coin]["electrum"]
+                }
+            },
+            "tx_history": True,
+            "slp_tokens_requests": [],
+            "required_confirmations": 5,
+            "requires_notarization": False,
+            "address_format": coins_config[coin]["address_format"]
+        }
+    }
+    
+
+def get_slp_activation(coins_config, coin):
+    return {
+        "userpass": "MM2_RPC_PASSWORD",
+        "method": "enable_slp",
+        "mmrpc": "2.0",
+        "params": {
+            "ticker": "SPICE-SLP",
+            "activation_params": {
+                "required_confirmations": 3
+            }
+        }
+    }
+
 
 def get_activation_command(coins_config, coin):
     resp_json = {}
@@ -94,6 +132,9 @@ def get_activation_command(coins_config, coin):
         if "platform" in coins_config[coin]["protocol"]["protocol_data"]:
             platform = coins_config[coin]["protocol"]["protocol_data"]["platform"]
 
+    if coin in ["BCH", "tBCH"]:
+        platform = "UTXO"
+        resp_json.update(get_bch_activation(coins_config, coin))
     if protocol == "ZHTLC":
         platform = "UTXO"
         resp_json.update(get_zhtlc_activation(coins_config, coin))
@@ -112,6 +153,9 @@ def get_activation_command(coins_config, coin):
     elif protocol == "TENDERMINTTOKEN":
         platform = 'TENDERMINTTOKEN'
         resp_json.update(get_tendermint_token_activation(coin))
+    elif protocol == "SLP":
+        platform = 'SLP'
+        resp_json.update(get_slp_activation(coin))
     elif coin in coins_config:
         resp_json.update(get_emv_activation(coins_config, coin))
     else:
