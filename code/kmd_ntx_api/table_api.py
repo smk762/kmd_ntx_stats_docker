@@ -8,7 +8,7 @@ from kmd_ntx_api.table import get_addresses_rows, get_balances_rows, \
     get_kmd_supply_rows, get_notary_last_mined_table_api, get_coin_social_table, \
     get_coin_last_ntx_table, get_notary_ntx_season_table, get_notary_ntx_season_table_data, \
     get_mined_24hrs_table, get_mined_count_season_table, get_coin_ntx_season_table, \
-    get_notarised_tenure_table, get_split_stats_table, get_notary_epoch_scores_table, \
+    get_notarised_tenure_table, get_notary_epoch_scores_table, \
     get_coin_activation_table, get_bestorders_table, get_dex_stats_table, \
     get_dex_os_stats_table, get_dex_version_stats_table, get_dex_ui_stats_table
             
@@ -169,12 +169,6 @@ def coin_ntx_season_table(request):
 def notarised_tenure_table(request):
     resp = get_notarised_tenure_table(request)
     filters = ["season", "server", "coin"]
-    return json_resp(resp, filters)
-
-
-def split_stats_table(request):
-    resp = get_split_stats_table(request)
-    filters = ['season', 'notary']
     return json_resp(resp, filters)
 
 
