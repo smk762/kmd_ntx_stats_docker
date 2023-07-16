@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from lib_const import *
 from lib_helper import has_season_started
-from mining import update_mined_table, update_mined_count_daily_table, update_mined_count_season_table
+from lib_mining import update_mined_table, update_mined_count_daily_table, update_mined_count_season_table
 from decorators import print_runtime
 
 ''' 
