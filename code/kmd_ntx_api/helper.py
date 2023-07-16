@@ -11,7 +11,7 @@ from datetime import timezone as tz
 from django.http import JsonResponse
 from kmd_ntx_api.const import SINCE_INTERVALS, INTERVALS
 from kmd_ntx_api.notary_seasons import get_seasons_info, get_season
-from kmd_ntx_api.cache_data import coins_config_cache
+from kmd_ntx_api.cache_data import ecosystem_links_cache
 
 
 # Time related functions
@@ -129,7 +129,7 @@ def get_notary_clean(notary):
 
 
 def get_eco_data_link():
-    ecosystem_links = ecosystem_links()
+    ecosystem_links = ecosystem_links_cache()
     if len(ecosystem_links) == 0:
         return ""
     item = random.choice(ecosystem_links)
