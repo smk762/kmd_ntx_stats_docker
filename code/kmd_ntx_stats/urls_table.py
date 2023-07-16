@@ -184,7 +184,4 @@ api_table_urls = [
           table_api.notarised_tenure_table,
           name='notarised_tenure_table'),
     
-    path('api/table/split_stats/',
-          table_api.split_stats_table,
-          name='split_stats_table'),
 ]
