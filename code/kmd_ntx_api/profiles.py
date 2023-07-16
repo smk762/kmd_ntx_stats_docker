@@ -76,6 +76,7 @@ def get_notary_profile_context(request, season, notary):
             "main_notarised_24hr": notarised_data_24hr.filter(server='Main').count(),
             "third_notarised_24hr": notarised_data_24hr.filter(server='Third_Party').count()
         })
+    return context
 
 
 def get_coin_profile_index_context(request, season):
