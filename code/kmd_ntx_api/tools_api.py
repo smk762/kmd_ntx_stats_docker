@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 from kmd_ntx_api.tools import get_addr_from_base58, get_address_conversion, \
-    get_address_from_pubkey, get_decode_op_return, get_pubkey_utxos, send_raw_tx, \
+    get_address_from_pubkey, get_decode_op_return, get_pubkey_utxos, \
     get_scripthash_from_address, get_scripthashes_from_pubkey
 from kmd_ntx_api.serializers import addrFromBase58Serializer
+from kmd_ntx_api.raw_transaction import send_raw_tx
 from kmd_ntx_api.helper import json_resp, \
     get_notary_list, get_dpow_coins, safe_div, \
     get_or_none, get_page_server, get_time_since, \
