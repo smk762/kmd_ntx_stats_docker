@@ -3,7 +3,8 @@ from django.http import JsonResponse
 
 from kmd_ntx_api.helper import json_resp
 from kmd_ntx_api.swaps import get_swaps_gui_stats
-from kmd_ntx_api.atomicdex import get_orderbook, get_bestorders, get_failed_swap_by_uuid
+from kmd_ntx_api.atomicdex import get_orderbook, get_bestorders
+from kmd_ntx_api.swaps import get_failed_swap_by_uuid
 from kmd_ntx_api.activation import get_activation_commands, get_coin_activation_commands
 from kmd_ntx_api.seednodes import get_seednode_version_month_table, \
     get_seednode_version_score_total, get_seednode_version_date_table

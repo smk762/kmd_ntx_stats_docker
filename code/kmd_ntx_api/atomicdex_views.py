@@ -6,7 +6,7 @@ from kmd_ntx_api.cache_data import activation_commands_cache
 from kmd_ntx_api.helper import get_or_none
 from kmd_ntx_api.context import get_base_context
 from kmd_ntx_api.forms import EnableCommandForm, MakerbotForm
-from kmd_ntx_api.atomicdex import get_last_200_swaps, format_gui_os_version
+from kmd_ntx_api.swaps import format_gui_os_version, get_last_200_swaps
 
 
 def activation_commands_view(request):
