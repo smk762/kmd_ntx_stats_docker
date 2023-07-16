@@ -194,7 +194,7 @@ def get_daily_stats_sorted(season=get_season(), coins_dict=None):
     notary_list = get_notary_list(season)
 
     day_ago = int(time.time()) - SINCE_INTERVALS['day']
-    data = get_mined_data().filter(block_time__gt=str(day_ago))
+    data = get_mined_data().filter(block_time__gt=str(day_ago()))
     mined_last_24hrs = get_mined_data_24hr().values('name').annotate(mined_24hrs=Sum('value'), blocks_24hrs=Count('value'))
     nn_mined_last_24hrs = {}
     for item in mined_last_24hrs:

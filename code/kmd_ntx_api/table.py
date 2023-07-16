@@ -649,7 +649,7 @@ def get_mined_24hrs_table(request):
     address = get_or_none(request, "address")
     day_ago = int(time.time()) - SINCE_INTERVALS['day']
     data = get_mined_data(None, name, address).filter(
-        block_time__gt=str(day_ago))
+        block_time__gt=str(day_ago()))
     data = data.values()
 
     serializer = minedSerializer(data, many=True)

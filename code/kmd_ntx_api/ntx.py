@@ -9,7 +9,7 @@ def get_notarised_date(season=None, server=None, coin=None, notary=None, last_24
     else:
         # TODO: apply rounding to day
         day_ago = int(time.time()) - SINCE_INTERVALS['day']
-    return get_notarised_data(season, server, None, coin, notary).filter(block_time__gt=str(day_ago)).order_by('-block_time')
+    return get_notarised_data(season, server, None, coin, notary).filter(block_time__gt=str(day_ago())).order_by('-block_time')
 
 def get_ntx_tenure_table(request):
     tenure_data = get_notarised_tenure_data().values()

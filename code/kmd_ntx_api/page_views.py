@@ -31,7 +31,7 @@ def dash_view(request):
         mined_season = 0
 
     try:
-        mined_24hr = mined_data.filter(block_time__gt=str(day_ago)).aggregate(Sum('value'))['value__sum']        
+        mined_24hr = mined_data.filter(block_time__gt=str(day_ago())).aggregate(Sum('value'))['value__sum']        
     except Exception as e:
         logger.error(e)
         mined_24hr = 0
