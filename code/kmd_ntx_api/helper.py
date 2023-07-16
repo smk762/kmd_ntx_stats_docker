@@ -7,7 +7,6 @@ import requests
 import datetime
 from calendar import monthrange
 from datetime import datetime as dt
-from datetime import timezone as tz
 from django.http import JsonResponse
 from kmd_ntx_api.const import SINCE_INTERVALS, INTERVALS
 from kmd_ntx_api.notary_seasons import get_seasons_info, get_season
@@ -281,7 +280,7 @@ def create_dict(key_list):
 # Only used in seednodes.py
 def date_hour(timestamp):
     if timestamp > time.time() * 10: timestamp /= 1000
-    date, hour = dt.utcfromtimestamp(timestamp, tz=tz.utc).strftime("%x %H").split(" ")
+    date, hour = dt.utcfromtimestamp(timestamp).strftime("%x %H").split(" ")
     return f"{date} {hour}:00"
 
 
