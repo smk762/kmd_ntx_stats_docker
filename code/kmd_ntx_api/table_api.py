@@ -4,7 +4,7 @@ from kmd_ntx_api.table import get_addresses_rows, get_balances_rows, \
     get_mined_count_daily_rows, get_mined_count_season_rows, \
     get_nn_ltc_tx_rows, get_notary_last_ntx_rows, get_notarised_coin_daily_rows, \
     get_notarised_count_daily_rows, get_notarised_rows, get_notary_ntx_season_rows, \
-    get_rewards_tx_rows, get_server_ntx_season_rows, get_scoring_epochs_rows, \
+    get_server_ntx_season_rows, get_scoring_epochs_rows, \
     get_kmd_supply_rows, get_notary_last_mined_table_api, get_coin_social_table, \
     get_coin_last_ntx_table, get_notary_ntx_season_table, get_notary_ntx_season_table_data, \
     get_mined_24hrs_table, get_mined_count_season_table, get_coin_ntx_season_table, \
@@ -79,10 +79,6 @@ def notary_ntx_season_table_api(request):
     data = get_notary_ntx_season_rows(request)
     return json_resp(data)
 
-
-def rewards_tx_table_api(request):
-    data = get_rewards_tx_rows(request)
-    return json_resp(data)
 
 
 def server_ntx_season_table_api(request):
