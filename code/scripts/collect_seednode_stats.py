@@ -154,6 +154,10 @@ seednodes = {
 		'IP': 'mm2-smdmitry-ar.smdmitry.com',
 		'PeerID': '12D3KooWJ3dEWK7ym1uwc5SmwbmfFSRmELrA9aPJYxFRrQCCNdwF'
 	},
+	'smdmitry2_AR': {
+		'IP': 'mm2-smdmitry2-ar.smdmitry.com',
+		'PeerID': '12D3KooWEpiMuCc47cYUXiLY5LcEEesREUNpZXF6KZA8jmFgxAeE'
+	},
 	'smdmitry_EU': {
 		'IP': 'mm2-smdmitry-eu.smdmitry.com',
 		'PeerID': '12D3KooWJTYiU9CqVyycpMnGC96WyP1GE62Ng5g93AUe9wRx5g7W'

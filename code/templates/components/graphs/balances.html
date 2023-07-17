@@ -28,7 +28,7 @@
   
     $.ajax({ 
       method: "GET", 
-      url: 'http://{{ request.get_host }}/api/graph_json/balances/?{{ gets }}', 
+      url: 'http:/api/graph_json/balances/?{{ gets }}', 
       success: function(data) { 
       	document.getElementById('graph_title').innerHTML = data.chartLabel;
         //drawLineGraph(data, 'myChartline'); 

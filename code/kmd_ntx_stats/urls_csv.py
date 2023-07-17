@@ -1,11 +1,11 @@
 from django.urls import path
 
-from kmd_ntx_api import api_csv
+from kmd_ntx_api import csv_api
 
 
 # CSV VIEWS
 api_csv_urls = [
     path('api/csv/mined/',
-         api_csv.mined_csv,
+         csv_api.mined_csv,
          name='mined_csv'),
 ]

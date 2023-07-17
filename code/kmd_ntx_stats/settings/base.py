@@ -136,7 +136,6 @@ STATIC_ROOT = '/var/www/stats.kmd.io/html/static/'
 STATICFILES_DIRS = [
     '/code/static'
 ]
-print(BASE_DIR)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -4,7 +4,7 @@ import lib_api
 import lib_electrum
 import lib_query
 from lib_helper import is_postseason, handle_translate_coins
-
+from lib_urls import get_notarised_tenure_table_url
 
 def check_excluded_coins(season, server, coin):
     if season in DPOW_EXCLUDED_COINS: 

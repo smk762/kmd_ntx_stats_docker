@@ -3,8 +3,7 @@ from lib_const import *
 from lib_wallet import get_balances, delete_stale_balances
 
 '''
-This script checks notary balances for all dpow coins via electrum servers,
-and any pending KMD rewards then stores data in db
+This script checks notary balances for all dpow coins via electrum servers
 It should be run as a cronjob every hour or so (takes about an 10 min to run).
 '''
 

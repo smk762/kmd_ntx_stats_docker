@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.models import JSONField
 from django.contrib.postgres.fields import ArrayField
-from kmd_ntx_api.lib_const import *
 
 # TODO: When updating on conflict, make sure all potentially variable fields are included.
 

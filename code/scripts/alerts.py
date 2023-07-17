@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 import os
 import datetime
-import logging
 import requests
 from dotenv import load_dotenv
-from logging import Handler, Formatter
 
 # DEPS:
 # sudo apt-get install libgnutls28-dev python3 python3-pip python3-setuptools python3-six

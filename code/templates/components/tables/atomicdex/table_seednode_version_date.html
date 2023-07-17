@@ -1,3 +1,4 @@
+<!-- table_seednode_version_date.html -->
 <div id="last_24hrs">
     <div class="card-header pb-0">
         <div class="d-flex justify-content-around">
@@ -120,7 +121,7 @@
                     start = Math.floor(start/86400)*86400
                     end = start + 86400
                     let params = "?start="+start+"&end="+end+"&season={{ season }}"
-                    let url = "{% url 'seednode_version_date_table_api' %}"+params
+                    let url = "{% url 'seednode_version_date_table_api' %}" + params
                     day_seed_table.ajax.url(url).load();
                     let api_btn = get_api_button("seednode_date", 100, url, "Source Data")
                     $('#date_api_link').html(api_btn);

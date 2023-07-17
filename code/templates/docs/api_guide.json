@@ -859,51 +859,6 @@
           "url": "http://stats.kmd.io"
         }
       ]
-    },
-    "/api/tools/kmd_rewards/": {
-      "get": {
-        "description": "Auto generated using Swagger Inspector",
-        "parameters": [
-          {
-            "name": "address",
-            "in": "query",
-            "required": false,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "RCyANUW2H5985zk8p6NHJfPyNBXnTVzGDh"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Auto generated using Swagger Inspector",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/inline_response_200_13"
-                },
-                "examples": {
-                  "0": {
-                    "value": "{\"address\": \"RCyANUW2H5985zk8p6NHJfPyNBXnTVzGDh\", \"utxo_count\": 1, \"utxos\": {\"c76f553497b558cf3bcdffe77d8381922b68fa85e64ec38e88a5ce477efca32f\": {\"locktime\": 1620700056, \"utxo_value\": 17477130.20431399, \"sat_rewards\": 1292330025504, \"kmd_rewards\": 12923.30025504, \"satoshis\": 1747713020431399, \"block_height\": 2387478}}, \"eligible_utxo_count\": 1, \"oldest_utxo_block\": 2387478, \"kmd_balance\": 17477130.20431399, \"total_rewards\": 12923.30025504}"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "servers": [
-          {
-            "url": "http://stats.kmd.io"
-          }
-        ]
-      },
-      "servers": [
-        {
-          "url": "http://stats.kmd.io"
-        }
-      ]
     }
   },
   "components": {
@@ -1481,9 +1436,6 @@
                     "type": "integer"
                   },
                   "utxo_value": {
-                    "type": "number"
-                  },
-                  "kmd_rewards": {
                     "type": "number"
                   },
                   "sat_rewards": {

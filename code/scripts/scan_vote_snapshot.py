@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+from lib_helper import get_nn_region_split
 from notary_candidates import CANDIDATE_ADDRESSES
 
 

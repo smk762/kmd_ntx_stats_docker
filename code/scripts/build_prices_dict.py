@@ -18,8 +18,8 @@ except Exception as e:
 for season in ["Season_7"]:
     if season not in prices:
         prices.update({season: {}})
-    season_start_dt = dt.fromtimestamp(SEASONS_INFO[season]["start_time"])
-    season_end_dt = dt.fromtimestamp(SEASONS_INFO[season]["end_time"])
+    season_start_dt = dt.utcfromtimestamp(SEASONS_INFO[season]["start_time"])
+    season_end_dt = dt.utcfromtimestamp(SEASONS_INFO[season]["end_time"])
     start = season_start_dt.date()
     end = datetime.date.today()
 

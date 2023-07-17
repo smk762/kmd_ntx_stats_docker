@@ -1,11 +1,9 @@
 from django import forms
 
-from kmd_ntx_api.lib_const import *
-import kmd_ntx_api.lib_info as info
+from kmd_ntx_api.info import get_mm2_coins_list
 
-mm2_coins = info.get_mm2_coins_list()
 TF_CHOICES = [(True,True), (False,False)]
-COIN_CHOICES = [(i,i) for i in mm2_coins]
+COIN_CHOICES = [(i,i) for i in get_mm2_coins_list()]
 
 class MakerbotForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -194,8 +192,6 @@ class EnableCommandForm(forms.Form):
         choices=TF_CHOICES,
         initial=True
         )
-
-
 
 
 class RecreateSwapDataForm(forms.Form):

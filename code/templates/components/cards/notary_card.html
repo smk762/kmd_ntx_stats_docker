@@ -2,7 +2,7 @@
 {% load static %}
             	<div class="card notary_card" style="max-width: 150px;">
             		<div class="card-header notary_card_header notary_card_name px-0">
-            			<a href="//{{ request.get_host }}/notary_profile/{{ node }}/?season={{ season }}">
+            			<a href="/notary_profile/{{ node }}/?season={{ season }}">
             				{{ node }}
 							{% for nn, site_links in nn_social.items %}
 								{% if node == nn %}

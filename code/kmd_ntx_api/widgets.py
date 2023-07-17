@@ -1,7 +1,6 @@
 from django import forms 
 from django.template import loader
 from django.utils.safestring import mark_safe
-from kmd_ntx_api.lib_const import *
 
 
 class ToggleWidget(forms.widgets.CheckboxInput): 
@@ -37,12 +36,12 @@ def update_attrs(self, options, attrs):
         attrs['data-{}'.format(key)] = val
     return attrs
 
-    def fix_class(self, attrs):
-        class_name = attrs.pop('class', '')
-        if class_name:
-            attrs['class'] = '{} {}'.format(
-                class_name, 'custom-select2-widget')
-        else:
-            attrs['class'] = 'custom-select2-widget'
+def fix_class(self, attrs):
+    class_name = attrs.pop('class', '')
+    if class_name:
+        attrs['class'] = '{} {}'.format(
+            class_name, 'custom-select2-widget')
+    else:
+        attrs['class'] = 'custom-select2-widget'
 
-        return attrs
+    return attrs

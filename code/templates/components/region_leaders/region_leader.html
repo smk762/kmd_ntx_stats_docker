@@ -1,6 +1,6 @@
 <div class="leader-badge">
 	<span class='badge stat_badge my-1 p-2 mx-auto' style="background-color: transparent;">
-		<a href="http://{{ request.get_host }}/ntx_scoreboard/?season={{ season }}#{{ region }}_table">
+		<a href="http:/ntx_scoreboard/?season={{ season }}#{{ region }}_table">
 			<div></i>{{ region_name }}</div>
 			<div class="py-2" style="font-size: 0.95rem;">{{ data.top_notary }}</div>
 		</a>
@@ -9,7 +9,7 @@
 		{% include "components/cards/card_img.html" with img_size=72 img_src=data.top_notary_icon alt_text=data.top_notary profile_page="notary_profile" profile_name=data.top_notary %}
 	</div>
 	<div class="">
-		<a class="badge stat_badge my-1 p-2 mx-auto" style="background-color: transparent;" href="http://{{ request.get_host }}/notary_profile/{{ data.top_notary }}/?season={{ season }}">
+		<a class="badge stat_badge my-1 p-2 mx-auto" style="background-color: transparent;" href="http:/notary_profile/{{ data.top_notary }}/?season={{ season }}">
 			<div class="py-2" style="font-size: 1.1rem;">{{ data.top_ntx_count }}</div>
 			<div>Notarisations</div>
 		</a>

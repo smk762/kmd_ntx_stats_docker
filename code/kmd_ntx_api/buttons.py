@@ -59,22 +59,6 @@ def get_faucet_buttons():
         }
     }
 
-def get_rewards_buttons():
-    buttons = ["accrued-rewards", "rewards-history"]
-    return {
-        "accrued-rewards": {
-            "action": f"show_card('accrued-rewards', {buttons})",
-            "width_pct": 19,
-            "text": "Accrued Rewards"
-        },
-        "rewards-history": {
-            "action": f"show_card('rewards-history', {buttons})",
-            "width_pct": 19,
-            "text": "Rewards History"
-        }
-    }
-
-
 def get_ntx_buttons():
     buttons = ["ntx", "ntx_24hr", "balances", "mining", "last_coin_ntx"]
     return {

@@ -1,4 +1,4 @@
-
+    <!-- table_bestorders.html -->
 	<div class="row col-12 m-auto">
 		<div class="card table_card floating-card m-auto col-12" id="bids_card" style="font-size: 1.1em;" >
 			<div class="card-body table_card_body col-12">
@@ -16,13 +16,7 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-	    
-    	function get_url() {
-	    	let coin = $('#coin').val() == undefined ? 'KMD' :  $('#coin').val()
-	    	url = "{{ endpoint }}?coin="+coin
-	    	console.log(url)
-	    	return url
-    	}
+
 	    $(document).ready(function() {
 
 			{% autoescape off %}
@@ -80,11 +74,11 @@
 		            $('.bids-tbl-title').html(dropdown);
 					$('#coin').select2();
 				    $('#coin').on('select2:select', function (e) {
-				    	bids_table.ajax.url(get_url()).load()
+				    	bids_table.ajax.url(get_bestorders_url()).load()
 					});
-		            let api_btn = get_api_button("bids", 100, get_url(), "Source Data")
+		            let api_btn = get_api_button("bids", 100, get_bestorders_url(), "Source Data")
 		            $('.bids-api-link').html(api_btn);
-		            add_dropdown_options(options, '#coin', '{{ coin }}')
+		            add_dropdown_options(mm2_coins, '#coin', '{{ coin }}')
 
 		        }
 	        });

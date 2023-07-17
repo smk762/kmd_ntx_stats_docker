@@ -1,0 +1,4 @@
+*.json
+!notary_pubkeys.json
+!notary_seasons.json
+!navigation.json

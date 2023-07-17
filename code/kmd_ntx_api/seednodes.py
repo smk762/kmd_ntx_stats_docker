@@ -3,11 +3,13 @@
 import time
 from datetime import datetime as dt
 from django.db.models import Sum
-import kmd_ntx_api.lib_helper as helper
-import kmd_ntx_api.lib_query as query
-import kmd_ntx_api.external_data as external_data
-from kmd_ntx_api.lib_const import SINCE_INTERVALS
-
+from kmd_ntx_api.helper import get_notary_list, get_or_none, get_notary_list, \
+    date_hour, get_month_epoch_range, prepopulate_seednode_version_month, \
+    prepopulate_seednode_version_date
+from kmd_ntx_api.notary_seasons import get_page_season
+from kmd_ntx_api.cache_data import version_timespans_cache
+from kmd_ntx_api.const import SINCE_INTERVALS
+from kmd_ntx_api.query import get_seednode_version_stats_data
 
 def seednode_version_context(request):
     active_version = " & ".join(get_active_mm2_versions(time.time()))
@@ -34,7 +36,7 @@ def seednode_version_context(request):
 
 def get_active_mm2_versions(ts):
     active_versions = []
-    versions = external_data.version_timespans()
+    versions = version_timespans_cache()
     for version in versions:
         if int(ts) < versions[version]["end"]:
             active_versions.append(version)
@@ -49,21 +51,21 @@ def is_mm2_version_valid(version, timestamp):
 
 
 def get_seednode_version_date_table(request):
-    season = helper.get_page_season(request)
-    start = int(helper.get_or_none(request, "start", time.time() - SINCE_INTERVALS["day"]))
-    end = int(helper.get_or_none(request, "end", time.time()))
-    notary_list = helper.get_notary_list(season)
-    default_scores = helper.prepopulate_seednode_version_date(notary_list)
+    season = get_page_season(request)
+    start = int(get_or_none(request, "start", time.time() - SINCE_INTERVALS["day"]))
+    end = int(get_or_none(request, "end", time.time()))
+    notary_list = get_notary_list(season)
+    default_scores = prepopulate_seednode_version_date(notary_list)
     hour_headers = list(default_scores.keys())
     hour_headers.sort()
     table_headers = ["Notary"] + hour_headers + ["Total"]
-    data = query.get_seednode_version_stats_data(start=start, end=end)
+    data = get_seednode_version_stats_data(start=start, end=end)
     scores = data.values()
     for item in scores:
         notary = item["name"]
         if notary in notary_list:
             score = item["score"]
-            _, hour = helper.date_hour(item["timestamp"]).split(" ")
+            _, hour = date_hour(item["timestamp"]).split(" ")
             hour = hour.replace(":00", "")
 
             default_scores[hour][notary]["score"] = score
@@ -99,22 +101,22 @@ def get_seednode_version_date_table(request):
 
 
 def get_seednode_version_month_table(request):
-    season = helper.get_page_season(request)
-    year = helper.get_or_none(request, "year", dt.utcnow().year)
-    month = helper.get_or_none(request, "month", dt.utcnow().month)
-    start, end, last_day = helper.get_month_epoch_range(year, month)
-    notary_list = helper.get_notary_list(season)
-    default_scores = helper.prepopulate_seednode_version_month(notary_list)
+    season = get_page_season(request)
+    year = get_or_none(request, "year", dt.utcnow().year)
+    month = get_or_none(request, "month", dt.utcnow().month)
+    start, end, last_day = get_month_epoch_range(year, month)
+    notary_list = get_notary_list(season)
+    default_scores = prepopulate_seednode_version_month(notary_list)
     day_headers = list(default_scores.keys())
     day_headers.sort()
     table_headers = ["Notary"] + day_headers + ["Total"]
-    data = query.get_seednode_version_stats_data(start=start, end=end).values()
+    data = get_seednode_version_stats_data(start=start, end=end).values()
     for item in data:
         notary = item["name"]
         if notary in notary_list:
             score = item["score"]
             if score == 0.2:
-                date, _ = helper.date_hour(item["timestamp"]).split(" ")
+                date, _ = date_hour(item["timestamp"]).split(" ")
                 day = date.split("/")[1]
                 default_scores[day][notary]["score"] += score
                 if item["version"] not in default_scores[day][notary]["versions"]:
@@ -142,13 +144,13 @@ def get_seednode_version_month_table(request):
 
 def get_seednode_version_score_total(request, season=None, start=None, end=None):
     if not season:
-        season = helper.get_page_season(request)
-    notary_list = helper.get_notary_list(season)
-    start = helper.get_or_none(request, "start", start)
+        season = get_page_season(request)
+    notary_list = get_notary_list(season)
+    start = get_or_none(request, "start", start)
     if not start: start = int(time.time()) - SINCE_INTERVALS["day"]
-    end = helper.get_or_none(request, "end", end)
+    end = get_or_none(request, "end", end)
     if not end: end = int(time.time())
-    data = query.get_seednode_version_stats_data(start=start, end=end)
+    data = get_seednode_version_stats_data(start=start, end=end)
     notary_scores = list(data.values('name').order_by('name').annotate(sum_score=Sum('score')))
     notaries_with_scores = data.distinct('name').values_list('name', flat=True)
     for notary in notary_list:

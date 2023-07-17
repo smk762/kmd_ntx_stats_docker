@@ -12,7 +12,7 @@
 			{% endfor %}
 	</div>
 	<div class="">
-		<a class="badge stat_badge my-1 p-2 mx-auto" style="font-size: 1.3em" href="{% url 'notary_profile_view' notary=item.notary %}/?season={{ season }}"> {{ item.notary }} <br /><span style="font-size: 1.3em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
+		<a class="badge stat_badge my-1 p-2 mx-auto" style="font-size: 1.3em" href="{% url 'notary_profile_view' notary=item.notary %}?season={{ season }}"> {{ item.notary }} <br /><span style="font-size: 1.3em; line-height: 1.3em;">{{ item.score|floatformat:-3 }}</span></a>
 	</div>
 
 	

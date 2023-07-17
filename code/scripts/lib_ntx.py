@@ -129,18 +129,14 @@ class notarised():
         if len(txid_info["notary_addresses"]) == 0:
 
             if ntx_row.coin == "BTC":
-                url = urls.get_notary_btc_txid_url(txid, True)
+                url = urls.get_notary_btc_txid_url(ntx_row.txid, True)
                 local_info = requests.get(url).json()["results"]
                 ntx_row.notary_addresses = get_local_addresses(local_info)
 
             elif ntx_row.coin == "LTC":
-                url = urls.get_notary_ltc_txid_url(txid, True)
+                url = urls.get_notary_ltc_txid_url(ntx_row.txid, True)
                 local_info = requests.get(url).json()["results"]
                 ntx_row.notary_addresses = helper.get_local_addresses(local_info)
-
-            else:
-                row_data = get_notarised_data(txid, coins_list)
-                ntx_row.notary_addresses = row_data[6]
 
         else:
             ntx_row.notary_addresses = txid_info["notary_addresses"]
@@ -226,21 +222,27 @@ class notarised():
     @print_runtime
     def import_ntx(self, server, coin):
 
-        import_txids_url = urls.get_ntxid_list_url(self.season, server, coin, False)
-        import_txids = requests.get(import_txids_url).json()["results"]
+        url = urls.get_ntxid_list_url(self.season, server, coin, False)
+        import_txids = requests.get(url)
+        if requests.status_codes == 429:
+            time.sleep(0.5)
+            return
+        import_txids = r.json()["results"]
 
         new_txids = list(set(import_txids)-set(self.existing_txids))
         logger.info(f"NTX TXIDs to import: {len(new_txids)}")
         logger.info(f"Processing ETA: {0.03*len(new_txids)} sec")
 
         for txid in new_txids:
-            time.sleep(0.02)
+            time.sleep(0.05)
             txid_url = urls.get_notarised_txid_url(txid, False)
             r = requests.get(txid_url)
-
-            for txid_info in r.json()["results"]:
-                ntx_row = self.get_import_row(txid_info)
-                ntx_row.update()
+            try:
+                for txid_info in r.json()["results"]:
+                    ntx_row = self.get_import_row(txid_info)
+                    ntx_row.update()
+            except Exception as e:
+                logger.error(f"Error importing {txid}: {e} | r.text: {r.text}")
 
 
 # Daily Notarised tables
@@ -254,8 +256,8 @@ class ntx_daily_stats():
             self.dpow_3p_coins = SEASONS_INFO[self.season]["servers"]["Third_Party"]["coins"]
 
     def update_daily_ntx_tables(self):
-        season_start_dt = dt.fromtimestamp(SEASONS_INFO[self.season]["start_time"])
-        season_end_dt = dt.fromtimestamp(SEASONS_INFO[self.season]["end_time"])
+        season_start_dt = dt.utcfromtimestamp(SEASONS_INFO[self.season]["start_time"])
+        season_end_dt = dt.utcfromtimestamp(SEASONS_INFO[self.season]["end_time"])
         start = season_start_dt.date()
         end = datetime.date.today()
 
@@ -1625,12 +1627,7 @@ def get_new_nn_ltc_txids(existing_txids, notary_address):
 def get_new_master_server_txids(notary_address, coin, season):
 
     existing_txids = []
-    if coin == "BTC":
-        existing_txids = query.get_existing_nn_btc_txids(notary_address, None, season)
-        url = f"{OTHER_SERVER}/api/info/btc_txid_list/?address={notary_address}&season={season}"
-        logger.info(f"{len(existing_txids)} existing txids in local DB detected for {notary_address} {season}")
-
-    elif coin == "LTC":
+    if coin == "LTC":
         existing_txids = query.get_existing_nn_ltc_txids(notary_address, None, season)
         url = f"{OTHER_SERVER}/api/info/ltc_txid_list/?notary={notary_address}&season={season}"
         logger.info(f"{len(existing_txids)} existing txids in local DB detected for {notary_address} {season}")

@@ -3,6 +3,7 @@ import os
 import json
 from psycopg2.extras import execute_values
 from lib_const import *
+from lib_filter import get_notarised_conditions_filter
 
 
 def update_ntx_row(row_data):
@@ -26,22 +27,6 @@ def update_ntx_row(row_data):
             logger.debug(row_data)
         CONN.rollback()
 
-
-def update_ntx_row_epoch_scores(row_data):
-    CONN = connect_db()
-    CURSOR = CONN.cursor()
-    sql = f"UPDATE notarised SET \
-            scored='{scored}', score_value={score_value} \
-            WHERE season='{season}' AND server='{server}' \
-            AND epoch='{epoch}';"
-    try:
-        CURSOR.execute(sql, row_data)
-        CONN.commit()
-    except Exception as e:
-        if str(e).find('duplicate') == -1:
-            logger.debug(e)
-            logger.debug(row_data)
-        CONN.rollback()
 
 
 def update_server_notarised_tbl(old_server, server):
@@ -68,7 +53,6 @@ def update_coin_server_season_notarised_tbl(server, season, coin):
     try:
         CURSOR.execute(sql)
         CONN.commit()
-        print(f"{old_server} reclassed as {server}")
     except Exception as e:
         logger.debug(e)
         CONN.rollback()

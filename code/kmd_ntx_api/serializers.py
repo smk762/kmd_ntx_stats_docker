@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User, Group
 from kmd_ntx_api.models import *
-from kmd_ntx_api.lib_const import *
 from rest_framework import serializers
 
 

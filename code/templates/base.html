@@ -38,7 +38,7 @@
         <!-- Datetimepicker -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha512-f0tzWhCwVFS3WeYaofoLWkTP62ObhewQ1EZn65oSYDZUg1+CyywGKkWzm8BxaJj5HGKI72PnMH9jYyIFz+GH7g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-        
+        <!-- JqueryUI -->
         <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
 
         <!-- Datatables -->
@@ -72,12 +72,23 @@
         <!-- Komodo Pallet -->
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
         {% include "css/kmd.css" %}
+        {% include "css/jquery-ui.css" %}
         {% include "css/graphs.css" %}
         {% include "css/tables.css" %}
-        {% include "css/jquery-ui.css" %}
-
-        {% include "js/custom.js" %}
-        {% include "js/custom_urls.js" %}
+        <!-- TODO: Not all this is needed for every page. It should be made more selective -->
+        {% include "js/buttons.js" %}
+        {% include "js/cells.js" %}
+        {% include "js/charts.js" %}
+        {% include "js/chrono.js" %}
+        {% include "js/components.js" %}
+        {% include "js/explorers.js" %}
+        {% include "js/helper.js" %}
+        {% include "js/icons.js" %}
+        {% include "js/mm2_coins.js" %}
+        {% include "js/rawtransaction.js" %}
+        {% include "js/styles.js" %}
+        {% include "js/tables.js" %}
+        {% include "js/urls.js" %}
     </head>
     <body class="c-app">
 
@@ -95,20 +106,12 @@
                     <div id="ui-view">
                         <div class="fade-in">
                             {% include "js/charts.js" %}
-
                             {% if messages %}
-                                {% for message in messages %}
-                                    {% include "components/messages/messages.html" %}
-                                {% endfor %}
+                                {% for message in messages %} {% include "components/messages/messages.html" %} {% endfor %}
                             {% endif %}
-
-                            {% if sidebar_links.server == 'dev' %}
-                                    {% include "components/messages/dev_msg.html" %}
-                            {% endif %}
-
+                            {% if sidebar_links.server == 'dev' %} {% include "components/messages/dev_msg.html" %} {% endif %}
                             {% block content %}
                             {% endblock %}
-
                         </div>
                     </div>
                 </div>
@@ -141,115 +144,7 @@
         <!-- DateTimePicker -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha512-AIOTidJAcHBH2G/oZv9viEGXRqDNmfdPVPYOYKGy3fti0xIplnlgMHUGfuNRzC6FkzIo0iIxgFnr9RikFxK+sw==" crossorigin="anonymous" referrerpolicy="no-referrer" ></script>
 
-        <script>
-            // init bootstrap tooltips
-            $(function () {
-                $('[data-toggle="tooltip"]').tooltip({
-                    delay: {
-                        show: 10,
-                        hide: 10
-                    }
-                })
-            })
-
-            // init clipboard buttons
-            var btns = document.querySelectorAll('button');
-            var clipboard = new ClipboardJS(btns);
-
-            clipboard.on('success', function (e) {
-                setTooltip(e.trigger, 'Copied!');
-                hideTooltip(e.trigger);
-            });
-
-            clipboard.on('error', function (e) {
-                console.log(e);
-            });
-
-            // init copy btn
-            var copy_btn = new ClipboardJS('.copy-btn');
-
-            copy_btn.on('success', function (e) {
-                setTooltip(e.trigger, 'Copied!');
-                hideTooltip(e.trigger);
-            });
-
-            copy_btn.on('error', function (e) {
-                console.log(e);
-            });
-
-            // init clipboard icon
-            var clipboard_icon = new ClipboardJS("#copy_icon");
-
-            clipboard_icon.on('success', function (e) {
-                setTooltip(e.trigger, 'Copied!');
-                hideTooltip(e.trigger);
-            });
-
-            clipboard_icon.on('error', function (e) {
-                console.log(e);
-            });
-
-            // init clipboard tooltips
-            function setTooltip(mdi, message) {
-              $(mdi).tooltip('hide')
-                .attr('data-original-title', message)
-                .tooltip('show');
-            }
-
-            function hideTooltip(mdi) {
-              setTimeout(function() {
-                $(mdi).tooltip('hide');
-              }, 1000);
-            }
-
-            
-            $(document).ready(function() {
-                var dt_ids = [];
-                $(".dataTable").each(function(){
-                    dt_ids.push($(this).attr("id"));
-                });
-                
-                for (i = 0; i < dt_ids.length; i++) {
-                    update_dt_search(dt_ids[i]);
-                    update_dt_length(dt_ids[i]);
-                }
-                
-                Chart.defaults.global.defaultFontColor = 'white';
-                Chart.defaults.global.defaultFontSize = 16;
-
-                // Init tooltips
-                $('[data-toggle="tooltip"]').tooltip();
-                
-                // Init Select2 dropdowns
-                $('select').select2();
-
-                
-            })
-
-
-        /*
-        $( "#pct_slider" ).slider({
-            min: 0,
-            max: 100
-        });
-        */
-
-        // Init Datetime picker
-        $('.dt_picker').datetimepicker({
-            theme:'dark', 
-            maxDate:new Date(),
-            defaultDate: new Date()
-        });
-
-        // Init Date picker
-        $('.d_picker').datetimepicker({
-            theme:'dark', 
-            maxDate:new Date(),
-            timepicker: false,
-            format:'d.m.Y',
-            defaultDate: new Date()
-        });
-        </script>
+        {% include "js/init.js" %}
         {% include "js/statcounter.js" %}
         {% include "js/jquery-qrcode.js" %}
     </body>

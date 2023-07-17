@@ -624,38 +624,6 @@ paths:
       - url: http://stats.kmd.io
     servers:
     - url: http://stats.kmd.io
-  /api/tools/kmd_rewards/:
-    get:
-      description: Returns pending KMD rewards for supplied address
-      parameters:
-      - name: address
-        in: query
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-        example: RCyANUW2H5985zk8p6NHJfPyNBXnTVzGDh
-      responses:
-        "200":
-          description: Pending KMD rewards for supplied address
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_200_13'
-              examples:
-                "0":
-                  value: "{\"address\": \"RCyANUW2H5985zk8p6NHJfPyNBXnTVzGDh\", \"\
-                    utxo_count\": 1, \"utxos\": {\"c76f553497b558cf3bcdffe77d8381922b68fa85e64ec38e88a5ce477efca32f\"\
-                    : {\"locktime\": 1620700056, \"utxo_value\": 17477130.20431399,\
-                    \ \"sat_rewards\": 1292330025504, \"kmd_rewards\": 12923.30025504,\
-                    \ \"satoshis\": 1747713020431399, \"block_height\": 2387478}},\
-                    \ \"eligible_utxo_count\": 1, \"oldest_utxo_block\": 2387478,\
-                    \ \"kmd_balance\": 17477130.20431399, \"total_rewards\": 12923.30025504}"
-      servers:
-      - url: http://stats.kmd.io
-    servers:
-    - url: http://stats.kmd.io
 components:
   schemas:
     inline_response_200:
@@ -820,8 +788,6 @@ components:
           type: integer
         utxos:
           $ref: '#/components/schemas/inline_response_200_13_utxos'
-        total_rewards:
-          type: number
     inline_response_200_results_Season_4_alien_AR_KMD:
       type: object
       properties:
@@ -1075,8 +1041,6 @@ components:
         locktime:
           type: integer
         utxo_value:
-          type: number
-        kmd_rewards:
           type: number
         sat_rewards:
           type: number

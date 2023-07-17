@@ -1,3 +1,4 @@
+<!-- charts.js -->
 <script>
     // ChartJS functions
 
@@ -337,5 +338,25 @@
         url = "/api/atomicdex/version_stats_by_hour/?chart=1&start="+start+"&end="+end
         get_versionData(url)
     }
+
+
+	function make_graph(graphtype, url, id) {
+	    $.ajax({ 
+			method: "GET", 
+			url: '/api/graph_json/balances/?coin={{ coin }}', 
+			success: function(data) { 
+				//document.getElementById('graph_title').innerHTML = data.chartLabel;
+				if (graphtype == 'line') {
+					drawLineGraph(data, 'myChartline');
+				}
+				else if (graphtype == 'bar') {
+					drawBarGraph(data, 'myChartBar');
+				}
+			}, 
+			error: function(error_data) { 
+				console.log(error_data); 
+			} 
+	    }) 
+	}
 
 </script>

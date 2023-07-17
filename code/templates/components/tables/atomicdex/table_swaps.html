@@ -1,3 +1,4 @@
+<!-- table_swaps.html -->
 	<div class="row col-12 m-auto">
 		<div class="card table_card floating-card m-auto col-12" id="last-swaps-card" style="font-size: 1.1em;" >
 			<div class="card-body table_card_body col-12">
@@ -20,10 +21,10 @@
 	<script type="text/javascript">
 
 
-    	function get_url() {
+    	function get_swaps_url() {
 	    	let maker_coin = $('#maker_coin').val() == undefined ? 'All' :  $('#maker_coin').val()
 	    	let taker_coin = $('#taker_coin').val() == undefined ? 'All' :  $('#taker_coin').val()
-	    	let url = "{{ endpoint }}?taker_coin="+taker_coin+"&maker_coin="+maker_coin
+	    	let url = "/api/atomicdex/last_200_swaps?taker_coin="+taker_coin+"&maker_coin="+maker_coin
 	    	console.log(url)
 	    	return url
 
@@ -34,14 +35,13 @@
 	    	const dom = '{% include "components/tables/dt_dom.html" with table="last-swaps" %}'
 			{% autoescape off %}
 		    	const dropdown_pair = `{% include 'components/form/dropdown_pair.html' with id_a='maker_coin' label_a='Maker coin ' width_a='125px' id_b='taker_coin' label_b='Taker coin ' width_b='125px' action="switch_combos('#maker_coin', '#taker_coin')" %}`
-				var options = {{ mm2_coins }}
 			{% endautoescape %}
 
 	    	$('#last-swaps').css('visibility', 'visible');
 
 	        const last_swaps_table = $('#last-swaps-tbl').DataTable({
 	     		"ajax": {
-				    "url": get_url(),
+				    "url": get_swaps_url(),
 	    			'dataSrc': '',
 	    			"deferRender": true
 				},
@@ -121,28 +121,25 @@
 				"initComplete": function (settings, json) {
 		            $('.last-swaps-tbl-title').html(dropdown_pair);
 
-		            let api_btn = get_api_button("last-swaps", 100, get_url(), "Source Data")
+		            let api_btn = get_api_button("last-swaps", 100, get_swaps_url(), "Source Data")
 		            $('.last-swaps-api-link').html(api_btn);
 
 		    		$('#maker_coin').select2();
 		    		$('#taker_coin').select2();
 
-		            add_dropdown_options(options, '#maker_coin', 'All')
-		            add_dropdown_options(options, '#taker_coin', 'All')
+		            add_dropdown_options(mm2_coins, '#maker_coin', 'All')
+		            add_dropdown_options(mm2_coins, '#taker_coin', 'All')
 
 				    $('#maker_coin').on('select2:select', function (e) {
-				    	console.log("maker_coin select")
-				    	last_swaps_table.ajax.url(get_url()).load()
+				    	last_swaps_table.ajax.url(get_swaps_url()).load()
 					});
 
 				    $('#taker_coin').on('select2:select', function (e) {
-				    	console.log("taker_coin select")
-				    	last_swaps_table.ajax.url(get_url()).load()
+				    	last_swaps_table.ajax.url(get_swaps_url()).load()
 					});
 
 				    $('#taker_coin').on('change', function (e) {
-				    	console.log("taker_coin change")
-				    	last_swaps_table.ajax.url(get_url()).load()
+				    	last_swaps_table.ajax.url(get_swaps_url()).load()
 					});
 	            }
 	        });            

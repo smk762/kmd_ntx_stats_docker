@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from django_filters.rest_framework import FilterSet, NumberFilter, CharFilter
-from kmd_ntx_api.lib_const import *
 from kmd_ntx_api.models import *
 from kmd_ntx_api.serializers import *
 
