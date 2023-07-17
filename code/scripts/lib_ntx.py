@@ -234,7 +234,7 @@ class notarised():
         logger.info(f"Processing ETA: {0.03*len(new_txids)} sec")
 
         for txid in new_txids:
-            time.sleep(0.05)
+            time.sleep(0.2)
             txid_url = urls.get_notarised_txid_url(txid, False)
             r = requests.get(txid_url)
             try:

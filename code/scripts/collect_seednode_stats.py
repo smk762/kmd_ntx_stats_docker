@@ -94,6 +94,10 @@ seednodes = {
 		'IP': 'cipi_ar.cipig.net',
 		'PeerID': '12D3KooWMsfmq3bNNPZTr7HdhTQvxovuR1jo5qvM362VQZorTk3F'
 	},
+	'cipi_EU': {
+		'IP': 'cipi_eu.cipig.net',
+		'PeerID': '12D3KooWBhGrTVfaK9v12eA3Et84Y8Bc6ixfZVVGShsad2GBWzm3'
+	},
 	'cipi_NA': {
 		'IP': 'cipi_na.cipig.net',
 		'PeerID': '12D3KooWBoQYTPf4q2bnsw8fUA2LKoknccVLrAcF1caCa48ev8QU'
