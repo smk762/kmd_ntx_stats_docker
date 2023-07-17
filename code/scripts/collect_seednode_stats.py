@@ -303,21 +303,12 @@ def get_version_stats_from_db():
 def get_registered_nodes_from_db():
     rows = cursor.execute("SELECT * FROM nodes;").fetchall()
     print("---------")
-    for row in rows:
-        print(dict(row))    
-    print("---------")
     
-def delete_registered_nodes_from_db():
-    rows = cursor.execute("DELETE FROM nodes;")
-    CONN.commit()
-    print("---------")
     for row in rows:
         print(dict(row))    
     print("---------")
+    return [i['name'] for i in rows]
 
-def deregister_nodes_from_db(notary):
-    cursor.execute(f"DELETE FROM nodes where name = '{notary}';")
-    cursor.commit()
 
 def update_seednode_version_stats_row(row_data):
     try:
@@ -489,7 +480,7 @@ if __name__ == '__main__':
 
         # Run manually to register nodes via JSON file
         elif sys.argv[1] == 'register':
-            notaries = seednodes.keys()
+            notaries = get_registered_nodes_from_db()
             remove_notaries(notaries)
             add_notaries()
 
