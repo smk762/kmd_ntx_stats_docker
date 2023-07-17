@@ -223,8 +223,8 @@ class notarised():
     def import_ntx(self, server, coin):
 
         url = urls.get_ntxid_list_url(self.season, server, coin, False)
-        import_txids = requests.get(url)
-        if requests.status_codes == 429:
+        r = requests.get(url)
+        if r.status_code == 429:
             time.sleep(0.5)
             return
         import_txids = r.json()["results"]
@@ -234,7 +234,7 @@ class notarised():
         logger.info(f"Processing ETA: {0.03*len(new_txids)} sec")
 
         for txid in new_txids:
-            time.sleep(0.05)
+            time.sleep(0.2)
             txid_url = urls.get_notarised_txid_url(txid, False)
             r = requests.get(txid_url)
             try:

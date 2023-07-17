@@ -27,10 +27,14 @@ def get_notarised_data(season=None, server=None, epoch=None, coin=None,
         return notarised.objects.filter(txid=txid)
     else:
         data = notarised.objects.all()
-    data = filter_data_basic(
-        data, notary=None, address=None, exclude_epoch=None,
-        min_blocktime=None, max_blocktime=None
-    )
+    if season:
+        data = data.filter(season=season)
+    if server:
+        data = data.filter(server=server)
+    if epoch:
+        data = data.filter(epoch=epoch)
+    if coin:
+        data = data.filter(coin=coin)
     if min_blocktime:
         data = data.filter(block_time__gte=min_blocktime)
     if max_blocktime:
