@@ -61,12 +61,13 @@ def get_tendermint_token_activation(coin):
 
 
 def get_emv_activation(coins_config, coin):
+    # TODO: Update to use newer methods
     if "nodes" in coins_config[coin]:
         return {
             "userpass": "'$userpass'",
             "method": "enable",
             "coin": coin, 
-            "urls": coins_config[coin]["nodes"]
+            "urls": [i["url"] for i in coins_config[coin]["nodes"] if "gui_auth" not in i]
         }
     else:
         logger.warning(f"EMV activation for {coin} not possible, no nodes found")
