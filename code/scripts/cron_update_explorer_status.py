@@ -48,6 +48,6 @@ for i in INSIGHT_EXPLORERS:
     data.append(info)
 
 SCRIPT_PATH = dirname(realpath(sys.argv[0]))
-CACHE_PATH = f"{SCRIPT_PATH}/../kmd_ntx_api/cache"
+CACHE_PATH = f"{SCRIPT_PATH}/../cache"
 
-json.dump(data, open(f'{CACHE_PATH}/explorer_status.json', 'w'), indent=4)
+json.dump(data, open(f'{CACHE_PATH}/explorer_status.json', 'w+'), indent=4)
