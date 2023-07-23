@@ -28,7 +28,7 @@ for i in INSIGHT_EXPLORERS:
             })
         except:
             pass
-    data.append(info)
+        data.append(info)
 
 SCRIPT_PATH = dirname(realpath(sys.argv[0]))
 CACHE_PATH = f"{SCRIPT_PATH}/../cache"
