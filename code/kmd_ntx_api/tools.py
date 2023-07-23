@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 from kmd_ntx_api.const import SMARTCHAINS
 from kmd_ntx_api.info import get_base_58_coin_params
 from kmd_ntx_api.based_58 import calc_addr_tool, convert_addresses, decode_opret, \
@@ -188,6 +189,9 @@ def get_scripthash_from_address(request):
             }
     return {"error": "You need to specify an address, like ?address=17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem"}
 
+
+def get_explorer_status():
+    return json.load(open("cache/explorer_status.json", "r"))
 
 
 def get_scripthashes_from_pubkey(request):

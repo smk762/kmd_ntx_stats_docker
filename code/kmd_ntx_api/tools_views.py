@@ -369,3 +369,12 @@ def send_raw_tx_view(request):
 
     return render(request, 'views/tools/tool_send_raw_transaction.html', context)
 
+
+def explorer_status_view(request):
+    context = get_base_context(request)
+    context.update({
+        "page_title":"Insight Explorer Status"
+    })
+
+    return render(request, 'views/tools/tool_insight_status.html', context)
+

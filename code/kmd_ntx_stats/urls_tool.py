@@ -26,6 +26,9 @@ frontend_tool_urls = [
           tools_views.faucet_view,
           name='faucet_view'),
     
+    path('tools/explorer_status/',
+          tools_views.explorer_status_view,
+          name='explorer_status_view'),
 
     path('tools/launch_params/',
           tools_views.launch_params_view,
@@ -72,10 +75,14 @@ api_tool_urls = [
           tools_api.pubkey_utxos_tool,
           name='pubkey_utxos_tool'),
 
+    path('api/tools/explorer_status/',
+          tools_api.explorer_status_tool,
+          name='explorer_status_tool'),
+
     path('api/tools/send_raw_tx/',
           tools_api.send_raw_tx_tool,
           name='send_raw_tx_tool'),
-    
+
     path('api/tools/scripthash_from_address/',
           tools_api.scripthash_from_address_tool,
           name='scripthash_from_address_tool'),
