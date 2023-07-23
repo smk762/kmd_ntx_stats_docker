@@ -150,3 +150,69 @@ class InsightAPI:
         return response.json()
 
 
+INSIGHT_EXPLORERS = {
+    'CCL': [
+        'https://ccl.komodo.earth/',
+        'https://ccl.explorer.dragonhound.info/'
+    ],
+    'CHIPS': [
+        'https://chips.komodo.earth/',
+        'https://chips.explorer.dragonhound.info/'
+    ],
+    'CLC': [
+        'https://clc.komodo.earth/',
+        'https://clc.explorer.dragonhound.info/'
+    ],
+    'DOC': [
+        'https://doc.komodo.earth/',
+        'https://doc.explorer.dragonhound.info/'
+    ],
+    'GLEEC': [
+        'https://gleec.komodo.earth/',
+        'https://gleec.explorer.dragonhound.info/'
+    ],
+    'ILN': [
+        'https://iln.komodo.earth/',
+        'https://iln.explorer.dragonhound.info/'
+    ],
+    'KMD': [
+        'https://kmd.komodo.earth/',
+        'https://kmd.explorer.dragonhound.info/'
+    ],
+    'KOIN': [
+        'https://koin.komodo.earth/',
+        'https://koin.explorer.dragonhound.info/'
+    ],
+    'MARTY': [
+        'https://marty.komodo.earth/',
+        'https://marty.explorer.dragonhound.info/'
+    ],
+    'MCL': [
+        'https://mcl.komodo.earth/',
+        'https://mcl.explorer.dragonhound.info/'
+    ],
+    'NINJA': [
+        'https://ninja.komodo.earth/',
+        'https://ninja.explorer.dragonhound.info/'
+    ],
+    'PIRATE': [
+        'https://pirate.komodo.earth/',
+        'https://pirate.explorer.dragonhound.info/'
+    ],
+    'SUPERNET': [
+        'https://supernet.komodo.earth/',
+        'https://supernet.explorer.dragonhound.info/'
+    ],
+    'THC': [
+        'https://thc.komodo.earth/',
+        'https://thc.explorer.dragonhound.info/'
+    ],
+    'TOKEL': [
+        'https://tokel.komodo.earth/',
+        'https://tokel.explorer.dragonhound.info/'
+    ],
+    'VRSC': [
+        'https://vrsc.komodo.earth/',
+        'https://vrsc.explorer.dragonhound.info/'
+    ]
+}

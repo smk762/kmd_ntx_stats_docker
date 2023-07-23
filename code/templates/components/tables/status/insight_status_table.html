@@ -17,7 +17,7 @@
                 <thead>
                     <tr>
                         <th data-data="coin">Coin</th>
-                        <th data-data="url">CoinURL</th>
+                        <th data-data="explorer">URL</th>
                         <th data-data="height">Height</th>
                         <th data-data="sync_pct">Sync %</th>
                         <th data-data="blockhash">Blockhash</th>
@@ -31,7 +31,7 @@
 <script type="text/javascript">
     window.tables = []
     $(document).ready(function() {
-        const url = "api/tools/explorer_status"
+        const url = "/api/tools/explorer_status"
         const dom = '{% include "components/tables/dt_dom.html" with table="insight" %}'
         $('#insight_table').css('visibility', 'visible');
         const insight_table = $('#insight_table').DataTable({
@@ -62,7 +62,7 @@
                     }
                 },
                 {
-                    "data": "url",
+                    "data": "explorer",
                     "targets": 1,
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
                     }
