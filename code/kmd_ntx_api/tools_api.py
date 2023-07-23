@@ -58,6 +58,6 @@ def scripthashes_from_pubkey_tool(request):
 
 
 def explorer_status_tool(request):
-    resp = get_explorer_status(request)
+    resp = get_explorer_status()
     filters = []
     return json_resp(resp, filters)
