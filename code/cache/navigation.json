@@ -80,6 +80,10 @@
                 "icon": "fa-solid fa-tower-broadcast",
                 "url": "/tools/daemon_clis"
             },
+            "Insight Explorer Status": {
+                "icon": "fa-solid fa-atom",
+                "url": "/tools/explorer_status"
+            },
             "Launch Params": {
                 "icon": "fa-solid fa-rocket",
                 "url": "/tools/launch_params"
