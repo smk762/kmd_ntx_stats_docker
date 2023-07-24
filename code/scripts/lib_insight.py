@@ -176,8 +176,9 @@ INSIGHT_EXPLORERS = {
         'https://iln.explorer.dragonhound.info/'
     ],
     'KMD': [
-        'https://kmd.komodo.earth/',
-        'https://kmd.explorer.dragonhound.info/'
+        'https://explorer.komodoplatform.com/',
+        'https://explorer.kmd.dev/',
+        'https://explorer.kmd.io/'        
     ],
     'KOIN': [
         'https://koin.komodo.earth/',
