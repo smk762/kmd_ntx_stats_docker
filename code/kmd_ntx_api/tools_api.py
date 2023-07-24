@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from kmd_ntx_api.tools import get_addr_from_base58, get_address_conversion, \
     get_address_from_pubkey, get_decode_op_return, get_pubkey_utxos, \
-    get_scripthash_from_address, get_scripthashes_from_pubkey
+    get_scripthash_from_address, get_scripthashes_from_pubkey, get_explorer_status
 from kmd_ntx_api.serializers import addrFromBase58Serializer
 from kmd_ntx_api.raw_transaction import send_raw_tx
 from kmd_ntx_api.helper import json_resp, \
@@ -54,4 +54,10 @@ def scripthash_from_address_tool(request):
 def scripthashes_from_pubkey_tool(request):
     resp = get_scripthashes_from_pubkey(request)
     filters = ["pubkey"]
+    return json_resp(resp, filters)
+
+
+def explorer_status_tool(request):
+    resp = get_explorer_status()
+    filters = []
     return json_resp(resp, filters)
