@@ -102,6 +102,10 @@ seednodes = {
 		'IP': 'cipi_na.cipig.net',
 		'PeerID': '12D3KooWBoQYTPf4q2bnsw8fUA2LKoknccVLrAcF1caCa48ev8QU'
 	},
+	'caglarkaya_EU': {
+		'IP': 'eu.caglarkaya.net',
+		'PeerID': '12D3KooWEg7MBp1P9k9rYVBcW5pa8tsHhyE5UuGAAerCARLzZBPn'
+	},
 	'computergenie_EU': {
 		'IP': 'cgeu.computergenie.gay',
 		'PeerID': '12D3KooWGkPFi43Nq6cAcc3gib1iECZijnKZLgEf1q1MBRKLczJF'
