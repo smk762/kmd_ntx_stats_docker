@@ -171,9 +171,9 @@ def faucet_view(request):
     pending_tx_list = []
     tx_rows = []
     pending_index = []
-    if "Result" in pending_tx_resp:
-        if "Message" in pending_tx_resp["Result"]:
-            pending_tx_list = pending_tx_resp["Result"]["Message"]
+    if "result" in pending_tx_resp:
+        if "message" in pending_tx_resp["result"]:
+            pending_tx_list = pending_tx_resp["result"]["message"]
     for item in pending_tx_list:
         tx_rows.append({
             "index": item[0],    
@@ -193,9 +193,9 @@ def faucet_view(request):
     now = time.time()
     sum_24hrs = 0
     count_24hrs = 0
-    if "Result" in sent_tx_resp:
-        if "Message" in sent_tx_resp["Result"]:
-            sent_tx_list = sent_tx_resp["Result"]["Message"]
+    if "result" in sent_tx_resp:
+        if "message" in sent_tx_resp["result"]:
+            sent_tx_list = sent_tx_resp["result"]["message"]
     for item in sent_tx_list:
         if item[0] not in pending_index:
             if item[3] > SINCE_INTERVALS['day']:
@@ -235,10 +235,10 @@ def faucet_view(request):
         r = requests.get(url)
         try:
             resp = r.json()
-            messages.success(request, resp["Result"]["Message"])
-            if resp['Status'] == "Success":
+            messages.success(request, resp["result"]["message"])
+            if resp['status'] == "success":
                 context.update({"result": coin+"_success"})
-            elif resp['Status'] == "Error":
+            elif resp['status'] == "error":
                 context.update({"result": "disqualified"})
             else:
                 context.update({"result": "fail"})
