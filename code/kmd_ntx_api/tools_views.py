@@ -181,7 +181,7 @@ def faucet_view(request):
             "address": item[2], 
             "time_sent": "n/a",
             "timestamp": 99999999999999,
-            "amount": "n/a",  
+            "amount": "n/a",
             "txid": "n/a",
             "status": item[6]
         })
