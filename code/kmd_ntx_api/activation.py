@@ -40,7 +40,7 @@ def get_tendermint_activation(coins_config, coin):
         "params": {
             "ticker": coin,
             "tokens_params": [],
-            "rpc_urls": coins_config[coin]["rpc_urls"]
+            "rpc_urls": [i["url"] for i in coins_config[coin]["rpc_urls"]]
         },
         "userpass": "'$userpass'"
     }
