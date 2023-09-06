@@ -284,7 +284,7 @@ def get_address_from_pubkey(request):
 def is_evm(coin):
     if coin in ["ETH", "MATIC", "FTM", "BNB", "AVAX"]:
         return True
-    split_coin = coin.replace("_OLD", "").split("_")
+    split_coin = coin.replace("_OLD", "").split("-")
     if len(split_coin) == 1:
         return False
     if split_coin[1] in ["BEP20", "ERC20", "FTM20", "PLG20", "AVX20", "KRC20", "HCO20"]:
