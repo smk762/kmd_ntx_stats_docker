@@ -219,11 +219,15 @@ def get_scripthashes_from_pubkey(request):
 
 
 def get_evm_address_from_pubkey(compressed_pubkey):
-    compressed_pubkey_bytes = bytes.fromhex(compressed_pubkey[2:])
-    uncompressed_pubkey = str(keys.PublicKey.from_compressed_bytes(compressed_pubkey_bytes))[2:]
-    uncompressed_pubkey_bytes = bytes.fromhex(uncompressed_pubkey)
-    address = (keys.PublicKey(uncompressed_pubkey_bytes).to_checksum_address())
-    logger.info(address)
+    try:
+        compressed_pubkey_bytes = bytes.fromhex(compressed_pubkey[2:])
+        uncompressed_pubkey = str(keys.PublicKey.from_compressed_bytes(compressed_pubkey_bytes))[2:]
+        uncompressed_pubkey_bytes = bytes.fromhex(uncompressed_pubkey)
+        address = (keys.PublicKey(uncompressed_pubkey_bytes).to_checksum_address())
+        logger.info(address)
+    except Exception as e:
+        logger.error(f"get_evm_address_from_pubkey: {e}")
+        address = "N/A"
     return address
 
 
