@@ -220,7 +220,9 @@ def get_scripthashes_from_pubkey(request):
 
 def get_evm_address_from_pubkey(compressed_pubkey):
     try:
-        compressed_pubkey_bytes = bytes.fromhex(compressed_pubkey[2:])
+        if compressed_pubkey.startswith("0x"):
+            compressed_pubkey = compressed_pubkey[2:]
+        compressed_pubkey_bytes = bytes.fromhex(compressed_pubkey)
         uncompressed_pubkey = str(keys.PublicKey.from_compressed_bytes(compressed_pubkey_bytes))[2:]
         uncompressed_pubkey_bytes = bytes.fromhex(uncompressed_pubkey)
         address = (keys.PublicKey(uncompressed_pubkey_bytes).to_checksum_address())
