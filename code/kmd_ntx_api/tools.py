@@ -12,7 +12,7 @@ from kmd_ntx_api.explorers import get_sync, get_dexstats_utxos
 from kmd_ntx_api.serializers import addrFromBase58Serializer
 from kmd_ntx_api.helper import get_or_none, get_page_server, get_time_since
 from kmd_ntx_api.notary_seasons import get_page_season, get_season, get_seasons_info
-
+from kmd_ntx_api.logger import logger
 
 def get_addr_from_base58(request):
     for x in addrFromBase58Serializer.Meta.fields:
@@ -222,7 +222,9 @@ def get_evm_address_from_pubkey(compressed_pubkey):
     compressed_pubkey_bytes = bytes.fromhex(compressed_pubkey[2:])
     uncompressed_pubkey = str(keys.PublicKey.from_compressed_bytes(compressed_pubkey_bytes))[2:]
     uncompressed_pubkey_bytes = bytes.fromhex(uncompressed_pubkey)
-    return keys.PublicKey(uncompressed_pubkey_bytes).to_checksum_address()
+    address = (keys.PublicKey(uncompressed_pubkey_bytes).to_checksum_address())
+    logger.info(address)
+    return address
 
 
 def get_address_from_pubkey(request):
@@ -248,13 +250,14 @@ def get_address_from_pubkey(request):
                     "supported_coins": list(base_58_coins.keys())
                 }
             else:
+                logger.info(f"get_address_from_pubkey: {coin} is an EVM coin, using eth_keys to generate address")
                 address_row = {
                     "pubkey": pubkey,
                     "pubtype": "N/A",
                     "p2shtype": "N/A",
                     "wiftype": "N/A",
                     "address": get_evm_address_from_pubkey(pubkey),
-                    "coin":coin
+                    "coin": coin
                 }
                 address_rows.append(address_row)
                 
