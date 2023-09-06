@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+from eth_keys import keys
 from kmd_ntx_api.const import SMARTCHAINS
 from kmd_ntx_api.info import get_base_58_coin_params
 from kmd_ntx_api.based_58 import calc_addr_tool, convert_addresses, decode_opret, \
@@ -11,7 +12,7 @@ from kmd_ntx_api.explorers import get_sync, get_dexstats_utxos
 from kmd_ntx_api.serializers import addrFromBase58Serializer
 from kmd_ntx_api.helper import get_or_none, get_page_server, get_time_since
 from kmd_ntx_api.notary_seasons import get_page_season, get_season, get_seasons_info
-
+from kmd_ntx_api.logger import logger
 
 def get_addr_from_base58(request):
     for x in addrFromBase58Serializer.Meta.fields:
@@ -217,6 +218,21 @@ def get_scripthashes_from_pubkey(request):
     return {"error": "You need to specify a pubkey, like ?pubkey=<PUBKEY>"}
 
 
+def get_evm_address_from_pubkey(compressed_pubkey):
+    try:
+        if compressed_pubkey.startswith("0x"):
+            compressed_pubkey = compressed_pubkey[2:]
+        compressed_pubkey_bytes = bytes.fromhex(compressed_pubkey)
+        uncompressed_pubkey = str(keys.PublicKey.from_compressed_bytes(compressed_pubkey_bytes))[2:]
+        uncompressed_pubkey_bytes = bytes.fromhex(uncompressed_pubkey)
+        address = (keys.PublicKey(uncompressed_pubkey_bytes).to_checksum_address())
+        logger.info(address)
+    except Exception as e:
+        logger.error(f"get_evm_address_from_pubkey: {e}")
+        address = "N/A"
+    return address
+
+
 def get_address_from_pubkey(request):
     coin = get_or_none(request, "coin")
     pubkey = get_or_none(request, "pubkey")
@@ -233,11 +249,24 @@ def get_address_from_pubkey(request):
     base_58_coins = get_base_58_coin_params(request)
 
     if coin:
-        if coin not in base_58_coins: 
-            return {
-                "error": f"{coin} does not have locally defined Base 58 Params.",
-                "supported_coins": list(base_58_coins.keys())
-            }
+        if coin not in base_58_coins:
+            if not is_evm(coin):
+                return {
+                    "error": f"{coin} does not have locally defined Base 58 Params.",
+                    "supported_coins": list(base_58_coins.keys())
+                }
+            else:
+                logger.info(f"get_address_from_pubkey: {coin} is an EVM coin, using eth_keys to generate address")
+                address_row = {
+                    "pubkey": pubkey,
+                    "pubtype": "N/A",
+                    "p2shtype": "N/A",
+                    "wiftype": "N/A",
+                    "address": get_evm_address_from_pubkey(pubkey),
+                    "coin": coin
+                }
+                address_rows.append(address_row)
+                
         else:
             address_row = calc_addr_tool(pubkey,
                                          base_58_coins[coin]["pubtype"],
@@ -260,3 +289,13 @@ def get_address_from_pubkey(request):
         "results": address_rows,
         "count": len(address_rows)
     }
+
+def is_evm(coin):
+    if coin in ["ETH", "MATIC", "FTM", "BNB", "AVAX"]:
+        return True
+    split_coin = coin.replace("_OLD", "").split("-")
+    if len(split_coin) == 1:
+        return False
+    if split_coin[1] in ["BEP20", "ERC20", "FTM20", "PLG20", "AVX20", "KRC20", "HCO20"]:
+        return True
+    
