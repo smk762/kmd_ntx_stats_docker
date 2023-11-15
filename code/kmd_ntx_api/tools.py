@@ -291,11 +291,35 @@ def get_address_from_pubkey(request):
     }
 
 def is_evm(coin):
-    if coin in ["ETH", "MATIC", "FTM", "BNB", "AVAX"]:
-        return True
     split_coin = coin.replace("_OLD", "").split("-")
     if len(split_coin) == 1:
         return False
-    if split_coin[1] in ["BEP20", "ERC20", "FTM20", "PLG20", "AVX20", "KRC20", "HCO20"]:
+    protocols = {
+        "AVAX": "AVX20",
+        "ETH": "ERC20",
+        "BNB": "BEP20",
+        "ETH-ARB20": "ARB20",
+        "FTM": "FTM20",
+        "HT": "HCO20",
+        "KCS": "KRC20",
+        "MATIC": "PLG20",
+        "GLMR": "Moonbeam",
+        "MOVR": "Moonriver",
+        "ONE": "HRC20",
+        "ETC": "Ethereum Classic",
+        "RBTC": "RSK Smart Bitcoin",
+        "SBCH": "SmartBCH",
+        "UBQ": "Ubiq"
+    }
+    testnet_protocols = {
+        "AVAXT": "AVX20",
+        "BNBT": "BEP20",
+        "FTMT": "FTM20",
+        "MATICTEST": "PLG20"
+    }
+    if coin in protocols.keys() or coin in testnet_protocols.keys():
         return True
+    if coin in protocols.values() or coin in testnet_protocols.values():
+        return True
+    return False
     
