@@ -133,7 +133,7 @@ def notary_seasons_cache():
 
 
 # Seed node version epochs
-VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/seednode-update/doc/seed_version_epochs.json"
+VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/doc/seed_version_epochs.json"
 VERSION_TIMESPANS_PATH = f"{CACHE_PATH}/version_timespans.json"
 def version_timespans_cache():
     return refresh_cache_data(VERSION_TIMESPANS_PATH, VERSION_TIMESPANS_URL)

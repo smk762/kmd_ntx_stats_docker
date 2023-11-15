@@ -25,7 +25,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
-VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/seednode-update/doc/seed_version_epochs.json"
+VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/doc/seed_version_epochs.json"
 VERSION_DATA = requests.get(VERSION_TIMESPANS_URL).json()
 SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 
@@ -123,11 +123,11 @@ seednodes = {
 		'PeerID': '12D3KooWNGGBfPWQbubupECdkYhj1VomMLUUAYpsR2Bo3R4NzHju'
 	},
 	'dragonhound_EU': {
-		'IP': 'eu.smk.dog',
+		'IP': 's7eu.smk.dog',
 		'PeerID': '12D3KooWDgFfyAzbuYNLMzMaZT9zBJX9EHd38XLQDRbNDYAYqMzd'
 	},
 	'dragonhound_NA': {
-		'IP': 'na.smk.dog',
+		'IP': 's7na.smk.dog',
 		'PeerID': '12D3KooWSmizY35qrfwX8qsuo8H8qrrvDjXBTMRBfeYsRQoybHaA'
 	},
 	'fediakash_AR': {
