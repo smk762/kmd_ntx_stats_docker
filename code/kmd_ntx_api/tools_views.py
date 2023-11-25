@@ -212,7 +212,7 @@ def faucet_view(request):
                 "status": item[6]
             })
 
-    coins_list = ["RICK", "MORTY", "DOC", "MARTY", "ZOMBIE"]
+    coins_list = ["DOC", "MARTY", "ZOMBIE"]
     context = get_base_context(request)
     context.update({
         "page_title":"Testcoin Faucet",
