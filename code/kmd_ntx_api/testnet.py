@@ -50,7 +50,7 @@ def get_testnet_scoreboard(request):
     ntx_data_24hr = get_notarised_date(
         season).order_by('coin', '-block_height').values()
 
-    testnet_coins = ["RICK", "MORTY"]
+    testnet_coins = ["DOC", "MARTY"]
     testnet_stats_dict = get_testnet_stats_dict(season, testnet_coins)
 
     seednode_scores = get_seednode_version_score_total(request, "VOTE2022_Testnet", 1653091199, 1653436800)
@@ -71,7 +71,7 @@ def get_testnet_scoreboard(request):
             ntx_dict.update({coin: []})
             ntx_dict_24hr.update({coin: []})
 
-        if coin in ["RICK", "MORTY"] and item["block_height"] >= seasons_info[season]["start_block"]:
+        if coin in ["DOC", "MARTY"] and item["block_height"] >= seasons_info[season]["start_block"]:
             ntx_dict[coin].append(item)
 
         elif coin in ["KMD"] and item["block_height"] >= seasons_info[season]["start_block"]:
@@ -80,7 +80,7 @@ def get_testnet_scoreboard(request):
     for item in ntx_data_24hr:
         coin = item['coin']
 
-        if coin in ["RICK", "MORTY"] and item["block_height"] >= seasons_info[season]["start_block"]:
+        if coin in ["DOC", "MARTY"] and item["block_height"] >= seasons_info[season]["start_block"]:
             ntx_dict_24hr[coin].append(item)
 
         elif coin in ["KMD"] and item["block_height"] >= seasons_info[season]["start_block"]:

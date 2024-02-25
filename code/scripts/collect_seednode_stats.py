@@ -120,7 +120,7 @@ seednodes = {
 	},
 	'dragonhound_DEV': {
 		'IP': 'dev.smk.dog',
-		'PeerID': '12D3KooWNGGBfPWQbubupECdkYhj1VomMLUUAYpsR2Bo3R4NzHju'
+		'PeerID': '12D3KooWEnrvbqvtTowYMR8FnBeKtryTj9RcXGx8EPpFZHou2ruP'
 	},
 	'dragonhound_EU': {
 		'IP': 's7eu.smk.dog',

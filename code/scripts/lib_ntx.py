@@ -1593,6 +1593,8 @@ def get_new_nn_ltc_txids(existing_txids, notary_address):
         if "error" in resp:
             logger.info(f"Error in resp: {resp}")
             exit_loop = api.api_sleep_or_exit(resp, exit=True)
+            if resp['error'] == 'Limits reached.':
+                break
         else:
             page += 1
             if 'txrefs' in resp:

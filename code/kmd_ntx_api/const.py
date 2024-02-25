@@ -60,6 +60,6 @@ SINCE_INTERVALS = {
 
 SMARTCHAINS = ["BET", "BOTS", "CCL", "CHIPS", "CLC", "CRYPTO", "DEX",
                   "DP", "GLEEC", "HODL", "ILN", "JUMBLR", "KMD", "KOIN",
-                  "LABS", "MCL", "MESH", "MGW", "MORTY", "MSHARK", "NINJA",
-                  "PANGEA", "PIRATE", "REVS", "RICK", "SOULJA", "SPACE",
+                  "LABS", "MCL", "MESH", "MGW", "MARTY", "MSHARK", "NINJA",
+                  "PANGEA", "PIRATE", "REVS", "DOC", "SOULJA", "SPACE",
                   "SUPERNET", "THC", "TOKEL", "VRSC", "WSB", "ZILLA"]

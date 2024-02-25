@@ -136,18 +136,19 @@ def update_coins_row(row_data):
     CURSOR = CONN.cursor()
     try:
         sql = "INSERT INTO coins \
-            (coin, coins_info, electrums, electrums_ssl, explorers, lightwallets, dpow, dpow_tenure, dpow_active, mm2_compatible) \
+            (coin, coins_info, electrums, electrums_ssl, electrums_wss, explorers, lightwallets, dpow, dpow_tenure, dpow_active, mm2_compatible) \
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
             ON CONFLICT ON CONSTRAINT unique_coin_coin DO UPDATE SET \
             coins_info='"+str(row_data[1])+"', \
             electrums='"+str(row_data[2])+"', \
             electrums_ssl='"+str(row_data[3])+"', \
-            explorers='"+str(row_data[4])+"', \
-            lightwallets='"+str(row_data[5])+"', \
-            dpow='"+str(row_data[6])+"', \
-            dpow_tenure='"+str(row_data[7])+"', \
-            dpow_active='"+str(row_data[8])+"', \
-            mm2_compatible='"+str(row_data[9])+"';"
+            electrums_wsl='"+str(row_data[4])+"', \
+            explorers='"+str(row_data[5])+"', \
+            lightwallets='"+str(row_data[6])+"', \
+            dpow='"+str(row_data[7])+"', \
+            dpow_tenure='"+str(row_data[8])+"', \
+            dpow_active='"+str(row_data[9])+"', \
+            mm2_compatible='"+str(row_data[10])+"';"
         CURSOR.execute(sql, row_data)
         CONN.commit()
         return 1

@@ -88,4 +88,20 @@
                 </div>
             </div>
         {% endif %}
+        {% if coins_data.electrums_wss|length > 0 %}
+            <div class="input-group mb-2">
+                <div class="input-group-prepend p-0 col-2 text-center prepend-label-left">
+                    <span class="input-group-text col-12 m-auto">
+                        Electrums (WSS)
+                    </span>
+                </div>
+                <div class="justify-content-between col-10 coin-params-field">
+                    {% for x in coins_data.electrums_wss %}
+                        <span class='badge p-2 m-1' style="font-size: 0.9em; background-color: #000;">
+                            {{ x }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
     </div>

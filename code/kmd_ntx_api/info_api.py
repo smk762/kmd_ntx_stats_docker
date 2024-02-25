@@ -8,7 +8,7 @@ from kmd_ntx_api.info import get_mined_between_blocks, \
     get_notarised_servers, get_notarisation_txid_list, get_notarised_txid, \
     get_notary_ltc_transactions, get_notary_ltc_txid, get_notary_nodes_info
 from kmd_ntx_api.explorers import get_explorers
-from kmd_ntx_api.electrum import get_electrums, get_electrums_ssl
+from kmd_ntx_api.electrum import get_electrums, get_electrums_ssl, get_electrums_wss
 from kmd_ntx_api.helper import json_resp
 
 
@@ -80,6 +80,12 @@ def coin_electrums(request):
 
 def coin_electrums_ssl(request):
     resp = get_electrums_ssl(request)
+    filters = ['coin']
+    return json_resp(resp, filters)
+
+
+def coin_electrums_wss(request):
+    resp = get_electrums_wss(request)
     filters = ['coin']
     return json_resp(resp, filters)
 
