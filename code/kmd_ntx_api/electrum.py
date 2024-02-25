@@ -34,6 +34,17 @@ def get_electrums_ssl(request):
             resp.update({item['coin']: electrums_ssl})
     return resp
 
+def get_electrums_wss(request):
+    coin = get_or_none(request, "coin")
+    data = get_coins_data(coin)
+    data = data.order_by('coin').values('coin', 'electrums_wss')
+    resp = {}
+    for item in data:
+        electrums_wss = item['electrums_wss']
+        if len(electrums_wss) > 0:
+            resp.update({item['coin']: electrums_wss})
+    return resp
+
 
 def get_coin_electrums(coin):
     data = get_coins_data(coin)
@@ -45,6 +56,12 @@ def get_coin_electrums_ssl(coin):
     data = get_coins_data(coin)
     if data.count() == 1:
         return data.values('electrums_ssl')[0]['electrums_ssl']
+
+
+def get_coin_electrums_wss(coin):
+    data = get_coins_data(coin)
+    if data.count() == 1:
+        return data.values('electrums_wss')[0]['electrums_wss']
 
 
 def get_from_electrum(url, port, method, params=[]):

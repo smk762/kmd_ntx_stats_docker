@@ -252,9 +252,9 @@ paths:
                   value: "{\"count\": 29, \"filters\": [\"season\", \"server\", \"\
                     epoch\", \"timestamp\"], \"results\": [\"AXO\", \"BET\", \"BOTS\"\
                     , \"BTCH\", \"CCL\", \"COQUICASH\", \"CRYPTO\", \"DEX\", \"HODL\"\
-                    , \"ILN\", \"JUMBLR\", \"KOIN\", \"MESH\", \"MGW\", \"MORTY\"\
+                    , \"ILN\", \"JUMBLR\", \"KOIN\", \"MESH\", \"MGW\", \"MARTY\"\
                     , \"MSHARK\", \"NINJA\", \"OOT\", \"PANGEA\", \"PGT\", \"PIRATE\"\
-                    , \"REVS\", \"RFOX\", \"RICK\", \"STBL\", \"SUPERNET\", \"THC\"\
+                    , \"REVS\", \"RFOX\", \"DOC\", \"STBL\", \"SUPERNET\", \"THC\"\
                     , \"WLC21\", \"ZILLA\"]}"
       servers:
       - url: http://stats.kmd.io
@@ -304,7 +304,7 @@ paths:
         example: BET
       responses:
         "200":
-          description: SSL enabled electrums serverl URLs for coin(s)
+          description: SSL enabled electrums server URLs for coin(s)
           content:
             application/json:
               schema:
@@ -312,8 +312,37 @@ paths:
               examples:
                 "0":
                   value: "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"\
-                    MORTY\": [\"electrum1.cipig.net:20018\", \"electrum2.cipig.net:20018\"\
+                    MARTY\": [\"electrum1.cipig.net:20018\", \"electrum2.cipig.net:20018\"\
                     , \"electrum3.cipig.net:20018\"]}}"
+      servers:
+      - url: http://stats.kmd.io
+    servers:
+    - url: http://stats.kmd.io
+  /api/info/electrums_wss/:
+    get:
+      description: WSS enabled electrums for coin(s)
+      parameters:
+      - name: chain
+        in: query
+        description: Chain Ticker of dPoW active coin
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: BET
+      responses:
+        "200":
+          description: WSS enabled electrums server URLs for coin(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_6'
+              examples:
+                "0":
+                  value: "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"\
+                    MARTY\": [\"electrum1.cipig.net:30018\", \"electrum2.cipig.net:30018\"\
+                    , \"electrum3.cipig.net:30018\"]}}"
       servers:
       - url: http://stats.kmd.io
     servers:
@@ -341,7 +370,7 @@ paths:
               examples:
                 "0":
                   value: "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"\
-                    RICK\": [\"https://rick.explorer.dexstats.info/\"]}}"
+                    DOC\": [\"https://doc.explorer.dexstats.info/\"]}}"
       servers:
       - url: http://stats.kmd.io
     servers:
@@ -424,10 +453,10 @@ paths:
                     BTC\": 95, \"BTCH\": 4, \"CCL\": 74, \"CHIPS\": 16, \"COQUICASH\"\
                     : 129, \"CRYPTO\": 118, \"DEX\": 61, \"EMC2\": 107, \"GLEEC\"\
                     : 70, \"HODL\": 120, \"ILN\": 139, \"JUMBLR\": 118, \"KOIN\":\
-                    \ 101, \"MCL\": 141, \"MESH\": 81, \"MGW\": 123, \"MORTY\": 89,\
+                    \ 101, \"MCL\": 141, \"MESH\": 81, \"MGW\": 123, \"MARTY\": 89,\
                     \ \"MSHARK\": 121, \"NINJA\": 2, \"OOT\": 134, \"PANGEA\": 115,\
                     \ \"PBC\": 140, \"PGT\": 77, \"PIRATE\": 121, \"REVS\": 128, \"\
-                    RICK\": 106, \"STBL\": 3, \"SUPERNET\": 155, \"THC\": 160, \"\
+                    DOC\": 106, \"STBL\": 3, \"SUPERNET\": 155, \"THC\": 160, \"\
                     VRSC\": 121, \"WLC21\": 145, \"ZILLA\": 79}}}"
       servers:
       - url: http://stats.kmd.io
@@ -901,6 +930,10 @@ components:
           type: integer
         dpow_tenure:
           $ref: '#/components/schemas/inline_response_200_2_results_KMD_dpow_tenure'
+        electrums_wss:
+          type: array
+          items:
+            type: string
         electrums_ssl:
           type: array
           items:
@@ -939,14 +972,14 @@ components:
     inline_response_200_6_results:
       type: object
       properties:
-        MORTY:
+        MARTY:
           type: array
           items:
             type: string
     inline_response_200_7_results:
       type: object
       properties:
-        RICK:
+        DOC:
           type: array
           items:
             type: string
@@ -988,7 +1021,7 @@ components:
           type: integer
         EMC2:
           type: integer
-        MORTY:
+        MARTY:
           type: integer
         WLC21:
           type: integer
@@ -1020,7 +1053,7 @@ components:
           type: integer
         AXO:
           type: integer
-        RICK:
+        DOC:
           type: integer
         PANGEA:
           type: integer

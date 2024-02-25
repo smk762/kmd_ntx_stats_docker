@@ -106,6 +106,7 @@ def get_coins(request, coin=None):
                 "explorers": item["explorers"],
                 "electrums": item["electrums"],
                 "electrums_ssl": item["electrums_ssl"],
+                "electrums_wss": item["electrums_wss"],
                 "lightwallets": item["lightwallets"],
                 "mm2_compatible": item["mm2_compatible"],
                 "dpow_active": item["dpow_active"]

@@ -38,7 +38,7 @@ class coinNtxSeasonSerializer(serializers.HyperlinkedModelSerializer):
 class coinsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = coins
-        fields = ['coin', 'coins_info', 'electrums', 'electrums_ssl',
+        fields = ['coin', 'coins_info', 'electrums', 'electrums_ssl', 'electrums_wss',
                   'explorers', 'lightwallets', 'dpow', 'dpow_tenure', 'dpow_active',
                   'mm2_compatible']
 

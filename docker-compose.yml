@@ -60,8 +60,8 @@ services:
       - ./mm2:/home/komodian/mm2
     ports:
       - 127.0.0.1:7783:7783
-      - 38890:38890
-      - 38900:38900
+      - 127.0.0.1:42845:42845
+      - 127.0.0.1:42855:42855
     logging:
       driver: "json-file"
       options:

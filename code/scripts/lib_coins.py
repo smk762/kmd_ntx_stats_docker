@@ -139,9 +139,12 @@ def get_coins_repo_electrums(electrums, coins_data):
         data = requests.get(electrums[coin]).json()
         logger.info(f"[get_coins_repo_electrums] {coin}")
         for item in data:
+            print(item)
             if "protocol" in item:
                 if item['protocol'] == "SSL":
                     coins_data[coin]['electrums_ssl'].append(item['url'])
+                elif item['protocol'] == "WSS":
+                    coins_data[coin]['electrums_wss'].append(item['ws_url'])
                 else:
                     coins_data[coin]['electrums'].append(item['url'])
             else:
@@ -301,6 +304,8 @@ def parse_electrum_explorer(coins_data):
     explorers_data = get_github_folder_contents("KomodoPlatform", "coins", "explorers")
     explorers = {}
     for item in explorers_data:
+        if 'message' in explorers_data:
+            print(explorers_data)
         if item["name"] not in ["deprecated", "explorer_paths.json"]:
             explorers.update({item["name"]:item["download_url"]})
 
@@ -345,6 +350,8 @@ def pre_populate_coins_data(coins_data, coin):
         coins_data[coin].update({"electrums": []})
     if "electrums_ssl" not in coins_data[coin]:
         coins_data[coin].update({"electrums_ssl": []})
+    if "electrums_wss" not in coins_data[coin]:
+        coins_data[coin].update({"electrums_wss": []})
     if "explorers" not in coins_data[coin]:
         coins_data[coin].update({"explorers": []})
     if "lightwallets" not in coins_data[coin]:
@@ -372,6 +379,7 @@ def update_coins(coins_data):
         coin_data.coins_info = json.dumps(coins_data[coin]['coins_info'])
         coin_data.electrums = json.dumps(coins_data[coin]['electrums'])
         coin_data.electrums_ssl = json.dumps(coins_data[coin]['electrums_ssl'])
+        coin_data.electrums_wss = json.dumps(coins_data[coin]['electrums_wss'])
         coin_data.explorers = json.dumps(coins_data[coin]['explorers'])
         coin_data.lightwallets = json.dumps(coins_data[coin]['lightwallets'])
         coin_data.dpow = json.dumps(coins_data[coin]['dpow'])

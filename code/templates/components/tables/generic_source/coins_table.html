@@ -14,6 +14,7 @@
 						<th data-data="coins_info">Coins Info</th>
 						<th data-data="electrums">Electrum</th>
 						<th data-data="electrums_ssl">Electrum SSL</th>
+						<th data-data="electrums_wss">Electrum WSS</th>
 						<th data-data="dpow">dPoW</th>
 						<th data-data="dpow_tenure">dPoW Tenure</th>
 						<th data-data="dpow_active">dPoW Active</th>
@@ -58,22 +59,27 @@
 		            "visible": false
 		        },
     			{
-		            "data": "dpow",
+		            "data": "electrums_wss",
 		            "targets": 4,
 		            "visible": false
 		        },
     			{
-		            "data": "dpow_tenure",
+		            "data": "dpow",
 		            "targets": 5,
 		            "visible": false
 		        },
     			{
+		            "data": "dpow_tenure",
+		            "targets": 6,
+		            "visible": false
+		        },
+    			{
 		            "data": "dpow_active",
-		            "targets": 6
+		            "targets": 7
 		        },
     			{
 		            "data": "mm2_compatible",
-		            "targets": 7
+		            "targets": 8
 		        },
 	        ]
         });

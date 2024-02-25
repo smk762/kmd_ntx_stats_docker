@@ -28,7 +28,7 @@
             },
             "Notarisations Last 24hrs": {
                 "icon": "fa-solid fa-gavel",
-                "url": "/notarised_24hrs/?coin=RICK"
+                "url": "/notarised_24hrs/?coin=DOC"
             },
             "Coin dPoW Tenure": {
                 "icon": "fa-solid fa-coins",

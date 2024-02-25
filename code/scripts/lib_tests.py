@@ -89,6 +89,11 @@ class TestLibCoins:
             "electrum2.cipig.net:10001",
             "electrum3.cipig.net:10001"
         ]
+        assert coins_data["KMD"]["electrums_wss"] == [
+            "electrum1.cipig.net:30001",
+            "electrum2.cipig.net:30001",
+            "electrum3.cipig.net:30001"
+        ]
         assert lib_coins.get_coins_repo_electrums(electrums, {
             "TOKEL": {
                 "coins_info": {},
@@ -97,6 +102,7 @@ class TestLibCoins:
                 "dpow_active": 0,
                 "electrums": [],
                 "electrums_ssl": [],
+                "electrums_wss": [],
                 "explorers": [],
                 "mm2_compatible": 0
             }
@@ -111,6 +117,7 @@ class TestLibCoins:
                     "2.eu.tokel.electrum.dexstats.info:10077"
                 ],
                 "electrums_ssl": [],
+                "electrums_wss": [],
                 "explorers": [],
                 "mm2_compatible": 0
             }
@@ -357,6 +364,11 @@ class TestLibCoins:
     def test_parse_electrum_explorer(self):
         coins_data = lib_coins.parse_electrum_explorer({"KMD": {}})
         assert "KMD" in coins_data
+        assert coins_data["KMD"]["electrums_wss"] == [
+            "electrum1.cipig.net:30001",
+            "electrum2.cipig.net:30001",
+            "electrum3.cipig.net:30001"
+        ]
         assert coins_data["KMD"]["electrums_ssl"] == [
             "electrum1.cipig.net:20001",
             "electrum2.cipig.net:20001",
@@ -487,13 +499,13 @@ class TestLibHelper:
             "ac_supply": "999999"
         }) == "~/komodo/src/komodod -ac_name=DEX -ac_supply=999999"
         assert lib_helper.get_assetchain_launch_params({
-            "ac_name": "MORTY",
+            "ac_name": "MARTY",
             "ac_supply": "90000000000",
             "ac_reward": "100000000",
             "ac_cc": "3",
             "ac_staked": "10",
             "addnode": ["138.201.136.145", "95.217.44.58"]
-        }) == "~/komodo/src/komodod -ac_name=MORTY -ac_supply=90000000000 -ac_reward=100000000 -ac_cc=3 -ac_staked=10 -addnode=138.201.136.145 -addnode=95.217.44.58"
+        }) == "~/komodo/src/komodod -ac_name=MARTY -ac_supply=90000000000 -ac_reward=100000000 -ac_cc=3 -ac_staked=10 -addnode=138.201.136.145 -addnode=95.217.44.58"
 
     def test_is_notary_ltc_address(self):
         assert lib_helper.is_notary_ltc_address("LfmssDyX6iZvbVqHv6t9P6JWXia2JG7mdb") == False

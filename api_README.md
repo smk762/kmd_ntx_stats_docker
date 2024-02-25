@@ -172,13 +172,14 @@ You can use this endpoint for:
 | Name                        | Type      | Description                                                                        |
 | --------------------------- | --------- | ---------------------------------------------------------------------------------- |
 | count                       | (integer) | Number of coins matching the filter                                                |
-| results                    | (json)    | A json dictionary of coin information                                              |
+| results                     | (json)    | A json dictionary of coin information                                              |
 | results.coin                | (json)    | the name of the coin (as a key)                                                    |
 | results.coin.coins_info     | (json)    | information about the coin as listed in https://github.com/KomodoPlatform/coins    |
 | results.coin.dpow           | (json)    | information about the coin as listed in https://github.com/KomodoPlatform/dPoW/    |
 | results.coin.explorers      | (list)    | list of block explorers for the coin from https://github.com/KomodoPlatform/coins  |
 | results.coin.electrums      | (list)    | list of electrum servers for the coin from https://github.com/KomodoPlatform/coins |
 | results.coin.electrums_ssl  | (list)    | list of SSL electrum servers for the coin                                          |
+| results.coin.electrums_wss  | (list)    | list of WSS electrum servers for the coin                                          |
 | results.coin.mm2_compatible | (integer) | 0 = not mm2 compatible; 1 = mm2 compatible                                         |
 | results.coin.dpow_active    | (integer) | 0 = not being notarised by dPoW; 1 = being notarised by dPoW                       |
 
@@ -187,7 +188,7 @@ You can use this endpoint for:
 URL:
 
 ```bash
-http://notary.earth:8762/info/coins/?chain=RICK&mm2_compatible=1&dpow_active=1
+http://notary.earth:8762/info/coins/?chain=DOC&mm2_compatible=1&dpow_active=1
 ```
 
 <collapse-text hidden title="Response">
@@ -197,12 +198,12 @@ http://notary.earth:8762/info/coins/?chain=RICK&mm2_compatible=1&dpow_active=1
     "count": 1,
     "results": [
         {
-            "RICK": {
+            "DOC": {
                 "coins_info": {
                     "mm2": 1,
-                    "coin": "RICK",
-                    "asset": "RICK",
-                    "fname": "RICK (TESTCOIN)",
+                    "coin": "DOC",
+                    "asset": "DOC",
+                    "fname": "DOC (TESTCOIN)",
                     "rpcport": 25435,
                     "txversion": 4,
                     "overwintered": 1
@@ -211,10 +212,10 @@ http://notary.earth:8762/info/coins/?chain=RICK&mm2_compatible=1&dpow_active=1
                     "src": "https://github.com/komodoplatform/komodo",
                     "server": "dPoW-mainnet",
                     "version": "0.5.2",
-                    "launch_params": " -ac_name=RICK -ac_supply=90000000000 -ac_reward=100000000 -ac_cc=3 -ac_staked=10 -addnode=138.201.136.145 -addnode=95.217.44.58"
+                    "launch_params": " -ac_name=DOC -ac_supply=90000000000 -ac_reward=100000000 -ac_cc=3 -ac_staked=10 -addnode=138.201.136.145 -addnode=95.217.44.58"
                 },
                 "explorers": [
-                    "https://rick.kmd.dev/tx/"
+                    "https://doc.kmd.dev/tx/"
                 ],
                 "electrums": [
                     "electrum1.cipig.net:10017",
@@ -225,6 +226,11 @@ http://notary.earth:8762/info/coins/?chain=RICK&mm2_compatible=1&dpow_active=1
                     "electrum1.cipig.net:20017",
                     "electrum2.cipig.net:20017",
                     "electrum3.cipig.net:20017"
+                ],
+                "electrums_wss": [
+                    "electrum1.cipig.net:30017",
+                    "electrum2.cipig.net:30017",
+                    "electrum3.cipig.net:30017"
                 ],
                 "mm2_compatible": 1,
                 "dpow_active": 1
@@ -683,7 +689,7 @@ http://notary.earth:8762/notary_stats/daily/?notarised_date=2020-04-20&notary=co
                             "count": 43,
                             "percentage": 48.31
                         },
-                        "RICK": {
+                        "DOC": {
                             "count": 37,
                             "percentage": 30.08
                         },
@@ -703,7 +709,7 @@ http://notary.earth:8762/notary_stats/daily/?notarised_date=2020-04-20&notary=co
                             "count": 56,
                             "percentage": 53.85
                         },
-                        "MORTY": {
+                        "MARTY": {
                             "count": 43,
                             "percentage": 33.08
                         },
@@ -1120,7 +1126,7 @@ http://notary.earth:8762/notary_stats/season/?notary=alien_AR&season=Season_3
                             "count": 7539,
                             "percentage": 27.16
                         },
-                        "RICK": {
+                        "DOC": {
                             "count": 13602,
                             "percentage": 34.52
                         },
@@ -1148,7 +1154,7 @@ http://notary.earth:8762/notary_stats/season/?notary=alien_AR&season=Season_3
                             "count": 12203,
                             "percentage": 43.86
                         },
-                        "MORTY": {
+                        "MARTY": {
                             "count": 14091,
                             "percentage": 35.42
                         },

@@ -50,6 +50,10 @@ api_info_urls = [
     path('api/info/electrums_ssl/',
           info_api.coin_electrums_ssl,
           name='coin_electrums_ssl'),
+    
+    path('api/info/electrums_wss/',
+          info_api.coin_electrums_wss,
+          name='coin_electrums_wss'),
 
     path('api/info/explorers/',
           info_api.coin_explorers,

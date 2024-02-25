@@ -305,7 +305,7 @@
                 },
                 "examples": {
                   "0": {
-                    "value": "{\"count\": 29, \"filters\": [\"season\", \"server\", \"epoch\", \"timestamp\"], \"results\": [\"AXO\", \"BET\", \"BOTS\", \"BTCH\", \"CCL\", \"COQUICASH\", \"CRYPTO\", \"DEX\", \"HODL\", \"ILN\", \"JUMBLR\", \"KOIN\", \"MESH\", \"MGW\", \"MORTY\", \"MSHARK\", \"NINJA\", \"OOT\", \"PANGEA\", \"PGT\", \"PIRATE\", \"REVS\", \"RFOX\", \"RICK\", \"STBL\", \"SUPERNET\", \"THC\", \"WLC21\", \"ZILLA\"]}"
+                    "value": "{\"count\": 29, \"filters\": [\"season\", \"server\", \"epoch\", \"timestamp\"], \"results\": [\"AXO\", \"BET\", \"BOTS\", \"BTCH\", \"CCL\", \"COQUICASH\", \"CRYPTO\", \"DEX\", \"HODL\", \"ILN\", \"JUMBLR\", \"KOIN\", \"MESH\", \"MGW\", \"MARTY\", \"MSHARK\", \"NINJA\", \"OOT\", \"PANGEA\", \"PGT\", \"PIRATE\", \"REVS\", \"RFOX\", \"DOC\", \"STBL\", \"SUPERNET\", \"THC\", \"WLC21\", \"ZILLA\"]}"
                   }
                 }
               }
@@ -382,7 +382,7 @@
             "schema": {
               "type": "string"
             },
-            "example": "MORTY"
+            "example": "MARTY"
           }
         ],
         "responses": {
@@ -395,7 +395,52 @@
                 },
                 "examples": {
                   "0": {
-                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"MORTY\": [\"electrum1.cipig.net:20018\", \"electrum2.cipig.net:20018\", \"electrum3.cipig.net:20018\"]}}"
+                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"MARTY\": [\"electrum1.cipig.net:20018\", \"electrum2.cipig.net:20018\", \"electrum3.cipig.net:20018\"]}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://stats.kmd.io"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://stats.kmd.io"
+        }
+      ]
+    },
+    "/api/info/electrums_wss/": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "parameters": [
+          {
+            "name": "chain",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "MARTY"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_6"
+                },
+                "examples": {
+                  "0": {
+                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"MARTY\": [\"electrum1.cipig.net:30018\", \"electrum2.cipig.net:30018\", \"electrum3.cipig.net:30018\"]}}"
                   }
                 }
               }
@@ -427,7 +472,7 @@
             "schema": {
               "type": "string"
             },
-            "example": "RICK"
+            "example": "DOC"
           }
         ],
         "responses": {
@@ -440,7 +485,7 @@
                 },
                 "examples": {
                   "0": {
-                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"RICK\": [\"https://rick.explorer.dexstats.info/\"]}}"
+                    "value": "{\"count\": 1, \"filters\": [\"chain\"], \"results\": {\"DOC\": [\"https://doc.explorer.dexstats.info/\"]}}"
                   }
                 }
               }
@@ -563,7 +608,7 @@
                 },
                 "examples": {
                   "0": {
-                    "value": "{\"count\": 36, \"next\": \"http://stats.kmd.io/api/info/notarised_chain_daily/?notarised_date=2021-03-17\", \"previous\": \"http://stats.kmd.io/api/info/notarised_chain_daily/?notarised_date=2021-03-15\", \"filters\": [\"notarised_date\"], \"results\": {\"2021-03-16\": {\"AXO\": 77, \"AYA\": 104, \"BET\": 145, \"BOTS\": 127, \"BTC\": 95, \"BTCH\": 4, \"CCL\": 74, \"CHIPS\": 16, \"COQUICASH\": 129, \"CRYPTO\": 118, \"DEX\": 61, \"EMC2\": 107, \"GLEEC\": 70, \"HODL\": 120, \"ILN\": 139, \"JUMBLR\": 118, \"KOIN\": 101, \"MCL\": 141, \"MESH\": 81, \"MGW\": 123, \"MORTY\": 89, \"MSHARK\": 121, \"NINJA\": 2, \"OOT\": 134, \"PANGEA\": 115, \"PBC\": 140, \"PGT\": 77, \"PIRATE\": 121, \"REVS\": 128, \"RICK\": 106, \"STBL\": 3, \"SUPERNET\": 155, \"THC\": 160, \"VRSC\": 121, \"WLC21\": 145, \"ZILLA\": 79}}}"
+                    "value": "{\"count\": 36, \"next\": \"http://stats.kmd.io/api/info/notarised_chain_daily/?notarised_date=2021-03-17\", \"previous\": \"http://stats.kmd.io/api/info/notarised_chain_daily/?notarised_date=2021-03-15\", \"filters\": [\"notarised_date\"], \"results\": {\"2021-03-16\": {\"AXO\": 77, \"AYA\": 104, \"BET\": 145, \"BOTS\": 127, \"BTC\": 95, \"BTCH\": 4, \"CCL\": 74, \"CHIPS\": 16, \"COQUICASH\": 129, \"CRYPTO\": 118, \"DEX\": 61, \"EMC2\": 107, \"GLEEC\": 70, \"HODL\": 120, \"ILN\": 139, \"JUMBLR\": 118, \"KOIN\": 101, \"MCL\": 141, \"MESH\": 81, \"MGW\": 123, \"MARTY\": 89, \"MSHARK\": 121, \"NINJA\": 2, \"OOT\": 134, \"PANGEA\": 115, \"PBC\": 140, \"PGT\": 77, \"PIRATE\": 121, \"REVS\": 128, \"DOC\": 106, \"STBL\": 3, \"SUPERNET\": 155, \"THC\": 160, \"VRSC\": 121, \"WLC21\": 145, \"ZILLA\": 79}}}"
                   }
                 }
               }
@@ -981,6 +1026,12 @@
                       "type": "string"
                     }
                   },
+                  "electrums_wss": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
                   "electrums": {
                     "type": "array",
                     "items": {
@@ -1165,7 +1216,7 @@
           "results": {
             "type": "object",
             "properties": {
-              "MORTY": {
+              "MARTY": {
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -1190,7 +1241,7 @@
           "results": {
             "type": "object",
             "properties": {
-              "RICK": {
+              "DOC": {
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -1291,7 +1342,7 @@
                   "EMC2": {
                     "type": "integer"
                   },
-                  "MORTY": {
+                  "MARTY": {
                     "type": "integer"
                   },
                   "WLC21": {
@@ -1339,7 +1390,7 @@
                   "AXO": {
                     "type": "integer"
                   },
-                  "RICK": {
+                  "DOC": {
                     "type": "integer"
                   },
                   "PANGEA": {

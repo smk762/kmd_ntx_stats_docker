@@ -3,7 +3,7 @@ import json
 import ssl
 import socket
 from lib_helper import get_electrum_url_port
-from lib_const import ELECTRUMS, ELECTRUMS_SSL, logger
+from lib_const import ELECTRUMS, ELECTRUMS_SSL, ELECTRUMS_WSS, logger
 from lib_crypto import *
 
 socket.setdefaulttimeout(5)

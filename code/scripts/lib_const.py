@@ -40,6 +40,7 @@ DEVISOR = 10512000
 EXPLORERS = requests.get(lib_urls.get_explorers_info_url()).json()['results']
 ELECTRUMS = requests.get(lib_urls.get_electrums_info_url()).json()['results']
 ELECTRUMS_SSL = requests.get(lib_urls.get_electrums_ssl_info_url()).json()['results']
+ELECTRUMS_WSS = requests.get(lib_urls.get_electrums_wss_info_url()).json()['results']
 
 
 # Coins

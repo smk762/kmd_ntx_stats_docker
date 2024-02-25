@@ -302,7 +302,7 @@ def get_coin_notariser_ranks(season, coins_list=None):
         region_notary_ranks = {
             "TESTNET": {}
         }
-        coins_list = ["RICK", "MORTY", "LTC"]
+        coins_list = ["DOC", "MARTY", "LTC"]
 
         for notary in notary_list:
             region_notary_ranks["TESTNET"].update({notary:{}})

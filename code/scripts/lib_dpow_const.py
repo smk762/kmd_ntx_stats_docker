@@ -425,13 +425,13 @@ SEASON_START_COINS = {
             "JUMBLR",
             "KOIN",
             "MGW",
-            "MORTY",
+            "MARTY",
             "MSHARK",
             "NINJA",
             "PANGEA",
             "PIRATE",
             "REVS",
-            "RICK",
+            "DOC",
             "SUPERNET",
             "THC"
         ],
@@ -471,8 +471,8 @@ SEASON_START_COINS = {
     },
     "VOTE2023_Testnet": {
         "Main": [
-            "RICK",
-            "MORTY"
+            "DOC",
+            "MARTY"
         ]
     }
 }
@@ -536,13 +536,13 @@ SEASONS_INFO = {
         "end_block": 2923160,
         "start_time": 1651622400,
         "end_time": 1653436800,
-        "coins": ["RICK", "MORTY"],
+        "coins": ["DOC", "MARTY"],
         "servers": {
             "Main": {
-                "coins": ["RICK", "MORTY"],
+                "coins": ["DOC", "MARTY"],
                 "addresses": {
-                    "RICK": {},
-                    "MORTY": {}
+                    "DOC": {},
+                    "MARTY": {}
                 },
                 "epochs": {
                     "Epoch_0": {
@@ -552,7 +552,7 @@ SEASONS_INFO = {
                         "end_block": 2923160,
                         "start_time": 1651622400,
                         "end_time": 1653436800,
-                        "coins": ["RICK", "MORTY"]
+                        "coins": ["DOC", "MARTY"]
                     }
                 }
             }
@@ -563,13 +563,13 @@ SEASONS_INFO = {
         "end_block": 2923160,
         "start_time": 1651622400,
         "end_time": 1653436800,
-        "coins": ["RICK", "MORTY"],
+        "coins": ["DOC", "MARTY"],
         "servers": {
             "Main": {
-                "coins": ["RICK", "MORTY"],
+                "coins": ["DOC", "MARTY"],
                 "addresses": {
-                    "RICK": {},
-                    "MORTY": {}
+                    "DOC": {},
+                    "MARTY": {}
                 },
                 "epochs": {
                     "Epoch_0": {
@@ -579,7 +579,7 @@ SEASONS_INFO = {
                         "end_block": 2923160,
                         "start_time": 1651622400,
                         "end_time": 1653436800,
-                        "coins": ["RICK", "MORTY"],
+                        "coins": ["DOC", "MARTY"],
                         'score_per_ntx': 1
                     }
                 }
