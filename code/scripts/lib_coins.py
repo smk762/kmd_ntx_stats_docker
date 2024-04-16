@@ -143,8 +143,14 @@ def get_coins_repo_electrums(electrums, coins_data):
             if "protocol" in item:
                 if item['protocol'] == "SSL":
                     coins_data[coin]['electrums_ssl'].append(item['url'])
+                    if 'ws_url' in item:
+                        coins_data[coin]['electrums_wss'].append(item['ws_url'])
                 elif item['protocol'] == "WSS":
-                    coins_data[coin]['electrums_wss'].append(item['ws_url'])
+                    print(item)
+                    if 'ws_url' in item:
+                        coins_data[coin]['electrums_wss'].append(item['ws_url'])
+                    elif 'url' in item:
+                        coins_data[coin]['electrums_wss'].append(item['url'])
                 else:
                     coins_data[coin]['electrums'].append(item['url'])
             else:
