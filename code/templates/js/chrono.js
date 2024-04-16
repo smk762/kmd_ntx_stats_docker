@@ -2,6 +2,9 @@
 <script>
 function get_time_since(ts, until=false, format='text', precalc=false) {
     timestamp = parseInt(ts)
+    if (ts == 0 ) {
+        return "Never"
+    }
     if (isNaN(timestamp)) return ts
 
     if (!precalc) {

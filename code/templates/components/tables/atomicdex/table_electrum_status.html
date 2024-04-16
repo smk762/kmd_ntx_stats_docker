@@ -19,10 +19,9 @@
                 <thead>
                     <tr>
                         <th data-data="coin">Coin</th>
-                        <th data-data="electrum">Electrum</th>
-                        <th data-data="ssl">SSL</th>
-                        <th data-data="status">Status</th>
-                        <th data-data="response">Response</th>
+                        <th data-data="server">Server</th>
+                        <th data-data="protocol">Protocol</th>
+                        <th data-data="result">Result</th>
                         <th data-data="last_connection">Last</th>
                     </tr>
                 </thead>
@@ -55,7 +54,7 @@
             "order": [ 0, 'asc' ],
             "responsive": true,
             "columnDefs": [
-                { className: "text-nowrap", "targets": [ 5 ] },
+                { className: "text-nowrap", "targets": [ 4 ] },
                 {
                     "data": "coin",
                     "targets": 0,
@@ -64,76 +63,58 @@
                     }
                 },
                 {
-                    "data": "electrum",
+                    "data": "server",
                     "targets": 1,
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        let content = oData.electrum
-                        let tooltip = '<span data-toggle="tooltip" data-placement="top" title=\'' + oData.response + '\'>'
-                        try {
-                            tooltip = '<span data-toggle="tooltip" data-placement="top" title=\'' + JSON.stringify(JSON.parse(oData.response)) + '\'>'
+                        if (oData.result == "Passed") {
+                            content = '<span style="color: #5ce35c; font-size: 0.9em;"> ' + oData.server + '</i></span>';
                         }
-                        catch {
-
-                        }
-                        if (oData.status == "Failing") {
-                            content = tooltip + '<span style="color: #d72222; font-size: 0.9em;"> ' + content + '</i></span>';
-                        }
-
                         else {
-                            content = tooltip + '<span style="color: #5ce35c; font-size: 0.9em;"> ' + content + '</i></span>';
+                            content = '<span style="color: #d72222; font-size: 0.9em;">' + oData.server + '</i></span>';
                         }
                         $(nTd).html(content);
                     }
                 },
                 {
-                    "data": "ssl",
+                    "data": "protocol",
                     "targets": 2,
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        if (oData.ssl == 1) {
-                            $(nTd).html('<i class="bi bi-file-lock2-fill"></i>');
+                        if (oData.result == "Passed") {
+                            content = '<span style="color: #5ce35c; font-size: 0.9em;"> ' + oData.protocol + '</i></span>';
                         }
                         else {
-                            $(nTd).html('');
+                            content = '<span style="color: #d72222; font-size: 0.9em;">' + oData.protocol + '</i></span>';
                         }
+                        $(nTd).html(content);
                     }
                 },
                 {
-                    "data": "status",
+                    "data": "result",
                     "targets": 3,
-                    "visible": false
-                },
-                {
-                    "data": "response",
-                    "targets": 4,
+                    "width": '250px',
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        let content = oData.response
-                        if (oData.status == "Failing") {
-                            content = '<span style="color: #d72222; font-size: 0.7em;"> ' + content + '</i></span>';
+                        let content = oData.result
+                        if (oData.result == "Passed") {
+                            content = '<span style="color: #5ce35c; font-size: 0.7em;"> ' + content + '</i></span>';
                         }
                         else {
-                            if (JSON.parse(content).hasOwnProperty("result")) {
-                                if (JSON.parse(content).result.hasOwnProperty("height")) {
-                                    content = 'Height: ' + JSON.parse(content).result.height
-                                }
-                            }
-                            else if (JSON.parse(content).hasOwnProperty("params")) {
-                                if (JSON.parse(content).params[0].hasOwnProperty("height")) {
-                                    content = 'Height: ' + JSON.parse(content).params[0].height
-                                }
-                            }
-
-                            content = '<span style="color: #5ce35c; font-size: 0.7em;">' + content + '</i></span>';
+                            content = '<span style="color: #d72222; font-size: 0.7em;">' + content + '</i></span>';
                         }
                         $(nTd).html(content);
                     }
                 },
                 {
                     "data": "last_connection",
-                    "targets": 5,
+                    "targets": 4,
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                        if (parseInt(oData.last_connection) > 0) {
-                            $(nTd).html('<span style="color: #5ce35c; font-size: 0.9em;"> ' + get_time_since(parseInt(oData.last_connection))) + '</i></span>';
+                        let content = oData.result
+                        if (oData.result == "Passed") {
+                            content = '<span style="color: #5ce35c; font-size: 0.9em;"> ' + get_time_since(parseInt(oData.last_connection)) + '</i></span>';
                         }
+                        else {
+                            content = '<span style="color: #d72222; font-size: 0.9em;">' + get_time_since(parseInt(oData.last_connection)) + '</i></span>';
+                        }
+                        $(nTd).html(content);
                     }
                 }
             ]
