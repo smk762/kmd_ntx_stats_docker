@@ -93,9 +93,7 @@ def update_mined_table(season, coin="KMD", start_block=None):
     recorded_blocks = [block[0] for block in select_from_table('mined', 'block_height')]
     unrecorded_blocks = set(all_blocks) - set(recorded_blocks)
     rescan_blocks = list(set(list(unrecorded_blocks)))
-    if start_block != 1:
-        random.shuffle(rescan_blocks)
-        rescan_blocks = [*range(start_block,tip,1)] + rescan_blocks[:100]
+    random.shuffle(rescan_blocks)
     logger.info(f"[update_mined_table] {len(recorded_blocks)} in mined table in db")
     logger.info(f"[update_mined_table] {len(unrecorded_blocks)} not in mined table in db")
     logger.info(f"[update_mined_table] {len(rescan_blocks)} blocks to scan")
