@@ -7,6 +7,8 @@ from kmd_ntx_api.helper import get_or_none, get_notary_list
 from kmd_ntx_api.query import get_mined_data, get_mined_count_season_data
 from kmd_ntx_api.notary_seasons import get_season, get_page_season
 from kmd_ntx_api.serializers import minedSerializer
+from kmd_ntx_api.cache_data import get_from_memcache, refresh_cache
+from kmd_ntx_api.logger import logger
 
 
 def get_mined_data_24hr():
@@ -93,3 +95,48 @@ def get_mined_count_daily_by_name(request):
             if k not in ["name", "season", "id"]:
                 resp[i["name"]].update({k:v})            
     return resp
+
+def get_mined_count_season(mined_data):
+    try:
+        cache_key = "mined_count_season"
+        data = get_from_memcache(cache_key, expire=300)
+        if data is None:
+            data = mined_data.aggregate(Sum('value'))['value__sum']
+            refresh_cache(data={"val": str(data)}, force=True, key=cache_key, expire=300)
+            return data
+        else:
+            return data["val"]
+    except Exception as e:
+        logger.error(e)
+        return 0
+    
+    
+def get_mined_count_24hr(mined_data):
+    try:
+        cache_key = "mined_count_24hr"
+        data = get_from_memcache(cache_key, expire=300)
+        if data is None:
+            data = mined_data.filter(block_time__gt=str(days_ago(1))).aggregate(Sum('value'))['value__sum']
+            refresh_cache(data={"val": str(data)}, force=True, key=cache_key, expire=300)
+            return data
+        else:
+            return data["val"]
+    except Exception as e:
+        logger.error(e)
+        return 0
+    
+    
+def get_biggest_block_season(mined_data):
+    try:
+        cache_key = "biggest_block_season"
+        data = get_from_memcache(cache_key, expire=300)
+        if data is None:
+            data = mined_data.order_by('-value').first()
+            refresh_cache(data={"val": str(data)}, force=True, key=cache_key, expire=300)
+            return data
+        else:
+            return data["val"]
+    except Exception as e:
+        logger.error(e)
+        return 0    
+    

@@ -69,7 +69,6 @@ def update_cache_file(file, url=None, data=None):
                 data = data["results"]
         if data is not None:
             if len(data) > 0:
-                logger.warning(f"data: {data}")
                 with open(file, "w+") as f:
                     json.dump(data, f, indent=4)
         return data
