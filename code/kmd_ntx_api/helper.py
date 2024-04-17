@@ -94,18 +94,6 @@ def get_eco_data_link():
           +ad['data']['anchorText']+"</a> "+ad['data']['string2']
     return link
 
-
-def get_sidebar_links(season, coins_dict, regions_info):
-    coins_dict["Main"] += ["KMD", "LTC"]
-    coins_dict["Main"].sort()
-    sidebar_links = {
-        "server": os.getenv("SERVER"),
-        "coins_menu": coins_dict,
-        "notaries_menu": regions_info,
-    }
-    return sidebar_links
-
-
 def json_resp(resp, filters=None, params=None, ignore_errors=False, raw=False):
 
     if raw:
