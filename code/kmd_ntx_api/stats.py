@@ -13,76 +13,84 @@ from kmd_ntx_api.query import get_seednode_version_stats_data, \
     get_mined_count_season_data, get_notary_ntx_season_data, get_mined_data, \
     get_scoring_epochs_data
 from kmd_ntx_api.struct import default_top_region_notarisers
-from kmd_ntx_api.coins import get_dpow_coins, get_dpow_coins_list
+from kmd_ntx_api.coins import get_dpow_coins_dict, get_dpow_coins_list
 from kmd_ntx_api.logger import logger, timed
+from kmd_ntx_api.cache_data import get_from_memcache, refresh_cache
 
-def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=get_season()):
-    coins_dict=get_dpow_coins(season)
-    notary_ntx_24hr = {
-            "master_ntx": 0,
-            "main_ntx": 0,
-            "third_party_ntx": 0,
-            "seed_node_status": 0,
-            "most_ntx": "N/A",
-            "score": 0
-        }
 
-    main_coins = get_mainnet_coins(coins_dict)
-    third_party_coins = get_third_party_coins(coins_dict)
+def get_notary_ntx_24hr_summary(ntx_24hr, notary, dpow_coins_dict):
+    cache_key = f"{notary}_ntx_24hr_summary"
+    if cache_key is not None:
+        data = get_from_memcache(cache_key, expire=300)
+    if data is not None:
+        return data
+    else:
+        logger.info("get_notary_ntx_24hr_summary")
+        notary_ntx_24hr = {
+                "master_ntx": 0,
+                "main_ntx": 0,
+                "third_party_ntx": 0,
+                "seed_node_status": 0,
+                "most_ntx": "N/A",
+                "score": 0
+            }
 
-    notary_coin_ntx_counts = {}
+        main_coins = get_mainnet_coins(dpow_coins_dict)
+        third_party_coins = get_third_party_coins(dpow_coins_dict)
 
-    for item in ntx_24hr:
-        notaries = item['notaries']
-        coin = item['coin']
-        ntx_score = item['score_value']
+        notary_coin_ntx_counts = {}
 
-        if notary in notaries:
+        for item in ntx_24hr:
+            notaries = item['notaries']
+            coin = item['coin']
+            ntx_score = item['score_value']
 
-            if coin not in notary_coin_ntx_counts:
-                notary_coin_ntx_counts.update({coin:1})
+            if notary in notaries:
 
-            else:
-                val = notary_coin_ntx_counts[coin]+1
-                notary_coin_ntx_counts.update({coin:val})
+                if coin not in notary_coin_ntx_counts:
+                    notary_coin_ntx_counts.update({coin:1})
 
-            notary_ntx_24hr["score"] += ntx_score
+                else:
+                    val = notary_coin_ntx_counts[coin]+1
+                    notary_coin_ntx_counts.update({coin:val})
 
-    max_ntx_count = 0
-    master_ntx_count = 0
-    main_ntx_count = 0
-    third_party_ntx_count = 0
+                notary_ntx_24hr["score"] += ntx_score
 
-    for coin in notary_coin_ntx_counts:
-        coin_ntx_count = notary_coin_ntx_counts[coin]
-        if coin_ntx_count > max_ntx_count:
-            max_coin = coin
-            max_ntx_count = coin_ntx_count
-        if coin == "KMD": 
-            master_ntx_count += coin_ntx_count
-        elif coin in main_coins:
-            main_ntx_count += coin_ntx_count
-        elif coin in third_party_coins:
-            third_party_ntx_count += coin_ntx_count
+        max_ntx_count = 0
+        master_ntx_count = 0
+        main_ntx_count = 0
+        third_party_ntx_count = 0
 
-    seed_node_score = 0
-    start = time.time() - SINCE_INTERVALS["day"]
-    end = time.time()
-    seed_data = get_seednode_version_stats_data(start=start, end=end, name=notary).filter(score=0.2).values()
-    notary_ntx_24hr["score"] = float(notary_ntx_24hr["score"])
-    for item in seed_data:
-        seed_node_score += round(item["score"], 2)
-        notary_ntx_24hr["score"] += round(item["score"], 2)
+        for coin in notary_coin_ntx_counts:
+            coin_ntx_count = notary_coin_ntx_counts[coin]
+            if coin_ntx_count > max_ntx_count:
+                max_coin = coin
+                max_ntx_count = coin_ntx_count
+            if coin == "KMD": 
+                master_ntx_count += coin_ntx_count
+            elif coin in main_coins:
+                main_ntx_count += coin_ntx_count
+            elif coin in third_party_coins:
+                third_party_ntx_count += coin_ntx_count
 
-    if max_ntx_count > 0:
-        notary_ntx_24hr.update({
-                "master_ntx": master_ntx_count,
-                "main_ntx": main_ntx_count,
-                "third_party_ntx": third_party_ntx_count,
-                "seed_node_status": round(seed_node_score, 2),
-                "most_ntx": str(max_ntx_count)+" ("+str(max_coin)+")"
-            })
-    return notary_ntx_24hr
+        seed_node_score = 0
+        start = time.time() - SINCE_INTERVALS["day"]
+        end = time.time()
+        seed_data = get_seednode_version_stats_data(start=start, end=end, name=notary).filter(score=0.2).values()
+        notary_ntx_24hr["score"] = float(notary_ntx_24hr["score"])
+        for item in seed_data:
+            seed_node_score += round(item["score"], 2)
+            notary_ntx_24hr["score"] += round(item["score"], 2)
+
+        if max_ntx_count > 0:
+            notary_ntx_24hr.update({
+                    "master_ntx": master_ntx_count,
+                    "main_ntx": main_ntx_count,
+                    "third_party_ntx": third_party_ntx_count,
+                    "seed_node_status": round(seed_node_score, 2),
+                    "most_ntx": str(max_ntx_count)+" ("+str(max_coin)+")"
+                })
+        return notary_ntx_24hr
  
 
 
@@ -91,11 +99,8 @@ def get_seednode_version_season_stats_data(season, notary=None):
     return get_seednode_version_stats_data(season=season, name=notary, score=0.2).values('name').annotate(sum_score=Sum('score'))
 
 
-def get_season_stats_sorted(season=get_season(), coins_dict=None):
+def get_season_stats_sorted(season, notary_list):
     logger.info("get_season_stats_sorted")
-    if not coins_dict:
-        coins_dict = get_dpow_coins(season)
-    notary_list = get_notary_list(season)
 
     mined_last_24hrs = get_mined_data_24hr().values('name')
     seednode_season = get_seednode_version_stats_data(season=season).values('name')
@@ -105,15 +110,12 @@ def get_season_stats_sorted(season=get_season(), coins_dict=None):
         nn_seednode_season.update({item['name']:round(item['sum_score'],2)})
 
     mined_season = get_mined_count_season_data(season).values()
-    
-
     nn_mined_season = {}
     for item in mined_season:
         nn_mined_season.update({item['name']:item['blocks_mined']})
 
     season_stats = {}
     for notary in notary_list:
-
         region = get_notary_region(notary)
         if region not in season_stats:
             season_stats.update({region:[]})
@@ -180,11 +182,8 @@ def get_region_score_stats(notarisation_scores):
     return region_score_stats
 
 
-def get_daily_stats_sorted(season=get_season(), coins_dict=None):
+def get_daily_stats_sorted(notary_list, dpow_coins_dict):
     logger.info("get_daily_stats_sorted")
-    if not coins_dict:
-        coins_dict = get_dpow_coins(season)
-    notary_list = get_notary_list(season)
 
     data = get_mined_data().filter(block_time__gt=str(days_ago(1)))
     mined_last_24hrs = get_mined_data_24hr().values('name').annotate(mined_24hrs=Sum('value'), blocks_24hrs=Count('value'))
@@ -203,8 +202,9 @@ def get_daily_stats_sorted(season=get_season(), coins_dict=None):
             nn_mined_last_24hrs.update({notary:0})
 
     ntx_24hr = get_notarised_date().values()
+    
     for notary_name in notary_list:
-        notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary_name, season)
+        notary_ntx_24hr_summary = get_notary_ntx_24hr_summary(ntx_24hr, notary_name, dpow_coins_dict)
         region = get_notary_region(notary_name)
 
         daily_stats[region].append({
@@ -282,17 +282,14 @@ def get_top_coin_notarisers(top_region_notarisers, coin, notary_icons):
 
 
 # returns region > notary > coin > season ntx count
-def get_coin_notariser_ranks(season, coins_list=None):
+def get_coin_notariser_ranks(season, dpow_coins_list):
     logger.info("get_coin_notariser_ranks")
-    # season ntx stats
-    if not coins_list:
-        coins_list = get_dpow_coins_list(season)
 
     ntx_season = get_notary_ntx_season_data(season)
     notary_list = get_notary_list(season)
     ntx_season = ntx_season.values()
 
-    if season == "Season_5_Testnet": 
+    if season.find("estnet") > -1:
         region_notary_ranks = {
             "TESTNET": {}
         }

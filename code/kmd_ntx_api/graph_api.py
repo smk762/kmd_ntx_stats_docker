@@ -71,7 +71,7 @@ def prepare_regional_graph_data(graph_data):
     return data
 
 
-def prepare_coins_graph_data(graph_data, coins_dict):
+def prepare_coins_graph_data(graph_data, dpow_coins_dict):
     bg_color = []
     border_color = []
     chartdata = []
@@ -80,8 +80,8 @@ def prepare_coins_graph_data(graph_data, coins_dict):
     labels = list(graph_data.keys())
     labels.sort()
 
-    main_coins = coins_dict["Main"]
-    third_coins = coins_dict["Third_Party"]
+    main_coins = dpow_coins_dict["Main"]
+    third_coins = dpow_coins_dict["Third_Party"]
 
     for label in labels:
         if label in third_coins:

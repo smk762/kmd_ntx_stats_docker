@@ -271,7 +271,7 @@ def get_server_active_scoring_dpow_coins_at_time(season, server, timestamp):
     return server_active_scoring_dpow_coins, len(server_active_scoring_dpow_coins)
 
 
-def get_coin_server(season, coin):
+def get_dpow_coin_server(season, coin):
     if season.find("Testnet") != -1:
         return "Main"
 

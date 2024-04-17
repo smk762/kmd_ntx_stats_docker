@@ -49,6 +49,7 @@ except Exception as e:  # pragma: no cover
         MEMCACHE.set("testing", True, 3600)
 
 MEMCACHE.cache_memlimit = MEMCACHE_LIMIT
+MEMCACHE.flush_all()
 
 
 class Cache:

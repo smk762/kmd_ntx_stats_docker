@@ -11,7 +11,7 @@ from kmd_ntx_api.context import get_base_context, get_notary_profile_context, \
     get_coin_profile_index_context
 from kmd_ntx_api.helper import get_or_none, get_notary_list, \
     get_page_server
-from kmd_ntx_api.coins import get_coin_server
+from kmd_ntx_api.coins import get_dpow_coin_server
 from kmd_ntx_api.info import get_nn_social_info
 from kmd_ntx_api.logger import logger
 from kmd_ntx_api.notary_seasons import get_page_season, get_notary_seasons
@@ -33,9 +33,9 @@ def notary_profile_view(request, notary=None):
     # Base context will return a random notary if one is not specified. For this view, we prefer 'None'.
     season = context["season"]
     if notary in context["notaries"]:
-        context.update(get_notary_profile_context(request, season, notary))
+        context.update(get_notary_profile_context(request, season, notary, context))
         return render(request, 'views/notarisation/notary_profile.html', context)
-    context.update(get_notary_profile_index_context(request, season))
+    context.update(get_notary_profile_index_context(request, season, context))
     return render(request, 'views/notarisation/notary_profile_index.html', context)
 
 
@@ -44,25 +44,25 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
     season = context["season"]
     coin = get_or_none(request, "coin", coin)
     context.update({
-        "server": get_coin_server(season, coin),
+        "server": get_dpow_coin_server(season, coin),
         "page_title": "Coin Profile Index"
     })
 
     if coin:
-        profile_data = get_coin_profile_context(request, season, coin)
+        profile_data = get_coin_profile_context(request, season, coin, context)
         if profile_data is not None:
             context.update(profile_data)
             return render(request, 'views/coin/coin_profile.html', context)    
         else:
             messages.error(request, f"Coin {coin} not found.")
-    context.update(get_coin_profile_index_context(request, season))
+    context.update(get_coin_profile_index_context(request, season, context))
     return render(request, 'views/coin/coin_profile_index.html', context)
 
 
 def ntx_scoreboard_view(request, region=None):
     context = get_base_context(request)
     context["region"] = get_or_none(request, "region", region)
-    season_stats_sorted = get_season_stats_sorted(context["season"])
+    season_stats_sorted = get_season_stats_sorted(context["season"], context["notaries"])
     context.update({
         "page_title": f"Notarisation Scoreboard",
         "anchored": True,
@@ -79,7 +79,7 @@ def ntx_scoreboard_24hrs_view(request, region=None):
     context.update({
         "page_title": f"Last 24hrs Notarisation Scoreboard",
         "anchored": True,
-        "daily_stats_sorted": get_daily_stats_sorted(context["season"]),
+        "daily_stats_sorted": get_daily_stats_sorted(context["notaries"], context["dpow_coins_dict"]),
         "nn_social": get_nn_social_info(request)
     })
     return render(request, 'views/ntx/ntx_scoreboard_24hrs.html', context)
@@ -219,14 +219,14 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
     season = context["season"]
     coin = get_or_none(request, "coin", coin)
     context.update({
-        "server": get_coin_server(season, coin),
+        "server": get_dpow_coin_server(season, coin),
         "page_title": "Coin Profile Index"
     })
     
     if coin:
-        context.update(get_coin_profile_context(request, season, coin))
+        context.update(get_coin_profile_context(request, season, coin, context))
         return render(request, 'views/coin/coin_profile.html', context)    
-    context.update(get_coin_profile_index_context(request, season))
+    context.update(get_coin_profile_index_context(request, season, context))
     return render(request, 'views/coin/coin_profile_index.html', context)
 
 

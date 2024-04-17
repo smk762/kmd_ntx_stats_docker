@@ -18,11 +18,11 @@ def get_from_memcache(key, path=None, url=None, expire=600):
     logger.cached(f"Getting {key} from cache...")
     key = key.lower()
     data = MEMCACHE.get(key)
-    if data is None:
+    if data is None or len(data) == 0:
         if path is None:
             path = f"{CACHE_PATH}/{key}.json"
         data = get_cache_file(path)
-        if data is None and url:
+        if data is None or len(data) == 0:
             data = refresh_cache(path, url, force=True, expire=expire)
         logger.cached(f"Returning {key} from {path}")
     else:
@@ -40,33 +40,42 @@ def get_cache_file(file):
 
 def refresh_cache(path=None, url=None, data=None, force=False, key=None, expire=86400):
     '''Only used for notary_seasons / seasons_info at the moment'''
-    now = int(time.time())
-    key = key.lower()
-    if path is None:
+    if path is None and key is not None:
+        key = key.lower()
         path = f"{CACHE_PATH}/{key}.json"
-    if not os.path.exists(path):
-        data = update_cache_file(path, url, data)    
-    else:
-        mtime = os.path.getmtime(path)
-        if now - mtime > expire or force: # 24 hrs
-            data = update_cache_file(path, url, data)
+
+    if path is not None:    
+        if not os.path.exists(path):
+            data = update_cache_file(path, url, data)    
+        else:
+            mtime = os.path.getmtime(path)
+            if int(time.time()) - mtime > expire or force:
+                data = update_cache_file(path, url, data)
+
     if key is not None:
-        MEMCACHE.set(key, data, expire)        
+        key = key.lower()
+        if data is not None:
+            if len(data) > 0:
+                MEMCACHE.set(key, data, expire)        
     return data
 
 
 def update_cache_file(file, url=None, data=None):
     try:
-        if url and not data:
+        if url and data is not None:
             data = requests.get(url).json()
-        if "results" in data:
-            data = data["results"]
-        with open(file, "w+") as f:
-            json.dump(data, f, indent=4)
+        if isinstance(data, dict):
+            if "results" in data:
+                data = data["results"]
+        if data is not None:
+            if len(data) > 0:
+                logger.warning(f"data: {data}")
+                with open(file, "w+") as f:
+                    json.dump(data, f, indent=4)
         return data
     except Exception as e:
         logger.warning(f"Failed to update {file} from {url}: {e}")
-        return {}
+        return None
 
 
 # Activation commands

@@ -50,9 +50,9 @@ def pad_dec_to_hex(num):
     return hex_val.upper()
 
 
-def get_mainnet_coins(coins_dict):
-    if "Main" in coins_dict:
-        return coins_dict["Main"]
+def get_mainnet_coins(dpow_coins_dict):
+    if "Main" in dpow_coins_dict:
+        return dpow_coins_dict["Main"]
     return []
 
 
@@ -166,9 +166,9 @@ def get_or_none(request, key, default=None):
         return default
     return val
 
-def get_third_party_coins(coins_dict):
-    if "Third_Party" in coins_dict:
-        return coins_dict["Third_Party"]
+def get_third_party_coins(dpow_coins_dict):
+    if "Third_Party" in dpow_coins_dict:
+        return dpow_coins_dict["Third_Party"]
     return []
 
 # takes a row from queryset values, and returns a dict using a defined row value as top level key

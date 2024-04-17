@@ -6,6 +6,7 @@ from kmd_ntx_api.helper import get_or_none, get_page_server, append_unique, \
     update_unique, region_sort, get_mainnet_coins, get_third_party_coins
 from kmd_ntx_api.coins import get_dpow_coins_dict
 from kmd_ntx_api.notary_seasons import get_page_season
+from kmd_ntx_api.logger import logger
 
 
 def est_blocks(time):
@@ -91,10 +92,10 @@ def get_balances_graph_data(request, notary=None, coin=None):
     coin_list.sort()
     notary_list.sort()
     notary_list = region_sort(notary_list)
-
-    coins_dict = get_dpow_coins_dict(season)
-    main_coins = get_mainnet_coins(coins_dict)
-    third_coins = get_third_party_coins(coins_dict)
+    logger.info("get_balances_graph_data")
+    dpow_coins_dict = get_dpow_coins_dict(season)
+    main_coins = get_mainnet_coins(dpow_coins_dict)
+    third_coins = get_third_party_coins(dpow_coins_dict)
 
     if len(coin_list) == 1:
         coin = coin_list[0]
@@ -164,9 +165,10 @@ def get_daily_ntx_graph_data(request):
                       ['notary', 'coin']"
         }
 
-    coins_dict = get_dpow_coins_dict(season)
-    main_coins = get_mainnet_coins(coins_dict)
-    third_coins = get_third_party_coins(coins_dict)
+    dpow_coins_dict = get_dpow_coins_dict(season)
+    logger.info("get_daily_ntx_graph_data")
+    main_coins = get_mainnet_coins(dpow_coins_dict)
+    third_coins = get_third_party_coins(dpow_coins_dict)
 
     data = get_notarised_count_daily_data(notarised_date, notary)
     data = data.values('notary', 'notarised_date', 'coin_ntx_counts')

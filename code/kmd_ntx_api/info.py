@@ -494,19 +494,20 @@ def get_dpow_server_coins_info(
     if data is None:
         data = get_scoring_epochs_data(season, server, coin, epoch, timestamp)
         data = data.values('epoch_coins')
-        logger.calc(data)
+        logger.info(data)
+        logger.info("#################################")
+
+        resp = []
+        for item in data:
+            resp += item['epoch_coins']
+
+        resp = list(set(resp))
+        resp.sort()
         if epoch is None and coin is None and timestamp is None:
             logger.calc(f"adding {cache_key} to memcache")
-            refresh_cache(key=cache_key, data=data, expire=86400)
-
-    resp = []
-    for item in data:
-        resp += item['epoch_coins']
-
-    resp = list(set(resp))
-    resp.sort()
-
-    return resp
+            refresh_cache(key=cache_key, data=resp, expire=86400)
+        return resp
+    return data
 
 
 def get_launch_params(request):

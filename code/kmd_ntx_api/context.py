@@ -2,11 +2,11 @@
 import numpy as np
 from kmd_ntx_api.cache_data import explorers_cache, coin_icons_cache, \
     notary_icons_cache, navigation_cache
-from kmd_ntx_api.coins import get_dpow_coins, get_coin_server
+from kmd_ntx_api.coins import get_dpow_coins_dict, get_dpow_coin_server
 from kmd_ntx_api.cron import get_time_since
 from kmd_ntx_api.helper import get_or_none, get_notary_list, get_page_server, \
-    get_notary_clean, get_notary_list, get_eco_data_link, \
-    get_sidebar_links, get_random_notary, get_regions_info, \
+    get_notary_clean, get_eco_data_link, \
+    get_random_notary, get_regions_info, \
     get_notary_region
 from kmd_ntx_api.info import get_nn_social_info, get_coins, \
     get_region_rank, get_coin_social_info, get_notary_icons, \
@@ -28,14 +28,17 @@ def get_base_context(request):
     seasons_info = get_seasons_info()
     season = get_page_season(request, seasons_info)
     server = get_page_server(request)
-    regions_info = get_regions_info(season)
-    notaries = get_notary_list(season, seasons_info)
+    notary_list = get_notary_list(season, seasons_info)
     region = get_or_none(request, "region", "EU")
-    notary = get_or_none(request, "notary", get_random_notary(notaries))
+    notary = get_or_none(request, "notary", get_random_notary(notary_list))
     epoch = get_or_none(request, "epoch", "Epoch_0")
     coin = get_or_none(request, "coin", "KMD")
-    coins_dict = get_dpow_coins(season)
-    dpow_coins = [item for sublist in coins_dict.values() for item in sublist]
+    logger.info("base_context")
+    dpow_coins_dict = get_dpow_coins_dict(season)
+    logger.info(dpow_coins_dict)
+    dpow_coins_dict["Main"] += ["KMD", "LTC"]
+    dpow_coins_dict["Main"].sort()
+    dpow_coins_list = [item for sublist in dpow_coins_dict.values() for item in sublist]
     year = get_or_none(request, "year")
     month = get_or_none(request, "month")
     address = get_or_none(request, "address")
@@ -45,7 +48,6 @@ def get_base_context(request):
     notary_icons = notary_icons_cache()
     nav_data = navigation_cache()
     eco_data_link = get_eco_data_link()
-    sidebar_links = get_sidebar_links(season, coins_dict, regions_info)
     selected = {}
     [selected.update({i: request.GET[i]}) for i in request.GET]
     context = {
@@ -65,28 +67,28 @@ def get_base_context(request):
         "epoch_clean": epoch.replace("_"," "),
         "notary_clean": get_notary_clean(notary),
         "explorers": explorers,
+        "dpow_coins_dict": dpow_coins_dict,
         "coin_icons": coin_icons,
-        "dpow_coins": dpow_coins,
+        "dpow_coins_list": dpow_coins_list,
         "notary_icons": notary_icons,
-        "notaries": notaries,
-        "sidebar_links": sidebar_links,
+        "notaries": notary_list,
         "nav_data": nav_data,
-        "eco_data_link": eco_data_link,
-        "nn_regions": regions_info
+        "eco_data_link": eco_data_link
     }
     return context
 
 
-def get_notary_profile_index_context(request, season):
+def get_notary_profile_index_context(request, season, context):
     logger.merge("get_notary_profile_index_context")
     return {
         "page_title": "Notary Profile Index",
         "buttons": buttons.get_region_buttons(),
-        "nn_social": get_nn_social_info(request)
+        "nn_social": get_nn_social_info(request),
+        "nn_regions": get_regions_info(season)
     }
 
 
-def get_notary_profile_context(request, season, notary):
+def get_notary_profile_context(request, season, notary, context):
     logger.merge("get_notary_profile_context")
     notary_profile_summary_table = get_notary_ntx_season_table_data(request, notary)
     if len(notary_profile_summary_table["notary_ntx_summary_table"]) == 1:
@@ -114,7 +116,7 @@ def get_notary_profile_context(request, season, notary):
         seed_scores = get_seednode_version_score_total(request)
         notarised_data_24hr = get_notarised_date(season, None, None, notary, True)
         region = get_notary_region(notary)
-        season_stats_sorted = get_season_stats_sorted(season)
+        season_stats_sorted = get_season_stats_sorted(season, context['notaries'])
 
         ntx_season_data = notary_profile_summary_table["ntx_season_data"][0]
         seed_score = seed_scores[notary]
@@ -141,19 +143,15 @@ def get_notary_profile_context(request, season, notary):
     return context
 
 
-def get_coin_profile_index_context(request, season):
+def get_coin_profile_index_context(request, season, context):
     logger.merge("get_coin_profile_index_context")
-    coins_dict = get_dpow_coins(season)
-    coins_dict["Main"] += ["KMD", "LTC"]
-    coins_dict["Main"].sort()
     return { 
         "buttons": buttons.get_server_buttons(),
-        "coin_social": get_coin_social_info(request),
-        "server_coins": coins_dict
+        "coin_social": get_coin_social_info(request)
     }
 
 
-def get_coin_profile_context(request, season, coin):
+def get_coin_profile_context(request, season, coin, context):
     logger.merge("get_coin_profile_context")
     coin_profile_summary_table = get_coin_ntx_season_table_data(request, coin)
     if len(coin_profile_summary_table["coin_ntx_summary_table"]) == 1:
@@ -173,18 +171,17 @@ def get_coin_profile_context(request, season, coin):
             max_tick = 10
 
         notary_icons = get_notary_icons(request)
-        coin_notariser_ranks = get_coin_notariser_ranks(season)
+        coin_notariser_ranks = get_coin_notariser_ranks(season, context['dpow_coins_list'])
         top_region_notarisers = get_top_region_notarisers(coin_notariser_ranks)
         top_coin_notarisers = get_top_coin_notarisers(
-                                    top_region_notarisers, coin, notary_icons
-                                )
+            top_region_notarisers, coin, context["notary_icons"]
+        )
 
         return {
             "page_title": f"{coin} Profile",
-            "server": get_coin_server(season, coin),
+            "server": get_dpow_coin_server(season, coin),
             "coin": coin,
             "coins_data": coins_data,
-            "notary_icons": notary_icons,
             "coin_balances": coin_balances["results"], # Balances in table format
             "max_tick": max_tick,
             "coin_social": get_coin_social_info(request),

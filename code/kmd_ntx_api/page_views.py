@@ -41,15 +41,10 @@ def dash_view(request):
     except Exception as e:
         logger.error(e)
         biggest_block = 0
-    
-    coins_dict = get_dpow_coins_dict(season)
-    coins_list = []
-    for server in coins_dict: 
-        coins_list += coins_dict[server]
-
-    daily_stats_sorted = get_daily_stats_sorted(season, coins_dict)
-    season_stats_sorted = get_season_stats_sorted(season, coins_list)
-    nn_social = get_nn_social_info(request)
+    logger.info("dash_view")
+    logger.calc(context["notaries"])
+    daily_stats_sorted = get_daily_stats_sorted(context["notaries"], context["dpow_coins_dict"])
+    season_stats_sorted = get_season_stats_sorted(season, context["notaries"])
     region_score_stats = get_region_score_stats(season_stats_sorted)
 
     context.update({
@@ -62,9 +57,7 @@ def dash_view(request):
         "season_stats_sorted": season_stats_sorted,
         "region_score_stats": region_score_stats,
         "show_ticker": True,
-        "server_coins": coins_dict,
-        "coins_list": coins_list,
         "daily_stats_sorted": daily_stats_sorted,
-        "nn_social": nn_social
+        "nn_social": get_nn_social_info(request)
     })
     return render(request, 'views/dash_index.html', context)

@@ -16,11 +16,11 @@ def get_dpow_coins_dict(season=get_season(), as_list=False):
     dpow_3p_coins = get_dpow_server_coins_info(season=season, server="Third_Party")
     if as_list:
         return dpow_main_coins + dpow_3p_coins
-    coins_dict = {
+    dpow_coins_dict = {
         "Main": dpow_main_coins,
         "Third_Party": dpow_3p_coins
     }
-    return coins_dict
+    return dpow_coins_dict
 
 
 def get_dpow_coins_list(season=None, server=None, epoch=None):
@@ -34,13 +34,13 @@ def get_dpow_coins_list(season=None, server=None, epoch=None):
     return coins_list
 
 
-def get_coin_server(season, coin):
+def get_dpow_coin_server(season, coin):
     if season.find("Testnet") != -1:
         return "Main"
     if coin in ["KMD", "BTC", "LTC"]:
         return coin
-    coins_dict = get_dpow_coins_dict(season)
-    for server in coins_dict:
-        if coin in coins_dict[server]:
+    dpow_coins_dict = get_dpow_coins_dict(season)
+    for server in dpow_coins_dict:
+        if coin in dpow_coins_dict[server]:
             return server
     return "Unofficial"
