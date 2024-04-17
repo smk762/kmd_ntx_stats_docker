@@ -109,7 +109,6 @@
                             {% if messages %}
                                 {% for message in messages %} {% include "components/messages/messages.html" %} {% endfor %}
                             {% endif %}
-                            {% if sidebar_links.server == 'dev' %} {% include "components/messages/dev_msg.html" %} {% endif %}
                             {% block content %}
                             {% endblock %}
                         </div>
