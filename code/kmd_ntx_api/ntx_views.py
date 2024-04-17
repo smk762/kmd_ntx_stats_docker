@@ -6,15 +6,15 @@ from django.shortcuts import render
 from django.contrib import messages
 from kmd_ntx_api.buttons import get_faucet_buttons
 from kmd_ntx_api.const import SINCE_INTERVALS
-from kmd_ntx_api.context import get_base_context
+from kmd_ntx_api.context import get_base_context, get_notary_profile_context, \
+    get_notary_profile_index_context, get_coin_profile_context, \
+    get_coin_profile_index_context
 from kmd_ntx_api.helper import get_or_none, get_notary_list, \
-    get_coin_server, get_page_server
+    get_page_server
+from kmd_ntx_api.coins import get_coin_server
 from kmd_ntx_api.info import get_nn_social_info
 from kmd_ntx_api.logger import logger
 from kmd_ntx_api.notary_seasons import get_page_season, get_notary_seasons
-from kmd_ntx_api.profiles import get_notary_profile_context, \
-    get_notary_profile_index_context, get_coin_profile_context, \
-    get_coin_profile_index_context
 from kmd_ntx_api.query import get_notarised_data
 from kmd_ntx_api.stats import get_season_stats_sorted, \
     get_region_score_stats, get_daily_stats_sorted
@@ -32,7 +32,7 @@ def notary_profile_view(request, notary=None):
     })
     # Base context will return a random notary if one is not specified. For this view, we prefer 'None'.
     season = context["season"]
-    if notary in get_notary_list(season):
+    if notary in context["notaries"]:
         context.update(get_notary_profile_context(request, season, notary))
         return render(request, 'views/notarisation/notary_profile.html', context)
     context.update(get_notary_profile_index_context(request, season))

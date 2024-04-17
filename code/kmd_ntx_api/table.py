@@ -8,7 +8,8 @@ from django.db.models import Max
 import kmd_ntx_api.models as models
 from kmd_ntx_api.info import get_epoch_coins_dict
 from kmd_ntx_api.const import SINCE_INTERVALS
-from kmd_ntx_api.helper import get_or_none, get_page_server, get_time_since, days_ago
+from kmd_ntx_api.helper import get_or_none, get_page_server
+from kmd_ntx_api.cron import days_ago, get_time_since
 from kmd_ntx_api.notary_seasons import get_page_season, get_season, get_seasons_info
 from kmd_ntx_api.serializers import addressesSerializer, balancesSerializer, \
     coinLastNtxSerializer, coinNtxSeasonSerializer, minedSerializer, \
@@ -65,6 +66,7 @@ class TableSettings():
 
 
 def get_addresses_rows(request):
+    logger.calc("get_addresses_rows")
     source = TableSettings(
         data=models.addresses.objects.all(),
         serializer=addressesSerializer,
@@ -175,6 +177,7 @@ def get_coin_ntx_season_rows(request):
 
 
 def get_mined_rows(request):
+    logger.calc("get_mined_rows")
     source = TableSettings(
         data=models.mined.objects.all(),
         serializer=minedSerializer,
@@ -251,6 +254,7 @@ def get_mined_count_season_rows(request):
     }
 
 def get_nn_ltc_tx_rows(request):
+    logger.calc("get_nn_ltc_tx_rows")
     source = TableSettings(
         data=models.nn_ltc_tx.objects.all(),
         serializer=nnLtcTxSerializer,

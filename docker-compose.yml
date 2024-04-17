@@ -112,11 +112,24 @@ services:
       - mm2
       - db
       - kmd
+      - memcached
     logging:
       driver: "json-file"
       options:
         max-size: "20m"
         max-file: "10"
+
+  memcached:
+    container_name: memcached
+    image: memcached:latest
+    ports:
+      - "127.0.0.1:11211:11211"
+    restart: always
+    depends_on:
+      - db
+      - mm2
+      - kmd
+    command: ["memcached", "-I", "40m", "-m", "100m"]
 
 networks:
   default:

@@ -2,6 +2,8 @@
 #### SEEDNODES 
 import time
 from datetime import datetime as dt
+from datetime import timezone
+
 from django.db.models import Sum
 from kmd_ntx_api.helper import get_notary_list, get_or_none, get_notary_list, \
     date_hour, get_month_epoch_range, prepopulate_seednode_version_month, \
@@ -102,8 +104,8 @@ def get_seednode_version_date_table(request):
 
 def get_seednode_version_month_table(request):
     season = get_page_season(request)
-    year = get_or_none(request, "year", dt.utcnow().year)
-    month = get_or_none(request, "month", dt.utcnow().month)
+    year = get_or_none(request, "year", dt.now(timezone.utc).timestamp().year)
+    month = get_or_none(request, "month", dt.now(timezone.utc).timestamp().month)
     start, end, last_day = get_month_epoch_range(year, month)
     notary_list = get_notary_list(season)
     default_scores = prepopulate_seednode_version_month(notary_list)

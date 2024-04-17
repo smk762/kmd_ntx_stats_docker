@@ -10,8 +10,7 @@ from kmd_ntx_api.electrum import get_coin_electrum, get_p2pk_scripthash_from_pub
     get_p2pkh_scripthash_from_pubkey, get_from_electrum_ssl, get_from_electrum
 from kmd_ntx_api.explorers import get_sync, get_dexstats_utxos
 from kmd_ntx_api.serializers import addrFromBase58Serializer
-from kmd_ntx_api.helper import get_or_none, get_page_server, get_time_since
-from kmd_ntx_api.notary_seasons import get_page_season, get_season, get_seasons_info
+from kmd_ntx_api.helper import get_or_none
 from kmd_ntx_api.logger import logger
 
 def get_addr_from_base58(request):

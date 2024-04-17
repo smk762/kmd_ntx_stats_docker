@@ -3,8 +3,9 @@ import time
 from django.db.models import Sum, Count
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.helper import get_notary_region, \
-    get_notary_list, get_dpow_coins, safe_div, \
-    get_mainnet_coins, get_third_party_coins, days_ago
+    get_notary_list, safe_div, \
+    get_mainnet_coins, get_third_party_coins
+from kmd_ntx_api.cron import days_ago
 from kmd_ntx_api.mining import get_mined_data_24hr
 from kmd_ntx_api.notary_seasons import get_season
 from kmd_ntx_api.ntx import get_notarised_date
@@ -12,7 +13,8 @@ from kmd_ntx_api.query import get_seednode_version_stats_data, \
     get_mined_count_season_data, get_notary_ntx_season_data, get_mined_data, \
     get_scoring_epochs_data
 from kmd_ntx_api.struct import default_top_region_notarisers
-
+from kmd_ntx_api.coins import get_dpow_coins, get_dpow_coins_list
+from kmd_ntx_api.logger import logger, timed
 
 def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=get_season()):
     coins_dict=get_dpow_coins(season)
@@ -85,22 +87,12 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, season=get_season()):
 
 
 
-def get_dpow_coins_list(season=None, server=None, epoch=None):
-    dpow_coins = get_scoring_epochs_data(season, server, None, epoch).values('epoch_coins')
-    
-    coins_list = []
-    for item in dpow_coins:
-        coins_list += item['epoch_coins']
-    coins_list = list(set(coins_list))
-    coins_list.sort()
-    return coins_list
-
-
 def get_seednode_version_season_stats_data(season, notary=None):
     return get_seednode_version_stats_data(season=season, name=notary, score=0.2).values('name').annotate(sum_score=Sum('score'))
 
 
 def get_season_stats_sorted(season=get_season(), coins_dict=None):
+    logger.info("get_season_stats_sorted")
     if not coins_dict:
         coins_dict = get_dpow_coins(season)
     notary_list = get_notary_list(season)
@@ -189,6 +181,7 @@ def get_region_score_stats(notarisation_scores):
 
 
 def get_daily_stats_sorted(season=get_season(), coins_dict=None):
+    logger.info("get_daily_stats_sorted")
     if not coins_dict:
         coins_dict = get_dpow_coins(season)
     notary_list = get_notary_list(season)
@@ -290,6 +283,7 @@ def get_top_coin_notarisers(top_region_notarisers, coin, notary_icons):
 
 # returns region > notary > coin > season ntx count
 def get_coin_notariser_ranks(season, coins_list=None):
+    logger.info("get_coin_notariser_ranks")
     # season ntx stats
     if not coins_list:
         coins_list = get_dpow_coins_list(season)

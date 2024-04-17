@@ -5,14 +5,14 @@ import numpy as np
 from datetime import datetime as dt
 from django.shortcuts import render
 from django.db.models import Sum
-
+from kmd_ntx_api.coins import get_dpow_coins
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.notary_seasons import get_page_season
 from kmd_ntx_api.query import get_notarised_data, get_mined_data
 from kmd_ntx_api.stats import get_season_stats_sorted, get_region_score_stats, get_daily_stats_sorted
 from kmd_ntx_api.info import get_nn_social_info
 from kmd_ntx_api.context import get_base_context
-from kmd_ntx_api.helper import get_dpow_coins, days_ago
+from kmd_ntx_api.cron import days_ago
 from kmd_ntx_api.logger import logger
 
 

@@ -17,7 +17,7 @@ class raw_tx():
         self.outputs = outputs
         # TODO: by default, 200 blocks past current tip
         self.expiry_ht = expiry_ht
-        self.locktime = locktime  # time.now()
+        self.locktime = locktime
         self.valueBalanceSapling = valueBalanceSapling
         self.nSpendsSapling = nSpendsSapling
         self.vSpendsSapling = vSpendsSapling

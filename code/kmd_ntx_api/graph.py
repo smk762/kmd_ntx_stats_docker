@@ -3,7 +3,8 @@ from kmd_ntx_api.colors import COLORS
 from kmd_ntx_api.query import get_kmd_supply_data, get_mined_count_daily_data, \
     get_balances_data, get_notarised_count_daily_data
 from kmd_ntx_api.helper import get_or_none, get_page_server, append_unique, \
-    update_unique, region_sort, get_dpow_coins, get_mainnet_coins, get_third_party_coins
+    update_unique, region_sort, get_mainnet_coins, get_third_party_coins
+from kmd_ntx_api.coins import get_dpow_coins
 from kmd_ntx_api.notary_seasons import get_page_season
 
 

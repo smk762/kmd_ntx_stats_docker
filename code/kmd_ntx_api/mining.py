@@ -2,7 +2,8 @@
 import requests
 from random import choice
 from django.db.models import Sum
-from kmd_ntx_api.helper import days_ago, get_time_since, get_or_none, get_notary_list
+from kmd_ntx_api.cron import days_ago, get_time_since
+from kmd_ntx_api.helper import get_or_none, get_notary_list
 from kmd_ntx_api.query import get_mined_data, get_mined_count_season_data
 from kmd_ntx_api.notary_seasons import get_season, get_page_season
 from kmd_ntx_api.serializers import minedSerializer

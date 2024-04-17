@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import datetime
+from datetime import datetime, timezone
 import requests
 from dotenv import load_dotenv
 
@@ -20,7 +20,7 @@ TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 def send_telegram(msg):
-    t = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    t = datetime.now(timezone.utc).timestamp().strftime('%Y-%m-%d %H:%M:%S')
     payload = {
         'chat_id': TELEGRAM_CHAT_ID,
         'text': f"{t}: {msg}"

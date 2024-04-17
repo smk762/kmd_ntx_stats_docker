@@ -423,6 +423,7 @@ def get_balances_data(season=None, server=None, coin=None, notary=None, address=
 
 def get_rewards_data(season=None, address=None, min_value=None, min_block=None, max_block=None,
                      min_blocktime=None, max_blocktime=None, exclude_coinbase=True):
+    logger.calc("get_rewards_data")
     data = rewards_tx.objects.all()
 
     if address:
