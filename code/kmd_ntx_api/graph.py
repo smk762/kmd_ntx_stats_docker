@@ -4,7 +4,7 @@ from kmd_ntx_api.query import get_kmd_supply_data, get_mined_count_daily_data, \
     get_balances_data, get_notarised_count_daily_data
 from kmd_ntx_api.helper import get_or_none, get_page_server, append_unique, \
     update_unique, region_sort, get_mainnet_coins, get_third_party_coins
-from kmd_ntx_api.coins import get_dpow_coins
+from kmd_ntx_api.coins import get_dpow_coins_dict
 from kmd_ntx_api.notary_seasons import get_page_season
 
 
@@ -92,7 +92,7 @@ def get_balances_graph_data(request, notary=None, coin=None):
     notary_list.sort()
     notary_list = region_sort(notary_list)
 
-    coins_dict = get_dpow_coins(season)
+    coins_dict = get_dpow_coins_dict(season)
     main_coins = get_mainnet_coins(coins_dict)
     third_coins = get_third_party_coins(coins_dict)
 
@@ -164,7 +164,7 @@ def get_daily_ntx_graph_data(request):
                       ['notary', 'coin']"
         }
 
-    coins_dict = get_dpow_coins(season)
+    coins_dict = get_dpow_coins_dict(season)
     main_coins = get_mainnet_coins(coins_dict)
     third_coins = get_third_party_coins(coins_dict)
 

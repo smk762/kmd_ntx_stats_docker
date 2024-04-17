@@ -5,7 +5,7 @@ import numpy as np
 from datetime import datetime as dt
 from django.shortcuts import render
 from django.db.models import Sum
-from kmd_ntx_api.coins import get_dpow_coins
+from kmd_ntx_api.coins import get_dpow_coins_dict
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.notary_seasons import get_page_season
 from kmd_ntx_api.query import get_notarised_data, get_mined_data
@@ -42,7 +42,7 @@ def dash_view(request):
         logger.error(e)
         biggest_block = 0
     
-    coins_dict = get_dpow_coins(season)
+    coins_dict = get_dpow_coins_dict(season)
     coins_list = []
     for server in coins_dict: 
         coins_list += coins_dict[server]
