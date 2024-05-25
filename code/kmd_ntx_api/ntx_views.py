@@ -166,7 +166,6 @@ def notaryfaucet_view(request):
         if "message" in sent_tx_resp["result"]:
             sent_tx_list = sent_tx_resp["result"]["message"]
     for item in sent_tx_list:
-        logger.info(item)
         if item[0] not in pending_index:
             if item[4] > SINCE_INTERVALS['day']:
                 sum_24hrs += item[5]

@@ -25,6 +25,8 @@ def get_explorers(request):
 def get_base_endpoint(coin):
     if coin == "MIL":
         return f"https://mil.kmdexplorer.io/api"
+    if coin == "VOTE2024":
+        return f"https://vote2024.explorer.lordofthechains.com/insight-api-komodo"
 
     if coin == "MCL":
         return f"https://explorer.marmara.io/insight-api-komodo"
