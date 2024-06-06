@@ -537,7 +537,7 @@ class notarised_coin_daily_row():
     def update(self):
         if season == "Unofficial":
             logger.info(f"[notarised_coin_daily_row] {coin} season unofficial?")
-        self.server = lib_validate.get_coin_server(self.season, self.coin)
+        self.server = lib_validate.get_dpow_coin_server(self.season, self.coin)
 
         self.server, self.coin = lib_validate.handle_dual_server_coins(
             self.server, self.coin
@@ -732,7 +732,7 @@ class coin_last_ntx_row():
 
     def update(self):
 
-        self.server = lib_validate.get_coin_server(self.season, self.coin)
+        self.server = lib_validate.get_dpow_coin_server(self.season, self.coin)
         self.server, self.coin = lib_validate.handle_dual_server_coins(self.server, self.coin)
         row_data = (self.season, self.server, self.coin,\
                      self.notaries, self.opret, self.kmd_ntx_blockhash,\
@@ -785,7 +785,7 @@ class notary_last_ntx_row():
         return True
 
     def update(self):
-        self.server = lib_validate.get_coin_server(self.season, self.coin)
+        self.server = lib_validate.get_dpow_coin_server(self.season, self.coin)
         self.server, self.coin = lib_validate.handle_dual_server_coins(self.server, self.coin)
         row_data = (self.season, self.server, self.coin, self.notary,\
                      self.notaries, self.opret, self.kmd_ntx_blockhash,\

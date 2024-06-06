@@ -163,7 +163,7 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
                 row.blocks_mined = int(item[1])
                 row.sum_value_mined = float(item[2])
                 row.mined_date = start
-                row.timestamp = datetime.datetime(*start.timetuple()[:-4]).timestamp()
+                row.timestamp = dt(*start.timetuple()[:-4]).timestamp()
 
                 if season != "since_genesis":
                     row.usd_price = Decimal(prices[season][date]['usd'])

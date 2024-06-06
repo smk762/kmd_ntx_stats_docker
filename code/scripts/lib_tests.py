@@ -695,9 +695,9 @@ class TestLibValidate:
         assert lib_validate.get_season(5623683000) == "Unofficial"
 
     def test_get_coin_server(self):
-        assert lib_validate.get_coin_server("GLEEC-OLD", "Season_5") == "Third_Party"
-        assert lib_validate.get_coin_server("DEX", "Season_5") == "Main"
-        assert lib_validate.get_coin_server("KMD", "Season_5") == "KMD"
+        assert lib_validate.get_dpow_coin_server("GLEEC-OLD", "Season_5") == "Third_Party"
+        assert lib_validate.get_dpow_coin_server("DEX", "Season_5") == "Main"
+        assert lib_validate.get_dpow_coin_server("KMD", "Season_5") == "KMD"
 
     def test_check_notarised_epochs(self):
         for season in SEASONS_INFO:

@@ -8,7 +8,7 @@
 		{% include "components/buttons/action_button.html" with action=params.action width_pct=params.width_pct text=params.text btn_id=button active="Main" %}
 	{% endfor %}
 
-	{% for server, coins in server_coins.items %}
+	{% for server, coins in dpow_coins_dict.items %}
 		{% if server == 'Main' %}
 		<div id="{{ server }}" class="section-anchor">
 		{% else %}

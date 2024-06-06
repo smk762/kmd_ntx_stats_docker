@@ -4,6 +4,9 @@ from kmd_ntx_api.notary_seasons import get_page_season
 from kmd_ntx_api.ntx import get_notarised_date, get_ntx_tenure_table
 from kmd_ntx_api.stats import get_season_stats_sorted, get_daily_stats_sorted
 from kmd_ntx_api.serializers import notarisedSerializer
+from kmd_ntx_api.notary_seasons import get_seasons_info
+from kmd_ntx_api.helper import get_notary_list
+from kmd_ntx_api.coins import get_dpow_coins_dict
 
 
 def notarised_date_api(request):
@@ -26,13 +29,19 @@ def ntx_tenture_api(request):
 
 def season_stats_sorted_api(request):
     season = get_page_season(request)
-    data = get_season_stats_sorted(season)
+    seasons_info = get_seasons_info()
+    notary_list = get_notary_list(season, seasons_info)
+    data = get_season_stats_sorted(season, notary_list)
     filters = ['season']
     return json_resp(data, filters)
 
 
 def daily_stats_sorted_api(request):
     season = get_page_season(request)
-    data = get_daily_stats_sorted(season)
-    filters = []
+    seasons_info = get_seasons_info()
+    data = get_daily_stats_sorted(
+        get_notary_list(season, seasons_info),
+        get_dpow_coins_dict(season)
+    )
+    filters = ['season']
     return json_resp(data, filters)

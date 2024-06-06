@@ -10,12 +10,12 @@ from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.mining import get_mined_data
 from kmd_ntx_api.explorers import get_sync
 from kmd_ntx_api.ntx import get_notarised_date
-from kmd_ntx_api.notary_seasons import get_page_season, get_season
-from kmd_ntx_api.cache_data import notary_pubkeys_cache
+from kmd_ntx_api.notary_seasons import get_page_season
 from kmd_ntx_api.serializers import balancesSerializer, notarisedSerializer, \
     coinsSerializer, notarisedCoinDailySerializer, notarisedCountDailySerializer, \
     nnLtcTxSerializer
-from kmd_ntx_api.helper import get_or_none, get_page_server, get_time_since, \
+from kmd_ntx_api.cron import get_time_since
+from kmd_ntx_api.helper import get_or_none, get_page_server, \
     pad_dec_to_hex, get_mainnet_coins, get_third_party_coins, items_row_to_dict
 from kmd_ntx_api.query import get_notarised_data, get_coin_last_ntx_data, \
     get_coin_ntx_season_data, get_coins_data, get_seednode_version_stats_data, \
@@ -24,6 +24,9 @@ from kmd_ntx_api.query import get_notarised_data, get_coin_last_ntx_data, \
     get_notarised_coins_data, get_nn_social_data, get_nn_ltc_tx_data, \
     get_coin_social_data
 from kmd_ntx_api.query import get_addresses_data, get_coins_data, get_scoring_epochs_data
+from kmd_ntx_api.logger import logger, timed
+from kmd_ntx_api.memcached import MEMCACHE
+from kmd_ntx_api.cache_data import get_from_memcache, refresh_cache
 
 
 def get_balances(request):
@@ -463,29 +466,48 @@ def get_coin_prefixes(request, coin=None):
                 resp[item['coin']]["hex"].update({i: pad_dec_to_hex(item['coins_info'][i])})
     return resp
 
-
-def get_dpow_server_coins_info(request):
-    season = get_page_season(request)
-    server = get_page_server(request)
-    epoch = get_or_none(request, "epoch")
-    coin = get_or_none(request, "coin")
-    timestamp = get_or_none(request, "timestamp")
+@timed
+def get_dpow_server_coins_info(
+    request=None, season=None,
+    server=None, epoch=None,
+    coin=None, timestamp=None
+):
+    data = None
+    cache_key = None
+    logger.calc("get_dpow_server_coins_info")
+    if request is not None:
+        season = get_page_season(request)
+        server = get_page_server(request)
+        epoch = get_or_none(request, "epoch")
+        coin = get_or_none(request, "coin")
+        timestamp = get_or_none(request, "timestamp")
+    else:
+        cache_key = f"dpow_server_coins_info_{season}_{server}"
 
     if not season or not server:
         return {
             "error": "You need to specify both of the following filter parameters: ['season', 'server']"
         }
-    data = get_scoring_epochs_data(season, server, coin, epoch, timestamp)
-    data = data.values('epoch_coins')
+    if cache_key is not None:
+        data = get_from_memcache(cache_key)
 
-    resp = []
-    for item in data:
-        resp += item['epoch_coins']
+    if data is None:
+        data = get_scoring_epochs_data(season, server, coin, epoch, timestamp)
+        data = data.values('epoch_coins')
+        logger.info(data)
+        logger.info("#################################")
 
-    resp = list(set(resp))
-    resp.sort()
+        resp = []
+        for item in data:
+            resp += item['epoch_coins']
 
-    return resp
+        resp = list(set(resp))
+        resp.sort()
+        if epoch is None and coin is None and timestamp is None:
+            logger.calc(f"adding {cache_key} to memcache")
+            refresh_cache(key=cache_key, data=resp, expire=86400)
+        return resp
+    return data
 
 
 def get_launch_params(request):
@@ -587,6 +609,7 @@ def get_notary_ltc_txid(request):
 
 
 def get_ltc_txid_list(request):
+    logger.calc("ltc_txid_list")
     season = get_page_season(request)
     notary = get_or_none(request, "notary")
     category = get_or_none(request, "category")

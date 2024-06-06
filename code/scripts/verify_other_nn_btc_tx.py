@@ -9,7 +9,7 @@ import concurrent.futures
 from telebot import util
 from telegram import ParseMode
 import requests
-from datetime import datetime as dt
+from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 from logging import Handler, Formatter
@@ -37,7 +37,7 @@ class LogstashFormatter(Formatter):
         super(LogstashFormatter, self).__init__()
 
     def format(self, record):
-        t = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        t = datetime.now(timezone.utc).timestamp().strftime('%Y-%m-%d %H:%M:%S')
 
         return "<i>{datetime}</i><pre>\n{message}</pre>".format(message=record.msg, datetime=t)
 

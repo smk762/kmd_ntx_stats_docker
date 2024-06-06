@@ -67,7 +67,7 @@ def create_raw_transaction_view(request):
         "now":int(time.time()),
         "locktime":int(time.time())-30*60,
         "30_min_ago":int(time.time()-30*60),
-        "coins_list": SMARTCHAINS
+        "smartchain_coins_list": SMARTCHAINS
     })
 
     # Step one: get UTXOs for selection and show form for destination and amount
@@ -164,8 +164,7 @@ def decode_op_return_view(request):
 
 
 def faucet_view(request):
-    season = get_page_season(request)
-    notary_list = get_notary_list(season)
+    context = get_base_context(request)
     faucet_balances = requests.get(f"https://faucet.komodo.earth/faucet_balances").json()
     pending_tx_resp = requests.get(f"https://faucet.komodo.earth/show_pending_tx").json()
     pending_tx_list = []
@@ -212,8 +211,7 @@ def faucet_view(request):
                 "status": item[6]
             })
 
-    coins_list = ["DOC", "MARTY", "DOC", "MARTY", "ZOMBIE"]
-    context = get_base_context(request)
+    faucet_coins_list = ["DOC", "MARTY", "ZOMBIE"]
     context.update({
         "page_title":"Testcoin Faucet",
         "explorers":get_explorers(request),
@@ -221,7 +219,7 @@ def faucet_view(request):
         "count_24hrs":count_24hrs,
         "sum_24hrs":sum_24hrs,
         "tx_rows": tx_rows,
-        "coins_list": coins_list
+        "faucet_coins_list": faucet_coins_list
     })
 
     if request.method == 'POST':
@@ -356,7 +354,7 @@ def send_raw_tx_view(request):
     context = get_base_context(request)
     context.update({
         "page_title":"Send Raw Transaction (experimental!)",
-        "coins_list": SMARTCHAINS
+        "smartchain_coins_list": SMARTCHAINS
     })
 
     if "coin" in request.GET or "tx_hex" in request.GET:

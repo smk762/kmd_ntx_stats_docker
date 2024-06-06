@@ -8,38 +8,10 @@ import datetime
 from calendar import monthrange
 from datetime import datetime as dt
 from django.http import JsonResponse
-from kmd_ntx_api.const import SINCE_INTERVALS, INTERVALS
 from kmd_ntx_api.notary_seasons import get_seasons_info, get_season
 from kmd_ntx_api.cache_data import ecosystem_links_cache
+from kmd_ntx_api.logger import logger
 
-
-# Time related functions
-def now():
-    return int(time.time())
-
-
-def days_ago(days=1):
-    return now() - SINCE_INTERVALS['day'] * days
-
-
-def get_time_since(timestamp):
-    if timestamp == 0:
-        return -1, "Never"
-    sec_since = now() - int(timestamp)
-    dms_since = day_hr_min_sec(sec_since)
-    return sec_since, dms_since
-
-
-def day_hr_min_sec(seconds, granularity=2):
-    result = []
-    for name, count in INTERVALS:
-        value = seconds // count
-        if value:
-            seconds -= value * count
-            if value == 1:
-                name = name.rstrip('s')
-            result.append("{} {}".format(value, name))
-    return ', '.join(result[:granularity])
 
 
 ##################
@@ -50,44 +22,25 @@ def get_nn_region_split(notary):
     nn = notary.replace(f"_{region}", "")
     return nn, region
 
-def get_random_notary(season):
-    if get_notary_list(season):
-        return random.choice(get_notary_list(season))
+def get_random_notary(notary_list):
+    if notary_list:
+        return random.choice(notary_list)
     return None
 
-
-def get_notary_list(season):
-    seasons_info = get_seasons_info()
+# TODO: reduce calls missing `seasons_info` param
+def get_notary_list(season, seasons_info=None):
+    logger.calc("get_notary_list")
+    if seasons_info is None:
+        seasons_info = get_seasons_info()
     if season not in seasons_info:
         return []
     return seasons_info[season]["notaries"]
 
 
-def get_dpow_coins(season=get_season(), list=False):
-    url = f"http://127.0.0.1:8762/api/info/dpow_server_coins"
-    dpow_main_coins = requests.get(f"{url}/?season={season}&server=Main")
-    dpow_3p_coins = requests.get(f"{url}/?season={season}&server=Third_Party")
-    if list:
-        return dpow_main_coins.json()['results'] + dpow_3p_coins.json()['results']
-    coins_dict = {
-        "Main": dpow_main_coins.json()['results'],
-        "Third_Party": dpow_3p_coins.json()['results']
-    }
-    return coins_dict
 
 
 def get_notary_region(notary):
     return notary.split("_")[-1]
-
-
-def get_coin_server(season, coin):
-    if coin in ["KMD", "BTC", "LTC"]:
-        return coin
-    coins_dict = get_dpow_coins(season)
-    for server in coins_dict:
-        if coin in coins_dict[server]:
-            return server
-    return "Unofficial"
 
 
 def pad_dec_to_hex(num):
@@ -97,13 +50,14 @@ def pad_dec_to_hex(num):
     return hex_val.upper()
 
 
-def get_mainnet_coins(coins_dict):
-    if "Main" in coins_dict:
-        return coins_dict["Main"]
+def get_mainnet_coins(dpow_coins_dict):
+    if "Main" in dpow_coins_dict:
+        return dpow_coins_dict["Main"]
     return []
 
 
 def get_regions_info(season):
+    logger.calc("get_regions_info")
     seasons_info = get_seasons_info()
     if season in seasons_info:
         return seasons_info[season]["regions"]
@@ -139,20 +93,6 @@ def get_eco_data_link():
     link = ad['data']['string1']+" <a href="+ad['data']['link']+"> " \
           +ad['data']['anchorText']+"</a> "+ad['data']['string2']
     return link
-
-
-def get_sidebar_links(season):
-    region_notaries = get_regions_info(season)
-    coins_dict = get_dpow_coins(season)
-    coins_dict["Main"] += ["KMD", "LTC"]
-    coins_dict["Main"].sort()
-    sidebar_links = {
-        "server": os.getenv("SERVER"),
-        "coins_menu": coins_dict,
-        "notaries_menu": region_notaries,
-    }
-    return sidebar_links
-
 
 def json_resp(resp, filters=None, params=None, ignore_errors=False, raw=False):
 
@@ -226,9 +166,9 @@ def get_or_none(request, key, default=None):
         return default
     return val
 
-def get_third_party_coins(coins_dict):
-    if "Third_Party" in coins_dict:
-        return coins_dict["Third_Party"]
+def get_third_party_coins(dpow_coins_dict):
+    if "Third_Party" in dpow_coins_dict:
+        return dpow_coins_dict["Third_Party"]
     return []
 
 # takes a row from queryset values, and returns a dict using a defined row value as top level key

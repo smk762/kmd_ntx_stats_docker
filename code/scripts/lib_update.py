@@ -687,7 +687,7 @@ def update_table_prices(table, date_field, day, btc_price, usd_price, timestamp=
     CURSOR = CONN.cursor()
     if timestamp:
         date = dt.strptime(day, "%d-%m-%Y")
-        start = int(datetime.datetime.timestamp(date))
+        start = int(dt.timestamp(date))
         end = start + 86400
 
         sql = f"UPDATE {table} SET btc_price={btc_price}, usd_price={usd_price} WHERE {date_field}>={start} AND {date_field}<{end} ;"

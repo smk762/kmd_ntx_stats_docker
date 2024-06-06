@@ -5,9 +5,10 @@ from kmd_ntx_api.tools import get_addr_from_base58, get_address_conversion, \
 from kmd_ntx_api.serializers import addrFromBase58Serializer
 from kmd_ntx_api.raw_transaction import send_raw_tx
 from kmd_ntx_api.helper import json_resp, \
-    get_notary_list, get_dpow_coins, safe_div, \
-    get_or_none, get_page_server, get_time_since, \
-    pad_dec_to_hex, get_mainnet_coins, get_third_party_coins, items_row_to_dict, get_notary_list
+    get_notary_list, safe_div, \
+    get_or_none, get_page_server, \
+    pad_dec_to_hex, get_mainnet_coins, get_third_party_coins, items_row_to_dict
+from kmd_ntx_api.cron import get_time_since
 
 def addr_from_base58_tool(request):
     params = addrFromBase58Serializer.Meta.fields

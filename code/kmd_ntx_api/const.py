@@ -1,14 +1,17 @@
 import os
 import os
 import sys
+import json
 from dotenv import load_dotenv
 from django.contrib import messages
 from os.path import expanduser, dirname, realpath
+from pymemcache.client.base import Client
 
 load_dotenv()
 OTHER_SERVER = os.getenv("OTHER_SERVER") # IP / domain of the remote server
 BASIC_PW = os.getenv("BASIC_PW")         # Simple pw for restricting views during testing
 
+MEMCACHE_LIMIT = 250 * 1024 * 1024  # 250 MB
 
 MM2_USERPASS = os.getenv("MM2_USERPASS")
 MM2_IP = "http://mm2:7783"

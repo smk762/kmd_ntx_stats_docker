@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.12
 
 ARG requirements=/code/requirements/prod.txt
 ENV DJANGO_SETTINGS_MODULE="kmd_ntx_stats.settings.prod"

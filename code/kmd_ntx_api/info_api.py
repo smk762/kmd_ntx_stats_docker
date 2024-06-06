@@ -10,7 +10,7 @@ from kmd_ntx_api.info import get_mined_between_blocks, \
 from kmd_ntx_api.explorers import get_explorers
 from kmd_ntx_api.electrum import get_electrums, get_electrums_ssl, get_electrums_wss
 from kmd_ntx_api.helper import json_resp
-from kmd_ntx_api.notary_seasons import get_seasons_info, get_season
+from kmd_ntx_api.notary_seasons import get_page_season, get_seasons_info, get_season
 from kmd_ntx_api.logger import logger
 
 
@@ -69,6 +69,7 @@ def coin_daemon_cli(request):
 
 
 def dpow_server_coins_info(request):
+    logger.info("dpow_server_coins_info(request)")
     resp = get_dpow_server_coins_info(request)
     filters = ['season', 'server', 'epoch', 'timestamp']
     return json_resp(resp, filters)
@@ -117,6 +118,7 @@ def coin_social_info(request):
 
 
 def ltc_txid_list(request):
+    logger.calc("ltc_txid_list")
     resp = get_ltc_txid_list(request)
     filters = ['season', 'notary', 'category', 'address']
     return json_resp(resp, filters)

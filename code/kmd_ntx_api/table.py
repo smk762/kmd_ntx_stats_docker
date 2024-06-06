@@ -4,11 +4,13 @@ import random
 import datetime
 from datetime import datetime as dt
 from django.db.models import Max
+from kmd_ntx_api.cache_data import get_from_memcache, refresh_cache
 
 import kmd_ntx_api.models as models
 from kmd_ntx_api.info import get_epoch_coins_dict
 from kmd_ntx_api.const import SINCE_INTERVALS
-from kmd_ntx_api.helper import get_or_none, get_page_server, get_time_since, days_ago
+from kmd_ntx_api.helper import get_or_none, get_page_server
+from kmd_ntx_api.cron import days_ago, get_time_since
 from kmd_ntx_api.notary_seasons import get_page_season, get_season, get_seasons_info
 from kmd_ntx_api.serializers import addressesSerializer, balancesSerializer, \
     coinLastNtxSerializer, coinNtxSeasonSerializer, minedSerializer, \
@@ -65,6 +67,7 @@ class TableSettings():
 
 
 def get_addresses_rows(request):
+    logger.calc("get_addresses_rows")
     source = TableSettings(
         data=models.addresses.objects.all(),
         serializer=addressesSerializer,
@@ -175,6 +178,7 @@ def get_coin_ntx_season_rows(request):
 
 
 def get_mined_rows(request):
+    logger.calc("get_mined_rows")
     source = TableSettings(
         data=models.mined.objects.all(),
         serializer=minedSerializer,
@@ -251,6 +255,7 @@ def get_mined_count_season_rows(request):
     }
 
 def get_nn_ltc_tx_rows(request):
+    logger.calc("get_nn_ltc_tx_rows")
     source = TableSettings(
         data=models.nn_ltc_tx.objects.all(),
         serializer=nnLtcTxSerializer,
@@ -281,37 +286,53 @@ def get_nn_ltc_tx_rows(request):
         "selected": selected
     }
 
-
+# TODO: caching only happens on request. Large data like this should update on a loop instead.
 def get_notarised_rows(request):
-    source = TableSettings(
-        data=models.notarised.objects.all(),
-        serializer=notarisedSerializer,
-        request=request
-    )
-    source.exclude_seasons()
-    source.data = source.data.filter(scored=True)
-    source.filters = ["season", "coin", "date", "txid"]
-    distinct = source.get_distinct(exclude=["date"])
-    source.filter_data('notarised')
-    count = source.count()
-    if count > 1000:
-        source.serializer = notarisedSerializerLite
+    season = get_page_season(request)
+    coin = get_or_none(request, "coin", "DOC")
+    date = get_or_none(request, "date", datetime.date.today())
+    txid = get_or_none(request, "txid")
+    cache_key = f"ntx_count_season_{season}_{coin}_{date}_{txid}"
+    data = get_from_memcache(cache_key, expire=900)
+    
+    if data is None:
+        logger.info(request.GET)
+        source = TableSettings(
+            data=models.notarised.objects.all(),
+            serializer=notarisedSerializer,
+            request=request
+        )
+        logger.info("Got source")
+        source.exclude_seasons()
+        source.data = source.data.filter(scored=True)
+        logger.info("Got source.data")
+        source.filters = ["season", "coin", "date", "txid"]
+        distinct = source.get_distinct(exclude=["date"])
+        logger.info("Got source.distinct")
+        source.filter_data('notarised')
+        logger.info("Got source.filter_data")
 
-    today = datetime.date.today()
-    source.required = {
-        "season": get_season(),
-        "coin": "KMD",
-        "date": f"{today}"
-    }
+        source.required = {
+            "season": season,
+            "coin": coin,
+            "date": f"{date}"
+        }
+        logger.info(source.required)
 
-    return {
-        "distinct": distinct,
-        "count": count,
-        "filters": source.filters,
-        "required": source.required,
-        "results": source.serialized(),
-        "selected": source.selected()
-    }
+        count = source.count()
+        if count > 1000:
+            source.serializer = notarisedSerializerLite
+
+        data = {
+            "distinct": distinct,
+            "count": count,
+            "filters": source.filters,
+            "required": source.required,
+            "results": source.serialized(),
+            "selected": source.selected()
+        }
+        refresh_cache(data=data, force=True, key=cache_key, expire=300)
+    return data
 
 
 def get_notarised_coin_daily_rows(request):
@@ -518,6 +539,7 @@ def get_notary_last_mined_table_api(request):
 
 # TODO: Handle where coin not notarised
 def get_notary_ntx_season_table_data(request, notary=None):
+    logger.merge("get_notary_ntx_season_table_data")
     season = get_page_season(request)
     notary = get_or_none(request, "notary", notary)
 
@@ -577,6 +599,7 @@ def get_notary_ntx_season_table_data(request, notary=None):
         "ntx_season_data": ntx_season_data,
         "notary_ntx_summary_table": notary_ntx_summary_table,
     }
+    logger.merge("g0t_notary_ntx_season_table_data")
     return api_resp
 
 

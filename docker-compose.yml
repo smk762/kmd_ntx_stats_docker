@@ -126,7 +126,9 @@ services:
       - "127.0.0.1:11211:11211"
     restart: always
     depends_on:
-      - pgsqldb
+      - db
+      - mm2
+      - kmd
     command: ["memcached", "-I", "40m", "-m", "100m"]
     ulimits:
       nproc: 65535
