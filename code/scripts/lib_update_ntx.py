@@ -6,15 +6,15 @@ from lib_const import *
 from lib_filter import get_notarised_conditions_filter
 
 
-def update_ntx_row(row_data):
+def update_ntx_row(row_data, table='notarised', unique='unique_txid'):
     CONN = connect_db()
     CURSOR = CONN.cursor()
-    sql = f"INSERT INTO notarised (coin, block_height, \
+    sql = f"INSERT INTO {table} (coin, block_height, \
                                 block_time, block_datetime, block_hash, \
                                 notaries, notary_addresses, ac_ntx_blockhash, ac_ntx_height, \
                                 txid, opret, season, server, scored, score_value, epoch) \
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-                ON CONFLICT ON CONSTRAINT unique_txid DO UPDATE SET \
+                ON CONFLICT ON CONSTRAINT {unique} DO UPDATE SET \
                 season='{row_data[11]}', server='{row_data[12]}', scored='{row_data[13]}', \
                 notaries=ARRAY{row_data[5]}, notary_addresses=ARRAY{row_data[6]}, \
                 score_value={row_data[14]}, epoch='{row_data[15]}';"
@@ -26,6 +26,7 @@ def update_ntx_row(row_data):
             logger.debug(e)
             logger.debug(row_data)
         CONN.rollback()
+
 
 
 
@@ -157,7 +158,7 @@ def delete_from_notarised_tbl_where(
         coin=coin, include_coins=include_coins,
         exclude_coins=exclude_coins
     )
-    CURSOR.execute()
+    CURSOR.execute(sql)
     CONN.commit()
 
 
@@ -198,7 +199,6 @@ def update_server_ntx_season_row(row_data):
             timestamp={row_data[3]};"
     CURSOR.execute(sql, row_data)
     CONN.commit()
-
 
 
 def update_daily_notarised_coin_row(row_data):

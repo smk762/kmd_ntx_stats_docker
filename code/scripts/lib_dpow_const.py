@@ -527,8 +527,8 @@ SEASONS_INFO = {
         "start_block": 3484958,
         "end_block": 4484958,
         "start_time": 1688132253,
-        "end_time": 1988132253,
-        "post_season_end_time": 1988132253,
+        "end_time": 1717199999,
+        "post_season_end_time": 1725148799,
         "servers": {}
     },
     "VOTE2022_Testnet": {

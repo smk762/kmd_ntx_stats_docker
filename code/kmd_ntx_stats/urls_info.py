@@ -102,6 +102,14 @@ api_info_urls = [
     path('api/info/notary_nodes/',
           info_api.notary_nodes_info,
           name='notary_nodes_info'),
+    
+    path('api/info/notary_season/',
+          info_api.notary_season,
+          name='notary_season_info'),
+    
+    path('api/info/notary_seasons/',
+          info_api.notary_seasons,
+          name='notary_seasons_info'),
 
     path('api/info/ltc_txid_list/',
           info_api.ltc_txid_list,

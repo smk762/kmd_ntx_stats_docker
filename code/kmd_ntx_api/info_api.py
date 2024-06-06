@@ -10,8 +10,20 @@ from kmd_ntx_api.info import get_mined_between_blocks, \
 from kmd_ntx_api.explorers import get_explorers
 from kmd_ntx_api.electrum import get_electrums, get_electrums_ssl, get_electrums_wss
 from kmd_ntx_api.helper import json_resp
+from kmd_ntx_api.notary_seasons import get_page_season, get_seasons_info, get_season
 from kmd_ntx_api.logger import logger
-from kmd_ntx_api.notary_seasons import get_page_season
+
+
+def notary_season(request):
+    resp = get_season()
+    filters = []
+    return json_resp(resp, filters)
+
+
+def notary_seasons(request):
+    resp = get_seasons_info()
+    filters = []
+    return json_resp(resp, filters)
 
 
 def mined_between_blocks(request):
