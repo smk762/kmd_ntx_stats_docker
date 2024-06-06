@@ -185,6 +185,37 @@ class mined(models.Model):
         ]
 
 
+class mined_archive(models.Model):
+    block_height = models.PositiveIntegerField(default=0)
+    block_time = models.PositiveIntegerField(default=0)
+    block_datetime = models.DateTimeField()
+    value = models.DecimalField(max_digits=18, decimal_places=8)
+    address = models.CharField(max_length=34)
+    name = models.CharField(max_length=34)
+    txid = models.CharField(max_length=64)
+    diff = models.FloatField(default=0)
+    season = models.CharField(max_length=34)
+    usd_price = models.DecimalField(max_digits=18, decimal_places=8, default=0)
+    btc_price = models.DecimalField(max_digits=18, decimal_places=8, default=0)
+    category = models.CharField(max_length=34 ,default="")
+
+    class Meta:
+        db_table = 'mined_archive'
+        indexes = [
+            models.Index(fields=['name']),
+            models.Index(fields=['category']),
+            models.Index(fields=['season']),
+            models.Index(fields=['-block_height']),
+            models.Index(fields=['-block_time'])
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['block_height'], 
+                name='unique_block_archive'
+            )
+        ]
+
+
 class mined_count_daily(models.Model):
     mined_date = models.DateField()
     notary = models.CharField(max_length=64)
@@ -358,6 +389,47 @@ class notarised(models.Model):
             models.UniqueConstraint(fields=['txid'],
                                  name='unique_txid')
         ]
+
+
+class notarised_archive(models.Model):
+    txid = models.CharField(max_length=64)
+    coin = models.CharField(max_length=32)
+    block_hash = models.CharField(max_length=64)
+    block_time = models.PositiveIntegerField(default=0)
+    block_datetime = models.DateTimeField()
+    block_height = models.PositiveIntegerField(default=0)
+    notaries = ArrayField(models.CharField(max_length=34),size=13)
+    notary_addresses = ArrayField(models.CharField(max_length=34),size=13, default=list)
+    ac_ntx_blockhash = models.CharField(max_length=64)
+    ac_ntx_height = models.PositiveIntegerField(default=0)
+    opret = models.CharField(max_length=2048)
+    season = models.CharField(max_length=32)
+    server = models.CharField(max_length=32, default='')
+    epoch = models.CharField(max_length=32, default='')
+    scored = models.BooleanField(default=True)
+    score_value = models.DecimalField(max_digits=18, decimal_places=8, default=0)
+
+    class Meta:
+        db_table = 'notarised_archive'
+        indexes = [
+            models.Index(fields=['txid']),
+            models.Index(fields=['-block_time']),
+            models.Index(fields=['-block_height']),
+            models.Index(fields=['season']),
+            models.Index(fields=['server']),
+            models.Index(fields=['epoch']),
+            models.Index(fields=['coin']),
+            models.Index(fields=['coin', '-block_height']),
+            models.Index(fields=['season', 'server']),
+            models.Index(fields=['season', 'server', 'coin']),
+            models.Index(fields=['season', 'server', 'epoch']),
+            models.Index(fields=['season', 'server', 'epoch', 'coin']),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['txid'],
+                                 name='unique_txid_archive')
+        ]
+
 
 
 class notarised_coin_daily(models.Model):

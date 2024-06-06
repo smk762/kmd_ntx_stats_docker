@@ -22,7 +22,6 @@ def update_ntx_tables(seasons, rescan=False):
 
         notarised_table = lib_ntx.notarised(season, rescan)
         if CLEAN_UP:
-            ntx_season_tables.clean_up()
             notarised_table.clean_up()
             rescan = True
 
@@ -32,6 +31,8 @@ def update_ntx_tables(seasons, rescan=False):
         last_ntx_tables.update_coin_table()
         last_ntx_tables.update_notary_table()
         ntx_season_tables = lib_ntx.ntx_season_stats(season)
+        if CLEAN_UP:
+            ntx_season_tables.clean_up()
         ntx_season_tables.update_ntx_season_stats_tables()
         ntx_daily_tables = lib_ntx.ntx_daily_stats(season, rescan)
         ntx_daily_tables.update_daily_ntx_tables()
