@@ -26,11 +26,11 @@ def get_season(timestamp: int=int(time.time()), notary_seasons=None) -> str:
 def get_page_season(request, seasons_info=None):
     logger.calc("get_page_season")
     if "season" in request.GET:
-        if seasons_info is None:
-            seasons_info = get_seasons_info()
         season = request.GET["season"]
         if season.isnumeric():
-            season = f"Season_{request.GET['season']}"
+            return f"Season_{request.GET['season']}"
+        if seasons_info is None:
+            seasons_info = get_seasons_info()
         if season.title() in seasons_info:
             return season.title()
     return get_season()

@@ -19,43 +19,21 @@ from kmd_ntx_api.mining import get_mined_count_season, get_mined_count_24hr, get
 
 
 def dash_view(request):
-    season = get_page_season(request)
     context = get_base_context(request)
-    logger.info("dash_view")
-    
-    ntx_data = get_notarised_data(season=season, exclude_epoch="Unofficial")
-    logger.info("got_notarised_data")
-    ntx_season = get_ntx_count_season(ntx_data)
-    logger.info("got_notarised_data count")
-    ntx_24hr = get_ntx_count_24hr(ntx_data)
-    logger.info("got_notarised_data count 24")
-    
-    # Get Mining Stats
-    mined_data = get_mined_data(season=season)
-    mined_season = get_mined_count_season(mined_data)
-    logger.info("got mined data")
-    mined_24hr = get_mined_count_24hr(mined_data)
-    logger.info("got mined 24 data")
-    biggest_block = get_biggest_block_season(mined_data)
-    logger.info("biggest_block")
-    daily_stats_sorted = get_daily_stats_sorted(context["notaries"], context["dpow_coins_dict"])
-    logger.info("daily_stats_sorted")
-    season_stats_sorted = get_season_stats_sorted(season, context["notaries"])
-    logger.info("season_stats_sorted")
-    region_score_stats = get_region_score_stats(season_stats_sorted)
-    logger.info("region_score_stats")
-
+    ntx_data = get_notarised_data(season=context["season"], exclude_epoch="Unofficial")
+    mined_data = get_mined_data(season=context["season"])
+    season_stats_sorted = get_season_stats_sorted(context["season"], context["notaries"])
     context.update({
-        "page_title": "Index",
-        "ntx_24hr": ntx_24hr,
-        "ntx_season": ntx_season,
-        "mined_24hr": mined_24hr,
-        "mined_season": mined_season,
-        "biggest_block": biggest_block,
-        "season_stats_sorted": season_stats_sorted,
-        "region_score_stats": region_score_stats,
         "show_ticker": True,
-        "daily_stats_sorted": daily_stats_sorted,
+        "page_title": "Index",
+        "ntx_24hr": get_ntx_count_24hr(ntx_data),
+        "ntx_season": get_ntx_count_season(ntx_data),
+        "mined_24hr": get_mined_count_24hr(mined_data),
+        "mined_season": get_mined_count_season(mined_data),
+        "biggest_block": get_biggest_block_season(mined_data),
+        "season_stats_sorted": season_stats_sorted,
+        "region_score_stats": get_region_score_stats(season_stats_sorted),
+        "daily_stats_sorted": get_daily_stats_sorted(context["notaries"], context["dpow_coins_dict"]),
         "nn_social": get_nn_social_info(request)
     })
     return render(request, 'views/dash_index.html', context)

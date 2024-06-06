@@ -2,14 +2,14 @@ import time
 from kmd_ntx_api.query import get_notarised_data, get_notarised_tenure_data
 from kmd_ntx_api.cron import days_ago
 from kmd_ntx_api.cache_data import get_from_memcache, refresh_cache
+from kmd_ntx_api.logger import logger
 
 def get_notarised_date(season=None, server=None, coin=None, notary=None, last_24hrs=True):
-    return get_notarised_data(
-        season, server, None, coin,
-        notary
-    ).filter(
-        block_time__gt=str(days_ago(1))
-    ).order_by('-block_time')
+    logger.info("get_notarised_date")
+    try:
+        return get_notarised_data(season, server, None, coin, notary).filter(block_time__gt=str(days_ago(1))).order_by('-block_time')
+    except Exception as e:
+        logger.warning(e)
 
 def get_ntx_tenure_table(request):
     tenure_data = get_notarised_tenure_data().values()

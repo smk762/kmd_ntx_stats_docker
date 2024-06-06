@@ -94,8 +94,6 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, dpow_coins_dict):
         return notary_ntx_24hr
  
 
-
-
 def get_seednode_version_season_stats_data(season, notary=None):
     return get_seednode_version_stats_data(season=season, name=notary, score=0.2).values('name').annotate(sum_score=Sum('score'))
 

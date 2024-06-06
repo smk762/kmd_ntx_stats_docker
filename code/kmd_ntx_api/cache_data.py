@@ -15,7 +15,7 @@ os.makedirs(CACHE_PATH, exist_ok=True)
 
 
 def get_from_memcache(key, path=None, url=None, expire=600):
-    logger.cached(f"Getting {key} from cache...")
+    # logger.cached(f"Getting {key} from cache...")
     key = key.lower()
     data = MEMCACHE.get(key)
     if data is None or len(data) == 0:
@@ -24,9 +24,10 @@ def get_from_memcache(key, path=None, url=None, expire=600):
         data = get_cache_file(path)
         if data is None or len(data) == 0:
             data = refresh_cache(path, url, force=True, expire=expire)
-        logger.cached(f"Returning {key} from {path}")
+        # logger.cached(f"Returning {key} from {path}")
     else:
-        logger.cached(f"Returning {key} from memcache")
+        # logger.cached(f"Returning {key} from memcache")
+        pass
     return data
 
 
