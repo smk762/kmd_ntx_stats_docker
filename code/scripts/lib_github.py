@@ -3,7 +3,6 @@ import os
 import json
 import requests
 from dotenv import load_dotenv
-from lib_color import *
 from logger import logger
 
 load_dotenv()
