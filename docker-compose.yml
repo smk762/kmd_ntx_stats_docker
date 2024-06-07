@@ -1,6 +1,3 @@
-version: '3.7'
-
-# All Antara coins need these params
 x-zcash-params-volume:
   &zcash-params
   type: bind

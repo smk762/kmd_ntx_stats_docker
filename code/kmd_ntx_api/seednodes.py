@@ -12,6 +12,9 @@ from kmd_ntx_api.notary_seasons import get_page_season
 from kmd_ntx_api.cache_data import version_timespans_cache
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.query import get_seednode_version_stats_data
+from kmd_ntx_api.logger import logger
+
+logger.info(SINCE_INTERVALS)
 
 def seednode_version_context(request):
     active_version = " & ".join(get_active_mm2_versions(time.time()))
@@ -103,46 +106,49 @@ def get_seednode_version_date_table(request):
 
 
 def get_seednode_version_month_table(request):
-    season = get_page_season(request)
-    year = get_or_none(request, "year", dt.now(timezone.utc).timestamp().year)
-    month = get_or_none(request, "month", dt.now(timezone.utc).timestamp().month)
-    start, end, last_day = get_month_epoch_range(year, month)
-    notary_list = get_notary_list(season)
-    default_scores = prepopulate_seednode_version_month(notary_list)
-    day_headers = list(default_scores.keys())
-    day_headers.sort()
-    table_headers = ["Notary"] + day_headers + ["Total"]
-    data = get_seednode_version_stats_data(start=start, end=end).values()
-    for item in data:
-        notary = item["name"]
-        if notary in notary_list:
-            score = item["score"]
-            if score == 0.2:
-                date, _ = date_hour(item["timestamp"]).split(" ")
-                day = date.split("/")[1]
-                default_scores[day][notary]["score"] += score
-                if item["version"] not in default_scores[day][notary]["versions"]:
-                    default_scores[day][notary]["versions"].append(item["version"])
-    table_data = []
-    for notary in notary_list:
-        notary_row = {"Notary": notary}
-        total = 0
-        for day in day_headers:
-            total += default_scores[day][notary]["score"]
+    try:
+        season = get_page_season(request)
+        year = get_or_none(request, "year", dt.now(timezone.utc).year)
+        month = get_or_none(request, "month", dt.now(timezone.utc).month)
+        start, end, last_day = get_month_epoch_range(year, month)
+        notary_list = get_notary_list(season)
+        default_scores = prepopulate_seednode_version_month(notary_list)
+        day_headers = list(default_scores.keys())
+        day_headers.sort()
+        table_headers = ["Notary"] + day_headers + ["Total"]
+        data = get_seednode_version_stats_data(start=start, end=end).values()
+        for item in data:
+            notary = item["name"]
+            if notary in notary_list:
+                score = item["score"]
+                if score == 0.2:
+                    date, _ = date_hour(item["timestamp"]).split(" ")
+                    day = date.split("/")[1]
+                    default_scores[day][notary]["score"] += score
+                    if item["version"] not in default_scores[day][notary]["versions"]:
+                        default_scores[day][notary]["versions"].append(item["version"])
+        table_data = []
+        for notary in notary_list:
+            notary_row = {"Notary": notary}
+            total = 0
+            for day in day_headers:
+                total += default_scores[day][notary]["score"]
+                notary_row.update({
+                    day: default_scores[day][notary]["score"]
+                })
             notary_row.update({
-                day: default_scores[day][notary]["score"]
+                "Total": round(total,1)
             })
-        notary_row.update({
-            "Total": round(total,1)
-        })
-        table_data.append(notary_row)
-    return {
-        "date_ts": dt.utcfromtimestamp(end).strftime('%m-%Y'),
-        "date": dt.utcfromtimestamp(end).strftime('%b %Y'),
-        "headers": table_headers,
-        "table_data": table_data,
-        "scores": default_scores
-    }
+            table_data.append(notary_row)
+        return {
+            "date_ts": dt.utcfromtimestamp(end).strftime('%m-%Y'),
+            "date": dt.utcfromtimestamp(end).strftime('%b %Y'),
+            "headers": table_headers,
+            "table_data": table_data,
+            "scores": default_scores
+        }
+    except Exception as e:
+        logger.error(e)
 
 def get_seednode_version_score_total(request, season=None, start=None, end=None):
     if not season:

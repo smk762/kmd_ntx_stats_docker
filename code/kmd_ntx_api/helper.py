@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from kmd_ntx_api.notary_seasons import get_seasons_info, get_season
 from kmd_ntx_api.cache_data import ecosystem_links_cache
 from kmd_ntx_api.logger import logger
+from kmd_ntx_api.const import SINCE_INTERVALS
 
 
 
