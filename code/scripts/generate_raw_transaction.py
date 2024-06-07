@@ -4,6 +4,7 @@ import re
 import json
 import platform
 from slickrpc import Proxy
+from logger import logger
 
 # define data dir
 def def_data_dir():
@@ -37,13 +38,13 @@ def def_credentials(coin):
         if coin == 'KMD':
             rpcport = 7771
         else:
-            print("rpcport not in conf file, exiting")
-            print("check " + coin_config_file)
+            logger.info("rpcport not in conf file, exiting")
+            logger.info("check " + coin_config_file)
             exit(1)
     try:
         return (Proxy("http://%s:%s@127.0.0.1:%d" % (rpcuser, rpcpassword, int(rpcport)), timeout=90))
     except:
-        print("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in "+coin_config_file)
+        logger.info("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in "+coin_config_file)
 
 kmd_rpc = def_credentials("KMD")
 
@@ -59,4 +60,4 @@ for txid in unspent:
     input_txids.append({"txid":txid["txid"], "vout":txid["vout"]})
 
 
-print("komodo-cli createrawtransaction '"+json.dumps(input_txids).replace('"', '\"')+"' '{\""+output_addr+"\":"+str(output_value)+"}'")
+logger.info("komodo-cli createrawtransaction '"+json.dumps(input_txids).replace('"', '\"')+"' '{\""+output_addr+"\":"+str(output_value)+"}'")

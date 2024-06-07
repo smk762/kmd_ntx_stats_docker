@@ -4,6 +4,7 @@ from lib_filter import *
 from lib_db import connect_db
 import lib_helper as helper
 from decorators import print_runtime
+from logger import logger
 
 
 def select_from_notarised_tbl_where(
@@ -230,8 +231,8 @@ def get_notarised_coin_date_aggregates(season, day):
         results = CURSOR.fetchall()
         return results
     except Exception as e:
-        print(e)
-        print(sql)
+        logger.info(e)
+        logger.info(sql)
         logger.warning(f"No get_notarised_coin_date_aggregates results for {day} {season}")
         return ()
 
@@ -328,17 +329,17 @@ def get_ntx_scored(season, server, coin, lowest_blocktime, highest_blocktime):
     CURSOR.execute(sql)
     unofficial_resp = CURSOR.fetchall()
 
-    print(f"------------------------------------")
-    print(f"Coin: {coin}")
-    print(f"Season: {season}")
-    print(f"Server: {server}")
-    print(f"lowest_blocktime: {lowest_blocktime}")
-    print(f"highest_blocktime: {highest_blocktime}")
-    print(f"in_season_server_resp: {len(in_season_server_resp)}")
-    print(f"scored_resp: {len(scored_resp)}")
-    print(f"unscored_resp: {len(unscored_resp)}")
-    print(f"unofficial_resp: {len(unofficial_resp)}")
-    print(f"------------------------------------")
+    logger.info(f"------------------------------------")
+    logger.info(f"Coin: {coin}")
+    logger.info(f"Season: {season}")
+    logger.info(f"Server: {server}")
+    logger.info(f"lowest_blocktime: {lowest_blocktime}")
+    logger.info(f"highest_blocktime: {highest_blocktime}")
+    logger.info(f"in_season_server_resp: {len(in_season_server_resp)}")
+    logger.info(f"scored_resp: {len(scored_resp)}")
+    logger.info(f"unscored_resp: {len(unscored_resp)}")
+    logger.info(f"unofficial_resp: {len(unofficial_resp)}")
+    logger.info(f"------------------------------------")
 
     for item in scored_resp:
         scored_list.append(scored_resp[0])

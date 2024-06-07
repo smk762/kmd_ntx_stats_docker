@@ -8,6 +8,7 @@ from decorators import *
 from lib_helper import get_season_notaries, get_nn_region_split
 from lib_urls import get_notary_nodes_repo_elected_nn_social_url, get_notary_addresses_url
 from models import nn_social_row
+from logger import logger
 
 
 @print_runtime
@@ -181,7 +182,7 @@ def remove_invalid_notaries(season):
 
 
 if __name__ == "__main__":
-    print(EXCLUDED_SEASONS)
+    logger.info(EXCLUDED_SEASONS)
     season = "Season_7"
     logger.info(f"Preparing to populate {season} [social_notaries] table...")
     populate_social_notaries(season)

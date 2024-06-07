@@ -2,12 +2,13 @@
 
 import json
 import requests
+from logger import logger
 
 all_data = []
 next_url = "http://116.203.120.91:8762/api/source/mined/"
 
 while next_url:
-	print(next_url)
+	logger.info(next_url)
 	data = requests.get(next_url).json()
 	next_url = data["next"]
 

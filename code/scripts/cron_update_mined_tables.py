@@ -3,6 +3,7 @@ from lib_const import *
 from lib_helper import has_season_started
 from lib_mining import update_mined_table, update_mined_count_daily_table, update_mined_count_season_table
 from decorators import print_runtime
+from logger import logger
 
 ''' 
 Script for updating mining related databases
@@ -21,7 +22,7 @@ def run_updates(seasons):
         update_mined_count_daily_table("since_genesis", True, True)
     else:
         for season in seasons:
-            print(f"Getting mined blocks for {season}")
+            logger.info(f"Getting mined blocks for {season}")
             if RESCAN_SEASON:
                 update_mined_table(season, "KMD", SEASONS_INFO[season]["start_block"])
                 update_mined_count_daily_table(season, True)

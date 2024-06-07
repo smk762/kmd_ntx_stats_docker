@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.12
 import os
 from dotenv import load_dotenv
+from logger import logger
 
 # ENV VARS
 load_dotenv()
@@ -38,7 +39,7 @@ def get_electrums_wss_info_url(local=True):
 def get_ntxid_list_url(season, server, coin, local=True):
     api_server = get_api_server(local)
     url = f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&coin={coin}"
-    print(url)
+    logger.info(url)
     return url
 
 

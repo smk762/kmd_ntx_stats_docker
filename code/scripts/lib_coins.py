@@ -13,6 +13,7 @@ from models import coins_row
 from lib_crypto import SMARTCHAIN_BASE_58
 from lib_helper import get_season_coins
 from decorators import print_runtime
+from logger import logger
 
 '''
 This script scans the komodo, coins and dpow repositories and updates contexual info about the coins in the "coins" table.
@@ -125,14 +126,14 @@ def get_coins_repo_electrums(electrums, coins_data):
         data = requests.get(electrums[coin]).json()
         logger.info(f"[get_coins_repo_electrums] {coin}")
         for item in data:
-            print(item)
+            logger.info(item)
             if "protocol" in item:
                 if item['protocol'] == "SSL":
                     coins_data[coin]['electrums_ssl'].append(item['url'])
                     if 'ws_url' in item:
                         coins_data[coin]['electrums_wss'].append(item['ws_url'])
                 elif item['protocol'] == "WSS":
-                    print(item)
+                    logger.info(item)
                     if 'ws_url' in item:
                         coins_data[coin]['electrums_wss'].append(item['ws_url'])
                     elif 'url' in item:
@@ -281,7 +282,7 @@ def remove_delisted_coins(dpow_coins):
     delisted_coins = list(set(db_coins) - set(coins_repo_coins))
     for coin in delisted_coins:
         if coin not in dpow_coins:
-            print(f"delisting {coin}")
+            logger.info(f"delisting {coin}")
             delist_coin(coin)
 
 
@@ -297,7 +298,7 @@ def parse_electrum_explorer(coins_data):
     explorers = {}
     for item in explorers_data:
         if 'message' in explorers_data:
-            print(explorers_data)
+            logger.info(explorers_data)
         if item["name"] not in ["deprecated", "explorer_paths.json"]:
             explorers.update({item["name"]:item["download_url"]})
 

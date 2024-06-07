@@ -1,5 +1,8 @@
 #!/usr/bin/env python3.12
 
+from logger import logger
+
+TODO: sunset this
 def colorize(string, color):
     colors = {
         'black':'\033[30m',
@@ -30,23 +33,23 @@ def colorize(string, color):
 def color_input(msg):
   return input(colorize(msg, "orange"))
 
-def table_print(msg):
-  print(colorize(msg, "cyan"))
+def table_logger.info(msg):
+  logger.info(colorize(msg, "cyan"))
 
-def info_print(msg):
-  print(colorize(msg, "orange"))
+def info_logger.info(msg):
+  logger.info(colorize(msg, "orange"))
 
-def status_print(msg):
-  print(colorize(msg, "status"))
+def status_logger.info(msg):
+  logger.info(colorize(msg, "status"))
 
-def success_print(msg):
-  print(colorize(msg, "green"))
+def success_logger.info(msg):
+  logger.info(colorize(msg, "green"))
 
-def error_print(msg):
-  print(colorize(msg, "error"))
+def error_logger.info(msg):
+  logger.info(colorize(msg, "error"))
 
-def fade_print(msg):
-  print(colorize(msg, "darkgrey"))
+def fade_logger.info(msg):
+  logger.info(colorize(msg, "darkgrey"))
 
 def wait_continue():
   color_input("Press [Enter] to continue...")

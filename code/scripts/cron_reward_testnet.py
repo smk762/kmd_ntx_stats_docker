@@ -10,6 +10,7 @@ from lib_rpc import RPC
 import lib_urls as urls
 from notary_candidates import CANDIDATE_ADDRESSES
 from notary_pubkeys import NOTARY_PUBKEYS
+from logger import logger
 
 PUBKEY = "03f7e4f3dfff18aa16ef409d5973397dc968f9077a21acef0c4af3b4829c2a9fb5"
 VOTE_YEAR = "VOTE2022"
@@ -29,10 +30,10 @@ if __name__ == "__main__":
     proposal_nodes = lib_vote.get_proposal_nodes()
 
     if len(ntx) == 0:
-        print("No ntx detected!")
+        logger.info("No ntx detected!")
         sys.exit()
 
-    print(f"{len(ntx)} ntx detected!")
+    logger.info(f"{len(ntx)} ntx detected!")
 
     with open('/home/smk762/kmd_ntx_stats_docker/code/scripts/rewarded_ntx.json', 'r') as f:
         rewarded_ntx = json.load(f)
@@ -62,7 +63,7 @@ if __name__ == "__main__":
                 utxo_ref = f'{utxo["tx_hash"]}_{utxo["tx_pos"]}'
 
                 if utxo_ref in used_utxos:
-                    print(f"{utxo_ref} already used!")
+                    logger.info(f"{utxo_ref} already used!")
                 else:
                     amount = utxo["value"] / 100000000
                     if amount > 5:
@@ -83,7 +84,7 @@ if __name__ == "__main__":
                                 })
 
                             else:
-                                print(f"{notary} not in proposal nodes")
+                                logger.info(f"{notary} not in proposal nodes")
 
                         remaining_input_value = round(input_value - (reward_amount * len(vouts)) - 0.0001, 5)
                         vouts.update({
@@ -93,28 +94,28 @@ if __name__ == "__main__":
 
                         try:
                             rawhex = RPC[VOTE_YEAR].createrawtransaction(input_utxo, vouts)
-                            print(f"rawhex: {rawhex}")
+                            logger.info(f"rawhex: {rawhex}")
                             time.sleep(0.1)
                             signedhex = RPC[VOTE_YEAR].signrawtransaction(rawhex)
-                            print(f"signedhex: {signedhex}")
+                            logger.info(f"signedhex: {signedhex}")
                             time.sleep(0.1)
                             txid = RPC[VOTE_YEAR].sendrawtransaction(signedhex["hex"])
-                            print(f"Sent {reward_amount} each to {notaries} for {coin}:{ac_height}")
-                            print(f"txid: {txid}")
+                            logger.info(f"Sent {reward_amount} each to {notaries} for {coin}:{ac_height}")
+                            logger.info(f"txid: {txid}")
                             time.sleep(0.1)
                         except Exception as e:
-                            print(e)
-                            print(utxo)
-                            print(vouts)
+                            logger.info(e)
+                            logger.info(utxo)
+                            logger.info(vouts)
 
 
 
                         rewarded_ntx[coin].append(ac_height)
                         break
                     else:
-                        print("utxo too small")
+                        logger.info("utxo too small")
         else:
-            print("ntx already rewarded")
+            logger.info("ntx already rewarded")
 
     json.dump(used_utxos, open('used_utxos.json', 'w+'))
     json.dump(rewarded_ntx, open('rewarded_ntx.json', 'w+'))

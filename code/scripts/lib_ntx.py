@@ -14,6 +14,7 @@ import lib_validate as validate
 from decorators import print_runtime
 from lib_const import *
 from models import *
+from logger import logger
 
 
 # Notarised table
@@ -574,7 +575,7 @@ class ntx_season_stats():
                 coin = item[2]
                 server_epoch_coin_count = item[3]
                 server_epoch_coin_score = item[4]
-                print(item)
+                logger.info(item)
 
                 if len({server, epoch}.intersection({"Unofficial", "LTC", "BTC", "None"})) == 0:
 

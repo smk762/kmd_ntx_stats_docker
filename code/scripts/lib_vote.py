@@ -7,6 +7,7 @@ from lib_rpc import RPC
 import lib_query_ntx as query
 import lib_github as git
 from notary_candidates import CANDIDATE_ADDRESSES
+from logger import logger
 
 # Notarised table
 class notary_vote():
@@ -62,9 +63,9 @@ class notary_vote():
                     row.year = self.year
                     return row
                 else:
-                    print(f"{txid} not a vote tx")
+                    logger.info(f"{txid} not a vote tx")
             else:
-                print(f"{txid} looks like a self-send")
+                logger.info(f"{txid} looks like a self-send")
 
         elif "addresses" in vout["scriptPubKey"]:
             if len(vout["scriptPubKey"]["addresses"]) == 1:
@@ -97,9 +98,9 @@ class notary_vote():
                         row.year = self.year
                         return row
                     else:
-                        print(f"{txid} not a vote tx")
+                        logger.info(f"{txid} not a vote tx")
                 else:
-                    print(f"{txid} looks like a self-send")
+                    logger.info(f"{txid} looks like a self-send")
 
             else:
                 for address in len(vout["scriptPubKey"]["addresses"]):
@@ -132,9 +133,9 @@ class notary_vote():
                             row.year = self.year
                             return row
                         else:
-                            print(f"{txid} not a vote tx")
+                            logger.info(f"{txid} not a vote tx")
                     else:
-                        print(f"{txid} looks like a self-send")
+                        logger.info(f"{txid} looks like a self-send")
 
 
         return None

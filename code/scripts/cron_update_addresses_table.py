@@ -4,6 +4,7 @@ import sys
 from decorators import *
 from lib_const import *
 from lib_wallet import populate_addresses
+from logger import logger
 
 '''
 You should only need to run this once per season, unless notary pubkeys change
@@ -17,7 +18,7 @@ def update_adresses(seasons):
         CONN.commit()
 
     for season in seasons:
-        print(season)
+        logger.info(season)
         for server in SEASONS_INFO[season]['servers']:
             populate_addresses(season, server)
 

@@ -5,6 +5,7 @@ from psycopg2.extras import execute_values
 from datetime import datetime as dt
 from lib_const import *
 from lib_update_ntx import *
+from logger import logger
 
 #### KMD SUPPLY TABLE
 
@@ -123,7 +124,7 @@ def delist_coin(coin):
         sql = f"DELETE FROM coins WHERE coin = '{coin}';"
         CURSOR.execute(sql)
         CONN.commit()
-        #print(sql)
+        #logger.info(sql)
         return 1
     except Exception as e:
         logger.debug(e)
@@ -318,10 +319,10 @@ def update_coin_social_row(row_data):
                 telegram='{row_data[9]}', twitter='{row_data[10]}', \
                 youtube='{row_data[11]}', website='{row_data[12]}', \
                 season='{row_data[13]}';"
-        #print(sql)
+        #logger.info(sql)
         CURSOR.execute(sql, row_data)
         CONN.commit()
-        print("commited")
+        logger.info("commited")
         return 1
     except Exception as e:
         if str(e).find('Duplicate') == -1:
@@ -562,7 +563,7 @@ def update_notary_vote_row(row_data):
     try:
         CURSOR.execute(sql, row_data)
         CONN.commit()
-        print("Notary Vote Row updated")
+        logger.info("Notary Vote Row updated")
     except Exception as e:
         logger.debug(e)
         if str(e).find('duplicate') == -1:

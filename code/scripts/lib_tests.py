@@ -19,6 +19,7 @@ import lib_rpc
 import lib_urls
 import lib_validate
 import lib_wallet
+from logger import logger
 
 
 # TODO: For CI, these tests need to be separated.
@@ -590,7 +591,7 @@ class TestLibNtx:
         sum_count = 0
         sum_score = 0
         for server in season_ntx_dict["notaries"]["alien_AR"]["servers"]:
-            print(season_ntx_dict["notaries"]["alien_AR"]["servers"][server])
+            logger.info(season_ntx_dict["notaries"]["alien_AR"]["servers"][server])
             sum_count += season_ntx_dict["notaries"]["alien_AR"]["servers"][server]["notary_server_ntx_count"]
             sum_score += season_ntx_dict["notaries"]["alien_AR"]["servers"][server]["notary_server_ntx_score"]
         assert round(sum_count, 4) == round(season_ntx_dict["notaries"]["alien_AR"]["notary_ntx_count"], 4)

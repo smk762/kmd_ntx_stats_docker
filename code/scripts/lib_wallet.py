@@ -18,6 +18,7 @@ import lib_query
 from lib_helper import get_pubkeys
 from models import addresses_row, rewards_tx_row, kmd_supply_row
 from lib_threads import update_notary_balances_thread
+from logger import logger
 
 
 script_path = os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -125,7 +126,7 @@ def update_supply(coin="KMD"):
     scan_blocks = list(set([*range(1, TIP, 1)]) - set(existing_blocks))
     scan_blocks.sort()
     for block in scan_blocks:
-        print(block)
+        logger.info(block)
         update_supply_for_block(coin, block)
 
 

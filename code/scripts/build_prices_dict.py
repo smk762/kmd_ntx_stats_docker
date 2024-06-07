@@ -7,12 +7,13 @@ from lib_const import *
 from lib_api import get_kmd_price
 import datetime
 from datetime import datetime as dt
+from logger import logger
 
 try:
     with open("prices_history.json", "r") as j:
         prices = json.load(j)
 except Exception as e:
-    print(e)
+    logger.info(e)
     prices = {}
 
 for season in ["Season_7"]:
@@ -35,7 +36,7 @@ for season in ["Season_7"]:
             date = "-".join(date)
             api_prices = get_kmd_price(date)
             prices[season][f"{start}"].update(api_prices)
-            print(api_prices['aud'])
+            logger.info(api_prices['aud'])
             time.sleep(5)
 
         start += datetime.timedelta(days=1)

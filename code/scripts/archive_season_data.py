@@ -6,13 +6,14 @@ from lib_query_ntx import select_from_notarised_tbl_where
 from lib_update_ntx import delete_from_notarised_tbl_where, update_ntx_row
 import lib_helper as helper
 import lib_ntx
+from logger import logger
 
 
 def archive_past_seasons(current_seasons=["Season_7"]):
     for season in SEASONS_INFO:
-        print(season)
+        logger.info(season)
         if season not in current_seasons:
-            print(season)
+            logger.info(season)
             data = select_from_notarised_tbl_where(season=season)
             for i in data:
                 txid = i[1]
