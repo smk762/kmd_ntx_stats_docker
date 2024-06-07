@@ -2,8 +2,7 @@
 import time
 import json
 import requests
-import logging
-import logging.handlers
+from logger import logger
 from lib_const import *
 from decorators import *
 from lib_helper import get_season_notaries, get_nn_region_split
