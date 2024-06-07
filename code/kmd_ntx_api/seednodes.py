@@ -14,7 +14,6 @@ from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.query import get_seednode_version_stats_data
 from kmd_ntx_api.logger import logger
 
-logger.info(SINCE_INTERVALS)
 
 def seednode_version_context(request):
     active_version = " & ".join(get_active_mm2_versions(time.time()))
