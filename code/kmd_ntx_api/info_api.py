@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from kmd_ntx_api.info import get_mined_between_blocks, \
     get_mined_between_blocktimes, get_base_58_coin_params, get_balances, get_coins, \
     get_coin_prefixes, get_daemon_cli, get_dpow_server_coins_info, \

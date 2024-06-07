@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from lib_const import *
 from decorators import *
 from lib_dpow_const import SEASONS_INFO

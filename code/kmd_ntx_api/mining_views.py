@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import random
 from django.shortcuts import render
 from kmd_ntx_api.context import get_base_context

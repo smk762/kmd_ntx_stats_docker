@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from datetime import datetime, timezone
 from os.path import basename, dirname, abspath
 import logging

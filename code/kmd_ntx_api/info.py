@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import time
 import requests
 from django.db.models import Count, Min, Max, Sum

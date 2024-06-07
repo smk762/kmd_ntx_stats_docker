@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import requests
 from random import choice
 from django.db.models import Sum

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from lib_const import *
 from lib_filter import *
 from lib_db import connect_db

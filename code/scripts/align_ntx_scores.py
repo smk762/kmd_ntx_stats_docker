@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import sys
 from lib_const import *
 import lib_helper as helper

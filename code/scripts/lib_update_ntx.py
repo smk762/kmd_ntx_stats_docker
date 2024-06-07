@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import os
 import json
 from psycopg2.extras import execute_values

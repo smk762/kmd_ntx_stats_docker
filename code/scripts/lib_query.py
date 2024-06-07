@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import lib_helper
 from lib_const import *
 from lib_query_ntx import *

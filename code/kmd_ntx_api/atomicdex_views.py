@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import json
 from django.contrib import messages
 from django.shortcuts import render

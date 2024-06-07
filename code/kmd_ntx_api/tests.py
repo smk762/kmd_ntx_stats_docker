@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import pytest
 import requests
 from django.urls import reverse, get_resolver

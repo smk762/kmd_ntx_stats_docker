@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from lib_const import *
 from lib_helper import has_season_started
 from lib_mining import update_mined_table, update_mined_count_daily_table, update_mined_count_season_table

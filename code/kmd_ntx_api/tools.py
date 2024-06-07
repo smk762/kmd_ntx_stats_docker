@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import json
 from eth_keys import keys
 from kmd_ntx_api.const import SMARTCHAINS

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import sys
 import lib_vote
 from lib_rpc import RPC

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from django.http import JsonResponse
 from kmd_ntx_api.vote import VOTE_YEAR, get_notary_vote_detail_table, get_vote_stats_info, \
     get_vote_aggregates, is_election_over, get_candidates_proposals
