@@ -367,7 +367,7 @@ def update_seednode_version_stats_row(row_data):
 
 def rectify_scores():
     for commithash in VERSION_DATA:
-        start_time = VERSION_DATA[commithash]["start"]
+        start_time = 0
         end_time = VERSION_DATA[commithash]["end"]
         logger.info(f"\n======= commithash: {commithash} =======")
         logger.info(f"start_time: {start_time}")
@@ -473,7 +473,7 @@ def migrate_sqlite_to_pgsql(ts, rescan=False):
             update_seednode_version_stats_row(row_data)
 
 def import_seednode_stats():
-    resp = requests.get("http://stats.kmd.io/api/source/seednode_version_stats/").json()
+    resp = requests.get(f"{OTHER_SERVER}/api/source/seednode_version_stats/").json()
 
     for i in resp["results"]:
         row_data = (i["name"], i["season"], i["version"], i["timestamp"], i["error"], i["score"])
