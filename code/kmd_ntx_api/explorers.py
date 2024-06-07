@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import requests
 from kmd_ntx_api.helper import get_or_none
 from kmd_ntx_api.query import get_coins_data

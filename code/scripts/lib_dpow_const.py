@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import sys
 import time
 import json
@@ -8,6 +8,7 @@ import lib_urls as urls
 from lib_crypto import * 
 from notary_pubkeys import NOTARY_PUBKEYS
 from notary_candidates import CANDIDATE_ADDRESSES
+from logger import logger
 
 
 def get_scoring_epochs_repo_data(branch='master'):
@@ -697,7 +698,7 @@ for _season in SEASONS_INFO:
                     SEASON = _season
 
 
-print(f"{int(time.time()) - NOW} sec to complete dpow const")
+logger.info(f"{int(time.time()) - NOW} sec to complete dpow const")
 
 NEXT_SEASON_COINS = []
 

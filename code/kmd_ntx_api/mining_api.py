@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import time
 from django.http import JsonResponse
 from kmd_ntx_api.mining import get_mined_data_24hr, get_mined_count_daily_by_name, \

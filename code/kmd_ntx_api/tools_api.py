@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from kmd_ntx_api.tools import get_addr_from_base58, get_address_conversion, \
     get_address_from_pubkey, get_decode_op_return, get_pubkey_utxos, \
     get_scripthash_from_address, get_scripthashes_from_pubkey, get_explorer_status

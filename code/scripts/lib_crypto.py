@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import hashlib
 import codecs
 import bitcoin
@@ -9,6 +9,7 @@ from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
 import alerts
 import lib_urls  
+from logger import logger
 
 
 # For more params, check a project's /src/chainparams.cpp file
@@ -126,7 +127,7 @@ for coin in COINS_INFO:
                 if coin in COIN_PARAMS:
                     COIN_PARAMS.update({coin: COIN_PARAMS[coin]})
                 else:
-                    print(alerts.send_telegram(f"{__name__}: {coin} doesnt have params defined!"))
+                    logger.info(alerts.send_telegram(f"{__name__}: {coin} doesnt have params defined!"))
 
 
 SMARTCHAIN_BASE_58 = {

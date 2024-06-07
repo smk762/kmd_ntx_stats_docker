@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import time
 import discord
 import asyncio
 from config import ALERT_INTERVAL, DISCORD_CHANNEL, DISCORD_TOKEN
 from models import NotaryMonitor
+from logger import logger
 
 class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -15,15 +16,15 @@ class MyClient(discord.Client):
         self.bg_task = self.loop.create_task(self.process_alerts())
 
     async def on_ready(self):
-        print(f'Logged in as {self.user} (ID: {self.user.id})')
-        print('------')
+        logger.info(f'Logged in as {self.user} (ID: {self.user.id})')
+        logger.info('------')
 
     async def process_alerts(self):
         await self.wait_until_ready()
-        print('Logged in as')
-        print(self.user.name)
-        print(self.user.id)
-        print('------')
+        logger.info('Logged in as')
+        logger.info(self.user.name)
+        logger.info(self.user.id)
+        logger.info('------')
         channel = self.get_channel(DISCORD_CHANNEL)
         while not self.is_closed():
             
@@ -33,7 +34,7 @@ class MyClient(discord.Client):
                     msg = self.sauron.alert_slow_miners()
                     if msg != "":
                         # await self.channel.send(msg)
-                        print(msg)
+                        logger.info(msg)
                         break
 
                     if loop > 12:

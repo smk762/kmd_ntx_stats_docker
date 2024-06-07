@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from kmd_ntx_api.graph import get_balances_graph_data, get_daily_ntx_graph_data, \
     get_mm2gui_piechart, get_mined_xy_data, get_supply_xy_data
 from kmd_ntx_api.helper import json_resp, region_sort

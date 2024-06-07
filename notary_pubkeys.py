@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import bitcoin
 from bitcoin.core import x
 from bitcoin.core import CoreMainParams

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import requests
 from django.shortcuts import render
 from kmd_ntx_api.electrum import get_full_electrum_balance

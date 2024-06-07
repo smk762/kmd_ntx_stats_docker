@@ -1,10 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import sys
 from lib_const import *
 import lib_helper as helper
 from decorators import print_runtime
 import lib_ntx
 import lib_update_ntx
+from logger import logger
 
 '''
 At the end of a season (or after an epoch change), the ntx scores may need to be realigned to the new epoch scores.
@@ -40,7 +41,7 @@ for season in ["Season_7"]:
                     coin_ranges[server][coin].update({
                         "end": end
                     })
-            print(f"{season} {server} {epoch} {score}")
+            logger.info(f"{season} {server} {epoch} {score}")
 
         for coin in coin_ranges[server]:
             if "end" not in coin_ranges[server][coin]:
@@ -70,6 +71,6 @@ for server in coin_ranges:
 
 
 if __name__ == '__main__':
-    print(coin_ranges)
+    logger.info(coin_ranges)
 
 

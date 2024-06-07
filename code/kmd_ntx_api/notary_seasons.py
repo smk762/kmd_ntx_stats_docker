@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import time
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.struct import default_regions_info

@@ -1,4 +1,5 @@
 import lib_query
+from logger import logger
 
 rewards = {}
 for year in range(2016, 2024):
@@ -18,7 +19,7 @@ resp = {
 rewards.update({"since_genesis": resp})
 
 for i in rewards:
-    print(f"Rewards {i}: {rewards[i]['claims']} claims, {rewards[i]['value']} KMD value")
+    logger.info(f"Rewards {i}: {rewards[i]['claims']} claims, {rewards[i]['value']} KMD value")
 
 
 mined = {}
@@ -39,4 +40,4 @@ resp = {
 mined.update({"since_genesis": resp})
 
 for i in mined:
-    print(f"Mined {i}: {mined[i]['blocks']} blocks, {mined[i]['value']} KMD value")
+    logger.info(f"Mined {i}: {mined[i]['blocks']} blocks, {mined[i]['value']} KMD value")

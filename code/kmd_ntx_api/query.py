@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import datetime
 from datetime import datetime as dt
 from django.db.models import Count, Sum

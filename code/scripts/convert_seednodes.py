@@ -1,12 +1,13 @@
 
 import csv
 import json
+from logger import logger
 
 seednodes = {"Season_7": {}}
 with open('s7_seednodes.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
-        print(row)
+        logger.info(row)
         seednodes["Season_7"].update({
 	        row[0]: {
 	            "IP": row[2],

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import requests
 import datetime as dt
 from datetime import datetime, timezone

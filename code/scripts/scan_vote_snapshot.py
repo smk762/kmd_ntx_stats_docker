@@ -1,7 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import json
 from lib_helper import get_nn_region_split
 from notary_candidates import CANDIDATE_ADDRESSES
+from logger import logger
 
 
 with open('VOTE2022_22920.json', 'r') as j:
@@ -35,11 +36,11 @@ for i in candidate_votes:
 
 
 for region in regions:
-    print(region)
+    logger.info(region)
     region_scores[region].sort()
-    print(region_scores[region])    
+    logger.info(region_scores[region])    
     region_scores[region].reverse()
-    print(region_scores[region])
+    logger.info(region_scores[region])
 
 for region in regions:
     for nn in regions[region]:
