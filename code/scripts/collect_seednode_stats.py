@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import os
 import csv
 import sys
@@ -10,23 +10,52 @@ from dotenv import load_dotenv
 from lib_db import CONN, CURSOR
 from psycopg2.extras import execute_values
 
-import requests
-import logging
-import logging.handlers
 
 from lib_helper import *
 import lib_validate as validate
 import lib_electrum as electrum
-
-logger = logging.getLogger()
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+from logger import logger
 
 VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/doc/seed_version_epochs.json"
-VERSION_DATA = requests.get(VERSION_TIMESPANS_URL).json()
+try:
+    VERSION_DATA = requests.get(VERSION_TIMESPANS_URL, timeout=10).json()
+except:
+    VERSION_DATA = {
+        "b8598439a": {
+        "end": 1659006671
+        },
+        "ce32ab8da": {
+        "end": 1666271160
+        },
+        "0f6c72615": {
+        "end": 1668898800
+        },
+        "6e4de5d21": {
+        "end": 1680566399
+        },
+        "6bb79b3d8": {
+        "end": 1680911999
+        },
+        "278b525ba": {
+        "end": 1680911999
+        },
+        "371595d6c": {
+        "version": "1.0.4",
+        "end": 1688829251
+        },
+        "19c8218": {
+        "version": "1.0.6",
+        "end": 1700697600
+        },
+        "79f6205": {
+        "version": "1.0.7",
+        "end": 1705212928
+        },
+        "b0fd99e": {
+        "version": "2.0.0",
+        "end": 1987654321
+        }
+    }
 SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 # Date:   Mon Nov 14 13:40:18 2022 +0300 6e4de5d21
@@ -217,7 +246,7 @@ def mm2_proxy(method, params=None):
         "userpass": MM2_USERPASS,
         })
     r = requests.post(MM2_IP, json.dumps(params))
-    print(r.json())
+    logger.info(r.json())
     return r
 
 
@@ -269,48 +298,48 @@ def start_stats_collection():
             "interval":1800,
         }
     }
-    print("Starting stats collection...")
+    logger.info("Starting stats collection...")
     r = mm2_proxy('start_version_stat_collection', params)
 
 
 def empty_pg_table():
     rows = CURSOR.execute("DELETE FROM seednode_version_stats;")
     CONN.commit()
-    print('Deleted', CURSOR.rowcount, 'records from seednode_version_stats PgSQL table.')
+    logger.info('Deleted', CURSOR.rowcount, 'records from seednode_version_stats PgSQL table.')
 
 
 def empty_sqlite_table(table):
     rows = cursor.execute(f"DELETE FROM {table};")
     CONN.commit()
-    print('Deleted', cursor.rowcount, 'records from the table.')
+    logger.info('Deleted', cursor.rowcount, 'records from the table.')
 
 
 def get_version_stats_from_sqlite_db(from_time=0, version=None):
     sql = f"SELECT * FROM stats_nodes WHERE version = '{version}' and timestamp > {from_time}"
     if not version:
         sql = f"SELECT * FROM stats_nodes WHERE version != '' and timestamp > {from_time}"
-    print(sql)
+    logger.info(sql)
     rows = cursor.execute(sql).fetchall()
     resp = []
     for row in rows:
         resp.append(dict(row))
-    print(f"{len(resp)} records returned")
+    logger.info(f"{len(resp)} records returned")
     return resp
 
 
 def get_version_stats_from_db():
     rows = cursor.execute("SELECT * FROM stats_nodes WHERE version != ''").fetchall()
     for row in rows:
-        print(dict(row))
+        logger.info(dict(row))
 
 
 def get_registered_nodes_from_db():
     rows = cursor.execute("SELECT * FROM nodes;").fetchall()
-    print("---------")
+    logger.info("---------")
     
     for row in rows:
-        print(dict(row))    
-    print("---------")
+        logger.info(dict(row))    
+    logger.info("---------")
     return [i['name'] for i in rows]
 
 
@@ -340,20 +369,20 @@ def rectify_scores():
     for commithash in VERSION_DATA:
         start_time = VERSION_DATA[commithash]["start"]
         end_time = VERSION_DATA[commithash]["end"]
-        print(f"\n======= commithash: {commithash} =======")
-        print(f"start_time: {start_time}")
-        print(f"end_time: {end_time}")
+        logger.info(f"\n======= commithash: {commithash} =======")
+        logger.info(f"start_time: {start_time}")
+        logger.info(f"end_time: {end_time}")
 
         sql = f"SELECT * FROM seednode_version_stats WHERE version LIKE '%{commithash}%' AND timestamp < {end_time} AND timestamp > {start_time};"
         CURSOR.execute(sql)
-        print(f"Records valid for scoring: {CURSOR.rowcount}")
+        logger.info(f"Records valid for scoring: {CURSOR.rowcount}")
         sql = f"UPDATE seednode_version_stats SET score = 0.2 WHERE version LIKE '%{commithash}%' AND timestamp < {end_time} AND timestamp > {start_time};"
         CURSOR.execute(sql)
         CONN.commit()
 
         sql = f"SELECT * FROM seednode_version_stats WHERE version LIKE '%{commithash}%' AND timestamp > {end_time};"
         CURSOR.execute(sql)
-        print(f"Records after end time: {CURSOR.rowcount}")
+        logger.info(f"Records after end time: {CURSOR.rowcount}")
         sql = f"UPDATE seednode_version_stats SET score = 0 WHERE version LIKE '%{commithash}%' AND timestamp > {end_time};"
         CURSOR.execute(sql)
         CONN.commit()
@@ -387,7 +416,8 @@ def round_ts_to_hour(timestamp):
 
 def get_version_score(version, timestamp, notary, wss_detected=False):
     active_versions_at = get_active_mm2_versions(timestamp)
-    print(f"mm2 active versions: {active_versions_at}")
+    logger.info(f"mm2 active versions: {active_versions_at}")
+    logger.merge(f"{version} | {timestamp} | {notary} | {wss_detected}")
     for v in active_versions_at:
         if version.find(v) > -1:
             if wss_detected:
@@ -406,15 +436,16 @@ def test_wss(notary):
     data = {"userpass": "userpass"}
     resp = electrum.get_from_electrum_ssl(url, 38900, "version", data)
     if str(resp).find("read operation timed out") > -1:
-        print(f"{notary}: WSS connection detected...")
+        logger.info(f"{notary}: WSS connection detected...")
         return True
     else:
-        print(f"{notary}: {resp}")
+        logger.info(f"{notary}: {resp}")
     return False
 
 
-def migrate_sqlite_to_pgsql(ts):
-    print(f"Migrating to pgsql from {ts}")
+def migrate_sqlite_to_pgsql(ts, rescan=False):
+    
+    logger.info(f"Migrating to pgsql from {ts}")
     wss_confirmed = []
     rows = get_version_stats_from_sqlite_db()
 
@@ -422,14 +453,15 @@ def migrate_sqlite_to_pgsql(ts):
         rows = get_version_stats_from_sqlite_db(ts)
 
     for row in rows:
-        print(row)
+        logger.calc("-----------------------------")
+        logger.info(f"SQLITE: {row}")
         if row["version"] != '':
             wss_detected = False
             hr_timestamp = round_ts_to_hour(row["timestamp"])   
             season = validate.get_season(hr_timestamp)
 
             if row["name"] not in wss_confirmed:
-                if test_wss(row["name"]):
+                if test_wss(row["name"]) or rescan:
                     wss_confirmed.append(row["name"])
 
             if row["name"] in wss_confirmed:
@@ -437,8 +469,7 @@ def migrate_sqlite_to_pgsql(ts):
             
             score = get_version_score(row["version"], hr_timestamp, row["name"], wss_detected)
             row_data = (row["name"], season, row["version"], hr_timestamp, row["error"], score)
-
-            print(row_data)
+            logger.loop(f"MIGRATE: {row_data}")
             update_seednode_version_stats_row(row_data)
 
 def import_seednode_stats():
@@ -446,16 +477,15 @@ def import_seednode_stats():
 
     for i in resp["results"]:
         row_data = (i["name"], i["season"], i["version"], i["timestamp"], i["error"], i["score"])
-        print(row_data)
+        logger.info(row_data)
         update_seednode_version_stats_row(row_data)
 
     if resp["next"]:
         while resp["next"]:
             resp = requests.get(resp["next"]).json()
-
             for i in resp["results"]:
                 row_data = (i["name"], i["season"], i["version"], i["timestamp"], i["error"], i["score"])
-                print(row_data)
+                logger.info(row_data)
                 update_seednode_version_stats_row(row_data)
 
 
@@ -465,7 +495,7 @@ if __name__ == '__main__':
 
     active_versions = get_active_mm2_versions(time.time())
     logger.info(f"Local MM2 version: {get_local_version().json()}")
-    print(f"active_versions: {active_versions}")
+    logger.info(f"active_versions: {active_versions}")
 
     if len(sys.argv) > 1:
 
@@ -493,21 +523,25 @@ if __name__ == '__main__':
             latest_record = get_pgsql_latest()
             logger.info(f"Latest entry in pgsql db: {latest_record}")
             migrate_sqlite_to_pgsql(latest_record)
+            
+        # Run at end of season
+        elif sys.argv[1] == 'migrate_season':
+            migrate_sqlite_to_pgsql(1688132253, True)
 
         # outputs SQLite data
         elif sys.argv[1] == 'sqlite_data':
             sqlite_version_stats = get_version_stats_from_sqlite_db(0)
-            print(f"sqlite_version_stats: {sqlite_version_stats}")
+            logger.info(f"sqlite_version_stats: {sqlite_version_stats}")
 
         # outputs pgSQL data
         elif sys.argv[1] == 'pgsql_data':
             pgsql_version_stats = get_version_stats_from_pgsql_db()
-            print(f"pgsql_version_stats: {pgsql_version_stats}")
+            logger.info(f"pgsql_version_stats: {pgsql_version_stats}")
 
         # outputs pgSQL data
         elif sys.argv[1] == 'versions_list':
             pgsql_version_list = get_version_list_from_pgsql_db()
-            print(f"pgsql_version_list: {pgsql_version_list}")
+            logger.info(f"pgsql_version_list: {pgsql_version_list}")
 
         # outputs pgSQL data
         elif sys.argv[1] == 'rectify_scores':
@@ -523,10 +557,10 @@ if __name__ == '__main__':
             import_seednode_stats()
 
         else:
-            print("invalid param, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test, import]")
+            logger.info("invalid param, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test, import]")
 
     else:
-        print("no param given, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test, import]")
+        logger.info("no param given, must be in [empty, start, nodes, register, migrate, sqlite_data, pgsql_data, wss_test, import]")
 
     #get_version_stats_from_db()
     conn.close()

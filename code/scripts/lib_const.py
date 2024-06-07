@@ -4,22 +4,12 @@ import sys
 from os.path import expanduser, dirname, realpath
 import time
 import requests
-import logging
-import logging.handlers
 
 from lib_dpow_const import *
 from lib_db import *
 from lib_rpc import *
 
-
-# Default Logger
-logger = logging.getLogger()
-handler = logging.StreamHandler()
-formatter = logging.Formatter(
-    '%(asctime)s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+from logger import logger
 
 # How many pages back to go with verbose API responses
 API_PAGE_BREAK = int(os.getenv("API_PAGE_BREAK"))
