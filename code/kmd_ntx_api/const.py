@@ -61,8 +61,8 @@ SINCE_INTERVALS = {
     "year": 365 * 24 * 60 * 60,
 }
 
-SMARTCHAINS = ["BET", "BOTS", "CCL", "CHIPS", "CLC", "CRYPTO", "DEX",
-                  "DP", "GLEEC", "HODL", "ILN", "JUMBLR", "KMD", "KOIN",
-                  "LABS", "MCL", "MESH", "MGW", "MARTY", "MSHARK", "NINJA",
-                  "PANGEA", "PIRATE", "REVS", "DOC", "SOULJA", "SPACE",
-                  "SUPERNET", "THC", "TOKEL", "VRSC", "WSB", "ZILLA"]
+SMARTCHAINS = ["BET", "BOTS", "CCL", "CHIPS", "CLC", "DEX",
+                  "GLEEC", "ILN", "KMD", "KOIN", "MCL", "MARTY",
+                  "NINJA", "PIRATE", "REVS", "DOC", "SUPERNET",
+                  "THC", "TOKEL", "VRSC", "VOTE2024"
+              ]
