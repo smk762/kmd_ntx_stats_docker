@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import os
 import sys
 import json
@@ -14,6 +14,7 @@ from lib_query import *
 import lib_api as api
 import lib_validate
 import lib_helper
+from logger import logger
 
 script_path = os.path.abspath(os.path.dirname(sys.argv[0]))
 
@@ -46,9 +47,9 @@ def update_mined_rows(rescan_blocks, coin="KMD", prices=None):
         date = date.split("-")
         date.reverse()
         date = "-".join(date)
-        print(date)
-        print(season)
-        #print(prices)
+        logger.info(date)
+        logger.info(season)
+        #logger.info(prices)
 
         if season not in prices:
             prices.update({season: {}})
@@ -62,13 +63,13 @@ def update_mined_rows(rescan_blocks, coin="KMD", prices=None):
                 price_updated = True
                 if "btc" in api_prices:
                     prices[season][f"{date}"].update(api_prices)
-                    print(prices[season][f"{date}"])
-                #print(prices[season][f"{date}"])
+                    logger.info(prices[season][f"{date}"])
+                #logger.info(prices[season][f"{date}"])
                 time.sleep(1)
             else:
                 prices[season][f"{date}"].update({"btc":0,"usd":0})
 
-        #print(prices[season][date])
+        #logger.info(prices[season][date])
         if 'usd' in prices[season][date]:
             row.usd_price = Decimal(prices[season][date]['usd'])
         if 'btc' in prices[season][date]:
@@ -102,7 +103,7 @@ def update_mined_table(season, coin="KMD", start_block=None):
         with open(f"{script_path}/prices_history.json", "r") as j:
             prices = json.load(j)
     except Exception as e:
-        print(e)
+        logger.info(e)
         prices = {}
     update_mined_rows(rescan_blocks, "KMD", prices)
 
@@ -114,7 +115,7 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
         with open(f"{script_path}/prices_history.json", "r") as j:
             prices = json.load(j)
     except Exception as e:
-        print(e)
+        logger.info(e)
         prices = {}
 
     if season != "since_genesis":
@@ -132,7 +133,7 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
         start = end - datetime.timedelta(days=30)
 
     logger.info(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
-    print(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
+    logger.info(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
 
     while start <= end:
         date = f"{start}".split("-")

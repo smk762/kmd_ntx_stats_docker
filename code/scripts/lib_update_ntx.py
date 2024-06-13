@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import os
 import json
 from psycopg2.extras import execute_values
 from lib_const import *
 from lib_filter import get_notarised_conditions_filter
+from logger import logger
 
 
 def update_ntx_row(row_data, table='notarised', unique='unique_txid'):
@@ -39,7 +40,7 @@ def update_server_notarised_tbl(old_server, server):
     try:
         CURSOR.execute(sql)
         CONN.commit()
-        print(f"{old_server} reclassed as {server}")
+        logger.info(f"{old_server} reclassed as {server}")
     except Exception as e:
         logger.debug(e)
         CONN.rollback()
@@ -68,7 +69,7 @@ def update_unofficial_coin_notarised_tbl(season, coin):
     try:
         CURSOR.execute(sql)
         CONN.commit()
-        print(f"Unofficial coin {coin} updated for {season}")
+        logger.info(f"Unofficial coin {coin} updated for {season}")
     except Exception as e:
         logger.debug(e)
         CONN.rollback()
@@ -112,7 +113,7 @@ def update_txid_score_notarised_tbl(txid, scored, score_value):
     try:
         CURSOR.execute(sql)
         CONN.commit()
-        print(f"{txid} tagged as {scored} ({score_value})")
+        logger.info(f"{txid} tagged as {scored} ({score_value})")
     except Exception as e:
         logger.debug(e)
         CONN.rollback()
@@ -133,7 +134,7 @@ def update_season_server_addresses_notarised_tbl(txid, season, server, addresses
     try:
         CURSOR.execute(sql)
         CONN.commit()
-        print(f"{txid} tagged as {season}")
+        logger.info(f"{txid} tagged as {season}")
     except Exception as e:
         logger.debug(e)
         CONN.rollback()

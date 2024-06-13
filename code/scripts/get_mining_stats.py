@@ -5,6 +5,7 @@ import datetime as dt
 import calendar
 import lib_rpc
 from datetime import datetime
+from logger import logger
 
 if __name__ == '__main__':
 
@@ -13,13 +14,13 @@ if __name__ == '__main__':
     for year in range(2018, 2024):
         mining_stats.update({year:{}})
         for month in range(1, 13):
-            print(year)
+            logger.info(year)
             month_str = dt.datetime(year, month, 1, 0, 0).strftime("%B")
             ldom = calendar.monthrange(year, month)[1]
             min_blocktime = int(dt.datetime(year, month, 1, 0, 0).timestamp())
             max_blocktime = int(dt.datetime(year, month, ldom, 23, 59, 59).timestamp())
             url = f"http://116.203.120.91:8762/info/mined_between_blocktimes/?min_blocktime={min_blocktime}&max_blocktime={max_blocktime}"
-            print(f"url: {url}")
+            logger.info(f"url: {url}")
             data = requests.get(url).json()["results"]
             if data["blocks_mined"]:
                 baseline_mined_value = data["blocks_mined"] * 3
@@ -47,6 +48,6 @@ if __name__ == '__main__':
                     surplus_to_mining = r["total"] - last_supply - data["sum_mined"]
                     data.update({"claimed_rewards_for_month": surplus_to_mining})
                 last_supply = r["total"]
-                print(resp)
+                logger.info(resp)
     with open(f"mining_stats_by_month.json", "w+") as j:
         json.dump(mining_stats, j, indent=4)

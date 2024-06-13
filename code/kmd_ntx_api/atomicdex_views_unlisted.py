@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import time
 from django.shortcuts import render
 from datetime import datetime as dt

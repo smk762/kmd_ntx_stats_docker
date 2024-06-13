@@ -1,10 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import json
 import ssl
 import socket
 from lib_helper import get_electrum_url_port
 from lib_const import ELECTRUMS, ELECTRUMS_SSL, ELECTRUMS_WSS, logger
 from lib_crypto import *
+from logger import logger
 
 socket.setdefaulttimeout(5)
 
@@ -45,7 +46,7 @@ def get_full_electrum_balance(pubkey, coin):
                 total = total_confirmed + total_unconfirmed
                 return total/100000000
             except Exception as e:
-                print(f"Error in [get_full_electrum_balance] with ELECTRUMS_SSL for {coin}: {e}")
+                logger.info(f"Error in [get_full_electrum_balance] with ELECTRUMS_SSL for {coin}: {e}")
 
     if coin in ELECTRUMS:
         for electrum in ELECTRUMS[coin]:
@@ -64,7 +65,7 @@ def get_full_electrum_balance(pubkey, coin):
                 total = total_confirmed + total_unconfirmed
                 return total/100000000
             except Exception as e:
-                print(f"Error in [get_full_electrum_balance] with ELECTRUMS for {coin}: {e}")
+                logger.info(f"Error in [get_full_electrum_balance] with ELECTRUMS for {coin}: {e}")
     return -1
 
 
@@ -81,7 +82,7 @@ def get_notary_utxo_count(coin, pubkey):
                         num_unspent +=1
                 return num_unspent
             else:
-                print(f"ELECTRUM returning 'int' response for {coin}")
+                logger.info(f"ELECTRUM returning 'int' response for {coin}")
 
 
     elif coin in ELECTRUMS:
@@ -96,7 +97,7 @@ def get_notary_utxo_count(coin, pubkey):
                         num_unspent +=1
                 return num_unspent
             else:
-                print(f"ELECTRUM returning 'int' response for {coin}")
+                logger.info(f"ELECTRUM returning 'int' response for {coin}")
     else:
         logger.info(f"{coin} not in electrums or electrums_ssl")
 

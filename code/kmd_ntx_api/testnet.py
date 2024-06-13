@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from django.db.models import Sum, Max, Count
 from datetime import datetime, timezone
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import json
 from lib_update import *
 from lib_query import *
@@ -6,6 +6,7 @@ import lib_validate
 from models import ntx_tenure_row, scoring_epoch_row
 from decorators import print_runtime
 from lib_helper import get_season_coins
+from logger import logger
 
 
 @print_runtime
@@ -89,7 +90,7 @@ def update_tenure(season):
 
             if now < SEASONS_INFO[season]["start_time"] and s_start - now < 604800:
 
-                print("Pre-season epoch pop!")
+                logger.info("Pre-season epoch pop!")
                 if server in NEXT_SEASON_COINS:
                     season_server_coins = NEXT_SEASON_COINS[server]
                 else:
@@ -118,7 +119,7 @@ def update_epochs(season):
 
             if now < SEASONS_INFO[season]["start_time"] and s_start - now < 604800:
 
-                print("Pre-season epoch pop!")
+                logger.info("Pre-season epoch pop!")
                 if server in NEXT_SEASON_COINS:
                     active_coins = NEXT_SEASON_COINS[server]
                     num_coins = len(active_coins)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from kmd_ntx_api.table import get_addresses_rows, get_balances_rows, \
     get_coin_last_ntx_rows, get_coin_ntx_season_rows, get_mined_rows, \
     get_mined_count_daily_rows, get_mined_count_season_rows, \

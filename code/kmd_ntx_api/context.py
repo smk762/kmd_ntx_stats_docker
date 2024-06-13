@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import numpy as np
 from kmd_ntx_api.cache_data import explorers_cache, coin_icons_cache, \
     notary_icons_cache, navigation_cache

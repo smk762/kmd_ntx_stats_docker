@@ -1,10 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import os 
 import re
 import platform
 from slickrpc import Proxy
 import lib_const
 import lib_crypto
+from logger import logger
 
 # define data dir
 def def_data_dir():
@@ -38,13 +39,13 @@ def def_credentials(coin):
         if coin == 'KMD':
             rpcport = 7771
         else:
-            print("rpcport not in conf file, exiting")
-            print("check " + coin_config_file)
+            logger.info("rpcport not in conf file, exiting")
+            logger.info("check " + coin_config_file)
             exit(1)
     try:
         return (Proxy("http://%s:%s@127.0.0.1:%d" % (rpcuser, rpcpassword, int(rpcport)), timeout=300))
     except:
-        print("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in "+coin_config_file)
+        logger.info("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in "+coin_config_file)
 
 def get_ntx_txids(start, end):
     return RPC["KMD"].getaddresstxids({"addresses": [lib_const.NTX_ADDR], "start":start, "end":end})
@@ -56,5 +57,5 @@ for coin in lib_crypto.COIN_PARAMS:
     try:
         RPC[coin] = def_credentials(coin)
     except:
-        #print(f"{coin} RPC failed")
+        #logger.info(f"{coin} RPC failed")
         pass

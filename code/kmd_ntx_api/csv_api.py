@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import csv
 from django.http import HttpResponse
 from kmd_ntx_api.helper import get_or_none

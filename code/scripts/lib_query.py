@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import lib_helper
 from lib_const import *
 from lib_query_ntx import *
 from lib_filter import *
 from decorators import print_runtime
+from logger import logger
 
 
 def get_mined_date_aggregates(day):
@@ -120,8 +121,8 @@ def get_max_value_mined_txid(max_value, season=None):
             if len(results) > 0:
                 return results[0]
     except Exception as e:
-        #print(sql)
-        print(e)
+        #logger.info(sql)
+        logger.info(e)
 
     return ''
 

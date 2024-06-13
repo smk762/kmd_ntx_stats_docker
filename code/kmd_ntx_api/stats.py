@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 import time
 from django.db.models import Sum, Count
 from kmd_ntx_api.const import SINCE_INTERVALS

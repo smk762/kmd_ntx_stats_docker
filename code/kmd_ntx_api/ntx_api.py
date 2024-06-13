@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from kmd_ntx_api.helper import get_or_none, get_page_server, json_resp
 from kmd_ntx_api.notary_seasons import get_page_season
 from kmd_ntx_api.ntx import get_notarised_date, get_ntx_tenure_table

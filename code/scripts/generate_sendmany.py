@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 
 import sys
 import json
 import requests
+from logger import logger
 
 coin = input("Coin: ")
 season = input("Season: ")
@@ -22,5 +23,5 @@ sendmany = {}
 for address in addresses:
     sendmany.update({address:amount})
 
-print(coin+' sendmany "" "'+json.dumps(sendmany).replace('"', '\\"')+'"')
-print(f"Sendmany generated for {len(resp)} {season} {server} addresses to send {amount}")
+logger.info(coin+' sendmany "" "'+json.dumps(sendmany).replace('"', '\\"')+'"')
+logger.info(f"Sendmany generated for {len(resp)} {season} {server} addresses to send {amount}")

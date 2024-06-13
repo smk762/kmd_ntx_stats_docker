@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.12
 from django.http import JsonResponse
 
 from kmd_ntx_api.helper import json_resp
