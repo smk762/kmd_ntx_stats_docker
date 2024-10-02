@@ -10,7 +10,7 @@ def get_url(year, month, season):
     return f"{BASEURL}/?year={year}&month={month}&season={season}"
 
 summary = {}
-season = "Season_7"
+season = "Season_8"
 for year in [2023, 2024]:
     if year == 2023:
         start_month = 6

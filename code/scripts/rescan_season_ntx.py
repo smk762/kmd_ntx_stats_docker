@@ -8,7 +8,7 @@ and epoch scores alignment. Runtime 4-5hrs.
 '''
 
 @print_runtime
-def rescan_season(season="Season_7"):
+def rescan_season(season="Season_8"):
     notarised_table = lib_ntx.notarised(season, rescan=True)
     # Revalidates existing data, run after epoch changes to correct the scores.
     notarised_table.clean_up()

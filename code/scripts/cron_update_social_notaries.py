@@ -183,7 +183,7 @@ def remove_invalid_notaries(season):
 
 if __name__ == "__main__":
     logger.info(EXCLUDED_SEASONS)
-    season = "Season_7"
+    season = "Season_8"
     logger.info(f"Preparing to populate {season} [social_notaries] table...")
     populate_social_notaries(season)
     remove_invalid_notaries(season)

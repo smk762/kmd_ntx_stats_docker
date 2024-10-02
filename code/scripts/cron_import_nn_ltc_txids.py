@@ -4,6 +4,6 @@ from lib_ntx import import_nn_ltc_txids
 
 if __name__ == "__main__":
 
-    for season in ["Season_7"]:
+    for season in ["Season_8"]:
         
             import_nn_ltc_txids(season)

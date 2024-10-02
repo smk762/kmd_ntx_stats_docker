@@ -32,7 +32,8 @@ def run_updates(seasons):
             update_mined_count_season_table(season)
 
 if __name__ == "__main__":
-    seasons = [CURRENT_SEASON]
+    current_season = get_season()['season']
+    seasons = [current_season]
     if len(sys.argv) > 1:
         if sys.argv[1] == "rescan":
             RESCAN_SEASON = True

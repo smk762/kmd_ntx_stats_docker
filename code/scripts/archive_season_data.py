@@ -9,7 +9,7 @@ import lib_ntx
 from logger import logger
 
 
-def archive_past_seasons(current_seasons=["Season_7"]):
+def archive_past_seasons(current_seasons=["Season_8"]):
     for season in SEASONS_INFO:
         logger.info(season)
         if season not in current_seasons:
@@ -46,5 +46,5 @@ def archive_past_seasons(current_seasons=["Season_7"]):
             
     
 if __name__ == '__main__':
-    current_seasons = ["Season_7"]
+    current_seasons = ["Season_8"]
     archive_past_seasons(current_seasons)

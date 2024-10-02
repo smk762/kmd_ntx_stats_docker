@@ -31,26 +31,47 @@ def get_scoring_epochs_repo_data(branch='master'):
                 del repo_data[_season]["Servers"]["dPoW-3P"]
     return repo_data
 
+def get_season():
+    now = time.time()
+    s = "unknown"
+    ps = False
+    for _season in SEASONS_INFO:
+        print(f"season: {_season}")
+        print(f"now: {now}")
+        print(f"season: {_season}")
+        if _season in SEASONS_INFO:
+            print(SEASONS_INFO[_season])
+            if _season.find("Testnet") == -1:
+                if SEASONS_INFO[_season]["start_time"] < now:
+                    print("After start time")
+                    if SEASONS_INFO[_season]["end_time"] > now:
+                        print("Before end time")
+                        s = _season
+                    elif "post_season_end_time" in SEASONS_INFO[_season]:
+                        if SEASONS_INFO[_season]["post_season_end_time"] > now:
+                            print("Before postseason end time")
+                            ps = True
+                            s = _season
+    
+    r = {
+        "season": s,
+        "is_postseason": ps
+    }
+    print(r)
+    return r
+    
 
 def get_dpow_active_info(seasons):
     '''Get current dpow coins from repo'''
     data = requests.get(urls.get_dpow_active_coins_url()).json()["results"]
-    for season in seasons:
-        if season.find("Testnet") == -1:
-            start_time, end_time = get_season_start_end(season)
-
-            if NOW >= start_time and NOW <= end_time:
-                current_season = season
-                current_dpow_coins = {season: {}}
-
-                for _coin in data:
-                    if data[_coin]["dpow"]["server"] not in current_dpow_coins[season]:
-                        current_dpow_coins[season].update({
-                            data[_coin]["dpow"]["server"]: []
-                        })
-
-                    current_dpow_coins[season][data[_coin]["dpow"]["server"]].append(_coin)
-
+    current_season = get_season()['season']
+    current_dpow_coins = {current_season: {}}
+    for _coin in data:
+        if data[_coin]["dpow"]["server"] not in current_dpow_coins[current_season]:
+            current_dpow_coins[current_season].update({
+                data[_coin]["dpow"]["server"]: []
+            })
+        current_dpow_coins[current_season][data[_coin]["dpow"]["server"]].append(_coin)
     return current_season, data, current_dpow_coins
 
 
@@ -281,7 +302,7 @@ SCORING_EPOCHS_REPO_DATA = get_scoring_epochs_repo_data()
 
 
 # Things that can be ignored
-RETIRED_DPOW_COINS = ["HUSH3", "GLEEC-OLD", "AXO", "BTCH", "COQUICASH", "OOT"]
+RETIRED_DPOW_COINS = ["HUSH3", "AXO", "BTCH", "COQUICASH", "OOT"]
 EXCLUDE_DECODE_OPRET_COINS = ['D']
 EXCLUDED_SERVERS = ["Unofficial"]
 EXCLUDED_SEASONS = ["Season_1", "Season_2", "Season_3", "Unofficial", "Season_4", "Season_5", "Season_5_Testnet", "VOTE2022_Testnet"]
@@ -299,7 +320,7 @@ OTHER_LAUNCH_PARAMS = {
     "VRSC": "~/VerusCoin/src/verusd",
     "GLEEC": "~/komodo/src/komodod -ac_name=GLEEC -ac_supply=210000000 -ac_public=1 -ac_staked=100 -addnode=95.217.161.126",
     "KIP0001": "~/komodo/src/komodod -ac_public=1 -ac_name=KIP0001 -ac_supply=139419284 -ac_staked=10 -addnode=178.159.2.6",
-    "MCL": "~/marmara/src/komodod -ac_name=MCL -ac_supply=2000000 -ac_cc=2 -addnode=5.189.149.242 -addnode=161.97.146.150 -addnode=149.202.158.145 -addressindex=1 -spentindex=1 -ac_marmara=1 -ac_staked=75 -ac_reward=3000000000 -daemon"
+    "MCL": "~/marmara/src/marmarad -ac_name=MCL-addnode=5.189.149.242 -addnode=161.97.146.150 -addnode=149.202.158.145 -addressindex=1 -spentindex=1 -daemon"
 }
 
 OTHER_CONF_FILE = {
@@ -330,7 +351,7 @@ OTHER_CLI = {
     "LTC": "~/litecoin/src/litecoin-cli",
     "KMD": "~/komodo/src/komodo-cli",
     "MIL": "~/mil-1/src/mil-cli",
-    "MCL": "~/komodo/src/komodo-cli -ac_name=MCL",
+    "MCL": "~/komodo/src/marmara-cli",
     "TOKEL": "~/komodo/src/komodo-cli -ac_name=TOKEL", 
     "GLEEC": "~/komodo/src/komodo-cli -ac_name=GLEEC",
     "KIP0001": "~/komodo/src/komodo-cli -ac_name=KIP0001",
@@ -470,6 +491,27 @@ SEASON_START_COINS = {
             "VRSC"
         ]
     },
+    "Season_8": {
+        "LTC": ["LTC"],
+        "KMD": ["KMD"],
+        "Main": [
+            "CLC",
+            "CCL",
+            "DOC",
+            "GLEEC",
+            "ILN",
+            "KOIN",
+            "MARTY",
+            "NINJA",
+            "PIRATE",
+            "SUPERNET",
+            "THC"
+        ],
+        "Third_Party": [
+            "MCL",
+            "TOKEL"
+        ]
+    },
     "VOTE2023_Testnet": {
         "Main": [
             "DOC",
@@ -526,10 +568,18 @@ SEASONS_INFO = {
     },
     "Season_7": {
         "start_block": 3484958,
-        "end_block": 4484958,
+        "end_block": 4125958,
         "start_time": 1688132253,
         "end_time": 1717199999,
-        "post_season_end_time": 1725148799,
+        "post_season_end_time": 1728049052,
+        "servers": {}
+    },
+    "Season_8": {
+        "start_block": 4125988,
+        "end_block": 8888888,
+        "start_time": 1728049053,
+        "end_time": 1999999999,
+        "post_season_end_time": 1999999999,
         "servers": {}
     },
     "VOTE2022_Testnet": {
@@ -686,7 +736,7 @@ for _season in SEASONS_INFO:
 
 
 # Set season and if postseason
-POSTSEASON = False
+POSTSEASON = True
 for _season in SEASONS_INFO:
     if _season.find("Testnet") == -1:
         if SEASONS_INFO[_season]["start_time"] < NOW:
@@ -696,6 +746,7 @@ for _season in SEASONS_INFO:
                     SEASON = _season
             elif SEASONS_INFO[_season]["end_time"] > NOW:
                     SEASON = _season
+
 
 
 logger.info(f"{int(time.time()) - NOW} sec to complete dpow const")

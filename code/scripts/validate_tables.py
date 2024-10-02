@@ -13,7 +13,7 @@ tables = ["addresses", "balances", "coin_sync", "coins", "coin_social",
           "notarised_count_daily", "notarised_count_season", "notarised_tenure",
           "scoring_epochs", "vote2021"]
 
-for season in ["Season_7"]:
+for season in ["Season_7", "Season_8"]:
     if season not in EXCLUDED_SEASONS:
         for server in SEASONS_INFO[season]["servers"]:
             for epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:

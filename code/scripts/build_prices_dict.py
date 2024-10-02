@@ -16,7 +16,7 @@ except Exception as e:
     logger.info(e)
     prices = {}
 
-for season in ["Season_7"]:
+for season in ["Season_8"]:
     if season not in prices:
         prices.update({season: {}})
     season_start_dt = dt.utcfromtimestamp(SEASONS_INFO[season]["start_time"])
