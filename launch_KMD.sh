@@ -3,8 +3,11 @@ set -x
 
 trap 'komodo-cli stop'  SIGHUP SIGINT SIGTERM
 
-# Running ILN daemon
-exec komodod -pubkey=${PUBKEY} &
-tail -f ~/.komodo/debug.log & wait
+if ! [ -f /home/komodian/.komodo/debug.log ]; then
+    echo "" > /home/komodian/.komodo/debug.log
+fi
 
+exec komodod -pubkey=${PUBKEY} &
+sleep 3
+tail -f /home/komodian/.komodo/debug.log & wait
 set +x
