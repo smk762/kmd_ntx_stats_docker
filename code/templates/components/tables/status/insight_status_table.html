@@ -65,6 +65,7 @@
                     "data": "explorer",
                     "targets": 1,
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html("<span class='' style='font-size: 0.9em'><a href='"+oData.explorer+"'>"+oData.explorer+"</a></span>")
                     }
                 },
                 {
@@ -82,12 +83,22 @@
                     "data": "blockhash",
                     "targets": 4,
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html("<span class='' style='font-size: 0.7em'>"+oData.blockhash+"</span>")
                     }
                 },
                 {
                     "data": "status",
                     "targets": 5,
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        let tooltip = oData.status.replace(/['"]+/g, '')
+                        if (tooltip == 'finished')
+                        {
+                            $(nTd).html("<span class='' style='font-size: 0.7em' data-bs-toggle='tooltip' data-bs-placement='top' title=' "+tooltip+"'><i class='fa-solid fa-circle-check' style='font-size:1.5em; color: green';></i></span>")    
+                        }
+                        else
+                        {
+                            $(nTd).html("<span class='' style='font-size: 0.7em' data-bs-toggle='tooltip' data-bs-placement='top' title=' "+tooltip+"'><i class='fa-solid fa-circle-exclamation' style='font-size:1.5em; color: red;'></i></span>")
+                        }
                     }
                 }
             ]
@@ -105,3 +116,5 @@
         });
     });
 </script>
+
+
