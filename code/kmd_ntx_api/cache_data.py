@@ -84,8 +84,7 @@ ACTIVATION_COMMANDS_PATH = f"{CACHE_PATH}/activation_commands.json"
 def activation_commands_cache():
     return get_from_memcache(
         "activation_commands_cache",
-        ACTIVATION_COMMANDS_PATH,
-        ACTIVATION_COMMANDS_URL
+        ACTIVATION_COMMANDS_PATH
     )
 
 

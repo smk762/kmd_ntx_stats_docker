@@ -1,7 +1,9 @@
+from collections import defaultdict
+from typing import Dict, Tuple, Any
 
 from kmd_ntx_api.logger import logger
 from kmd_ntx_api.helper import get_or_none, sort_dict
-from kmd_ntx_api.cache_data import coins_config_cache
+from kmd_ntx_api.cache_data import coins_config_cache, refresh_cache, ACTIVATION_COMMANDS_PATH
 
 
 def get_zhtlc_activation(coins_config, coin):
@@ -117,21 +119,22 @@ def get_slp_activation(coin):
     }
 
 
-def get_activation_command(coins_config, coin):
-    resp_json = {}
-    compatible = coins_config[coin]["mm2"] == 1
-    if not compatible:
-        resp_json
+def get_activation_command(coins_config: Dict[str, Dict[str, Any]], coin: str) -> Tuple[str, Dict[str, Any]]:
+    if coin not in coins_config:
+        return None, {}
+    if coins_config[coin]["mm2"] != 1:
+        logger.error(f"Coin {coin} is not compatible with mm2.")
+        return None, {}
+    resp_json = defaultdict(dict)
     protocol = coins_config[coin]["protocol"]["type"]
     platform = None
 
-    for i in ["swap_contract_address", "fallback_swap_contract"]:
-        if i in coins_config[coin]:
-            resp_json.update({i: coins_config[coin][i]})
+    for contract_key in ["swap_contract_address", "fallback_swap_contract"]:
+        if contract_key in coins_config[coin]:
+            resp_json.update({contract_key: coins_config[coin][contract_key]})
 
-    if "protocol_data" in coins_config[coin]["protocol"]:
-        if "platform" in coins_config[coin]["protocol"]["protocol_data"]:
-            platform = coins_config[coin]["protocol"]["protocol_data"]["platform"]
+    protocol_data = coins_config[coin]["protocol"].get("protocol_data", {})
+    platform = protocol_data.get("platform")
 
     if coin in ["BCH", "tBCH"]:
         platform = "UTXO"
@@ -165,7 +168,7 @@ def get_activation_command(coins_config, coin):
 
 
 def get_activation_commands(request):
-    logger.info("Running get_activation_commands")
+    logger.info("=========================================== Running get_activation_commands ===================================")
     enable_commands = {"commands":{}}
     resp_json = {}
 
@@ -173,10 +176,15 @@ def get_activation_commands(request):
     selected_coin = get_or_none(request, "coin")
     if selected_coin is None:
         for coin in coins_config:
+            if coin.startswith('I') or coin.startswith('G'):
+                logger.calc(coin)          
+            
             platform, resp_json = get_activation_command(coins_config, coin)
             if platform not in enable_commands["commands"]:
                 enable_commands["commands"].update({platform: {}})
             enable_commands["commands"][platform].update({coin: sort_dict(resp_json)})
+        # Update memcache
+        refresh_cache(path=ACTIVATION_COMMANDS_PATH, data=enable_commands, force=False, key="activation_commands_cache", expire=86400)
         return enable_commands
     else:
         platform, resp_json = get_activation_command(coins_config, selected_coin)
