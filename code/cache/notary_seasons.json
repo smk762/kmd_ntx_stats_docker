@@ -1141,5 +1141,11 @@
             "who-biz_NA",
             "yurri-khi_DEV"
         ]
+    },
+    "Season_8": {
+        "start_block": 4125988,
+        "end_block": 8888888,
+        "start_time": 1728049053,
+        "end_time": 1999999999
     }
 }
