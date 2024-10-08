@@ -221,7 +221,7 @@ def create_dict(key_list):
 # Only used in seednodes.py
 def date_hour(timestamp):
     if timestamp > time.time() * 10: timestamp /= 1000
-    date, hour = dt.utcfromtimestamp(timestamp).strftime("%x %H").split(" ")
+    date, hour = dt.fromtimestamp(timestamp, datetime.UTC).strftime("%x %H").split(" ")
     return f"{date} {hour}:00"
 
 

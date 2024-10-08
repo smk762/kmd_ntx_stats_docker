@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.12
 import time
 import requests
+import datetime
 from datetime import datetime as dt
 from django.shortcuts import render
 from django.contrib import messages
@@ -178,7 +179,7 @@ def notaryfaucet_view(request):
                 "pubkey":item[2],
                 "notary": item[3],
                 "timestamp": item[4],
-                "time_sent":dt.utcfromtimestamp(item[4]),
+                "time_sent":dt.fromtimestamp(item[4], datetime.UTC),
                 "amount":item[5],
                 "txid":item[6],
                 "status":item[7]

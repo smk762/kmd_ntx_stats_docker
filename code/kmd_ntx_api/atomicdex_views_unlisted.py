@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.12
 import time
 from django.shortcuts import render
+import datetime
 from datetime import datetime as dt
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.query import get_swaps_data, filter_swaps_timespan, get_swaps_counts
@@ -30,9 +31,9 @@ def gui_stats_view(request):
         "since": since,
         "since_options": list(SINCE_INTERVALS.keys()),
         "from_time": from_time,
-        "from_time_dt": dt.utcfromtimestamp(from_time),
+        "from_time_dt": dt.fromtimestamp(from_time, datetime.UTC),
         "to_time": to_time,
-        "to_time_dt": dt.utcfromtimestamp(to_time),
+        "to_time_dt": dt.fromtimestamp(to_time, datetime.UTC),
         "swaps_counts": get_swaps_counts(swaps_data)
     })
 

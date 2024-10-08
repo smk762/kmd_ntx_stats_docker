@@ -1,6 +1,7 @@
 
 #### SEEDNODES 
 import time
+import datetime
 from datetime import datetime as dt
 from datetime import timezone
 
@@ -96,7 +97,7 @@ def get_seednode_version_date_table(request):
         table_data.append(notary_row)
     return {
         "start": start,
-        "date": dt.utcfromtimestamp(end).strftime('%a %-d %B %Y'),
+        "date": dt.fromtimestamp(end, datetime.UTC).strftime('%a %-d %B %Y'),
         "end": end,
         "headers": table_headers,
         "table_data": table_data,
@@ -140,8 +141,8 @@ def get_seednode_version_month_table(request):
             })
             table_data.append(notary_row)
         return {
-            "date_ts": dt.utcfromtimestamp(end).strftime('%m-%Y'),
-            "date": dt.utcfromtimestamp(end).strftime('%b %Y'),
+            "date_ts": dt.fromtimestamp(end, datetime.UTC).strftime('%m-%Y'),
+            "date": dt.fromtimestamp(end, datetime.UTC).strftime('%b %Y'),
             "headers": table_headers,
             "table_data": table_data,
             "scores": default_scores

@@ -3,6 +3,7 @@ import time
 import requests
 from django.shortcuts import render
 from django.contrib import messages
+import datetime
 from datetime import datetime as dt
 
 from kmd_ntx_api.const import SINCE_INTERVALS, SMARTCHAINS
@@ -205,7 +206,7 @@ def faucet_view(request):
                 "coin": item[1],
                 "address": item[2],
                 "timestamp": item[3],
-                "time_sent": dt.utcfromtimestamp(item[3]),
+                "time_sent": dt.fromtimestamp(item[3], datetime.UTC),
                 "amount": item[4],
                 "txid": item[5],
                 "status": item[6]
