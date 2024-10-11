@@ -8,7 +8,7 @@ from typing import List, Dict, Optional
 from decimal import *
 from datetime import datetime as dt
 import datetime
-from const_seasons import SEASONS_INFO, get_season_from_ts
+from const_seasons import SEASONS
 from lib_const import *
 from decorators import *
 from models import mined_row, daily_mined_count_row, season_mined_count_row
@@ -79,7 +79,7 @@ def update_mined_rows(rescan_blocks: List[int], coin: str = "KMD", prices: Optio
         row.diff = blockinfo['difficulty']
         row.block_height = block
         
-        season = get_season_from_ts(row.block_time)['season']
+        season = SEASONS.get_season_from_ts(row.block_time)['season']
         date = format_date(row.block_time)
 
         logger.info(f"Processing block {block} from {season} on {date}")
@@ -141,8 +141,8 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
         prices = {}
 
     if season != "since_genesis":
-        season_notaries = SEASONS_INFO[season]["notaries"]
-        season_start_dt = dt.fromtimestamp(SEASONS_INFO[season]["start_time"], datetime.UTC)
+        season_notaries = SEASONS.INFO[season]["notaries"]
+        season_start_dt = dt.fromtimestamp(SEASONS.INFO[season]["start_time"], datetime.UTC)
         start = season_start_dt.date()
     else:
         start = datetime.date(2016, 9, 13)
@@ -218,11 +218,11 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
 #Todo: calc YTD mined btc/usd value
 @print_runtime
 def update_mined_count_season_table(season):
-    season_notaries = SEASONS_INFO[season]["notaries"]
+    season_notaries = SEASONS.INFO[season]["notaries"]
 
     for item in get_season_mined_counts(season):
-        if item[0] in SEASONS_INFO[season]["notaries"]:
-            if item[1] not in SEASONS_INFO[season]["servers"]["KMD"]["addresses"]["KMD"]:
+        if item[0] in SEASONS.INFO[season]["notaries"]:
+            if item[1] not in SEASONS.INFO[season]["servers"]["KMD"]["addresses"]["KMD"]:
                 continue
 
         if item[1] in KNOWN_ADDRESSES or int(item[2]) > 25:

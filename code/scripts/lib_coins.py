@@ -4,7 +4,7 @@ import time
 import requests
 from lib_api import *
 from lib_const import *
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from lib_helper import *
 from lib_validate import *
 from lib_query import *
@@ -209,10 +209,10 @@ def get_dpow_tenure(coins_data):
                 server = notarised_tenure["server"]
                 logger.info(f"[get_dpow_tenure] adding dpow_tenure data to {coin} {season} {server}")
 
-                if season in SEASONS_INFO:
+                if season in SEASONS.INFO:
 
-                    season_start_time = SEASONS_INFO[season]["start_time"]
-                    season_end_time = SEASONS_INFO[season]["end_time"]
+                    season_start_time = SEASONS.INFO[season]["start_time"]
+                    season_end_time = SEASONS.INFO[season]["end_time"]
 
                     if season not in coins_data[coin]["dpow_tenure"]:
                         coins_data[coin]["dpow_tenure"].update({season:{}})
@@ -223,16 +223,16 @@ def get_dpow_tenure(coins_data):
                     coins_data[coin]["dpow_tenure"][season][server].update({"start_time":season_start_time})
                     coins_data[coin]["dpow_tenure"][season][server].update({"end_time":season_end_time})
 
-                    if season in SCORING_EPOCHS_REPO_DATA:
-                        if server in SCORING_EPOCHS_REPO_DATA[season]["Servers"]:
-                            if coin in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server]:
+                    if season in SEASONS.epochs_repo_data:
+                        if server in SEASONS.epochs_repo_data[season]["Servers"]:
+                            if coin in SEASONS.epochs_repo_data[season]["Servers"][server]:
 
-                                if "start_time" in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]:
-                                    start_time = SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]["start_time"]
+                                if "start_time" in SEASONS.epochs_repo_data[season]["Servers"][server][coin]:
+                                    start_time = SEASONS.epochs_repo_data[season]["Servers"][server][coin]["start_time"]
                                     coins_data[coin]["dpow_tenure"][season][server].update({"start_time":start_time})
 
-                                if "end_time" in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]:
-                                    end_time = SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]["end_time"]
+                                if "end_time" in SEASONS.epochs_repo_data[season]["Servers"][server][coin]:
+                                    end_time = SEASONS.epochs_repo_data[season]["Servers"][server][coin]["end_time"]
                                     coins_data[coin]["dpow_tenure"][season][server].update({"end_time":end_time})
 
     return coins_data

@@ -6,7 +6,6 @@ import lib_db
 import lib_ntx
 import lib_helper as helper
 from decorators import print_runtime
-from const_seasons import get_season_from_ts
 from logger import logger
 
 

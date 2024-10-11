@@ -2,7 +2,7 @@
 import pytest
 import math
 from lib_const import *
-from const_seasons import SEASONS_INFO, get_season_from_ts, EXCLUDED_SEASONS
+from const_seasons import SEASONS
 import lib_api
 import lib_coins
 import lib_const
@@ -438,26 +438,26 @@ class TestLibElectrum:
 class TestLibEpochs:
     def test_get_ntx_tenure(self):
         tenure = lib_epochs.get_ntx_tenure("Season_5", "Main", "OOT")
-        assert tenure.official_start_block_time >= SEASONS_INFO["Season_5"]["servers"]["Main"]["epochs"]["Epoch_0"]["start_time"]
-        assert tenure.official_start_block_time <= SEASONS_INFO["Season_5"]["servers"]["Main"]["epochs"]["Epoch_0"]["end_time"]
+        assert tenure.official_start_block_time >= SEASONS.INFO["Season_5"]["servers"]["Main"]["epochs"]["Epoch_0"]["start_time"]
+        assert tenure.official_start_block_time <= SEASONS.INFO["Season_5"]["servers"]["Main"]["epochs"]["Epoch_0"]["end_time"]
         tenure = lib_epochs.get_ntx_tenure("Season_5", "Main", "CLC")
-        assert tenure.official_start_block_time >= SEASONS_INFO["Season_5"]["servers"]["Main"]["epochs"]["Epoch_2"]["start_time"]
-        assert tenure.official_start_block_time <= SEASONS_INFO["Season_5"]["servers"]["Main"]["epochs"]["Epoch_2"]["end_time"]
+        assert tenure.official_start_block_time >= SEASONS.INFO["Season_5"]["servers"]["Main"]["epochs"]["Epoch_2"]["start_time"]
+        assert tenure.official_start_block_time <= SEASONS.INFO["Season_5"]["servers"]["Main"]["epochs"]["Epoch_2"]["end_time"]
         tenure = lib_epochs.get_ntx_tenure("Season_5", "Third_Party", "MIL")
-        assert tenure.official_start_block_time >= SEASONS_INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_4"]["start_time"]
-        assert tenure.official_start_block_time <= SEASONS_INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_4"]["end_time"]
+        assert tenure.official_start_block_time >= SEASONS.INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_4"]["start_time"]
+        assert tenure.official_start_block_time <= SEASONS.INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_4"]["end_time"]
         tenure = lib_epochs.get_ntx_tenure("Season_5", "Third_Party", "GLEEC-OLD")
-        assert tenure.official_start_block_time >= SEASONS_INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_0"]["start_time"]
-        assert tenure.official_start_block_time <= SEASONS_INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_3"]["end_time"]
+        assert tenure.official_start_block_time >= SEASONS.INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_0"]["start_time"]
+        assert tenure.official_start_block_time <= SEASONS.INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_3"]["end_time"]
 
     def test_get_dpow_scoring_window(self):
         window = lib_epochs.get_dpow_scoring_window("Season_5", "Third_Party", "MIL")
-        assert window[0] == SEASONS_INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_4"]["start_time"]
-        assert window[1] == SEASONS_INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_4"]["end_time"]
+        assert window[0] == SEASONS.INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_4"]["start_time"]
+        assert window[1] == SEASONS.INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_4"]["end_time"]
 
         window = lib_epochs.get_dpow_scoring_window("Season_5", "Third_Party", "GLEEC-OLD")
-        assert window[0] == SEASONS_INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_0"]["start_time"]
-        assert window[1] == SEASONS_INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_2"]["end_time"]
+        assert window[0] == SEASONS.INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_0"]["start_time"]
+        assert window[1] == SEASONS.INFO["Season_5"]["servers"]["Third_Party"]["epochs"]["Epoch_2"]["end_time"]
 
 
 class TestLibHelper:
@@ -691,10 +691,10 @@ class TestLibValidate:
         assert lib_validate.get_coin_epoch_score_at("Season_5", "Third_Party", "GLEEC-OLD", 1647120740) == 0
 
     def test_get_season(self):
-        assert get_season_from_ts(1623683000)['season'] == "Season_5"
-        assert get_season_from_ts(1647480279)['season'] == "Season_5"
-        assert get_season_from_ts(1623683000000)['season'] == "Season_5"
-        assert get_season_from_ts(5623683000)['season'] == "Unofficial"
+        assert SEASONS.get_season_from_ts(1623683000)['season'] == "Season_5"
+        assert SEASONS.get_season_from_ts(1647480279)['season'] == "Season_5"
+        assert SEASONS.get_season_from_ts(1623683000000)['season'] == "Season_5"
+        assert SEASONS.get_season_from_ts(5623683000)['season'] == "Unofficial"
 
     def test_get_coin_server(self):
         assert lib_validate.get_dpow_coin_server("GLEEC_OLD", "Season_8") == "Main"
@@ -702,14 +702,14 @@ class TestLibValidate:
         assert lib_validate.get_dpow_coin_server("KMD", "Season_8") == "KMD"
 
     def test_check_notarised_epochs(self):
-        for season in SEASONS_INFO:
-            if season not in EXCLUDED_SEASONS:
+        for season in SEASONS.INFO:
+            if season not in SEASONS.EXCLUDED:
                 notarised_server_epoch_coins = lib_query.get_notarised_server_epoch_coins(season)
                 notarised_server_epoch_scores = lib_query.get_notarised_server_epoch_scores(season)
 
-                for server in SEASONS_INFO[season]["servers"]:
-                    for epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:
-                        epoch_data = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]
+                for server in SEASONS.INFO[season]["servers"]:
+                    for epoch in SEASONS.INFO[season]["servers"][server]["epochs"]:
+                        epoch_data = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]
                         epoch_start = epoch_data["start_time"]
                         epoch_end = epoch_data["end_time"]
                         epoch_coins = epoch_data["coins"]

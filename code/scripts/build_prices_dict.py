@@ -3,7 +3,7 @@ import requests
 import sys
 import json
 import time
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from lib_const import *
 from lib_api import get_kmd_price
 import datetime
@@ -20,12 +20,12 @@ except Exception as e:
 for season in ["Season_8"]:
     if season not in prices:
         prices.update({season: {}})
-    season_start_dt = dt.fomtimestamp(SEASONS_INFO[season]["start_time"], datetime.UTC)
-    season_end_dt = dt.fromtimestamp(SEASONS_INFO[season]["end_time"], datetime.UTC)
+    season_start_dt = dt.fomtimestamp(SEASONS.INFO[season]["start_time"], datetime.UTC)
+    season_end_dt = dt.fromtimestamp(SEASONS.INFO[season]["end_time"], datetime.UTC)
     start = season_start_dt.date()
     end = datetime.date.today()
 
-    if time.time() > SEASONS_INFO[season]["end_time"]:
+    if time.time() > SEASONS.INFO[season]["end_time"]:
         end = season_end_dt.date()
 
     while start <= end:

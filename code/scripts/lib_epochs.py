@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.12
 import json
-from const_seasons import SEASONS_INFO, SCORING_EPOCHS_REPO_DATA
+from const_seasons import SEASONS
 from lib_update import *
 from lib_query import *
 import lib_validate
@@ -13,16 +13,16 @@ from logger import logger
 @print_runtime
 def preseason_populate_ntx_tenure(season):
     now = int(time.time())
-    s_start = SEASONS_INFO[season]["start_time"]
-    if now < SEASONS_INFO[season]["start_time"] and s_start - now < 604800:
+    s_start = SEASONS.INFO[season]["start_time"]
+    if now < SEASONS.INFO[season]["start_time"] and s_start - now < 604800:
         row = ntx_tenure_row()
         row.coin = coin
         row.first_ntx_block = 0
         row.last_ntx_block = 0
-        row.first_ntx_block_time = SEASONS_INFO[season]["start_block"]
-        row.last_ntx_block_time = SEASONS_INFO[season]["end_block"]
-        row.official_start_block_time = SEASONS_INFO[season]["start_time"]
-        row.official_end_block_time = SEASONS_INFO[season]["end_time"]
+        row.first_ntx_block_time = SEASONS.INFO[season]["start_block"]
+        row.last_ntx_block_time = SEASONS.INFO[season]["end_block"]
+        row.official_start_block_time = SEASONS.INFO[season]["start_time"]
+        row.official_end_block_time = SEASONS.INFO[season]["end_time"]
         row.scored_ntx_count = 0
         row.unscored_ntx_count = 0
         row.season = season
@@ -85,20 +85,20 @@ def get_ntx_tenure(season, server, coin):
 @print_runtime
 def update_tenure(season):
     now = int(time.time())
-    if season in SEASONS_INFO:
-        for server in SEASONS_INFO[season]["servers"]:
-            s_start = SEASONS_INFO[season]["start_time"]
+    if season in SEASONS.INFO:
+        for server in SEASONS.INFO[season]["servers"]:
+            s_start = SEASONS.INFO[season]["start_time"]
 
-            if now < SEASONS_INFO[season]["start_time"] and s_start - now < 604800:
+            if now < SEASONS.INFO[season]["start_time"] and s_start - now < 604800:
 
                 logger.info("Pre-season epoch pop!")
-                if server in NEXT_SEASON_COINS:
-                    season_server_coins = NEXT_SEASON_COINS[server]
+                if server in SEASONS.NEXT_COINS:
+                    season_server_coins = SEASONS.NEXT_COINS[server]
                 else:
                     season_server_coins = []
 
             else:
-                season_server_coins = SEASONS_INFO[season]["servers"][server]["coins"]
+                season_server_coins = SEASONS.INFO[season]["servers"][server]["coins"]
 
             for coin in season_server_coins:
                 update_ntx_tenure(season, server, coin)
@@ -109,27 +109,27 @@ def update_epochs(season):
     now = int(time.time())
     logger.info(f"Processing {season}...")
 
-    for server in SEASONS_INFO[season]["servers"]:
-        scoring_season_server_epochs = SEASONS_INFO[season]["servers"][server]["epochs"]
-        for epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:
+    for server in SEASONS.INFO[season]["servers"]:
+        scoring_season_server_epochs = SEASONS.INFO[season]["servers"][server]["epochs"]
+        for epoch in SEASONS.INFO[season]["servers"][server]["epochs"]:
             logger.info(f">>> Processing {season} {server} {epoch} epoch_row")
-            epoch_start = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["start_time"]
-            epoch_end = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["end_time"]
+            epoch_start = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]["start_time"]
+            epoch_end = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]["end_time"]
             epoch_midpoint = int((epoch_start + epoch_end)/2)
-            s_start = SEASONS_INFO[season]["start_time"]
+            s_start = SEASONS.INFO[season]["start_time"]
 
-            if now < SEASONS_INFO[season]["start_time"] and s_start - now < 604800:
+            if now < SEASONS.INFO[season]["start_time"] and s_start - now < 604800:
 
                 logger.info("Pre-season epoch pop!")
-                if server in NEXT_SEASON_COINS:
-                    active_coins = NEXT_SEASON_COINS[server]
+                if server in SEASONS.NEXT_COINS:
+                    active_coins = SEASONS.NEXT_COINS[server]
                     num_coins = len(active_coins)
                 else:
                     active_coins = []
                     num_coins = len(active_coins)
 
             else:
-                active_coins = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["coins"]
+                active_coins = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]["coins"]
                 num_coins = len(active_coins)
 
             active_coins.sort()
@@ -147,21 +147,21 @@ def update_epochs(season):
                     epoch_row.epoch_coins = [epoch_row.server]
                     epoch_row.start_event = "Season start"
 
-                elif isinstance(SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["start_event"], list):
+                elif isinstance(SEASONS.INFO[season]["servers"][server]["epochs"][epoch]["start_event"], list):
                     epoch_row.start_event = ", ".join(scoring_season_server_epochs[epoch]["start_event"]) 
 
                 else:
-                    epoch_row.start_event = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["start_event"]
+                    epoch_row.start_event = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]["start_event"]
 
 
                 if epoch_row.server in ["KMD", "BTC", "LTC"]:
                     epoch_row.end_event = "Season end"
 
-                elif isinstance(SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["end_event"], list):
-                    epoch_row.end_event = ", ".join(SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["end_event"])
+                elif isinstance(SEASONS.INFO[season]["servers"][server]["epochs"][epoch]["end_event"], list):
+                    epoch_row.end_event = ", ".join(SEASONS.INFO[season]["servers"][server]["epochs"][epoch]["end_event"])
 
                 else:
-                    epoch_row.end_event = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["end_event"]
+                    epoch_row.end_event = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]["end_event"]
 
                 if len(epoch_row.epoch_coins) != 0:
                     epoch_row.score_per_ntx = lib_validate.calc_epoch_score(server, num_coins)
@@ -176,18 +176,18 @@ def get_dpow_scoring_window(season, server, coin):
     official_start = None
     official_end = None
 
-    if season in SEASONS_INFO:
-        official_start = SEASONS_INFO[season]["start_time"]
-        official_end = SEASONS_INFO[season]["end_time"] - 1
+    if season in SEASONS.INFO:
+        official_start = SEASONS.INFO[season]["start_time"]
+        official_end = SEASONS.INFO[season]["end_time"] - 1
 
-    if season in SCORING_EPOCHS_REPO_DATA:
-        if server in SCORING_EPOCHS_REPO_DATA[season]["Servers"]:
-            if coin in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server]:
+    if season in SEASONS.epochs_repo_data:
+        if server in SEASONS.epochs_repo_data[season]["Servers"]:
+            if coin in SEASONS.epochs_repo_data[season]["Servers"][server]:
 
-                if "start_time" in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]:
-                    official_start = SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]["start_time"]
-                if "end_time" in SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]:
-                    official_end = SCORING_EPOCHS_REPO_DATA[season]["Servers"][server][coin]["end_time"] - 1
+                if "start_time" in SEASONS.epochs_repo_data[season]["Servers"][server][coin]:
+                    official_start = SEASONS.epochs_repo_data[season]["Servers"][server][coin]["start_time"]
+                if "end_time" in SEASONS.epochs_repo_data[season]["Servers"][server][coin]:
+                    official_end = SEASONS.epochs_repo_data[season]["Servers"][server][coin]["end_time"] - 1
 
     scored_list, unscored_list = get_ntx_scored(season, server, coin, official_start, official_end)
     return official_start, official_end, scored_list, unscored_list
@@ -196,12 +196,12 @@ def get_dpow_scoring_window(season, server, coin):
 # Update notarised table epochs and score value
 @print_runtime
 def update_notarised_epoch_scoring(season):
-    for server in SEASONS_INFO[season]["servers"]:
-        for epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:
+    for server in SEASONS.INFO[season]["servers"]:
+        for epoch in SEASONS.INFO[season]["servers"][server]["epochs"]:
 
-            epoch_start = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]['start_time']
-            epoch_end = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]['end_time']
-            epoch_coins = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]['coins']
+            epoch_start = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]['start_time']
+            epoch_end = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]['end_time']
+            epoch_coins = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]['coins']
             if season.find("Testnet") != -1:
                 score_per_ntx = 1
             else:
@@ -236,7 +236,7 @@ def delete_invalid_servers():
 
 def delete_invalid_seasons():
 
-    for season in EXCLUDED_SEASONS:
+    for season in SEASONS.excluded:
         logger.info(f"Deleting invalid season {season} from [ntx_tenure] table (excluded season)...")
         row = ntx_tenure_row()
         row.delete(season)
@@ -245,8 +245,8 @@ def delete_invalid_seasons():
         row = scoring_epoch_row()
         row.delete(season) 
 
-    for season in SEASONS_INFO:
-        if season not in SCORING_EPOCHS_REPO_DATA and season not in EXCLUDED_SEASONS:
+    for season in SEASONS.INFO:
+        if season not in SEASONS.epochs_repo_data and season not in SEASONS.excluded:
             logger.info(f"Deleting invalid season {season} from [scoring_epochs] table (not in scoring epochs)...")
             row = scoring_epoch_row()
             row.delete(season)

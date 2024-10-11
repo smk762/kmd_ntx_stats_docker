@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.12
 import lib_helper
 from lib_const import *
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from lib_query_ntx import *
 from lib_filter import *
 from decorators import print_runtime
@@ -93,13 +93,13 @@ def select_from_table(table, cols, conditions=None):
 
 
 def get_season_mined_counts(season):
-    end_time = SEASONS_INFO[season]['end_time']
+    end_time = SEASONS.INFO[season]['end_time']
     if lib_helper.is_postseason():
-        if 'post_season_end_time' in SEASONS_INFO[season]:
-            end_time = SEASONS_INFO[season]['post_season_end_time']
+        if 'post_season_end_time' in SEASONS.INFO[season]:
+            end_time = SEASONS.INFO[season]['post_season_end_time']
 
     sql = "SELECT name, address, COUNT(*), SUM(value), MAX(value), max(block_time), \
-           max(block_height) FROM mined WHERE block_time >= "+str(SEASONS_INFO[season]['start_time'])+" \
+           max(block_height) FROM mined WHERE block_time >= "+str(SEASONS.INFO[season]['start_time'])+" \
            AND block_time <= "+str(end_time)+" GROUP BY name, address;"
 
     CURSOR.execute(sql)

@@ -108,6 +108,7 @@ COIN_PARAMS = {
     "LTC": LTC_CoinParams,
     "AYA": AYA_CoinParams,
     "EMC2": EMC2_CoinParams,
+    "HUSH3": KMD_CoinParams,
     "GAME": GAME_CoinParams
 }
 

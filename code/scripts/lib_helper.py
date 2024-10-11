@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.12
 from lib_const import *
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from lib_urls import *
 
 
@@ -95,34 +95,34 @@ def is_notary_ltc_address(addr):
 def get_active_seasons(timestamp=None):
     active_seasons = []
     if not timestamp: timestamp = int(time.time())
-    for season in SEASONS_INFO:
-        if timestamp >= SEASONS_INFO[season]["start_time"]:
-            if "end_time" in SEASONS_INFO[season]:
-                if timestamp <= SEASONS_INFO[season]["end_time"]:
+    for season in SEASONS.INFO:
+        if timestamp >= SEASONS.INFO[season]["start_time"]:
+            if "end_time" in SEASONS.INFO[season]:
+                if timestamp <= SEASONS.INFO[season]["end_time"]:
                     active_seasons.append(season)
-            if "post_season_end_time" in SEASONS_INFO[season]:
-                if timestamp <= SEASONS_INFO[season]["post_season_end_time"]:
+            if "post_season_end_time" in SEASONS.INFO[season]:
+                if timestamp <= SEASONS.INFO[season]["post_season_end_time"]:
                     active_seasons.append(season)
-        elif timestamp + 86400 * 7 >= SEASONS_INFO[season]["start_time"]:
+        elif timestamp + 86400 * 7 >= SEASONS.INFO[season]["start_time"]:
             active_seasons.append(season)
     return active_seasons
 
 
 def is_postseason(timestamp=None, block=None):
     if block:
-        for season in SEASONS_INFO:
-            if "post_season_end_block" in SEASONS_INFO[season]:
-                if block >= SEASONS_INFO[season]["end_block"]:
-                    if block <= SEASONS_INFO[season]["post_season_end_block"]:
+        for season in SEASONS.INFO:
+            if "post_season_end_block" in SEASONS.INFO[season]:
+                if block >= SEASONS.INFO[season]["end_block"]:
+                    if block <= SEASONS.INFO[season]["post_season_end_block"]:
                         return True
         
 
     if not timestamp:
         timestamp = int(time.time())
-    for season in SEASONS_INFO:
-        if "post_season_end_time" in SEASONS_INFO[season]:
-            if timestamp >= SEASONS_INFO[season]["end_time"]:
-                if timestamp <= SEASONS_INFO[season]["post_season_end_time"]:
+    for season in SEASONS.INFO:
+        if "post_season_end_time" in SEASONS.INFO[season]:
+            if timestamp >= SEASONS.INFO[season]["end_time"]:
+                if timestamp <= SEASONS.INFO[season]["post_season_end_time"]:
                     return True
     return False
 
@@ -135,30 +135,30 @@ def get_pubkeys(season, server):
 
 
 def get_address_from_notary(season, notary, coin):
-    if season in SEASONS_INFO:
-        for server in SEASONS_INFO[season]["servers"]:
-            if coin in SEASONS_INFO[season]["servers"][server]["addresses"]:
-                for address in SEASONS_INFO[season]["servers"][server]["addresses"][coin]:
-                    if SEASONS_INFO[season]["servers"][server]["addresses"][coin][address] == notary:
+    if season in SEASONS.INFO:
+        for server in SEASONS.INFO[season]["servers"]:
+            if coin in SEASONS.INFO[season]["servers"][server]["addresses"]:
+                for address in SEASONS.INFO[season]["servers"][server]["addresses"][coin]:
+                    if SEASONS.INFO[season]["servers"][server]["addresses"][coin][address] == notary:
                         return address
     return "Unknown"
 
 
 def has_season_started(season, by_block=False):
     now = time.time()
-    if season in SEASONS_INFO:
+    if season in SEASONS.INFO:
         if by_block:
-            if SEASONS_INFO[season]["start_block"] < now:
+            if SEASONS.INFO[season]["start_block"] < now:
                 return True
 
-        elif SEASONS_INFO[season]["start_time"] < now:
+        elif SEASONS.INFO[season]["start_time"] < now:
             return True
     return False
 
 
 def get_season_notaries(season):
-    if season in SEASONS_INFO:
-        notaries = SEASONS_INFO[season]["notaries"]
+    if season in SEASONS.INFO:
+        notaries = SEASONS.INFO[season]["notaries"]
         notaries.sort()
         return notaries
     return []
@@ -167,34 +167,34 @@ def get_season_notaries(season):
 def get_season_coins(season=None, server=None, epoch=None):
     coins = []
     if not season:
-        for season in SEASONS_INFO:
-            coins += SEASONS_INFO[season]["coins"]
+        for season in SEASONS.INFO:
+            coins += SEASONS.INFO[season]["coins"]
         coins = list(set(coins))
 
-    if season in SEASONS_INFO:
-        coins = SEASONS_INFO[season]["coins"]
+    if season in SEASONS.INFO:
+        coins = SEASONS.INFO[season]["coins"]
 
-        if server in SEASONS_INFO[season]["servers"]:
-            coins = SEASONS_INFO[season]["servers"][server]["coins"]
+        if server in SEASONS.INFO[season]["servers"]:
+            coins = SEASONS.INFO[season]["servers"][server]["coins"]
 
-            if epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:
-                coins = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]["coins"]
+            if epoch in SEASONS.INFO[season]["servers"][server]["epochs"]:
+                coins = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]["coins"]
     coins.sort()
     return coins
 
     
 def get_season_servers(season):
-    if season in SEASONS_INFO:
-        servers = list(SEASONS_INFO[season]["servers"].keys())
+    if season in SEASONS.INFO:
+        servers = list(SEASONS.INFO[season]["servers"].keys())
         servers.sort()
         return servers
     return []
 
 
 def get_season_server_epochs(season, server):
-    if season in SEASONS_INFO:
-        if server in SEASONS_INFO[season]["servers"]:
-            epochs = list(SEASONS_INFO[season]["servers"][server]["epochs"].keys())
+    if season in SEASONS.INFO:
+        if server in SEASONS.INFO[season]["servers"]:
+            epochs = list(SEASONS.INFO[season]["servers"][server]["epochs"].keys())
             epochs.sort()
             return epochs
     return []

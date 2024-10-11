@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.12
 from lib_const import *
-from const_seasons import SEASONS_INFO, EXCLUDED_SEASONS
+from const_seasons import SEASONS
 from lib_wallet import get_balances, delete_stale_balances
 import lib_helper as helper
 

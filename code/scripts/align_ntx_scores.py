@@ -6,6 +6,7 @@ from decorators import print_runtime
 import lib_ntx
 import lib_update_ntx
 from logger import logger
+from const_seasons import SEASONS
 
 '''
 At the end of a season (or after an epoch change), the ntx scores may need to be realigned to the new epoch scores.
@@ -13,10 +14,10 @@ This script will do that.
 TODO: Use SEASONS
 '''
 
-scoring_epochs = get_scoring_epochs_repo_data()
+scoring_epochs = SEASONS.epochs_repo_data
 
 coin_ranges = {}
-epochs = populate_epochs()
+epochs = SEASONS.epochs
 for season in ["Season_8"]:
     for server in epochs[season]:
         if server not in coin_ranges:

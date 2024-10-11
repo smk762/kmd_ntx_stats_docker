@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.12
 import sys
 from lib_dpow_const import RESCAN_SEASON
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from lib_helper import get_active_seasons
 from lib_mining import update_mined_table, update_mined_count_daily_table, update_mined_count_season_table
 from decorators import print_runtime
@@ -26,7 +26,7 @@ def run_updates(seasons):
         for season in seasons:
             logger.info(f"Getting mined blocks for {season}")
             if RESCAN_SEASON:
-                update_mined_table(season, "KMD", SEASONS_INFO[season]["start_block"])
+                update_mined_table(season, "KMD", SEASONS.INFO[season]["start_block"])
                 update_mined_count_daily_table(season, True)
             else:
                 update_mined_table(season)
@@ -40,7 +40,7 @@ if __name__ == "__main__":
             RESCAN_SEASON = True
 
         if sys.argv[1] == "all":
-            seasons = SEASONS_INFO.keys()
+            seasons = SEASONS.INFO.keys()
 
         if sys.argv[1] == "since_genesis":
             seasons = "since_genesis"

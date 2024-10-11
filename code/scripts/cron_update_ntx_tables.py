@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.12
 import sys
 from lib_const import *
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 import lib_helper as helper
 from decorators import print_runtime
 import lib_ntx
@@ -13,7 +13,7 @@ After updaing the "notarised" table, aggregations are performed to get counts fo
 It is intended to be run as a cronjob every 15-30 min
 Script runtime is around 5-10 mins, except for initial population which is up to 1 day per season
 '''
-#logger.info(SEASONS_INFO)
+#logger.info(SEASONS.INFO)
 
 @print_runtime
 def update_ntx_tables(seasons, rescan=False):
@@ -58,7 +58,7 @@ if __name__ == "__main__":
             CLEAN_UP = True
         elif "all" in sys.argv:
             FULL_SCAN = True
-            seasons = SEASONS_INFO.keys()
+            seasons = SEASONS.INFO.keys()
         elif "season" in sys.argv:
             seasons = [sys.argv[2]]
 

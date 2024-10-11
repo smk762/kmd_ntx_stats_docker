@@ -17,7 +17,7 @@ import lib_validate as validate
 from decorators import print_runtime
 from lib_const import *
 from lib_dpow_const import noMoM
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from models import *
 from logger import logger
 
@@ -30,14 +30,14 @@ class Notarised:
         self.chain_tip = int(RPC["KMD"].getblockcount())
         self.start_block = self._determine_start_block()
         self.end_block = (
-            SEASONS_INFO[self.season].get("post_season_end_block") or
-            SEASONS_INFO[self.season]["end_block"]
+            SEASONS.INFO[self.season].get("post_season_end_block") or
+            SEASONS.INFO[self.season]["end_block"]
         )
         self.chain_tip = min(self.chain_tip, self.end_block)
 
     def _determine_start_block(self):
         """Determine the starting block based on the rescan flag."""
-        return self.chain_tip - 24 * 60 if not self.rescan else SEASONS_INFO[self.season]["start_block"]
+        return self.chain_tip - 24 * 60 if not self.rescan else SEASONS.INFO[self.season]["start_block"]
 
     @print_runtime
     def update_table(self):
@@ -260,16 +260,16 @@ class NtxDailyStats:
 
     def get_dpow_coins(self, server_type):
         """Retrieve the coins associated with the specified server type."""
-        return SEASONS_INFO[self.season]["servers"].get(server_type, {}).get("coins", [])
+        return SEASONS.INFO[self.season]["servers"].get(server_type, {}).get("coins", [])
 
     def update_daily_ntx_tables(self):
         """Update daily notarised tables for the specified season."""
-        season_start_dt = dt.fromtimestamp(SEASONS_INFO[self.season]["start_time"], datetime.UTC)
-        season_end_dt = dt.fromtimestamp(SEASONS_INFO[self.season]["end_time"], datetime.UTC)
+        season_start_dt = dt.fromtimestamp(SEASONS.INFO[self.season]["start_time"], datetime.UTC)
+        season_end_dt = dt.fromtimestamp(SEASONS.INFO[self.season]["end_time"], datetime.UTC)
         start = season_start_dt.date()
         end = datetime.date.today()
 
-        if time.time() > SEASONS_INFO[self.season]["end_time"]:
+        if time.time() > SEASONS.INFO[self.season]["end_time"]:
             end = season_end_dt.date()
 
         if not self.rescan:
@@ -388,7 +388,7 @@ class LastNotarisations:
         self.ntx_coin_last = {}
         self.last_nota = {}
 
-        if self.season in SEASONS_INFO:
+        if self.season in SEASONS.INFO:
             self.season_last_ntx = query.get_notary_last_ntx()
             self.last_ntx_data = query.get_coin_last_ntx()
             self.notarised_last_data = query.get_notarised_last_data_by_coin()
@@ -396,7 +396,7 @@ class LastNotarisations:
     @print_runtime
     def update_coin_table(self):
         """Update the coin table with the latest notarization information."""
-        for coin in SEASONS_INFO[self.season]["coins"]:
+        for coin in SEASONS.INFO[self.season]["coins"]:
             self.initialize_coin_data(coin)
             row = self.get_coin_last_ntx_row_rowdata(coin)
 
@@ -444,16 +444,16 @@ class LastNotarisations:
     @print_runtime
     def update_notary_table(self):
         """Update the notary table with the latest notarization information."""
-        for notary in SEASONS_INFO[self.season]["notaries"]:
+        for notary in SEASONS.INFO[self.season]["notaries"]:
             self.initialize_notary_data(notary)
 
             self.last_nota[notary] = query.get_notary_coin_last_nota(self.season, notary)
 
-            for coin in SEASONS_INFO[self.season]["coins"]:
+            for coin in SEASONS.INFO[self.season]["coins"]:
                 self.initialize_coin_for_notary(notary, coin)
 
-        for notary in SEASONS_INFO[self.season]["notaries"]:
-            for coin in SEASONS_INFO[self.season]["coins"]:
+        for notary in SEASONS.INFO[self.season]["notaries"]:
+            for coin in SEASONS.INFO[self.season]["coins"]:
                 row = self.get_notary_last_ntx_row_rowdata(notary, coin)
                 if row:
                     row.update()
@@ -650,7 +650,7 @@ class NtxSeasonStats:
 
     @print_runtime
     def update_ntx_season_stats_tables(self):
-        if self.season in SEASONS_INFO:
+        if self.season in SEASONS.INFO:
             self.build_season_ntx_dict()
             self.update_rows(self.season_coins, self.get_coin_row)
             self.update_rows(self.season_notaries, self.get_notary_row)
@@ -696,7 +696,7 @@ class NtxSeasonStats:
 
 
     def add_scores_counts(self):
-        total_notaries = len(SEASONS_INFO[self.season]['notaries'])
+        total_notaries = len(SEASONS.INFO[self.season]['notaries'])
         
         for i, notary in enumerate(self.season_notaries, start=1):
             logger.info(f"[season_totals] {self.season} {i}/{total_notaries}: {notary}")

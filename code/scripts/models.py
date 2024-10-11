@@ -1,7 +1,7 @@
 import datetime
 from datetime import datetime as dt
 from lib_const import *
-from const_seasons import SEASONS_INFO, get_season_from_ts, EXCLUDED_SEASONS
+from const_seasons import SEASONS
 from lib_helper import *
 import lib_validate
 import lib_crypto
@@ -210,7 +210,7 @@ class tx_row():
         if self.notary.find("linked") != -1:
             self.notary = lib_validate.get_name_from_address(self.address)
 
-        self.season = get_season_from_ts(self.block_time)['season']
+        self.season = SEASONS.get_season_from_ts(self.block_time)['season']
 
         row_data = (self.txid, self.block_hash, self.block_height,
                     self.block_time, self.block_datetime, self.address,
@@ -408,7 +408,7 @@ class ltc_tx_row():
         if self.notary.find("linked") != -1:
             self.notary = lib_validate.get_name_from_address(self.address)
 
-        self.season = get_season_from_ts(self.block_time)['season']
+        self.season = SEASONS.get_season_from_ts(self.block_time)['season']
 
         row_data = (
             self.txid, self.block_hash, self.block_height,
@@ -1007,11 +1007,11 @@ class scoring_epoch_row():
         self.score_per_ntx = score_per_ntx
 
     def validated(self):
-        if self.season in EXCLUDED_SEASONS:
-            logger.warning(f"{self.season} in EXCLUDED_SEASONS")
+        if self.season in SEASONS.EXCLUDED:
+            logger.warning(f"{self.season} in SEASONS.EXCLUDED")
             return False
-        if self.server in EXCLUDED_SERVERS:
-            logger.warning(f"{self.server} in EXCLUDED_SERVERS")
+        if self.server in SEASONS.EXCLUDED:
+            logger.warning(f"{self.server} in SEASONS.EXCLUDED")
             return False
         epoch_coins_validated = lib_validate.validate_epoch_coins(
                                         self.epoch_coins, self.season)
@@ -1179,20 +1179,20 @@ class mined_row():
                 logger.warning(f"No value for {item}!")
                 return False
 
-        if self.season in SEASONS_INFO:
-            if self.name in SEASONS_INFO[self.season]["notaries"]:
-                if self.address not in SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]:
-                    logger.warning(f'{self.address} not in SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]')
-                    for season in SEASONS_INFO:
+        if self.season in SEASONS.INFO:
+            if self.name in SEASONS.INFO[self.season]["notaries"]:
+                if self.address not in SEASONS.INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]:
+                    logger.warning(f'{self.address} not in SEASONS.INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]')
+                    for season in SEASONS.INFO:
                         if season.find("Testnet") == -1:
-                            if "Main" in SEASONS_INFO[season]["servers"]:
-                                if self.address in SEASONS_INFO[season]["servers"]["Main"]["addresses"]["KMD"]:
+                            if "Main" in SEASONS.INFO[season]["servers"]:
+                                if self.address in SEASONS.INFO[season]["servers"]["Main"]["addresses"]["KMD"]:
                                     self.season = season
                                     return True
         return True
 
     def update(self):
-        self.season = get_season_from_ts(self.block_time)['season']
+        self.season = SEASONS.get_season_from_ts(self.block_time)['season']
         self.name = lib_validate.get_name_from_address(self.address)
         self.category = lib_validate.get_category_from_name(self.name)
         self.block_datetime = dt.fromtimestamp(self.block_time, datetime.UTC)
@@ -1248,13 +1248,13 @@ class season_mined_count_row():
 
         
 
-        if self.name in SEASONS_INFO[self.season]["notaries"]:
-            if self.address not in SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]:
-                logger.warning(f'{self.address} not in SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]')
-                for season in SEASONS_INFO:
+        if self.name in SEASONS.INFO[self.season]["notaries"]:
+            if self.address not in SEASONS.INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]:
+                logger.warning(f'{self.address} not in SEASONS.INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]')
+                for season in SEASONS.INFO:
                     if season.find("Testnet") == -1:                        
-                        if "Main" in SEASONS_INFO[season]["servers"]:
-                            if self.address == SEASONS_INFO[season]["servers"]["Main"]["addresses"]["KMD"]:
+                        if "Main" in SEASONS.INFO[season]["servers"]:
+                            if self.address == SEASONS.INFO[season]["servers"]["Main"]["addresses"]["KMD"]:
                                 self.season = season
                                 return True
                 return False

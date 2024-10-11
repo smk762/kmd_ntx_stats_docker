@@ -2,7 +2,7 @@
 import sys
 import lib_epochs
 import lib_helper as helper
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from lib_const import *
 from decorators import print_runtime
 
@@ -17,7 +17,7 @@ def populate_epochs(season):
         lib_epochs.delete_invalid_servers()
         lib_epochs.delete_invalid_season_servers(season)
 
-        for server in SEASONS_INFO[season]["servers"]:
+        for server in SEASONS.INFO[season]["servers"]:
             lib_epochs.delete_invalid_season_server_coins(season, server)
 
     lib_epochs.update_tenure(season)
@@ -37,7 +37,7 @@ if __name__ == "__main__":
         if sys.argv[1] == "clean":
             CLEAN_UP = True
         if sys.argv[1] == "rescan":
-            seasons = SEASONS_INFO.keys()
+            seasons = SEASONS.INFO.keys()
 
     for season in seasons:
         populate_epochs(season)

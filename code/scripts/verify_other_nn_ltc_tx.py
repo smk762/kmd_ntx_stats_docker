@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 from logging import Handler, Formatter
 from lib_const import *
 from logger import logger
+from const_seasons import SEASONS
 
 load_dotenv()
 
@@ -49,7 +50,7 @@ formatter = LogstashFormatter()
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-season = SEASON
+season = SEASONS.current()
 
 r = requests.get(f"{THIS_SERVER}/api/info/notary_nodes/?season={season}")
 notaries = r.json()["results"]

@@ -4,7 +4,7 @@ import sys
 from os.path import expanduser, dirname, realpath
 import time
 import requests
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from lib_dpow_const import *
 from lib_db import *
 from lib_rpc import *
@@ -78,11 +78,11 @@ REVERSE_TRANSLATE_COINS = {
 KNOWN_NOTARIES = []
 KNOWN_ADDRESSES = {}
 
-for season in SEASONS_INFO:
-    KNOWN_NOTARIES += SEASONS_INFO[season]["notaries"]
-    for server in SEASONS_INFO[season]["servers"]:
-        for coin in SEASONS_INFO[season]["servers"][server]["addresses"]:
-            KNOWN_ADDRESSES.update(SEASONS_INFO[season]["servers"][server]["addresses"][coin])
+for season in SEASONS.INFO:
+    KNOWN_NOTARIES += SEASONS.INFO[season]["notaries"]
+    for server in SEASONS.INFO[season]["servers"]:
+        for coin in SEASONS.INFO[season]["servers"][server]["addresses"]:
+            KNOWN_ADDRESSES.update(SEASONS.INFO[season]["servers"][server]["addresses"][coin])
 
 KNOWN_ADDRESSES.update(NON_NOTARY_ADDRESSES)
 KNOWN_NOTARIES = list(set(KNOWN_NOTARIES))

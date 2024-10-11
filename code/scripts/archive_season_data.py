@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.12
 from lib_const import *
 from decorators import *
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from lib_query_ntx import select_from_notarised_tbl_where
 from lib_update_ntx import delete_from_notarised_tbl_where, update_ntx_row
 import lib_helper as helper
@@ -10,7 +10,7 @@ from logger import logger
 
 
 def archive_past_seasons(current_seasons=["Season_8"]):
-    for season in SEASONS_INFO:
+    for season in SEASONS.INFO:
         logger.info(season)
         if season not in current_seasons:
             logger.info(season)

@@ -13,7 +13,7 @@ from psycopg2.extras import execute_values
 
 from lib_helper import *
 
-from const_seasons import get_season_from_ts
+from const_seasons import SEASONS
 
 import lib_validate as validate
 import lib_electrum as electrum
@@ -349,7 +349,7 @@ def get_registered_nodes_from_db():
 def update_seednode_version_stats_row(row_data):
     try:
         timestamp = row_data[3]
-        season = get_season_from_ts(timestamp)['season']
+        season = SEASONS.get_season_from_ts(timestamp)['season']
         sql = f"INSERT INTO seednode_version_stats \
                     (name, season, version, timestamp, error, score) \
                 VALUES (%s, %s, %s, %s, %s, %s) \

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.12
 from models import *
 from lib_const import *
-from const_seasons import SEASONS_INFO, EXCLUDED_SEASONS
+from const_seasons import SEASONS
 from lib_helper import *
 from lib_validate import *
 from lib_query import *
@@ -15,10 +15,10 @@ tables = ["addresses", "balances", "coin_sync", "coins", "coin_social",
           "scoring_epochs", "vote2021"]
 
 for season in ["Season_8"]:
-    if season not in EXCLUDED_SEASONS:
-        for server in SEASONS_INFO[season]["servers"]:
-            for epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:
-                epoch_data = SEASONS_INFO[season]["servers"][server]["epochs"][epoch]
+    if season not in SEASONS.EXCLUDED:
+        for server in SEASONS.INFO[season]["servers"]:
+            for epoch in SEASONS.INFO[season]["servers"][server]["epochs"]:
+                epoch_data = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]
                 logger.info(epoch_data)
                 score_per_ntx = epoch_data["score_per_ntx"]
                 epoch_start = epoch_data["start_time"]
@@ -33,9 +33,17 @@ for season in ["Season_8"]:
                     if coin not in epoch_coins:
                         logger.warning(f"Invalid coin {coin} in notarised for {season} {server} {epoch}")
 
-                epoch_scores = get_notarised_server_epoch_scores(season, server, epoch)[server][epoch]
+                scores = get_notarised_server_epoch_scores(season, server, epoch)
+                logger.info(scores)
+                epoch_scores = {}
+                if server in scores:
+                    if epoch in scores[server]:
+                        epoch_scores = scores[server][epoch]
+                        
                 logger.info(epoch_scores)
                 logger.info(f"{len(epoch_scores)} ntx score for {season} {server} {epoch}")
+                if len(epoch_scores) == 0:
+                    continue
                 if len(epoch_scores) > 1:
                     logger.warning(f"Invalid epoch scores {epoch_scores} in notarised for {season} {server} {epoch}")
                 elif epoch_scores[0] != score_per_ntx:

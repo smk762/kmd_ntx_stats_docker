@@ -1,11 +1,11 @@
 #!/usr/bin/env python3.12
-from const_seasons import SEASONS_INFO, get_dpow_active_info
+from const_seasons import SEASONS
 from lib_crypto import get_addr_from_pubkey
 from notary_pubkeys import NOTARY_PUBKEYS
 
 RESCAN_SEASON = False
 RESCAN_CHUNK_SIZE = 10000
-CURRENT_SEASON, DPOW_COINS_ACTIVE, CURRENT_DPOW_COINS = get_dpow_active_info(SEASONS_INFO.keys())
+CURRENT_SEASON, DPOW_COINS_ACTIVE, CURRENT_DPOW_COINS = SEASONS.get_dpow_active_info()
 
 
 
@@ -167,7 +167,7 @@ ALL_SEASON_NOTARY_KMD_ADDRESSES = {}
 NOTARY_LTC_ADDRESSES = {}
 ALL_SEASON_NOTARY_LTC_ADDRESSES = {}
 
-for _season in SEASONS_INFO:
+for _season in SEASONS.INFO:
     for _coin in ["KMD", "BTC", "LTC"]:
 
         if _season not in NOTARY_BTC_ADDRESSES:
@@ -181,8 +181,8 @@ for _season in SEASONS_INFO:
 
         if _season in NOTARY_PUBKEYS:
 
-            for _server in SEASONS_INFO[_season]["servers"]:
-                _coins = SEASONS_INFO[_season]["servers"][_server]["coins"][:]
+            for _server in SEASONS.INFO[_season]["servers"]:
+                _coins = SEASONS.INFO[_season]["servers"][_server]["coins"][:]
 
                 if _server in ["Main", "Third_Party"]:
                     _coins.append("KMD")
@@ -190,7 +190,7 @@ for _season in SEASONS_INFO:
                     _coins.append("BTC")
 
                 for _coin in _coins:
-                    for _notary in SEASONS_INFO[_season]["notaries"]:
+                    for _notary in SEASONS.INFO[_season]["notaries"]:
 
                         if _server in ["BTC", "LTC", "KMD"]:
                             pubkey = NOTARY_PUBKEYS[_season]["Main"][_notary]
@@ -214,12 +214,12 @@ for _season in SEASONS_INFO:
                             NOTARY_LTC_ADDRESSES[_season].update({address: _notary})
                             ALL_SEASON_NOTARY_LTC_ADDRESSES.update({address: _notary})
 
-                        if _coin not in SEASONS_INFO[_season]["servers"][_server]["addresses"]:
-                            SEASONS_INFO[_season]["servers"][_server]["addresses"].update({
+                        if _coin not in SEASONS.INFO[_season]["servers"][_server]["addresses"]:
+                            SEASONS.INFO[_season]["servers"][_server]["addresses"].update({
                                 _coin: {}
                             })
 
-                        SEASONS_INFO[_season]["servers"][_server]["addresses"][_coin].update({
+                        SEASONS.INFO[_season]["servers"][_server]["addresses"][_coin].update({
                             address: _notary
                         })
 

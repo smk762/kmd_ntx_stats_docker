@@ -3,7 +3,7 @@ import sys
 
 from decorators import *
 from lib_const import *
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from lib_wallet import populate_addresses
 from logger import logger
 
@@ -20,7 +20,7 @@ def update_adresses(seasons):
 
     for season in seasons:
         logger.info(season)
-        for server in SEASONS_INFO[season]['servers']:
+        for server in SEASONS.INFO[season]['servers']:
             populate_addresses(season, server)
 
     CURSOR.close()
@@ -28,7 +28,7 @@ def update_adresses(seasons):
 
 
 if __name__ == "__main__":
-    seasons = list(SEASONS_INFO.keys())[::-1]
+    seasons = list(SEASONS.INFO.keys())[::-1]
     if len(sys.argv) > 1:
         if sys.argv[1] == "clean":
             CLEAN_UP = True

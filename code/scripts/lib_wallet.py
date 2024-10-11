@@ -12,7 +12,7 @@ import lib_api as api
 import lib_validate
 from lib_urls import *
 from lib_const import *
-from const_seasons import SEASONS_INFO, get_season_from_ts
+from const_seasons import SEASONS
 from lib_update import *
 from decorators import *
 from lib_rpc import RPC
@@ -28,9 +28,9 @@ script_path = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 @print_runtime
 def get_balances(season):
-    dpow_main_coins = SEASONS_INFO[season]["servers"]["Main"]["coins"]
-    if "Third_Party" in SEASONS_INFO[season]["servers"]:
-        dpow_3p_coins = SEASONS_INFO[season]["servers"]["Third_Party"]["coins"]
+    dpow_main_coins = SEASONS.INFO[season]["servers"]["Main"]["coins"]
+    if "Third_Party" in SEASONS.INFO[season]["servers"]:
+        dpow_3p_coins = SEASONS.INFO[season]["servers"]["Third_Party"]["coins"]
     else:
         dpow_3p_coins = []
 
@@ -42,15 +42,15 @@ def get_balances(season):
             address_data = requests.get(url).json()
 
             for server in address_data[season]:
-                if season in SEASONS_INFO:
-                    if server in SEASONS_INFO[season]["servers"]:
+                if season in SEASONS.INFO:
+                    if server in SEASONS.INFO[season]["servers"]:
 
-                        coins = SEASONS_INFO[season]["servers"][server]["coins"]
+                        coins = SEASONS.INFO[season]["servers"][server]["coins"]
                         coins += ["BTC", "KMD", "LTC"]
                         coins.sort()
                         logger.debug(f"{season} {server} {coins}")
                         
-                        for notary in SEASONS_INFO[season]["notaries"]:
+                        for notary in SEASONS.INFO[season]["notaries"]:
                             thread_list.update({notary:[]})
 
                             for coin in coins:
@@ -71,9 +71,9 @@ def get_balances(season):
 
 
 def populate_addresses(season, server):
-    if season in SEASONS_INFO:
-        if server in SEASONS_INFO[season]["servers"]:
-            coins = SEASONS_INFO[season]["servers"][server]["coins"]
+    if season in SEASONS.INFO:
+        if server in SEASONS.INFO[season]["servers"]:
+            coins = SEASONS.INFO[season]["servers"][server]["coins"]
             coins += ["BTC", "KMD", "LTC"]
             coins.sort()
 
@@ -222,7 +222,7 @@ def scan_blocks_for_rewards(scan_blocks, coin="KMD"):
     for block_height in scan_blocks:
         block = RPC[coin].getblock(str(block_height))
         block_time = block["time"]
-        season = get_season_from_ts(block_time)['season']
+        season = SEASONS.get_season_from_ts(block_time)['season']
         date = str(dt.fromtimestamp(block_time, datetime.UTC)).split(" ")[0]
         date = f"{date}".split("-")
         date.reverse()
@@ -283,7 +283,7 @@ def check_tx_for_rewards_info(coin, txid, block=None, prices=None):
         block_hash = block["hash"]
         block_time = block["time"]
         block_height = block["height"]
-    season = get_season_from_ts(block_time)['season']
+    season = SEASONS.get_season_from_ts(block_time)['season']
     date = str(dt.fromtimestamp(block_time, datetime.UTC)).split(" ")[0]
     date = f"{date}".split("-")
     date.reverse()

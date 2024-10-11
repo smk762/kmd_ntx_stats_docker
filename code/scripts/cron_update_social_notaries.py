@@ -4,9 +4,9 @@ import json
 import requests
 from logger import logger
 from lib_const import *
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from decorators import *
-from lib_helper import get_season_notaries, get_nn_region_split
+import lib_helper as helper
 from lib_urls import get_notary_nodes_repo_elected_nn_social_url, get_notary_addresses_url
 from models import nn_social_row
 from logger import logger
@@ -14,7 +14,7 @@ from logger import logger
 
 @print_runtime
 def generate_social_notaries_template(season):
-    notaries = get_season_notaries(season)
+    notaries = helper.get_season_notaries(season)
     try:
         repo_info = requests.get(get_notary_nodes_repo_elected_nn_social_url(season)).json()
     except Exception as e:
@@ -22,7 +22,7 @@ def generate_social_notaries_template(season):
         repo_info = {}
     template = {}
     for notary in notaries:
-        notary_name, region = get_nn_region_split(notary)
+        notary_name, region = helper.get_nn_region_split(notary)
         template.update({
             notary_name: {
                 "discord": "",
@@ -43,7 +43,7 @@ def generate_social_notaries_template(season):
                 template[notary_name].update({item:repo_info[notary_name][item]})
 
     for notary in notaries:
-        notary_name, notary_region = get_nn_region_split(notary)
+        notary_name, notary_region = helper.get_nn_region_split(notary)
         if notary_region not in template[notary_name]["regions"]:
             notary_addresses = requests.get(get_notary_addresses_url(season, notary)).json()
             template[notary_name]["regions"].update({
@@ -76,9 +76,9 @@ def populate_social_notaries(season):
         r = requests.get(url)
         elected_nn_social = r.json()
 
-        for notary in SEASONS_INFO[season]["notaries"]:
+        for notary in SEASONS.INFO[season]["notaries"]:
             nn_social = nn_social_row()
-            notary_name, region = get_nn_region_split(notary)
+            notary_name, region = helper.get_nn_region_split(notary)
             if notary_name in list(elected_nn_social.keys()):
 
                 for region in elected_nn_social[notary_name]['regions']:
@@ -148,7 +148,7 @@ def populate_social_notaries(season):
 
     except Exception as e:
         logger.warning(f"{url} returns 404? {e}")
-        for notary_name in SEASONS_INFO[season]["notaries"]:
+        for notary_name in SEASONS.INFO[season]["notaries"]:
             nn_social = nn_social_row()
             nn_social.notary = f"{notary_name}"
             nn_social.season = season
@@ -173,7 +173,7 @@ def remove_invalid_notaries(season):
     try:
         results = CURSOR.fetchall()
         for item in results:
-            if item[0] not in SEASONS_INFO[season]["notaries"]:
+            if item[0] not in SEASONS.INFO[season]["notaries"]:
                 sql = f"DELETE FROM nn_social WHERE notary = '{item[0]}' AND season = '{season}';"
                 logger.warning(f"Deleting [nn_social] row: {season} {item[0]}")
                 CURSOR.execute(sql)
@@ -183,7 +183,7 @@ def remove_invalid_notaries(season):
 
 
 if __name__ == "__main__":
-    logger.info(EXCLUDED_SEASONS)
+    logger.info(SEASONS.EXCLUDED)
     season = "Season_8"
     logger.info(f"Preparing to populate {season} [social_notaries] table...")
     populate_social_notaries(season)

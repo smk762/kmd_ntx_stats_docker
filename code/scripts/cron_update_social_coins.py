@@ -4,7 +4,7 @@ import json
 import time
 import requests
 from lib_const import *
-from const_seasons import SEASONS_INFO
+from const_seasons import SEASONS
 from decorators import *
 from models import coin_social_row
 import lib_helper as helper
@@ -14,7 +14,7 @@ import lib_urls as urls
 @print_runtime
 def generate_social_coins_template(season):
 
-    all_coins = SEASONS_INFO[season]["coins"]
+    all_coins = SEASONS.INFO[season]["coins"]
     try:
         url = urls.get_notary_nodes_repo_coin_social_url(season)
         repo_info = requests.get(url).json()
@@ -59,7 +59,7 @@ def populate_coins_social(season):
         with open(f"{os.path.dirname(os.path.abspath(__file__))}/social_coins_{season.lower()}.json", 'r') as j:
             coin_social = json.load(j)
 
-        all_coins = SEASONS_INFO[season]["coins"]
+        all_coins = SEASONS.INFO[season]["coins"]
         coin_info = requests.get(urls.get_coins_info_url()).json()['results']
 
         for coin in all_coins:
