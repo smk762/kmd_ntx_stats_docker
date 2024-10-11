@@ -1,11 +1,13 @@
+import datetime
+from datetime import datetime as dt
 from lib_const import *
+from const_seasons import SEASONS_INFO, get_season_from_ts, EXCLUDED_SEASONS
 from lib_helper import *
 import lib_validate
 import lib_crypto
 from lib_update import *
 import lib_filter as filters
 import lib_helper as helper
-from datetime import datetime as dt
 
 class addresses_row():
     def __init__(self, season='', server='', notary='',
@@ -22,14 +24,18 @@ class addresses_row():
         for i in [self.season, self.server, self.notary,
                   self.notary_id, self.address, self.pubkey,
                   self.coin]:
-            if i == '':
+            if i in ['', None]:
                 return False
         return True
 
     def update(self):
 
         self.server, self.coin = lib_validate.handle_dual_server_coins(self.server, self.coin)
-        self.address = lib_crypto.get_addr_from_pubkey(self.coin, self.pubkey)
+        if server == "Main":
+            c = "KMD"
+        else:
+            c = self.coin
+        self.address = lib_crypto.get_addr_from_pubkey(c, self.pubkey)
 
         row_data = (self.season, self.server, self.notary,
                     self.notary_id, self.address, self.pubkey,
@@ -46,7 +52,7 @@ class addresses_row():
         logger.info(f"Deleted [addresses] row {self.season} | {self.coin} | {self.address}")
 
 
-class balance_row():
+class BalanceRow():
     def __init__(self, season='', server='', notary='', address='',
                  coin='', balance=0, update_time=0):
         self.notary = notary
@@ -204,7 +210,7 @@ class tx_row():
         if self.notary.find("linked") != -1:
             self.notary = lib_validate.get_name_from_address(self.address)
 
-        self.season = lib_validate.get_season(self.block_time)
+        self.season = get_season_from_ts(self.block_time)['season']
 
         row_data = (self.txid, self.block_hash, self.block_height,
                     self.block_time, self.block_datetime, self.address,
@@ -402,7 +408,7 @@ class ltc_tx_row():
         if self.notary.find("linked") != -1:
             self.notary = lib_validate.get_name_from_address(self.address)
 
-        self.season = lib_validate.get_season(self.block_time)
+        self.season = get_season_from_ts(self.block_time)['season']
 
         row_data = (
             self.txid, self.block_hash, self.block_height,
@@ -429,7 +435,7 @@ class ltc_tx_row():
 
 
 ######### NTX Related ##########
-class notarised_row():
+class NotarisedRow():
     def __init__(self, coin='', block_height='', 
                  block_time='', block_datetime='', block_hash='', 
                  notaries=list, notary_addresses=list, ac_ntx_blockhash='',
@@ -547,6 +553,8 @@ class notarised_coin_daily_row():
         )
         if self.validated():
             logger.info(f"Updating [notarised_coin_daily] {self.coin} {self.notarised_date}")
+            if self.coin == "MCL":
+                logger.info(f"Updating [notarised_coin_daily] {row_data}")
             update_daily_notarised_coin_row(row_data)
         else:
             logger.warning(f"[notarised_coin_daily] Row data invalid!")
@@ -589,6 +597,8 @@ class notarised_count_daily_row():
                     self.notarised_date)
         if self.validated():
             logger.info(f"Updating [notarised_count_daily] {self.notarised_date} {self.notary}")
+            if self.notary == "dragonhound_DEV":
+                logger.info(f"Updating [notarised_count_daily] {row_data}")
             update_daily_notarised_count_row(row_data)
         else:
             logger.warning(f"[notarised_count_daily_row] Row data invalid!")
@@ -602,7 +612,7 @@ class notarised_count_daily_row():
         CONN.commit()
 
        
-class coin_ntx_season_row():
+class CoinNtxSeasonRow():
     def __init__(self, season='', coin='', coin_data='{}',
                  timestamp=int(time.time())):
         self.season = season
@@ -623,11 +633,11 @@ class coin_ntx_season_row():
     def update(self):
         row_data = (self.season, self.coin, self.coin_data, self.timestamp)
         if self.validated():
-            logger.info(f"Updating [coin_ntx_season_row] {self.coin} {self.season}")
+            logger.info(f"Updating [CoinNtxSeasonRow] {self.coin} {self.season}")
             update_coin_ntx_season_row(row_data)
         else:
-            logger.warning(f"[coin_ntx_season_row] Row data invalid! {self.coin} {self.season}")
-            #logger.warning(f"{row_data}")
+            logger.warning(f"[CoinNtxSeasonRow] Row data invalid! {self.coin} {self.season}")
+            logger.warning(f"{row_data}")
 
     def delete(self, season, coin=None):
         sql = f"DELETE FROM coin_ntx_season"
@@ -637,7 +647,7 @@ class coin_ntx_season_row():
         logger.warning(f"[coin_ntx_season] {season} {coin} deleted")
 
        
-class notary_ntx_season_row():
+class NotaryNtxSeasonRow():
     def __init__(self, season='', notary='', notary_data='{}',
                  timestamp=int(time.time())):
         self.season = season
@@ -658,11 +668,11 @@ class notary_ntx_season_row():
     def update(self):
         row_data = (self.season, self.notary, self.notary_data, self.timestamp)
         if self.validated():
-            logger.info(f"Updating [notary_ntx_season] {self.notary} {self.season}")
             update_notary_ntx_season_row(row_data)
+            logger.info(f"Updating [notary_ntx_season] {self.notary} {self.season}")
         else:
             logger.warning(f"[notary_ntx_season] Row data invalid! {self.notary} {self.season}")
-            #logger.warning(f"{row_data}")
+            logger.warning(f"{row_data}")
 
     def delete(self, season, notary=None):
         sql = f"DELETE FROM notary_ntx_season"
@@ -672,15 +682,13 @@ class notary_ntx_season_row():
         logger.warning(f"[notary_ntx_season] {season} {notary} deleted")
 
        
-class server_ntx_season_row():
+class ServerNtxSeasonRow():
     def __init__(self, season='', server='', server_data='{}',
                  timestamp=int(time.time())):
         self.season = season
         self.server = server
         self.server_data = server_data
         self.timestamp = timestamp
-        
-
 
     def validated(self):
         for i in [self.season, self.server]:
@@ -793,7 +801,8 @@ class notary_last_ntx_row():
                      self.kmd_ntx_txid, self.ac_ntx_blockhash,\
                      self.ac_ntx_height)
         if self.validated():
-            logger.info(f"[notary_last_ntx] Updating {self.season} {self.notary} {self.coin} [{self.kmd_ntx_blockheight}] {self.kmd_ntx_txid}")
+            if self.kmd_ntx_blockheight != 0:
+                logger.info(f"[notary_last_ntx] Updating {self.season} {self.notary} {self.coin} [{self.kmd_ntx_blockheight}] {self.kmd_ntx_txid}")
             update_notary_last_ntx_row(row_data)
         else:
             logger.warning(f"[notary_last_ntx] Row data invalid!")
@@ -1183,10 +1192,10 @@ class mined_row():
         return True
 
     def update(self):
-        self.season = lib_validate.get_season(self.block_time)
+        self.season = get_season_from_ts(self.block_time)['season']
         self.name = lib_validate.get_name_from_address(self.address)
         self.category = lib_validate.get_category_from_name(self.name)
-        self.block_datetime = dt.utcfromtimestamp(self.block_time)
+        self.block_datetime = dt.fromtimestamp(self.block_time, datetime.UTC)
         row_data = (
             self.block_height, self.block_time, self.block_datetime, 
             self.value, self.address, self.name, self.txid, self.diff,
@@ -1240,11 +1249,10 @@ class season_mined_count_row():
         
 
         if self.name in SEASONS_INFO[self.season]["notaries"]:
-            if self.address != SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]:
+            if self.address not in SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]:
                 logger.warning(f'{self.address} not in SEASONS_INFO[self.season]["servers"]["Main"]["addresses"]["KMD"]')
                 for season in SEASONS_INFO:
-                    if season.find("Testnet") == -1:
-                        
+                    if season.find("Testnet") == -1:                        
                         if "Main" in SEASONS_INFO[season]["servers"]:
                             if self.address == SEASONS_INFO[season]["servers"]["Main"]["addresses"]["KMD"]:
                                 self.season = season
@@ -1312,10 +1320,11 @@ class daily_mined_count_row():
         row_data = (self.notary, self.blocks_mined, self.sum_value_mined, \
                     self.mined_date, self.btc_price, self.usd_price, self.timestamp)
         if self.validated():
-            logger.info(f"Updating [mined_count_daily] {row_data}")
+            logger.info(f"[mined_count_daily] {self.mined_date} {self.notary} {self.blocks_mined} {self.sum_value_mined}")
+            logger.info(f"{row_data}")
             update_daily_mined_count_row(row_data)
         else:
-            logger.warning(f"[mined_count_daily] Row data invalid!")
+            logger.warning(f"[mined_count_daily] Row invalid! {self.mined_date} {self.notary} {self.blocks_mined} {self.sum_value_mined}")
             logger.warning(f"{row_data}")
 
     def delete(self):
@@ -1356,7 +1365,7 @@ class rewards_tx_row():
 
     def update(self):
 
-        self.block_datetime = dt.utcfromtimestamp(self.block_time)
+        self.block_datetime = dt.fromtimestamp(self.block_time, datetime.UTC)
         row_data = (self.txid, self.block_hash, self.block_height,
                     self.block_time, self.block_datetime,
                     self.address, self.rewards_value,

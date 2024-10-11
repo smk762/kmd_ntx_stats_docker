@@ -15,20 +15,30 @@ for coin, explorers in INSIGHT_EXPLORERS.items():
             "explorer": domain,
             "height": 0,
             "sync_pct": 0,
+            "version": 0,
+            "notarised": 0,
             "blockhash": "",
             "status": "unresponsive"
         }
         insight = InsightAPI(domain)
         try:
             sync = insight.sync_status()
+            node = insight.node_status()
             logger.info(f"scanning {domain} for {coin}")
+            logger.info(node)
             info.update({
                 "height": sync['height'],
                 "explorer": domain,
+                
+                "version": node['info']['version'],
                 "sync_pct": sync['syncPercentage'],
                 "blockhash": insight.block_index_info(sync['height'])['blockHash'],
                 "status": sync['status']
             })
+            if 'notarized' in node['info']:
+                info.update({
+                    "notarized": node['info']['notarized'],
+                })
             logger.info(f"[{coin}] {domain} OK!")
         except Exception as e:
             info.update({"status": str(e)})

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.12
 import lib_helper
 from lib_const import *
+from const_seasons import SEASONS_INFO
 from lib_query_ntx import *
 from lib_filter import *
 from decorators import print_runtime
@@ -187,9 +188,9 @@ def get_coin_last_ntx():
     return coin_last_ntx
 
 
-def get_existing_nn_btc_txids(address=None, category=None, season=None, notary=None):
+def get_existing_nn_txids(coin, address=None, category=None, season=None, notary=None):
     recorded_txids = []
-    sql = f"SELECT DISTINCT txid from nn_btc_tx"
+    sql = f"SELECT DISTINCT txid from nn_{coin.lower()}_tx"
     conditions = []
     if category:
         conditions.append(f"category = '{category}'")
@@ -212,31 +213,6 @@ def get_existing_nn_btc_txids(address=None, category=None, season=None, notary=N
         recorded_txids.append(txid[0])
     return recorded_txids
 
-
-def get_existing_nn_ltc_txids(address=None, category=None, season=None, notary=None):
-    recorded_txids = []
-    sql = f"SELECT DISTINCT txid from nn_ltc_tx"
-    conditions = []
-    if category:
-        conditions.append(f"category = '{category}'")
-    if season:
-        conditions.append(f"season = '{season}'")
-    if address:
-        conditions.append(f"address = '{address}'")
-    if notary:
-        conditions.append(f"notary = '{notary}'")
-
-    if len(conditions) > 0:
-        sql += " where "
-        sql += " and ".join(conditions)    
-    sql += ";"
-
-    CURSOR.execute(sql)
-    existing_txids = CURSOR.fetchall()
-
-    for txid in existing_txids:
-        recorded_txids.append(txid[0])
-    return recorded_txids
 
 
 

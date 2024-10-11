@@ -7,7 +7,7 @@ import datetime
 from datetime import datetime as dt
 
 from kmd_ntx_api.const import SINCE_INTERVALS, SMARTCHAINS
-from kmd_ntx_api.cache_data import launch_params_cache
+from kmd_ntx_api.cache_data import cached
 from kmd_ntx_api.logger import logger
 from kmd_ntx_api.based_58 import convert_addresses, decode_opret, \
     validate_pubkey, calc_addr_tool
@@ -250,7 +250,7 @@ def faucet_view(request):
 
 
 def launch_params_view(request):
-    launch_params = launch_params_cache()
+    launch_params = cached.get_data("launch_params_cache")
 
     launch_param_rows = []
     coin_icons = get_coin_icons(request)

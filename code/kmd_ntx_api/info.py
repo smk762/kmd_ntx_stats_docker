@@ -8,9 +8,9 @@ import datetime as dt
 
 from kmd_ntx_api.const import SINCE_INTERVALS
 from kmd_ntx_api.mining import get_mined_data
-from kmd_ntx_api.explorers import get_sync
+from kmd_ntx_api.explorers import get_sync, get_blockhash, getblock
 from kmd_ntx_api.ntx import get_notarised_date
-from kmd_ntx_api.notary_seasons import get_page_season
+from kmd_ntx_api.notary_seasons import get_page_season, SEASONS_DATA
 from kmd_ntx_api.serializers import balancesSerializer, notarisedSerializer, \
     coinsSerializer, notarisedCoinDailySerializer, notarisedCountDailySerializer, \
     nnLtcTxSerializer
@@ -25,8 +25,7 @@ from kmd_ntx_api.query import get_notarised_data, get_coin_last_ntx_data, \
     get_coin_social_data
 from kmd_ntx_api.query import get_addresses_data, get_coins_data, get_scoring_epochs_data
 from kmd_ntx_api.logger import logger, timed
-from kmd_ntx_api.memcached import MEMCACHE
-from kmd_ntx_api.cache_data import get_from_memcache, refresh_cache
+from kmd_ntx_api.cache_data import cached
 
 
 def get_balances(request):
@@ -474,7 +473,6 @@ def get_dpow_server_coins_info(
 ):
     data = None
     cache_key = None
-    logger.calc("get_dpow_server_coins_info")
     if request is not None:
         season = get_page_season(request)
         server = get_page_server(request)
@@ -489,7 +487,7 @@ def get_dpow_server_coins_info(
             "error": "You need to specify both of the following filter parameters: ['season', 'server']"
         }
     if cache_key is not None:
-        data = get_from_memcache(cache_key)
+        data = cached.get_data(cache_key)
 
     if data is None:
         data = get_scoring_epochs_data(season, server, coin, epoch, timestamp)
@@ -504,8 +502,8 @@ def get_dpow_server_coins_info(
         resp = list(set(resp))
         resp.sort()
         if epoch is None and coin is None and timestamp is None:
-            logger.calc(f"adding {cache_key} to memcache")
-            refresh_cache(key=cache_key, data=resp, expire=86400)
+            logger.saved(f"adding {cache_key} to memcache")
+            cached.refresh(key=cache_key, data=resp, expire=86400)
         return resp
     return data
 
@@ -541,6 +539,39 @@ def get_notary_nodes_info(request):
 
     resp = list(set(resp))
     resp.sort()
+    return resp
+
+def get_hardfork_countdown(request):
+    season = get_page_season(request, default="Season_8")
+    if season in SEASONS_DATA:
+        season_info = SEASONS_DATA[season]
+        now_ts = time.time()
+
+        block_tip = get_sync("KMD")["height"]
+        blocks_remaining = season_info["start_block"] - block_tip
+        index_block = block_tip - blocks_remaining
+        index_block_hash = get_blockhash("KMD", index_block)["blockHash"]
+        index_block_ts = getblock("KMD", index_block_hash)["time"]
+        block_rate = (now_ts - index_block_ts) / (blocks_remaining)
+        sec_remaining = blocks_remaining * block_rate
+        hf_est_ts = now_ts + sec_remaining
+        hf_est_dt = datetime.fromtimestamp(hf_est_ts, dt.UTC)
+        hf_est_str = hf_est_dt.strftime('%Y-%m-%d %H:%M:%S')
+        
+        resp = {
+            "seconds": sec_remaining,
+            "minutes": int(sec_remaining/60),
+            "hours": int(sec_remaining/3600),
+            "days": int(sec_remaining/86400),
+            "recent_block_time": round(block_rate,2),
+            "recent_blocks_per_day": round(86400 / block_rate,2),
+            "estimated_hardfork_utc": hf_est_str,
+            "current_block": block_tip,
+            "hardfork_block": season_info["start_block"],
+            "blocks_remaining": blocks_remaining
+        }
+    else:
+        resp = {"error": "Season '{season}' not recognised!"}
     return resp
 
 
@@ -609,7 +640,6 @@ def get_notary_ltc_txid(request):
 
 
 def get_ltc_txid_list(request):
-    logger.calc("ltc_txid_list")
     season = get_page_season(request)
     notary = get_or_none(request, "notary")
     category = get_or_none(request, "category")

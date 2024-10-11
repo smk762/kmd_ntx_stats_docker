@@ -133,32 +133,45 @@ def delist_coin(coin):
 
 
 def update_coins_row(row_data):
-    CONN = connect_db()
-    CURSOR = CONN.cursor()
+    """
+    Inserts or updates a coin row in the database. If the coin already exists, updates the row data.
+    
+    Parameters:
+    row_data (list): List of values corresponding to the coin's data. Must follow the order of columns in the table.
+
+    Returns:
+    int: 1 if the operation is successful, 0 otherwise.
+    """
+    sql = """
+        INSERT INTO coins
+        (coin, coins_info, electrums, electrums_ssl, electrums_wss, explorers, lightwallets, dpow, dpow_tenure, dpow_active, mm2_compatible)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT ON CONSTRAINT unique_coin_coin DO UPDATE SET
+        coins_info = EXCLUDED.coins_info,
+        electrums = EXCLUDED.electrums,
+        electrums_ssl = EXCLUDED.electrums_ssl,
+        electrums_wss = EXCLUDED.electrums_wss,
+        explorers = EXCLUDED.explorers,
+        lightwallets = EXCLUDED.lightwallets,
+        dpow = EXCLUDED.dpow,
+        dpow_tenure = EXCLUDED.dpow_tenure,
+        dpow_active = EXCLUDED.dpow_active,
+        mm2_compatible = EXCLUDED.mm2_compatible;
+    """
+    
     try:
-        sql = "INSERT INTO coins \
-            (coin, coins_info, electrums, electrums_ssl, electrums_wss, explorers, lightwallets, dpow, dpow_tenure, dpow_active, mm2_compatible) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) \
-            ON CONFLICT ON CONSTRAINT unique_coin_coin DO UPDATE SET \
-            coins_info='"+str(row_data[1])+"', \
-            electrums='"+str(row_data[2])+"', \
-            electrums_ssl='"+str(row_data[3])+"', \
-            electrums_wsl='"+str(row_data[4])+"', \
-            explorers='"+str(row_data[5])+"', \
-            lightwallets='"+str(row_data[6])+"', \
-            dpow='"+str(row_data[7])+"', \
-            dpow_tenure='"+str(row_data[8])+"', \
-            dpow_active='"+str(row_data[9])+"', \
-            mm2_compatible='"+str(row_data[10])+"';"
-        CURSOR.execute(sql, row_data)
-        CONN.commit()
-        return 1
+        # Use a context manager for automatic resource management
+        with connect_db() as conn:
+            with conn.cursor() as cursor:
+                # Execute the query using parameterized SQL to prevent injection
+                cursor.execute(sql, row_data)
+                conn.commit()
+                return 1
     except Exception as e:
-        logger.debug(e)
-        if str(e).find('Duplicate') == -1:
-            logger.debug(row_data)
-        CONN.rollback()
+        logger.error(f"Error updating coins row: {e}")
+        logger.debug(f"Row data: {row_data}")
         return 0
+
 
 
 def update_mined_row(row_data):
@@ -209,6 +222,9 @@ def update_season_mined_count_row(row_data):
         if str(e).find('Duplicate') == -1:
             logger.debug(e)
             logger.debug(row_data)
+        else:
+            logger.error(e)
+            logger.error(row_data)
         CONN.rollback()
         return 0
 

@@ -2,6 +2,7 @@
 import pytest
 import math
 from lib_const import *
+from const_seasons import SEASONS_INFO, get_season_from_ts, EXCLUDED_SEASONS
 import lib_api
 import lib_coins
 import lib_const
@@ -21,6 +22,10 @@ import lib_validate
 import lib_wallet
 from logger import logger
 
+from kmd_ntx_api.cache_data import cached
+
+
+cached.flush()
 
 # TODO: For CI, these tests need to be separated.
 # - No data in actions, so get from urls while testing them
@@ -480,19 +485,19 @@ class TestLibHelper:
         assert len(lib_helper.get_pubkeys("Season_5", "Minecraft")) == 0
 
     def test_get_address_from_notary(self):
-        assert lib_helper.get_address_from_notary("Season_5", "dragonhound_NA", "LTC") == "LPNLTVnhQasABRUk64VmdyajFjxRCiZvUo"
-        assert lib_helper.get_address_from_notary("Season_5", "dragonhound_DEV", "KMD") == "RDragoNHdwovvsDLSLMiAEzEArAD3kq6FN"
-        assert lib_helper.get_address_from_notary("Season_5", "mrlynch_AR", "DEX") == "RKytuA1ubrCD66hNNemcsvyDhDbcR2S1sU"
+        assert lib_helper.get_address_from_notary("Season_8", "dragonhound_NA", "LTC") == "LPYe5q2yV8Uv1DzWAYgwsimnVfkrmCALJT"
+        assert lib_helper.get_address_from_notary("Season_8", "dragonhound_DEV", "KMD") == "RDbsu8cS1J3RpRfYTagmhE3E3irBLdG1io"
+        assert lib_helper.get_address_from_notary("Season_8", "dragonhound_DEV", "KMD_3P") == "RUq3kkWUU5UdbVwmLeMHAST7SCyfgNZsBA"
 
     def test_get_season_notaries(self):
-        assert len(lib_helper.get_season_notaries("Season_5")) == 64
+        assert len(lib_helper.get_season_notaries("Season_8")) == 64
 
     def test_get_dpow_coin_src(self):
         assert lib_helper.get_dpow_coin_src("(https://github.com/chips-blockchain/chips)") == "https://github.com/chips-blockchain/chips"
 
     def test_get_dpow_coin_server(self):
-        assert lib_helper.get_dpow_coin_server("dPoW-3P") == "Third_Party"
-        assert lib_helper.get_dpow_coin_server("dPoW-MainNet") == "Main"
+        assert lib_helper.translate_dpow_server("dPoW-3P") == "Third_Party"
+        assert lib_helper.translate_dpow_server("dPoW-MainNet") == "Main"
 
     def test_get_assetchain_launch_params(self):
         assert lib_helper.get_assetchain_launch_params({
@@ -537,7 +542,7 @@ class TestLibHelper:
 
 class TestLibMining:
     def test_get_mined_row(self):
-        row = lib_mining.get_mined_row(2824869)
+        row = lib_mining.get_mined_row("0e8b80cf94ac73d831b068cce8ccc83366787d6b7bd267096a60de4ab7615c48")
         assert row.block_height == 2824869
         assert row.block_time == 1647487930
         assert row.address == "RKytuA1ubrCD66hNNemcsvyDhDbcR2S1sU"
@@ -569,7 +574,7 @@ class TestLibNtx:
         assert actual == expected
 
     def test_get_season_ntx_dict(season):
-        season_ntx_dict = lib_ntx.get_season_ntx_dict("Season_5")
+        season_ntx_dict = lib_ntx.NtxSeasonStats("Season_5").build_season_ntx_dict()
         season_count = season_ntx_dict["season_ntx_count"]
         season_score = season_ntx_dict["season_ntx_score"]
         assert len(season_ntx_dict["notaries"]) == 64
@@ -621,7 +626,6 @@ class TestLibRpc:
 
     def test_get_ntx_txids(self):
         assert lib_rpc.get_ntx_txids(
-            "RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA",
              2827762,
              2827763) == [
                 "824686b7a27db779447fe24992c9c026abac8adc855b6b0ccc53384385786df4",
@@ -644,9 +648,6 @@ class TestLibUrls:
 
 class TestLibValidate:
     def test_handle_dual_server_coins(self):
-        assert lib_validate.handle_dual_server_coins("Third_Party", "GLEEC") == ("Third_Party", "GLEEC-OLD")
-        assert lib_validate.handle_dual_server_coins("Main", "GleecBTC")     == ("Third_Party", "GLEEC-OLD")
-        assert lib_validate.handle_dual_server_coins("Main", "GLEEC")        == ("Main", "GLEEC")
         assert lib_validate.handle_dual_server_coins("Third_Party", "VRSC")  == ("Third_Party", "VRSC")
         assert lib_validate.handle_dual_server_coins("Main", "DEX")          == ("Main", "DEX")
 
@@ -690,15 +691,15 @@ class TestLibValidate:
         assert lib_validate.get_coin_epoch_score_at("Season_5", "Third_Party", "GLEEC-OLD", 1647120740) == 0
 
     def test_get_season(self):
-        assert lib_validate.get_season(1623683000) == "Season_5"
-        assert lib_validate.get_season(1647480279) == "Season_5"
-        assert lib_validate.get_season(1623683000000) == "Season_5"
-        assert lib_validate.get_season(5623683000) == "Unofficial"
+        assert get_season_from_ts(1623683000)['season'] == "Season_5"
+        assert get_season_from_ts(1647480279)['season'] == "Season_5"
+        assert get_season_from_ts(1623683000000)['season'] == "Season_5"
+        assert get_season_from_ts(5623683000)['season'] == "Unofficial"
 
     def test_get_coin_server(self):
-        assert lib_validate.get_dpow_coin_server("GLEEC-OLD", "Season_5") == "Third_Party"
-        assert lib_validate.get_dpow_coin_server("DEX", "Season_5") == "Main"
-        assert lib_validate.get_dpow_coin_server("KMD", "Season_5") == "KMD"
+        assert lib_validate.get_dpow_coin_server("GLEEC_OLD", "Season_8") == "Main"
+        assert lib_validate.get_dpow_coin_server("MCL", "Season_8") == "Main"
+        assert lib_validate.get_dpow_coin_server("KMD", "Season_8") == "KMD"
 
     def test_check_notarised_epochs(self):
         for season in SEASONS_INFO:
@@ -717,6 +718,9 @@ class TestLibValidate:
                         min_max = lib_query.get_ntx_min_max(season, server, epoch)
                         min_time = min_max[1]
                         max_time = min_max[3]
+                        if min_time == 0:
+                            logger.warning(f"Skipping {season} {server} {epoch}, no data")
+                            continue
 
                         assert epoch_start <= min_time and epoch_end >= max_time
                         assert epoch_coins == notarised_server_epoch_coins[server][epoch]

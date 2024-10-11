@@ -9,7 +9,7 @@ from calendar import monthrange
 from datetime import datetime as dt
 from django.http import JsonResponse
 from kmd_ntx_api.notary_seasons import get_seasons_info, get_season
-from kmd_ntx_api.cache_data import ecosystem_links_cache
+from kmd_ntx_api.cache_data import cached
 from kmd_ntx_api.logger import logger
 from kmd_ntx_api.const import SINCE_INTERVALS
 
@@ -30,7 +30,6 @@ def get_random_notary(notary_list):
 
 # TODO: reduce calls missing `seasons_info` param
 def get_notary_list(season, seasons_info=None):
-    logger.calc("get_notary_list")
     if seasons_info is None:
         seasons_info = get_seasons_info()
     if season not in seasons_info:
@@ -58,7 +57,6 @@ def get_mainnet_coins(dpow_coins_dict):
 
 
 def get_regions_info(season):
-    logger.calc("get_regions_info")
     seasons_info = get_seasons_info()
     if season in seasons_info:
         return seasons_info[season]["regions"]
@@ -83,7 +81,7 @@ def get_notary_clean(notary):
 
 
 def get_eco_data_link():
-    ecosystem_links = ecosystem_links_cache()
+    ecosystem_links = cached.get_data("ecosystem_links_cache")
     if len(ecosystem_links) == 0:
         return ""
     item = random.choice(ecosystem_links)

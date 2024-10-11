@@ -2,7 +2,7 @@
 import json
 from django.contrib import messages
 from django.shortcuts import render
-from kmd_ntx_api.cache_data import activation_commands_cache
+from kmd_ntx_api.cache_data import cached
 from kmd_ntx_api.helper import get_or_none
 from kmd_ntx_api.context import get_base_context
 from kmd_ntx_api.forms import EnableCommandForm, MakerbotForm
@@ -20,7 +20,7 @@ def activation_commands_view(request):
 
 def batch_activation_form_view(request):
     context = get_base_context(request)
-    activation_commands = activation_commands_cache()
+    activation_commands = cached.get_data("activation_commands_cache")
     context.update({
         "page_title":"Generate AtomicDEX-API Batch Activation Commands",
         "mm2_coins": True

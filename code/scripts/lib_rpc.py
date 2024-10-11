@@ -53,9 +53,9 @@ def get_ntx_txids(start, end):
 
 # KMD RPC Proxy
 RPC = {}
-for coin in lib_crypto.COIN_PARAMS:
+for coin in ["KMD"]:
     try:
         RPC[coin] = def_credentials(coin)
     except:
-        #logger.info(f"{coin} RPC failed")
+        logger.info(f"{coin} RPC failed")
         pass

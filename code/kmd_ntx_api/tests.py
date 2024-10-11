@@ -5,7 +5,7 @@ from django.urls import reverse, get_resolver
 from django.test import TestCase
 from django.conf import settings
 
-from kmd_ntx_api.cache_data import navigation_cache
+from kmd_ntx_api.cache_data import cached
 
 base_url = 'http://stats.kmd.io'
 if settings.DEBUG:
@@ -14,7 +14,7 @@ if settings.DEBUG:
 
 def get_urls_list(server='dev'):
     urls = []
-    nav = navigation_cache()
+    nav = cached.get_data("navigation")
     for section in nav:
         for option in nav[section]['options']:
             urls.append(nav[section]['options'][option]['url'])

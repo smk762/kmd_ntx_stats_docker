@@ -1,8 +1,7 @@
-#!/usr/bin/env python3.12
-from datetime import datetime, timezone
-from os.path import basename, dirname, abspath
 import logging
 import functools
+from datetime import datetime, timezone
+from os.path import basename, abspath, dirname
 
 PROJECT_ROOT_PATH = dirname(dirname(abspath(__file__)))
 
@@ -51,132 +50,57 @@ class CustomFormatter(logging.Formatter):
     debug = "\x1b[30;1m"
     reset = "\x1b[0m"
 
-    format = (
-        "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-    )
+    base_format = "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
     datefmt = "%d-%b-%y %H:%M:%S"
 
     FORMATS = {
-        logging.DEBUG: debug + format + reset,
-        logging.INFO: lightgreen + format + reset,
-        logging.WARNING: red + format + reset,
-        logging.ERROR: lightred + format + reset,
-        logging.CRITICAL: bold_red + format + reset,
+        logging.DEBUG: debug + base_format + reset,
+        logging.INFO: lightgreen + base_format + reset,
+        logging.WARNING: red + base_format + reset,
+        logging.ERROR: lightred + base_format + reset,
+        logging.CRITICAL: bold_red + base_format + reset,
+    }
+
+    # Custom level colors
+    custom_colors = {
+        "STOPWATCH": pink,
+        "PAIR": skyblue,
+        "DEXRPC": iceblue,
+        "SOURCED": blue,
+        "QUERY": lightyellow,
+        "REQUEST": gold,
+        "LOOP": purple,
+        "CALC": lightcyan,
+        "MERGE": cyan,
+        "CACHED": drabgreen,
+        "SAVED": mintgreen,
+        "UPDATED": lightgreen,
+        "MUTED": muted,
     }
 
     def format(self, record):
-        if record.levelname == "STOPWATCH":
-            log_fmt = (
-                self.pink
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "PAIR":
-            # Blue for lib class
-            log_fmt = (
-                self.skyblue
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-            )
-        elif record.levelname == "DEXRPC":
-            # Blue for lib class
-            log_fmt = (
-                self.iceblue
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "SOURCED":
-            # Blue for lib class
-            log_fmt = (
-                self.blue
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "QUERY":
-            # Yellow for incoming data
-            log_fmt = (
-                self.lightyellow
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "REQUEST":
-            # Yellow for incoming data
-            log_fmt = (
-                self.gold
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "LOOP":
-            # Purple for cache loops
-            log_fmt = (
-                self.purple
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "CALC":
-            # Cyan for data processing
-            log_fmt = (
-                self.lightcyan
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "MERGE":
-            # Cyan for data processing
-            log_fmt = (
-                self.cyan
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "CACHED":
-            # Green for data storage
-            log_fmt = (
-                self.drabgreen
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "SAVED":
-            # Green for data storage
-            log_fmt = (
-                self.mintgreen
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "UPDATED":
-            # Green for data storage
-            log_fmt = (
-                self.lightgreen
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-            )
-        elif record.levelname == "MUTED":
-            log_fmt = (
-                self.muted
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        elif record.levelname == "DEBUG":
-            log_fmt = (
-                self.debug
-                + "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s (%(filename)s:%(lineno)d)"
-                + self.reset
-            )
-        else:
-            log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt, datefmt="%d-%b-%y %H:%M:%S")
+        # Use standard format unless custom color is available
+        log_fmt = self.FORMATS.get(record.levelno, self.debug + self.base_format + self.reset)
+        if record.levelname in self.custom_colors:
+            log_fmt = self.custom_colors[record.levelname] + self.base_format + self.reset
+
+        formatter = logging.Formatter(log_fmt, datefmt=self.datefmt)
         return formatter.format(record)
 
 
+def add_logging_levels(levels):
+    """Dynamically add custom logging levels."""
+    for level_name, level_num in levels.items():
+        addLoggingLevel(level_name, level_num)
+        logger.setLevel(level_name)
+    logger.setLevel("DEBUG")
+
+
 def addLoggingLevel(levelName, levelNum, methodName=None):
-    # From https://stackoverflow.com/questions/2183233/
-    # how-to-add-a-custom-loglevel-to-pythons-logging-facility/
-
-    if not methodName:
-        methodName = levelName.lower()
-
-    if hasattr(logging, levelName):
-        raise AttributeError("{} already defined in logging module".format(levelName))
-    if hasattr(logging, methodName):
-        raise AttributeError("{} already defined in logging module".format(methodName))
-    if hasattr(logging.getLoggerClass(), methodName):
-        raise AttributeError("{} already defined in logger class".format(methodName))
+    """Add a custom log level."""
+    methodName = methodName or levelName.lower()
+    if hasattr(logging, levelName) or hasattr(logging.getLoggerClass(), methodName):
+        raise AttributeError(f"{levelName} or {methodName} already defined")
 
     def logForLevel(self, message, *args, **kwargs):
         if self.isEnabledFor(levelNum):
@@ -186,205 +110,94 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
         logging.log(levelNum, message, *args, **kwargs)
 
     logging.addLevelName(levelNum, levelName)
-    setattr(logging, levelName, levelNum)
     setattr(logging.getLoggerClass(), methodName, logForLevel)
     setattr(logging, methodName, logToRoot)
 
 
-logger = logging.getLogger("defi-stats")
-# create console handler with a higher log level
-handler = logging.StreamHandler()
-handler.setFormatter(CustomFormatter())
-logger.addHandler(handler)
-
-
-addLoggingLevel("SOURCED", logging.DEBUG + 14)
-logger.setLevel("SOURCED")
-
-
-addLoggingLevel("SAVED", logging.DEBUG + 13)
-logger.setLevel("SAVED")
-
-
-addLoggingLevel("CACHED", logging.DEBUG + 12)
-logger.setLevel("CACHED")
-
-
-addLoggingLevel("PAIR", logging.DEBUG + 11)
-logger.setLevel("PAIR")
-
-
-addLoggingLevel("MERGE", logging.DEBUG + 9)
-logger.setLevel("MERGE")
-
-# Shows cache updates
-addLoggingLevel("UPDATED", logging.DEBUG + 8)
-logger.setLevel("UPDATED")
-
-# Shows database req/resp
-addLoggingLevel("QUERY", logging.DEBUG + 7)
-logger.setLevel("QUERY")
-
-# Shows dex api req/resp
-addLoggingLevel("DEXRPC", logging.DEBUG + 6)
-logger.setLevel("DEXRPC")
-
-# Shows cache loop updates
-addLoggingLevel("LOOP", logging.DEBUG + 5)
-logger.setLevel("LOOP")
-
-# Shows cache loop updates
-addLoggingLevel("CALC", logging.DEBUG + 4)
-logger.setLevel("CALC")
-
-# Shows generally ignorable errors, e.g. CoinConfigNotFound
-addLoggingLevel("MUTED", logging.DEBUG - 1)
-logger.setLevel("MUTED")
-
-# Shows cache loop updates
-addLoggingLevel("REQUEST", logging.DEBUG + 2)
-logger.setLevel("REQUEST")
-
-
 def send_log(loglevel, msg):
-    match loglevel:
-        case "info":
-            logger.info(f"   {msg}")
-        case "muted":
-            pass
-        case "saved":
-            logger.saved(f"  {msg}")
-        case "merge":
-            logger.merge(f"  {msg}")
-        case "merge":
-            logger.merge(f"  {msg}")
-        case "updated":
-            logger.updated(f"{msg}")
-        case "calc":
-            logger.calc(f"   {msg}")
-        case "warning":
-            logger.warning(f"{msg}")
-        case "error":
-            logger.error(f"  {msg}")
-        case "debug":
-            logger.debug(f"  {msg}")
-        case "error":
-            logger.error(f"  {msg}")
-        case "loop":
-            logger.loop(f"   {msg}")
-        case "pair":
-            logger.pair(f"   {msg}")
-        case "query":
-            logger.query(f"  {msg}")
-        case "sourced":
-            logger.sourced(f"{msg}")
-        case "request":
-            logger.request(f"{msg}")
-        case "cached":
-            logger.cached(f" {msg}")
-        case _:
-            logger.debug(f"  {msg}")
+    """Dynamically send logs to the appropriate logger."""
+    log_method = getattr(logger, loglevel.lower(), None)
+    if log_method:
+        log_method(f"   {msg}")
+    else:
+        logger.debug(f"   {msg}")
 
 
 class StopWatch:
-    def __init__(self, start_time, trace, loglevel="debug", msg="") -> None:
+    def __init__(self, start_time, trace, loglevel="debug", msg=""):
         self.start_time = start_time
-        self.msg = msg
         self.trace = trace
         self.loglevel = loglevel
+        self.msg = msg or "<<< no msg provided >>>"
         self.get_stopwatch()
 
     def get_stopwatch(self):
         duration = int(datetime.now(timezone.utc).timestamp()) - int(self.start_time)
-        if not isinstance(self.msg, str):
-            self.msg = str(self.msg)
         lineno = self.trace["lineno"]
         filename = self.trace["file"]
         func = self.trace["function"]
-        if PROJECT_ROOT_PATH in self.msg:
-            self.msg = self.msg.replace(f"{PROJECT_ROOT_PATH}/", "")
-        self.msg = f"{duration:>2} sec | {func:<20} | {str(self.msg):<80} "
-        self.msg += f"| {basename(filename)}:{lineno}"
-        send_log(loglevel=self.loglevel, msg=self.msg)
+        self.msg = f"{duration:>2} sec | {func:<20} | {self.msg:<80} | {basename(filename)}:{lineno}"
+        send_log(self.loglevel, self.msg)
 
 
-def get_trace(func, error=None):
-    msg = {
+def get_trace(func):
+    """Get trace information for the current function."""
+    return {
         "function": func.__name__,
         "file": func.__code__.co_filename,
         "lineno": func.__code__.co_firstlineno,
         "vars": func.__code__.co_varnames,
     }
-    if error is not None:
-        msg.update({"error": error})
-    return msg
 
 
-# Returns console colors for customising
-def show_pallete():
-    logger.info("info")
-    logger.debug("debug")
-    logger.warning("warning")
-    logger.error("error")
-    logger.critical("critical")
-    logger.updated("updated")
-    logger.merge("merge")
-    logger.saved("saved")
-    logger.calc("calc")
-    logger.dexrpc("dexrpc")
-    logger.loop("loop")
-    logger.muted("muted")
-    logger.query("query")
-    logger.request("request")
-    logger.cached("cached")
-
-
-# A decorator for returning runtime of functions:def timed(func):
 def timed(func):
+    """Decorator to log the runtime of a function."""
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         start_time = int(datetime.now(timezone.utc).timestamp())
-        duration = int(datetime.now(timezone.utc).timestamp()) - start_time
         trace = get_trace(func)
-        msg = "<<< no msg provided >>>"
         try:
             result = func(*args, **kwargs)
         except Exception as e:
-            ignore_until = 0
-            loglevel = "error"
-            if isinstance(e, ValueError):
-                # Custom logic here
-                pass
-            msg = f"{type(e)}: {e}"
-            StopWatch(start_time, trace=trace, loglevel=loglevel, msg=msg)
-        else:
-            send = False
-            msg = ""
-            ignore_until = 0
-            loglevel = "info"
-            if isinstance(result, dict):
-                if "loglevel" in result:
-                    loglevel = result["loglevel"]
-                    send = True
-                else:
-                    # if not using `default.result`
-                    return result
-                if "message" in result:
-                    msg = result["message"]
-                    send = True
-                if "ignore_until" in result:
-                    ignore_until = result["ignore_until"]
-                    send = True
-                if duration >= ignore_until and send:
-                    StopWatch(start_time, trace=trace, loglevel=loglevel, msg=msg)
-                # Using `default.result`, with actual data to return
-                if "data" in result:
-                    if result["data"] is not None:
-                        result = result["data"]
-            return result
-
+            StopWatch(start_time, trace, loglevel="error", msg=f"{type(e).__name__}: {e}")
+            raise
+        StopWatch(start_time, trace, loglevel="info", msg="Function completed")
+        return result
     return wrapper
 
 
+# Create a logger and set up custom levels
+logger = logging.getLogger("defi-stats")
+handler = logging.StreamHandler()
+handler.setFormatter(CustomFormatter())
+logger.addHandler(handler)
+
+# Dynamically add all custom levels
+custom_levels = {
+    "SOURCED": logging.DEBUG + 14,
+    "SAVED": logging.DEBUG + 13,
+    "CACHED": logging.DEBUG + 12,
+    "PAIR": logging.DEBUG + 11,
+    "MERGE": logging.DEBUG + 9,
+    "UPDATED": logging.DEBUG + 8,
+    "QUERY": logging.DEBUG + 7,
+    "DEXRPC": logging.DEBUG + 6,
+    "LOOP": logging.DEBUG + 5,
+    "CALC": logging.DEBUG + 4,
+    "MUTED": logging.DEBUG - 1,
+    "REQUEST": logging.DEBUG + 2
+}
+
+add_logging_levels(custom_levels)
+
+
+def show_palette():
+    """Show a sample of all log levels with colors."""
+    log_levels = ["info", "debug", "warning", "error", "critical", "updated", "merge", "saved", "calc", 
+                  "dexrpc", "loop", "muted", "query", "request", "cached"]
+    for level in log_levels:
+        send_log(level, level)
+
+
 if __name__ == "__main__":
-    show_pallete()
+    show_palette()

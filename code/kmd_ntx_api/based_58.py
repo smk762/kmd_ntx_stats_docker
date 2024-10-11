@@ -12,7 +12,7 @@ from base58 import b58decode_check
 from kmd_ntx_api.const import OP_DUP, OP_HASH160, OP_EQUALVERIFY, OP_CHECKSIG
 from kmd_ntx_api.const import EXCLUDE_DECODE_OPRET_COINS, noMoM, SMARTCHAINS
 from kmd_ntx_api.info import get_all_coins
-from kmd_ntx_api.cache_data import b58_params_cache
+from kmd_ntx_api.cache_data import cached
 from kmd_ntx_api.helper import has_error
 from kmd_ntx_api.logger import logger
 
@@ -291,7 +291,7 @@ def convert_addresses(address):
         "errors": []
     }
 
-    base58_coins = b58_params_cache()
+    base58_coins = cached.get_data("b58_params_cache")
 
     for coin in base58_coins:
         decoded_bytes = bitcoin.base58.decode(address)

@@ -24,3 +24,5 @@ python-dateutil==2.8.2
 eth_keys==0.4.0
 pycryptodome==3.18.0
 pymemcache==4.0.0
+websockets==13.1
+filelock==3.16.1

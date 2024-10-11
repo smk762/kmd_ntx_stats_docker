@@ -4,6 +4,7 @@ import json
 import requests
 from logger import logger
 from lib_const import *
+from const_seasons import SEASONS_INFO
 from decorators import *
 from lib_helper import get_season_notaries, get_nn_region_split
 from lib_urls import get_notary_nodes_repo_elected_nn_social_url, get_notary_addresses_url

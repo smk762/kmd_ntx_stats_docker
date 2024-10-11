@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.12
 from models import *
 from lib_const import *
+from const_seasons import SEASONS_INFO, EXCLUDED_SEASONS
 from lib_helper import *
 from lib_validate import *
 from lib_query import *
@@ -13,7 +14,7 @@ tables = ["addresses", "balances", "coin_sync", "coins", "coin_social",
           "notarised_count_daily", "notarised_count_season", "notarised_tenure",
           "scoring_epochs", "vote2021"]
 
-for season in ["Season_7", "Season_8"]:
+for season in ["Season_8"]:
     if season not in EXCLUDED_SEASONS:
         for server in SEASONS_INFO[season]["servers"]:
             for epoch in SEASONS_INFO[season]["servers"][server]["epochs"]:

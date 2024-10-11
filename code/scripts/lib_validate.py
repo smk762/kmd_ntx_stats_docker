@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.12
 from lib_const import *
+from const_seasons import SEASONS_INFO
 import lib_api
 import lib_electrum
 import lib_query
@@ -39,7 +40,7 @@ def get_season_from_block(block):
     return None
 
 
-def get_coin_epoch_at(season, server, coin, timestamp, testnet):
+def get_coin_epoch_at(season, server, coin, timestamp, testnet=False):
     if testnet:
         return "Epoch_0"
 
@@ -87,11 +88,11 @@ def handle_dual_server_coins(server, coin):
     coin = handle_translate_coins(coin)
 
     if coin in ["GLEEC-OLD"]:
-        server = "Third_Party"
+        server = "Main"
         
     if coin in ["GLEEC"]:
         if server == "Third_Party":
-            coin ="GLEEC-OLD"
+            coin ="Main"
 
     return server, coin
 
@@ -279,36 +280,14 @@ def get_dpow_coin_server(season, coin):
         return coin
     else:
         if "Main" in SEASONS_INFO[season]["servers"]:
+            if coin == "GLEEC-OLD":
+                coin == "GLEEC_OLD"
             if coin in SEASONS_INFO[season]["servers"]["Main"]["coins"]:
                 return "Main"
 
         if "Third_Party" in SEASONS_INFO[season]["servers"]:
             if coin in SEASONS_INFO[season]["servers"]["Third_Party"]["coins"]:
                 return "Third_Party"
-
-    return "Unofficial"
-
- 
-def get_season(timestamp=None):
-
-    if not timestamp:
-        timestamp = int(time.time())
-    timestamp = int(timestamp)
-
-    # detect & convert js timestamps
-    if round((timestamp/1000)/time.time()) == 1:
-        timestamp = timestamp/1000
-
-    for season in SEASONS_INFO:
-
-        if season.find("Testnet") == -1:
-            if 'post_season_end_time' in SEASONS_INFO[season]:
-                end_time = SEASONS_INFO[season]['post_season_end_time']
-            else:
-                end_time = SEASONS_INFO[season]['end_time']
-
-        if timestamp >= SEASONS_INFO[season]['start_time'] and timestamp <= end_time:
-            return season
 
     return "Unofficial"
 

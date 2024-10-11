@@ -2,6 +2,7 @@
 import sys
 import lib_epochs
 import lib_helper as helper
+from const_seasons import SEASONS_INFO
 from lib_const import *
 from decorators import print_runtime
 
@@ -39,5 +40,4 @@ if __name__ == "__main__":
             seasons = SEASONS_INFO.keys()
 
     for season in seasons:
-        if season not in EXCLUDED_SEASONS:
-            populate_epochs(season)
+        populate_epochs(season)

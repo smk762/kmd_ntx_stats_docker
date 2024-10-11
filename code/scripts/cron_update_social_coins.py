@@ -4,6 +4,7 @@ import json
 import time
 import requests
 from lib_const import *
+from const_seasons import SEASONS_INFO
 from decorators import *
 from models import coin_social_row
 import lib_helper as helper
@@ -101,7 +102,8 @@ def populate_coins_social(season):
 if __name__ == "__main__":
 
     logger.info(f"Preparing to populate [social_coins] table...")
-    for season in ["Season_8"]:
+    seasons = helper.get_active_seasons()
+    for season in seasons:
         generate_social_coins_template(season)
         populate_coins_social(season)
     

@@ -4,6 +4,7 @@ import time
 import json
 from decimal import *
 from random import shuffle, choice
+import datetime
 from datetime import datetime as dt
 from filelock import Timeout, FileLock
 
@@ -11,6 +12,7 @@ import lib_api as api
 import lib_validate
 from lib_urls import *
 from lib_const import *
+from const_seasons import SEASONS_INFO, get_season_from_ts
 from lib_update import *
 from decorators import *
 from lib_rpc import RPC
@@ -36,7 +38,8 @@ def get_balances(season):
         thread_list = {}
 
         if season in NOTARY_PUBKEYS:
-            address_data = requests.get(get_notary_addresses_url(season)).json()
+            url = get_notary_addresses_url(season)
+            address_data = requests.get(url).json()
 
             for server in address_data[season]:
                 if season in SEASONS_INFO:
@@ -45,6 +48,7 @@ def get_balances(season):
                         coins = SEASONS_INFO[season]["servers"][server]["coins"]
                         coins += ["BTC", "KMD", "LTC"]
                         coins.sort()
+                        logger.debug(f"{season} {server} {coins}")
                         
                         for notary in SEASONS_INFO[season]["notaries"]:
                             thread_list.update({notary:[]})
@@ -76,7 +80,7 @@ def populate_addresses(season, server):
             if len(coins) > 0:
                 i = 0
                 pubkeys = get_pubkeys(season, server)
-
+                logger.info(f"{coins}")
                 for notary in pubkeys:
                     pubkey = pubkeys[notary]
 
@@ -218,8 +222,8 @@ def scan_blocks_for_rewards(scan_blocks, coin="KMD"):
     for block_height in scan_blocks:
         block = RPC[coin].getblock(str(block_height))
         block_time = block["time"]
-        season = lib_validate.get_season(block_time)
-        date = str(dt.utcfromtimestamp(block_time)).split(" ")[0]
+        season = get_season_from_ts(block_time)['season']
+        date = str(dt.fromtimestamp(block_time, datetime.UTC)).split(" ")[0]
         date = f"{date}".split("-")
         date.reverse()
         date = "-".join(date)
@@ -279,8 +283,8 @@ def check_tx_for_rewards_info(coin, txid, block=None, prices=None):
         block_hash = block["hash"]
         block_time = block["time"]
         block_height = block["height"]
-    season = lib_validate.get_season(block_time)
-    date = str(dt.utcfromtimestamp(block_time)).split(" ")[0]
+    season = get_season_from_ts(block_time)['season']
+    date = str(dt.fromtimestamp(block_time, datetime.UTC)).split(" ")[0]
     date = f"{date}".split("-")
     date.reverse()
     date = "-".join(date)      

@@ -1,9 +1,7 @@
 #!/usr/bin/env python3.12
 import threading
-from lib_helper import *
-from lib_query import *
 
-from models import *
+from models import BalanceRow
 
 
 class update_notary_balances_thread(threading.Thread):
@@ -25,7 +23,7 @@ class update_notary_balances_thread(threading.Thread):
 
 
 def update_notary_balances(season, server, notary, coin, pubkey, address):
-    balance = balance_row()
+    balance = BalanceRow()
     balance.season = season
     balance.server = server
     balance.notary = notary

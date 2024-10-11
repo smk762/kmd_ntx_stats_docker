@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.12
 import json
+from const_seasons import SEASONS_INFO, SCORING_EPOCHS_REPO_DATA
 from lib_update import *
 from lib_query import *
 import lib_validate

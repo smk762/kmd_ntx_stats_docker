@@ -259,7 +259,10 @@ def get_ntx_min_max(season, server=None, epoch=None, coin=None):
     CURSOR = CONN.cursor()
 
     CURSOR.execute(sql)
-    return CURSOR.fetchone()
+    x = CURSOR.fetchone()
+    if x[4] == 0:
+        return [0,0,0,0,0]
+    return x
 
 
 def get_notary_coin_last_nota(season, notary):

@@ -87,6 +87,7 @@
 			            "data": 'opret',
 			            "targets": 6,
 			            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+							console.log(oData.opret)
 			            	let op_return = (oData.opret.split(" ").length > 1) ? oData.opret.split(" ")[1] : oData.opret
 							let icon = "<i class='fas fa-arrow-right'></i>"
 							let tooltip = "Decode OP_RETURN: "+op_return

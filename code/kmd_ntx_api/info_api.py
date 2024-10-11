@@ -6,11 +6,12 @@ from kmd_ntx_api.info import get_mined_between_blocks, \
     get_coin_social_info, get_ltc_txid_list, get_nn_social_info, get_notary_icons, \
     get_notarised_coin_daily, get_notarised_count_daily, get_notarised_coins, \
     get_notarised_servers, get_notarisation_txid_list, get_notarised_txid, \
-    get_notary_ltc_transactions, get_notary_ltc_txid, get_notary_nodes_info
+    get_notary_ltc_transactions, get_notary_ltc_txid, get_notary_nodes_info, \
+    get_hardfork_countdown
 from kmd_ntx_api.explorers import get_explorers
 from kmd_ntx_api.electrum import get_electrums, get_electrums_ssl, get_electrums_wss
 from kmd_ntx_api.helper import json_resp
-from kmd_ntx_api.notary_seasons import get_page_season, get_seasons_info, get_season
+from kmd_ntx_api.notary_seasons import get_page_season, get_seasons_info, get_season, SEASONS_DATA
 from kmd_ntx_api.logger import logger
 
 
@@ -118,7 +119,6 @@ def coin_social_info(request):
 
 
 def ltc_txid_list(request):
-    logger.calc("ltc_txid_list")
     resp = get_ltc_txid_list(request)
     filters = ['season', 'notary', 'category', 'address']
     return json_resp(resp, filters)
@@ -188,3 +188,12 @@ def notary_nodes_info(request):
     resp = get_notary_nodes_info(request)
     filters = ['year']
     return json_resp(resp, filters)
+
+def hardfork_countdown(request):
+    resp = get_hardfork_countdown(request)
+    filters = ['season']
+    return json_resp(resp, filters)
+
+def seasons_data(request):
+    resp = SEASONS_DATA
+    return json_resp(resp)

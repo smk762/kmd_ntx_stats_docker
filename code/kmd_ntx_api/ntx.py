@@ -1,7 +1,7 @@
 import time
 from kmd_ntx_api.query import get_notarised_data, get_notarised_tenure_data
 from kmd_ntx_api.cron import days_ago
-from kmd_ntx_api.cache_data import get_from_memcache, refresh_cache
+from kmd_ntx_api.cache_data import cached
 from kmd_ntx_api.logger import logger
 
 def get_notarised_date(season=None, server=None, coin=None, notary=None, last_24hrs=True):
@@ -29,20 +29,20 @@ def get_ntx_tenure_table(request):
 
 def get_ntx_count_season(notarised_data):
     cache_key = "ntx_count_season"
-    data = get_from_memcache(cache_key, expire=300)
+    data = cached.get_data(cache_key, expire=300)
     if data is None:
         data = notarised_data.count()
-        refresh_cache(data={"val": data}, force=True, key=cache_key, expire=300)
+        cached.refresh(data={"val": data}, force=True, key=cache_key, expire=300)
         return data
     else:
         return data["val"]
 
 def get_ntx_count_24hr(notarised_data):
     cache_key = "ntx_count_season"
-    data = get_from_memcache(cache_key, expire=300)
+    data = cached.get_data(cache_key, expire=300)
     if data is None:
         data = notarised_data.filter(block_time__gt=str(days_ago(1))).count()
-        refresh_cache(data={"val": data}, force=True, key=cache_key, expire=300)
+        cached.refresh(data={"val": data}, force=True, key=cache_key, expire=300)
         return data
     else:
         return data["val"]

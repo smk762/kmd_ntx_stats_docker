@@ -122,5 +122,13 @@ api_info_urls = [
     path('api/info/notary_ltc_transactions/',
           info_api.notary_ltc_transactions,
           name='notary_ltc_transactions'),
+    
+    path('api/info/hardfork_countdown/',
+          info_api.hardfork_countdown,
+          name='hardfork_countdown'),
+
+    path('api/info/seasons_data/',
+          info_api.seasons_data,
+          name='seasons_data'),
 
 ]

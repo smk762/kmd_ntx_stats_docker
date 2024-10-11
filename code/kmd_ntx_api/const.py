@@ -11,8 +11,6 @@ load_dotenv()
 OTHER_SERVER = os.getenv("OTHER_SERVER") # IP / domain of the remote server
 BASIC_PW = os.getenv("BASIC_PW")         # Simple pw for restricting views during testing
 
-MEMCACHE_LIMIT = 250 * 1024 * 1024  # 250 MB
-
 MM2_USERPASS = os.getenv("MM2_USERPASS")
 MM2_IP = "http://mm2:7783"
 
@@ -61,8 +59,7 @@ SINCE_INTERVALS = {
     "year": 365 * 24 * 60 * 60,
 }
 
-SMARTCHAINS = ["BET", "BOTS", "CCL", "CHIPS", "CLC", "DEX",
-                  "GLEEC", "ILN", "KMD", "KOIN", "MCL", "MARTY",
-                  "NINJA", "PIRATE", "REVS", "DOC", "SUPERNET",
-                  "THC", "TOKEL", "VRSC", "VOTE2024"
+SMARTCHAINS = ["CCL", "CLC", "GLEEC", "GLEEC-OLD", "ILN", "KMD", "KOIN", "MCL", "MARTY",
+                  "NINJA", "PIRATE", "DOC", "SUPERNET",
+                  "THC", "TOKEL"
               ]

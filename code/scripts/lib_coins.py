@@ -4,6 +4,7 @@ import time
 import requests
 from lib_api import *
 from lib_const import *
+from const_seasons import SEASONS_INFO
 from lib_helper import *
 from lib_validate import *
 from lib_query import *
@@ -96,7 +97,7 @@ def parse_dpow_coins(coins_data):
                 "dpow":{
                     "src": get_dpow_coin_src(info[1]),
                     "version": info[2],
-                    "server": get_dpow_coin_server(info[4])
+                    "server": translate_dpow_server(info[4])
                 },
                 "dpow_active":1
             })

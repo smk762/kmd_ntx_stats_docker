@@ -94,6 +94,10 @@ class InsightAPI:
         """Get the current sync status of the blockchain."""
         return self._request("sync")
 
+    def node_status(self) -> Dict[str, Any]:
+        """Get the current status of the node."""
+        return self._request("status")
+
     def transaction_info(self, txid: str) -> Dict[str, Any]:
         """Get information about a transaction by its ID."""
         return self._request(f"tx/{txid}")
@@ -118,8 +122,6 @@ class InsightAPI:
 
 INSIGHT_EXPLORERS = {
     "CHIPS": [
-        "https://chips.komodo.earth/",
-        "https://chips.explorer.dragonhound.info/",
         "https://chips.explorer.dexstats.info/",
         "https://explorer.chips.cash/",
     ],
@@ -131,7 +133,6 @@ INSIGHT_EXPLORERS = {
     ],
     "CLC": [
         "https://clc.komodo.earth/",
-        "https://clc.explorer.dragonhound.info/",
         "https://clc.explorer.dexstats.info/",
     ],
     "DOC": [
@@ -176,10 +177,8 @@ INSIGHT_EXPLORERS = {
         "https://marty.explorer.dexstats.info/",
     ],
     "MCL": [
-        "https://mcl.komodo.earth/",
         "https://explorer.marmara.io/",
         "https://mcl.explorer.dexstats.info/",
-        "https://mcl.explorer.dragonhound.info/",
     ],
     "NINJA": [
         "https://ninja.komodo.earth/",
@@ -188,37 +187,24 @@ INSIGHT_EXPLORERS = {
         "https://ninja.kmdexplorer.io/",
     ],
     "PIRATE": [
-        "https://pirate.komodo.earth/",
-        "https://pirate.explorer.dragonhound.info/",
         "https://explorer.pirate.black/",
         "https://pirate.explorer.dexstats.info/",
         "https://pirate.kmdexplorer.io/",
     ],
-    "SPACE": [
-        "https://explorer.spaceworks.co/",
-        "https://space.explorer.dexstats.info/",
-    ],
     "SUPERNET": [
-        "https://supernet.komodo.earth/",
-        "https://supernet.explorer.dragonhound.info/",
         "https://supernet.explorer.dexstats.info/",
         "https://supernet.kmdexplorer.io/",
     ],
     "THC": [
         "https://thc.komodo.earth/",
-        "https://thc.explorer.dragonhound.info/",
         "https://thc.explorer.dexstats.info/",
     ],
     "TOKEL": [
         "https://tokel.komodo.earth/",
-        "https://tokel.explorer.dragonhound.info/",
         "https://explorer.tokel.io/",
         "https://tokel.explorer.dexstats.info/",
     ],
     "VRSC": [
-        "https://vrsc.komodo.earth/",
-        "https://vrsc.explorer.dragonhound.info/",
-        "https://explorer.verus.io/",
         "https://vrsc.explorer.dexstats.info/",
     ],
 }

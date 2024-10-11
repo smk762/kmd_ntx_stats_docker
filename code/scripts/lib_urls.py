@@ -1,7 +1,6 @@
 #!/usr/bin/env python3.12
 import os
 from dotenv import load_dotenv
-from logger import logger
 
 # ENV VARS
 load_dotenv()
@@ -39,7 +38,6 @@ def get_electrums_wss_info_url(local=True):
 def get_ntxid_list_url(season, server, coin, local=True):
     api_server = get_api_server(local)
     url = f"{api_server}/api/info/notarisation_txid_list/?season={season}&server={server}&coin={coin}"
-    logger.info(url)
     return url
 
 
@@ -230,11 +228,11 @@ def get_coins_repo_icons_url(branch='master'):
     return f"https://raw.githubusercontent.com/KomodoPlatform/coins/{branch}/icons"
 
 
-def get_dpow_readme_url(branch='master'):
+def get_dpow_readme_url(branch='update/s8-pubkeys'):
     return f"https://raw.githubusercontent.com/KomodoPlatform/dPoW/{branch}/README.md"
 
 
-def get_dpow_assetchains_url(branch='master'):
+def get_dpow_assetchains_url(branch='update/s8-pubkeys'):
     return f"https://raw.githubusercontent.com/KomodoPlatform/dPoW/{branch}/iguana/assetchains.json"
 
 
@@ -246,6 +244,6 @@ def get_notary_nodes_repo_elected_nn_social_url(season):
     return f"https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/{season.lower().replace('_', '')}/elected_nn_social.json"
 
 
-def get_scoring_epochs_repo_url(branch='master'):
+def get_scoring_epochs_repo_url(branch='update/s8-pubkeys'):
     return f"https://raw.githubusercontent.com/KomodoPlatform/dPoW/{branch}/doc/scoring_epochs.json"
 

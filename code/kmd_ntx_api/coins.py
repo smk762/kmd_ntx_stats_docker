@@ -1,11 +1,11 @@
-from kmd_ntx_api.cache_data import coins_config_cache
+from kmd_ntx_api.cache_data import cached
 from kmd_ntx_api.info import get_dpow_server_coins_info
 from kmd_ntx_api.notary_seasons import get_season
 from kmd_ntx_api.query import get_scoring_epochs_data
-from kmd_ntx_api.logger import logger, timed
+from kmd_ntx_api.logger import logger
 
 def is_testnet(coin):
-    coins_config = coins_config_cache()
+    coins_config = cached.get_data("coins_config_cache")
     return coins_config[coin]["is_testnet"]
 
 
@@ -23,12 +23,16 @@ def get_dpow_coins_dict(season=get_season(), as_list=False):
     return dpow_coins_dict
 
 
-def get_dpow_coins_list(season=None, server=None, epoch=None):
+def get_dpow_coins_list(season=None, server=None, epoch=None, include_kmd=False):
     logger.info(f"get_dpow_coins_list {season}")
     dpow_coins = get_scoring_epochs_data(season, server, None, epoch).values('epoch_coins')
     coins_list = []
     for item in dpow_coins:
         coins_list += item['epoch_coins']
+    if include_kmd:
+        if server in ["Main", None]:
+            coins_list.append("KMD")
+            coins_list.append("LTC")
     coins_list = list(set(coins_list))
     coins_list.sort()
     return coins_list

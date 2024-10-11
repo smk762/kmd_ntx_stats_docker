@@ -4,13 +4,14 @@ import sys
 from os.path import expanduser, dirname, realpath
 import time
 import requests
-
+from const_seasons import SEASONS_INFO
 from lib_dpow_const import *
 from lib_db import *
 from lib_rpc import *
-
+import lib_urls as urls
 from logger import logger
 
+time_now = time.time()
 # How many pages back to go with verbose API responses
 API_PAGE_BREAK = int(os.getenv("API_PAGE_BREAK"))
 
@@ -27,14 +28,14 @@ DEVISOR = 10512000
 
 
 # Electrums & Explorers
-EXPLORERS = requests.get(lib_urls.get_explorers_info_url()).json()['results']
-ELECTRUMS = requests.get(lib_urls.get_electrums_info_url()).json()['results']
-ELECTRUMS_SSL = requests.get(lib_urls.get_electrums_ssl_info_url()).json()['results']
-ELECTRUMS_WSS = requests.get(lib_urls.get_electrums_wss_info_url()).json()['results']
-
+EXPLORERS = requests.get(urls.get_explorers_info_url()).json()['results']
+ELECTRUMS = requests.get(urls.get_electrums_info_url()).json()['results']
+ELECTRUMS_SSL = requests.get(urls.get_electrums_ssl_info_url()).json()['results']
+ELECTRUMS_WSS = requests.get(urls.get_electrums_wss_info_url()).json()['results']
+urls
 
 # Coins
-COINS_INFO = requests.get(lib_urls.get_coins_info_url()).json()['results']
+COINS_INFO = requests.get(urls.get_coins_info_url()).json()['results']
 KNOWN_COINS = COINS_INFO.keys()
 
 
@@ -70,7 +71,6 @@ REVERSE_TRANSLATE_COINS = {
     'COQUICASH': 'COQUI',
     'OUR': 'OURC',
     'WLC21': 'WLC',
-    'GLEEC-OLD': 'GleecBTC',
     'PIRATE': "ARRR",
     'TOKEL':'TKL'
 }
@@ -95,4 +95,4 @@ SCRIPT_PATH = dirname(realpath(sys.argv[0]))
 COINS_CONFIG_URL = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/utils/coins_config.json"
 COINS_CONFIG_PATH = f"{SCRIPT_PATH}/coins_config.json"
 
-logger.info(f"{int(time.time()) - NOW} sec to complete const")
+logger.info(f"{int(time.time()) - time_now} sec to complete const")

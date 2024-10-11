@@ -15,13 +15,13 @@ from kmd_ntx_api.query import get_seednode_version_stats_data, \
 from kmd_ntx_api.struct import default_top_region_notarisers
 from kmd_ntx_api.coins import get_dpow_coins_dict, get_dpow_coins_list
 from kmd_ntx_api.logger import logger, timed
-from kmd_ntx_api.cache_data import get_from_memcache, refresh_cache
+from kmd_ntx_api.cache_data import cached
 
 
 def get_notary_ntx_24hr_summary(ntx_24hr, notary, dpow_coins_dict):
     cache_key = f"{notary}_ntx_24hr_summary"
     if cache_key is not None:
-        data = get_from_memcache(cache_key, expire=300)
+        data = cached.get_data(cache_key, expire=300)
     if data is not None:
         return data
     else:
@@ -90,7 +90,7 @@ def get_notary_ntx_24hr_summary(ntx_24hr, notary, dpow_coins_dict):
                     "seed_node_status": round(seed_node_score, 2),
                     "most_ntx": str(max_ntx_count)+" ("+str(max_coin)+")"
                 })
-        refresh_cache(data=notary_ntx_24hr, force=True, key=cache_key, expire=300)
+        cached.refresh(data=notary_ntx_24hr, force=True, key=cache_key, expire=300)
         return notary_ntx_24hr
  
 
@@ -185,7 +185,7 @@ def get_daily_stats_sorted(notary_list, dpow_coins_dict):
     logger.info("get_daily_stats_sorted")
     cache_key = f"daily_stats_sorted"
     if cache_key is not None:
-        data = get_from_memcache(cache_key, expire=300)
+        data = cached.get_data(cache_key, expire=300)
     if data is not None:
         return data
     else:
@@ -237,7 +237,7 @@ def get_daily_stats_sorted(notary_list, dpow_coins_dict):
                         new_item.update({"rank": i})
                         daily_stats_sorted[region].append(new_item)
                 i += 1
-        refresh_cache(data=daily_stats_sorted, force=True, key=cache_key, expire=300)
+        cached.refresh(data=daily_stats_sorted, force=True, key=cache_key, expire=300)
         return daily_stats_sorted
 
 

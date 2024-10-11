@@ -1,190 +1,173 @@
+
+#!/usr/bin/env python3.12
 import os
-import sys
 import time
 import json
 import requests
-from os.path import expanduser, dirname, realpath
+from dotenv import load_dotenv
+from pathlib import Path
+from pymemcache.client.base import PooledClient
+from typing import Any, Optional, Dict, Union
+
 from kmd_ntx_api.logger import logger
-from kmd_ntx_api.memcached import MEMCACHE
+
+load_dotenv()
+
+HOME = Path.home()
+SCRIPT_PATH: Path = Path(__file__).resolve().parent.resolve().parent
+CACHE_PATH: Path = SCRIPT_PATH / "cache"
+CACHE_PATH.mkdir(exist_ok=True)
+CACHE_TIMEOUT = 86400  # 1 day in seconds
+CACHE_SIZE_LIMIT = 250 * 1024 * 1024  # 250 MB
+CACHE_EXPIRY = 600  # 10 minutes in seconds
+
+CACHE_SOURCE_URLS: Dict[str, Optional[str]] = {
+    "activation_commands_cache": None,
+    "b58_params_cache": None,
+    "coins_config_cache": "https://raw.githubusercontent.com/KomodoPlatform/coins/master/utils/coins_config.json",
+    "coin_icons_cache": None,
+    "coins_info_cache": None,
+    "ecosystem_links_cache": "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json",
+    "get_electrum_status_cache": "https://electrum-status.dragonhound.info/api/v1/electrums_status",
+    "explorers_cache": None,
+    "launch_params_cache": None,
+    "notary_icons": None,
+    "version_timespans_cache": "https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/doc/seed_version_epochs.json",
+    "navigation": None,
+    "notary_pubkeys_cache": None,
+    "notary_seasons": None
+}
 
 
-HOME = expanduser('~')
-SCRIPT_PATH = dirname(realpath(sys.argv[0]))
-CACHE_PATH = f"{SCRIPT_PATH}/cache"
-os.makedirs(CACHE_PATH, exist_ok=True)
+
+class JsonSerde(object):  # pragma: no cover
+    def serialize(self, key, value: Any) -> tuple[bytes, int]:
+        if isinstance(value, str):
+            return value.encode("utf-8"), 1
+        return json.dumps(value).encode("utf-8"), 2
+
+    def deserialize(self, key, value: bytes, flags: int) -> Any:
+        if flags == 1:
+            return value.decode("utf-8")
+        if flags == 2:
+            return json.loads(value.decode("utf-8"))
+        raise Exception("Unknown serialization format")
 
 
-def get_from_memcache(key, path=None, url=None, expire=600):
-    # logger.cached(f"Getting {key} from cache...")
-    key = key.lower()
-    data = MEMCACHE.get(key)
-    if data is None or len(data) == 0:
-        if path is None:
-            path = f"{CACHE_PATH}/{key}.json"
-        data = get_cache_file(path)
-        if data is None or len(data) == 0:
-            data = refresh_cache(path, url, force=True, expire=expire)
-        # logger.cached(f"Returning {key} from {path}")
-    else:
-        # logger.cached(f"Returning {key} from memcache")
-        pass
-    return data
+class Cache:
 
+    def __init__(self, host: str = 'memcached', port: int = 11211, timeout: int = 10, pool: int = 50) -> None:
+        self.host = os.getenv('MEMCACHE_HOST', host)
+        self.port = int(os.getenv('MEMCACHE_PORT', port))
+        self.timeout = int(os.getenv('MEMCACHE_TIMEOUT', timeout))
+        self.pool_size = int(os.getenv('MEMCACHE_POOL_SIZE', pool))
+        self.limit = CACHE_SIZE_LIMIT
+        self._client: Optional[PooledClient] = None
 
-def get_cache_file(file):
-    if not os.path.exists(file):
-        logger.warning(f"Failed to get {file} from cache")
-        return None
-    with open(file, "r") as f:
-        return json.load(f)
+    @property
+    def client(self) -> PooledClient:
+        if self._client is None:
+            try:  # pragma: no cover
+                self._client = PooledClient(
+                    (self.host, self.port),
+                    serde=JsonSerde(),
+                    timeout=self.timeout,
+                    max_pool_size=self.pool_size,
+                    ignore_exc=True,
+                )
+                self.ping()
+                if os.getenv("IS_TESTING") == "True":
+                    self._client.set("testing", True, 3600)
+                logger.info("Connected to memcached docker container")
+            except Exception as e:  # pragma: no cover
+                logger.muted(e)
+                # During tests, we might need localhost
+                self._client = PooledClient(
+                    ('localhost', self.port),
+                    serde=JsonSerde(),
+                    timeout=self.timeout,
+                    max_pool_size=self.pool_size,
+                    ignore_exc=True,
+                )
+                logger.info("Connected to memcached on localhost")
+                if os.getenv("IS_TESTING") == "True":
+                    self._client.set("testing", True, 3600)
+            self._client.cache_memlimit = self.limit
+        return self._client
 
+    def flush(self):
+        self.client.flush_all()
 
-def refresh_cache(path=None, url=None, data=None, force=False, key=None, expire=86400):
-    '''Only used for notary_seasons / seasons_info at the moment'''
-    if path is None and key is not None:
+    def data_path(self, key: str) -> Path:
+        """Returns the cache file path based on the key."""
+        path: Path = CACHE_PATH / f"{key}.json"
+        return path
+
+    def is_expired(self, path: Path, expire: int) -> bool:
+        """Checks if the cache file is expired."""
+        if not path.exists():
+            return True
+        return time.time() - path.stat().st_mtime > expire
+
+    def ping(self) -> bool:
+        """Tests connection to Memcached."""
+        try:
+            self.client.set("foo", "bar", 60)
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to ping Memcached: {e}")
+            return False
+    
+    def get_data(self, key: str, expire: int = CACHE_EXPIRY) -> Optional[Union[dict, list, str]]:
+        """Fetches data from Memcached or file cache."""
+        logger.info(f"Getting {key} from cache")
         key = key.lower()
-        path = f"{CACHE_PATH}/{key}.json"
-
-    if path is not None:    
-        if not os.path.exists(path):
-            data = update_cache_file(path, url, data)    
-        else:
-            mtime = os.path.getmtime(path)
-            if int(time.time()) - mtime > expire or force:
-                data = update_cache_file(path, url, data)
-
-    if key is not None:
-        key = key.lower()
-        if data is not None:
-            if len(data) > 0:
-                MEMCACHE.set(key, data, expire)        
-    return data
-
-
-def update_cache_file(file, url=None, data=None):
-    try:
-        if url and data is not None:
-            data = requests.get(url).json()
-        if isinstance(data, dict):
-            if "results" in data:
-                data = data["results"]
-        if data is not None:
-            if len(data) > 0:
-                with open(file, "w+") as f:
-                    json.dump(data, f, indent=4)
+        data = self.client.get(key)
+        if not data:
+            data = self.refresh(key=key, expire=expire, force=True)
+        if not data and not str(self.data_path(key)).endswith("_summary.json"):
+            data = self.file_data(key)
         return data
-    except Exception as e:
-        logger.warning(f"Failed to update {file} from {url}: {e}")
+
+    def source_data(self, key: str) -> Optional[Union[dict, list]]:
+        """Fetches data from the source URL."""
+        url = CACHE_SOURCE_URLS.get(key)
+        if url:
+            try:
+                logger.info(f"Getting {key} from {url}")
+                response = requests.get(url)
+                response.raise_for_status()
+                data = response.json()
+                if isinstance(data, dict) and "results" in data:
+                    data = data["results"]
+                return data
+            except requests.RequestException as e:
+                logger.warning(f"Failed to fetch data from {url}: {e}")
         return None
 
+    def file_data(self, key: str) -> Optional[Union[dict, list, str]]:
+        """Loads data from file cache."""
+        try:
+            path = self.data_path(key)
+            logger.info(f"Getting {key} from {path}")
+            with open(path, "r") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, OSError) as e:
+            logger.error(f"Failed to read from cache file {path}: {e}")
+            return None
 
-# Activation commands
-ACTIVATION_COMMANDS_URL = "http://127.0.0.1:8762/api/atomicdex/activation_commands/"
-ACTIVATION_COMMANDS_PATH = f"{CACHE_PATH}/activation_commands.json"
-def activation_commands_cache():
-    return get_from_memcache(
-        "activation_commands_cache",
-        ACTIVATION_COMMANDS_PATH
-    )
+    def refresh(self, key: str, expire: int = CACHE_TIMEOUT, force: bool = False, data: Optional[Union[dict, list, str]] = None) -> Optional[Union[dict, list, str]]:
+        """Refreshes the cache file and updates Memcached."""
+        key = key.lower()
+        path = self.data_path(key)
+        if self.is_expired(path, expire) or force and data is None:
+            data = self.source_data(key)
+        if data:
+            self.client.set(key, data, expire)
+            logger.info(f"{key} updated in mem {path}")
+            if not str(path).endswith("_summary.json"):
+                path.write_text(json.dumps(data, indent=4))
+                logger.saved(f"{path} updated!")
+        return self.client.get(key)
 
-
-# Base58 Params
-B58_PARAMS_URL = "http://127.0.0.1:8762/api/info/base_58/"
-B58_PARAMS_PATH = f"{CACHE_PATH}/b58_params.json"
-def b58_params_cache():
-    return get_from_memcache("b58_params_cache", B58_PARAMS_PATH, B58_PARAMS_URL)
-
-
-# Unified coins config
-COINS_CONFIG_URL = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/utils/coins_config.json"
-COINS_CONFIG_PATH = f"{CACHE_PATH}/coins_config.json"
-def coins_config_cache():
-    return get_from_memcache("coins_config_cache", COINS_CONFIG_PATH, COINS_CONFIG_URL)
-
-
-# Coin icons
-# TODO: we should have these local, not hosted in github
-COIN_ICONS_URL = f"http://127.0.0.1:8762/api/info/coin_icons"
-COIN_ICONS_PATH = f"{CACHE_PATH}/coins_icons.json"
-def coin_icons_cache():
-    return get_from_memcache("coin_icons_cache", COIN_ICONS_PATH, COIN_ICONS_URL)
-
-
-# Coins info
-COIN_INFO_URL = f"http://127.0.0.1:8762/api/info/coin"
-COIN_INFO_PATH = f"{CACHE_PATH}/coins_info.json"
-def coins_info_cache():
-    return get_from_memcache("coins_info_cache", COIN_ICONS_PATH, COIN_ICONS_URL)
-
-
-# Links to ecosystem sites
-ECOSYSTEM_LINKS_URL = "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json"
-ECOSYSTEM_LINKS_PATH = f"{CACHE_PATH}/ecosystem.json"
-def ecosystem_links_cache():
-    return get_from_memcache("ecosystem_links_cache", ECOSYSTEM_LINKS_PATH, ECOSYSTEM_LINKS_URL)
-
-
-# Electrum Status
-ELECTRUM_STATUS_URL = "https://electrum-status.dragonhound.info/api/v1/electrums_status"
-ELECTRUM_STATUS_PATH = f"{CACHE_PATH}/electrum_status.json"
-def get_electrum_status_cache():
-    return get_from_memcache(
-        "get_electrum_status_cache",
-        ELECTRUM_STATUS_PATH,
-        ELECTRUM_STATUS_URL
-    )
-
-
-# Block Explorers
-EXPLORERS_URL = "http://127.0.0.1:8762/api/info/explorers/"
-EXPLORERS_PATH = f"{CACHE_PATH}/explorers.json"
-def explorers_cache():
-    return get_from_memcache("explorers_cache", EXPLORERS_PATH, EXPLORERS_URL)
-
-
-# Launch Params
-LAUNCH_PARAMS_URL = "http://127.0.0.1:8762/api/info/launch_params/"
-LAUNCH_PARAMS_PATH = f"{CACHE_PATH}/launch_params.json"
-def launch_params_cache():
-    return get_from_memcache("launch_params_cache", LAUNCH_PARAMS_PATH, LAUNCH_PARAMS_URL)
-
-
-# Notary Icons
-NOTARY_ICONS_URL = f"http://127.0.0.1:8762/api/info/notary_icons/"
-NOTARY_ICONS_PATH = f"{CACHE_PATH}/notary_icons.json"
-def notary_icons_cache():
-    return get_from_memcache("notary_icons_cache", NOTARY_ICONS_PATH, NOTARY_ICONS_URL)
-
-
-# Seed node version epochs
-VERSION_TIMESPANS_URL = "https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/doc/seed_version_epochs.json"
-VERSION_TIMESPANS_PATH = f"{CACHE_PATH}/version_timespans.json"
-def version_timespans_cache():
-    return get_from_memcache(
-        "version_timespans_cache",
-        VERSION_TIMESPANS_PATH,
-        VERSION_TIMESPANS_URL
-    )
-
-# Navigation
-NAVIGATION_PATH = f"{CACHE_PATH}/navigation.json"
-def navigation_cache():
-    return get_from_memcache("navigation", NAVIGATION_PATH)
-
-
-# Notary Pubkeys
-NOTARY_PUBKEYS_PATH = f"{CACHE_PATH}/notary_pubkeys.json"
-def notary_pubkeys_cache():
-    return get_from_memcache("notary_pubkeys", NOTARY_PUBKEYS_PATH)
-
-
-# Notary Seasons
-NOTARY_SEASONS_PATH = f"{CACHE_PATH}/notary_seasons.json"
-def notary_seasons_cache():
-    return get_from_memcache("notary_seasons", NOTARY_SEASONS_PATH)
-
-
-# Seasons Info
-SEASONS_INFO_PATH = f"{CACHE_PATH}/seasons_info.json"
-def seasons_info_cache():
-    return get_from_memcache("seasons_info", SEASONS_INFO_PATH)
+cached = Cache()

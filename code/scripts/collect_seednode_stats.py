@@ -12,6 +12,9 @@ from psycopg2.extras import execute_values
 
 
 from lib_helper import *
+
+from const_seasons import get_season_from_ts
+
 import lib_validate as validate
 import lib_electrum as electrum
 from logger import logger
@@ -346,7 +349,7 @@ def get_registered_nodes_from_db():
 def update_seednode_version_stats_row(row_data):
     try:
         timestamp = row_data[3]
-        season = validate.get_season(timestamp)
+        season = get_season_from_ts(timestamp)['season']
         sql = f"INSERT INTO seednode_version_stats \
                     (name, season, version, timestamp, error, score) \
                 VALUES (%s, %s, %s, %s, %s, %s) \
@@ -453,12 +456,11 @@ def migrate_sqlite_to_pgsql(ts, rescan=False):
         rows = get_version_stats_from_sqlite_db(ts)
 
     for row in rows:
-        logger.calc("-----------------------------")
         logger.info(f"SQLITE: {row}")
         if row["version"] != '':
             wss_detected = False
             hr_timestamp = round_ts_to_hour(row["timestamp"])   
-            season = validate.get_season(hr_timestamp)
+            season = get_season_from_ts(hr_timestamp)['season']
 
             if row["name"] not in wss_confirmed:
                 if test_wss(row["name"]) or rescan:

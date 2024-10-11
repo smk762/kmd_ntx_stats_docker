@@ -1,6 +1,8 @@
 #!/usr/bin/env python3.12
-from lib_const import *
-from lib_helper import has_season_started
+import sys
+from lib_dpow_const import RESCAN_SEASON
+from const_seasons import SEASONS_INFO
+from lib_helper import get_active_seasons
 from lib_mining import update_mined_table, update_mined_count_daily_table, update_mined_count_season_table
 from decorators import print_runtime
 from logger import logger
@@ -32,8 +34,7 @@ def run_updates(seasons):
             update_mined_count_season_table(season)
 
 if __name__ == "__main__":
-    current_season = get_season()['season']
-    seasons = [current_season]
+    seasons = get_active_seasons()
     if len(sys.argv) > 1:
         if sys.argv[1] == "rescan":
             RESCAN_SEASON = True

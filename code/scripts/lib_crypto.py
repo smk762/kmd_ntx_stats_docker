@@ -8,7 +8,7 @@ from bitcoin.core import x
 from bitcoin.core import CoreMainParams
 from bitcoin.wallet import P2PKHBitcoinAddress
 import alerts
-import lib_urls  
+from lib_urls import get_coins_info_url
 from logger import logger
 
 
@@ -111,7 +111,7 @@ COIN_PARAMS = {
     "GAME": GAME_CoinParams
 }
 
-COINS_INFO = requests.get(lib_urls.get_coins_info_url()).json()['results']
+COINS_INFO = requests.get(get_coins_info_url()).json()['results']
 
 # Defines BASE_58 coin parameters
 for coin in COINS_INFO:
@@ -142,6 +142,7 @@ def get_addr_from_pubkey(coin, pubkey):
     if coin in COIN_PARAMS:
         bitcoin.params = COIN_PARAMS[coin]
         return str(P2PKHBitcoinAddress.from_pubkey(x(pubkey)))
+    logger.warning(f"{coin} not in COIN_PARAMS")
     return None
 
 

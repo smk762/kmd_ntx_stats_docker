@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.12
 from lib_const import *
 from decorators import *
-from lib_dpow_const import SEASONS_INFO
+from const_seasons import SEASONS_INFO
 from lib_query_ntx import select_from_notarised_tbl_where
 from lib_update_ntx import delete_from_notarised_tbl_where, update_ntx_row
 import lib_helper as helper

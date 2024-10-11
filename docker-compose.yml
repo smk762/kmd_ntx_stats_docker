@@ -107,9 +107,6 @@ services:
     ports:
       - "8762:8762"
     depends_on:
-      - mm2
-      - db
-      - kmd
       - memcached
     logging:
       driver: "json-file"
@@ -125,8 +122,6 @@ services:
     restart: always
     depends_on:
       - db
-      - mm2
-      - kmd
     command: ["memcached", "-I", "40m", "-m", "100m"]
     ulimits:
       nproc: 65535

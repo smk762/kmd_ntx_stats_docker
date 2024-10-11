@@ -4,9 +4,11 @@ import sys
 import json
 import time
 import random
+from typing import List, Dict, Optional
 from decimal import *
 from datetime import datetime as dt
 import datetime
+from const_seasons import SEASONS_INFO, get_season_from_ts
 from lib_const import *
 from decorators import *
 from models import mined_row, daily_mined_count_row, season_mined_count_row
@@ -34,53 +36,72 @@ def get_mined_row(row, block_tx, coin="KMD", prices=None):
     return row
 
 
-def update_mined_rows(rescan_blocks, coin="KMD", prices=None):
-    for block in rescan_blocks:
+def update_mined_rows(rescan_blocks: List[int], coin: str = "KMD", prices: Optional[Dict] = None):
+    if prices is None:
+        prices = {}
+    
+    def format_date(timestamp: int) -> str:
+        """Helper function to format the date."""
+        return dt.utcfromtimestamp(timestamp).strftime('%d-%m-%Y')
+
+    def fetch_block_info(block: int, coin: str) -> dict:
+        """Fetch block info from the RPC."""
+        try:
+            return RPC[coin].getblock(str(block), 2)
+        except Exception as e:
+            logger.error(f"Error fetching block info for block {block}: {e}")
+            return {}
+
+    def fetch_and_update_prices(season: str, date: str) -> None:
+        """Fetch prices from the API and update the prices dictionary."""
+        if season not in prices:
+            prices[season] = {}
+
+        if date not in prices[season]:
+            api_prices = api.get_kmd_price(date)
+            if api_prices:
+                logger.info(f"Fetched prices for {date}: {api_prices}")
+                prices[season][date] = api_prices
+            else:
+                logger.warning(f"No prices available for {date}, setting default values.")
+                prices[season][date] = {"btc": 0, "usd": 0}
+
+            time.sleep(1)  # Adjust this based on the API rate limits
+
+    def process_block(block: int) -> None:
+        """Process individual block."""
         row = mined_row()
-        blockinfo = RPC[coin].getblock(str(block), 2)
+        blockinfo = fetch_block_info(block, coin)
+        if not blockinfo:
+            return
+        
         row.block_time = blockinfo['time']
         row.diff = blockinfo['difficulty']
         row.block_height = block
+        
+        season = get_season_from_ts(row.block_time)['season']
+        date = format_date(row.block_time)
 
-        season = lib_validate.get_season(row.block_time)
-        date = f"{dt.utcfromtimestamp(row.block_time)}".split(" ")[0]
-        date = date.split("-")
-        date.reverse()
-        date = "-".join(date)
-        logger.info(date)
-        logger.info(season)
-        #logger.info(prices)
+        logger.info(f"Processing block {block} from {season} on {date}")
 
-        if season not in prices:
-            prices.update({season: {}})
+        fetch_and_update_prices(season, date)
 
-        if f"{date}" not in prices[season]:
-            prices[season].update({f"{date}": {}})
-
-        if 'btc' not in prices[season][f"{date}"]:
-            api_prices = api.get_kmd_price(date)
-            if api_prices:
-                price_updated = True
-                if "btc" in api_prices:
-                    prices[season][f"{date}"].update(api_prices)
-                    logger.info(prices[season][f"{date}"])
-                #logger.info(prices[season][f"{date}"])
-                time.sleep(1)
-            else:
-                prices[season][f"{date}"].update({"btc":0,"usd":0})
-
-        #logger.info(prices[season][date])
-        if 'usd' in prices[season][date]:
-            row.usd_price = Decimal(prices[season][date]['usd'])
-        if 'btc' in prices[season][date]:
-            row.btc_price = Decimal(prices[season][date]['btc'])
+        # Set price in row
+        row.usd_price = Decimal(prices[season][date].get('usd', 0))
+        row.btc_price = Decimal(prices[season][date].get('btc', 0))
 
         row = get_mined_row(row, blockinfo['tx'], coin, prices)
         if row.address not in ['', 'N/A']:
             row.update()
 
+    # Main loop through blocks
+    for block in rescan_blocks:
+        process_block(block)
+
+    # Save updated prices history
     with open(f"{script_path}/prices_history.json", "w+") as j:
         json.dump(prices, j, indent=4)
+
 
 
 @print_runtime
@@ -88,8 +109,9 @@ def update_mined_table(season, coin="KMD", start_block=None):
 
     tip = int(RPC[coin].getblockcount())
     if not start_block:
-        start_block = tip - 150
+        start_block = tip - 15000
 
+    logger.info(f"Checking mined blocks {start_block} - {tip}")
     all_blocks = [*range(1,tip,1)]
     recorded_blocks = [block[0] for block in select_from_table('mined', 'block_height')]
     unrecorded_blocks = set(all_blocks) - set(recorded_blocks)
@@ -120,7 +142,7 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
 
     if season != "since_genesis":
         season_notaries = SEASONS_INFO[season]["notaries"]
-        season_start_dt = dt.utcfromtimestamp(SEASONS_INFO[season]["start_time"])
+        season_start_dt = dt.fromtimestamp(SEASONS_INFO[season]["start_time"], datetime.UTC)
         start = season_start_dt.date()
     else:
         start = datetime.date(2016, 9, 13)
@@ -130,7 +152,7 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
     now = int(time.time())
 
     if not rescan:
-        start = end - datetime.timedelta(days=30)
+        start = end - datetime.timedelta(days=3)
 
     logger.info(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
     logger.info(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")

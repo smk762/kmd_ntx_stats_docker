@@ -14,6 +14,7 @@ from kmd_ntx_api.table import get_addresses_rows, get_balances_rows, \
             
 from kmd_ntx_api.swaps import get_swaps_gui_stats
 from kmd_ntx_api.helper import json_resp
+from kmd_ntx_api.logger import logger
 
 # Source Data Tables
 def addresses_table_api(request):
@@ -134,11 +135,17 @@ def notary_profile_summary_table(request):
 
 
 def notary_season_ntx_summary_table(request):
-    resp = get_notary_ntx_season_table_data(request)['notary_ntx_summary_table']
-    table_data = []
-    for coin in resp[0]:
-        table_data.append(resp[0][coin])
+    resp = get_notary_ntx_season_table_data(request)
     filters = ["season", "server", "notary"]
+    # logger.info(resp)
+    if 'error' in resp:
+        return json_resp(resp, filters)
+    resp = resp['notary_ntx_summary_table']
+    logger.info(resp)
+    table_data = []
+    if len(resp) > 0:
+        for coin in resp:
+            table_data.append(resp[coin])
     return json_resp(table_data, filters)
 
 

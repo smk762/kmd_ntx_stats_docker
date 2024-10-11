@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.12
 import sys
 from lib_const import *
+from const_seasons import SEASONS_INFO
 import lib_helper as helper
 from decorators import print_runtime
 import lib_ntx
@@ -20,21 +21,21 @@ def update_ntx_tables(seasons, rescan=False):
     for season in seasons:
         logger.info(f"Updating notarisations for {season}")
 
-        notarised_table = lib_ntx.notarised(season, rescan)
+        notarised_table = lib_ntx.Notarised(season, rescan)
         if CLEAN_UP:
             notarised_table.clean_up()
             rescan = True
 
         notarised_table.update_table()
 
-        last_ntx_tables = lib_ntx.last_notarisations(season)
+        last_ntx_tables = lib_ntx.LastNotarisations(season)
         last_ntx_tables.update_coin_table()
         last_ntx_tables.update_notary_table()
-        ntx_season_tables = lib_ntx.ntx_season_stats(season)
+        ntx_season_tables = lib_ntx.NtxSeasonStats(season)
         if CLEAN_UP:
             ntx_season_tables.clean_up()
         ntx_season_tables.update_ntx_season_stats_tables()
-        ntx_daily_tables = lib_ntx.ntx_daily_stats(season, rescan)
+        ntx_daily_tables = lib_ntx.NtxDailyStats(season, rescan)
         ntx_daily_tables.update_daily_ntx_tables()
 
 

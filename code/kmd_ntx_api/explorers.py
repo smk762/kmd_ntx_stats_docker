@@ -2,6 +2,7 @@
 import requests
 from kmd_ntx_api.helper import get_or_none
 from kmd_ntx_api.query import get_coins_data
+from kmd_ntx_api.logger import logger
 
 # Grabs data from Dexstats explorer APIs
 # e.g. https://kmd.explorer.dexstats.info/insight-api-komodo
@@ -23,13 +24,12 @@ def get_explorers(request):
 
 
 def get_base_endpoint(coin):
-    if coin == "MIL":
-        return f"https://mil.kmdexplorer.io/api"
-    if coin == "VOTE2024":
-        return f"https://vote2024.explorer.lordofthechains.com/insight-api-komodo"
-
     if coin == "MCL":
         return f"https://explorer.marmara.io/insight-api-komodo"
+    if coin == "GLEEC":
+        return f"https://explorer.gleec.com/insight-api-komodo"
+    if coin in ["GLEEC_OLD", "GLEEC-OLD"]:
+        return f"https://old.gleec.xyz/insight-api-komodo"
 
     return f"https://{coin.lower()}.explorer.dexstats.info/insight-api-komodo"
 
@@ -53,7 +53,7 @@ def get_sync(coin):
         return f"{e}"
 
 
-def get_block_info(coin, block_height):
+def get_blockhash(coin, block_height):
     try:
         subdomain = get_base_endpoint(coin)
         endpoint = f"block-index/{block_height}"

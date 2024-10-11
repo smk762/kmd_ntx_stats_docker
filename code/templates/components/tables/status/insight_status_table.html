@@ -21,6 +21,7 @@
                         <th data-data="height">Height</th>
                         <th data-data="sync_pct">Sync %</th>
                         <th data-data="blockhash">Blockhash</th>
+                        <th data-data="version">Version</th>
                         <th data-data="status">Status</th>
                     </tr>
                 </thead>
@@ -87,8 +88,14 @@
                     }
                 },
                 {
-                    "data": "status",
+                    "data": "version",
                     "targets": 5,
+                    "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                    }
+                },
+                {
+                    "data": "status",
+                    "targets": 6,
                     "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
                         let tooltip = oData.status.replace(/['"]+/g, '')
                         if (tooltip == 'finished')

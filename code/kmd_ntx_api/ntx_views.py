@@ -25,18 +25,24 @@ from kmd_ntx_api.table import get_notary_epoch_scores_table
 
 
 def notary_profile_view(request, notary=None):
-    logger.info("notary_profile_view")
-    context = get_base_context(request)
+    logger.warning("notary_profile_view")
+    context = get_base_context(request, notary=notary)
+    logger.warning(context['notary'])
     # TODO: This is not currently used, but can be added for prior season stats given fully populated databases
     context.update({
         "notary_seasons": get_notary_seasons(),
         "notary": notary
     })
+    logger.warning(context['notary'])
+    logger.warning(notary)
     # Base context will return a random notary if one is not specified. For this view, we prefer 'None'.
     if notary in context["notaries"]:
         context = get_notary_profile_context(request, notary, context)
         return render(request, 'views/notarisation/notary_profile.html', context)
     context = get_notary_profile_index_context(request, context)
+    logger.warning(notary)
+    logger.warning(context['notary'])
+    
     return render(request, 'views/notarisation/notary_profile_index.html', context)
 
 
@@ -53,7 +59,7 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
     if coin:
         context = get_coin_profile_context(request, season, coin, context)
         return render(request, 'views/coin/coin_profile.html', context)   
-    context = get_coin_profile_index_context(request, season, context)
+    context = get_coin_profile_index_context(request, context)
     return render(request, 'views/coin/coin_profile_index.html', context)
 
 
@@ -120,7 +126,10 @@ def notarisation_view(request):
     ntx_data = get_notarised_data(txid=txid)
     context = get_base_context(request)
     serializer = notarisedSerializer(ntx_data, many=True)
-    context.update({"ntx_data": dict(serializer.data[0])})
+    try:
+        context.update({"ntx_data": dict(serializer.data[0])})
+    except:
+        pass
     return render(request, 'views/ntx/notarisation.html', context)
 
 
@@ -228,7 +237,7 @@ def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY 
     if coin:
         context = get_coin_profile_context(request, season, coin, context)
         return render(request, 'views/coin/coin_profile.html', context)    
-    context = get_coin_profile_index_context(request, season, context)
+    context = get_coin_profile_index_context(request, context)
     return render(request, 'views/coin/coin_profile_index.html', context)
 
 
