@@ -633,7 +633,6 @@ class CoinNtxSeasonRow():
     def update(self):
         row_data = (self.season, self.coin, self.coin_data, self.timestamp)
         if self.validated():
-            logger.info(f"Updating [CoinNtxSeasonRow] {self.coin} {self.season}")
             update_coin_ntx_season_row(row_data)
         else:
             logger.warning(f"[CoinNtxSeasonRow] Row data invalid! {self.coin} {self.season}")
@@ -669,7 +668,6 @@ class NotaryNtxSeasonRow():
         row_data = (self.season, self.notary, self.notary_data, self.timestamp)
         if self.validated():
             update_notary_ntx_season_row(row_data)
-            logger.info(f"Updating [notary_ntx_season] {self.notary} {self.season}")
         else:
             logger.warning(f"[notary_ntx_season] Row data invalid! {self.notary} {self.season}")
             logger.warning(f"{row_data}")
@@ -703,7 +701,6 @@ class ServerNtxSeasonRow():
     def update(self):
         row_data = (self.season, self.server, self.server_data, self.timestamp)
         if self.validated():
-            logger.info(f"Updating [server_ntx_season] {self.server} {self.season}")
             update_server_ntx_season_row(row_data)
         else:
             logger.warning(f"[server_ntx_season] Row data invalid! {self.server} {self.season}")
@@ -749,7 +746,6 @@ class coin_last_ntx_row():
                      self.ac_ntx_height)
         if self.validated():
             msg = f"{self.season} {self.server} {self.coin} "
-            logger.info(f"Updating [coin_last_ntx] {msg}")
             update_coin_last_ntx_row(row_data)
         else:
             logger.warning(f"[coin_last_ntx] Row data invalid!")

@@ -130,15 +130,12 @@ def get_notary_profile_index_context(request, context):
 def get_notary_profile_context(request, notary, context):
     try:
         notary_profile_summary_table = get_notary_ntx_season_table_data(request, notary)
-        if len(notary_profile_summary_table["notary_ntx_summary_table"]) == 1:
-
+        if len(notary_profile_summary_table["notary_ntx_summary_table"]) > 1:
             last_ntx_time = 0
             last_ntx_coin = ""
             last_ltc_ntx_time = 0
-            notary_ntx_summary_table = notary_profile_summary_table["notary_ntx_summary_table"][0]
-
+            notary_ntx_summary_table = notary_profile_summary_table["notary_ntx_summary_table"]
             for coin in notary_ntx_summary_table:
-                logger.loop(coin)
                 if "last_ntx_blocktime" in notary_ntx_summary_table[coin]:
                     if coin == "KMD":
                         last_ltc_ntx_time = notary_ntx_summary_table[coin]["last_ntx_blocktime"]
@@ -153,20 +150,18 @@ def get_notary_profile_context(request, notary, context):
                 "last_ntx_time": get_time_since(last_ntx_time)[1],
                 "last_ntx_coin": last_ntx_coin
             })
-            logger.info(context["last_ntx_coin"])
 
             seed_scores = get_seednode_version_score_total(request)
             notarised_data_24hr = get_notarised_date(context['season'], None, None, notary, True)
             region = get_notary_region(notary)
             season_stats_sorted = get_season_stats_sorted(context['season'], context['notaries'])
-            logger.calc(region)
             
             ntx_season_data = notary_profile_summary_table["ntx_season_data"][0]
             seed_score = seed_scores[notary]
             total_ntx_score = ntx_season_data["total_ntx_score"]
             logger.query(total_ntx_score)
             total_score = total_ntx_score + seed_score
-            logger.merge(f"total_score: {total_score}")
+            mining_summary = get_nn_mining_summary(notary, context['season'])
             context.update({
                 "page_title": f"{notary} Notary Profile",
                 "notary": notary,
@@ -180,11 +175,13 @@ def get_notary_profile_context(request, notary, context):
                 "rank": get_region_rank(season_stats_sorted[region], notary),
                 "buttons": buttons.get_ntx_buttons(),
                 "nn_social": get_nn_social_info(request), # Social Media Links
-                "mining_summary": get_nn_mining_summary(notary), #  Mining Summary
+                "mining_summary": mining_summary, #  Mining Summary
                 "master_notarised_24hr": notarised_data_24hr.filter(server='KMD').count(),
                 "main_notarised_24hr": notarised_data_24hr.filter(server='Main').count(),
                 "third_notarised_24hr": notarised_data_24hr.filter(server='Third_Party').count()
             })
+        else:
+            logger.warning("Unexpected length for notary_profile_summary_table")
     except Exception as e:
         logger.warning(f"Failed to get notary profile context for {notary}: {e}")
     return context

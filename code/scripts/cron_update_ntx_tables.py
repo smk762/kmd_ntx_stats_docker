@@ -50,7 +50,6 @@ if __name__ == "__main__":
     FULL_SCAN = False
     RESCAN_SEASON = False
     seasons = helper.get_active_seasons()
-    logger.info(f"Active season: {seasons}")
     if len(sys.argv) > 1:
         if "rescan" in sys.argv:
             RESCAN_SEASON = True

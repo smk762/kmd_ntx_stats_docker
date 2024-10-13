@@ -141,7 +141,6 @@ def notary_season_ntx_summary_table(request):
     if 'error' in resp:
         return json_resp(resp, filters)
     resp = resp['notary_ntx_summary_table']
-    logger.info(resp)
     table_data = []
     if len(resp) > 0:
         for coin in resp:

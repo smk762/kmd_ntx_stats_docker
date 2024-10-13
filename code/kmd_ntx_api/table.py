@@ -9,7 +9,7 @@ from kmd_ntx_api.cache_data import cached
 import kmd_ntx_api.models as models
 from kmd_ntx_api.info import get_epoch_coins_dict
 from kmd_ntx_api.const import SINCE_INTERVALS
-from kmd_ntx_api.helper import get_or_none, get_page_server
+from kmd_ntx_api.helper import get_or_none, get_page_server, get_notary_list
 from kmd_ntx_api.cron import days_ago, get_time_since
 from kmd_ntx_api.notary_seasons import (
     get_page_season,
@@ -575,9 +575,11 @@ def get_notary_ntx_season_table_data(request, notary=None):
     season_coins = get_dpow_coins_list(season, include_kmd=True)
     notary = get_or_none(request, "notary", notary)
     if not notary or not season:
-        return {
+        error = {
             "error": "You need to specify at least both of the following filter parameters: ['notary', 'season']"
         }
+        logger.error(error)
+        return error
     ntx_season_data = get_notary_ntx_season_table(request, notary)
 
     notary_summary = {}
@@ -585,10 +587,8 @@ def get_notary_ntx_season_table_data(request, notary=None):
         try:
             if notary == item["notary"]:
                 for server in servers:
-                    logger.info(servers)
                     server_coins = get_dpow_coins_list(season, server, include_kmd=True)
                     for coin in server_coins:
-                        logger.info(server_coins)
                         if coin not in item["server_data"][server]["coins"]:
                             coin_ntx_count = 0
                             coin_ntx_score = 0
@@ -614,8 +614,6 @@ def get_notary_ntx_season_table_data(request, notary=None):
                                 }
                             }
                         )
-                        logger.info(notary_summary[coin])
-
                 for coin in season_coins:
                     if coin not in item["coin_data"]:
                         logger.warning(f"{coin} not in notary_summary[{notary}]")
@@ -672,12 +670,14 @@ def get_coin_ntx_season_table_data(request, coin=None):
         }
 
     ntx_season_data = get_coin_ntx_season_table(request, coin)
+    seasons_info = get_seasons_info()
+    notary_list = get_notary_list(season, seasons_info)
 
     coin_summary = {}
     for item in ntx_season_data:
         coin = item["coin"]
         server = item["server"]
-        for notary in item["notary_data"]:
+        for notary in notary_list:
             if coin not in coin_summary:
                 coin_summary.update({coin: {}})
 
@@ -933,40 +933,40 @@ def get_notary_epoch_scores_table(request, notary=None):
         """
         server_data = item["notary_data"]["servers"]
         for server in server_data:
-            if server not in ["Unofficial", "LTC"]:
+            if server not in ["Unofficial", "LTC"] and isinstance(server_data[server], dict):
                 for epoch in server_data[server]["epochs"]:
-                    if epoch != "Unofficial":
-
+                    if epoch != "Unofficial" and isinstance(server_data[server]["epochs"][epoch], dict):
                         for coin in server_data[server]["epochs"][epoch]["coins"]:
+                            if isinstance(server_data[server]["epochs"][epoch]["coins"][coin], dict):
+                                if epoch.find("_") > -1:
+                                    epoch_id = epoch.split("_")[1]
+                                else:
+                                    epoch_id = epoch
+                                logger.calc(f"{server} {epoch} {coin}")
+                                row = {
+                                    "notary": notary,
+                                    "season": season.replace("_", " "),
+                                    "server": server,
+                                    "epoch": epoch_id,
+                                    "coin": coin,
+                                    "score_per_ntx": server_data[server]["epochs"][epoch][
+                                        "score_per_ntx"
+                                    ],
+                                    "epoch_coin_count": server_data[server]["epochs"][
+                                        epoch
+                                    ]["coins"][coin]["ntx_count"],
+                                    "epoch_coin_score": server_data[server]["epochs"][
+                                        epoch
+                                    ]["coins"][coin]["ntx_score"],
+                                    "epoch_coin_count_self_pct": server_data[server][
+                                        "epochs"
+                                    ][epoch]["coins"][coin]["pct_of_notary_ntx_count"],
+                                    "epoch_coin_score_self_pct": server_data[server][
+                                        "epochs"
+                                    ][epoch]["coins"][coin]["pct_of_notary_ntx_score"],
+                                }
 
-                            if epoch.find("_") > -1:
-                                epoch_id = epoch.split("_")[1]
-                            else:
-                                epoch_id = epoch
-                            row = {
-                                "notary": notary,
-                                "season": season.replace("_", " "),
-                                "server": server,
-                                "epoch": epoch_id,
-                                "coin": coin,
-                                "score_per_ntx": server_data[server]["epochs"][epoch][
-                                    "score_per_ntx"
-                                ],
-                                "epoch_coin_count": server_data[server]["epochs"][
-                                    epoch
-                                ]["coins"][coin]["ntx_count"],
-                                "epoch_coin_score": server_data[server]["epochs"][
-                                    epoch
-                                ]["coins"][coin]["ntx_score"],
-                                "epoch_coin_count_self_pct": server_data[server][
-                                    "epochs"
-                                ][epoch]["coins"][coin]["pct_of_notary_ntx_count"],
-                                "epoch_coin_score_self_pct": server_data[server][
-                                    "epochs"
-                                ][epoch]["coins"][coin]["pct_of_notary_ntx_score"],
-                            }
-
-                            rows.append(row)
+                                rows.append(row)
     return rows, totals
 
 

@@ -294,7 +294,7 @@ def get_coin_notariser_ranks(season, dpow_coins_list):
     notary_list = get_notary_list(season)
     ntx_season = ntx_season.values()
 
-    if season.find("estnet") > -1:
+    if season.lower().find("testnet") > -1:
         region_notary_ranks = {
             "TESTNET": {}
         }
@@ -311,8 +311,13 @@ def get_coin_notariser_ranks(season, dpow_coins_list):
                         region_notary_ranks[region][notary].update({
                             coin:item['coin_ntx_counts'][coin]
                         })
+                    else:
+                        logger.warning(f"{coin} not in {season} coins_list")
+            else:
+                logger.warning(f"{notary} not in {season} notary_list")
 
     else:
+        coins_list = get_dpow_coins_list(season, include_kmd=True)
         region_notary_ranks = {
             "AR": {},
             "EU": {},
@@ -324,6 +329,8 @@ def get_coin_notariser_ranks(season, dpow_coins_list):
             region = get_notary_region(notary)
             if region in ["AR","EU","NA","SH", "DEV"]:
                 region_notary_ranks[region].update({notary:{}})
+            else:
+                logger.warning(f"Region {region} in {season} not recognised!")
 
         for item in ntx_season:
             notary = item['notary']
@@ -335,5 +342,11 @@ def get_coin_notariser_ranks(season, dpow_coins_list):
                             region_notary_ranks[region][notary].update({
                                 coin: item['notary_data']["coins"][coin]["ntx_count"]
                             })
+                        else:
+                            logger.warning(f"Region {region} in {season} not recognised!")
+                else:
+                    logger.warning(f"{coin} not in {season} coins_list")
+            else:
+                logger.warning(f"{notary} not in {season} notary_list")
     return region_notary_ranks
 

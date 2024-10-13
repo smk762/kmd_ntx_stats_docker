@@ -25,24 +25,17 @@ from kmd_ntx_api.table import get_notary_epoch_scores_table
 
 
 def notary_profile_view(request, notary=None):
-    logger.warning("notary_profile_view")
     context = get_base_context(request, notary=notary)
-    logger.warning(context['notary'])
     # TODO: This is not currently used, but can be added for prior season stats given fully populated databases
     context.update({
         "notary_seasons": get_notary_seasons(),
         "notary": notary
     })
-    logger.warning(context['notary'])
-    logger.warning(notary)
     # Base context will return a random notary if one is not specified. For this view, we prefer 'None'.
     if notary in context["notaries"]:
         context = get_notary_profile_context(request, notary, context)
         return render(request, 'views/notarisation/notary_profile.html', context)
-    context = get_notary_profile_index_context(request, context)
-    logger.warning(notary)
-    logger.warning(context['notary'])
-    
+    context = get_notary_profile_index_context(request, context)    
     return render(request, 'views/notarisation/notary_profile_index.html', context)
 
 

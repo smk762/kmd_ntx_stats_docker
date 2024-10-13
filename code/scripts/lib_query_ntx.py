@@ -378,7 +378,31 @@ def get_existing_notarised_txids(season=None, server=None, coin=None):
     recorded_txids = []
     for txid in existing_txids:
         recorded_txids.append(txid[0])
+    logger.info(f"Got {len(recorded_txids)} existing TXIDs from [notarised]...")
     return recorded_txids
+
+
+def refresh_materialized_view(view, season=None):
+    CONN = connect_db()
+    CURSOR = CONN.cursor()
+    for k, v in materialized_views:
+        try:
+            sql = f"CREATE MATERIALIZED VIEW {k} AS {v};"
+            if season:
+                sql.replace("SEASON", season)
+            CURSOR.execute(sql)
+            CONN.commit()
+        except:
+            pass
+    
+        
+        
+    logger.info(f"Refreshing materialized view {view}")
+    sql = f"REFRESH MATERIALIZED VIEW {view};"
+    CURSOR.execute(sql)
+    CONN.commit()
+    CURSOR.close()
+    CONN.close()  #
 
 
 def validate_notarised_epoch_timespan(season, server, epoch):
@@ -386,3 +410,7 @@ def validate_notarised_epoch_timespan(season, server, epoch):
     min_time = min_max[1]
     max_time = min_max[3]
 
+materialized_views = {
+    "existing_notarised_txids_SEASON": "SELECT DISTINCT txid from notarised WHERE season = 'SEASON'"
+}
+"CREATE MATERIALIZED VIEW fast_view AS"

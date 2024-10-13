@@ -5,6 +5,7 @@ import random
 import requests
 import datetime
 from datetime import datetime as dt
+from functools import cached_property
 
 import alerts
 import lib_api as api
@@ -26,7 +27,6 @@ class Notarised:
     def __init__(self, season, rescan=False):
         self.season = season
         self.rescan = rescan
-        self.existing_txids = query.get_existing_notarised_txids()
         self.chain_tip = int(RPC["KMD"].getblockcount())
         self.start_block = self._determine_start_block()
         self.end_block = (
@@ -34,10 +34,17 @@ class Notarised:
             SEASONS.INFO[self.season]["end_block"]
         )
         self.chain_tip = min(self.chain_tip, self.end_block)
+        self._existing_txids = None
 
     def _determine_start_block(self):
         """Determine the starting block based on the rescan flag."""
         return self.chain_tip - 24 * 60 if not self.rescan else SEASONS.INFO[self.season]["start_block"]
+
+    @property
+    def existing_txids(self):
+        if self._existing_txids is None:
+            self._existing_txids = query.get_existing_notarised_txids(self.season)
+        return self._existing_txids
 
     @print_runtime
     def update_table(self):
@@ -48,6 +55,11 @@ class Notarised:
         else:
             logger.info(f"Recanning notarisations for {self.season}, blocks {self.start_block} - {self.end_block}")
             self.rescan_notarisations()
+
+    def refresh_materialized_views(self):
+        query.refresh_materialized_view(f"existing_notarised_txids_{self.season}", self.season)
+        
+        
 
     def process_notarisations(self, start, end):
         unrecorded_txids = self.get_missing_txids_list(start, end)
@@ -64,7 +76,7 @@ class Notarised:
             logger.info(f"Processing notarisations for blocks in window {window[0]} - {window[1]} ({i} done, {len(windows)} remaining...)")
             unrecorded_txids = self.get_missing_txids_list(window[0], window[1])
             self.update_notarisations(unrecorded_txids)
-            self.existing_txids += unrecorded_txids
+            self._existing_txids += unrecorded_txids
             time.sleep(0.1)
 
     @print_runtime
@@ -76,7 +88,7 @@ class Notarised:
             logger.info(f"Adding {start} to {start + RESCAN_CHUNK_SIZE} ntx address txids...")
             all_txids += rpc.get_ntx_txids(start, start + RESCAN_CHUNK_SIZE)
             start += RESCAN_CHUNK_SIZE
-            time.sleep(0.1)
+            time.sleep(0.02)
 
         all_txids += rpc.get_ntx_txids(start, self.chain_tip)
 
@@ -704,7 +716,6 @@ class NtxSeasonStats:
 
             for item in official_ntx_results:
                 server, epoch, coin, server_epoch_coin_count, server_epoch_coin_score = item
-                logger.info(f"[NtxSeasonStats.add_score_counts] {notary}: {item}")
 
                 if not self.is_excluded_server_epoch(server, epoch):
                     if coin != 'KMD' or (coin == server and server == epoch):
@@ -1196,7 +1207,6 @@ class NtxSeasonStats:
 
         for coin in helper.get_season_coins(self.season, server):
             coin_data = notary_server_data["coins"][coin]
-            logger.info(coin_data)
             coin_data["pct_of_server_ntx_count"] = self._calculate_percentage(coin_data["ntx_count"], server_ntx_count)
             coin_data["ntx_score"] = round(coin_data["ntx_score"], 8)
             coin_data["pct_of_server_ntx_score"] = self._calculate_percentage(coin_data["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
@@ -1358,27 +1368,27 @@ def process_tx_list(tx_list, new_txids, existing_txids):
 
 
 def get_new_master_server_txids(coin, notary_address, season):
-    existing_txids = query.get_existing_nn_txids(coin, notary_address, season=season)  # Assuming a generic function exists for both coins
+    existing_txids = query.get_existing_nn_txids(coin, notary_address, season=season) 
     url = f"{OTHER_SERVER}/api/info/{coin.lower()}_txid_list/?notary={notary_address}&season={season}"
     logger.info(f"{len(existing_txids)} existing txids in local DB detected for {notary_address} {season}")
 
     try:
         r = requests.get(url)
-        r.raise_for_status()  # Raise an error for bad responses
+        r.raise_for_status()
         resp = r.json()
         txids = resp.get('results', [])
         
-        # Using a set comprehension to filter new TXIDs
+        # set comprehension to filter new TXIDs
         new_txids = {txid for txid in txids if txid not in existing_txids}
 
         logger.info(f"{len(new_txids)} extra txids detected for {coin} notary_address {notary_address} {season}")
-        return list(new_txids)  # Return as a list if needed
+        return list(new_txids)
     except requests.RequestException as e:
         logger.error(f"Request error for {url}: {e}")
-        return []  # Return an empty list on error
+        return []
     except ValueError as e:
         logger.error(f"Error parsing JSON response: {e}")
-        return []  # Return an empty list on JSON parse error
+        return []
 
 
 def get_extra_ntx_data(coin, scriptPubKey_asm):

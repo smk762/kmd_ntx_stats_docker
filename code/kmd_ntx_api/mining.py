@@ -24,12 +24,14 @@ def get_notary_mined_last_24hrs(notary):
     return sum_mined
 
 
-def get_nn_mining_summary(notary, season=get_season()):
+def get_nn_mining_summary(notary, season=None):
+    if season is None:
+        season = get_season()
 
     url = f"http://127.0.0.1:8762/api/table/mined_count_season/?season={season}&name={notary}"
-    mining_summary = requests.get(url).json()['results']
-    if len(mining_summary) > 0:
-        mining_summary = mining_summary[0]
+    data = requests.get(url).json()['results']
+    if len(data) > 0:
+        mining_summary = data[0]
         time_since_mined_ts, time_since_mined = get_time_since(mining_summary["last_mined_blocktime"])
         mining_summary.update({
             "time_since_mined_ts": time_since_mined_ts,
@@ -49,7 +51,6 @@ def get_nn_mining_summary(notary, season=get_season()):
     mining_summary.update({
         "mined_last_24hrs": mined_last_24hrs
     })
-    
     return mining_summary
 
 ## API Functions

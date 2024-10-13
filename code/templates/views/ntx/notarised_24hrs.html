@@ -30,7 +30,7 @@
 	    $(document).ready(function() {
 	    	let url = "/api/ntx/notarised_date?last_24hrs=true"
 	    	{% autoescape off %}
-	    	$("#coin_icons_menu").html(get_coin_icons_from_list({{ dpow_coins }}, "/notarised_24hrs/", '{{ coin }}'))
+	    	$("#coin_icons_menu").html(get_coin_icons_from_list({{ dpow_coins_list }}, "/notarised_24hrs/", '{{ coin }}'))
 	    	{% endautoescape %}
 	    	if ('{{ coin }}' != 'None') {
 	    		url += '&coin={{ coin }}'

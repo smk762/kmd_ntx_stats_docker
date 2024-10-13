@@ -105,7 +105,8 @@ def get_active_seasons(timestamp=None):
                     active_seasons.append(season)
         elif timestamp + 86400 * 7 >= SEASONS.INFO[season]["start_time"]:
             active_seasons.append(season)
-    return active_seasons
+    logger.info(f"Active seasons: {active_seasons}")
+    return list(set(active_seasons))
 
 
 def is_postseason(timestamp=None, block=None):

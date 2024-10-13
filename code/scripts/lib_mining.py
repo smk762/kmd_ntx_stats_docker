@@ -105,11 +105,11 @@ def update_mined_rows(rescan_blocks: List[int], coin: str = "KMD", prices: Optio
 
 
 @print_runtime
-def update_mined_table(season, coin="KMD", start_block=None):
+def update_mined_table(season, coin="KMD", start_block=None, scan_back=20):
 
     tip = int(RPC[coin].getblockcount())
     if not start_block:
-        start_block = tip - 15000
+        start_block = tip - scan_back
 
     logger.info(f"Checking mined blocks {start_block} - {tip}")
     all_blocks = [*range(1,tip,1)]
@@ -152,7 +152,7 @@ def update_mined_count_daily_table(season, rescan=None, since_genesis=False):
     now = int(time.time())
 
     if not rescan:
-        start = end - datetime.timedelta(days=3)
+        start = end - datetime.timedelta(days=2)
 
     logger.info(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
     logger.info(f"[process_mined_aggregates] Aggregating daily mined counts from {start} to {end}")
