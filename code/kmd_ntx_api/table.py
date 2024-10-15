@@ -942,7 +942,6 @@ def get_notary_epoch_scores_table(request, notary=None):
                                     epoch_id = epoch.split("_")[1]
                                 else:
                                     epoch_id = epoch
-                                logger.calc(f"{server} {epoch} {coin}")
                                 row = {
                                     "notary": notary,
                                     "season": season.replace("_", " "),

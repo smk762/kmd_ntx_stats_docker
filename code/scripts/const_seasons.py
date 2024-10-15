@@ -319,7 +319,6 @@ class Seasons:
                             }
                         )
                         epoch_coins = self.coins_between(season, server, time_breaks[i], time_breaks[i + 1] - 1)
-                        logger.calc(f"{season} {server} {epoch}")
                         season_epochs_dict[server][epoch].update(
                             {
                                 "coins": epoch_coins,

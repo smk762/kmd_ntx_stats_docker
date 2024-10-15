@@ -18,6 +18,6 @@ def print_runtime(func):
         start = time.perf_counter()
         x = func(*args, **kwargs)
         end = time.perf_counter()
-        logger.info(f">>> {end-start:.3f} sec to complete {func.__name__!r}")
+        logger.calc(f">>> {end-start:.3f} sec to complete {func.__name__!r}")
         return x
     return wrapper_print_runtime

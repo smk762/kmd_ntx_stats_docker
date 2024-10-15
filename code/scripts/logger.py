@@ -101,13 +101,16 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
     methodName = methodName or levelName.lower()
     if hasattr(logging, levelName) or hasattr(logging.getLoggerClass(), methodName):
         raise AttributeError(f"{levelName} or {methodName} already defined")
-
+    if levelName.lower() in ["info", "debug", "warning", "error"]:
+        stacklevel = 1
+    else:
+        stacklevel = 2
     def logForLevel(self, message, *args, **kwargs):
         if self.isEnabledFor(levelNum):
-            self._log(levelNum, message, args, **kwargs)
+            self._log(levelNum, message, args, **kwargs, stacklevel=stacklevel)
 
     def logToRoot(message, *args, **kwargs):
-        logging.log(levelNum, message, *args, **kwargs)
+        logging.log(levelNum, message, *args, **kwargs, stacklevel=stacklevel)
 
     logging.addLevelName(levelNum, levelName)
     setattr(logging.getLoggerClass(), methodName, logForLevel)

@@ -48,7 +48,7 @@ def def_credentials(coin):
         logger.info("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in "+coin_config_file)
 
 def get_ntx_txids(start, end):
-    logger.calc(f"Getting nxt txids from blocks {start}-{end}")
+    logger.info(f"Getting nxt txids from blocks {start}-{end}")
     return RPC["KMD"].getaddresstxids({"addresses": [lib_const.NTX_ADDR], "start":start, "end":end})
 
 

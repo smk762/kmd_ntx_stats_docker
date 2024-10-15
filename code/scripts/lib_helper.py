@@ -1,4 +1,5 @@
 #!/usr/bin/env python3.12
+from functools import lru_cache
 from lib_const import *
 from const_seasons import SEASONS
 from lib_urls import *
@@ -13,11 +14,13 @@ def safe_div(x,y):
     return float(x/y)
 
 
+@lru_cache(maxsize=None)
 def handle_translate_coins(coin):
     if coin in TRANSLATE_COINS:
         return TRANSLATE_COINS[coin]
     return coin
 
+@lru_cache(maxsize=None)
 def handle_translate_coins_reverse(coin):
     if coin in REVERSE_TRANSLATE_COINS:
         return REVERSE_TRANSLATE_COINS[coin]
@@ -30,6 +33,7 @@ def get_dpow_coin_src(src):
         return src
 
 
+@lru_cache(maxsize=None)
 def get_nn_region_split(notary):
     x = notary.split("_")
     region = x[-1]
@@ -44,6 +48,7 @@ def get_results_or_none(cursor):
         return ()
 
 
+@lru_cache(maxsize=None)
 def translate_dpow_server(server):
     if server.lower() == "dpow-3p":
         return "Third_Party"
@@ -86,6 +91,7 @@ def get_notary_address_lists(vin):
     return notary_list, address_list
 
 
+@lru_cache(maxsize=None)
 def is_notary_ltc_address(addr):
     if addr in ALL_SEASON_NOTARY_LTC_ADDRESSES:
         return True
@@ -128,6 +134,7 @@ def is_postseason(timestamp=None, block=None):
     return False
 
 
+@lru_cache(maxsize=None)
 def get_pubkeys(season, server):
     if season in NOTARY_PUBKEYS:
         if server in NOTARY_PUBKEYS[season]:
@@ -135,6 +142,7 @@ def get_pubkeys(season, server):
     return []
 
 
+@lru_cache(maxsize=None)
 def get_address_from_notary(season, notary, coin):
     if season in SEASONS.INFO:
         for server in SEASONS.INFO[season]["servers"]:
@@ -157,6 +165,7 @@ def has_season_started(season, by_block=False):
     return False
 
 
+@lru_cache(maxsize=None)
 def get_season_notaries(season):
     if season in SEASONS.INFO:
         notaries = SEASONS.INFO[season]["notaries"]
@@ -164,7 +173,7 @@ def get_season_notaries(season):
         return notaries
     return []
 
-
+@lru_cache(maxsize=None)
 def get_season_coins(season=None, server=None, epoch=None):
     coins = []
     if not season:
@@ -184,6 +193,7 @@ def get_season_coins(season=None, server=None, epoch=None):
     return coins
 
     
+@lru_cache(maxsize=None)
 def get_season_servers(season):
     if season in SEASONS.INFO:
         servers = list(SEASONS.INFO[season]["servers"].keys())
@@ -192,6 +202,7 @@ def get_season_servers(season):
     return []
 
 
+@lru_cache(maxsize=None)
 def get_season_server_epochs(season, server):
     if season in SEASONS.INFO:
         if server in SEASONS.INFO[season]["servers"]:

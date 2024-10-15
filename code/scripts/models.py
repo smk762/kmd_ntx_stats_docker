@@ -596,9 +596,7 @@ class notarised_count_daily_row():
                     self.coin_ntx_pct, self.timestamp, self.season,
                     self.notarised_date)
         if self.validated():
-            logger.info(f"Updating [notarised_count_daily] {self.notarised_date} {self.notary}")
-            if self.notary == "dragonhound_DEV":
-                logger.info(f"Updating [notarised_count_daily] {row_data}")
+            logger.debug(f"Updating [notarised_count_daily] {self.notarised_date} {self.notary}")
             update_daily_notarised_count_row(row_data)
         else:
             logger.warning(f"[notarised_count_daily_row] Row data invalid!")

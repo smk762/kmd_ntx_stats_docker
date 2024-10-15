@@ -38,7 +38,7 @@ class Notarised:
 
     def _determine_start_block(self):
         """Determine the starting block based on the rescan flag."""
-        return self.chain_tip - 24 * 60 if not self.rescan else SEASONS.INFO[self.season]["start_block"]
+        return self.chain_tip - 144 * 60 if not self.rescan else SEASONS.INFO[self.season]["start_block"]
 
     @property
     def existing_txids(self):
@@ -99,8 +99,10 @@ class Notarised:
 
     @print_runtime
     def update_notarisations(self, unrecorded_txids):
-        logger.info(f"Updating KMD {len(unrecorded_txids)} notarisations...")
+        logger.calc(f"Updating KMD {len(unrecorded_txids)} notarisations...")
+        i = 1
         for txid in unrecorded_txids:
+            i += 1
             row_data = self.get_ntx_data(txid)
             if row_data:
                 ntx_row = self.create_ntx_row(row_data)
@@ -168,7 +170,9 @@ class Notarised:
             if 'blocktime' in raw_tx:
                 return self.extract_ntx_data(raw_tx, txid)
         except Exception as e:
-            alerts.send_telegram(f"[{__name__}] [get_ntx_data] TXID: {txid}. Error: {e}")
+            err = f"[{__name__}] [get_ntx_data] TXID: {txid}. Error: {e}"
+            logger.warning(err)
+            alerts.send_telegram(err)
 
         return None
 
@@ -179,10 +183,9 @@ class Notarised:
             block_time = raw_tx['blocktime']
             block_datetime = dt.fromtimestamp(block_time, datetime.UTC)
             this_block_height = raw_tx['height']
-
             if len(raw_tx['vin']) > 1:
-                notary_list, address_list = helper.get_notary_address_lists(raw_tx['vin'])
                 opret = raw_tx['vout'][1]['scriptPubKey']['asm']
+                notary_list, address_list = helper.get_notary_address_lists(raw_tx['vin'])
                 if "OP_RETURN" in opret:
                     return self.build_row_data(opret, block_hash, this_block_height, block_time, block_datetime, notary_list, address_list, txid)
 
@@ -322,7 +325,7 @@ class NtxDailyStats:
 
     def update_daily_coin_ntx(self):
         """Update daily coin ntx counts."""
-        logger.info(f"Getting daily ntx coin counts for {self.day}")
+        logger.calc(f"Getting daily ntx coin counts for {self.day}")
         for item in self.coins_aggr_resp:
             row = notarised_coin_daily_row()
             row.season = self.season
@@ -501,8 +504,7 @@ class LastNotarisations:
     def fetch_notary_last_ntx_data(self, row, notary, coin):
         """Fetch and populate last notarization data for a notary."""
         if row.kmd_ntx_blockheight > self.season_last_ntx[notary][coin]:
-            logger.info(f"New {row.coin} ntx for {row.notary}")
-
+            logger.calc(f"New {row.coin} ntx for {row.notary}")
             cols = 'server, notaries, opret, block_hash, block_height, block_time, txid, ac_ntx_blockhash, ac_ntx_height'
             conditions = f"block_height={row.kmd_ntx_blockheight} AND coin='{coin}'"
             last_ntx_data = query.select_from_table('notarised', cols, conditions)[0]
@@ -536,9 +538,7 @@ class NtxSeasonStats:
         self.season_servers = self.get_filtered_servers(helper.get_season_servers(self.season))
         self.season_ntx_dict = {
             "ntx_count": 0,
-            "ntx_score": 0,
-            "pct_of_season_ntx_count": 100,
-            "pct_of_season_ntx_score": 100
+            "ntx_score": 0
         }
 
 
@@ -546,9 +546,7 @@ class NtxSeasonStats:
         return {
             item: {
                 "ntx_count": 0,
-                "ntx_score": 0,
-                "pct_of_season_ntx_count": 0,
-                "pct_of_season_ntx_score": 0,
+                "ntx_score": 0
             }
         }
 
@@ -862,14 +860,14 @@ class NtxSeasonStats:
                     total_count = self.season_ntx_dict["ntx_count"]
                     total_score = self.season_ntx_dict["ntx_score"]
 
-                    # Percentage of Global Count
-                    data[key]["pct_of_season_ntx_count"] = round(safe_div(data[key][count_key], total_count) * 100, 6)
-
                     # Round the score
                     data[key][score_key] = round(data[key][score_key], 8)
 
-                    # Percentage of Global Score
-                    data[key]["pct_of_season_ntx_score"] = round(safe_div(data[key][score_key], total_score) * 100, 6)
+                    # Percentage of Global Count
+                    data[key].update({
+                        "pct_of_season_ntx_count": round(safe_div(data[key][count_key], total_count) * 100, 6),
+                        "pct_of_season_ntx_score": round(safe_div(data[key][score_key], total_score) * 100, 6)
+                    })
                 else:
                     logger.warning(f"Invalid item/key combination!")
                     logger.warning(f"key: {key}")
@@ -1100,58 +1098,61 @@ class NtxSeasonStats:
         server_epoch_coin_data["pct_of_coin_ntx_score"] = round(
             safe_div(server_epoch_coin_data["ntx_score"], coin_data["ntx_score"]) * 100, 6)
 
-
     def add_notary_percentages(self):
-        # Helper method to compute percentages
-        def compute_percentage(value, total):
-            return round(safe_div(value, total) * 100, 6)
 
         # Update percentages relative to notary
         for notary in self.season_notaries:
             notary_data = self.season_ntx_dict["notaries"][notary]
             total_notary_count = notary_data["ntx_count"]
-            notary_score = round(notary_data["ntx_score"], 8)
+            total_notary_score = round(notary_data["ntx_score"], 8)
 
             for coin in self.season_coins:
-                coin_data = notary_data["coins"][coin]
-                coin_data["ntx_score"] = notary_score
-                coin_data["pct_of_notary_ntx_count"] = compute_percentage(coin_data["ntx_count"], total_notary_count)
-                coin_data["pct_of_notary_ntx_score"] = compute_percentage(coin_data["ntx_score"], notary_score)
+                notary_coin_data = notary_data["coins"][coin]
+                notary_coin_data["ntx_score"] = round(notary_coin_data["ntx_score"], 8)
+                notary_coin_data["pct_of_notary_ntx_count"] = compute_percentage(notary_coin_data["ntx_count"], total_notary_count)
+                notary_coin_data["pct_of_notary_ntx_score"] = compute_percentage(notary_coin_data["ntx_score"], total_notary_score)
 
             for server in self.season_servers:
-                server_data = notary_data["servers"][server]
-                server_count = server_data["ntx_count"]
-                server_data["ntx_score"] = round(server_data["ntx_score"], 8)
-
-                server_data["pct_of_notary_ntx_count"] = compute_percentage(server_count, total_notary_count)
-                server_data["pct_of_notary_ntx_score"] = compute_percentage(server_data["ntx_score"], notary_score)
+                notary_server_data = notary_data["servers"][server]
+                notary_server_data["ntx_score"] = round(notary_server_data["ntx_score"], 8)
+                notary_server_data["pct_of_notary_ntx_count"] = compute_percentage(notary_server_data["ntx_count"], total_notary_count)
+                notary_server_data["pct_of_notary_ntx_score"] = compute_percentage(notary_server_data["ntx_score"], total_notary_score)
 
                 server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial", "None"}))
                 for epoch in server_epochs:
-                    epoch_data = server_data["epochs"][epoch]
-                    epoch_count = epoch_data["ntx_count"]
-                    epoch_data["ntx_score"] = round(epoch_data["ntx_score"], 8)
+                    notary_server_epoch_data = notary_server_data["epochs"][epoch]
+                    notary_server_epoch_data["ntx_score"] = round(notary_server_epoch_data["ntx_score"], 8)
+                    notary_server_epoch_data["pct_of_notary_ntx_count"] = compute_percentage(notary_server_epoch_data["ntx_count"], total_notary_count)
+                    notary_server_epoch_data["pct_of_notary_ntx_score"] = compute_percentage(notary_server_epoch_data["ntx_score"], total_notary_score)
 
-                    epoch_data["pct_of_notary_ntx_count"] = compute_percentage(epoch_count, total_notary_count)
-                    epoch_data["pct_of_notary_ntx_score"] = compute_percentage(epoch_data["ntx_score"], notary_score)
+                    notary_server_epoch_data["coins"]["ntx_score"] = round(notary_server_epoch_data["coins"]["ntx_score"], 8)
+                    notary_server_epoch_data["coins"]["pct_of_notary_ntx_count"] = compute_percentage(notary_server_epoch_data["ntx_count"], total_notary_count)
+                    notary_server_epoch_data["coins"]["pct_of_notary_ntx_score"] = compute_percentage(notary_server_epoch_data["ntx_score"], total_notary_score)
 
-
-                    epoch_data["coins"]["pct_of_notary_ntx_count"] = compute_percentage(coin_data["ntx_count"], total_notary_count)
-                    epoch_data["coins"]["ntx_score"] = round(coin_data["ntx_score"], 8)
-                    epoch_data["coins"]["pct_of_notary_ntx_score"] = compute_percentage(coin_data["ntx_score"], notary_score)
-                    epoch_coins = helper.get_season_coins(self.season, server, epoch)
-                    for coin in epoch_coins:
-                        epoch_data["coins"][coin]["pct_of_notary_ntx_count"] = compute_percentage(epoch_data["coins"][coin]["ntx_count"], total_notary_count)
-                        epoch_data["coins"][coin]["ntx_score"] = round(epoch_data["coins"][coin]["ntx_score"], 8)
-                        epoch_data["coins"][coin]["pct_of_notary_ntx_score"] = compute_percentage(epoch_data["coins"][coin]["ntx_score"], notary_score)
-                            
-
+                    for coin in helper.get_season_coins(self.season, server, epoch):
+                        notary_server_epoch_coin_data = notary_server_epoch_data["coins"][coin]
+                        notary_server_epoch_coin_data["ntx_score"] = round(notary_server_epoch_coin_data["ntx_score"], 8)
+                        notary_server_epoch_coin_data["pct_of_notary_ntx_count"] = compute_percentage(notary_server_epoch_coin_data["ntx_count"], total_notary_count)
+                        notary_server_epoch_coin_data["pct_of_notary_ntx_score"] = compute_percentage(notary_server_epoch_coin_data["ntx_score"], total_notary_score)
+        
+    def add_final_percentages(self):
         for coin in self.season_coins:
             for notary in self.season_notaries:
-                notary_coin_data = self.season_ntx_dict["coins"][coin]["notaries"][notary]
-                notary_coin_data["pct_of_notary_ntx_count"] = compute_percentage(notary_coin_data["ntx_count"], self.season_ntx_dict["notaries"][notary]["ntx_count"])
-                notary_coin_data["ntx_score"] = round(notary_coin_data["ntx_score"], 8)
-                notary_coin_data["pct_of_notary_ntx_score"] = compute_percentage(notary_coin_data["ntx_score"], self.season_ntx_dict["notaries"][notary]["ntx_score"])
+                notary_data = self.season_ntx_dict["notaries"][notary]
+                total_notary_count = notary_data["ntx_count"]
+                total_notary_score = round(notary_data["ntx_score"], 8)
+                coin_notary_data = self.season_ntx_dict["coins"][coin]["notaries"][notary]
+                coin_notary_data["ntx_score"] = round(coin_notary_data["ntx_score"], 8)
+                coin_notary_data["pct_of_notary_ntx_count"] = compute_percentage(coin_notary_data["ntx_count"], total_notary_count)
+                coin_notary_data["pct_of_notary_ntx_score"] = compute_percentage(coin_notary_data["ntx_score"], total_notary_score)
+                logger.debug(f"{coin} {notary} {total_notary_count}")
+                logger.debug(f"{coin} {notary} {coin_notary_data["ntx_count"]}")
+                logger.debug(f"{coin} {notary} {coin_notary_data["pct_of_notary_ntx_count"]}")
+                logger.debug(f"{coin} {notary} {total_notary_score}")
+                logger.debug(f"{coin} {notary} {coin_notary_data["ntx_score"]}")
+                logger.debug(f"{coin} {notary} {coin_notary_data["pct_of_notary_ntx_score"]}")
+                logger.debug(f"===============================================")                    
+
 
     def add_server_percentages(self):
         for coin in self.season_coins:
@@ -1167,90 +1168,131 @@ class NtxSeasonStats:
             for notary in self.season_notaries:
                 self._calculate_server_notary_percentages(server, notary)
 
+
     def _calculate_coin_server_percentages(self, coin, server):
-        coin_data = self.season_ntx_dict["coins"][coin]["servers"][server]
         server_ntx_count = self.season_ntx_dict["servers"][server]["ntx_count"]
-        coin_data["pct_of_server_ntx_count"] = self._calculate_percentage(coin_data["ntx_count"], server_ntx_count)
-        coin_data["ntx_score"] = round(coin_data["ntx_score"], 8)
-        coin_data["pct_of_server_ntx_score"] = self._calculate_percentage(coin_data["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
+        server_ntx_score = self.season_ntx_dict["servers"][server]["ntx_score"]
+        
+        coin_server_data = self.season_ntx_dict["coins"][coin]["servers"][server]
+        coin_server_data["ntx_score"] = round(coin_server_data["ntx_score"], 8)
+        coin_server_data["pct_of_server_ntx_count"] = self._calculate_percentage(coin_server_data["ntx_count"], server_ntx_count)
+        coin_server_data["pct_of_server_ntx_score"] = self._calculate_percentage(coin_server_data["ntx_score"], server_ntx_score)
 
         for notary in self.season_notaries:
-            self._calculate_notary_percentages(coin_data, notary, server_ntx_count)
+            coin_servers_notary_data = coin_server_data["notaries"][notary]
+            coin_servers_notary_data["ntx_score"] = round(coin_servers_notary_data["ntx_score"], 8)
+            coin_servers_notary_data["pct_of_server_ntx_count"] = self._calculate_percentage(coin_servers_notary_data["ntx_count"], server_ntx_count)
+            coin_servers_notary_data["pct_of_server_ntx_score"] = self._calculate_percentage(coin_servers_notary_data["ntx_score"], server_ntx_score)
 
         server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial", "None"}))
         for epoch in server_epochs:
-            self._calculate_epoch_percentages(coin_data["epochs"][epoch], server_ntx_count, notary)
+            coin_server_epoch_data = coin_server_data["epochs"][epoch]
+            coin_server_epoch_data["ntx_score"] = round(coin_server_epoch_data["ntx_score"], 8)
+            coin_server_epoch_data["pct_of_server_ntx_count"] = self._calculate_percentage(coin_server_epoch_data["ntx_count"], server_ntx_count)
+            coin_server_epoch_data["pct_of_server_ntx_score"] = self._calculate_percentage(coin_server_epoch_data["ntx_score"], server_ntx_score)
 
-    def _calculate_notary_percentages(self, coin_data, notary, server_ntx_count):
-        notary_data = coin_data["notaries"][notary]
-        notary_data["pct_of_server_ntx_count"] = self._calculate_percentage(notary_data["ntx_count"], server_ntx_count)
-        notary_data["ntx_score"] = round(notary_data["ntx_score"], 8)
-        notary_data["pct_of_server_ntx_score"] = self._calculate_percentage(notary_data["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
+            for notary in self.season_notaries:
+                coin_server_epoch_notary_data = coin_server_epoch_data["notaries"][notary]
+                coin_server_epoch_notary_data["ntx_score"] = round(coin_server_epoch_notary_data["ntx_score"], 8)
+                coin_server_epoch_notary_data["pct_of_server_ntx_count"] = self._calculate_percentage(coin_server_epoch_notary_data["ntx_count"], server_ntx_count)
+                coin_server_epoch_notary_data["pct_of_server_ntx_score"] = self._calculate_percentage(coin_server_epoch_notary_data["ntx_score"], server_ntx_score)
 
-    def _calculate_epoch_percentages(self, epoch_data, server_ntx_count, notary):
-        epoch_data["pct_of_server_ntx_count"] = self._calculate_percentage(epoch_data["ntx_count"], server_ntx_count)
-        epoch_data["ntx_score"] = round(epoch_data["ntx_score"], 8)
-        epoch_data["pct_of_server_ntx_score"] = self._calculate_percentage(epoch_data["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
-
-        for notary in self.season_notaries:
-            notary_data = epoch_data["notaries"][notary]
-            notary_data["pct_of_server_ntx_count"] = self._calculate_percentage(notary_data["ntx_count"], server_ntx_count)
-            notary_data["ntx_score"] = round(notary_data["ntx_score"], 8)
-            notary_data["pct_of_server_ntx_score"] = self._calculate_percentage(notary_data["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
 
     def _calculate_notary_server_percentages(self, notary, server):
         notary_server_data = self.season_ntx_dict["notaries"][notary]["servers"][server]
-        server_ntx_count = self.season_ntx_dict["servers"][server]["ntx_count"]
-        notary_server_data["pct_of_server_ntx_count"] = self._calculate_percentage(notary_server_data["ntx_count"], server_ntx_count)
         notary_server_data["ntx_score"] = round(notary_server_data["ntx_score"], 8)
-        notary_server_data["pct_of_server_ntx_score"] = self._calculate_percentage(notary_server_data["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
+        server_ntx_count = self.season_ntx_dict["servers"][server]["ntx_count"]
+        server_ntx_score = self.season_ntx_dict["servers"][server]["ntx_score"]
+        notary_server_data["pct_of_server_ntx_count"] = self._calculate_percentage(notary_server_data["ntx_count"], server_ntx_count)
+        notary_server_data["pct_of_server_ntx_score"] = self._calculate_percentage(notary_server_data["ntx_score"], server_ntx_score)
 
         for coin in helper.get_season_coins(self.season, server):
-            coin_data = notary_server_data["coins"][coin]
-            coin_data["pct_of_server_ntx_count"] = self._calculate_percentage(coin_data["ntx_count"], server_ntx_count)
-            coin_data["ntx_score"] = round(coin_data["ntx_score"], 8)
-            coin_data["pct_of_server_ntx_score"] = self._calculate_percentage(coin_data["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
+            notary_server_coin_data = notary_server_data["coins"][coin]
+            notary_server_coin_data["ntx_score"] = round(notary_server_coin_data["ntx_score"], 8)
+            notary_server_coin_data["pct_of_server_ntx_count"] = self._calculate_percentage(notary_server_coin_data["ntx_count"], server_ntx_count)
+            notary_server_coin_data["pct_of_server_ntx_score"] = self._calculate_percentage(notary_server_coin_data["ntx_score"], server_ntx_score)
 
         server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial", "None"}))
         for epoch in server_epochs:
-            notary_server_data["epochs"][epoch]["pct_of_server_ntx_count"] = self._calculate_percentage(notary_server_data["epochs"][epoch]["ntx_count"], server_ntx_count)
-            notary_server_data["epochs"][epoch]["ntx_score"] = round(notary_server_data["epochs"][epoch]["ntx_score"], 8)
-            notary_server_data["epochs"][epoch]["pct_of_server_ntx_score"] = self._calculate_percentage(notary_server_data["epochs"][epoch]["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
+            notary_server_epoch_data = notary_server_data["epochs"][epoch]
+            notary_server_epoch_data["ntx_score"] = round(notary_server_epoch_data["ntx_score"], 8)
+            notary_server_epoch_data["pct_of_server_ntx_count"] = self._calculate_percentage(notary_server_epoch_data["ntx_count"], server_ntx_count)
+            notary_server_epoch_data["pct_of_server_ntx_score"] = self._calculate_percentage(notary_server_epoch_data["ntx_score"], server_ntx_score)
+
 
     def _calculate_server_notary_percentages(self, server, notary):
-        notary_data = self.season_ntx_dict["servers"][server]["notaries"][notary]
+        server_notary_data = self.season_ntx_dict["servers"][server]["notaries"][notary]
         server_ntx_count = self.season_ntx_dict["servers"][server]["ntx_count"]
-        notary_data["pct_of_server_ntx_count"] = self._calculate_percentage(notary_data["ntx_count"], server_ntx_count)
-        notary_data["ntx_score"] = round(notary_data["ntx_score"], 8)
-        notary_data["pct_of_server_ntx_score"] = self._calculate_percentage(notary_data["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
+        server_ntx_score = self.season_ntx_dict["servers"][server]["ntx_score"]
+        server_notary_data["ntx_score"] = round(server_notary_data["ntx_score"], 8)
+        server_notary_data["pct_of_server_ntx_count"] = self._calculate_percentage(server_notary_data["ntx_count"], server_ntx_count)
+        server_notary_data["pct_of_server_ntx_score"] = self._calculate_percentage(server_notary_data["ntx_score"], server_ntx_score)
 
         server_coins = helper.get_season_coins(self.season, server)
         for coin in server_coins:
-            coin_data = notary_data["coins"][coin]
-            coin_data["pct_of_server_ntx_count"] = self._calculate_percentage(coin_data["ntx_count"], server_ntx_count)
-            coin_data["ntx_score"] = round(coin_data["ntx_score"], 8)
-            coin_data["pct_of_server_ntx_score"] = self._calculate_percentage(coin_data["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
+            server_notary_coin_data = server_notary_data["coins"][coin]
+            server_notary_coin_data["ntx_score"] = round(server_notary_coin_data["ntx_score"], 8)
+            server_notary_coin_data["pct_of_server_ntx_count"] = self._calculate_percentage(server_notary_coin_data["ntx_count"], server_ntx_count)
+            server_notary_coin_data["pct_of_server_ntx_score"] = self._calculate_percentage(server_notary_coin_data["ntx_score"], server_ntx_score)
 
         server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial", "None"}))
         for epoch in server_epochs:
-            notary_data["epochs"][epoch]["pct_of_server_ntx_count"] = self._calculate_percentage(notary_data["epochs"][epoch]["ntx_count"], server_ntx_count)
-            notary_data["epochs"][epoch]["ntx_score"] = round(notary_data["epochs"][epoch]["ntx_score"], 8)
-            notary_data["epochs"][epoch]["pct_of_server_ntx_score"] = self._calculate_percentage(notary_data["epochs"][epoch]["ntx_score"], self.season_ntx_dict["servers"][server]["ntx_score"])
+            server_notary_epoch_data = server_notary_data["epochs"][epoch]
+            server_notary_epoch_data["ntx_score"] = round(server_notary_epoch_data["ntx_score"], 8)
+            server_notary_epoch_data["pct_of_server_ntx_count"] = self._calculate_percentage(server_notary_epoch_data["ntx_count"], server_ntx_count)
+            server_notary_epoch_data["pct_of_server_ntx_score"] = self._calculate_percentage(server_notary_epoch_data["ntx_score"], server_ntx_score)
 
 
     def _calculate_percentage(self, value, total):
         return round(safe_div(value, total) * 100, 6) if total else 0.0
 
+
     def build_season_ntx_dict(self):
         logger.info(f"Building season ntx dict for {self.season}")
         self.prepopulate()
+        with open("prepopulate.json", "w+") as f:
+            json.dump(self.season_ntx_dict, f, indent=4)
         self.add_scores_counts()
+        with open("add_scores_counts.json", "w+") as f:
+            json.dump(self.season_ntx_dict, f, indent=4)
         self.add_global_percentages()
+        with open("add_global_percentages.json", "w+") as f:
+            json.dump(self.season_ntx_dict, f, indent=4)
         self.add_coin_percentages()
+        with open("add_coin_percentages.json", "w+") as f:
+            json.dump(self.season_ntx_dict, f, indent=4)
         self.add_notary_percentages()
+        with open("add_notary_percentages.json", "w+") as f:
+            json.dump(self.season_ntx_dict, f, indent=4)
         self.add_server_percentages()
+        with open("add_server_percentages.json", "w+") as f:
+            json.dump(self.season_ntx_dict, f, indent=4)
+            
         with open("season_ntx_dict.json", "w+") as f:
             json.dump(self.season_ntx_dict, f, indent=4)
+        with open("season_ntx_dict_coins.json", "w+") as f:
+            json.dump(self.season_ntx_dict["coins"], f, indent=4)
+        with open("season_ntx_dict_servers.json", "w+") as f:
+            json.dump(self.season_ntx_dict["servers"], f, indent=4)
+        with open("season_ntx_dict_notaries.json", "w+") as f:
+            json.dump(self.season_ntx_dict["notaries"], f, indent=4)
+            
+        with open("season_ntx_dict.json", "r") as f:
+            data = json.load(f)
+
+        dh_data = {
+            "ntx_count": data['ntx_count'],
+            'ntx_score': data['ntx_score'],
+            "coins": {},
+            "servers": {},
+            "notaries": {}            
+        }
+        for i in data:
+            pass
+            
+        with open("dragonhound_DEV.json", "w+") as f:
+            json.dump(self.season_ntx_dict, f, indent=4)
+            
         return self.season_ntx_dict
 
 
@@ -1326,6 +1368,10 @@ def get_txid_url(txid, coin_type):
         return url_builders[coin_type](txid)
     else:
         raise ValueError(f"Unsupported coin type: {coin_type}")
+
+# Helper method to compute percentages
+def compute_percentage(value, total):
+    return round(safe_div(value, total) * 100, 6)
 
 
 def create_txid_row(row, txid):
