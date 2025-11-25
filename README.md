@@ -99,3 +99,26 @@ Check web pages to confirm display / no errors.
 
 #### Prune old docker images (do while container is running so active containers are not removed)
 - `docker system prune -a --volumes`
+
+## Database Backup & Migration
+
+Use the helper scripts in `util/` to safely move the Postgres data directory between servers without copying raw volumes.
+
+### Exporting from the source server
+
+1. Ensure the stack is up with `docker compose up -d db`.
+2. Run `./util/export_postgres.sh /absolute/path/to/postgres.sql.gz` (the path is optional; a timestamped file is written to `backups/` by default).
+3. Copy the resulting `.sql.gz` file to secure storage or directly to the destination host.
+
+### Importing on the destination server
+
+1. Clone this repository, create the `.env` files, and bring the database online: `docker compose up -d db`.
+2. Transfer the dump file to the new host.
+3. Run `./util/import_postgres.sh /absolute/path/to/postgres.sql.gz`. The script drops and recreates the `public` schema before streaming the dump into Postgres.
+4. Start or restart the rest of the stack (`docker compose up -d`) and follow the standard Django migration/static collection steps if needed.
+
+This workflow keeps the migration deterministic, avoids mismatched Postgres minor versions, and allows you to archive backups under `backups/` (ignored by git).
+
+## Production Deployment
+
+See `docs/production-deployment.md` for a step-by-step server hardening and deployment checklist, including SSL termination, monitoring, and backup rotation guidance.
