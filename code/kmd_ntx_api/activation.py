@@ -62,7 +62,7 @@ def get_tendermint_token_activation(coin):
     }
 
 
-def get_emv_activation(coins_config, coin):
+def get_evm_activation(coins_config, coin):
     # TODO: Update to use newer methods
     if "nodes" in coins_config[coin]:
         return {
@@ -81,6 +81,7 @@ def get_emv_activation(coins_config, coin):
         }
 
 def get_bch_activation(coins_config, coin):
+    '''Deprecated'''
     return {
         "userpass": "'$userpass'",
         "method": "enable_bch_with_tokens",
@@ -136,10 +137,7 @@ def get_activation_command(coins_config: Dict[str, Dict[str, Any]], coin: str) -
     protocol_data = coins_config[coin]["protocol"].get("protocol_data", {})
     platform = protocol_data.get("platform")
 
-    if coin in ["BCH", "tBCH"]:
-        platform = "UTXO"
-        resp_json.update(get_bch_activation(coins_config, coin))
-    elif protocol == "ZHTLC":
+    if protocol == "ZHTLC":
         platform = "UTXO"
         resp_json.update(get_zhtlc_activation(coins_config, coin))
     elif protocol == "UTXO":
@@ -161,7 +159,9 @@ def get_activation_command(coins_config: Dict[str, Dict[str, Any]], coin: str) -
         platform = 'SLPTOKEN'
         resp_json.update(get_slp_activation(coin))
     elif coin in coins_config:
-        resp_json.update(get_emv_activation(coins_config, coin))
+        if platform is None:
+            platform = protocol
+        resp_json.update(get_evm_activation(coins_config, coin))
     else:
         logger.error("No platform found for coin: {}".format(coin))
     return platform, resp_json
@@ -171,27 +171,24 @@ def get_activation_commands(request):
     selected_coin = get_or_none(request, "coin")
     if selected_coin is None:
         resp_json = {}
-        enable_commands = cached.get_data("activation_commands_cache")
-        if enable_commands is None:
-            logger.info("================ Running get_activation_commands ================")
-            enable_commands = {}
-            coins_config = cached.get_data("coins_config_cache")
-            for coin in coins_config:
-                platform, resp_json = get_activation_command(coins_config, coin)
-                if platform not in enable_commands:
-                    enable_commands.update({platform: {}})
-                enable_commands[platform].update({coin: sort_dict(resp_json)})
-            # Update memcache
-            cached.refresh(data=enable_commands, force=False, key="activation_commands_cache", expire=86400)
+        logger.info("================ Running get_activation_commands ================")
+        enable_commands = {}
+        coins_config = cached.get_data("coins_config_cache")
+        for coin in coins_config:
+            platform, resp_json = get_activation_command(coins_config, coin)
+            if platform not in enable_commands:
+                enable_commands.update({platform: {}})
+            enable_commands[platform].update({coin: sort_dict(resp_json)})
         return enable_commands
     else:
         platform, resp_json = get_activation_command(coins_config, selected_coin)
+        logger.info(f"================ Running get_activation_command for {coin} ================")
         return resp_json
 
 
 def get_coin_activation_commands(request):
     coin_commands = {}
-    logger.info("Running get_coin_activation_commands")
+    logger.info("================ Running get_coin_activation_commands ================")
     protocol_commands = get_activation_commands(request)
     for protocol in protocol_commands:
         for coin in protocol_commands[protocol]:

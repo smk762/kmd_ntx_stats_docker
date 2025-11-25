@@ -3,6 +3,7 @@ import time
 import requests
 import datetime
 from datetime import datetime as dt
+from kmd_ntx_api.cache_data import cached
 from django.shortcuts import render
 from django.contrib import messages
 from kmd_ntx_api.buttons import get_faucet_buttons
@@ -127,16 +128,15 @@ def notarisation_view(request):
 
 
 def notaryfaucet_view(request):
-    season = get_page_season(request)
-    notary_list = get_notary_list(season)
     coins_list = []
     try:
-        faucet_coins = requests.get("https://notaryfaucet.dragonhound.tools/faucet_coins").json()["result"]
-        coins_list = faucet_coins["Main"] + faucet_coins["3P"]
-    except:
-        pass
-    faucet_balances = requests.get("https://notaryfaucet.dragonhound.tools/faucet_balances").json()
-    pending_tx_resp = requests.get("https://notaryfaucet.dragonhound.tools/show_pending_tx").json()
+        faucet_coins = cached.get_data("notary_faucet_coins")
+        if "result" in faucet_coins:
+            coins_list = faucet_coins["result"]["Main"] + faucet_coins["result"]["3P"]
+    except Exception as e:
+        logger.warning(e)
+    faucet_balances = cached.get_data("notary_faucet_balances")
+    pending_tx_resp = cached.get_data("notary_faucet_pending_tx")
     pending_tx_list = []
     tx_rows = []
     pending_index = []
@@ -162,7 +162,7 @@ def notaryfaucet_view(request):
             logger.info(f"Error: {e}")
         if len(tx_rows) >= 250:
             break
-    sent_tx_resp = requests.get("https://notaryfaucet.dragonhound.tools/show_faucet_db").json()
+    sent_tx_resp = cached.get_data("notary_faucet_db")
     sent_tx_list = []
     now = time.time()
     sum_24hrs = 0
@@ -192,7 +192,7 @@ def notaryfaucet_view(request):
         "explorers": True,
         "count_24hrs": count_24hrs,
         "sum_24hrs": sum_24hrs,
-        "coins_list": coins_list,
+        "faucet_coins_list": coins_list,
         "tx_rows": tx_rows,
         "buttons": get_faucet_buttons(),
         "faucet_balances": faucet_balances
@@ -218,6 +218,8 @@ def notaryfaucet_view(request):
             messages.success(request, f"Something went wrong... {e} {url}")
             context.update({"result":"fail"})
     return render(request, 'views/tools/tool_notaryfaucet.html', context)
+
+
 def coin_profile_view(request, coin=None): # TODO: REVIEW and ALIGN with NOTARY PROFILE
     context = get_base_context(request)
     season = context["season"]

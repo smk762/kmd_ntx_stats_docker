@@ -38,7 +38,7 @@ class Notarised:
 
     def _determine_start_block(self):
         """Determine the starting block based on the rescan flag."""
-        return self.chain_tip - 144 * 60 if not self.rescan else SEASONS.INFO[self.season]["start_block"]
+        return self.chain_tip - 24 * 60 if not self.rescan else SEASONS.INFO[self.season]["start_block"]
 
     @property
     def existing_txids(self):
@@ -444,7 +444,7 @@ class LastNotarisations:
     def fetch_last_ntx_data(self, row):
         """Fetch and populate last notarization data for the row."""
         if self.last_ntx_data[row.coin] < row.kmd_ntx_blockheight:
-            logger.info(f"Fetching last ntx data for {row.coin}...")
+            logger.calc(f"Fetching last ntx data for {row.coin}...")
 
             cols = 'server, notaries, opret, block_hash, block_height, block_time, txid, ac_ntx_blockhash, ac_ntx_height'
             conditions = f"block_height={row.kmd_ntx_blockheight} AND coin='{row.coin}'"
@@ -504,7 +504,7 @@ class LastNotarisations:
     def fetch_notary_last_ntx_data(self, row, notary, coin):
         """Fetch and populate last notarization data for a notary."""
         if row.kmd_ntx_blockheight > self.season_last_ntx[notary][coin]:
-            logger.calc(f"New {row.coin} ntx for {row.notary}")
+            logger.debug(f"New {row.coin} ntx for {row.notary}")
             cols = 'server, notaries, opret, block_hash, block_height, block_time, txid, ac_ntx_blockhash, ac_ntx_height'
             conditions = f"block_height={row.kmd_ntx_blockheight} AND coin='{coin}'"
             last_ntx_data = query.select_from_table('notarised', cols, conditions)[0]
@@ -709,7 +709,7 @@ class NtxSeasonStats:
         total_notaries = len(SEASONS.INFO[self.season]['notaries'])
         
         for i, notary in enumerate(self.season_notaries, start=1):
-            logger.info(f"[season_totals] {self.season} {i}/{total_notaries}: {notary}")
+            logger.debug(f"[season_totals] {self.season} {i}/{total_notaries}: {notary}")
             official_ntx_results = query.get_official_ntx_results(self.season, ["server", "epoch", "coin"], None, None, None, notary)
 
             for item in official_ntx_results:

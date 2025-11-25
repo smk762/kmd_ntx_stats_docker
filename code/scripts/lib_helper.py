@@ -5,6 +5,7 @@ from const_seasons import SEASONS
 from lib_urls import *
 
 
+@lru_cache(maxsize=None)
 def get_electrum_url_port(electrum):
     return electrum.split(":")
 
@@ -56,6 +57,7 @@ def translate_dpow_server(server):
         return "Main"
 
 
+@lru_cache(maxsize=None)
 def get_assetchain_launch_params(item):
     params = "~/komodo/src/komodod"
     for k, v in item.items():
@@ -111,8 +113,9 @@ def get_active_seasons(timestamp=None):
                     active_seasons.append(season)
         elif timestamp + 86400 * 7 >= SEASONS.INFO[season]["start_time"]:
             active_seasons.append(season)
+    active_seasons = list(set(active_seasons))
     logger.info(f"Active seasons: {active_seasons}")
-    return list(set(active_seasons))
+    return active_seasons   
 
 
 def is_postseason(timestamp=None, block=None):

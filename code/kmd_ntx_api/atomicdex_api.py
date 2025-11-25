@@ -9,8 +9,9 @@ from kmd_ntx_api.activation import get_activation_commands, get_coin_activation_
 from kmd_ntx_api.seednodes import get_seednode_version_month_table, \
     get_seednode_version_score_total, get_seednode_version_date_table
 from kmd_ntx_api.swaps import format_gui_os_version, get_last_200_failed_swaps_private, \
-    get_last_200_failed_swaps, get_last_200_swaps
+    get_last_200_failed_swaps, get_last_200_swaps, get_swap_by_uuid
 from kmd_ntx_api.table import get_orderbook_table
+from kmd_ntx_api.logger import logger
 
 
 def orderbook_api(request):
@@ -45,6 +46,10 @@ def failed_swap_api(request):
     return JsonResponse(get_failed_swap_by_uuid(request), safe=False)
 
 
+def swap_info_api(request):
+    return JsonResponse(get_swap_by_uuid(request), safe=False)
+
+
 def last_200_swaps_api(request):
     data = get_last_200_swaps(request)
     data = format_gui_os_version(data)
@@ -70,8 +75,10 @@ def swaps_gui_stats_api(request):
 
 def activation_commands_api(request):
     resp = get_activation_commands(request)
+    logger.info(f"================ Running activation_commands_api for ================")
     return JsonResponse(resp)
 
 def coin_activation_commands_api(request):
     resp = get_coin_activation_commands(request)
+    logger.info(f"================ Running get_coin_activation_commands for ================")
     return JsonResponse(resp)

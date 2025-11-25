@@ -138,7 +138,19 @@ def get_failed_swap_by_uuid(request):
         serializer = serializers.swapsFailedSerializerPub(data, many=True)
         data = serializer.data     
     else:
-        data = {}
+        data = {"error": "uuid not specified!"}
+    return data
+
+def get_swap_by_uuid(request):
+    if 'uuid' in request.GET:
+        data = get_failed_swap_by_uuid(request)
+        if len(data) == 0:
+            data = get_swaps_data(request.GET['uuid']).values()
+            serializer = serializers.swapsSerializerPub(data, many=True)
+            data = serializer.data
+    else:
+        data = {"error": "uuid not specified!"}
+        
     return data
 
 

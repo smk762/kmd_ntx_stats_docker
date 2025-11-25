@@ -83,6 +83,10 @@ api_atomicdex_urls = [
          atomicdex_api.failed_swap_api,
          name='failed_swap_api'),
 
+    path('api/atomicdex/swap_info/',
+         atomicdex_api.swap_info_api,
+         name='failed_swap_api'),
+
     path('api/atomicdex/last_200_swaps/',
          atomicdex_api.last_200_swaps_api,
          name='last_200_swaps_api'),

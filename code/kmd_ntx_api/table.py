@@ -634,6 +634,7 @@ def get_notary_ntx_season_table_data(request, notary=None):
                     )
 
                 last_ntx = get_notary_last_ntx_rows(request, notary)["results"]
+                logger.info(last_ntx)
                 for item in last_ntx:
                     coin = item["coin"]
                     notary_summary[coin].update(

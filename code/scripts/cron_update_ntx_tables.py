@@ -5,6 +5,7 @@ from const_seasons import SEASONS
 import lib_helper as helper
 from decorators import print_runtime
 import lib_ntx
+import locker
 
 
 '''
@@ -44,6 +45,11 @@ def update_ntx_tables(seasons, rescan=False):
 
 if __name__ == "__main__":
 
+    lockfile = locker.check_if_running("update_ntx_tables.lock")
+    if lockfile == "Running":
+         print("Script is running, exiting")
+         sys.exit(0)
+
     # Rescan will check chain for data since season start
     # Clean will recalculate data existing in table
     CLEAN_UP = False
@@ -63,3 +69,7 @@ if __name__ == "__main__":
 
     update_ntx_tables(seasons, RESCAN_SEASON)
 
+    # Release the lock by closing the file
+    lockfile.close()
+    # Remove the lock file if you want it to be cleaned up afterward
+    os.remove("update_ntx_tables.lock")

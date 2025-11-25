@@ -30,17 +30,21 @@ CACHE_SOURCE_URLS: Dict[str, Optional[str]] = {
     "ecosystem_links_cache": "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json",
     "get_electrum_status_cache": "https://electrum-status.dragonhound.info/api/v1/electrums_status",
     "explorers_cache": None,
-    "launch_params_cache": None,
+    "launch_params_cache": "https://raw.githubusercontent.com/KomodoPlatform/coins/refs/heads/master/launch/smartchains.json",
     "notary_icons": None,
     "version_timespans_cache": "https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/doc/seed_version_epochs.json",
     "navigation": None,
     "notary_pubkeys_cache": None,
-    "notary_seasons": None
+    "notary_seasons": None,
+    "notary_faucet_coins": "https://notaryfaucet.dragonhound.tools/faucet_coins",
+    "notary_faucet_balances": "https://notaryfaucet.dragonhound.tools/faucet_balances",
+    "notary_faucet_pending_tx": "https://notaryfaucet.dragonhound.tools/show_pending_tx",
+    "notary_faucet_db": "https://notaryfaucet.dragonhound.tools/faucet_history"
 }
 
 
 
-class JsonSerde(object):  # pragma: no cover
+class JsonSerde(object):  # pragma: no coverhttps://notaryfaucet.dragonhound.tools/show_faucet_db
     def serialize(self, key, value: Any) -> tuple[bytes, int]:
         if isinstance(value, str):
             return value.encode("utf-8"), 1

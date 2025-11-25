@@ -1,16 +1,13 @@
-import os
 import math
 import time
 import string
 import random
-import requests
 import datetime
 from calendar import monthrange
 from datetime import datetime as dt
 from django.http import JsonResponse
-from kmd_ntx_api.notary_seasons import get_seasons_info, get_season
+from kmd_ntx_api.notary_seasons import get_seasons_info
 from kmd_ntx_api.cache_data import cached
-from kmd_ntx_api.logger import logger
 from kmd_ntx_api.const import SINCE_INTERVALS
 
 

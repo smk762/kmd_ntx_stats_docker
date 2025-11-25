@@ -118,7 +118,6 @@ def create_raw_transaction_view(request):
 def daemon_cli_view(request):
 
     daemon_cli = get_daemon_cli(request)
-    coin_icons = get_coin_icons(request)
 
     daemon_cli_rows = []
     for coin in daemon_cli:

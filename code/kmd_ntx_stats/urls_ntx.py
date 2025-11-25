@@ -78,6 +78,10 @@ api_ntx_urls = [
     path('api/ntx/24hr_stats/',
           ntx_api.daily_stats_sorted_api,
           name='daily_stats_sorted_api'),
+    
+    path('api/ntx/profile_data/',
+          ntx_api.profile_data_api,
+          name='profile_data_api'),
 
     path('api/ntx/notarised_tenure/',
           ntx_api.ntx_tenture_api,

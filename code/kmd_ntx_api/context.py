@@ -56,26 +56,37 @@ def get_base_context(request, notary=None):
         return [coin for sublist in dpow_coins_dict.values() for coin in sublist]
 
     # Fetch cached data lazily
+    logger.warning("starting base context")
     cached_data = get_cached_data()
+    logger.warning("got base context cached_data")
     
     # Fetch seasons and notaries
     seasons_info = get_seasons_info()
+    logger.warning("got base context seasons_info")
     season = get_page_season(request, seasons_info)
+    logger.warning("got base context season")
     notary_list = get_notary_list(season, seasons_info)
+    logger.warning("got base context notary_list")
     notary = get_notary_selection(notary, notary_list)
+    logger.warning("got base context notary")
     
     # Fetch dPoW coins and related data
     dpow_coins_dict = get_dpow_coins_dict(season)
+    logger.warning("got base context dpow_coins_dict")
     dpow_coins_list = get_dpow_coins_list(dpow_coins_dict)
+    logger.warning("got base context dpow_coins_list")
     
     # Default and selected values from request
     values = get_default_values()
+    logger.warning("got base context get_default_values")
     
     # Fetch eco data link
     eco_data_link = get_eco_data_link()
+    logger.warning("got base context get_eco_data_link")
     
     # Get selected GET parameters as a dictionary
     selected = {key: request.GET[key] for key in request.GET}
+    logger.warning("got base context selected")
 
     # Prepare context for the template
     context = {
