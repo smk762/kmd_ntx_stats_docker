@@ -1,73 +1,4 @@
-x-zcash-params-volume:
-  &zcash-params
-  type: bind
-  source: /home/smk762/.zcash-params
-  target: /home/komodian/.zcash-params
-
 services:
-  kmd:
-    container_name: kmd
-    init: true
-    network_mode: "host"
-    stop_signal: SIGTERM
-    shm_size: '2gb'
-    healthcheck:
-      test: ["CMD", "bash", "/usr/local/bin/healthcheck.sh", "komodo-cli"]
-      interval: 15m
-      timeout: 60s
-      retries: 3
-      start_period: 15m
-    env_file:
-      - .env
-    build:
-      context: .
-      dockerfile: Dockerfile.komodod
-      args:
-        - USER_ID=$USER_ID
-        - GROUP_ID=$GROUP_ID
-        - SERVICE_CLI="komodo-cli"
-    ports:
-      - "127.0.0.1:7770:7770"
-      - "127.0.0.1:7771:7771"
-    volumes:
-      - /home/smk762/.komodo:/home/komodian/.komodo
-      - /home/smk762/.zcash-params:/home/komodian/.zcash-params
-    stop_grace_period: 10s
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "20m"
-        max-file: "10"
-    entrypoint: ["/home/komodian/launch_KMD.sh"]
-
-
-  mm2:
-    container_name: mm2
-    env_file:
-      - .env
-    environment:
-      - userpass=${userpass}
-    build:
-      context: ./mm2
-      dockerfile: Dockerfile
-      args:
-        - USER_ID=$USER_ID
-        - GROUP_ID=$GROUP_ID
-    volumes:
-      - ./mm2:/home/komodian/mm2
-    ports:
-      - 127.0.0.1:7783:7783
-      - 127.0.0.1:42845:42845
-      - 127.0.0.1:42855:42855
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "20m"
-        max-file: "10"
-    restart: always
-    command: ["/init.sh"]
-
   db:
     container_name: db
     image: postgres
@@ -79,9 +10,6 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    depends_on:
-      - kmd
-      - mm2
     ports:
       - "7654:5432"
     logging:
@@ -99,7 +27,7 @@ services:
         requirements: requirements/dev.txt
     environment:
       - DJANGO_SETTINGS_MODULE=kmd_ntx_stats.settings.dev
-    command: bash -c "python manage.py runserver 0.0.0.0:8762 && /code/scripts/collect_seednode_stats.py start"
+    command: bash -c "python manage.py runserver 0.0.0.0:8762"
     restart: always
     volumes:
       - ./code:/code

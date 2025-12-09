@@ -1,6 +1,5 @@
 #!/bin/bash
 set -x
-./fetch-params.sh
 ./configure.py
 docker compose stop
 git pull
