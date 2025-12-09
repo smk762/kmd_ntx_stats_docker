@@ -17,47 +17,59 @@ def def_data_dir():
         ac_dir = '%s/komodo/' % os.environ['APPDATA']
     return(ac_dir)
 
-# fucntion to define rpc_connection
+# function to define rpc_connection
 def def_credentials(coin):
-    rpcport = '';
-    ac_dir = def_data_dir()
-    if coin == 'KMD':
-        coin_config_file = str(ac_dir + '/komodo.conf')
+    env_ip = os.getenv("RPC_IP")
+    env_port = os.getenv("RPC_PORT")
+    env_user = os.getenv("RPC_USERNAME")
+    env_password = os.getenv("RPC_PASSWORD")
+    if all([env_ip, env_port, env_user, env_password]):
+        rpc_ip, rpcport, rpcuser, rpcpassword = env_ip, env_port, env_user, env_password
     else:
-        coin_config_file = str(ac_dir + '/' + coin + '/' + coin + '.conf')
-    with open(coin_config_file, 'r') as f:
-        for line in f:
-            l = line.rstrip()
-            if re.search('rpcuser', l):
-                rpcuser = l.replace('rpcuser=', '')
-            elif re.search('rpcpassword', l):
-                rpcpassword = l.replace('rpcpassword=', '')
-            elif re.search('rpcport', l):
-                rpcport = l.replace('rpcport=', '')
-    if len(rpcport) == 0:
+        rpcport = ''
+        ac_dir = def_data_dir()
         if coin == 'KMD':
-            rpcport = 7771
+            coin_config_file = str(ac_dir + '/komodo.conf')
         else:
-            logger.info("rpcport not in conf file, exiting")
-            logger.info("check " + coin_config_file)
-            exit(1)
+            coin_config_file = str(ac_dir + '/' + coin + '/' + coin + '.conf')
+        with open(coin_config_file, 'r') as f:
+            for line in f:
+                l = line.rstrip()
+                if re.search('rpcuser', l):
+                    rpcuser = l.replace('rpcuser=', '')
+                elif re.search('rpcpassword', l):
+                    rpcpassword = l.replace('rpcpassword=', '')
+                elif re.search('rpcport', l):
+                    rpcport = l.replace('rpcport=', '')
+        if len(rpcport) == 0:
+            if coin == 'KMD':
+                rpcport = 7771
+            else:
+                logger.info("rpcport not in conf file, exiting")
+                logger.info("check " + coin_config_file)
+                exit(1)
+        rpc_ip = "127.0.0.1"
     try:
-        return (Proxy("http://%s:%s@127.0.0.1:%d" % (rpcuser, rpcpassword, int(rpcport)), timeout=90))
-    except:
-        logger.info("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in "+coin_config_file)
-
-kmd_rpc = def_credentials("KMD")
-
-output_addr = "RP81MSVu39QgXhGDHfnk9d9KMnp4vhEVBu"
-output_value = 7.77
-
-unspent = kmd_rpc.listunspent()
+        return Proxy(f"http://{rpcuser}:{rpcpassword}@{rpc_ip}:{int(rpcport)}", timeout=90)
+    except Exception:
+        logger.info("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in environment or config")
 
 
 
-input_txids = []
-for txid in unspent:
-    input_txids.append({"txid":txid["txid"], "vout":txid["vout"]})
+
+if __name__ == "__main__":
+    kmd_rpc = def_credentials("KMD")
+
+    output_addr = "RP81MSVu39QgXhGDHfnk9d9KMnp4vhEVBu"
+    output_value = 7.77
+
+    unspent = kmd_rpc.listunspent()
 
 
-logger.info("komodo-cli createrawtransaction '"+json.dumps(input_txids).replace('"', '\"')+"' '{\""+output_addr+"\":"+str(output_value)+"}'")
+
+    input_txids = []
+    for txid in unspent:
+        input_txids.append({"txid":txid["txid"], "vout":txid["vout"]})
+
+
+    logger.info("komodo-cli createrawtransaction '"+json.dumps(input_txids).replace('"', '\"')+"' '{\""+output_addr+"\":"+str(output_value)+"}'")

@@ -18,34 +18,50 @@ def def_data_dir():
         ac_dir = '%s/komodo/' % os.environ['APPDATA']
     return(ac_dir)
 
-# fucntion to define rpc_connection
+def _env_rpc_credentials():
+    """Prefer host KMD RPC credentials from environment."""
+    ip = os.getenv("RPC_IP")
+    port = os.getenv("RPC_PORT")
+    user = os.getenv("RPC_USERNAME")
+    password = os.getenv("RPC_PASSWORD")
+    if all([ip, port, user, password]):
+        return ip, port, user, password
+    return None
+
+
+# function to define rpc_connection
 def def_credentials(coin):
-    rpcport = '';
-    ac_dir = def_data_dir()
-    if coin == 'KMD':
-        coin_config_file = str(ac_dir + '/komodo.conf')
+    env_creds = _env_rpc_credentials()
+    if env_creds:
+        rpc_ip, rpcport, rpcuser, rpcpassword = env_creds
     else:
-        coin_config_file = str(ac_dir + '/' + coin + '/' + coin + '.conf')
-    with open(coin_config_file, 'r') as f:
-        for line in f:
-            l = line.rstrip()
-            if re.search('rpcuser', l):
-                rpcuser = l.replace('rpcuser=', '')
-            elif re.search('rpcpassword', l):
-                rpcpassword = l.replace('rpcpassword=', '')
-            elif re.search('rpcport', l):
-                rpcport = l.replace('rpcport=', '')
-    if len(rpcport) == 0:
+        rpcport = ''
+        ac_dir = def_data_dir()
         if coin == 'KMD':
-            rpcport = 7771
+            coin_config_file = str(ac_dir + '/komodo.conf')
         else:
-            logger.info("rpcport not in conf file, exiting")
-            logger.info("check " + coin_config_file)
-            exit(1)
+            coin_config_file = str(ac_dir + '/' + coin + '/' + coin + '.conf')
+        with open(coin_config_file, 'r') as f:
+            for line in f:
+                l = line.rstrip()
+                if re.search('rpcuser', l):
+                    rpcuser = l.replace('rpcuser=', '')
+                elif re.search('rpcpassword', l):
+                    rpcpassword = l.replace('rpcpassword=', '')
+                elif re.search('rpcport', l):
+                    rpcport = l.replace('rpcport=', '')
+        if len(rpcport) == 0:
+            if coin == 'KMD':
+                rpcport = 7771
+            else:
+                logger.info("rpcport not in conf file, exiting")
+                logger.info("check " + coin_config_file)
+                exit(1)
+        rpc_ip = "127.0.0.1"
     try:
-        return (Proxy("http://%s:%s@127.0.0.1:%d" % (rpcuser, rpcpassword, int(rpcport)), timeout=300))
-    except:
-        logger.info("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in "+coin_config_file)
+        return Proxy(f"http://{rpcuser}:{rpcpassword}@{rpc_ip}:{int(rpcport)}", timeout=300)
+    except Exception:
+        logger.info("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in environment or config")
 
 def get_ntx_txids(start, end):
     logger.info(f"Getting nxt txids from blocks {start}-{end}")
