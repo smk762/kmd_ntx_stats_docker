@@ -14,7 +14,6 @@ from kmd_ntx_api.logger import logger, timed
 from kmd_ntx_api.mining import get_nn_mining_summary
 from kmd_ntx_api.notary_seasons import get_page_season, get_seasons_info
 from kmd_ntx_api.ntx import get_notarised_date
-from kmd_ntx_api.seednodes import get_seednode_version_score_total
 from kmd_ntx_api.stats import get_coin_notariser_ranks, get_top_region_notarisers, \
     get_top_coin_notarisers, get_season_stats_sorted
 from kmd_ntx_api.table import get_notary_ntx_season_table_data, \
@@ -162,22 +161,19 @@ def get_notary_profile_context(request, notary, context):
                 "last_ntx_coin": last_ntx_coin
             })
 
-            seed_scores = get_seednode_version_score_total(request)
             notarised_data_24hr = get_notarised_date(context['season'], None, None, notary, True)
             region = get_notary_region(notary)
             season_stats_sorted = get_season_stats_sorted(context['season'], context['notaries'])
             
             ntx_season_data = notary_profile_summary_table["ntx_season_data"][0]
-            seed_score = seed_scores[notary]
             total_ntx_score = ntx_season_data["total_ntx_score"]
             logger.query(total_ntx_score)
-            total_score = total_ntx_score + seed_score
+            total_score = total_ntx_score
             mining_summary = get_nn_mining_summary(notary, context['season'])
             context.update({
                 "page_title": f"{notary} Notary Profile",
                 "notary": notary,
                 "notary_clean": notary.replace("_", " "),
-                "seed_score": seed_score,
                 "ntx_score": total_score,
                 "season_score": total_score,
                 "master_server_count": ntx_season_data['master_server_count'],

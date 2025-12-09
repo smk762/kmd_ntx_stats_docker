@@ -18,7 +18,7 @@ from kmd_ntx_api.cron import get_time_since
 from kmd_ntx_api.helper import get_or_none, get_page_server, \
     pad_dec_to_hex, get_mainnet_coins, get_third_party_coins, items_row_to_dict
 from kmd_ntx_api.query import get_notarised_data, get_coin_last_ntx_data, \
-    get_coin_ntx_season_data, get_coins_data, get_seednode_version_stats_data, \
+    get_coin_ntx_season_data, get_coins_data, \
     get_scoring_epochs_data, get_balances_data, apply_filters_api, \
     get_notarised_coin_daily_data, get_notarised_count_daily_data, \
     get_notarised_coins_data, get_nn_social_data, get_nn_ltc_tx_data, \

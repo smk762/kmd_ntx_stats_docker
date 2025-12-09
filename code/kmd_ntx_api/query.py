@@ -9,8 +9,7 @@ from kmd_ntx_api.models import notarised, kmd_supply, mined_count_daily, \
     notarised_count_daily, notary_ntx_season, notarised_tenure, \
     scoring_epochs, mined_count_season, mined, notary_candidates, \
     notary_vote, addresses, balances, rewards_tx, coins, coin_social, \
-    coin_last_ntx, coin_ntx_season, swaps, swaps_failed, seednode_version_stats
-from kmd_ntx_api.serializers import seednodeVersionStatsSerializer
+    coin_last_ntx, coin_ntx_season, swaps, swaps_failed
 from kmd_ntx_api.notary_seasons import get_seasons_info
 from kmd_ntx_api.logger import logger
 
@@ -634,14 +633,6 @@ def filter_swaps_timespan(data, from_time=None, to_time=None):
         data = data.filter(timestamp__lte=to_time)
     return data
 
-
-
-# Table: seednode_version_stats 
-
-def get_seednode_version_stats_data(**kwargs):
-    data = seednode_version_stats.objects.all()
-    data = filter_kwargs(data, seednodeVersionStatsSerializer, **kwargs)
-    return data
 
 
 def filter_kwargs(data, serializer, **kwargs):

@@ -43,10 +43,6 @@ source_router.register(r'mined',
                 viewsets_api.minedViewSet,
                 basename='minedViewSet') 
 
-source_router.register(r'seednode_version_stats',
-                viewsets_api.mm2VersionStatsViewSet,
-                basename='mm2VersionStatsViewSet')
-
 source_router.register(r'mined_count_daily',
                 viewsets_api.minedCountDailyViewSet,
                 basename='minedCountDailyViewSet')

@@ -206,15 +206,6 @@ class rewardsTxSerializer(serializers.HyperlinkedModelSerializer):
                   'usd_price', 'btc_price', "block_hash"]
 
 
-class seednodeVersionStatsSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = seednode_version_stats
-        fields = ['name', 'season', 'version',
-                  'timestamp', 'error', 'score']
-        headers = ['Notary', 'Season', 'Version',
-                  'Timestamp', 'Error', 'Score']
-
-
 class serverNtxSeasonSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = server_ntx_season

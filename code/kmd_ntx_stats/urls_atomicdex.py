@@ -47,18 +47,6 @@ frontend_atomicdex_urls = [
 # AtomicDEX API V2
 api_atomicdex_urls = [
 
-    path('api/atomicdex/seednode_version_date_table/',
-         atomicdex_api.seednode_version_date_table_api,
-         name='seednode_version_date_table_api'),
-
-    path('api/atomicdex/seednode_version_month_table/',
-         atomicdex_api.seednode_version_month_table_api,
-         name='seednode_version_month_table_api'),
-
-    path('api/atomicdex/seednode_version_score_total/',
-         atomicdex_api.seednode_version_score_total_api,
-         name='seednode_version_score_total_api'),
-
     path('api/atomicdex/activation_commands/',
           atomicdex_api.activation_commands_api,
           name='activation_commands_api'),

@@ -15,7 +15,6 @@
                             <th class="py-2 px-4">LTC</th>
                             <th class="py-2 px-4">Main</th>
                             <th class="py-2 px-4">3P</th>
-                            <th class="py-2 px-4">Seed</th>
                             <th class="py-2 px-4">Mined</th>
                             <th class="py-2 px-4">Score</th>
                         </tr>
@@ -37,9 +36,6 @@
                             </td>
                             <td data-data="third_party" class="px-4">
                                 {{ item.third_party }}
-                            </td>
-                            <td data-data="seed" class="px-4">
-                                <a href="{% url 'seednode_version_view' %}">{{ item.seed }}</a>
                             </td>
                             <td data-data="mining" class="px-4">
                                 <a href="{% url 'notary_mining_view' %}{{ item.notary }}">{{ item.mining }}</a>

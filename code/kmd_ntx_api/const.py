@@ -12,7 +12,7 @@ OTHER_SERVER = os.getenv("OTHER_SERVER") # IP / domain of the remote server
 BASIC_PW = os.getenv("BASIC_PW")         # Simple pw for restricting views during testing
 
 MM2_USERPASS = os.getenv("MM2_USERPASS")
-MM2_IP = "http://mm2:7783"
+MM2_IP = os.getenv("MM2_IP")
 
 
 MESSAGE_TAGS = {

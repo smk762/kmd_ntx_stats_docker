@@ -81,11 +81,3 @@ class rewardsFilter(FilterSet):
         fields += ["min_block", "max_block", "min_blocktime", "max_blocktime",
                    "min_reward", "max_reward"]
 
-
-class seednodeVersionStatsFilter(FilterSet):
-    min_score = NumberFilter(field_name="score", lookup_expr='gte')
-    max_score = NumberFilter(field_name="score", lookup_expr='lte')
-
-    class Meta:
-        model = seednode_version_stats
-        fields = seednodeVersionStatsSerializer.Meta.fields + ['min_score', 'max_score']

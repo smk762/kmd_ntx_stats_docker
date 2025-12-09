@@ -20,7 +20,6 @@ from kmd_ntx_api.notary_seasons import get_page_season, get_notary_seasons
 from kmd_ntx_api.query import get_notarised_data
 from kmd_ntx_api.stats import get_season_stats_sorted, \
     get_region_score_stats, get_daily_stats_sorted
-from kmd_ntx_api.seednodes import seednode_version_context
 from kmd_ntx_api.serializers import notarisedSerializer
 from kmd_ntx_api.table import get_notary_epoch_scores_table
 
@@ -85,13 +84,6 @@ def ntx_scoreboard_24hrs_view(request, region=None):
     return render(request, 'views/ntx/ntx_scoreboard_24hrs.html', context)
  
  
-def seednode_version_view(request):
-    logger.info("seednode_version_view")
-    context = get_base_context(request)
-    context.update(seednode_version_context(request))
-    return render(request, 'views/atomicdex/seednode_version_stats.html', context)
-
-
 def coins_last_ntx_view(request):
     logger.info("coins_last_ntx_view")
     season = get_page_season(request)

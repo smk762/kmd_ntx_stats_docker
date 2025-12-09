@@ -2,8 +2,6 @@
 from django.db.models import Sum, Max, Count
 from datetime import datetime, timezone
 
-# S7 refactoring
-from kmd_ntx_api.seednodes import get_seednode_version_score_total
 from kmd_ntx_api.vote import VOTE_YEAR, get_candidates_proposals, translate_proposal_name_to_candidate
 from kmd_ntx_api.notary_seasons import get_seasons_info
 from kmd_ntx_api.helper import get_or_none, get_notary_list, create_dict, add_numeric_dict_nest, add_string_dict_nest, add_string_dict_nest
@@ -27,10 +25,6 @@ TESTNET_NAV = {
                 "icon": "",
                 "url": "/testnet_ntx_scoreboard"
             },
-            "Testnet Seednodes": {
-                "icon": "",
-                "url": "/seednode_version"
-            }
         }
     }
 }
@@ -52,15 +46,6 @@ def get_testnet_scoreboard(request):
 
     testnet_coins = ["DOC", "MARTY"]
     testnet_stats_dict = get_testnet_stats_dict(season, testnet_coins)
-
-    seednode_scores = get_seednode_version_score_total(request, "VOTE2022_Testnet", 1653091199, 1653436800)
-    for notary in seednode_scores:
-        testnet_stats_dict[notary].update({"seednode_score": seednode_scores[notary]})
-
-    seednode_scores_24hr = get_seednode_version_score_total(request, "VOTE2022_Testnet")
-    for notary in seednode_scores_24hr:
-        testnet_stats_dict[notary].update({"24hr_seednode_score": seednode_scores_24hr[notary]})
-
 
     ntx_dict = {}
     ntx_dict_24hr = {}
@@ -140,10 +125,6 @@ def get_testnet_scoreboard(request):
                     logger.warning(f"[get_testnet_scoreboard] {notary} not found \
                                      in ntx_notaries: {item}")
 
-
-    for notary in testnet_stats_dict:
-        testnet_stats_dict[notary]["Total"] += seednode_scores[notary]
-        testnet_stats_dict[notary]["24hr_Total"] += seednode_scores_24hr[notary]
 
     notary_totals = {}
     notary_totals_24hr = {}

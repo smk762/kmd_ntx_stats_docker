@@ -213,53 +213,8 @@ def create_dict(key_list):
     return new_dict
 
 
-# Only used in seednodes.py
-def date_hour(timestamp):
-    if timestamp > time.time() * 10: timestamp /= 1000
-    date, hour = dt.fromtimestamp(timestamp, datetime.UTC).strftime("%x %H").split(" ")
-    return f"{date} {hour}:00"
-
-
 def floor_to_utc_day(ts):
     return math.floor(int(ts) / (SINCE_INTERVALS['day'])) * (SINCE_INTERVALS['day'])
-
-
-def prepopulate_seednode_version_date(notaries):
-    resp = {}
-    for i in range(24):
-        if i < 10: i = f"0{i}"
-        resp.update({f"{i}": {}})
-
-    for notary in notaries:
-        for i in resp.keys():
-            resp[i].update({
-                notary: {
-                    "versions": [],
-                    "score": -1
-                }
-            })
-    return resp
-
-
-def prepopulate_seednode_version_month(notaries):
-    resp = {}
-    for i in range(31):
-        if i + 1 < 10:
-            x = f"0{i + 1}"
-        else:
-            x = str(i + 1)
-        resp.update({x: {}})
-
-    for notary in notaries:
-        for i in resp.keys():
-            resp[i].update({
-                notary: {
-                    "versions": [],
-                    "score": 0
-                }
-            })
-    return resp
-
 
 def get_month_epoch_range(year=None, month=None):
     if not year or not month:

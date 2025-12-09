@@ -662,27 +662,6 @@ class scoring_epochs(models.Model):
         ]
 
 
-class seednode_version_stats(models.Model):
-    name = models.CharField(max_length=128)
-    season = models.CharField(max_length=128, default='')
-    version = models.CharField(max_length=128)
-    timestamp = models.PositiveIntegerField(default=0)
-    error = models.CharField(max_length=256)
-    score = models.FloatField(default=0)
-
-    class Meta:
-        db_table = 'seednode_version_stats'
-        indexes = [
-            models.Index(fields=['timestamp'])
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=['name', 'timestamp'],
-                name='unique_mm2_version_stat'
-            )
-        ]
-
-
 class server_ntx_season(models.Model):
     season = models.CharField(max_length=34)
     server = models.CharField(max_length=64)

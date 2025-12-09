@@ -28,10 +28,6 @@ frontend_ntx_urls = [
             ntx_views.ntx_scoreboard_24hrs_view,
             name='ntx_scoreboard_24hrs_view'),
 
-      path('atomicdex/seednode_version/',
-            ntx_views.seednode_version_view,
-            name='seednode_version_view'),
-
       path('coins_last_ntx/',
             ntx_views.coins_last_ntx_view,
             name='coins_last_ntx_view'),

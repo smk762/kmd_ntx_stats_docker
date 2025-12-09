@@ -8,17 +8,17 @@ from rest_framework.pagination import PageNumberPagination
 from kmd_ntx_api.models import addresses, balances, notarised, mined, coins, \
     coin_social, notarised_coin_daily, notarised_count_daily, nn_ltc_tx, \
     notary_last_ntx, coin_ntx_season, coin_last_ntx, mined_count_daily, \
-    mined_count_season, seednode_version_stats, nn_btc_tx, nn_social, \
+    mined_count_season, nn_btc_tx, nn_social, \
     notarised_tenure, rewards_tx, scoring_epochs, server_ntx_season, \
     notary_ntx_season, notary_candidates, notary_vote
-from kmd_ntx_api.filters import notarisedFilter, minedFilter, seednodeVersionStatsFilter, \
+from kmd_ntx_api.filters import notarisedFilter, minedFilter, \
     notarisedTenureFilter, rewardsFilter
 from kmd_ntx_api.serializers import balancesSerializer, notarisedSerializer, \
     coinsSerializer, notarisedCoinDailySerializer, notarisedCountDailySerializer, \
     nnLtcTxSerializer, UserSerializer, GroupSerializer, addressesSerializer, \
     minedSerializer, coinSocialSerializer, notaryLastNtxSerializer, \
     coinLastNtxSerializer, minedCountDailySerializer, minedCountSeasonSerializer, \
-    coinNtxSeasonSerializer, seednodeVersionStatsSerializer, nnBtcTxSerializer, \
+    coinNtxSeasonSerializer, nnBtcTxSerializer, \
     nnLtcTxSerializer, nnSocialSerializer, notarisedTenureSerializer, \
     scoringEpochsSerializer, rewardsTxSerializer, notaryNtxSeasonSerializer, \
     notaryVoteSerializer, notaryCandidatesSerializer, serverNtxSeasonSerializer
@@ -173,21 +173,6 @@ class minedCountSeasonViewSet(viewsets.ModelViewSet):
     filterset_fields = ['name', 'season']
     ordering_fields = ['name']
     ordering = ['name']
-
-
-class mm2VersionStatsViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint showing mm2 Version Stats table data
-    """
-    queryset = seednode_version_stats.objects.all()
-    serializer_class = seednodeVersionStatsSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    pagination_class = MassiveResultsSetPagination
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = seednodeVersionStatsFilter
-    filterset_fields = ['name', 'season', 'version', 'score']
-    ordering_fields = ['name', 'season', '-timestamp']
-    ordering = ['name', 'season', '-timestamp']
 
 
 class nnBtcTxViewSet(viewsets.ModelViewSet):

@@ -64,11 +64,6 @@ def get_coins_info_url(local=True):
     api_server = get_api_server(local)
     return f"{api_server}/api/info/coins/"
 
-def get_seednode_stats_url(season, local=False):
-    api_server = get_api_server(local)
-    return f"{api_server}/api/source/seednode_version_stats/?season={season}"
-
-
 def get_decode_opret_url(opret, local=True):
     api_server = get_api_server(local)
     return f'{api_server}/api/tools/decode_opreturn/?OP_RETURN={opret}'
