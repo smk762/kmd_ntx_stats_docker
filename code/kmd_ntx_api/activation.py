@@ -10,7 +10,7 @@ def get_zhtlc_activation(coins_config, coin):
     return {
         "method": "task::enable_z_coin::init",
         "mmrpc": "2.0",
-        "userpass":"'$userpass'",
+        "userpass":"'$MM2_USERPASS'",
         "params": {
             "ticker": coin,
             "activation_params": {
@@ -28,7 +28,7 @@ def get_zhtlc_activation(coins_config, coin):
 
 def get_utxo_activation(coins_config, coin):
     return {
-        "userpass": "'$userpass'",
+        "userpass": "'$MM2_USERPASS'",
         "method": "electrum",
         "coin": coin,
         "servers": coins_config[coin]["electrum"],
@@ -44,13 +44,13 @@ def get_tendermint_activation(coins_config, coin):
             "tokens_params": [],
             "rpc_urls": [i["url"] for i in coins_config[coin]["rpc_urls"]]
         },
-        "userpass": "'$userpass'"
+        "userpass": "'$MM2_USERPASS'"
     }
 
 
 def get_tendermint_token_activation(coin):
     return {
-        "userpass": "'$userpass'",
+        "userpass": "'$MM2_USERPASS'",
         "method": "enable_tendermint_token",
         "mmrpc": "2.0",
         "params": {
@@ -66,7 +66,7 @@ def get_evm_activation(coins_config, coin):
     # TODO: Update to use newer methods
     if "nodes" in coins_config[coin]:
         return {
-            "userpass": "'$userpass'",
+            "userpass": "'$MM2_USERPASS'",
             "method": "enable",
             "coin": coin, 
             "urls": [i["url"] for i in coins_config[coin]["nodes"] if "gui_auth" not in i]
@@ -75,7 +75,7 @@ def get_evm_activation(coins_config, coin):
         logger.warning(f"EMV activation for {coin} not possible, no nodes found")
         logger.warning(coins_config[coin])
         return {
-            "userpass": "'$userpass'",
+            "userpass": "'$MM2_USERPASS'",
             "method": "METHOD_NOT_FOUND",
             "coin": coin
         }
@@ -83,7 +83,7 @@ def get_evm_activation(coins_config, coin):
 def get_bch_activation(coins_config, coin):
     '''Deprecated'''
     return {
-        "userpass": "'$userpass'",
+        "userpass": "'$MM2_USERPASS'",
         "method": "enable_bch_with_tokens",
         "mmrpc": "2.0",
         "params": {
@@ -108,7 +108,7 @@ def get_bch_activation(coins_config, coin):
 
 def get_slp_activation(coin):
     return {
-        "userpass": "'$userpass'",
+        "userpass": "'$MM2_USERPASS'",
         "method": "enable_slp",
         "mmrpc": "2.0",
         "params": {

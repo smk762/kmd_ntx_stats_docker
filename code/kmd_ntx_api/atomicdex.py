@@ -2,14 +2,14 @@ import json
 import requests
 from datetime import datetime as dt
 
-from kmd_ntx_api.const import MM2_USERPASS, MM2_IP
+from kmd_ntx_api.const import MM2_USERPASS, MM2_URL
 from kmd_ntx_api.helper import get_or_none
 
 
 def mm2_proxy(params):
     try:
         params.update({"userpass": MM2_USERPASS})
-        r = requests.post(MM2_IP, json.dumps(params))
+        r = requests.post(MM2_URL, json.dumps(params))
         return r
     except Exception as e:
         return e

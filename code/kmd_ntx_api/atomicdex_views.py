@@ -34,20 +34,20 @@ def batch_activation_form_view(request):
             form = EnableCommandForm(request.GET)
             context.update({"form":form})
             command_str = activation_commands[coin]
-            command_str["userpass"] = "'$userpass'"
+            command_str["userpass"] = "'$MM2_USERPASS'"
             form_resp = [command_str]
             try:
                 if request.GET['add_to_batch_command'] == "True":
                     if len(request.GET['existing_command']) > 0:
                         command_str = request.GET['existing_command']
-                        command_str = command_str.replace("'$userpass'", "$userpass")
+                        command_str = command_str.replace("'$MM2_USERPASS'", "$MM2_USERPASS")
                         command_str = command_str.replace("\'", "\"")
                         command_str = command_str.replace("True", "true")
                         command_str = command_str.replace("False", "false")
                         existing_commands = json.loads(command_str)
                         for i in existing_commands:
                             if i["coin"] != coin:
-                                i['userpass'] = "'$userpass'"
+                                i['userpass'] = "'$MM2_USERPASS'"
                                 form_resp.append(i)
             except Exception as e:
                 messages.error(request, e)

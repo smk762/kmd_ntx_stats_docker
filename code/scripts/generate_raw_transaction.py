@@ -19,40 +19,53 @@ def def_data_dir():
 
 # function to define rpc_connection
 def def_credentials(coin):
-    env_ip = os.getenv("RPC_IP")
-    env_port = os.getenv("RPC_PORT")
-    env_user = os.getenv("RPC_USERNAME")
-    env_password = os.getenv("RPC_PASSWORD")
+    env_ip = os.getenv("KMD_RPC_IP")
+    if env_ip == "0.0.0.0":
+        env_ip = "127.0.0.1"
+    env_port = os.getenv("KMD_RPC_PORT")
+    env_user = os.getenv("KMD_RPC_USERNAME")
+    env_password = os.getenv("KMD_RPC_PASSWORD")
     if all([env_ip, env_port, env_user, env_password]):
         rpc_ip, rpcport, rpcuser, rpcpassword = env_ip, env_port, env_user, env_password
     else:
         rpcport = ''
+        rpcuser = None
+        rpcpassword = None
         ac_dir = def_data_dir()
         if coin == 'KMD':
             coin_config_file = str(ac_dir + '/komodo.conf')
         else:
             coin_config_file = str(ac_dir + '/' + coin + '/' + coin + '.conf')
-        with open(coin_config_file, 'r') as f:
-            for line in f:
-                l = line.rstrip()
-                if re.search('rpcuser', l):
-                    rpcuser = l.replace('rpcuser=', '')
-                elif re.search('rpcpassword', l):
-                    rpcpassword = l.replace('rpcpassword=', '')
-                elif re.search('rpcport', l):
-                    rpcport = l.replace('rpcport=', '')
-        if len(rpcport) == 0:
+        try:
+            with open(coin_config_file, 'r') as f:
+                for line in f:
+                    l = line.rstrip()
+                    if re.search('rpcuser', l):
+                        rpcuser = l.replace('rpcuser=', '')
+                    elif re.search('rpcpassword', l):
+                        rpcpassword = l.replace('rpcpassword=', '')
+                    elif re.search('rpcport', l):
+                        rpcport = l.replace('rpcport=', '')
+        except FileNotFoundError:
+            logger.info(f"RPC config not found: {coin_config_file}. Set KMD_RPC_IP, KMD_RPC_PORT, KMD_RPC_USERNAME, KMD_RPC_PASSWORD in environment.")
+            return None
+
+        if not rpcuser or not rpcpassword:
+            logger.info(f"rpcuser/rpcpassword missing in {coin_config_file}. Set KMD_RPC_IP, KMD_RPC_PORT, KMD_RPC_USERNAME, KMD_RPC_PASSWORD in environment.")
+            return None
+
+        if len(str(rpcport)) == 0:
             if coin == 'KMD':
                 rpcport = 7771
             else:
-                logger.info("rpcport not in conf file, exiting")
-                logger.info("check " + coin_config_file)
-                exit(1)
+                logger.info("rpcport not in conf file; set KMD_RPC_PORT env or update config.")
+                return None
         rpc_ip = "127.0.0.1"
     try:
         return Proxy(f"http://{rpcuser}:{rpcpassword}@{rpc_ip}:{int(rpcport)}", timeout=90)
-    except Exception:
-        logger.info("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in environment or config")
+    except Exception as e:
+        logger.info(f"Unable to set RPC proxy: {e}. Confirm KMD_RPC_IP/KMD_RPC_PORT/KMD_RPC_USERNAME/KMD_RPC_PASSWORD env or komodo.conf values.")
+        return None
 
 
 

@@ -20,12 +20,14 @@ def def_data_dir():
 
 def _env_rpc_credentials():
     """Prefer host KMD RPC credentials from environment."""
-    ip = os.getenv("RPC_IP")
-    port = os.getenv("RPC_PORT")
-    user = os.getenv("RPC_USERNAME")
-    password = os.getenv("RPC_PASSWORD")
+    ip = "127.0.0.1"  # force localhost only
+    port = os.getenv("KMD_RPC_PORT")
+    user = os.getenv("KMD_RPC_USERNAME")
+    password = os.getenv("KMD_RPC_PASSWORD")
     if all([ip, port, user, password]):
         return ip, port, user, password
+    if any([ip, port, user, password]):
+        logger.info("KMD RPC env vars incomplete; set KMD_RPC_IP, KMD_RPC_PORT, KMD_RPC_USERNAME, KMD_RPC_PASSWORD or ensure komodo.conf is readable")
     return None
 
 
@@ -36,32 +38,61 @@ def def_credentials(coin):
         rpc_ip, rpcport, rpcuser, rpcpassword = env_creds
     else:
         rpcport = ''
+        rpcuser = None
+        rpcpassword = None
         ac_dir = def_data_dir()
         if coin == 'KMD':
             coin_config_file = str(ac_dir + '/komodo.conf')
         else:
             coin_config_file = str(ac_dir + '/' + coin + '/' + coin + '.conf')
-        with open(coin_config_file, 'r') as f:
-            for line in f:
-                l = line.rstrip()
-                if re.search('rpcuser', l):
-                    rpcuser = l.replace('rpcuser=', '')
-                elif re.search('rpcpassword', l):
-                    rpcpassword = l.replace('rpcpassword=', '')
-                elif re.search('rpcport', l):
-                    rpcport = l.replace('rpcport=', '')
-        if len(rpcport) == 0:
+        try:
+            with open(coin_config_file, 'r') as f:
+                for line in f:
+                    l = line.rstrip()
+                    if re.search('rpcuser', l):
+                        rpcuser = l.replace('rpcuser=', '')
+                    elif re.search('rpcpassword', l):
+                        rpcpassword = l.replace('rpcpassword=', '')
+                    elif re.search('rpcport', l):
+                        rpcport = l.replace('rpcport=', '')
+        except FileNotFoundError:
+            logger.info(f"RPC config not found: {coin_config_file}. Set KMD_RPC_IP, KMD_RPC_PORT, KMD_RPC_USERNAME, KMD_RPC_PASSWORD in environment.")
+            return None
+
+        if not rpcuser or not rpcpassword:
+            logger.info(f"rpcuser/rpcpassword missing in {coin_config_file}. Set KMD_RPC_IP, KMD_RPC_PORT, KMD_RPC_USERNAME, KMD_RPC_PASSWORD in environment.")
+            return None
+
+        if len(str(rpcport)) == 0:
             if coin == 'KMD':
                 rpcport = 7771
             else:
-                logger.info("rpcport not in conf file, exiting")
-                logger.info("check " + coin_config_file)
-                exit(1)
+                logger.info("rpcport not in conf file; set KMD_RPC_PORT env or update config.")
+                return None
         rpc_ip = "127.0.0.1"
     try:
-        return Proxy(f"http://{rpcuser}:{rpcpassword}@{rpc_ip}:{int(rpcport)}", timeout=300)
-    except Exception:
-        logger.info("Unable to set RPC proxy, please confirm rpcuser, rpcpassword and rpcport are set in environment or config")
+        return RestrictedRPC(f"http://{rpcuser}:{rpcpassword}@{rpc_ip}:{int(rpcport)}")
+    except Exception as e:
+        logger.info(f"Unable to set RPC proxy: {e}. Confirm KMD_RPC_IP/KMD_RPC_PORT/KMD_RPC_USERNAME/KMD_RPC_PASSWORD env or komodo.conf values.")
+        return None
+
+
+class RestrictedRPC:
+    """Whitelisted, localhost-only RPC wrapper to avoid unsafe KMD calls."""
+    ALLOWED_METHODS = {
+        "getblockcount",
+        "getaddresstxids",
+        "getrawtransaction",
+        "coinsupply",
+    }
+
+    def __init__(self, uri: str, timeout: int = 300):
+        self._proxy = Proxy(uri, timeout=timeout)
+
+    def __getattr__(self, name):
+        if name not in self.ALLOWED_METHODS:
+            raise AttributeError(f"RPC method '{name}' is not permitted")
+        return getattr(self._proxy, name)
 
 def get_ntx_txids(start, end):
     logger.info(f"Getting nxt txids from blocks {start}-{end}")

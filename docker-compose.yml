@@ -10,6 +10,7 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
     ports:
       - "7654:5432"
     logging:
@@ -27,6 +28,15 @@ services:
         requirements: requirements/dev.txt
     environment:
       - DJANGO_SETTINGS_MODULE=kmd_ntx_stats.settings.dev
+      - POSTGRES_HOST=${POSTGRES_HOST:-db}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - KMD_RPC_IP=${KMD_RPC_IP:-}
+      - KMD_RPC_PORT=${KMD_RPC_PORT:-}
+      - KMD_RPC_USERNAME=${KMD_RPC_USERNAME:-}
+      - KMD_RPC_PASSWORD=${KMD_RPC_PASSWORD:-}
     command: bash -c "python manage.py runserver 0.0.0.0:8762"
     restart: always
     volumes:
@@ -62,4 +72,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.18.1.1/16
+        - subnet: 172.30.0.0/16
