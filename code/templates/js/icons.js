@@ -143,10 +143,14 @@
         }
         if (!url) url = '#'
     
+        if (typeof coin_icons === "undefined" || coin_icons === null) {
+            console.log("coin_icons missing, using blank for", coin)
+            return "<a href='"+url+"'><img height='16px' class='mr-2' src='/static/img/notary/icon/blank.png' />"+coin+"</a>";
+        }
         if (coin_icons.hasOwnProperty(coin)) {
             return "<a href='"+url+"'><img height='16px' class='mr-2' src='"+coin_icons[coin]+"' />"+coin+"</a>";
-        }
-        else {
+        } else {
+            console.log("coin icon missing, using blank for", coin)
             return "<a href='"+url+"'><img height='16px' class='mr-2' src='/static/img/notary/icon/blank.png' />"+coin+"</a>";
         }		
     }
@@ -158,10 +162,14 @@
                 url = "/coin_profile/" + coin
             }
         }
+        if (typeof coin_icons === "undefined" || coin_icons === null) {
+            console.log("coin_icons missing, using blank for", coin)
+            return "<span class='' style='' data-toggle='tooltip' data-placement='top' title='"+coin+"'><a href='"+url+"'><img height='"+size+"px' class='"+img_class+"' src='/static/img/notary/icon/blank.png' /></a></span>"
+        }
         if (coin_icons.hasOwnProperty(coin)) {
             return "<span class='' style='' data-toggle='tooltip' data-placement='top' title='"+coin+"'><a href='"+url+"'><img height='"+size+"px' class='"+img_class+"' src='"+coin_icons[coin]+"' /></a></span>";
-        }
-        else {
+        } else {
+            console.log("coin icon missing, using blank for", coin)
             return "<span class='' style='' data-toggle='tooltip' data-placement='top' title='"+coin+"'><a href='"+url+"'><img height='"+size+"px' class='"+img_class+"' src='/static/img/notary/icon/blank.png' /></a></span>"
         }		
     }

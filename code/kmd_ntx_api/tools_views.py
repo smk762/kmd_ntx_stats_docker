@@ -250,13 +250,10 @@ def faucet_view(request):
 
 def launch_params_view(request):
     launch_params = cached.get_data("launch_params_cache")
-
     launch_param_rows = []
     coin_icons = get_coin_icons(request)
     for coin in launch_params:
         launch_param_rows.append({"coin":coin, "launch_params":launch_params[coin]})
-        if coin not in coin_icons:
-            coin_icons.update({coin: "/static/img/notary/icon/blank.png"})
 
     context = get_base_context(request)
     context.update({

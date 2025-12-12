@@ -20,7 +20,10 @@ def def_data_dir():
 
 def _env_rpc_credentials():
     """Prefer host KMD RPC credentials from environment."""
-    ip = "127.0.0.1"  # force localhost only
+    ip = os.getenv("KMD_RPC_IP").split(":")[0] or "127.0.0.1"
+    # Disallow binding to 0.0.0.0 for safety; fall back to localhost
+    if ip in ["0.0.0.0", ""]:
+        ip = "127.0.0.1"
     port = os.getenv("KMD_RPC_PORT")
     user = os.getenv("KMD_RPC_USERNAME")
     password = os.getenv("KMD_RPC_PASSWORD")
@@ -71,6 +74,7 @@ def def_credentials(coin):
                 return None
         rpc_ip = "127.0.0.1"
     try:
+        logger.info(f"Setting RPC proxy: http://{rpcuser}:{rpcpassword}@{rpc_ip}:{int(rpcport)}")
         return RestrictedRPC(f"http://{rpcuser}:{rpcpassword}@{rpc_ip}:{int(rpcport)}")
     except Exception as e:
         logger.info(f"Unable to set RPC proxy: {e}. Confirm KMD_RPC_IP/KMD_RPC_PORT/KMD_RPC_USERNAME/KMD_RPC_PASSWORD env or komodo.conf values.")
@@ -80,6 +84,7 @@ def def_credentials(coin):
 class RestrictedRPC:
     """Whitelisted, localhost-only RPC wrapper to avoid unsafe KMD calls."""
     ALLOWED_METHODS = {
+        "getblock",
         "getblockcount",
         "getaddresstxids",
         "getrawtransaction",

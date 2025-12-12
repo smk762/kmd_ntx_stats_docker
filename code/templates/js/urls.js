@@ -185,20 +185,21 @@
     }
 
 	function get_explorer(coin) {
+        if (!explorers) {
+            console.log("No explorers found!")
+            return false
+        }
 		if (!(explorers.hasOwnProperty(coin))) {
+            console.log("No explorer found for coin: " + coin)
 			return false
 		}
-		else {
-			for (let x of explorers[coin]) {
-				if (explorers.length == 1) {
-					return x
-				}
-				if (x.search("dexstats") > -1) {
-					return x
-				}
-			}
-			return explorers[coin][0]
-		}	
+        const list = explorers[coin] || [];
+        for (let x of list) {
+            if (x && x.search("dexstats") > -1) {
+                return x;
+            }
+        }
+        return list.length > 0 ? list[0] : false;
 	}
 
 </script>

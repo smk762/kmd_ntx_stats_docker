@@ -208,26 +208,26 @@ def get_dpow_server_coins_url(season, server, local=True):
 
 
 def get_coins_repo_coins_url(branch='master'):
-    return f"https://raw.githubusercontent.com/KomodoPlatform/coins/{branch}/coins"
+    return f"https://raw.githubusercontent.com/gleecbtc/coins/{branch}/coins"
 
 
 def get_coins_repo_electrums_url(branch='master'):
-    return f"https://raw.githubusercontent.com/KomodoPlatform/coins/{branch}/electrums"
+    return f"https://raw.githubusercontent.com/gleecbtc/coins/{branch}/electrums"
 
 
 def get_coins_repo_explorers_url(branch='master'):
-    return f"https://raw.githubusercontent.com/KomodoPlatform/coins/{branch}/explorers"
+    return f"https://raw.githubusercontent.com/gleecbtc/coins/{branch}/explorers"
 
 
 def get_coins_repo_icons_url(branch='master'):
-    return f"https://raw.githubusercontent.com/KomodoPlatform/coins/{branch}/icons"
+    return f"https://raw.githubusercontent.com/gleecbtc/coins/{branch}/icons"
 
 
-def get_dpow_readme_url(branch='update/s8-pubkeys'):
+def get_dpow_readme_url(branch='master'):
     return f"https://raw.githubusercontent.com/KomodoPlatform/dPoW/{branch}/README.md"
 
 
-def get_dpow_assetchains_url(branch='update/s8-pubkeys'):
+def get_dpow_assetchains_url(branch='master'):
     return f"https://raw.githubusercontent.com/KomodoPlatform/dPoW/{branch}/iguana/assetchains.json"
 
 
@@ -239,6 +239,6 @@ def get_notary_nodes_repo_elected_nn_social_url(season):
     return f"https://raw.githubusercontent.com/KomodoPlatform/NotaryNodes/master/{season.lower().replace('_', '')}/elected_nn_social.json"
 
 
-def get_scoring_epochs_repo_url(branch='update/s8-pubkeys'):
+def get_scoring_epochs_repo_url(branch='master'):
     return f"https://raw.githubusercontent.com/KomodoPlatform/dPoW/{branch}/doc/scoring_epochs.json"
 

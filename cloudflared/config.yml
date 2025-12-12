@@ -1,0 +1,4 @@
+ingress:
+  - hostname: notary-stats.dragonhound.info
+    service: http://web:8762
+  - service: http_status:404

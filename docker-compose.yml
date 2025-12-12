@@ -26,8 +26,14 @@ services:
       shm_size: '2gb'
       args:
         requirements: requirements/dev.txt
+    env_file:
+      - .env
     environment:
-      - DJANGO_SETTINGS_MODULE=kmd_ntx_stats.settings.dev
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-kmd_ntx_stats.settings.dev}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost}
+      - SECRET_KEY=${SECRET_KEY:-changeme}
+      - GH_USER=${GH_USER:-}
+      - GH_TOKEN=${GH_TOKEN:-}
       - POSTGRES_HOST=${POSTGRES_HOST:-db}
       - POSTGRES_PORT=${POSTGRES_PORT:-5432}
       - POSTGRES_DB=${POSTGRES_DB:-postgres}
@@ -37,20 +43,84 @@ services:
       - KMD_RPC_PORT=${KMD_RPC_PORT:-}
       - KMD_RPC_USERNAME=${KMD_RPC_USERNAME:-}
       - KMD_RPC_PASSWORD=${KMD_RPC_PASSWORD:-}
-    command: bash -c "python manage.py runserver 0.0.0.0:8762"
+    command: >
+      bash -lc "pip install --no-cache-dir gunicorn &&
+                python manage.py collectstatic --noinput &&
+                gunicorn kmd_ntx_stats.wsgi:application --bind 0.0.0.0:8762 --timeout 120 --access-logfile - --error-logfile -"
     restart: always
     volumes:
       - ./code:/code
-      - /var/www/stats.kmd.io/html/static:/var/www/stats.kmd.io/html/static
+      - /var/www/notary-stats.dragonhound.info/html/static:/var/www/notary-stats.dragonhound.info/html/static
     ports:
       - "8762:8762"
     depends_on:
       - memcached
+    networks:
+      - default
+      - komodo-shared
     logging:
       driver: "json-file"
       options:
         max-size: "20m"
         max-file: "10"
+
+  cloudflared:
+    container_name: cloudflared
+    image: cloudflare/cloudflared:latest
+    volumes:
+      - ./cloudflared/config.yml:/etc/cloudflared/config.yml:ro
+    command: >
+      tunnel --no-autoupdate
+      --config /etc/cloudflared/config.yml
+      run
+      --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    env_file:
+      - .env
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - web
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  scheduler:
+    container_name: scheduler
+    build:
+      context: .
+      shm_size: '2gb'
+      args:
+        requirements: requirements/dev.txt
+    env_file:
+      - .env
+    environment:
+      - GH_USER=${GH_USER:-}
+      - GH_TOKEN=${GH_TOKEN:-}
+    volumes:
+      - ./code:/code
+      - ./cron/ntx-cron.tab:/etc/cron.d/ntx-cron.tab:ro
+    command: >
+      bash -lc "
+      apt-get update &&
+      apt-get install -y --no-install-recommends ca-certificates curl &&
+      curl -fsSL https://github.com/aptible/supercronic/releases/download/v0.2.40/supercronic-linux-amd64 -o /usr/local/bin/supercronic &&
+      chmod +x /usr/local/bin/supercronic &&
+      supercronic /etc/cron.d/ntx-cron.tab
+      "
+    depends_on:
+      - db
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - default
+      - komodo-shared
 
   memcached:
     container_name: memcached
@@ -73,3 +143,6 @@ networks:
       driver: default
       config:
         - subnet: 172.30.0.0/16
+  komodo-shared:
+    external: true
+    name: komodo-shared

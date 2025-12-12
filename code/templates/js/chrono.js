@@ -36,7 +36,7 @@ function get_time_since(ts, until=false, format='text', precalc=false) {
         return response
     }
 
-    if (days > 400) return "Never"
+    if (days > 600) return "Never"
     if ((days == 0) && (hours == 0) && (minutes == 0)) {
         timesince = seconds + " sec";
     } else if (days == 0 & hours == 0) {

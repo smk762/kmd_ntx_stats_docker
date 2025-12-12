@@ -13,6 +13,7 @@ from kmd_ntx_api.electrum import get_electrums, get_electrums_ssl, get_electrums
 from kmd_ntx_api.helper import json_resp
 from kmd_ntx_api.notary_seasons import get_page_season, get_seasons_info, get_season, SEASONS_DATA
 from kmd_ntx_api.logger import logger
+from kmd_ntx_api.badges import coin_badge
 
 
 def notary_season(request):
@@ -197,3 +198,8 @@ def hardfork_countdown(request):
 def seasons_data(request):
     resp = SEASONS_DATA
     return json_resp(resp)
+
+
+def badge_svg(request, coin):
+    """Serve a lightweight SVG badge for coin notarisation status."""
+    return coin_badge(request, coin)

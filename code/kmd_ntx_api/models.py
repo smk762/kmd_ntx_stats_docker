@@ -174,6 +174,7 @@ class mined(models.Model):
             models.Index(fields=['name']),
             models.Index(fields=['category']),
             models.Index(fields=['season']),
+            models.Index(fields=['season', 'name']),
             models.Index(fields=['-block_height']),
             models.Index(fields=['-block_time'])
         ]
@@ -205,6 +206,7 @@ class mined_archive(models.Model):
             models.Index(fields=['name']),
             models.Index(fields=['category']),
             models.Index(fields=['season']),
+            models.Index(fields=['season', 'name']),
             models.Index(fields=['-block_height']),
             models.Index(fields=['-block_time'])
         ]
@@ -255,7 +257,8 @@ class mined_count_season(models.Model):
         db_table = 'mined_count_season'
         indexes = [
             models.Index(fields=['name']),
-            models.Index(fields=['season'])
+            models.Index(fields=['season']),
+            models.Index(fields=['season', 'name']),
         ]
         constraints = [
             models.UniqueConstraint(

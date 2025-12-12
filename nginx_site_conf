@@ -2,13 +2,13 @@ server {
     listen 80;
     listen [::]:80;
 
-    root /var/www/stats.kmd.io/html;
+    root /var/www/notary-stats.dragonhound.info/html;
     index index.html index.htm index.nginx-debian.html;
 
-    server_name stats.kmd.io www.stats.kmd.io;
+    server_name notary-stats.dragonhound.info www.notary-stats.dragonhound.info;
 
 	location ^~ /static {
-        alias /var/www/stats.kmd.io/html/static;
+        alias /var/www/notary-stats.dragonhound.info/html/static;
     }
 
     location / {
@@ -41,7 +41,7 @@ server {
 
 		}
         proxy_pass http://localhost:8762/;
-        proxy_set_header Host stats.kmd.io;
+        proxy_set_header Host notary-stats.dragonhound.info;
 
         # First attempt to serve request as file, then
         # as directory, then fall back to displaying a 404.

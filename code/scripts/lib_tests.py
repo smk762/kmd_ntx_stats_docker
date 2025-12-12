@@ -269,7 +269,7 @@ class TestLibCoins:
 
     def test_get_coins_repo_icons(self):
         coins_data = lib_coins.get_coins_repo_icons(icons, {"KMD": {"coins_info":{}}})
-        assert coins_data["KMD"]["coins_info"]["icon"] == "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/kmd.png"
+        assert coins_data["KMD"]["coins_info"]["icon"] == "https://raw.githubusercontent.com/gleecbtc/coins/master/icons/kmd.png"
         assert lib_coins.get_coins_repo_icons(icons, {
             "TOKEL": {
                 "coins_info": {},
@@ -284,7 +284,7 @@ class TestLibCoins:
         }) == {
             "TOKEL": {
                 "coins_info": {
-                    "icon": "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/tkl.png"
+                    "icon": "https://raw.githubusercontent.com/gleecbtc/coins/master/icons/tkl.png"
                 },
                 "dpow": {},
                 "dpow_tenure": {},
@@ -309,7 +309,7 @@ class TestLibCoins:
         }) == {
             "PIRATE": {
                 "coins_info": {
-                    "icon": "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/arrr.png"
+                    "icon": "https://raw.githubusercontent.com/gleecbtc/coins/master/icons/arrr.png"
                 },
                 "dpow": {},
                 "dpow_tenure": {},
@@ -334,7 +334,7 @@ class TestLibCoins:
         }) == {
             "KMD": {
                 "coins_info": {
-                    "icon": "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/kmd.png"
+                    "icon": "https://raw.githubusercontent.com/gleecbtc/coins/master/icons/kmd.png"
                 },
                 "dpow": {},
                 "dpow_tenure": {},

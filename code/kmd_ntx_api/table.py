@@ -580,6 +580,10 @@ def get_notary_ntx_season_table_data(request, notary=None):
         }
         logger.error(error)
         return error
+    cache_key = f"notary_ntx_summary_{season}_{notary}".lower()
+    cached_data = cached.get_data(cache_key, expire=900)
+    if cached_data:
+        return cached_data
     ntx_season_data = get_notary_ntx_season_table(request, notary)
 
     notary_summary = {}
@@ -634,7 +638,7 @@ def get_notary_ntx_season_table_data(request, notary=None):
                     )
 
                 last_ntx = get_notary_last_ntx_rows(request, notary)["results"]
-                logger.info(last_ntx)
+                # logger.info(last_ntx)
                 for item in last_ntx:
                     coin = item["coin"]
                     notary_summary[coin].update(
@@ -657,6 +661,10 @@ def get_notary_ntx_season_table_data(request, notary=None):
         "notary_ntx_summary_table": notary_summary
     }
     logger.merge(f"g0t_notary_ntx_season_table_data for {season} {notary}")
+    try:
+        cached.refresh(key=cache_key, data=api_resp, force=True, expire=900)
+    except Exception:
+        pass
     return api_resp
 
 

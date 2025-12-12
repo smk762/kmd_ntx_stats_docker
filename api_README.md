@@ -147,7 +147,7 @@ http://notary.earth:8762/info/balances/?notary=pirate_AR&chain=OOT
 
 **coins information**
 
-The `/api/info/coins/` endpoint shows information about coins from the [KomodoPlatform/coins](https://github.com/komodoplatform/coins) and [KomodoPlatform/dPoW](https://github.com/KomodoPlatform/dPoW) repositories.
+The `/api/info/coins/` endpoint shows information about coins from the [KomodoPlatform/coins](https://github.com/gleecbtc/coins) and [KomodoPlatform/dPoW](https://github.com/KomodoPlatform/dPoW) repositories.
 
 Information includes mm2 compatibility, electrum/explorer availability, and dPoW status.
 
@@ -174,10 +174,10 @@ You can use this endpoint for:
 | count                       | (integer) | Number of coins matching the filter                                                |
 | results                     | (json)    | A json dictionary of coin information                                              |
 | results.coin                | (json)    | the name of the coin (as a key)                                                    |
-| results.coin.coins_info     | (json)    | information about the coin as listed in https://github.com/KomodoPlatform/coins    |
+| results.coin.coins_info     | (json)    | information about the coin as listed in https://github.com/gleecbtc/coins    |
 | results.coin.dpow           | (json)    | information about the coin as listed in https://github.com/KomodoPlatform/dPoW/    |
-| results.coin.explorers      | (list)    | list of block explorers for the coin from https://github.com/KomodoPlatform/coins  |
-| results.coin.electrums      | (list)    | list of electrum servers for the coin from https://github.com/KomodoPlatform/coins |
+| results.coin.explorers      | (list)    | list of block explorers for the coin from https://github.com/gleecbtc/coins  |
+| results.coin.electrums      | (list)    | list of electrum servers for the coin from https://github.com/gleecbtc/coins |
 | results.coin.electrums_ssl  | (list)    | list of SSL electrum servers for the coin                                          |
 | results.coin.electrums_wss  | (list)    | list of WSS electrum servers for the coin                                          |
 | results.coin.mm2_compatible | (integer) | 0 = not mm2 compatible; 1 = mm2 compatible                                         |

@@ -73,7 +73,7 @@ This approach is deterministic, version-agnostic, and easy to audit in backups (
 
 - Place NGINX (or your preferred reverse proxy) in front of the `web` container.
 - Terminate TLS with Let's Encrypt (`certbot`) or a managed certificate and proxy to `127.0.0.1:8762`.
-- Sync collected static files to `/var/www/stats.kmd.io/html/static` (already bind-mounted in `docker-compose.yml`).
+- Sync collected static files to `/var/www/notary-stats.dragonhound.info/html/static` (already bind-mounted in `docker-compose.yml`).
 - Enable gzip, caching headers, and request buffering at the proxy.
 
 ## 6. Operational Checklist

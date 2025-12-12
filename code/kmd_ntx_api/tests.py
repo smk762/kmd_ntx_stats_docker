@@ -7,7 +7,7 @@ from django.conf import settings
 
 from kmd_ntx_api.cache_data import cached
 
-base_url = 'http://stats.kmd.io'
+base_url = 'http://notary-stats.dragonhound.info'
 if settings.DEBUG:
     base_url = 'http://116.203.120.91:8762'
 

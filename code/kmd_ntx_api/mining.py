@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.12
 import requests
 from random import choice
-from django.db.models import Sum
+from django.db.models import Sum, Max
 from kmd_ntx_api.cron import days_ago, get_time_since
 from kmd_ntx_api.helper import get_or_none, get_notary_list
 from kmd_ntx_api.query import get_mined_data, get_mined_count_season_data
@@ -25,33 +25,113 @@ def get_notary_mined_last_24hrs(notary):
 
 
 def get_nn_mining_summary(notary, season=None):
+    """Return mining summary without HTTP self-calls to avoid deadlocks/timeouts."""
     if season is None:
         season = get_season()
 
-    url = f"http://127.0.0.1:8762/api/table/mined_count_season/?season={season}&name={notary}"
-    data = requests.get(url).json()['results']
-    if len(data) > 0:
-        mining_summary = data[0]
-        time_since_mined_ts, time_since_mined = get_time_since(mining_summary["last_mined_blocktime"])
-        mining_summary.update({
-            "time_since_mined_ts": time_since_mined_ts,
-            "time_since_mined": time_since_mined
-        })
-    else:
-        mining_summary = {
-          "blocks_mined": 0,
-          "sum_value_mined": 0,
-          "max_value_mined": 0,
-          "last_mined_block": "N/A",
-          "last_mined_blocktime": "N/A",
-          "time_since_mined": "N/A"
+    cache_key = f"mining_summary_{season}_{notary}"
+    cached_summary = cached.get_data(cache_key)
+    if cached_summary:
+        return cached_summary
+
+    mining_summary = {
+        "blocks_mined": 0,
+        "sum_value_mined": 0,
+        "max_value_mined": 0,
+        "last_mined_block": "N/A",
+        "last_mined_blocktime": 0,
+        "time_since_mined": "N/A",
+        "mined_last_24hrs": 0,
+    }
+
+    try:
+        qs = get_mined_count_season_data(season).filter(name=notary).values().order_by("-last_mined_blocktime")
+        if qs:
+            row = qs[0]
+            mining_summary.update({
+                "blocks_mined": row.get("blocks_mined", 0),
+                "sum_value_mined": row.get("sum_value_mined", 0),
+                "max_value_mined": row.get("max_value_mined", 0),
+                "last_mined_block": row.get("last_mined_block", "N/A"),
+                "last_mined_blocktime": row.get("last_mined_blocktime", 0),
+            })
+            ts, ts_text = get_time_since(mining_summary["last_mined_blocktime"])
+            mining_summary.update({
+                "time_since_mined_ts": ts,
+                "time_since_mined": ts_text,
+            })
+    except Exception as e:
+        logger.warning(f"get_nn_mining_summary fallback for {notary}: {e}")
+
+    try:
+        mined_last_24hrs = float(get_notary_mined_last_24hrs(notary))
+        mining_summary.update({"mined_last_24hrs": mined_last_24hrs})
+    except Exception as e:
+        logger.warning(f"get_nn_mining_summary 24h fallback for {notary}: {e}")
+
+    try:
+        cached.refresh(key=cache_key, data=mining_summary, force=True, expire=300)
+    except Exception:
+        pass
+
+    return mining_summary
+
+
+def warm_mining_cache(season=None):
+    """
+    Warm per-notary mining summaries with minimal queries:
+    - One query for season aggregates (blocks/sum/max/last).
+    - One grouped query for last-24h sums.
+    """
+    if season is None:
+        season = get_season()
+
+    cache_expire = 300
+    summaries = {}
+
+    # Base aggregates per notary for the season.
+    # Pick the row with the most recent mined block per notary (max last_mined_blocktime).
+    season_rows = (
+        get_mined_count_season_data(season)
+        .order_by("-last_mined_blocktime")
+        .values("name", "blocks_mined", "sum_value_mined", "max_value_mined", "last_mined_block", "last_mined_blocktime")
+    )
+    for row in season_rows:
+        name = row["name"]
+        if name in summaries:
+            continue  # already set the most recent row for this notary
+        summaries[name] = {
+            "blocks_mined": row.get("blocks_mined", 0),
+            "sum_value_mined": row.get("sum_value_mined", 0),
+            "max_value_mined": row.get("max_value_mined", 0),
+            "last_mined_block": row.get("last_mined_block", "N/A"),
+            "last_mined_blocktime": row.get("last_mined_blocktime", 0),
         }
 
-    mined_last_24hrs = float(get_notary_mined_last_24hrs(notary))
-    mining_summary.update({
-        "mined_last_24hrs": mined_last_24hrs
-    })
-    return mining_summary
+    # 24h mined sums per notary (grouped)
+    last_24h_rows = (
+        get_mined_data_24hr()
+        .values("name")
+        .annotate(mined_last_24hrs=Sum("value"), last_blocktime=Max("block_time"))
+    )
+    last_24h_map = {row["name"]: float(row["mined_last_24hrs"] or 0) for row in last_24h_rows}
+
+    # Compose final summaries and cache
+    for name, summary in summaries.items():
+        last_ts = summary.get("last_mined_blocktime", 0)
+        ts, ts_text = get_time_since(last_ts)
+        summary.update({
+            "time_since_mined_ts": ts,
+            "time_since_mined": ts_text,
+            "mined_last_24hrs": last_24h_map.get(name, 0.0),
+        })
+        cache_key = f"mining_summary_{season}_{name}"
+        try:
+            cached.refresh(key=cache_key, data=summary, force=True, expire=cache_expire)
+        except Exception:
+            pass
+
+    return len(summaries)
 
 ## API Functions
 

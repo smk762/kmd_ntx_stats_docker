@@ -2,18 +2,24 @@
 import os
 
 def update_dotenv():
-    with open(".env", "r") as f:
-        data = {}
-        for line in f.readlines():
-            item = line.split("=")
-            k = item[0].strip()
-            if len(item) == 1:
-                continue
-            if len(item) > 2:
-                v = ''.join(item[1:]).strip()
-            else:
-                v = item[1].strip()
-            data.update({k: v})
+    data = {}
+    original_keys = set()
+    try:
+        with open(".env", "r") as f:
+            for line in f.readlines():
+                item = line.split("=")
+                k = item[0].strip()
+                if len(item) == 1:
+                    continue
+                if len(item) > 2:
+                    v = ''.join(item[1:]).strip()
+                else:
+                    v = item[1].strip()
+                data.update({k: v})
+                original_keys.add(k)
+    except FileNotFoundError:
+        # Start with an empty .env; we'll create it
+        pass
 
     required_keys = [
         "MM2_IP", "MM2_PORT", "MM2_USERPASS", "SECRET_KEY", "DJANGO_ALLOWED_HOSTS",
@@ -22,7 +28,7 @@ def update_dotenv():
         "API_PAGE_BREAK", "TELEGRAM_TOKEN", "TELEGRAM_CHAT_ID", "ext_hostname",
         "ext_username", "ext_password", "ext_db", "DB_PATH", "GH_USER", "GH_TOKEN",
         "KMD_RPC_IP", "KMD_RPC_PORT", "KMD_RPC_USERNAME", "KMD_RPC_PASSWORD",
-        "USER_ID", "GROUP_ID"
+        "USER_ID", "GROUP_ID", "CLOUDFLARE_TUNNEL_TOKEN"
     ]
 
     extra_keys = sorted(set(data.keys()) - set(required_keys))
@@ -53,7 +59,7 @@ def update_dotenv():
                         rpcbind = l.replace("rpcbind=", "", 1)
             # defaults
             rpc_ip = rpcbind or "127.0.0.1"
-            if rpc_ip == "0.0.0.0":
+            if "0.0.0.0" in rpc_ip:
                 rpc_ip = "127.0.0.1"
             rpc_port = rpcport or "7771"
             if rpcuser and rpcpassword:
@@ -93,33 +99,70 @@ def update_dotenv():
         if missing_mm2:
             print(f"WARNING: {mm2_conf_path} not found and MM2_IP/MM2_PORT/MM2_USERPASS not set in .env. Add them for MM2/atomicdex connectivity.")
 
-    # Apply mm2 defaults into data so we don't prompt again
+    # Apply mm2 defaults into data (overwrite with file values if present)
     for k, v in mm2_defaults.items():
-        if k not in data or data[k] == "":
+        if v not in ["", None]:
             data[k] = v
 
-    # Apply KMD defaults into data so we don't prompt again
+    # Normalize MM2 defaults (host process)
+    if data.get("MM2_IP", "") in ["", "0.0.0.0"]:
+        data["MM2_IP"] = "127.0.0.1"
+    if data.get("MM2_PORT", "") == "":
+        data["MM2_PORT"] = "7783"
+
+    # Apply KMD defaults into data (overwrite with file values if present)
     for k, v in kmd_defaults.items():
-        if k not in data or data[k] == "":
+        if v not in ["", None]:
             data[k] = v
 
     # Normalize KMD RPC defaults (host process)
-    if data.get("KMD_RPC_IP", "") in ["", "0.0.0.0"]:
+    data["KMD_RPC_IP"] = data.get("KMD_RPC_IP", "").split(":")[0]
+    if data["KMD_RPC_IP"] in ["", "0.0.0.0"]:
         data["KMD_RPC_IP"] = "127.0.0.1"
+
     if data.get("KMD_RPC_PORT", "") == "":
         data["KMD_RPC_PORT"] = "7771"
 
-    for i in required_keys:
-        with open(".env", "a+") as f:
-            if i not in data or data[i] == "":
-                if i == "USER_ID":
-                    q = os.geteuid()
-                elif i == "GROUP_ID":
-                    q = os.getegid()
-                else:
-                    q = input(f"Enter {i}: ")
+    # Helper: auto-fill KMD RPC keys if still missing
+    def _kmd_default(key):
+        if key == "KMD_RPC_IP":
+            return data.get("KMD_RPC_IP", "127.0.0.1")
+        if key == "KMD_RPC_PORT":
+            return data.get("KMD_RPC_PORT", "7771")
+        if key in ["KMD_RPC_USERNAME", "KMD_RPC_PASSWORD"]:
+            return "changeme"
+        return ""
 
-                f.write(f"{i}={q}\n")
+    def _mm2_default(key):
+        if key == "MM2_IP":
+            return data.get("MM2_IP", "127.0.0.1")
+        if key == "MM2_PORT":
+            return data.get("MM2_PORT", "7783")
+        if key == "MM2_USERPASS":
+            return "changeme"
+        return ""
+
+    # Fill required keys, prompting only when no default exists
+    for i in required_keys:
+        if data.get(i, "") == "":
+            if i.startswith("KMD_RPC_"):
+                if i == "KMD_RPC_IP":
+                    i = i.split(':')[0]
+                q = _kmd_default(i)
+            elif i.startswith("MM2_"):
+                q = _mm2_default(i)
+            elif i == "USER_ID":
+                q = os.geteuid()
+            elif i == "GROUP_ID":
+                q = os.getegid()
+            else:
+                q = input(f"Enter {i}: ")
+            data[i] = str(q)
+
+    # Rewrite .env with updated values (preserve existing unknown keys)
+    with open(".env", "w") as f:
+        for k, v in data.items():
+            f.write(f"\n{k}={v}")
 
 if __name__ == "__main__":
     update_dotenv()

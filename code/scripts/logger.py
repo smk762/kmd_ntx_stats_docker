@@ -99,8 +99,9 @@ def add_logging_levels(levels):
 def addLoggingLevel(levelName, levelNum, methodName=None):
     """Add a custom log level."""
     methodName = methodName or levelName.lower()
+    # Make idempotent: if the level or method already exists, skip re-registering
     if hasattr(logging, levelName) or hasattr(logging.getLoggerClass(), methodName):
-        raise AttributeError(f"{levelName} or {methodName} already defined")
+        return
     if levelName.lower() in ["info", "debug", "warning", "error"]:
         stacklevel = 1
     else:
@@ -191,7 +192,10 @@ custom_levels = {
     "REQUEST": logging.DEBUG + 2
 }
 
-add_logging_levels(custom_levels)
+_custom_levels_registered = False
+if not _custom_levels_registered:
+    add_logging_levels(custom_levels)
+    _custom_levels_registered = True
 
 
 def show_palette():

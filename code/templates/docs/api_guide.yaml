@@ -4,7 +4,7 @@ info:
   description: Misc endpoints to assist with Notary Node Ops
   version: '0.1'
 servers:
-  - url: 'http://stats.kmd.io'
+  - url: 'http://notary-stats.dragonhound.info'
 paths:
   /api/info/balances/:
     get:
@@ -75,9 +75,9 @@ paths:
                     "chain"], "results": {"Season_4": {"alien_AR": {"KMD":
                     {"RVrtLPvKrszs7zSggTsXPYsbxc5SwALiEN": "9.09163599"}}}}}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/base_58/:
     get:
       description: Base58 Parameters (pubType, wifType, p2shType) for chain(s) 
@@ -120,9 +120,9 @@ paths:
                     {"count": 1, "filters": ["chain"], "results": {"KMD":
                     {"pubtype": 60, "wiftype": 188, "p2shtype": 85}}}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/coins/:
     get:
       description: Coins info sourced via dpow repo, coins repo and other sources
@@ -255,7 +255,7 @@ paths:
                     {"count": 1, "filters": ["chain", "dpow_active",
                     "mm2_active"], "results": {"KMD": {"coins_info": {"cli":
                     "~/komodo/src/komodo-cli", "mm2": 1, "coin": "KMD", "icon":
-                    "https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/kmd.png",
+                    "https://raw.githubusercontent.com/gleecbtc/coins/master/icons/kmd.png",
                     "name": "komodo", "fname": "Komodo", "txfee": 1000,
                     "pubtype": 60, "rpcport": 7771, "wiftype": 188, "p2shtype":
                     85, "protocol": {"type": "UTXO"}, "conf_path":
@@ -278,9 +278,9 @@ paths:
                     "electrum2.cipig.net:30001", "electrum3.cipig.net:30001"],
                     "mm2_compatible": 1, "dpow_active": 1}}}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/daemon_cli/:
     get:
       description: Command Line Interface string for dPoW Coins.
@@ -316,9 +316,9 @@ paths:
                     {"count": 1, "filters": ["chain"], "results": {"AYA":
                     "~/AYAv2/src/aryacoin-cli"}}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/dpow_server_coins/:
     get:
       description: Auto generated using Swagger Inspector
@@ -379,9 +379,9 @@ paths:
                     "OOT", "PANGEA", "PGT", "PIRATE", "REVS", "RFOX", "DOC",
                     "STBL", "SUPERNET", "THC", "WLC21", "ZILLA"]}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/electrums/:
     get:
       description: Electrum URLs for chain(s)
@@ -420,9 +420,9 @@ paths:
                     ["electrum1.cipig.net:10007", "electrum2.cipig.net:10007",
                     "electrum3.cipig.net:10007"]}}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/electrums_ssl/:
     get:
       description: SSL enabled electrums for coin(s)
@@ -461,9 +461,9 @@ paths:
                     ["electrum1.cipig.net:20018", "electrum2.cipig.net:20018",
                     "electrum3.cipig.net:20018"]}}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/electrums_wss/:
     get:
       description: WSS enabled electrums for coin(s)
@@ -502,9 +502,9 @@ paths:
                     ["electrum1.cipig.net:30018", "electrum2.cipig.net:30018",
                     "electrum3.cipig.net:30018"]}}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/explorers/:
     get:
       description: Block Explorer URLs for coins
@@ -542,9 +542,9 @@ paths:
                     {"count": 1, "filters": ["chain"], "results": {"DOC":
                     ["https://doc.explorer.dexstats.info/"]}}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/launch_params/:
     get:
       description: CLI Launch Parameters for dPoW active coins
@@ -582,9 +582,9 @@ paths:
                     -ac_reward=25600000000 -ac_halving=77777 -ac_private=1
                     -addnode=88.99.212.81"}}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/mined_count_daily/:
     get:
       description: Auto generated using Swagger Inspector
@@ -598,9 +598,9 @@ paths:
         '200':
           description: Auto generated using Swagger Inspector
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/notarised_chain_daily/:
     get:
       description: Auto generated using Swagger Inspector
@@ -710,9 +710,9 @@ paths:
                 '0':
                   value: >-
                     {"count": 36, "next":
-                    "http://stats.kmd.io/api/info/notarised_chain_daily/?notarised_date=2021-03-17",
+                    "http://notary-stats.dragonhound.info/api/info/notarised_chain_daily/?notarised_date=2021-03-17",
                     "previous":
-                    "http://stats.kmd.io/api/info/notarised_chain_daily/?notarised_date=2021-03-15",
+                    "http://notary-stats.dragonhound.info/api/info/notarised_chain_daily/?notarised_date=2021-03-15",
                     "filters": ["notarised_date"], "results": {"2021-03-16":
                     {"AXO": 77, "AYA": 104, "BET": 145, "BOTS": 127, "BTC": 95,
                     "BTCH": 4, "CCL": 74, "CHIPS": 16, "COQUICASH": 129,
@@ -724,9 +724,9 @@ paths:
                     "SUPERNET": 155, "THC": 160, "VRSC": 121, "WLC21": 145,
                     "ZILLA": 79}}}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/info/notarised_count_daily/:
     get:
       description: Auto generated using Swagger Inspector
@@ -740,9 +740,9 @@ paths:
         '200':
           description: Auto generated using Swagger Inspector
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/tools/addr_from_base58/:
     get:
       description: Auto generated using Swagger Inspector
@@ -793,9 +793,9 @@ paths:
                     "pubtype": "60", "p2shtype": "85", "wiftype": "188",
                     "address": "REnXF6VBjvVeWEYPFD4EHi4ToEb7PHsgYY"}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/tools/address_from_pubkey/:
     get:
       description: Auto generated using Swagger Inspector
@@ -831,9 +831,9 @@ paths:
                     "03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828",
                     "address": "1E2ac2gxeFR2ir1H3vqETTperWkiXkwy99"}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/tools/decode_opreturn/:
     get:
       description: Auto generated using Swagger Inspector
@@ -865,9 +865,9 @@ paths:
                     "notarised_blockhash":
                     "0000000048b5062870d0d5115d5f3e9dec6cd73fb6b653c731f088a06053fcfc"}
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'
   /api/tools/notary_utxos/:
     get:
       description: Summary of a Notary Node's UTXOs for a chain
@@ -906,6 +906,6 @@ paths:
         '200':
           description: Auto generated using Swagger Inspector
       servers:
-        - url: 'http://stats.kmd.io'
+        - url: 'http://notary-stats.dragonhound.info'
     servers:
-      - url: 'http://stats.kmd.io'
+      - url: 'http://notary-stats.dragonhound.info'

@@ -24,9 +24,13 @@ from logger import logger
 
 
 class Notarised:
+    def __init__(self):
+        self.kmd_rpc = rpc.def_credentials("KMD")
+
     def __init__(self, season, rescan=False):
         self.season = season
         self.rescan = rescan
+
         self.chain_tip = int(RPC["KMD"].getblockcount())
         self.start_block = self._determine_start_block()
         self.end_block = (

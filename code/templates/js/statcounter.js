@@ -1,6 +1,6 @@
 
         <!-- Default Statcounter code for Komodo Platform dPoW
-        Notary Stat http://stats.kmd.io/ -->
+        Notary Stat http://notary-stats.dragonhound.info/ -->
         <script>
         var sc_project=12515839; 
         var sc_invisible=1; 

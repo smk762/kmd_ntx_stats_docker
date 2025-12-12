@@ -1,5 +1,7 @@
 #!/usr/bin/env python3.12
 import numpy as np
+import json
+from pathlib import Path
 from kmd_ntx_api.cache_data import cached
 from kmd_ntx_api.coins import get_dpow_coins_dict, get_dpow_coin_server
 from kmd_ntx_api.cron import get_time_since
@@ -8,7 +10,7 @@ from kmd_ntx_api.helper import get_or_none, get_notary_list, get_page_server, \
     get_random_notary, get_regions_info, \
     get_notary_region
 from kmd_ntx_api.info import get_nn_social_info, get_coins, \
-    get_region_rank, get_coin_social_info, get_notary_icons, \
+    get_region_rank, get_coin_social_info, get_notary_icons, get_coin_icons, \
     get_coin_ntx_summary
 from kmd_ntx_api.logger import logger, timed
 from kmd_ntx_api.mining import get_nn_mining_summary
@@ -23,12 +25,53 @@ import kmd_ntx_api.buttons as buttons
 @timed
 def get_base_context(request, notary=None):
     # Helper function to avoid fetching all cached data upfront
+    def load_explorers_fallback():
+        """Load explorers from the static insight_explorers.json if cache/db is empty."""
+        try:
+            path = Path(__file__).resolve().parent.parent / "scripts" / "insight_explorers.json"
+            return json.loads(path.read_text())
+        except Exception:
+            return {}
+
     def get_cached_data():
+        explorers = cached.get_data("explorers_cache")
+        if not explorers:
+            explorers = load_explorers_fallback()
+            if explorers:
+                cached.refresh(key="explorers_cache", data=explorers, force=True, expire=86400)
+        coin_icons = cached.get_data("coin_icons_cache")
+        if not coin_icons:
+            coin_icons = get_coin_icons(request)
+            # Fallback: synthesize icon URLs from standard coins repo if DB lacks them
+            if not coin_icons:
+                base_icon_url = "https://raw.githubusercontent.com/gleecbtc/coins/master/icons"
+                coin_icons = {c: f"{base_icon_url}/{c.lower()}.png" for c in get_coins()}
+                logger.warning("[get_base_context] coin_icons missing; using repo URL fallback")
+            if coin_icons:
+                cached.refresh(key="coin_icons_cache", data=coin_icons, force=True, expire=86400)
+            else:
+                logger.warning("[get_base_context] coin_icons missing after cache and fallback")
+
+        notary_icons = cached.get_data("notary_icons")
+        if not notary_icons:
+            notary_icons = get_notary_icons(request)
+            if notary_icons:
+                cached.refresh(key="notary_icons", data=notary_icons, force=True, expire=86400)
+            else:
+                logger.warning("[get_base_context] notary_icons missing after cache and fallback")
+
+        nav_data = cached.get_data("navigation")
+        if not nav_data:
+            nav_data = cached.file_data("navigation") or {}
+            if nav_data:
+                cached.refresh(key="navigation", data=nav_data, force=True, expire=86400)
+            else:
+                logger.warning("[get_base_context] navigation missing after cache and fallback")
         return {
-            "explorers": cached.get_data("explorers_cache"),
-            "coin_icons": cached.get_data("coin_icons_cache"),
-            "notary_icons": cached.get_data("notary_icons"),
-            "nav_data": cached.get_data("navigation"),
+            "explorers": explorers,
+            "coin_icons": coin_icons,
+            "notary_icons": notary_icons,
+            "nav_data": nav_data,
         }
 
     def get_default_values():
@@ -55,37 +98,26 @@ def get_base_context(request, notary=None):
         return [coin for sublist in dpow_coins_dict.values() for coin in sublist]
 
     # Fetch cached data lazily
-    logger.warning("starting base context")
     cached_data = get_cached_data()
-    logger.warning("got base context cached_data")
     
     # Fetch seasons and notaries
     seasons_info = get_seasons_info()
-    logger.warning("got base context seasons_info")
     season = get_page_season(request, seasons_info)
-    logger.warning("got base context season")
     notary_list = get_notary_list(season, seasons_info)
-    logger.warning("got base context notary_list")
     notary = get_notary_selection(notary, notary_list)
-    logger.warning("got base context notary")
     
     # Fetch dPoW coins and related data
     dpow_coins_dict = get_dpow_coins_dict(season)
-    logger.warning("got base context dpow_coins_dict")
     dpow_coins_list = get_dpow_coins_list(dpow_coins_dict)
-    logger.warning("got base context dpow_coins_list")
     
     # Default and selected values from request
     values = get_default_values()
-    logger.warning("got base context get_default_values")
     
     # Fetch eco data link
     eco_data_link = get_eco_data_link()
-    logger.warning("got base context get_eco_data_link")
     
     # Get selected GET parameters as a dictionary
     selected = {key: request.GET[key] for key in request.GET}
-    logger.warning("got base context selected")
 
     # Prepare context for the template
     context = {
@@ -191,6 +223,24 @@ def get_notary_profile_context(request, notary, context):
             logger.warning("Unexpected length for notary_profile_summary_table")
     except Exception as e:
         logger.warning(f"Failed to get notary profile context for {notary}: {e}")
+        # Provide safe defaults so the page still renders
+        context.update({
+            "page_title": f"{notary} Notary Profile",
+            "notary": notary,
+            "notary_clean": notary.replace("_", " "),
+            "ntx_score": 0,
+            "season_score": 0,
+            "master_server_count": 0,
+            "main_server_count": 0,
+            "third_party_server_count": 0,
+            "rank": None,
+            "buttons": buttons.get_ntx_buttons(),
+            "nn_social": get_nn_social_info(request),
+            "mining_summary": {},
+            "master_notarised_24hr": 0,
+            "main_notarised_24hr": 0,
+            "third_notarised_24hr": 0
+        })
     return context
 
 

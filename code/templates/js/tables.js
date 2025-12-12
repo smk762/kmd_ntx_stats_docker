@@ -12,13 +12,24 @@ function get_region_scoreboard_table(season, region, url, title='') {
             { "data": "master" },
             { "data": "main" },
             { "data": "third_party" },	
-            { "data": "seed" },	
-            { "data": "mining" },
-            { "data": "score" }
+            { "data": "seed", "defaultContent": 0 },	
+            { "data": "mining", "defaultContent": 0 },
+            { "data": "score", "defaultContent": 0 }
         ],
         "columnDefs": [
             { className: "text-left text-nowrap", "targets": [ 1 ] },
             { className: "text-right text-nowrap", "targets": [ 2,3,4,5,6,7 ] },
+            {
+                "targets": 5, // seed
+                "visible": false,
+                "defaultContent": 0,
+                "render": function(data, type, row) {
+                    if (!data) {
+                        console.log("seed default used for", row);
+                    }
+                    return data ? data : 0;
+                }
+            },
             {
                 "targets": 1,
                 "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
@@ -28,7 +39,11 @@ function get_region_scoreboard_table(season, region, url, title='') {
             {
                 "targets": 7,
                 "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-                    $(nTd).html((Math.round(oData.score*100, 2)/100).toFixed(2));
+                    let val = oData.score ? oData.score : 0;
+                    if (!oData.score) {
+                        console.log("score default used for", oData);
+                    }
+                    $(nTd).html((Math.round(val*100, 2)/100).toFixed(2));
                 }
             }
         ],

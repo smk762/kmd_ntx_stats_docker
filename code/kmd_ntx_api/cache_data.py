@@ -4,6 +4,7 @@ import os
 import time
 import json
 import requests
+from decimal import Decimal
 from dotenv import load_dotenv
 from pathlib import Path
 from pymemcache.client.base import PooledClient
@@ -24,13 +25,13 @@ CACHE_EXPIRY = 600  # 10 minutes in seconds
 CACHE_SOURCE_URLS: Dict[str, Optional[str]] = {
     "activation_commands_cache": None,
     "b58_params_cache": None,
-    "coins_config_cache": "https://raw.githubusercontent.com/KomodoPlatform/coins/master/utils/coins_config.json",
+    "coins_config_cache": "https://raw.githubusercontent.com/gleecbtc/coins/master/utils/coins_config.json",
     "coin_icons_cache": None,
     "coins_info_cache": None,
     "ecosystem_links_cache": "https://raw.githubusercontent.com/gcharang/data/master/info/ecosystem.json",
     "get_electrum_status_cache": "https://electrum-status.dragonhound.info/api/v1/electrums_status",
     "explorers_cache": None,
-    "launch_params_cache": "https://raw.githubusercontent.com/KomodoPlatform/coins/refs/heads/master/launch/smartchains.json",
+    "launch_params_cache": "https://raw.githubusercontent.com/gleecbtc/coins/refs/heads/master/launch/smartchains.json",
     "notary_icons": None,
     "version_timespans_cache": "https://raw.githubusercontent.com/KomodoPlatform/dPoW/dev/doc/seed_version_epochs.json",
     "navigation": None,
@@ -45,10 +46,17 @@ CACHE_SOURCE_URLS: Dict[str, Optional[str]] = {
 
 
 class JsonSerde(object):  # pragma: no coverhttps://notaryfaucet.dragonhound.tools/show_faucet_db
+
+    @staticmethod
+    def _json_default(obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
     def serialize(self, key, value: Any) -> tuple[bytes, int]:
         if isinstance(value, str):
             return value.encode("utf-8"), 1
-        return json.dumps(value).encode("utf-8"), 2
+        return json.dumps(value, default=self._json_default).encode("utf-8"), 2
 
     def deserialize(self, key, value: bytes, flags: int) -> Any:
         if flags == 1:
@@ -161,17 +169,25 @@ class Cache:
             return None
 
     def refresh(self, key: str, expire: int = CACHE_TIMEOUT, force: bool = False, data: Optional[Union[dict, list, str]] = None) -> Optional[Union[dict, list, str]]:
-        """Refreshes the cache file and updates Memcached."""
+        """Refreshes the cache file and updates Memcached.
+        Writes even empty lists/dicts so callers don't later hit missing-file errors."""
         key = key.lower()
         path = self.data_path(key)
-        if self.is_expired(path, expire) or force and data is None:
+        # Only fetch from remote source if caller did not supply data
+        if data is None and (self.is_expired(path, expire) or force):
             data = self.source_data(key)
-        if data:
-            self.client.set(key, data, expire)
-            logger.info(f"{key} updated in mem {path}")
-            if not str(path).endswith("_summary.json"):
-                path.write_text(json.dumps(data, indent=4))
-                logger.saved(f"{path} updated!")
+        existing = self.client.get(key)
+        if data is None:
+            return existing
+        if isinstance(data, (dict, list)) and len(data) == 0:
+            logger.warning(f"{key} refresh skipped: empty payload (preserving existing cache/file)")
+            return existing
+
+        self.client.set(key, data, expire)
+        logger.info(f"{key} updated in mem {path}")
+        if not str(path).endswith("_summary.json"):
+            path.write_text(json.dumps(data, indent=4))
+            logger.saved(f"{path} updated!")
         return self.client.get(key)
 
 cached = Cache()

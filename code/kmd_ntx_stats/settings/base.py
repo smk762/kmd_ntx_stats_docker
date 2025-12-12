@@ -132,7 +132,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/var/www/stats.kmd.io/html/static/'
+STATIC_ROOT = '/var/www/notary-stats.dragonhound.info/html/static/'
 STATICFILES_DIRS = [
     '/code/static'
 ]

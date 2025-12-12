@@ -9,6 +9,8 @@ from decorators import *
 from models import coin_social_row
 import lib_helper as helper
 import lib_urls as urls
+from pathlib import Path
+from typing import Dict, Any
 
 
 @print_runtime
@@ -53,6 +55,48 @@ def generate_social_coins_template(season):
         json.dump(template, j, indent = 4, sort_keys=True)
 
 
+def _season_number(season: str) -> int:
+    try:
+        return int(season.split("_")[1])
+    except Exception:
+        return 0
+
+
+def fetch_prior_social_coins(current_season: str) -> Dict[str, Any]:
+    """
+    Look for local social_coins files from previous seasons (descending).
+    Returns the first found as dict.
+    """
+    cur_num = _season_number(current_season)
+    base = Path(__file__).resolve().parent
+    for n in range(cur_num - 1, 0, -1):
+        cand = base / f"social_coins_season_{n}.json"
+        if cand.exists():
+            try:
+                data = json.loads(cand.read_text())
+                if isinstance(data, dict):
+                    logger.info(f"[backfill] Using prior social coins from {cand.name}")
+                    return data
+            except Exception as e:
+                logger.debug(f"[backfill] Failed to read {cand}: {e}")
+    logger.info("[backfill] No prior season social coins data found")
+    return {}
+
+
+def backfill_coin_social_fields(template: Dict[str, Any], prior: Dict[str, Any]) -> Dict[str, Any]:
+    """Fill empty social fields from prior season data without overwriting existing values."""
+    social_fields = ["discord", "email", "explorers", "github", "linkedin",
+                     "mining_pools", "reddit", "telegram", "twitter", "website", "youtube"]
+    for coin, data in prior.items():
+        if coin not in template or not isinstance(data, dict):
+            continue
+        for field in social_fields:
+            if field not in template[coin] or not template[coin][field]:
+                if field in data and data[field]:
+                    template[coin][field] = data[field]
+    return template
+
+
 @print_runtime
 def populate_coins_social(season):
     try:
@@ -60,7 +104,7 @@ def populate_coins_social(season):
             coin_social = json.load(j)
 
         all_coins = SEASONS.INFO[season]["coins"]
-        coin_info = requests.get(urls.get_coins_info_url()).json()['results']
+        coin_info = COINS_INFO
 
         for coin in all_coins:
 
@@ -95,6 +139,15 @@ def populate_coins_social(season):
                 row.youtube = coin_social[coin]["youtube"]
 
             row.update()
+
+        # Backfill empty social fields from prior seasons if available
+        prior = fetch_prior_social_coins(season)
+        if prior:
+            coin_social = backfill_coin_social_fields(coin_social, prior)
+
+        # Persist the enriched file for transparency/pushing
+        with open(f"{os.path.dirname(os.path.abspath(__file__))}/social_coins_{season.lower()}.json", 'w+') as j:
+            json.dump(coin_social, j, indent=4, sort_keys=True)
     except Exception as e:
         logger.info(f"Error in [populate_coins_social]: {e}")
 

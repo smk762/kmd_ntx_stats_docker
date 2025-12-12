@@ -11,4 +11,4 @@ ENV PYTHONUNBUFFERED 1
 ENV PGDATA=/pg-data
 
 RUN pip install --upgrade pip
-RUN pip install -r $requirements && python manage.py collectstatic --noinput
+RUN pip install -r $requirements

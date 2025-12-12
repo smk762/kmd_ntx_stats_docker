@@ -100,7 +100,8 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
     """Add a custom log level."""
     methodName = methodName or levelName.lower()
     if hasattr(logging, levelName) or hasattr(logging.getLoggerClass(), methodName):
-        raise AttributeError(f"{levelName} or {methodName} already defined")
+        # Already defined (likely due to multiple imports); no-op
+        return
 
     def logForLevel(self, message, *args, **kwargs):
         if self.isEnabledFor(levelNum):

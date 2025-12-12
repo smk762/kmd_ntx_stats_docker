@@ -131,4 +131,8 @@ api_info_urls = [
           info_api.seasons_data,
           name='seasons_data'),
 
+    path('badges/<str:coin>.svg',
+          info_api.badge_svg,
+          name='badge_svg'),
+
 ]

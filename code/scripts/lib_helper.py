@@ -57,7 +57,6 @@ def translate_dpow_server(server):
         return "Main"
 
 
-@lru_cache(maxsize=None)
 def get_assetchain_launch_params(item):
     params = "~/komodo/src/komodod"
     for k, v in item.items():
@@ -67,7 +66,6 @@ def get_assetchain_launch_params(item):
         else:
             params += " -"+k+"="+str(v)
     return params
-
 
 
 def get_local_addresses(local_info):

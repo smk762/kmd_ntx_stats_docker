@@ -1,15 +1,23 @@
 #!/usr/bin/env python3.12
 import os
 import sys
+from pathlib import Path
 from os.path import expanduser, dirname, realpath
 import time
 import requests
+
+# Ensure project root is on PYTHONPATH so kmd_ntx_api imports work in scripts
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from const_seasons import SEASONS
 from lib_dpow_const import *
 from lib_db import *
 from lib_rpc import *
 import lib_urls as urls
 from logger import logger
+from kmd_ntx_api.cache_data import cached
 
 time_now = time.time()
 # How many pages back to go with verbose API responses
@@ -27,15 +35,37 @@ ONE_YEAR = 365 * 24 * 60
 DEVISOR = 10512000
 
 
-# Electrums & Explorers
-EXPLORERS = requests.get(urls.get_explorers_info_url()).json()['results']
-ELECTRUMS = requests.get(urls.get_electrums_info_url()).json()['results']
-ELECTRUMS_SSL = requests.get(urls.get_electrums_ssl_info_url()).json()['results']
-ELECTRUMS_WSS = requests.get(urls.get_electrums_wss_info_url()).json()['results']
-urls
+def _cached_api_results(cache_key, url, expire=3600):
+    """
+    Fetch results from memcache if present, otherwise hit the API and store.
+    Expects API responses shaped as {"results": {...}} and returns that inner payload.
+    """
+    data = cached.get_data(cache_key, expire=expire)
+    if isinstance(data, dict) and "results" in data:
+        data = data["results"]
+    if data:
+        return data
+    try:
+        resp = requests.get(url, timeout=30)
+        resp.raise_for_status()
+        payload = resp.json()
+        if isinstance(payload, dict) and "results" in payload:
+            payload = payload["results"]
+        cached.refresh(key=cache_key, data=payload, force=True, expire=expire)
+        return payload
+    except Exception as e:
+        logger.warning(f"[lib_const] Failed to fetch {url}: {e}")
+        return {}
+
+
+# Electrums & Explorers (prefer memcache to cut internal API calls)
+EXPLORERS = _cached_api_results("explorers_cache", urls.get_explorers_info_url(), expire=900)
+ELECTRUMS = _cached_api_results("electrums_cache", urls.get_electrums_info_url(), expire=900)
+ELECTRUMS_SSL = _cached_api_results("electrums_ssl_cache", urls.get_electrums_ssl_info_url(), expire=900)
+ELECTRUMS_WSS = _cached_api_results("electrums_wss_cache", urls.get_electrums_wss_info_url(), expire=900)
 
 # Coins
-COINS_INFO = requests.get(urls.get_coins_info_url()).json()['results']
+COINS_INFO = _cached_api_results("coins_info_cache", urls.get_coins_info_url(), expire=86400)
 KNOWN_COINS = COINS_INFO.keys()
 
 
@@ -92,7 +122,7 @@ CLEAN_UP = False
 
 HOME = expanduser('~')
 SCRIPT_PATH = dirname(realpath(sys.argv[0]))
-COINS_CONFIG_URL = "https://raw.githubusercontent.com/KomodoPlatform/coins/master/utils/coins_config.json"
+COINS_CONFIG_URL = "https://raw.githubusercontent.com/gleecbtc/coins/master/utils/coins_config.json"
 COINS_CONFIG_PATH = f"{SCRIPT_PATH}/coins_config.json"
 
 logger.info(f"{int(time.time()) - time_now} sec to complete const")

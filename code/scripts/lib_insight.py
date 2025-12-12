@@ -2,6 +2,8 @@
 from typing import List, Dict, Any, Optional
 import requests
 from functools import cached_property
+from pathlib import Path
+import json
 
 from logger import logger
 
@@ -120,91 +122,14 @@ class InsightAPI:
         return self.transactions_for_block(block_hash)
 
 
-INSIGHT_EXPLORERS = {
-    "CHIPS": [
-        "https://chips.explorer.dexstats.info/",
-        "https://explorer.chips.cash/",
-    ],
-    "CCL": [
-        "https://ccl.komodo.earth/",
-        "https://ccl.explorer.dragonhound.info/",
-        "https://ccl.kmdexplorer.io/",
-        "https://ccl.explorer.dexstats.info/"
-    ],
-    "CLC": [
-        "https://clc.komodo.earth/",
-        "https://clc.explorer.dexstats.info/",
-    ],
-    "DOC": [
-        "https://doc.explorer.dexstats.info/",
-        "https://doc.komodo.earth/",
-        "https://doc.explorer.dragonhound.info/",
-    ],
-    "DP": ["https://dp.explorer.dexstats.info/"],
-    "GLEEC": [
-        "https://explorer.gleec.com/",
-        "https://gleec.explorer.dexstats.info/"
-    ],
-    "GLEEC-OLD": [
-        "https://gleec.komodo.earth/",
-        "https://gleec.explorer.dragonhound.info/",
-        "https://old.gleec.xyz/",
-    ],
-    "ILN": [
-        "https://iln.komodo.earth/",
-        "https://iln.explorer.dragonhound.info/",
-        "https://explorer.ilien.io/",
-        "https://iln.explorer.dexstats.info/",
-    ],
-    "KMD": [
-        "https://explorer.komodoplatform.com/",
-        "https://explorer.kmd.dev/",
-        "https://explorer.kmd.io/",
-        "https://kmd.explorer.dexstats.info/",
-        "https://kmdexplorer.io/",
-        "https://www.kmdexplorer.ru/",
-    ],
-    "LABS": ["https://labs.explorer.dexstats.info/"],
-    "KOIN": [
-        "https://koin.komodo.earth/",
-        "https://koin.explorer.dragonhound.info/",
-        "https://block.koinon.cloud/",
-        "https://koin.explorer.dexstats.info/",
-    ],
-    "MARTY": [
-        "https://marty.komodo.earth/",
-        "https://marty.explorer.dragonhound.info/",
-        "https://marty.explorer.dexstats.info/",
-    ],
-    "MCL": [
-        "https://explorer.marmara.io/",
-        "https://mcl.explorer.dexstats.info/",
-    ],
-    "NINJA": [
-        "https://ninja.komodo.earth/",
-        "https://ninja.explorer.dragonhound.info/",
-        "https://ninja.explorer.dexstats.info/",
-        "https://ninja.kmdexplorer.io/",
-    ],
-    "PIRATE": [
-        "https://explorer.pirate.black/",
-        "https://pirate.explorer.dexstats.info/",
-        "https://pirate.kmdexplorer.io/",
-    ],
-    "SUPERNET": [
-        "https://supernet.explorer.dexstats.info/",
-        "https://supernet.kmdexplorer.io/",
-    ],
-    "THC": [
-        "https://thc.komodo.earth/",
-        "https://thc.explorer.dexstats.info/",
-    ],
-    "TOKEL": [
-        "https://tokel.komodo.earth/",
-        "https://explorer.tokel.io/",
-        "https://tokel.explorer.dexstats.info/",
-    ],
-    "VRSC": [
-        "https://vrsc.explorer.dexstats.info/",
-    ],
-}
+def load_insight_explorers() -> Dict[str, list]:
+    """Load explorer list from JSON so it can be edited without touching code."""
+    path = Path(__file__).resolve().parent / "insight_explorers.json"
+    try:
+        return json.loads(path.read_text())
+    except Exception as e:
+        logger.error(f"Failed to load insight_explorers.json: {e}")
+        return {}
+
+
+INSIGHT_EXPLORERS = load_insight_explorers()

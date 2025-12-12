@@ -10,7 +10,7 @@ class NotaryMonitor():
 
     def get_last_mined(self):
         try:
-            r = requests.get("https://stats.kmd.io/api/mining/notary_last_mined_table/")
+            r = requests.get("https://notary-stats.dragonhound.info/api/mining/notary_last_mined_table/")
             return r.json()["results"]
         except Exception as e:
             logger.info(f"Error: {e}")

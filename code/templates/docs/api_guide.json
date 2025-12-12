@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://stats.kmd.io"
+      "url": "http://notary-stats.dragonhound.info"
     }
   ],
   "paths": {
@@ -79,13 +79,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -124,13 +124,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -182,7 +182,7 @@
                 },
                 "examples": {
                   "0": {
-                    "value": "{\"count\": 1, \"filters\": [\"chain\", \"dpow_active\", \"mm2_active\"], \"results\": {\"KMD\": {\"coins_info\": {\"cli\": \"~/komodo/src/komodo-cli\", \"mm2\": 1, \"coin\": \"KMD\", \"icon\": \"https://raw.githubusercontent.com/KomodoPlatform/coins/master/icons/kmd.png\", \"name\": \"komodo\", \"fname\": \"Komodo\", \"txfee\": 1000, \"pubtype\": 60, \"rpcport\": 7771, \"wiftype\": 188, \"p2shtype\": 85, \"protocol\": {\"type\": \"UTXO\"}, \"conf_path\": \"~/.komodo/komodo.conf\", \"txversion\": 4, \"overwintered\": 1, \"avg_blocktime\": 1, \"launch_params\": \"~/komodo/src/komodod\", \"requires_notarization\": true, \"required_confirmations\": 2}, \"dpow\": {\"src\": \"https://github.com/komodoplatform/komodo\", \"server\": \"Main\", \"version\": \"[e159b4e](https://github.com/KomodoPlatform/komodo/tree/e159b4e7a40d3886519401c4074e957a1f9d42ba)\"}, \"dpow_tenure\": {\"Season_4\": {\"KMD\": {\"end_time\": 1617364800, \"start_time\": 1592146800}}}, \"explorers\": [\"https://kmdexplorer.io/\", \"https://kmd.explorer.dexstats.info/\", \"https://komodod.com/\", \"https://www.kmdexplorer.ru/\"], \"electrums\": [\"electrum1.cipig.net:10001\", \"electrum2.cipig.net:10001\", \"electrum3.cipig.net:10001\"], \"electrums_ssl\": [\"electrum1.cipig.net:20001\", \"electrum2.cipig.net:20001\", \"electrum3.cipig.net:20001\"], \"mm2_compatible\": 1, \"dpow_active\": 1}}}"
+                    "value": "{\"count\": 1, \"filters\": [\"chain\", \"dpow_active\", \"mm2_active\"], \"results\": {\"KMD\": {\"coins_info\": {\"cli\": \"~/komodo/src/komodo-cli\", \"mm2\": 1, \"coin\": \"KMD\", \"icon\": \"https://raw.githubusercontent.com/gleecbtc/coins/master/icons/kmd.png\", \"name\": \"komodo\", \"fname\": \"Komodo\", \"txfee\": 1000, \"pubtype\": 60, \"rpcport\": 7771, \"wiftype\": 188, \"p2shtype\": 85, \"protocol\": {\"type\": \"UTXO\"}, \"conf_path\": \"~/.komodo/komodo.conf\", \"txversion\": 4, \"overwintered\": 1, \"avg_blocktime\": 1, \"launch_params\": \"~/komodo/src/komodod\", \"requires_notarization\": true, \"required_confirmations\": 2}, \"dpow\": {\"src\": \"https://github.com/komodoplatform/komodo\", \"server\": \"Main\", \"version\": \"[e159b4e](https://github.com/KomodoPlatform/komodo/tree/e159b4e7a40d3886519401c4074e957a1f9d42ba)\"}, \"dpow_tenure\": {\"Season_4\": {\"KMD\": {\"end_time\": 1617364800, \"start_time\": 1592146800}}}, \"explorers\": [\"https://kmdexplorer.io/\", \"https://kmd.explorer.dexstats.info/\", \"https://komodod.com/\", \"https://www.kmdexplorer.ru/\"], \"electrums\": [\"electrum1.cipig.net:10001\", \"electrum2.cipig.net:10001\", \"electrum3.cipig.net:10001\"], \"electrums_ssl\": [\"electrum1.cipig.net:20001\", \"electrum2.cipig.net:20001\", \"electrum3.cipig.net:20001\"], \"mm2_compatible\": 1, \"dpow_active\": 1}}}"
                   }
                 }
               }
@@ -191,13 +191,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -236,13 +236,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -314,13 +314,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -359,13 +359,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -404,13 +404,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -449,13 +449,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -494,13 +494,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -539,13 +539,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -572,13 +572,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -608,7 +608,7 @@
                 },
                 "examples": {
                   "0": {
-                    "value": "{\"count\": 36, \"next\": \"http://stats.kmd.io/api/info/notarised_chain_daily/?notarised_date=2021-03-17\", \"previous\": \"http://stats.kmd.io/api/info/notarised_chain_daily/?notarised_date=2021-03-15\", \"filters\": [\"notarised_date\"], \"results\": {\"2021-03-16\": {\"AXO\": 77, \"AYA\": 104, \"BET\": 145, \"BOTS\": 127, \"BTC\": 95, \"BTCH\": 4, \"CCL\": 74, \"CHIPS\": 16, \"COQUICASH\": 129, \"CRYPTO\": 118, \"DEX\": 61, \"EMC2\": 107, \"GLEEC\": 70, \"HODL\": 120, \"ILN\": 139, \"JUMBLR\": 118, \"KOIN\": 101, \"MCL\": 141, \"MESH\": 81, \"MGW\": 123, \"MARTY\": 89, \"MSHARK\": 121, \"NINJA\": 2, \"OOT\": 134, \"PANGEA\": 115, \"PBC\": 140, \"PGT\": 77, \"PIRATE\": 121, \"REVS\": 128, \"DOC\": 106, \"STBL\": 3, \"SUPERNET\": 155, \"THC\": 160, \"VRSC\": 121, \"WLC21\": 145, \"ZILLA\": 79}}}"
+                    "value": "{\"count\": 36, \"next\": \"http://notary-stats.dragonhound.info/api/info/notarised_chain_daily/?notarised_date=2021-03-17\", \"previous\": \"http://notary-stats.dragonhound.info/api/info/notarised_chain_daily/?notarised_date=2021-03-15\", \"filters\": [\"notarised_date\"], \"results\": {\"2021-03-16\": {\"AXO\": 77, \"AYA\": 104, \"BET\": 145, \"BOTS\": 127, \"BTC\": 95, \"BTCH\": 4, \"CCL\": 74, \"CHIPS\": 16, \"COQUICASH\": 129, \"CRYPTO\": 118, \"DEX\": 61, \"EMC2\": 107, \"GLEEC\": 70, \"HODL\": 120, \"ILN\": 139, \"JUMBLR\": 118, \"KOIN\": 101, \"MCL\": 141, \"MESH\": 81, \"MGW\": 123, \"MARTY\": 89, \"MSHARK\": 121, \"NINJA\": 2, \"OOT\": 134, \"PANGEA\": 115, \"PBC\": 140, \"PGT\": 77, \"PIRATE\": 121, \"REVS\": 128, \"DOC\": 106, \"STBL\": 3, \"SUPERNET\": 155, \"THC\": 160, \"VRSC\": 121, \"WLC21\": 145, \"ZILLA\": 79}}}"
                   }
                 }
               }
@@ -617,13 +617,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -650,13 +650,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -728,13 +728,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -784,13 +784,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -829,13 +829,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     },
@@ -895,13 +895,13 @@
         },
         "servers": [
           {
-            "url": "http://stats.kmd.io"
+            "url": "http://notary-stats.dragonhound.info"
           }
         ]
       },
       "servers": [
         {
-          "url": "http://stats.kmd.io"
+          "url": "http://notary-stats.dragonhound.info"
         }
       ]
     }

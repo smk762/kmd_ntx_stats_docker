@@ -1,124 +1,59 @@
-# Dependancies:
+# Komodo Notarisation Stats (Docker)
 
-- NGINX:  https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04
+Updated for Ubuntu 22.04.5 LTS and current stack.
 
-- Docker: https://docs.docker.com/engine/install/ubuntu/
+## Host prerequisites
+- Git, curl, build tools: `sudo apt update && sudo apt install -y git curl ca-certificates`
+- Docker Engine + Compose plugin: https://docs.docker.com/engine/install/ubuntu/
+  - After install: `sudo usermod -aG docker $USER` (relog) and `docker compose version`
+- Python (for helpers): `sudo apt install -y python3 python3-venv`
+- Optional: Nginx/Certbot if you front this with TLS (not required for local dev)
+- KMD node (on host) with `~/.komodo/komodo.conf` or set `KMD_RPC_*` envs. RPC is locked to localhost and whitelisted read-only methods.
+- MM2/KDF: provide `~/.kdf/MM2.json` or set `MM2_*` envs. KDF doc: [Configure MM2.json](https://komodoplatform.com/en/docs/komodo-defi-framework/setup/configure-mm2-json/).
 
-- Docker Compose: https://docs.docker.com/compose/install/
+## Quick start
+```bash
+git clone https://github.com/smk762/kmd_ntx_stats_docker
+cd kmd_ntx_stats_docker
 
-- Certbot: https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx.html
+# Populate .env (prefills from ~/.komodo/komodo.conf and ~/.kdf/MM2.json)
+python3 configure.py
 
-- Git: `sudo apt install git`
+# Build and start Postgres + web
+docker compose up -d db
+# (Optional) import an existing dump: cat stats-kmd-io-db.sql.gz | docker compose exec -T db bash -c "gunzip -c - | psql -U postgres postgres"
+docker compose up -d web
 
-- PostgreSQL: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04
+# (Optional) expose via Cloudflare Tunnel instead of Nginx
+# 1) In Cloudflare, create a tunnel and copy the token.
+# 2) Add CLOUDFLARE_TUNNEL_TOKEN=<token> to .env
+# 3) docker compose up -d cloudflared
+# 4) In the Cloudflare dashboard, point the tunnel ingress to http://web:8762
+#    and create/attach the DNS record for your hostname. Add Cloudflare Access if desired.
+```
+The app listens on `http://localhost:8762` (Postgres on 7654).
 
-- Komodod - https://github.com/komodoplatform/komodo (you can use bootstrap from https://www.dexstats.info/bootstrap.php to speed things up)
+## Environment keys (summary)
+- MM2_IP / MM2_PORT / MM2_USERPASS (prefilled from MM2.json if present)
+- KMD_RPC_IP (forced to 127.0.0.1 if blank/0.0.0.0) / KMD_RPC_PORT (default 7771) / KMD_RPC_USERNAME / KMD_RPC_PASSWORD (prefilled from komodo.conf if present)
+- POSTGRES_HOST/PORT/DB/USER/PASSWORD (defaults: db/5432/postgres/postgres/postgres)
+- DJANGO_ALLOWED_HOSTS, SECRET_KEY, and the other keys added by `configure.py`
 
-- Pip3: `sudo apt install python3-pip` then `pip3 install --upgrade setuptools wheel`
+## Database ops
+- Migrations: `docker compose run --rm web python manage.py migrate`
+- Collect static: `docker compose run --rm web python manage.py collectstatic --noinput`
+- Create superuser: `docker compose run --rm web python manage.py createsuperuser`
+- Rebuild images after code changes: `docker compose build`
 
-- Psychpg2 `sudo apt-get install python-psycopg2` then `sudo apt-get install python3-dev build-essential libpq-dev  libgnutls28-dev gcc`
+## Security notes
+- KMD RPC is localhost-only; only whitelisted read-only methods are exposed (getblockcount, getaddresstxids, getrawtransaction, coinsupply). UI cannot issue write RPCs.
+- Keep `.env` out of git; adjust file perms as needed.
 
-- mysql-client / connector `sudo apt-get install default-libmysqlclient-dev build-essential python3-mysql.connector`
+## Maintenance
+- Rebuild: `docker compose build`
+- Restart: `docker compose up -d`
+- Prune old images: `docker system prune -a --volumes`
 
-
-# Clone repo
-`git clone https://github.com/smk762/kmd_ntx_stats_docker`
-
-`cd kmd_ntx_stats_docker`
-
-Install Python Packages: `pip3 install -r requirements.txt` 
-
-`sudo docker compose build`  (needs to be run to apply code changes)
-
-`sudo docker compose up` (run to launch containers)
-
-# Setup .env files (scripts pending...)
-- pgsql credentials
-
-- django secret key
-
-- allowed hosts
-
-# Create Database Tables
-
-Make migrations: `"docker compose run web python3 manage.py makemigrations"`
-
-Apply migrations: `"docker compose run web python3 manage.py migrate"`
-
-Collect static files: `"docker compose run web python3 manage.py collectstatic"`
-
-# Create superuser:
- `docker compose run web python3 manage.py createsuperuser --email brian@spam.ni --username messiah`
-
-See https://docs.djangoproject.com/en/3.0/ref/django-admin/ for more django admin commands.
-
-# Applying code changes
-`cd ~/kmd_ntx_stats_docker`
-
-`docker compose build`
-
-`sudo chown $USER:$USER /home/$USER/kmd_ntx_stats_docker/postgres-data -R`
-
-`docker compose build`
-
-`sudo cp -R static /var/www/stats.kmd.io/html`
-
-# Adding new coins
-
-add coin parmas to `scripts/base_58.py`
-
-run `scripts/populate_coins_table.py`
-
-run `scripts/populate_balances_table.py`
-
-run `scripts/populate_addresses_table.py`
-
-Check web pages to confirm display / no errors.
-
-
-## Reference
-- to make migrations, use `docker compose run web python3 manage.py makemigrations`
-- to apply migrations, use `docker compose run web python3 manage.py migrate`
-- to update static files, use `docker compose run web python3 manage.py collectstatic`
-#### Editing pg.conf
-- `docker exec -it <pgsql_container_name> bash`
-- `apt update & apt install nano`
-- `nano  ./var/lib/postgresql/data/postgresql.conf`
-- change max_connections to 1000
-- change max_wal_size to 2gb
-- log_rotation_size to 100mb
-
-#### Find where colectstatic is looking
-- `docker compose run web python3 manage.py findstatic --verbosity 2 static`
-
-#### PGSQL access config
-- `sudo nano /home/$USER/kmd_ntx_stats_docker/postgres-data/pg_hba.conf`
-
-#### Fix permissions
-- `sudo chown $USER:$USER /home/$USER/kmd_ntx_stats_docker/postgres-data -R`
-
-#### Prune old docker images (do while container is running so active containers are not removed)
-- `docker system prune -a --volumes`
-
-## Database Backup & Migration
-
-Use the helper scripts in `util/` to safely move the Postgres data directory between servers without copying raw volumes.
-
-### Exporting from the source server
-
-1. Ensure the stack is up with `docker compose up -d db`.
-2. Run `./util/export_postgres.sh /absolute/path/to/postgres.sql.gz` (the path is optional; a timestamped file is written to `backups/` by default).
-3. Copy the resulting `.sql.gz` file to secure storage or directly to the destination host.
-
-### Importing on the destination server
-
-1. Clone this repository, create the `.env` files, and bring the database online: `docker compose up -d db`.
-2. Transfer the dump file to the new host.
-3. Run `./util/import_postgres.sh /absolute/path/to/postgres.sql.gz`. The script drops and recreates the `public` schema before streaming the dump into Postgres.
-4. Start or restart the rest of the stack (`docker compose up -d`) and follow the standard Django migration/static collection steps if needed.
-
-This workflow keeps the migration deterministic, avoids mismatched Postgres minor versions, and allows you to archive backups under `backups/` (ignored by git).
-
-## Production Deployment
-
-See `docs/production-deployment.md` for a step-by-step server hardening and deployment checklist, including SSL termination, monitoring, and backup rotation guidance.
+## Backups / restore
+- Export (example): `docker compose exec db pg_dump -U postgres postgres | gzip > backups/postgres-$(date +%s).sql.gz`
+- Import (example): `cat path/to/dump.sql.gz | docker compose exec -T db bash -c "gunzip -c - | psql -U postgres postgres"`

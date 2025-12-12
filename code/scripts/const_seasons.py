@@ -1,10 +1,21 @@
 #!/usr/bin/env python3.12
+import sys
+from pathlib import Path
 import requests
 import time
 import lib_urls as urls
 from notary_pubkeys import NOTARY_PUBKEYS
 from functools import cached_property, lru_cache
 from logger import logger
+
+# Ensure project root is on PYTHONPATH so kmd_ntx_api imports succeed when
+# running scripts directly (e.g. python scripts/cron_update_epochs.py).
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from kmd_ntx_api.cache_data import cached
+import time
 
 
 ### Const Vars
@@ -499,24 +510,68 @@ class Seasons:
         return self.get_season_from_ts()["season"]
 
     def get_dpow_active_info(self):
-        """Get current dpow coins from repo"""
-        data = requests.get(urls.get_dpow_active_coins_url()).json()["results"]
+        """Compute current dPoW-active coins from season start list + scoring epochs window."""
+        cache_key = "dpow_active_coins"
+        now = int(time.time())
         current_season = self.current()
-        current_dpow_coins = {current_season: {}}
-        for _coin in data:
-            if data[_coin]["dpow"]["server"] not in current_dpow_coins[current_season]:
-                current_dpow_coins[current_season].update(
-                    {data[_coin]["dpow"]["server"]: []}
-                )
-            current_dpow_coins[current_season][data[_coin]["dpow"]["server"]].append(
-                _coin
-            )
-        return current_season, data, current_dpow_coins
+        active_details = {}
+        active_by_server = {current_season: {}}
+
+        # Start with season start coins as baseline
+        start_coins = self.START_COINS.get(current_season, {})
+        for server, coins in start_coins.items():
+            active_by_server[current_season].setdefault(server, [])
+            for coin in coins:
+                if coin not in active_by_server[current_season][server]:
+                    active_by_server[current_season][server].append(coin)
+                active_details.setdefault(coin, {"dpow": {}})
+                active_details[coin]["dpow"]["server"] = server
+
+        # Apply epochs timing: remove coins whose epoch ended; add coins whose epoch is active now
+        if current_season in self.epochs_repo_data:
+            servers = self.epochs_repo_data[current_season].get("Servers", {})
+            for server, coins in servers.items():
+                active_by_server[current_season].setdefault(server, [])
+                for coin, meta in coins.items():
+                    start = meta.get("start_time", 0)
+                    end = meta.get("end_time", 1999999999)
+                    in_window = start <= now <= end
+                    if in_window and coin not in active_by_server[current_season][server]:
+                        active_by_server[current_season][server].append(coin)
+                        active_details.setdefault(coin, {"dpow": {}})
+                        active_details[coin]["dpow"]["server"] = server
+                    if not in_window and coin in active_by_server[current_season][server]:
+                        active_by_server[current_season][server].remove(coin)
+                        active_details.pop(coin, None)
+
+        # Sort lists for stability
+        for server in active_by_server[current_season]:
+            active_by_server[current_season][server].sort()
+
+        # Persist computed snapshot to cache (no remote fetch)
+        cached.refresh(key=cache_key, data=active_details, force=True, expire=900)
+        return current_season, active_details, active_by_server
 
     def get_epoch_score(self, server, num_coins):
         if num_coins == 0:
-            logger.warning(f"Attempted to calculate score for {server} with no coins.")
-            return 0
+            # Attempt a one-shot fallback count using current season server coins.
+            try:
+                current_season = self.current()
+                server_coins = []
+                if (
+                    current_season in self.INFO
+                    and "servers" in self.INFO[current_season]
+                    and server in self.INFO[current_season]["servers"]
+                ):
+                    server_coins = self.INFO[current_season]["servers"][server].get("coins", [])
+                if not server_coins and current_season in self.START_COINS:
+                    server_coins = self.START_COINS[current_season].get(server, [])
+                num_coins = len(server_coins)
+            except Exception as e:
+                logger.debug(f"fallback coin count failed: {e}")
+            # If still empty, return 0 without warning to avoid log spam or recursion.
+            if num_coins == 0:
+                return 0
         score_map = {
             "Main": 0.8698,
             "Third_Party": 0.0977,

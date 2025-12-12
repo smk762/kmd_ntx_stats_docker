@@ -10,6 +10,7 @@ from lib_validate import *
 from lib_query import *
 from lib_update import *
 from lib_urls import *
+from lib_github import gh, get_github_folder_contents
 from models import coins_row
 from lib_crypto import SMARTCHAIN_BASE_58
 from lib_helper import get_season_coins
@@ -43,17 +44,23 @@ def parse_coins_repo():
     Some coins are named differently in dPoW Repo (e.g. ARRR/TKL) so
     in thiese cases both are initialised.
     '''
-    coins_data = {}
-    r = requests.get(get_coins_repo_coins_url())
-    coins_repo = r.json()
+    try:
+        coins_data = {}
+        r = gh.get(get_coins_repo_coins_url())
+        coins_repo = r.json()
 
-    for item in coins_repo:
-        coin = item['coin']
-        _coin = get_alt_name(item['coin'])
-        if coin != _coin:
-            coins_data = get_coins_repo_info(coins_data, _coin, item)
-        coins_data = get_coins_repo_info(coins_data, coin, item)
-    return coins_data
+        for item in coins_repo:
+            coin = item['coin']
+            _coin = get_alt_name(item['coin'])
+            if coin != _coin:
+                coins_data = get_coins_repo_info(coins_data, _coin, item)
+            coins_data = get_coins_repo_info(coins_data, coin, item)
+        return coins_data
+
+    except Exception as e:
+        logger.info(f"[parse_coins_repo] GITHUB CREDENTIALS: {GH_USER} {GH_TOKEN}")
+        logger.error(f"[parse_coins_repo] Error: {e}")
+        return {}
 
 
 def get_coins_repo_info(coins_data, coin, item):
@@ -111,6 +118,10 @@ def get_coins_repo_lightwallets(lightwallets, coins_data):
     No coin renaming or name duplication
     '''
     for coin in lightwallets:
+        # Skip websocket-suffixed entries that do not map to a base coin
+        if coin.endswith("_WSS") and coin not in coins_data:
+            logger.info(f"[get_coins_repo_lightwallets] Skipping {coin} (no base coin entry)")
+            continue
         data = requests.get(lightwallets[coin]).json()
         logger.info(f"[get_coins_repo_lightwallets] {coin}")
         coins_data[coin]['lightwallets'] = data
@@ -246,9 +257,14 @@ def parse_assetchains(coins_data):
     '''
     r = requests.get(get_dpow_assetchains_url())
     for item in r.json():
-
-        coin = item['ac_name']
-
+        coin = item.get('ac_name')
+        if not coin:
+            continue
+        # Skip malformed items that are dicts used as keys downstream
+        if isinstance(coin, dict):
+            logger.warning(f"[parse_assetchains] Skipping invalid ac_name entry: {coin}")
+            continue
+        coins_data = pre_populate_coins_data(coins_data, coin)
         coins_data[coin]["coins_info"].update({
             "cli": get_assetchain_cli(coin),
             "conf_path": get_assetchain_conf_path(coin),
@@ -296,6 +312,9 @@ def parse_electrum_explorer(coins_data):
     coins.sort()
 
     explorers_data = get_github_folder_contents("KomodoPlatform", "coins", "explorers")
+    if isinstance(explorers_data, dict) and explorers_data.get("status") == "401":
+        logger.info(f"[parse_electrum_explorer] GITHUB CREDENTIALS: {GH_USER} {GH_TOKEN}")
+        raise RuntimeError("GitHub credentials missing/invalid (401) for coins/explorers")
     explorers = {}
     for item in explorers_data:
         if 'message' in explorers_data:
@@ -304,18 +323,27 @@ def parse_electrum_explorer(coins_data):
             explorers.update({item["name"]:item["download_url"]})
 
     electrums_data = get_github_folder_contents("KomodoPlatform", "coins", "electrums")
+    if isinstance(electrums_data, dict) and electrums_data.get("status") == "401":
+        logger.info(f"[parse_electrum_explorer] GITHUB CREDENTIALS: {GH_USER} {GH_TOKEN}")
+        raise RuntimeError("GitHub credentials missing/invalid (401) for coins/electrums")
     electrums = {}
     for item in electrums_data:
         if item["name"] not in ["deprecated"]:
             electrums.update({item["name"]:item["download_url"]})
 
     lightwallets_data = get_github_folder_contents("KomodoPlatform", "coins", "light_wallet_d")
+    if isinstance(lightwallets_data, dict) and lightwallets_data.get("status") == "401":
+        logger.info(f"[parse_electrum_explorer] GITHUB CREDENTIALS: {GH_USER} {GH_TOKEN}")
+        raise RuntimeError("GitHub credentials missing/invalid (401) for coins/light_wallet_d")
     lightwallets = {}
     for item in lightwallets_data:
         if item["name"] not in ["deprecated"]:
             lightwallets.update({item["name"]:item["download_url"]})
 
     icons_data = get_github_folder_contents("KomodoPlatform", "coins", "icons_original")
+    if isinstance(icons_data, dict) and icons_data.get("status") == "401":
+        logger.info(f"[parse_electrum_explorer] GITHUB CREDENTIALS: {GH_USER} {GH_TOKEN}")
+        raise RuntimeError("GitHub credentials missing/invalid (401) for coins/icons_original")
     icons = {}
     for item in icons_data:
         if item["name"] not in ["deprecated"]:

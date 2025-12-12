@@ -2,12 +2,12 @@
 import requests
 
 season = "Season_8"
-url = "https://stats.kmd.io/api/wallet/notary_addresses/?season={season}"
+url = "https://notary-stats.dragonhound.info/api/wallet/notary_addresses/?season={season}"
 data = requests.get(url).json()
 
 
 for server in data[season]:
-    balances_url = f"https://stats.kmd.io/api/table/balances/?season={season}&server={server}"
+    balances_url = f"https://notary-stats.dragonhound.info/api/table/balances/?season={season}&server={server}"
     balances_data = requests.get(balances_url).json()['results']
     for i in balances_data:
         coin = i['coin']

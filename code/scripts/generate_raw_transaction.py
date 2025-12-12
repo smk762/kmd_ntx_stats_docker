@@ -19,7 +19,7 @@ def def_data_dir():
 
 # function to define rpc_connection
 def def_credentials(coin):
-    env_ip = os.getenv("KMD_RPC_IP")
+    env_ip = os.getenv("KMD_RPC_IP").split(":")[0]
     if env_ip == "0.0.0.0":
         env_ip = "127.0.0.1"
     env_port = os.getenv("KMD_RPC_PORT")

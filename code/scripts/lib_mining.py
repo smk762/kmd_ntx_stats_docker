@@ -221,24 +221,32 @@ def update_mined_count_season_table(season):
     season_notaries = SEASONS.INFO[season]["notaries"]
 
     for item in get_season_mined_counts(season):
-        if item[0] in SEASONS.INFO[season]["notaries"]:
-            if item[1] not in SEASONS.INFO[season]["servers"]["KMD"]["addresses"]["KMD"]:
-                continue
+        addr = item[1]
+        blocks = int(item[2])
+        # Allow any address with significant activity, all known notary addresses for the current season,
+        # and legacy known addresses.
+        season_notary_addrs = set(SEASONS.INFO[season]["servers"]["KMD"]["addresses"]["KMD"].keys())
+        allowed = (
+            addr in season_notary_addrs
+            or addr in KNOWN_ADDRESSES
+            or blocks > 25
+        )
+        if not allowed:
+            continue
 
-        if item[1] in KNOWN_ADDRESSES or int(item[2]) > 25:
-            row = season_mined_count_row()
-            row.season = season
-            row.name = item[0]
-            row.address = item[1]
-            row.blocks_mined = int(item[2])
-            row.sum_value_mined = float(item[3])
-            row.max_value_mined = float(item[4])
-            row.max_value_txid = get_max_value_mined_txid(item[4], season)
-            row.last_mined_blocktime = int(item[5])
-            row.last_mined_block = int(item[6])
-            row.update()
-            if row.name in season_notaries:
-                season_notaries.remove(row.name)
+        row = season_mined_count_row()
+        row.season = season
+        row.name = item[0]
+        row.address = addr
+        row.blocks_mined = blocks
+        row.sum_value_mined = float(item[3])
+        row.max_value_mined = float(item[4])
+        row.max_value_txid = get_max_value_mined_txid(item[4], season)
+        row.last_mined_blocktime = int(item[5])
+        row.last_mined_block = int(item[6])
+        row.update()
+        if row.name in season_notaries:
+            season_notaries.remove(row.name)
 
     for remaining_notary in season_notaries:
         row = season_mined_count_row()
