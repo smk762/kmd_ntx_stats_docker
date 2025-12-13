@@ -29,7 +29,9 @@
         var balTable = $('#balances_table').DataTable({
      		ajax: {
 			    url: balances_url,
-    			dataSrc: 'results',
+    			dataSrc: function (json) {
+                    return Array.isArray(json && json.results) ? json.results : [];
+                },
     			"deferRender": true
 			},
             "orderClasses": false,
@@ -43,35 +45,40 @@
 		            "targets": 0,
 		            "data": "coin",
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				        $(nTd).html(get_coin_icon(oData.coin));
+				        if (!nTd || !oData) return;
+                        $(nTd).html(get_coin_icon(oData.coin));
 			        }
     			},
     			{
 		            "data": "server",
 		            "targets": 1,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				        $(nTd).html(get_server_styled(oData.server));
+				        if (!nTd || !oData) return;
+                        $(nTd).html(get_server_styled(oData.server));
 		        	}
 		        },
     			{
 		            "data": "address",
 		            "targets": 2,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(get_address_url(oData.coin, oData.address));
+		            	if (!nTd || !oData) return;
+                        $(nTd).html(get_address_url(oData.coin, oData.address));
 		            }
 		        },
     			{
 		            "data": "balance",
 		            "targets": 3,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html(oData.balance);
+			            if (!nTd || !oData) return;
+                        $(nTd).html(oData.balance);
 			        }
 		        },
     			{
 		            "data": 'update_time',
 		            "targets": 4,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(get_time_since(oData.update_time));
+		            	if (!nTd || !oData) return;
+                        $(nTd).html(get_time_since(oData.update_time));
 			        }
 		        }		
     		],

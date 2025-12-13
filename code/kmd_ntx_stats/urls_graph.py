@@ -13,10 +13,6 @@ api_graph_urls = [
          graph_api.daily_ntx_graph,
          name='daily_ntx_graph'),
 
-    path('api/graph/mm2gui/',
-         graph_api.mm2gui_piechart,
-         name='mm2gui_piechart'),
-
     path('api/graph/mined_xy_data/',
          graph_api.mined_xy_data,
          name='mined_xy_data'),

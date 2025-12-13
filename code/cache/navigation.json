@@ -88,10 +88,6 @@
                 "icon": "fa-solid fa-faucet-drip",
                 "url": "/tools/faucet"
             },
-            "Raw Transactions": {
-                "icon": "bi bi-receipt-cutoff",
-                "url": "/tools/send_raw_tx"
-            },
             "Scripthash from Address": {
                 "icon": "bi bi-hash",
                 "url": "/tools/scripthash_from_address"
@@ -237,45 +233,6 @@
             "Shossain's Wallet Cleaner Notes": {
                 "icon": "fa-brands fa-wolf-pack-battalion",
                 "url": "https://techloverhd.com/2020/07/how-to-send-komodo-or-any-smart-chain-funds-from-your-address-without-rescanning-the-wallet/"
-            }
-        }
-    },
-    "AtomicDEX": {
-        "icon": "fa-solid fa-atom",
-        "options": {
-            "Activation": {
-                "icon": "fa-solid fa-atom",
-                "url": "/atomicdex/activation_commands"
-            },
-            "Bestorders": {
-                "icon": "fa-solid fa-atom",
-                "url": "/atomicdex/bestorders"
-            },
-            "Electrum Status": {
-                "icon": "fa-solid fa-atom",
-                "url": "/atomicdex/electrum_status"
-            },
-            "GUI Stats": {
-                "icon": "fa-solid fa-atom",
-                "hide": true,
-                "url": "/atomicdex/gui_stats"
-            },
-            "Last 200 Swaps": {
-                "icon": "fa-solid fa-atom",
-                "url": "/atomicdex/last_200_swaps"
-            },
-            "Last 200 Failed Swaps": {
-                "icon": "fa-solid fa-atom",
-                "hide": true,
-                "url": "/atomicdex/last_200_failed_swaps"
-            },
-            "Makerbot Config": {
-                "icon": "fa-solid fa-atom",
-                "url": "/atomicdex/makerbot_config_form"
-            },
-            "Orderbook": {
-                "icon": "fa-solid fa-atom",
-                "url": "/atomicdex/orderbook"
             }
         }
     }

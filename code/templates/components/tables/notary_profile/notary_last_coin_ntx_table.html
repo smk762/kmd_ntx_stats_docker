@@ -32,7 +32,9 @@
      		ajax: {
                 "serverSide": true,
 			    url: url,
-    			dataSrc: 'data',
+    			dataSrc: function (json) {
+                    return Array.isArray(json && json.data) ? json.data : [];
+                },
     			"deferRender": true
 			},
     		order: [[ 2, 'desc' ]],
@@ -53,49 +55,56 @@
 		            "data": "coin",
 		            "targets": 0,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			        	$(nTd).html(get_coin_icon(oData.coin));
+			        	if (!nTd || !oData) return;
+                        $(nTd).html(get_coin_icon(oData.coin));
 			        }
 		        },
     			{
 		            "data": "server",
 		            "targets": 1,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html(get_server_styled(oData.server));
+			            if (!nTd || !oData) return;
+                        $(nTd).html(get_server_styled(oData.server));
 		        	}
 		        },
         		{
 		            "data": 'kmd_ntx_blockheight',
 		            "targets": 2,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-	            		$(nTd).html(get_block_url("KMD", oData.kmd_ntx_blockheight))
+	            		if (!nTd || !oData) return;
+                        $(nTd).html(get_block_url("KMD", oData.kmd_ntx_blockheight))
 			        }
 		        },
         		{
 		            "data": 'ac_ntx_height',
 		            "targets": 3,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-	            		$(nTd).html(get_block_url(oData.coin, oData.ac_ntx_height))
+	            		if (!nTd || !oData) return;
+                        $(nTd).html(get_block_url(oData.coin, oData.ac_ntx_height))
 			        }
 		        },
     			{
 		            "data": 'kmd_ntx_txid',
 		            "targets": 4,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(get_txid_url("KMD", oData.kmd_ntx_txid));
+		            	if (!nTd || !oData) return;
+                        $(nTd).html(get_txid_url("KMD", oData.kmd_ntx_txid));
 			        }
 		        },
     			{
 		            "data": 'notaries',
 		            "targets": 5,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html(get_notaries_symbol('{{ season }}', oData.notaries, oData.txid));
+			            if (!nTd || !oData) return;
+                        $(nTd).html(get_notaries_symbol('{{ season }}', oData.notaries, oData.txid));
 			        }
 		        },
     			{
 		            "data": 'kmd_ntx_blocktime',
 		            "targets": 6,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-	            		$(nTd).html(get_time_since(oData.kmd_ntx_blocktime));
+	            		if (!nTd || !oData) return;
+                        $(nTd).html(get_time_since(oData.kmd_ntx_blocktime));
 			        }
 		        }
     		],

@@ -1,5 +1,3 @@
-<!-- charts.js -->
-<script>
     // ChartJS functions
 
     function drawBarGraph(data, id, y_axis_text, max_tick=5) { 
@@ -329,17 +327,6 @@
         })
     }
 
-    function update_chart() {
-        var start = Date.parse($('#start').datetimepicker('getValue'))/1000;
-        var end = Date.parse($('#end').datetimepicker('getValue'))/1000;
-        myChart.destroy()
-        console.log(start)
-        console.log(end)
-        url = "/api/atomicdex/version_stats_by_hour/?chart=1&start="+start+"&end="+end
-        get_versionData(url)
-    }
-
-
 	function make_graph(graphtype, url, id) {
 	    $.ajax({ 
 			method: "GET", 
@@ -358,5 +345,3 @@
 			} 
 	    }) 
 	}
-
-</script>

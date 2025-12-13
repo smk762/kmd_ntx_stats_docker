@@ -1,5 +1,4 @@
-<!-- styles.js -->
-<script>
+// styles.js
 function get_className(header) {
     switch(header) {
 
@@ -128,5 +127,3 @@ function titlecase(string) {
           return "<span data-toggle='tooltip' data-placement='top' title='"+epoch+"'><i class='bi bi-exclamation-triangle-fill'></i>";
       }
   }
-
-</script>

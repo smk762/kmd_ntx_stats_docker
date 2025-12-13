@@ -1,15 +1,4 @@
-
-{{ coin_icons|json_script:"coin_icons-data" }}
-{{ notary_icons|json_script:"notary_icons-data" }}
-{{ dpow_coins|json_script:"dpow_coins-data" }}
-{{ notaries|json_script:"notaries-data" }}
-<!-- icons.js -->
-<script>
-	var coin_icons = JSON.parse(document.getElementById('coin_icons-data').textContent);
-	var notary_icons = JSON.parse(document.getElementById('notary_icons-data').textContent);
-	var dpow_coins = JSON.parse(document.getElementById('dpow_coins-data').textContent);
-	var notaries = JSON.parse(document.getElementById('notaries-data').textContent);
-
+// icons.js
 
 	function get_social_icon(category, url) {
 		let icon = ''
@@ -137,13 +126,18 @@
     }
 
     function get_coin_icon(coin, url) {
+    	if (!coin) {
+    		return "<a href='#'><img height='16px' class='mr-2' src='/static/img/notary/icon/blank.png' />?</a>";
+    	}
         if (coin == "TKL") coin = "TOKEL"
-        if (dpow_coins.includes(coin)) {
+
+        const dpowList = Array.isArray(dpow_coins) ? dpow_coins : []
+        if (dpowList.includes(coin)) {
             url = "/coin_profile/" + coin
         }
         if (!url) url = '#'
     
-        if (typeof coin_icons === "undefined" || coin_icons === null) {
+        if (!coin_icons || typeof coin_icons !== "object") {
             console.log("coin_icons missing, using blank for", coin)
             return "<a href='"+url+"'><img height='16px' class='mr-2' src='/static/img/notary/icon/blank.png' />"+coin+"</a>";
         }
@@ -157,12 +151,16 @@
     
     
     function get_coin_icon_only(coin, url='', size=18, img_class="m-1") {
-        if (dpow_coins.includes(coin)) {
+    	if (!coin) {
+    		return "<span class='' style='' data-toggle='tooltip' data-placement='top' title='?'><a href='"+url+"'><img height='"+size+"px' class='"+img_class+"' src='/static/img/notary/icon/blank.png' /></a></span>"
+    	}
+        const dpowList = Array.isArray(dpow_coins) ? dpow_coins : []
+        if (dpowList.includes(coin)) {
             if (url == '') {
                 url = "/coin_profile/" + coin
             }
         }
-        if (typeof coin_icons === "undefined" || coin_icons === null) {
+        if (!coin_icons || typeof coin_icons !== "object") {
             console.log("coin_icons missing, using blank for", coin)
             return "<span class='' style='' data-toggle='tooltip' data-placement='top' title='"+coin+"'><a href='"+url+"'><img height='"+size+"px' class='"+img_class+"' src='/static/img/notary/icon/blank.png' /></a></span>"
         }
@@ -174,5 +172,3 @@
         }		
     }
     
-        
-</script>

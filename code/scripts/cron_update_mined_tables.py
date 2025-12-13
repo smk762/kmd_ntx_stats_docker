@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.12
 import sys
+import json
 from lib_dpow_const import RESCAN_SEASON
 from const_seasons import SEASONS
 from lib_helper import get_active_seasons
@@ -14,6 +15,8 @@ Tables updated:
     - mined
     - mined_count_daily
     - mined_count_season
+
+If running with `rescan`, it will take around 10-15 minutes.
 '''
 
 
@@ -46,3 +49,12 @@ if __name__ == "__main__":
             seasons = "since_genesis"
 
     run_updates(seasons)
+
+    # Invalidate mining cache namespace after updates.
+    try:
+        from kmd_ntx_api.cache_data import cached
+        cached.bump_epoch("mining")
+        cached.bump_epoch("stats")  # stats aggregates depend on mining + ntx
+        logger.info("Cache epoch bumped for mining after update")
+    except Exception as e:
+        logger.warning(f"Cache epoch bump failed after mining update: {e}")

@@ -37,7 +37,9 @@
      		"ajax": {
                 "serverSide": true,
 			    "url": url,
-	    		"dataSrc": 'results',
+	    		"dataSrc": function (json) {
+                    return Array.isArray(json && json.results) ? json.results : [];
+                },
     			"deferRender": true
 			},
     		"order": [[ 6, 'desc' ], [ 0, 'asc' ]],
@@ -62,20 +64,23 @@
 		            "targets": 0,
 		            "data": "coin",
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				        $(nTd).html(get_coin_icon(oData.coin));
+				        if (!nTd || !oData) return;
+                        $(nTd).html(get_coin_icon(oData.coin));
 			        }
     			},
     			{
 		            "data": "server",
 		            "targets": 1,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-				        $(nTd).html(get_server_styled(oData.server));
+				        if (!nTd || !oData) return;
+                        $(nTd).html(get_server_styled(oData.server));
 		        	}
 		        },
     			{
 		            "data": "coin_ntx_count",
 		            "targets": 2,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        if (!nTd || !oData) return;
 		            	$(nTd).html("<a href='{% url 'notary_coin_notarised_view' %}?season={{ season }}&server={{ data.server }}&notary={{ notary }}&coin={{ data.coin }}'>"+oData.coin_ntx_count+"")
 		            }			            
 		        },
@@ -83,14 +88,16 @@
 		            "data": "coin_ntx_count_pct",
 		            "targets": 3,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(parseFloat(oData.coin_ntx_count_pct).toFixed(3) + ' %')
+		            	if (!nTd || !oData || oData.coin_ntx_count_pct === undefined) return;
+                        $(nTd).html(parseFloat(oData.coin_ntx_count_pct).toFixed(3) + ' %')
 		            }			            
 		        },
     			{
 		            "data": "coin_ntx_score",
 		            "targets": 4,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html("<a href='{% url 'notary_epoch_scores_view' %}?notary={{ notary }}&server={{ data.server }}&coin={{ data.coin }}&season={{ season }}'>"+parseFloat(oData.coin_ntx_score).toFixed(3)+"</a>")
+		            	if (!nTd || !oData || oData.coin_ntx_score === undefined) return;
+                        $(nTd).html("<a href='{% url 'notary_epoch_scores_view' %}?notary={{ notary }}&server={{ data.server }}&coin={{ data.coin }}&season={{ season }}'>"+parseFloat(oData.coin_ntx_score).toFixed(3)+"</a>")
 		            }			            
 		        },
     			{
@@ -104,7 +111,8 @@
 		            "data": 'last_ntx_blockheight',
 		            "targets": 6,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	if (oData.coin == "KMD") $(nTd).html(get_block_url("LTC", oData.last_ntx_blockheight))
+		            	if (!nTd || !oData) return;
+                        if (oData.coin == "KMD") $(nTd).html(get_block_url("LTC", oData.last_ntx_blockheight))
 		            	else $(nTd).html(get_block_url("KMD", oData.last_ntx_blockheight))
 			        }
 		        },
@@ -112,7 +120,8 @@
 		            "data": 'last_ntx_txid',
 		            "targets": 7,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-						if (oData.coin == "KMD") $(nTd).html(get_txid_url("LTC", oData.last_ntx_txid))
+						if (!nTd || !oData) return;
+                        if (oData.coin == "KMD") $(nTd).html(get_txid_url("LTC", oData.last_ntx_txid))
 						else $(nTd).html(get_txid_url("KMD", oData.last_ntx_txid))
 			        }
 		        },
@@ -120,7 +129,7 @@
 		            "data": 'opret',
 		            "targets": 8,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-						console.log(oData)
+						if (!nTd || !oData || !oData.opret) return;
 		            	let op_return = (oData.opret.split(" ").length > 1) ? oData.opret.split(" ")[1] : oData.opret
 						let icon = "<i class='fas fa-arrow-right'></i>"
 						let tooltip = "Decode OP_RETURN: "+op_return
@@ -132,7 +141,8 @@
 		            "data": 'last_ntx_blocktime',
 		            "targets": 9,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(get_time_since(oData.last_ntx_blocktime));
+		            	if (!nTd || !oData) return;
+                        $(nTd).html(get_time_since(oData.last_ntx_blocktime));
 			        }
 		        }
     		],

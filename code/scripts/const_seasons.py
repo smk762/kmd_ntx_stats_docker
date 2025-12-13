@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.12
 import sys
+import json
 from pathlib import Path
 import requests
 import time
@@ -7,6 +8,7 @@ import lib_urls as urls
 from notary_pubkeys import NOTARY_PUBKEYS
 from functools import cached_property, lru_cache
 from logger import logger
+from lib_github import gh, GH_TOKEN
 
 # Ensure project root is on PYTHONPATH so kmd_ntx_api imports succeed when
 # running scripts directly (e.g. python scripts/cron_update_epochs.py).
@@ -273,18 +275,38 @@ class Seasons:
 
     @cached_property
     def epochs_repo_data(self):
+        """Fetch scoring_epochs.json; cache locally for offline fallback."""
         url = urls.get_scoring_epochs_repo_url()
+        cache_path = Path(__file__).resolve().parent.parent / "cache" / "scoring_epochs.json"
+        cache_path.parent.mkdir(exist_ok=True)
+
+        data = None
+        sess = gh if GH_TOKEN else requests.Session()
+        if not GH_TOKEN:
+            logger.warning("GITHUB_TOKEN not set; fetching scoring_epochs without auth")
+        logger.info("epochs_repo_data: starting fetch/cache sequence")
         try:
-            response = requests.get(url)
+            # Prefer authenticated GitHub session from lib_github
+            logger.info(f"Fetching scoring_epochs from {url}")
+            response = sess.get(url, timeout=15)
             response.raise_for_status()
             data = response.json()
-        except requests.RequestException as e:
-            logger.error(f"Failed to fetch epochs repo data: {e}")
+            cache_path.write_text(json.dumps(data, indent=4))
+            logger.info(f"scoring_epochs fetched ({len(data)} seasons) and cached to {cache_path}")
+        except (requests.RequestException, ValueError) as e:
+            logger.warning(f"Failed to fetch scoring_epochs: {e}; trying cached file at {cache_path}")
+            if cache_path.exists():
+                try:
+                    data = json.loads(cache_path.read_text())
+                    logger.info("Loaded scoring_epochs from cache")
+                except Exception as ee:
+                    logger.error(f"Failed to read cached scoring_epochs: {ee}")
+                    data = None
+
+        if not data:
+            logger.warning("scoring_epochs data empty after fetch/cache fallback")
             return {}
-        except ValueError as e:
-            logger.error(f"Invalid JSON response: {e}")
-            return {}
-    
+
         for _season in data:
             _servers = list(data[_season]["Servers"].keys())[:]
             for _server in _servers:
@@ -511,7 +533,7 @@ class Seasons:
 
     def get_dpow_active_info(self):
         """Compute current dPoW-active coins from season start list + scoring epochs window."""
-        cache_key = "dpow_active_coins"
+        cache_key = cached.namespaced_key("epochs", "dpow_active_coins")
         now = int(time.time())
         current_season = self.current()
         active_details = {}
@@ -549,6 +571,8 @@ class Seasons:
             active_by_server[current_season][server].sort()
 
         # Persist computed snapshot to cache (no remote fetch)
+        cached.bump_epoch("epochs")
+        cache_key = cached.namespaced_key("epochs", "dpow_active_coins")
         cached.refresh(key=cache_key, data=active_details, force=True, expire=900)
         return current_season, active_details, active_by_server
 

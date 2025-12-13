@@ -1,6 +1,4 @@
 
-<script>
-
     function get_link(url, text) {
         return "<a href='"+url+"'>"+text+"</a>"
     }
@@ -201,5 +199,3 @@
         }
         return list.length > 0 ? list[0] : false;
 	}
-
-</script>

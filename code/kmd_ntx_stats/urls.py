@@ -3,7 +3,6 @@ from django.conf.urls import url
 from django.urls import include, path
 
 
-from kmd_ntx_stats.urls_atomicdex import frontend_atomicdex_urls, api_atomicdex_urls
 
 from kmd_ntx_stats.urls_source import source_router
 from kmd_ntx_stats.urls_csv import api_csv_urls
@@ -53,7 +52,6 @@ url_lists = [
     frontend_table_urls, api_table_urls,
     frontend_mining_urls, api_mining_urls,
     frontend_testnet_urls, api_testnet_urls,
-    frontend_atomicdex_urls, api_atomicdex_urls,
     frontend_page_urls,
     frontend_stats_urls,
     frontend_community_urls,

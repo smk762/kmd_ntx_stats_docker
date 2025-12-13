@@ -3,7 +3,6 @@ from kmd_ntx_api.tools import get_addr_from_base58, get_address_conversion, \
     get_address_from_pubkey, get_decode_op_return, get_pubkey_utxos, \
     get_scripthash_from_address, get_scripthashes_from_pubkey, get_explorer_status
 from kmd_ntx_api.serializers import addrFromBase58Serializer
-from kmd_ntx_api.raw_transaction import send_raw_tx
 from kmd_ntx_api.helper import json_resp, \
     get_notary_list, safe_div, \
     get_or_none, get_page_server, \
@@ -38,12 +37,6 @@ def pubkey_utxos_tool(request):
     filters = ["coin", "pubkey"]
     resp = get_pubkey_utxos(request)
     return json_resp(resp, filters)
-
-
-def send_raw_tx_tool(request):
-    params = ["coin", "raw_hex"]
-    resp = send_raw_tx(request)
-    return json_resp(resp, None, params)
 
 
 def scripthash_from_address_tool(request):

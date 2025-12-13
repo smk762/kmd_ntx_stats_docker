@@ -8,6 +8,7 @@ WORKDIR /code
 COPY ./code/ /code/
 
 ENV PYTHONUNBUFFERED 1
+ENV PYTHONPATH="/code:${PYTHONPATH}"
 ENV PGDATA=/pg-data
 
 RUN pip install --upgrade pip

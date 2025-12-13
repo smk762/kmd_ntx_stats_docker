@@ -14,9 +14,9 @@ IRREGULAR_MAX_AGE = 60 * 60 * 24  # 24 hours
 
 def _badge_svg(label: str, message: str, color: str) -> str:
     """Return a simple two-part badge SVG (lightweight shields-like)."""
-    # Basic sizing heuristics (monospace-ish)
-    label_width = max(50, 6 * len(label) + 20)
-    message_width = max(60, 7 * len(message) + 20)
+    # Basic sizing heuristics with generous padding for long tickers (avoid text bleed)
+    label_width = max(90, 8 * len(label) + 32)
+    message_width = max(90, 8 * len(message) + 32)
     total_width = label_width + message_width
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total_width}" height="20" role="img" aria-label="{label}: {message}">
   <linearGradient id="smooth" x2="0" y2="100%">
@@ -32,8 +32,8 @@ def _badge_svg(label: str, message: str, color: str) -> str:
     <rect width="{total_width}" height="20" fill="url(#smooth)"/>
   </g>
   <g fill="#fff" text-anchor="start" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
-    <text x="10" y="14">{label}</text>
-    <text x="{label_width + 10}" y="14">{message}</text>
+    <text x="12" y="14">{label}</text>
+    <text x="{label_width + 12}" y="14">{message}</text>
   </g>
 </svg>"""
     return svg

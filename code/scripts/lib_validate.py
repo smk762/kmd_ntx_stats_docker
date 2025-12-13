@@ -70,7 +70,11 @@ def validate_season_server_epoch(season, notary_addresses, block_time, coin, tes
             season = "Unofficial"
             server = "Unofficial"
             epoch = "Unofficial"
-    season, server, testnet = get_season_server_from_kmd_addresses(notary_addresses, coin, testnet)
+    # Prefer the caller-provided season when determining season/server, but still
+    # fall back to other seasons if the address set does not match.
+    season, server, testnet = get_season_server_from_kmd_addresses(
+        notary_addresses, coin, testnet, preferred_season=season
+    )
     epoch = get_coin_epoch_at(season, server, coin, block_time, testnet)
     return season, server, epoch, testnet
 
@@ -187,7 +191,7 @@ def get_epoch_scores_dict(season):
     return epoch_scores_dict
 
 
-def get_season_server_from_kmd_addresses(address_list, coin, testnet=False):
+def get_season_server_from_kmd_addresses(address_list, coin, testnet=False, preferred_season=None):
 
     ntx_coin = "KMD"
 
@@ -205,7 +209,13 @@ def get_season_server_from_kmd_addresses(address_list, coin, testnet=False):
     elif not set(address_list).issubset(set(KNOWN_ADDRESSES.keys())):
         return "Unofficial", "Unofficial", False
 
-    for season in SEASONS.INFO:
+    # Test the hinted season first (if provided), then fall back through others.
+    season_order = []
+    if preferred_season in SEASONS.INFO:
+        season_order.append(preferred_season)
+    season_order += [s for s in SEASONS.INFO if s not in season_order]
+
+    for season in season_order:
         if season.find("Testnet") == -1:
             testnet = False
         else:

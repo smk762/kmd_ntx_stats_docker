@@ -480,7 +480,7 @@ def get_dpow_server_coins_info(
         coin = get_or_none(request, "coin")
         timestamp = get_or_none(request, "timestamp")
     else:
-        cache_key = f"dpow_server_coins_info_{season}_{server}"
+        cache_key = cached.namespaced_key("epochs", f"dpow_server_coins_info_{season}_{server}")
 
     if not season or not server:
         return {

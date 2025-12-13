@@ -10,10 +10,6 @@ frontend_tool_urls = [
           tools_views.convert_addresses_view,
           name='convert_addresses_view'),
 
-    path('tools/create_raw_transaction/',
-          tools_views.create_raw_transaction_view,
-          name='create_raw_transaction_view'),
-
     path('tools/daemon_clis/',
           tools_views.daemon_cli_view,
           name='daemon_cli_view'),
@@ -46,9 +42,6 @@ frontend_tool_urls = [
           tools_views.scripthash_from_address_view,
           name='scripthash_from_address_view'),
 
-    path('tools/send_raw_tx/',
-          tools_views.send_raw_tx_view,
-          name='send_raw_tx_view'),
 ]
 
 
@@ -78,10 +71,6 @@ api_tool_urls = [
     path('api/tools/explorer_status/',
           tools_api.explorer_status_tool,
           name='explorer_status_tool'),
-
-    path('api/tools/send_raw_tx/',
-          tools_api.send_raw_tx_tool,
-          name='send_raw_tx_tool'),
 
     path('api/tools/scripthash_from_address/',
           tools_api.scripthash_from_address_tool,

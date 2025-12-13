@@ -18,7 +18,7 @@ from kmd_ntx_api.cache_data import cached
 
 
 def get_notary_ntx_24hr_summary(ntx_24hr, notary, dpow_coins_dict):
-    cache_key = f"{notary}_ntx_24hr_summary"
+    cache_key = cached.namespaced_key("ntx", f"{notary}_ntx_24hr_summary")
     if cache_key is not None:
         data = cached.get_data(cache_key, expire=300)
     if data is not None:
@@ -154,7 +154,7 @@ def get_region_score_stats(notarisation_scores):
 
 def get_daily_stats_sorted(notary_list, dpow_coins_dict):
     logger.info("get_daily_stats_sorted")
-    cache_key = f"daily_stats_sorted"
+    cache_key = cached.namespaced_key("stats", "daily_stats_sorted")
     if cache_key is not None:
         data = cached.get_data(cache_key, expire=300)
     if data is not None:

@@ -98,20 +98,56 @@ def is_notary_ltc_address(addr):
     return False
 
 
-def get_active_seasons(timestamp=None):
+def get_active_seasons(timestamp=None, block=None):
+    """
+    Determine active seasons using both wall-clock time and chain height.
+    Preference: return only the most recent matching season to avoid
+    processing historical seasons during live runs.
+    """
     active_seasons = []
-    if not timestamp: timestamp = int(time.time())
+    if not timestamp:
+        timestamp = int(time.time())
+
+    # Try to infer current KMD height if not provided.
+    if block is None:
+        try:
+            block = RPC["KMD"].getblockcount()
+        except Exception:
+            block = None
+
     for season in SEASONS.INFO:
-        if timestamp >= SEASONS.INFO[season]["start_time"]:
-            if "end_time" in SEASONS.INFO[season]:
-                if timestamp <= SEASONS.INFO[season]["end_time"]:
-                    active_seasons.append(season)
-            if "post_season_end_time" in SEASONS.INFO[season]:
-                if timestamp <= SEASONS.INFO[season]["post_season_end_time"]:
-                    active_seasons.append(season)
-        elif timestamp + 86400 * 7 >= SEASONS.INFO[season]["start_time"]:
+        info = SEASONS.INFO[season]
+
+        time_active = (
+            timestamp >= info["start_time"] and
+            (
+                ("end_time" in info and timestamp <= info["end_time"]) or
+                ("post_season_end_time" in info and timestamp <= info["post_season_end_time"])
+            )
+        )
+
+        block_active = False
+        if block is not None:
+            start_block = info.get("start_block")
+            end_block = info.get("post_season_end_block") or info.get("end_block")
+            if start_block and end_block:
+                block_active = start_block <= block <= end_block
+
+        if time_active or block_active:
             active_seasons.append(season)
-    active_seasons = list(set(active_seasons))
+        # Upcoming within a week (time-based only)
+        elif timestamp + 86400 * 7 >= info["start_time"] and timestamp <= info["end_time"]:
+            active_seasons.append(season)
+
+    # Prefer the most recent season by start_block when multiple match.
+    if active_seasons:
+        active_seasons = sorted(
+            set(active_seasons),
+            key=lambda s: SEASONS.INFO[s].get("start_block", 0),
+            reverse=True
+        )
+        active_seasons = [active_seasons[0]]
+
     logger.info(f"Active seasons: {active_seasons}")
     return active_seasons   
 
@@ -190,6 +226,19 @@ def get_season_coins(season=None, server=None, epoch=None):
 
             if epoch in SEASONS.INFO[season]["servers"][server]["epochs"]:
                 coins = SEASONS.INFO[season]["servers"][server]["epochs"][epoch]["coins"]
+
+    # Dynamically merge currently-active dPoW coins (covers late additions like MDX/RAPH/BCZERO).
+    try:
+        cache_key = cached.namespaced_key("epochs", "dpow_active_coins")
+        active_details = cached.get_data(cache_key, expire=300) or {}
+        if server:
+            extra = [c for c, meta in active_details.items() if meta.get("dpow", {}).get("server") == server]
+        else:
+            extra = list(active_details.keys())
+        coins = list(set(coins + extra))
+    except Exception:
+        pass
+
     coins.sort()
     return coins
 

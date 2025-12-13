@@ -3,7 +3,7 @@ import os
 import json
 import requests
 from dotenv import load_dotenv
-from logger import logger
+from kmd_ntx_api.logger import logger
 
 load_dotenv()
 

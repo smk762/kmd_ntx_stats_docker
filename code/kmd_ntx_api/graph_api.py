@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.12
 from kmd_ntx_api.graph import get_balances_graph_data, get_daily_ntx_graph_data, \
-    get_mm2gui_piechart, get_mined_xy_data, get_supply_xy_data
+    get_mined_xy_data, get_supply_xy_data
 from kmd_ntx_api.helper import json_resp, region_sort
 from kmd_ntx_api.colors import COLORS
 
@@ -13,12 +13,6 @@ def balances_graph(request):
 def daily_ntx_graph(request):
     filters = ['notarised_date', 'server', 'coin', 'notary']
     resp = get_daily_ntx_graph_data(request)
-    return json_resp(resp, filters)
-
-
-def mm2gui_piechart(request):
-    filters = ['since', 'from_time', 'to_time']
-    resp = get_mm2gui_piechart(request)
     return json_resp(resp, filters)
 
 

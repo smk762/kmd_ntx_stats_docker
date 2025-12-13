@@ -52,8 +52,16 @@
             <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.4/css/select.bootstrap5.css"/>
 
 
-        <!-- Data Tables -->     
+        <!-- Data Tables (with CDN fallbacks) -->     
             <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.js"></script>
+            <script>
+                // Fallback for jQuery if primary CDN is blocked
+                if (typeof window.jQuery === "undefined") {
+                    var jq = document.createElement("script");
+                    jq.src = "https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js";
+                    document.head.appendChild(jq);
+                }
+            </script>
             <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js" ></script>
             <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.js" ></script>
             <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.js" ></script>
@@ -65,6 +73,18 @@
             <script type="text/javascript" src="https://cdn.datatables.net/searchpanes/2.0.0/js/dataTables.searchPanes.js" ></script>
             <script type="text/javascript" src="https://cdn.datatables.net/searchpanes/2.0.0/js/searchPanes.bootstrap5.js" ></script>
             <script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.js" ></script>
+            <script>
+                // Fallback for DataTables core if blocked
+                (function ensureDataTables(){
+                    if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) return;
+                    var dt = document.createElement("script");
+                    dt.src = "https://cdn.jsdelivr.net/npm/datatables.net@1.11.5/js/jquery.dataTables.min.js";
+                    document.head.appendChild(dt);
+                    var dtbs = document.createElement("script");
+                    dtbs.src = "https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.11.5/js/dataTables.bootstrap5.min.js";
+                    document.head.appendChild(dtbs);
+                })();
+            </script>
 
             <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
 
@@ -76,6 +96,40 @@
         {% include "css/graphs.css" %}
         {% include "css/tables.css" %}
         <!-- TODO: Not all this is needed for every page. It should be made more selective -->
+        {{ explorers|json_script:"explorers-data" }}
+        {{ coin_icons|json_script:"coin_icons-data" }}
+        {{ notary_icons|json_script:"notary_icons-data" }}
+        {{ dpow_coins|json_script:"dpow_coins-data" }}
+        {{ notaries|json_script:"notaries-data" }}
+        <script type="text/javascript">
+        // Bootstrap globals from json_script tags for downstream inline JS
+        (function() {
+            function safeJson(id, fallback) {
+                const el = document.getElementById(id);
+                if (!el) return fallback;
+                try { return JSON.parse(el.textContent); } catch (e) { return fallback; }
+            }
+            window.explorers = safeJson('explorers-data', []);
+            window.coin_icons = safeJson('coin_icons-data', {});
+            window.notary_icons = safeJson('notary_icons-data', {});
+            window.dpow_coins = safeJson('dpow_coins-data', []);
+            window.notaries = safeJson('notaries-data', []);
+        })();
+
+        // Defer inline includes until core deps (jQuery + DataTables) are present
+        // to avoid first-load races if CDNs are slow/blocked.
+        (function waitForDeps(tries) {
+            if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) {
+                return;
+            }
+            if (tries <= 0) {
+                console.warn("Deps not ready: jQuery/DataTables missing");
+                return;
+            }
+            setTimeout(function() { waitForDeps(tries - 1); }, 100);
+        })(50);
+        /* eslint-disable */
+        {% autoescape off %}
         {% include "js/buttons.js" %}
         {% include "js/cells.js" %}
         {% include "js/charts.js" %}
@@ -84,11 +138,12 @@
         {% include "js/explorers.js" %}
         {% include "js/helper.js" %}
         {% include "js/icons.js" %}
-        {% include "js/mm2_coins.js" %}
-        {% include "js/rawtransaction.js" %}
         {% include "js/styles.js" %}
         {% include "js/tables.js" %}
         {% include "js/urls.js" %}
+        {% endautoescape %}
+        /* eslint-enable */
+        </script>
     </head>
     <body class="c-app">
 
@@ -105,7 +160,6 @@
                 <div class="container text-center">
                     <div id="ui-view">
                         <div class="fade-in">
-                            {% include "js/charts.js" %}
                             {% if messages %}
                                 {% for message in messages %} {% include "components/messages/messages.html" %} {% endfor %}
                             {% endif %}

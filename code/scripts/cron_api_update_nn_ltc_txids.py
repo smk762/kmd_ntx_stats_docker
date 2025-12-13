@@ -16,11 +16,13 @@ from lib_ntx import *
 from lib_update import update_nn_ltc_tx_notary_from_addr
 from lib_query import get_existing_nn_txids, get_existing_notarised_txids
 from lib_api import get_ltc_tx_info
-from models import ltc_tx_row, NotarisedRow
+from models import ltc_tx_row, NotarisedRow, coin_last_ntx_row, notary_last_ntx_row
 
 from lib_validate import *
 from lib_const import *
 from known_txids import *
+from lib_db import connect_db
+from logger import logger
 
 def get_linked_addresses(addr=None, notary=None):
     conditions = [f"address='{addr}'"] if addr else []
@@ -252,10 +254,81 @@ def scan_ltc_transactions(season):
         season_ltc_addresses.remove(notary_address)
 
 
+def _get_latest_ltc_ntx(season):
+    """Return the latest LTC NTX row for the season."""
+    conn = connect_db()
+    cur = conn.cursor()
+    sql = (
+        "SELECT txid, block_hash, block_height, block_time, notary "
+        "FROM nn_ltc_tx "
+        f"WHERE season = '{season}' AND category = 'NTX' "
+        "ORDER BY block_time DESC LIMIT 1;"
+    )
+    cur.execute(sql)
+    return cur.fetchone()
+
+
+def _get_latest_ltc_ntx_by_notary(season):
+    """Return latest LTC NTX per notary for the season."""
+    conn = connect_db()
+    cur = conn.cursor()
+    sql = (
+        "SELECT DISTINCT ON (notary) notary, txid, block_hash, block_height, block_time "
+        "FROM nn_ltc_tx "
+        f"WHERE season = '{season}' AND category = 'NTX' "
+        "ORDER BY notary, block_time DESC;"
+    )
+    cur.execute(sql)
+    return cur.fetchall()
+
+
+def update_ltc_last_ntx_tables(season):
+    """Populate coin_last_ntx and notary_last_ntx for LTC using nn_ltc_tx."""
+    latest_ntx = _get_latest_ltc_ntx(season)
+    if latest_ntx:
+        txid, block_hash, block_height, block_time, notary = latest_ntx
+        coin_row = coin_last_ntx_row()
+        coin_row.season = season
+        coin_row.server = "LTC"
+        coin_row.coin = "LTC"
+        coin_row.notaries = [notary] if notary else []
+        coin_row.opret = ""
+        coin_row.kmd_ntx_blockhash = block_hash
+        coin_row.kmd_ntx_blockheight = block_height
+        coin_row.kmd_ntx_blocktime = block_time
+        coin_row.kmd_ntx_txid = txid
+        coin_row.ac_ntx_blockhash = block_hash
+        coin_row.ac_ntx_height = block_height
+        coin_row.update()
+    else:
+        logger.info(f"[LTC last_ntx] No NTX rows found for {season}")
+
+    notary_rows = _get_latest_ltc_ntx_by_notary(season)
+    if notary_rows:
+        for notary, txid, block_hash, block_height, block_time in notary_rows:
+            notary_row = notary_last_ntx_row()
+            notary_row.season = season
+            notary_row.server = "LTC"
+            notary_row.coin = "LTC"
+            notary_row.notary = notary
+            notary_row.notaries = [notary]
+            notary_row.opret = ""
+            notary_row.kmd_ntx_blockhash = block_hash
+            notary_row.kmd_ntx_blockheight = block_height
+            notary_row.kmd_ntx_blocktime = block_time
+            notary_row.kmd_ntx_txid = txid
+            notary_row.ac_ntx_blockhash = block_hash
+            notary_row.ac_ntx_height = block_height
+            notary_row.update()
+    else:
+        logger.info(f"[LTC last_ntx] No per-notary NTX rows found for {season}")
+
+
 if __name__ == "__main__":
     seasons = helper.get_active_seasons()
     for season in seasons:
         scan_ltc_transactions(season)
+        update_ltc_last_ntx_tables(season)
     CURSOR.close()
     CONN.close()
 

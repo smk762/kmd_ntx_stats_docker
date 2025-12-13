@@ -9,14 +9,12 @@ Updated for Ubuntu 22.04.5 LTS and current stack.
 - Python (for helpers): `sudo apt install -y python3 python3-venv`
 - Optional: Nginx/Certbot if you front this with TLS (not required for local dev)
 - KMD node (on host) with `~/.komodo/komodo.conf` or set `KMD_RPC_*` envs. RPC is locked to localhost and whitelisted read-only methods.
-- MM2/KDF: provide `~/.kdf/MM2.json` or set `MM2_*` envs. KDF doc: [Configure MM2.json](https://komodoplatform.com/en/docs/komodo-defi-framework/setup/configure-mm2-json/).
-
 ## Quick start
 ```bash
 git clone https://github.com/smk762/kmd_ntx_stats_docker
 cd kmd_ntx_stats_docker
 
-# Populate .env (prefills from ~/.komodo/komodo.conf and ~/.kdf/MM2.json)
+# Populate .env (prefills from ~/.komodo/komodo.conf)
 python3 configure.py
 
 # Build and start Postgres + web
@@ -34,7 +32,6 @@ docker compose up -d web
 The app listens on `http://localhost:8762` (Postgres on 7654).
 
 ## Environment keys (summary)
-- MM2_IP / MM2_PORT / MM2_USERPASS (prefilled from MM2.json if present)
 - KMD_RPC_IP (forced to 127.0.0.1 if blank/0.0.0.0) / KMD_RPC_PORT (default 7771) / KMD_RPC_USERNAME / KMD_RPC_PASSWORD (prefilled from komodo.conf if present)
 - POSTGRES_HOST/PORT/DB/USER/PASSWORD (defaults: db/5432/postgres/postgres/postgres)
 - DJANGO_ALLOWED_HOSTS, SECRET_KEY, and the other keys added by `configure.py`

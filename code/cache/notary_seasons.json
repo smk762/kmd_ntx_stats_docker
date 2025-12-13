@@ -5,7 +5,11 @@
         "start_time": 1473793441,
         "end_time": 1530921600,
         "servers": {
-            "Main": {}
+            "Main": {
+                "addresses": {},
+                "coins": [],
+                "epochs": {}
+            }
         },
         "notaries": [
             "0_jl777_testA",
@@ -163,7 +167,8 @@
                     "xxspot2_XX"
                 ]
             }
-        }
+        },
+        "coins": []
     },
     "Season_2": {
         "start_block": 814000,
@@ -171,7 +176,11 @@
         "start_time": 1530921600,
         "end_time": 1563148799,
         "servers": {
-            "Main": {}
+            "Main": {
+                "addresses": {},
+                "coins": [],
+                "epochs": {}
+            }
         },
         "notaries": [
             "0dev1_jl777",
@@ -329,7 +338,8 @@
                     "0dev4_decker"
                 ]
             }
-        }
+        },
+        "coins": []
     },
     "Season_3": {
         "start_block": 1444000,
@@ -337,8 +347,16 @@
         "start_time": 1563148800,
         "end_time": 1592146799,
         "servers": {
-            "Main": {},
-            "Third_Party": {}
+            "Main": {
+                "addresses": {},
+                "coins": [],
+                "epochs": {}
+            },
+            "Third_Party": {
+                "addresses": {},
+                "coins": [],
+                "epochs": {}
+            }
         },
         "notaries": [
             "alien_AR",
@@ -496,7 +514,8 @@
                     "kolo_DEV"
                 ]
             }
-        }
+        },
+        "coins": []
     },
     "Season_4": {
         "start_block": 1922000,
@@ -504,8 +523,210 @@
         "start_time": 1592146800,
         "end_time": 1617364800,
         "servers": {
-            "Main": {},
-            "Third_Party": {}
+            "Main": {
+                "addresses": {},
+                "coins": [
+                    "GLEEC",
+                    "PGT",
+                    "RFOX",
+                    "STBL",
+                    "VOTE2021"
+                ],
+                "epochs": {
+                    "Epoch_0": {
+                        "start_time": 1592146800,
+                        "end_time": 1613769735,
+                        "start_event": "season start",
+                        "end_event": "RFOX end",
+                        "coins": [
+                            "RFOX",
+                            "PGT",
+                            "STBL"
+                        ],
+                        "num_epoch_coins": 3,
+                        "score_per_ntx": 0.28993333
+                    },
+                    "Epoch_1": {
+                        "start_time": 1613769736,
+                        "end_time": 1616250929,
+                        "start_event": "RFOX end",
+                        "end_event": "PGT end, STBL end",
+                        "coins": [
+                            "PGT",
+                            "STBL"
+                        ],
+                        "num_epoch_coins": 2,
+                        "score_per_ntx": 0.4349
+                    },
+                    "Epoch_2": {
+                        "start_time": 1616250930,
+                        "end_time": 1617181775,
+                        "start_event": "PGT end, STBL end",
+                        "end_event": "GLEEC start, VOTE2021 start",
+                        "coins": [],
+                        "num_epoch_coins": 0,
+                        "score_per_ntx": 0.05798667
+                    },
+                    "Epoch_3": {
+                        "start_time": 1617181776,
+                        "end_time": 1617364799,
+                        "start_event": "GLEEC start, VOTE2021 start",
+                        "end_event": "season end",
+                        "coins": [
+                            "GLEEC",
+                            "VOTE2021"
+                        ],
+                        "num_epoch_coins": 2,
+                        "score_per_ntx": 0.4349
+                    }
+                },
+                "tenure": {
+                    "RFOX": {
+                        "start": 1592146800,
+                        "end": 1613769736
+                    },
+                    "PGT": {
+                        "start": 1592146800,
+                        "end": 1616250930
+                    },
+                    "STBL": {
+                        "start": 1592146800,
+                        "end": 1616250930
+                    },
+                    "GLEEC": {
+                        "start": 1617181776,
+                        "end": 1617364800
+                    },
+                    "VOTE2021": {
+                        "start": 1617181776,
+                        "end": 1617364800
+                    }
+                }
+            },
+            "Third_Party": {
+                "addresses": {},
+                "coins": [
+                    "GLEEC",
+                    "HUSH3",
+                    "MCL",
+                    "PBC"
+                ],
+                "epochs": {
+                    "Epoch_0": {
+                        "start_time": 1592146800,
+                        "end_time": 1593331688,
+                        "start_event": "season start",
+                        "end_event": "HUSH3 start, MCL start",
+                        "coins": [],
+                        "num_epoch_coins": 0,
+                        "score_per_ntx": 0.04885
+                    },
+                    "Epoch_1": {
+                        "start_time": 1593331689,
+                        "end_time": 1603623833,
+                        "start_event": "HUSH3 start, MCL start",
+                        "end_event": "HUSH3 end",
+                        "coins": [
+                            "HUSH3",
+                            "MCL"
+                        ],
+                        "num_epoch_coins": 2,
+                        "score_per_ntx": 0.04885
+                    },
+                    "Epoch_2": {
+                        "start_time": 1603623834,
+                        "end_time": 1603710233,
+                        "start_event": "HUSH3 end",
+                        "end_event": "GLEEC start",
+                        "coins": [
+                            "MCL"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0977
+                    },
+                    "Epoch_3": {
+                        "start_time": 1603710234,
+                        "end_time": 1606390839,
+                        "start_event": "GLEEC start",
+                        "end_event": "PBC start",
+                        "coins": [
+                            "GLEEC",
+                            "MCL"
+                        ],
+                        "num_epoch_coins": 2,
+                        "score_per_ntx": 0.04885
+                    },
+                    "Epoch_4": {
+                        "start_time": 1606390840,
+                        "end_time": 1617364799,
+                        "start_event": "PBC start",
+                        "end_event": "season end",
+                        "coins": [
+                            "PBC",
+                            "GLEEC",
+                            "MCL"
+                        ],
+                        "num_epoch_coins": 3,
+                        "score_per_ntx": 0.03256667
+                    }
+                },
+                "tenure": {
+                    "PBC": {
+                        "start": 1606390840,
+                        "end": 1617364800
+                    },
+                    "HUSH3": {
+                        "start": 1593331689,
+                        "end": 1603623834
+                    },
+                    "GLEEC": {
+                        "start": 1603710234,
+                        "end": 1617364800
+                    },
+                    "MCL": {
+                        "start": 1593331689,
+                        "end": 1617364800
+                    }
+                }
+            },
+            "KMD": {
+                "addresses": {},
+                "coins": [
+                    "KMD"
+                ],
+                "epochs": {
+                    "KMD": {
+                        "start_time": 1592146800,
+                        "end_time": 1617364800,
+                        "start_event": "season start",
+                        "end_event": "season end",
+                        "coins": [
+                            "KMD"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0325
+                    }
+                }
+            },
+            "LTC": {
+                "addresses": {},
+                "coins": [
+                    "LTC"
+                ],
+                "epochs": {
+                    "LTC": {
+                        "start_time": 1592146800,
+                        "end_time": 1617364800,
+                        "start_event": "season start",
+                        "end_event": "season end",
+                        "coins": [
+                            "LTC"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0
+                    }
+                }
+            }
         },
         "notaries": [
             "alien_AR",
@@ -663,7 +884,17 @@
                     "tonyl_DEV"
                 ]
             }
-        }
+        },
+        "coins": [
+            "GLEEC",
+            "HUSH3",
+            "MCL",
+            "PBC",
+            "PGT",
+            "RFOX",
+            "STBL",
+            "VOTE2021"
+        ]
     },
     "Season_5": {
         "start_block": 2437000,
@@ -673,8 +904,184 @@
         "end_time": 1651622400,
         "post_season_end_time": 1656077852,
         "servers": {
-            "Main": {},
-            "Third_Party": {}
+            "Main": {
+                "addresses": {},
+                "coins": [
+                    "CLC",
+                    "OOT"
+                ],
+                "epochs": {
+                    "Epoch_0": {
+                        "start_time": 1623682800,
+                        "end_time": 1624004470,
+                        "start_event": "season start",
+                        "end_event": "OOT end",
+                        "coins": [
+                            "OOT"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.8698
+                    },
+                    "Epoch_1": {
+                        "start_time": 1624004471,
+                        "end_time": 1647207138,
+                        "start_event": "OOT end",
+                        "end_event": "CLC start, MIL start",
+                        "coins": [],
+                        "num_epoch_coins": 0,
+                        "score_per_ntx": 0.05798667
+                    },
+                    "Epoch_2": {
+                        "start_time": 1647207139,
+                        "end_time": 1651622399,
+                        "start_event": "CLC start, MIL start",
+                        "end_event": "",
+                        "coins": [
+                            "CLC"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.8698
+                    }
+                },
+                "tenure": {
+                    "OOT": {
+                        "start": 1623682800,
+                        "end": 1624004471
+                    },
+                    "CLC": {
+                        "start": 1647207139,
+                        "end": 1651622400
+                    }
+                }
+            },
+            "Third_Party": {
+                "addresses": {},
+                "coins": [
+                    "AYA",
+                    "GLEEC-OLD",
+                    "MIL",
+                    "TOKEL"
+                ],
+                "epochs": {
+                    "Epoch_0": {
+                        "start_time": 1623682800,
+                        "end_time": 1624406399,
+                        "start_event": "season start",
+                        "end_event": "AYA start",
+                        "coins": [
+                            "GLEEC-OLD"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0977
+                    },
+                    "Epoch_1": {
+                        "start_time": 1624406400,
+                        "end_time": 1627802395,
+                        "start_event": "AYA start",
+                        "end_event": "TOKEL start",
+                        "coins": [
+                            "AYA",
+                            "GLEEC-OLD"
+                        ],
+                        "num_epoch_coins": 2,
+                        "score_per_ntx": 0.04885
+                    },
+                    "Epoch_2": {
+                        "start_time": 1627802396,
+                        "end_time": 1647120738,
+                        "start_event": "TOKEL start",
+                        "end_event": "GLEEC-OLD end",
+                        "coins": [
+                            "AYA",
+                            "TOKEL",
+                            "GLEEC-OLD"
+                        ],
+                        "num_epoch_coins": 3,
+                        "score_per_ntx": 0.03256667
+                    },
+                    "Epoch_3": {
+                        "start_time": 1647120739,
+                        "end_time": 1647207138,
+                        "start_event": "GLEEC-OLD end",
+                        "end_event": "CLC start, MIL start",
+                        "coins": [
+                            "AYA",
+                            "TOKEL"
+                        ],
+                        "num_epoch_coins": 2,
+                        "score_per_ntx": 0.04885
+                    },
+                    "Epoch_4": {
+                        "start_time": 1647207139,
+                        "end_time": 1651622399,
+                        "start_event": "CLC start, MIL start",
+                        "end_event": "",
+                        "coins": [
+                            "AYA",
+                            "TOKEL",
+                            "MIL"
+                        ],
+                        "num_epoch_coins": 3,
+                        "score_per_ntx": 0.03256667
+                    }
+                },
+                "tenure": {
+                    "AYA": {
+                        "start": 1624406400,
+                        "end": 1651622400
+                    },
+                    "TOKEL": {
+                        "start": 1627802396,
+                        "end": 1651622400
+                    },
+                    "MIL": {
+                        "start": 1647207139,
+                        "end": 1651622400
+                    },
+                    "GLEEC-OLD": {
+                        "start": 1623682800,
+                        "end": 1647120739
+                    }
+                }
+            },
+            "KMD": {
+                "addresses": {},
+                "coins": [
+                    "KMD"
+                ],
+                "epochs": {
+                    "KMD": {
+                        "start_time": 1623682800,
+                        "end_time": 1651622400,
+                        "start_event": "season start",
+                        "end_event": "season end",
+                        "coins": [
+                            "KMD"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0325
+                    }
+                }
+            },
+            "LTC": {
+                "addresses": {},
+                "coins": [
+                    "LTC"
+                ],
+                "epochs": {
+                    "LTC": {
+                        "start_time": 1623682800,
+                        "end_time": 1651622400,
+                        "start_event": "season start",
+                        "end_event": "season end",
+                        "coins": [
+                            "LTC"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0
+                    }
+                }
+            }
         },
         "notaries": [
             "alien_AR",
@@ -832,7 +1239,15 @@
                     "yurii_DEV"
                 ]
             }
-        }
+        },
+        "coins": [
+            "AYA",
+            "CLC",
+            "GLEEC-OLD",
+            "MIL",
+            "OOT",
+            "TOKEL"
+        ]
     },
     "Season_6": {
         "start_block": 2963330,
@@ -841,8 +1256,354 @@
         "end_time": 1680911999,
         "post_season_end_time": 1688169599,
         "servers": {
-            "Main": {},
-            "Third_Party": {}
+            "Main": {
+                "addresses": {},
+                "coins": [
+                    "BET",
+                    "BOTS",
+                    "CCL",
+                    "CLC",
+                    "CRYPTO",
+                    "DEX",
+                    "DOC",
+                    "GLEEC",
+                    "HODL",
+                    "ILN",
+                    "JUMBLR",
+                    "KIP0001",
+                    "KOIN",
+                    "MARTY",
+                    "MGW",
+                    "MSHARK",
+                    "NINJA",
+                    "PANGEA",
+                    "PIRATE",
+                    "REVS",
+                    "SUPERNET",
+                    "THC"
+                ],
+                "epochs": {
+                    "Epoch_0": {
+                        "start_time": 1656077853,
+                        "end_time": 1677725102,
+                        "start_event": "season start",
+                        "end_event": "KIP0001 start",
+                        "coins": [
+                            "BET",
+                            "BOTS",
+                            "CLC",
+                            "CCL",
+                            "CRYPTO",
+                            "DEX",
+                            "GLEEC",
+                            "HODL",
+                            "ILN",
+                            "JUMBLR",
+                            "KOIN",
+                            "MGW",
+                            "MARTY",
+                            "MSHARK",
+                            "NINJA",
+                            "PANGEA",
+                            "PIRATE",
+                            "REVS",
+                            "DOC",
+                            "SUPERNET",
+                            "THC"
+                        ],
+                        "num_epoch_coins": 21,
+                        "score_per_ntx": 0.04141905
+                    },
+                    "Epoch_1": {
+                        "start_time": 1677725103,
+                        "end_time": 1680911998,
+                        "start_event": "KIP0001 start",
+                        "end_event": "season end",
+                        "coins": [
+                            "BET",
+                            "BOTS",
+                            "CLC",
+                            "CCL",
+                            "CRYPTO",
+                            "DEX",
+                            "GLEEC",
+                            "HODL",
+                            "ILN",
+                            "JUMBLR",
+                            "KOIN",
+                            "MGW",
+                            "MARTY",
+                            "MSHARK",
+                            "NINJA",
+                            "PANGEA",
+                            "PIRATE",
+                            "REVS",
+                            "DOC",
+                            "SUPERNET",
+                            "THC",
+                            "KIP0001"
+                        ],
+                        "num_epoch_coins": 22,
+                        "score_per_ntx": 0.03953636
+                    }
+                },
+                "tenure": {
+                    "BET": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "BOTS": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "CLC": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "CCL": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "CRYPTO": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "DEX": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "GLEEC": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "HODL": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "ILN": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "JUMBLR": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "KOIN": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "MGW": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "MARTY": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "MSHARK": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "NINJA": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "PANGEA": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "PIRATE": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "REVS": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "DOC": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "SUPERNET": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "THC": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "KIP0001": {
+                        "start": 1677725103,
+                        "end": 1680911999
+                    }
+                }
+            },
+            "Third_Party": {
+                "addresses": {},
+                "coins": [
+                    "AYA",
+                    "CHIPS",
+                    "EMC2",
+                    "MCL",
+                    "MIL",
+                    "SFUSD",
+                    "TOKEL",
+                    "VRSC"
+                ],
+                "epochs": {
+                    "Epoch_0": {
+                        "start_time": 1656077853,
+                        "end_time": 1658901192,
+                        "start_event": "season start",
+                        "end_event": "CHIPS start, MIL start",
+                        "coins": [
+                            "AYA",
+                            "EMC2",
+                            "MCL",
+                            "SFUSD",
+                            "TOKEL"
+                        ],
+                        "num_epoch_coins": 5,
+                        "score_per_ntx": 0.01954
+                    },
+                    "Epoch_1": {
+                        "start_time": 1658901193,
+                        "end_time": 1667152087,
+                        "start_event": "CHIPS start, MIL start",
+                        "end_event": "VRSC start",
+                        "coins": [
+                            "AYA",
+                            "EMC2",
+                            "MCL",
+                            "SFUSD",
+                            "TOKEL",
+                            "MIL",
+                            "CHIPS"
+                        ],
+                        "num_epoch_coins": 7,
+                        "score_per_ntx": 0.01395714
+                    },
+                    "Epoch_2": {
+                        "start_time": 1667152088,
+                        "end_time": 1674838169,
+                        "start_event": "VRSC start",
+                        "end_event": "SFUSD end",
+                        "coins": [
+                            "AYA",
+                            "EMC2",
+                            "MCL",
+                            "SFUSD",
+                            "TOKEL",
+                            "MIL",
+                            "CHIPS",
+                            "VRSC"
+                        ],
+                        "num_epoch_coins": 8,
+                        "score_per_ntx": 0.0122125
+                    },
+                    "Epoch_3": {
+                        "start_time": 1674838170,
+                        "end_time": 1680911998,
+                        "start_event": "SFUSD end",
+                        "end_event": "season end",
+                        "coins": [
+                            "AYA",
+                            "EMC2",
+                            "MCL",
+                            "TOKEL",
+                            "MIL",
+                            "CHIPS",
+                            "VRSC"
+                        ],
+                        "num_epoch_coins": 7,
+                        "score_per_ntx": 0.01395714
+                    }
+                },
+                "tenure": {
+                    "AYA": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "EMC2": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "MCL": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "SFUSD": {
+                        "start": 1656077853,
+                        "end": 1674838170
+                    },
+                    "TOKEL": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    },
+                    "MIL": {
+                        "start": 1658901193,
+                        "end": 1680911999
+                    },
+                    "CHIPS": {
+                        "start": 1658901193,
+                        "end": 1680911999
+                    },
+                    "VRSC": {
+                        "start": 1667152088,
+                        "end": 1680911999
+                    }
+                }
+            },
+            "LTC": {
+                "addresses": {},
+                "coins": [
+                    "LTC"
+                ],
+                "epochs": {
+                    "LTC": {
+                        "start_time": 1656077853,
+                        "end_time": 1680911999,
+                        "start_event": "season start",
+                        "end_event": "season end",
+                        "coins": [
+                            "LTC"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0
+                    }
+                },
+                "tenure": {
+                    "LTC": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    }
+                }
+            },
+            "KMD": {
+                "addresses": {},
+                "coins": [
+                    "KMD"
+                ],
+                "epochs": {
+                    "KMD": {
+                        "start_time": 1656077853,
+                        "end_time": 1680911999,
+                        "start_event": "season start",
+                        "end_event": "season end",
+                        "coins": [
+                            "KMD"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0325
+                    }
+                },
+                "tenure": {
+                    "KMD": {
+                        "start": 1656077853,
+                        "end": 1680911999
+                    }
+                }
+            }
         },
         "notaries": [
             "alien_EU",
@@ -1000,7 +1761,41 @@
                     "yurii-khi_DEV"
                 ]
             }
-        }
+        },
+        "coins": [
+            "AYA",
+            "BET",
+            "BOTS",
+            "CCL",
+            "CHIPS",
+            "CLC",
+            "CRYPTO",
+            "DEX",
+            "DOC",
+            "EMC2",
+            "GLEEC",
+            "HODL",
+            "ILN",
+            "JUMBLR",
+            "KIP0001",
+            "KMD",
+            "KOIN",
+            "LTC",
+            "MARTY",
+            "MCL",
+            "MGW",
+            "MIL",
+            "MSHARK",
+            "NINJA",
+            "PANGEA",
+            "PIRATE",
+            "REVS",
+            "SFUSD",
+            "SUPERNET",
+            "THC",
+            "TOKEL",
+            "VRSC"
+        ]
     },
     "Season_7": {
         "start_block": 3484958,
@@ -1009,8 +1804,284 @@
         "end_time": 1717199999,
         "post_season_end_time": 1728049052,
         "servers": {
-            "Main": {},
-            "Third_Party": {}
+            "Main": {
+                "addresses": {},
+                "coins": [
+                    "CCL",
+                    "CLC",
+                    "DOC",
+                    "GLEEC",
+                    "ILN",
+                    "KIP0002",
+                    "KIP0003",
+                    "KIP0004",
+                    "KOIN",
+                    "MARTY",
+                    "NINJA",
+                    "PIRATE",
+                    "SUPERNET",
+                    "THC",
+                    "VOTE2024"
+                ],
+                "epochs": {
+                    "Epoch_0": {
+                        "start_time": 1688132253,
+                        "end_time": 1712957750,
+                        "start_event": "season start",
+                        "end_event": "KIP0002 start, KIP0003 start, KIP0004 start",
+                        "coins": [
+                            "CLC",
+                            "CCL",
+                            "DOC",
+                            "GLEEC",
+                            "ILN",
+                            "KOIN",
+                            "MARTY",
+                            "NINJA",
+                            "PIRATE",
+                            "SUPERNET",
+                            "THC"
+                        ],
+                        "num_epoch_coins": 11,
+                        "score_per_ntx": 0.07907273
+                    },
+                    "Epoch_1": {
+                        "start_time": 1712957751,
+                        "end_time": 1716039984,
+                        "start_event": "KIP0002 start, KIP0003 start, KIP0004 start",
+                        "end_event": "KIP0002 end, VRSC end, KIP0003 end, KIP0004 end, VOTE2024 start",
+                        "coins": [
+                            "CLC",
+                            "CCL",
+                            "DOC",
+                            "GLEEC",
+                            "ILN",
+                            "KOIN",
+                            "MARTY",
+                            "NINJA",
+                            "PIRATE",
+                            "SUPERNET",
+                            "THC",
+                            "KIP0002",
+                            "KIP0003",
+                            "KIP0004"
+                        ],
+                        "num_epoch_coins": 14,
+                        "score_per_ntx": 0.06212857
+                    },
+                    "Epoch_2": {
+                        "start_time": 1716039985,
+                        "end_time": 1717199998,
+                        "start_event": "KIP0002 end, VRSC end, KIP0003 end, KIP0004 end, VOTE2024 start",
+                        "end_event": "season end",
+                        "coins": [
+                            "CLC",
+                            "CCL",
+                            "DOC",
+                            "GLEEC",
+                            "ILN",
+                            "KOIN",
+                            "MARTY",
+                            "NINJA",
+                            "PIRATE",
+                            "SUPERNET",
+                            "THC",
+                            "VOTE2024"
+                        ],
+                        "num_epoch_coins": 12,
+                        "score_per_ntx": 0.07248333
+                    }
+                },
+                "tenure": {
+                    "CLC": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "CCL": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "DOC": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "GLEEC": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "ILN": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "KOIN": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "MARTY": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "NINJA": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "PIRATE": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "SUPERNET": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "THC": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "KIP0002": {
+                        "start": 1712957751,
+                        "end": 1716039985
+                    },
+                    "KIP0003": {
+                        "start": 1712957751,
+                        "end": 1716039985
+                    },
+                    "KIP0004": {
+                        "start": 1712957751,
+                        "end": 1716039985
+                    },
+                    "VOTE2024": {
+                        "start": 1716039985,
+                        "end": 1717199999
+                    }
+                }
+            },
+            "Third_Party": {
+                "addresses": {},
+                "coins": [
+                    "AYA",
+                    "CHIPS",
+                    "EMC2",
+                    "MCL",
+                    "MIL",
+                    "TOKEL",
+                    "VRSC"
+                ],
+                "epochs": {
+                    "Epoch_0": {
+                        "start_time": 1688132253,
+                        "end_time": 1716039984,
+                        "start_event": "season start",
+                        "end_event": "KIP0002 end, VRSC end, KIP0003 end, KIP0004 end, VOTE2024 start",
+                        "coins": [
+                            "AYA",
+                            "CHIPS",
+                            "EMC2",
+                            "MCL",
+                            "MIL",
+                            "TOKEL",
+                            "VRSC"
+                        ],
+                        "num_epoch_coins": 7,
+                        "score_per_ntx": 0.01395714
+                    },
+                    "Epoch_1": {
+                        "start_time": 1716039985,
+                        "end_time": 1717199998,
+                        "start_event": "KIP0002 end, VRSC end, KIP0003 end, KIP0004 end, VOTE2024 start",
+                        "end_event": "season end",
+                        "coins": [
+                            "AYA",
+                            "CHIPS",
+                            "EMC2",
+                            "MCL",
+                            "MIL",
+                            "TOKEL"
+                        ],
+                        "num_epoch_coins": 6,
+                        "score_per_ntx": 0.01628333
+                    }
+                },
+                "tenure": {
+                    "AYA": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "CHIPS": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "EMC2": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "MCL": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "MIL": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "TOKEL": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    },
+                    "VRSC": {
+                        "start": 1688132253,
+                        "end": 1716039985
+                    }
+                }
+            },
+            "LTC": {
+                "addresses": {},
+                "coins": [
+                    "LTC"
+                ],
+                "epochs": {
+                    "LTC": {
+                        "start_time": 1688132253,
+                        "end_time": 1717199999,
+                        "start_event": "season start",
+                        "end_event": "season end",
+                        "coins": [
+                            "LTC"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0
+                    }
+                },
+                "tenure": {
+                    "LTC": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    }
+                }
+            },
+            "KMD": {
+                "addresses": {},
+                "coins": [
+                    "KMD"
+                ],
+                "epochs": {
+                    "KMD": {
+                        "start_time": 1688132253,
+                        "end_time": 1717199999,
+                        "start_event": "season start",
+                        "end_event": "season end",
+                        "coins": [
+                            "KMD"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0325
+                    }
+                },
+                "tenure": {
+                    "KMD": {
+                        "start": 1688132253,
+                        "end": 1717199999
+                    }
+                }
+            }
         },
         "notaries": [
             "alien_EU",
@@ -1168,7 +2239,33 @@
                     "yurri-khi_DEV"
                 ]
             }
-        }
+        },
+        "coins": [
+            "AYA",
+            "CCL",
+            "CHIPS",
+            "CLC",
+            "DOC",
+            "EMC2",
+            "GLEEC",
+            "ILN",
+            "KIP0002",
+            "KIP0003",
+            "KIP0004",
+            "KMD",
+            "KOIN",
+            "LTC",
+            "MARTY",
+            "MCL",
+            "MIL",
+            "NINJA",
+            "PIRATE",
+            "SUPERNET",
+            "THC",
+            "TOKEL",
+            "VOTE2024",
+            "VRSC"
+        ]
     },
     "Season_8": {
         "start_block": 4125988,
@@ -1177,8 +2274,257 @@
         "end_time": 1999999999,
         "post_season_end_time": 1999999999,
         "servers": {
-            "Main": {},
-            "Third_Party": {}
+            "Main": {
+                "addresses": {},
+                "coins": [
+                    "BCZERO",
+                    "CCL",
+                    "CLC",
+                    "DOC",
+                    "GLEEC",
+                    "GLEEC-OLD",
+                    "ILN",
+                    "KOIN",
+                    "MARTY",
+                    "MDX",
+                    "NINJA",
+                    "PIRATE",
+                    "RAPH",
+                    "SUPERNET",
+                    "THC"
+                ],
+                "epochs": {
+                    "Epoch_0": {
+                        "start_time": 1728049053,
+                        "end_time": 1729521794,
+                        "start_event": "NINJA start, MARTY start, SUPERNET start, DOC start, season start",
+                        "end_event": "SUPERNET end, NINJA end",
+                        "coins": [
+                            "CLC",
+                            "CCL",
+                            "DOC",
+                            "GLEEC",
+                            "GLEEC-OLD",
+                            "ILN",
+                            "KOIN",
+                            "MARTY",
+                            "NINJA",
+                            "PIRATE",
+                            "SUPERNET",
+                            "THC"
+                        ],
+                        "num_epoch_coins": 12,
+                        "score_per_ntx": 0.07248333
+                    },
+                    "Epoch_1": {
+                        "start_time": 1729521795,
+                        "end_time": 1737306977,
+                        "start_event": "SUPERNET end, NINJA end",
+                        "end_event": "MDX start, RAPH start, BCZERO start",
+                        "coins": [
+                            "CLC",
+                            "CCL",
+                            "DOC",
+                            "GLEEC",
+                            "GLEEC-OLD",
+                            "ILN",
+                            "KOIN",
+                            "MARTY",
+                            "PIRATE",
+                            "THC"
+                        ],
+                        "num_epoch_coins": 10,
+                        "score_per_ntx": 0.08698
+                    },
+                    "Epoch_2": {
+                        "start_time": 1737306978,
+                        "end_time": 1738195199,
+                        "start_event": "MDX start, RAPH start, BCZERO start",
+                        "end_event": "MARTY end, DOC end",
+                        "coins": [
+                            "CLC",
+                            "CCL",
+                            "DOC",
+                            "GLEEC",
+                            "GLEEC-OLD",
+                            "ILN",
+                            "KOIN",
+                            "MARTY",
+                            "PIRATE",
+                            "THC",
+                            "BCZERO",
+                            "RAPH",
+                            "MDX"
+                        ],
+                        "num_epoch_coins": 13,
+                        "score_per_ntx": 0.06690769
+                    },
+                    "Epoch_3": {
+                        "start_time": 1738195200,
+                        "end_time": 1999999998,
+                        "start_event": "MARTY end, DOC end",
+                        "end_event": "season end, RAPH end, MDX end, BCZERO end",
+                        "coins": [
+                            "CLC",
+                            "CCL",
+                            "GLEEC",
+                            "GLEEC-OLD",
+                            "ILN",
+                            "KOIN",
+                            "PIRATE",
+                            "THC",
+                            "BCZERO",
+                            "RAPH",
+                            "MDX"
+                        ],
+                        "num_epoch_coins": 11,
+                        "score_per_ntx": 0.07907273
+                    }
+                },
+                "tenure": {
+                    "CLC": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    },
+                    "CCL": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    },
+                    "DOC": {
+                        "start": 1728049053,
+                        "end": 1738195200
+                    },
+                    "GLEEC": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    },
+                    "GLEEC-OLD": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    },
+                    "ILN": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    },
+                    "KOIN": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    },
+                    "MARTY": {
+                        "start": 1728049053,
+                        "end": 1738195200
+                    },
+                    "NINJA": {
+                        "start": 1728049053,
+                        "end": 1729521795
+                    },
+                    "PIRATE": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    },
+                    "SUPERNET": {
+                        "start": 1728049053,
+                        "end": 1729521795
+                    },
+                    "THC": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    },
+                    "BCZERO": {
+                        "start": 1737306978,
+                        "end": 1999999999
+                    },
+                    "RAPH": {
+                        "start": 1737306978,
+                        "end": 1999999999
+                    },
+                    "MDX": {
+                        "start": 1737306978,
+                        "end": 1999999999
+                    }
+                }
+            },
+            "Third_Party": {
+                "addresses": {},
+                "coins": [
+                    "MCL",
+                    "TOKEL"
+                ],
+                "epochs": {
+                    "Epoch_0": {
+                        "start_time": 1728049053,
+                        "end_time": 1999999998,
+                        "start_event": "NINJA start, MARTY start, SUPERNET start, DOC start, season start",
+                        "end_event": "season end, RAPH end, MDX end, BCZERO end",
+                        "coins": [
+                            "MCL",
+                            "TOKEL"
+                        ],
+                        "num_epoch_coins": 2,
+                        "score_per_ntx": 0.04885
+                    }
+                },
+                "tenure": {
+                    "MCL": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    },
+                    "TOKEL": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    }
+                }
+            },
+            "LTC": {
+                "addresses": {},
+                "coins": [
+                    "LTC"
+                ],
+                "epochs": {
+                    "LTC": {
+                        "start_time": 1728049053,
+                        "end_time": 1999999999,
+                        "start_event": "season start",
+                        "end_event": "season end",
+                        "coins": [
+                            "LTC"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0
+                    }
+                },
+                "tenure": {
+                    "LTC": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    }
+                }
+            },
+            "KMD": {
+                "addresses": {},
+                "coins": [
+                    "KMD"
+                ],
+                "epochs": {
+                    "KMD": {
+                        "start_time": 1728049053,
+                        "end_time": 1999999999,
+                        "start_event": "season start",
+                        "end_event": "season end",
+                        "coins": [
+                            "KMD"
+                        ],
+                        "num_epoch_coins": 1,
+                        "score_per_ntx": 0.0325
+                    }
+                },
+                "tenure": {
+                    "KMD": {
+                        "start": 1728049053,
+                        "end": 1999999999
+                    }
+                }
+            }
         },
         "notaries": [
             "alien_AR",
@@ -1336,7 +2682,28 @@
                     "security_DEV"
                 ]
             }
-        }
+        },
+        "coins": [
+            "BCZERO",
+            "CCL",
+            "CLC",
+            "DOC",
+            "GLEEC",
+            "GLEEC-OLD",
+            "ILN",
+            "KMD",
+            "KOIN",
+            "LTC",
+            "MARTY",
+            "MCL",
+            "MDX",
+            "NINJA",
+            "PIRATE",
+            "RAPH",
+            "SUPERNET",
+            "THC",
+            "TOKEL"
+        ]
     },
     "VOTE2022_Testnet": {
         "start_block": 2903777,

@@ -138,32 +138,6 @@ api_table_urls = [
           table_api.notary_last_mined_table_api,
           name='notary_last_mined_table_api'),
 
-    path('api/table/dex_stats/',
-          table_api.dex_stats_table,
-          name='dex_stats_table'),
-
-    path('api/table/dex_os_stats/',
-          table_api.dex_os_stats_table,
-          name='dex_os_stats_table'),
-
-    path('api/table/dex_ui_stats/',
-          table_api.dex_ui_stats_table,
-          name='dex_ui_stats_table'),
-
-    path('api/table/dex_version_stats/',
-          table_api.dex_version_stats_table,
-          name='dex_version_stats_table'),
-
-
-    path('api/table/bestorders/',
-          table_api.bestorders_table,
-          name='bestorders_table'),
-
-
-    path('api/table/coin_activation/',
-          table_api.coin_activation_table,
-          name='coin_activation_table'),
-
     path('api/table/mined_24hrs/',
           table_api.mined_24hrs_table,
           name='mined_24hrs_table'),

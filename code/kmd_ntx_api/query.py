@@ -9,7 +9,7 @@ from kmd_ntx_api.models import notarised, kmd_supply, mined_count_daily, \
     notarised_count_daily, notary_ntx_season, notarised_tenure, \
     scoring_epochs, mined_count_season, mined, notary_candidates, \
     notary_vote, addresses, balances, rewards_tx, coins, coin_social, \
-    coin_last_ntx, coin_ntx_season, swaps, swaps_failed
+    coin_last_ntx, coin_ntx_season
 from kmd_ntx_api.notary_seasons import get_seasons_info
 from kmd_ntx_api.logger import logger
 
@@ -506,132 +506,6 @@ def get_server_ntx_season_data(season=None, server=None):
         data = data.filter(server=server)
     return data
 
-
-# Table: Atomicdex swaps, swaps_failed (and extra filtering)
-
-def get_swaps_failed_data(uuid=None):
-    data = swaps_failed.objects.all()
-    if uuid:
-        data = data.filter(uuid=uuid)
-    return data
-
-
-def get_swaps_data(uuid=None):
-    data = swaps.objects.all()
-    if uuid:
-        data = data.filter(uuid=uuid)
-    return data
-
-
-def get_swaps_counts(swaps_data):
-    q_pairs_counts = swaps_data.values('maker_coin', 'taker_coin').annotate(
-        count=Count('taker_coin')
-    )
-
-    q_pairs_volumes = swaps_data.values('maker_coin', 'taker_coin').annotate(
-        swap_count=Count('maker_coin'),
-        maker_amount=Sum('maker_amount'),
-        taker_amount=Sum('taker_amount')
-    )
-    q_maker_guis = swaps_data.values(
-        'maker_gui').annotate(count=Count('maker_gui'))
-    q_taker_guis = swaps_data.values(
-        'taker_gui').annotate(count=Count('taker_gui'))
-
-    guis = {}
-
-    for i in q_taker_guis:
-        guis.update(
-            {
-                i["taker_gui"]: {
-                    "taker_swaps": i["count"],
-                    "maker_swaps": 0
-                }
-            }
-        )
-
-    for i in q_maker_guis:
-        if i["maker_gui"] not in guis:
-            guis.update(
-                {
-                    i["maker_gui"]: {
-                        "maker_swaps": i["count"],
-                        "taker_swaps": 0
-                    }
-                }
-            )
-        else:
-            guis[i["maker_gui"]].update({"maker_swaps": i["count"]})
-
-    pair_counts = [
-        {"maker": i['maker_coin'], "taker":i['taker_coin'], "count":i['count']}
-        for i in q_pairs_counts  # if i["count"] >= 10
-    ]
-
-    pair_volumes = [
-        {
-            "maker": i['maker_coin'],
-            "taker":i['taker_coin'],
-            "swap_count":i['swap_count'],
-            "maker_volume":i['maker_amount'],
-            "taker_volume":i['taker_amount']
-        }
-        for i in q_pairs_volumes  # if i["count"] >= 10
-    ]
-
-    return {
-        "pair_volumes": pair_volumes,
-        "pair_counts": pair_counts,
-        "guis": guis
-    }
-
-
-def filter_swaps_coins(data, taker_coin=None, maker_coin=None):
-    if taker_coin:
-        data = data.filter(taker_coin=taker_coin)
-    if maker_coin:
-        data = data.filter(maker_coin=maker_coin)
-    return data
-
-
-def filter_swaps_gui(data, taker_gui=None, maker_gui=None):
-    if taker_gui:
-        data = data.filter(taker_gui=taker_gui)
-    if maker_gui:
-        data = data.filter(maker_gui=maker_gui)
-    return data
-
-
-def filter_swaps_version(data, taker_version=None, maker_version=None):
-    if taker_version:
-        data = data.filter(taker_version=taker_version)
-    if maker_version:
-        data = data.filter(maker_version=maker_version)
-    return data
-
-
-def filter_swaps_pubkey(data, taker_pubkey=None, maker_pubkey=None):
-    if taker_pubkey:
-        data = data.filter(taker_pubkey=taker_pubkey)
-    if maker_pubkey:
-        data = data.filter(maker_pubkey=maker_pubkey)
-    return data
-
-
-def filter_swaps_error(data, taker_error_type=None, maker_error_type=None):
-    if taker_error_type:
-        data = data.filter(taker_error_type=taker_error_type)
-    if maker_error_type:
-        data = data.filter(maker_error_type=maker_error_type)
-    return data
-
-
-def filter_swaps_timespan(data, from_time=None, to_time=None):
-    if from_time:
-        data = data.filter(timestamp__gte=from_time)
-    if to_time:
-        data = data.filter(timestamp__lte=to_time)
-    return data
 
 
 

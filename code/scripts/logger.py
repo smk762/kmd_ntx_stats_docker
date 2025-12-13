@@ -172,9 +172,13 @@ def timed(func):
 
 # Create a logger and set up custom levels
 logger = logging.getLogger("defi-stats")
-handler = logging.StreamHandler()
-handler.setFormatter(CustomFormatter())
-logger.addHandler(handler)
+# Avoid duplicate handlers when imported multiple times or alongside kmd_ntx_api.logger
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(CustomFormatter())
+    logger.addHandler(handler)
+# Stop propagation to root to prevent double emission when basicConfig/other handlers exist.
+logger.propagate = False
 
 # Dynamically add all custom levels
 custom_levels = {

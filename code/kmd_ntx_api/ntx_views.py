@@ -120,15 +120,22 @@ def notarisation_view(request):
 
 
 def notaryfaucet_view(request):
+    # Allow targeted invalidation of faucet caches via namespace.
+    faucet_ns = "faucet"
+    coins_key = cached.namespaced_key(faucet_ns, "notary_faucet_coins")
+    balances_key = cached.namespaced_key(faucet_ns, "notary_faucet_balances")
+    pending_key = cached.namespaced_key(faucet_ns, "notary_faucet_pending_tx")
+    history_key = cached.namespaced_key(faucet_ns, "notary_faucet_db")
+
     coins_list = []
     try:
-        faucet_coins = cached.get_data("notary_faucet_coins")
+        faucet_coins = cached.get_data(coins_key, expire=300)
         if "result" in faucet_coins:
             coins_list = faucet_coins["result"]["Main"] + faucet_coins["result"]["3P"]
     except Exception as e:
         logger.warning(e)
-    faucet_balances = cached.get_data("notary_faucet_balances")
-    pending_tx_resp = cached.get_data("notary_faucet_pending_tx")
+    faucet_balances = cached.get_data(balances_key, expire=300)
+    pending_tx_resp = cached.get_data(pending_key, expire=300)
     pending_tx_list = []
     tx_rows = []
     pending_index = []
@@ -154,7 +161,7 @@ def notaryfaucet_view(request):
             logger.info(f"Error: {e}")
         if len(tx_rows) >= 250:
             break
-    sent_tx_resp = cached.get_data("notary_faucet_db")
+    sent_tx_resp = cached.get_data(history_key, expire=300)
     sent_tx_list = []
     now = time.time()
     sum_24hrs = 0
@@ -201,6 +208,8 @@ def notaryfaucet_view(request):
             messages.success(request, resp["result"]["message"])
             if resp['status'] == "success":
                 context.update({"result":coin+"_success"})
+                # New faucet activity; invalidate faucet caches to force fresh reads.
+                cached.bump_epoch(faucet_ns)
             elif resp['status'] == "error":
                 context.update({"result":"disqualified"})
             else:

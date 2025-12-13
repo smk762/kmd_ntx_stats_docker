@@ -29,7 +29,7 @@ def get_nn_mining_summary(notary, season=None):
     if season is None:
         season = get_season()
 
-    cache_key = f"mining_summary_{season}_{notary}"
+    cache_key = cached.namespaced_key("mining", f"mining_summary_{season}_{notary}")
     cached_summary = cached.get_data(cache_key)
     if cached_summary:
         return cached_summary
@@ -125,7 +125,7 @@ def warm_mining_cache(season=None):
             "time_since_mined": ts_text,
             "mined_last_24hrs": last_24h_map.get(name, 0.0),
         })
-        cache_key = f"mining_summary_{season}_{name}"
+        cache_key = cached.namespaced_key("mining", f"mining_summary_{season}_{name}")
         try:
             cached.refresh(key=cache_key, data=summary, force=True, expire=cache_expire)
         except Exception:
@@ -179,7 +179,7 @@ def get_mined_count_daily_by_name(request):
 
 def get_mined_count_season(mined_data):
     try:
-        cache_key = "mined_count_season"
+        cache_key = cached.namespaced_key("mining", "mined_count_season")
         data = cached.get_data(cache_key, expire=300)
         if data is None:
             data = mined_data.aggregate(Sum('value'))['value__sum']
@@ -194,7 +194,7 @@ def get_mined_count_season(mined_data):
     
 def get_mined_count_24hr(mined_data):
     try:
-        cache_key = "mined_count_24hr"
+        cache_key = cached.namespaced_key("mining", "mined_count_24hr")
         data = cached.get_data(cache_key, expire=300)
         if data is None:
             data = mined_data.filter(block_time__gt=str(days_ago(1))).aggregate(Sum('value'))['value__sum']
@@ -209,7 +209,7 @@ def get_mined_count_24hr(mined_data):
     
 def get_biggest_block_season(mined_data):
     try:
-        cache_key = "biggest_block_season"
+        cache_key = cached.namespaced_key("mining", "biggest_block_season")
         data = cached.get_data(cache_key, expire=300)
         if data is None:
             data = mined_data.order_by('-value').first()

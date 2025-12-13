@@ -1,5 +1,4 @@
-<!-- cells.js -->
-<script>
+// cells.js
 
 function get_faucet_status(status) {
     if (status == 'pending') {
@@ -28,5 +27,3 @@ function get_qrcode(id, text, title, subtitle) {
     $('#qrcode-modal-label').html(title)
     $('#qrcode-modal-subtitle').html(subtitle)
 }
-
-</script>

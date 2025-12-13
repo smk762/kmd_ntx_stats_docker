@@ -1,19 +1,19 @@
-#*/20 * * * * /usr/local/bin/python /code/scripts/cron_import_nn_ltc_txids.py
-#*/10 * * * * /usr/local/bin/python /code/scripts/cron_import_notarised.py
-*/20 * * * * /usr/local/bin/python /code/scripts/cron_api_populate_nn_ltc_txids.py
-*/3 * * * * /usr/local/bin/python /code/scripts/cron_update_ntx_tables.py
-*/3 * * * * /usr/local/bin/python /code/scripts/cron_update_mined_tables.py
-12 8 * * * /usr/local/bin/python /code/scripts/cron_update_addresses_table.py
-12 */4 * * * /usr/local/bin/python /code/scripts/cron_update_balances_table.py
-12 6 * * * /usr/local/bin/python /code/scripts/cron_update_coins_table.py
-12 5 * * * /usr/local/bin/python /code/scripts/cron_update_epochs.py
-12 9 * * * /usr/local/bin/python /code/scripts/cron_update_social_notaries.py
-12 7 * * * /usr/local/bin/python /code/scripts/cron_update_social_coins.py
-1-59/10 * * * * /usr/local/bin/python /code/scripts/cron_update_explorer_status.py
-48 5 */7 * * /usr/local/bin/python /code/scripts/table_ops/vac_tables.py
+#*/20 * * * * /usr/local/bin/python3 /code/scripts/cron_import_nn_ltc_txids.py
+#*/10 * * * * /usr/local/bin/python3 /code/scripts/cron_import_notarised.py
+*/20 * * * * /usr/local/bin/python3 /code/scripts/cron_api_update_nn_ltc_txids.py
+*/3 * * * * /usr/local/bin/python3 /code/scripts/cron_update_ntx_tables.py
+*/3 * * * * /usr/local/bin/python3 /code/scripts/cron_update_mined_tables.py
+12 8 * * * /usr/local/bin/python3 /code/scripts/cron_update_addresses_table.py
+12 */4 * * * /usr/local/bin/python3 /code/scripts/cron_update_balances_table.py
+12 6 * * * /usr/local/bin/python3 /code/scripts/cron_update_coins_table.py
+12 5 * * * /usr/local/bin/python3 /code/scripts/cron_update_epochs.py
+12 9 * * * /usr/local/bin/python3 /code/scripts/cron_update_social_notaries.py
+12 7 * * * /usr/local/bin/python3 /code/scripts/cron_update_social_coins.py
+1-59/10 * * * * /usr/local/bin/python3 /code/scripts/cron_update_explorer_status.py
+48 5 */7 * * /usr/local/bin/python3 /code/scripts/table_ops/vac_tables.py
 
-# Warm mining cache once every 30 minutes
-*/30 * * * * /usr/local/bin/python /code/scripts/cron_warm_mining_cache.py
-# Warm notary summary cache every 30 minutes
-*/30 * * * * /usr/local/bin/python /code/scripts/cron_warm_notary_summary.py
+# Warm mining cache once every 15 minutes to align with memcache
+*/15 * * * * /usr/local/bin/python3 /code/scripts/cron_warm_mining_cache.py
+# Warm notary summary cache every 15 minutes to align with memcache
+*/15 * * * * /usr/local/bin/python3 /code/scripts/cron_warm_notary_summary.py
 

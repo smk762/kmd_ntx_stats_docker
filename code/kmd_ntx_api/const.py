@@ -1,5 +1,4 @@
 import os
-import os
 import sys
 import json
 from dotenv import load_dotenv
@@ -10,11 +9,6 @@ from pymemcache.client.base import Client
 load_dotenv()
 OTHER_SERVER = os.getenv("OTHER_SERVER") # IP / domain of the remote server
 BASIC_PW = os.getenv("BASIC_PW")         # Simple pw for restricting views during testing
-
-MM2_IP = os.getenv("MM2_IP", "http://127.0.0.1")
-MM2_PORT = os.getenv("MM2_PORT", 7783)
-MM2_USERPASS = os.getenv("MM2_USERPASS")
-MM2_URL = f"{MM2_IP}:{MM2_PORT}"
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',

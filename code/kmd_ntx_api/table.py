@@ -38,8 +38,6 @@ from kmd_ntx_api.serializers import (
     kmdSupplySerializer,
     notarisedTenureSerializer,
 )
-from kmd_ntx_api.activation import get_activation_commands
-from kmd_ntx_api.atomicdex import get_bestorders, get_orderbook
 from kmd_ntx_api.query import (
     get_distinct_filters,
     apply_filters_api,
@@ -316,7 +314,7 @@ def get_notarised_rows(request):
     coin = get_or_none(request, "coin", "DOC")
     date = get_or_none(request, "date", datetime.date.today())
     txid = get_or_none(request, "txid")
-    cache_key = f"ntx_count_season_{season}_{coin}_{date}_{txid}"
+    cache_key = cached.namespaced_key("ntx", f"ntx_count_season_{season}_{coin}_{date}_{txid}")
     data = cached.get_data(cache_key, expire=900)
 
     if data is None:
@@ -580,7 +578,7 @@ def get_notary_ntx_season_table_data(request, notary=None):
         }
         logger.error(error)
         return error
-    cache_key = f"notary_ntx_summary_{season}_{notary}".lower()
+    cache_key = cached.namespaced_key("ntx", f"notary_ntx_summary_{season}_{notary}")
     cached_data = cached.get_data(cache_key, expire=900)
     if cached_data:
         return cached_data
@@ -981,184 +979,5 @@ def get_notary_epoch_scores_table(request, notary=None):
 ## AtomicDEX Related
 
 
-def get_coin_activation_table(request):
-    selected_platform = get_or_none(request, "platform")
-    json_data = get_activation_commands(request)
-
-    table_data = []
-    for platform in json_data:
-        if platform == selected_platform or selected_platform is None:
-            for coin in json_data[platform]:
-                table_data.append(
-                    {
-                        "platform": platform,
-                        "coin": coin,
-                        "command": json_data[platform][coin],
-                    }
-                )
-    return table_data
-
-
-def get_bestorders_table(request):
-    rows = []
-    bestorders = get_bestorders(request)["result"]
-
-    for _coin in bestorders:
-        rows.append(
-            {
-                "coin": _coin,
-                "price": bestorders[_coin][0]["price"],
-                "maxvolume": bestorders[_coin][0]["maxvolume"],
-                "min_volume": bestorders[_coin][0]["min_volume"],
-            }
-        )
-
-    return rows
-
-
-def get_orderbook_table(request):
-    orderbook = get_orderbook(request)
-
-    base = request.GET["base"]
-    rel = request.GET["rel"]
-
-    orders = []
-    if "bids" in orderbook:
-
-        for bid in orderbook["bids"]:
-            price = bid["price"]
-            maxvolume = bid["maxvolume"]
-            min_volume = bid["min_volume"]
-            orders.append(
-                {
-                    "type": "bid",
-                    "base": base,
-                    "rel": rel,
-                    "price": price,
-                    "maxvolume": maxvolume,
-                    "min_volume": min_volume,
-                    "total": float(maxvolume) / float(price),
-                }
-            )
-
-    if "asks" in orderbook:
-
-        for ask in orderbook["asks"]:
-            price = ask["price"]
-            maxvolume = ask["maxvolume"]
-            min_volume = ask["min_volume"]
-            orders.append(
-                {
-                    "type": "ask",
-                    "base": base,
-                    "rel": rel,
-                    "price": price,
-                    "maxvolume": maxvolume,
-                    "min_volume": min_volume,
-                    "total": float(maxvolume) * float(price),
-                }
-            )
-
-    return orders
-
-
-def get_dex_stats_table(gui_stats):
-    return {
-        "os": get_dex_os_stats_table(gui_stats),
-        "ui": get_dex_ui_stats_table(gui_stats),
-        "version": get_dex_version_stats_table(gui_stats),
-    }
-
-
-def get_dex_os_stats_table(gui_stats):
-    os_stats = {}
-    for i in ["maker_dict", "taker_dict"]:
-        j = i.split("_")[0]
-        os_stats.update({j: []})
-        for os in gui_stats[i]["os"]:
-            os_stats[j].append(
-                {
-                    "os": os,
-                    "num_swaps": gui_stats[i]["os"][os]["num_swaps"],
-                    "num_pubkeys": len(gui_stats[i]["os"][os]["pubkeys"]),
-                    "global_swap_pct": gui_stats[i]["os"][os]["global_swap_pct"],
-                    "global_pubkey_pct": gui_stats[i]["os"][os]["global_pubkey_pct"],
-                }
-            )
-    return os_stats
-
-
-def get_dex_ui_stats_table(gui_stats):
-    ui_stats = {}
-    for i in ["maker_dict", "taker_dict"]:
-        j = i.split("_")[0]
-        ui_stats.update({j: []})
-        for os in gui_stats[i]["os"]:
-            for ui in gui_stats[i]["os"][os]["ui"]:
-
-                ui_stats[j].append(
-                    {
-                        "os": os,
-                        "ui": ui,
-                        "num_swaps": gui_stats[i]["os"][os]["ui"][ui]["num_swaps"],
-                        "num_pubkeys": len(gui_stats[i]["os"][os]["ui"][ui]["pubkeys"]),
-                        "os_swap_pct": gui_stats[i]["os"][os]["ui"][ui]["os_swap_pct"],
-                        "os_pubkey_pct": gui_stats[i]["os"][os]["ui"][ui][
-                            "os_pubkey_pct"
-                        ],
-                        "global_swap_pct": gui_stats[i]["os"][os]["ui"][ui][
-                            "global_swap_pct"
-                        ],
-                        "global_pubkey_pct": gui_stats[i]["os"][os]["ui"][ui][
-                            "global_pubkey_pct"
-                        ],
-                    }
-                )
-    return ui_stats
-
-
 def get_dex_version_stats_table(gui_stats):
-    ui_stats = {}
-    for i in ["maker_dict", "taker_dict"]:
-        j = i.split("_")[0]
-        ui_stats.update({j: []})
-        for os in gui_stats[i]["os"]:
-            for ui in gui_stats[i]["os"][os]["ui"]:
-                for v in gui_stats[i]["os"][os]["ui"][ui]["versions"]:
-                    ui_stats[j].append(
-                        {
-                            "os": os,
-                            "ui": ui,
-                            "version": v,
-                            "num_swaps": gui_stats[i]["os"][os]["ui"][ui]["versions"][
-                                v
-                            ]["num_swaps"],
-                            "num_pubkeys": len(
-                                gui_stats[i]["os"][os]["ui"][ui]["versions"][v][
-                                    "pubkeys"
-                                ]
-                            ),
-                            "ui_swap_pct": gui_stats[i]["os"][os]["ui"][ui]["versions"][
-                                v
-                            ]["ui_swap_pct"],
-                            "ui_pubkey_pct": gui_stats[i]["os"][os]["ui"][ui][
-                                "versions"
-                            ][v]["ui_pubkey_pct"],
-                            "num_swaps": gui_stats[i]["os"][os]["ui"][ui]["versions"][
-                                v
-                            ]["num_swaps"],
-                            "os_swap_pct": gui_stats[i]["os"][os]["ui"][ui]["versions"][
-                                v
-                            ]["os_swap_pct"],
-                            "os_pubkey_pct": gui_stats[i]["os"][os]["ui"][ui][
-                                "versions"
-                            ][v]["os_pubkey_pct"],
-                            "global_swap_pct": gui_stats[i]["os"][os]["ui"][ui][
-                                "versions"
-                            ][v]["global_swap_pct"],
-                            "global_pubkey_pct": gui_stats[i]["os"][os]["ui"][ui][
-                                "versions"
-                            ][v]["global_pubkey_pct"],
-                        }
-                    )
-    return ui_stats
+    return {}

@@ -1,5 +1,4 @@
-<!-- chrono.js -->
-<script>
+// chrono.js
 function get_time_since(ts, until=false, format='text', precalc=false) {
     timestamp = parseInt(ts)
     if (ts == 0 ) {
@@ -130,4 +129,3 @@ function update_timespan(e, from_id, to_id) {
     $('#'+from_id).val(when)
 }
 
-</script>

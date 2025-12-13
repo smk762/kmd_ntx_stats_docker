@@ -1,5 +1,8 @@
-<!-- helper.js -->
-<script>
+// helper.js
+	const notariesDataElement = document.getElementById('notaries-data');
+	const NOTARIES = notariesDataElement
+		? JSON.parse(notariesDataElement.textContent)
+		: [];
 
 	function pad(num, size) {
 	    num = num.toString();
@@ -91,9 +94,6 @@
 	}
 
 	function isNotary(name) {
-		{% autoescape off %}
-			return ({{ notaries }}).includes(name)
-		{% endautoescape %}
+		return NOTARIES.includes(name)
 	}
 
-</script>

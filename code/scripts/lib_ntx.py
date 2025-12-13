@@ -60,10 +60,22 @@ class Notarised:
             logger.info(f"Recanning notarisations for {self.season}, blocks {self.start_block} - {self.end_block}")
             self.rescan_notarisations()
 
+        # Keep downstream consumers (views + cached endpoints) in sync.
+        self.refresh_materialized_views()
+        self.bump_cache_epoch()
+
     def refresh_materialized_views(self):
         query.refresh_materialized_view(f"existing_notarised_txids_{self.season}", self.season)
         
-        
+    def bump_cache_epoch(self):
+        """Bump cache epoch so notary/coin summaries refetch without nuking all cache."""
+        try:
+            from kmd_ntx_api.cache_data import cached
+            cached.bump_epoch("ntx")
+            cached.bump_epoch("stats")
+            logger.info("Cache epoch bumped for ntx namespace")
+        except Exception as e:
+            logger.warning(f"Failed to bump cache epoch for ntx: {e}")
 
     def process_notarisations(self, start, end):
         unrecorded_txids = self.get_missing_txids_list(start, end)
@@ -1000,8 +1012,11 @@ class NtxSeasonStats:
             self._update_server_notary_percentages(coin, server, notary)
 
         server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial", "None"}))
-        for epoch in server_epochs: 
-            self._update_server_epoch_percentages(coin, server, epoch)
+        for epoch in server_epochs:
+            # Only process epochs where the coin is active for the server; otherwise
+            # the epoch bucket is not pre-populated and will raise a KeyError.
+            if coin in helper.get_season_coins(self.season, server, epoch):
+                self._update_server_epoch_percentages(coin, server, epoch)
 
     def _update_server_notary_percentages(self, coin, server, notary):
         notary_data = self.season_ntx_dict["coins"][coin]["servers"][server]["notaries"][notary]
@@ -1188,9 +1203,11 @@ class NtxSeasonStats:
             coin_servers_notary_data["pct_of_server_ntx_count"] = self._calculate_percentage(coin_servers_notary_data["ntx_count"], server_ntx_count)
             coin_servers_notary_data["pct_of_server_ntx_score"] = self._calculate_percentage(coin_servers_notary_data["ntx_score"], server_ntx_score)
 
-        server_epochs = list(set(get_season_server_epochs(self.season, server)).difference({"Unofficial", "None"}))
-        for epoch in server_epochs:
-            coin_server_epoch_data = coin_server_data["epochs"][epoch]
+        # Only iterate epochs where this coin is present to avoid missing keys
+        for epoch, coin_server_epoch_data in coin_server_data.get("epochs", {}).items():
+            # Skip aggregate counters (ntx_count/ntx_score) that live alongside epoch keys
+            if not isinstance(coin_server_epoch_data, dict):
+                continue
             coin_server_epoch_data["ntx_score"] = round(coin_server_epoch_data["ntx_score"], 8)
             coin_server_epoch_data["pct_of_server_ntx_count"] = self._calculate_percentage(coin_server_epoch_data["ntx_count"], server_ntx_count)
             coin_server_epoch_data["pct_of_server_ntx_score"] = self._calculate_percentage(coin_server_epoch_data["ntx_score"], server_ntx_score)

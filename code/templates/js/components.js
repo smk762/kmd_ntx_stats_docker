@@ -1,6 +1,4 @@
-<!-- components.js -->
-
-<script>
+// components.js
 
 function show_region(region) {
     const options = ["AR", "EU", "NA", "SH", "DEV"];
@@ -96,5 +94,3 @@ function build_dropdowns(table, json, listtype) {
         });
     }
 }
-
-</script>

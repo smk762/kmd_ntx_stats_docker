@@ -22,11 +22,10 @@ def update_dotenv():
         pass
 
     required_keys = [
-        "MM2_IP", "MM2_PORT", "MM2_USERPASS", "SECRET_KEY", "DJANGO_ALLOWED_HOSTS",
+        "SECRET_KEY", "DJANGO_ALLOWED_HOSTS",
         "NAME", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT",
         "SKIP_PAST_SEASONS", "SKIP_UNTIL_YESTERDAY", "OTHER_SERVER", "THIS_SERVER",
-        "API_PAGE_BREAK", "TELEGRAM_TOKEN", "TELEGRAM_CHAT_ID", "ext_hostname",
-        "ext_username", "ext_password", "ext_db", "DB_PATH", "GH_USER", "GH_TOKEN",
+        "API_PAGE_BREAK", "TELEGRAM_TOKEN", "TELEGRAM_CHAT_ID", "GH_USER", "GH_TOKEN",
         "KMD_RPC_IP", "KMD_RPC_PORT", "KMD_RPC_USERNAME", "KMD_RPC_PASSWORD",
         "USER_ID", "GROUP_ID", "CLOUDFLARE_TUNNEL_TOKEN"
     ]
@@ -75,41 +74,6 @@ def update_dotenv():
         if missing_kmd:
             print(f"WARNING: {kmd_conf_path} not found and KMD_RPC_* not set in .env. Add them for KMD RPC connectivity.")
 
-    # Hint for local MM2 config (host path, not inside containers)
-    mm2_conf_path = os.path.expanduser("~/.kdf/MM2.json")
-    mm2_defaults = {}
-    if os.path.exists(mm2_conf_path):
-        try:
-            import json
-            with open(mm2_conf_path, "r", encoding="utf-8") as f:
-                mm2_cfg = json.load(f)
-            mm2_ip = mm2_cfg.get("rpc_ip") or mm2_cfg.get("rpchost") or mm2_cfg.get("rpcip") or "127.0.0.1"
-            mm2_port = mm2_cfg.get("rpc_port") or mm2_cfg.get("rpcport") or "7783"
-            mm2_userpass = mm2_cfg.get("rpc_password") or mm2_cfg.get("userpass") or mm2_cfg.get("rpc_userpass")
-            mm2_defaults["MM2_IP"] = str(mm2_ip)
-            mm2_defaults["MM2_PORT"] = str(mm2_port)
-            if mm2_userpass:
-                mm2_defaults["MM2_USERPASS"] = str(mm2_userpass)
-            if mm2_defaults:
-                print(f"INFO: Found {mm2_conf_path}. Prefilled MM2_IP/MM2_PORT/MM2_USERPASS from it (fallbacks: 127.0.0.1:7783).")
-        except Exception as e:
-            print(f"WARNING: Found {mm2_conf_path} but could not read it ({e}). Ensure MM2_IP/MM2_PORT/MM2_USERPASS are set in .env.")
-    else:
-        missing_mm2 = any((k not in data or data.get(k, "") == "") for k in ["MM2_IP", "MM2_PORT", "MM2_USERPASS"])
-        if missing_mm2:
-            print(f"WARNING: {mm2_conf_path} not found and MM2_IP/MM2_PORT/MM2_USERPASS not set in .env. Add them for MM2/atomicdex connectivity.")
-
-    # Apply mm2 defaults into data (overwrite with file values if present)
-    for k, v in mm2_defaults.items():
-        if v not in ["", None]:
-            data[k] = v
-
-    # Normalize MM2 defaults (host process)
-    if data.get("MM2_IP", "") in ["", "0.0.0.0"]:
-        data["MM2_IP"] = "127.0.0.1"
-    if data.get("MM2_PORT", "") == "":
-        data["MM2_PORT"] = "7783"
-
     # Apply KMD defaults into data (overwrite with file values if present)
     for k, v in kmd_defaults.items():
         if v not in ["", None]:
@@ -133,15 +97,6 @@ def update_dotenv():
             return "changeme"
         return ""
 
-    def _mm2_default(key):
-        if key == "MM2_IP":
-            return data.get("MM2_IP", "127.0.0.1")
-        if key == "MM2_PORT":
-            return data.get("MM2_PORT", "7783")
-        if key == "MM2_USERPASS":
-            return "changeme"
-        return ""
-
     # Fill required keys, prompting only when no default exists
     for i in required_keys:
         if data.get(i, "") == "":
@@ -149,8 +104,6 @@ def update_dotenv():
                 if i == "KMD_RPC_IP":
                     i = i.split(':')[0]
                 q = _kmd_default(i)
-            elif i.startswith("MM2_"):
-                q = _mm2_default(i)
             elif i == "USER_ID":
                 q = os.geteuid()
             elif i == "GROUP_ID":

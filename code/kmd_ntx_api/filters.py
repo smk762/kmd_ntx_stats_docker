@@ -50,23 +50,6 @@ class notarisedTenureFilter(FilterSet):
                    'gte_official_end', 'lte_official_end']
 
 
-class swapsFilter(FilterSet):
-    from_time = NumberFilter(field_name="timestamp", lookup_expr='gte')
-    to_time = NumberFilter(field_name="timestamp", lookup_expr='lte')
-    class Meta:
-        model = swaps
-
-        fields = swapsSerializerPub.Meta.fields + ["from_time", "to_time"]
-
-
-class swapsFailedFilter(FilterSet):
-    from_time = NumberFilter(field_name="timestamp", lookup_expr='gte')
-    to_time = NumberFilter(field_name="timestamp", lookup_expr='lte')
-    class Meta:
-        model = swaps_failed
-        fields = swapsFailedSerializerPub.Meta.fields + ["from_time", "to_time"]
-
-
 class rewardsFilter(FilterSet):
     min_block = NumberFilter(field_name="block_height", lookup_expr='gte')
     max_block = NumberFilter(field_name="block_height", lookup_expr='lte')

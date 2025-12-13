@@ -1,0 +1,21 @@
+{{ explorers|json_script:"explorers-data" }}
+{{ coin_icons|json_script:"coin_icons-data" }}
+{{ notary_icons|json_script:"notary_icons-data" }}
+{{ dpow_coins|json_script:"dpow_coins-data" }}
+{{ notaries|json_script:"notaries-data" }}
+<script type="text/javascript">
+{% autoescape off %}
+{% include "js/buttons.js" %}
+{% include "js/cells.js" %}
+{% include "js/charts.js" %}
+{% include "js/chrono.js" %}
+{% include "js/components.js" %}
+{% include "js/explorers.js" %}
+{% include "js/helper.js" %}
+{% include "js/icons.js" %}
+{% include "js/styles.js" %}
+{% include "js/tables.js" %}
+{% include "js/urls.js" %}
+{% endautoescape %}
+</script>
+

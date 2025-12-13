@@ -34,7 +34,9 @@
      		ajax: {
                 "serverSide": true,
 			    url: url,
-	    		dataSrc: 'data',
+	    		dataSrc: function (json) {
+                    return Array.isArray(json && json.data) ? json.data : [];
+                },
     			"deferRender": true
 			},
             "orderClasses": false,
@@ -46,14 +48,16 @@
 		            "data": 'block_height',
 		            "targets": 0,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(get_block_url("KMD", oData.block_height))
+		            	if (!nTd || !oData) return;
+                        $(nTd).html(get_block_url("KMD", oData.block_height))
 			        }
 		        },
     			{
 		            "data": 'name',
 		            "targets": 1,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html("<a href='https://komodod.com/a/"+oData.address+"'>"+oData.name+"</a>");
+			            if (!nTd || !oData) return;
+                        $(nTd).html("<a href='https://komodod.com/a/"+oData.address+"'>"+oData.name+"</a>");
 			        }
 		        },
     			{
@@ -65,28 +69,32 @@
 		            "data": 'value',
 		            "targets": 3,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.value+"</a>");
+			            if (!nTd || !oData) return;
+                        $(nTd).html("<a href='https://komodod.com/t/"+oData.txid+"'>"+oData.value+"</a>");
 			        }
 		        },
     			{
 		            "data": 'usd_price',
 		            "targets": 4,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-			            $(nTd).html("$" + Math.round(oData.usd_price * oData.value*100, 2)/100 + " USD");
+			            if (!nTd || !oData) return;
+                        $(nTd).html("$" + Math.round(oData.usd_price * oData.value*100, 2)/100 + " USD");
 			        }
 		        },
     			{
 		            "data": 'txid',
 		            "targets": 5,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-						$(nTd).html(get_txid_url("KMD", oData.txid))
+						if (!nTd || !oData) return;
+                        $(nTd).html(get_txid_url("KMD", oData.txid))
 			        }
 		        },
     			{
 		            "data": 'block_time',
 		            "targets": 6,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
-		            	$(nTd).html(get_time_since(oData.block_time));
+		            	if (!nTd || !oData) return;
+                        $(nTd).html(get_time_since(oData.block_time));
 			        }
 		        }
     		],

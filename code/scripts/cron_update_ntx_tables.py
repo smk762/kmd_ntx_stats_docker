@@ -1,5 +1,7 @@
 #!/usr/bin/env python3.12
+import os
 import sys
+import json
 from lib_const import *
 from const_seasons import SEASONS
 import lib_helper as helper
@@ -38,6 +40,15 @@ def update_ntx_tables(seasons, rescan=False):
         ntx_season_tables.update_ntx_season_stats_tables()
         ntx_daily_tables = lib_ntx.NtxDailyStats(season, rescan)
         ntx_daily_tables.update_daily_ntx_tables()
+
+    # Invalidate targeted ntx cache after updates (avoid full memcache flush).
+    try:
+        from kmd_ntx_api.cache_data import cached
+        cached.bump_epoch("ntx")
+        cached.bump_epoch("stats")  # stats aggregates depend on ntx + mining
+        logger.info("Cache epoch bumped for ntx after update_ntx_tables")
+    except Exception as e:
+        logger.warning(f"Cache epoch bump failed after update_ntx_tables: {e}")
 
 
 

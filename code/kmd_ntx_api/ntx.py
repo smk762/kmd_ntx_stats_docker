@@ -28,7 +28,7 @@ def get_ntx_tenure_table(request):
     return data
 
 def get_ntx_count_season(notarised_data):
-    cache_key = "ntx_count_season"
+    cache_key = cached.namespaced_key("ntx", "ntx_count_season")
     data = cached.get_data(cache_key, expire=300)
     if data is None:
         data = notarised_data.count()
@@ -38,7 +38,7 @@ def get_ntx_count_season(notarised_data):
         return data["val"]
 
 def get_ntx_count_24hr(notarised_data):
-    cache_key = "ntx_count_season"
+    cache_key = cached.namespaced_key("ntx", "ntx_count_24hr")
     data = cached.get_data(cache_key, expire=300)
     if data is None:
         data = notarised_data.filter(block_time__gt=str(days_ago(1))).count()

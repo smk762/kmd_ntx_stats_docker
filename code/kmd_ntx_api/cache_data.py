@@ -23,7 +23,6 @@ CACHE_SIZE_LIMIT = 250 * 1024 * 1024  # 250 MB
 CACHE_EXPIRY = 600  # 10 minutes in seconds
 
 CACHE_SOURCE_URLS: Dict[str, Optional[str]] = {
-    "activation_commands_cache": None,
     "b58_params_cache": None,
     "coins_config_cache": "https://raw.githubusercontent.com/gleecbtc/coins/master/utils/coins_config.json",
     "coin_icons_cache": None,
@@ -110,9 +109,42 @@ class Cache:
     def flush(self):
         self.client.flush_all()
 
+    # -------- Namespaced cache helpers --------
+    def _epoch_key(self, namespace: str) -> str:
+        return f"epoch::{namespace}".lower()
+
+    def get_epoch(self, namespace: str) -> int:
+        """Return the current cache epoch for a namespace (defaults to 0)."""
+        try:
+            val = self.client.get(self._epoch_key(namespace))
+            return int(val) if val is not None else 0
+        except Exception:
+            return 0
+
+    def bump_epoch(self, namespace: str) -> int:
+        """Increment the cache epoch to invalidate namespaced keys."""
+        try:
+            key = self._epoch_key(namespace)
+            val = self.client.get(key)
+            if val is None:
+                self.client.set(key, 1, CACHE_TIMEOUT)
+                return 1
+            new_val = int(val) + 1
+            self.client.set(key, new_val, CACHE_TIMEOUT)
+            return new_val
+        except Exception as e:
+            logger.warning(f"Failed to bump cache epoch for {namespace}: {e}")
+            return 0
+
+    def namespaced_key(self, namespace: str, key: str) -> str:
+        """Attach namespace epoch to the key for targeted invalidation."""
+        return f"{self.get_epoch(namespace)}::{key}".lower()
+
     def data_path(self, key: str) -> Path:
         """Returns the cache file path based on the key."""
-        path: Path = CACHE_PATH / f"{key}.json"
+        # Strip namespace epoch prefix (e.g. "3::key") so we keep one file per logical key.
+        base_key = key.split("::", 1)[-1]
+        path: Path = CACHE_PATH / f"{base_key}.json"
         return path
 
     def is_expired(self, path: Path, expire: int) -> bool:
@@ -131,13 +163,21 @@ class Cache:
             return False
     
     def get_data(self, key: str, expire: int = CACHE_EXPIRY) -> Optional[Union[dict, list, str]]:
-        """Fetches data from Memcached or file cache."""
+        """Fetch data from Memcached or file cache, treating empty payloads as valid.
+        Avoid redundant refetches by using on-disk cache when memcache evicts."""
         logger.info(f"Getting {key} from cache")
         key = key.lower()
         data = self.client.get(key)
-        if not data:
-            data = self.refresh(key=key, expire=expire, force=True)
-        if not data and not str(self.data_path(key)).endswith("_summary.json"):
+        if data is None:
+            path = self.data_path(key)
+            # Rehydrate memcache from file if still fresh
+            if path.exists() and not self.is_expired(path, expire):
+                data = self.file_data(key)
+                if data is not None:
+                    self.client.set(key, data, expire)
+            if data is None:
+                data = self.refresh(key=key, expire=expire, force=False)
+        if data is None and not str(self.data_path(key)).endswith("_summary.json"):
             data = self.file_data(key)
         return data
 
@@ -170,23 +210,23 @@ class Cache:
 
     def refresh(self, key: str, expire: int = CACHE_TIMEOUT, force: bool = False, data: Optional[Union[dict, list, str]] = None) -> Optional[Union[dict, list, str]]:
         """Refreshes the cache file and updates Memcached.
-        Writes even empty lists/dicts so callers don't later hit missing-file errors."""
+        Empty lists/dicts are written to avoid stale data."""
         key = key.lower()
         path = self.data_path(key)
+        # Ensure cache directory exists before attempting to write files
+        path.parent.mkdir(parents=True, exist_ok=True)
         # Only fetch from remote source if caller did not supply data
         if data is None and (self.is_expired(path, expire) or force):
             data = self.source_data(key)
         existing = self.client.get(key)
         if data is None:
             return existing
-        if isinstance(data, (dict, list)) and len(data) == 0:
-            logger.warning(f"{key} refresh skipped: empty payload (preserving existing cache/file)")
-            return existing
 
         self.client.set(key, data, expire)
         logger.info(f"{key} updated in mem {path}")
         if not str(path).endswith("_summary.json"):
-            path.write_text(json.dumps(data, indent=4))
+            # Use the same Decimal-safe serializer as Memcached writes
+            path.write_text(json.dumps(data, indent=4, default=JsonSerde._json_default))
             logger.saved(f"{path} updated!")
         return self.client.get(key)
 

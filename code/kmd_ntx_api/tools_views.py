@@ -15,7 +15,6 @@ from kmd_ntx_api.context import get_base_context
 from kmd_ntx_api.explorers import get_explorers, get_dexstats_utxos
 from kmd_ntx_api.helper import get_or_none, \
     has_error, get_notary_list
-from kmd_ntx_api.raw_transaction import send_raw_tx, raw_tx
 from kmd_ntx_api.info import get_base_58_coin_params, get_coin_icons, \
     get_daemon_cli
 from kmd_ntx_api.notary_seasons import get_page_season
@@ -52,67 +51,6 @@ def convert_addresses_view(request):
             })
 
     return render(request, 'views/tools/tool_convert_addresses.html', context)
-
-
-def create_raw_transaction_view(request):
-    coin = get_or_none(request, "coin", "KMD")
-    address = get_or_none(request, "address")
-    inputs = get_or_none(request, "inputs")
-    context = get_base_context(request)
-
-    context.update({
-        "page_title":"Create Raw Transaction from Address",
-        "reqget":request.GET,
-        "coin":coin,
-        "address": address,
-        "now":int(time.time()),
-        "locktime":int(time.time())-30*60,
-        "30_min_ago":int(time.time()-30*60),
-        "smartchain_coins_list": SMARTCHAINS
-    })
-
-    # Step one: get UTXOs for selection and show form for destination and amount
-    if address:
-        context.update({
-            "utxos": get_dexstats_utxos(coin, address)
-        })
-
-    # Step two, construct the raw hex
-    if inputs:
-        output_amounts = request.GET.getlist("output_amount")
-        to_addresses = request.GET.getlist("to_address")
-        locktime = request.GET["locktime"]
-        expiry_height = request.GET["expiry_height"]
-
-        test_tx = raw_tx()
-        tx_inputs = []
-        for vin in inputs.split(","):
-            elements = vin.split("|")
-            tx_inputs.append({
-                "tx_hash":elements[0],
-                "tx_pos":int(elements[1]),
-                "value":float(elements[2]),
-                "scriptPubKey":elements[3]
-                })
-        test_tx.inputs = tx_inputs
-
-        outputs = []
-        for i in range(len(to_addresses)):
-            outputs.append({
-                "address":to_addresses[i],
-                "amount":output_amounts[i]
-            })
-        test_tx.outputs = outputs
-        test_tx.locktime = locktime
-        raw_hex = test_tx.construct()
-
-        context.update({
-            "tx_inputs": tx_inputs,
-            "outputs": outputs,
-            "raw_tx": raw_hex
-        })
-
-    return render(request, 'views/tools/tool_create_raw_transaction.html', context)
 
 
 def daemon_cli_view(request):
@@ -345,24 +283,6 @@ def scripthash_from_address_view(request):
             })
 
     return render(request, 'views/tools/tool_scripthash_from_address.html', context)
-
-
-def send_raw_tx_view(request):
-    context = get_base_context(request)
-    context.update({
-        "page_title":"Send Raw Transaction (experimental!)",
-        "smartchain_coins_list": SMARTCHAINS
-    })
-
-    if "coin" in request.GET or "tx_hex" in request.GET:
-        resp = send_raw_tx(request)
-
-        if has_error(resp):
-            messages.error(request, f"{resp['error']}")
-        else:
-            messages.success(request, f"{resp}")
-
-    return render(request, 'views/tools/tool_send_raw_transaction.html', context)
 
 
 def explorer_status_view(request):

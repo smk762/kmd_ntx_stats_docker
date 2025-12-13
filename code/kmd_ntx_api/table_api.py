@@ -8,11 +8,8 @@ from kmd_ntx_api.table import get_addresses_rows, get_balances_rows, \
     get_kmd_supply_rows, get_notary_last_mined_table_api, get_coin_social_table, \
     get_coin_last_ntx_table, get_notary_ntx_season_table, get_notary_ntx_season_table_data, \
     get_mined_24hrs_table, get_mined_count_season_table, get_coin_ntx_season_table, \
-    get_notarised_tenure_table, get_notary_epoch_scores_table, \
-    get_coin_activation_table, get_bestorders_table, get_dex_stats_table, \
-    get_dex_os_stats_table, get_dex_version_stats_table, get_dex_ui_stats_table
+    get_notarised_tenure_table, get_notary_epoch_scores_table
             
-from kmd_ntx_api.swaps import get_swaps_gui_stats
 from kmd_ntx_api.helper import json_resp
 from kmd_ntx_api.logger import logger
 
@@ -194,42 +191,3 @@ def notarised_table(request):
 
 
 ## AtomicDEX Related
-def coin_activation_table(request):
-    resp = get_coin_activation_table(request)
-    filters = ['platform']
-    return json_resp(resp, filters)
-
-
-def bestorders_table(request):
-    resp = get_bestorders_table(request)
-    filters = ['coin']
-    return json_resp(resp, filters)
-
-
-def dex_stats_table(request):
-    stats = get_swaps_gui_stats(request)
-    resp = get_dex_stats_table(stats)
-    filters = ['from_time', 'to_time']
-    return json_resp(resp, filters)
-
-
-def dex_os_stats_table(request):
-    stats = get_swaps_gui_stats(request)
-    resp = get_dex_os_stats_table(stats)
-    filters = ['from_time', 'to_time']
-    return json_resp(resp, filters)
-
-
-def dex_ui_stats_table(request):
-    stats = get_swaps_gui_stats(request)
-    resp = get_dex_ui_stats_table(stats)
-    filters = ['from_time', 'to_time']
-    return json_resp(resp, filters)
-
-
-def dex_version_stats_table(request):
-    stats = get_swaps_gui_stats(request)
-    resp = get_dex_version_stats_table(stats)
-    filters = ['from_time', 'to_time']
-    return json_resp(resp, filters)
-

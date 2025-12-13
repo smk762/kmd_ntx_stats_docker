@@ -385,22 +385,26 @@ def get_existing_notarised_txids(season=None, server=None, coin=None):
 def refresh_materialized_view(view, season=None):
     CONN = connect_db()
     CURSOR = CONN.cursor()
-    for k, v in materialized_views:
+    for k, v in materialized_views.items():
+        view_name = k.replace("SEASON", season) if season else k
+        view_sql = v.replace("SEASON", season) if season else v
         try:
-            sql = f"CREATE MATERIALIZED VIEW {k} AS {v};"
-            if season:
-                sql.replace("SEASON", season)
+            sql = f"CREATE MATERIALIZED VIEW IF NOT EXISTS {view_name} AS {view_sql};"
             CURSOR.execute(sql)
             CONN.commit()
-        except:
-            pass
-    
-        
-        
-    logger.info(f"Refreshing materialized view {view}")
-    sql = f"REFRESH MATERIALIZED VIEW {view};"
-    CURSOR.execute(sql)
-    CONN.commit()
+        except Exception as e:
+            logger.info(f"Materialized view {view_name} exists or failed to create: {e}")
+            CONN.rollback()
+
+    view_target = view.replace("SEASON", season) if season else view
+    try:
+        logger.info(f"Refreshing materialized view {view_target}")
+        sql = f"REFRESH MATERIALIZED VIEW {view_target};"
+        CURSOR.execute(sql)
+        CONN.commit()
+    except Exception as e:
+        logger.warning(f"Failed to refresh materialized view {view_target}: {e}")
+        CONN.rollback()
     CURSOR.close()
     CONN.close()  #
 

@@ -43,15 +43,3 @@ def get_table_names(cursor):
         tables_list.append(table[0])
     return tables_list
 
-
-try:
-    ext_mydb = mysql.connector.connect(
-      host=os.getenv("ext_hostname"),
-      user=os.getenv("ext_username"),
-      passwd=os.getenv("ext_password"),
-      database=os.getenv("ext_db")
-    )
-    ext_cursor = ext_mydb.cursor()
-except:
-    pass
-

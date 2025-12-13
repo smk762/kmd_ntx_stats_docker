@@ -30,9 +30,11 @@
     $(document).ready(function() {
      	let url = "{% url 'notarisedViewSet-list' %}?notary={{ '{' }}{{ notary }}}&season={{ season }}&format=datatables"
         $('#ntx_24hr_tbl').DataTable({
-     		ajax: {
+    		ajax: {
 			    url: url,
-    			dataSrc: 'data',
+    			dataSrc: function (json) {
+                    return Array.isArray(json && json.data) ? json.data : [];
+                },
     			"deferRender": true
 			},
     		order: [[ 1, 'desc' ]],
@@ -45,6 +47,7 @@
 		            "data": 'coin',
 		            "targets": 0,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        if (!nTd || !oData) return;
 				        $(nTd).html(get_coin_icon(oData.coin));
 			        }
 		        },
@@ -52,6 +55,7 @@
 		            "data": 'block_height',
 		            "targets": 1,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        if (!nTd || !oData) return;
 		            	let ntx_coin = "KMD"
 		            	if (oData.coin == "LTC") {
 		            		ntx_coin = "LTC"
@@ -63,6 +67,7 @@
 		            "data": 'ac_ntx_height',
 		            "targets": 2,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        if (!nTd || !oData) return;
 		            	let ntx_coin = oData.coin
 		            	if (oData.coin == "LTC") {
 		            		ntx_coin = "KMD"
@@ -74,6 +79,7 @@
 		            "data": 'txid',
 		            "targets": 3,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        if (!nTd || !oData) return;
 		            	let ntx_coin = "KMD"
 		            	if (oData.coin == "LTC") {
 		            		ntx_coin = "LTC"
@@ -85,6 +91,7 @@
 		            "data": 'notaries',
 		            "targets": 4,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        if (!nTd || !oData) return;
 						$(nTd).html(get_notaries_symbol('{{ season }}', oData.notaries, oData.txid))
 					}
 		        },
@@ -92,6 +99,7 @@
 		            "data": 'opret',
 		            "targets": 5,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        if (!nTd || !oData || !oData.opret) return;
 		            	let op_return = (oData.opret.split(" ").length > 1) ? oData.opret.split(" ")[1] : oData.opret
 						let icon = "<i class='fas fa-arrow-right'></i>"
 						let tooltip = "Decode OP_RETURN: "+op_return
@@ -103,6 +111,7 @@
 		            "data": 'block_time',
 		            "targets": 6,
 		            "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                        if (!nTd || !oData) return;
 		            	$(nTd).html(get_time_since(oData.block_time));
 			        }
 		        }

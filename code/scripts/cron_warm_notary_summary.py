@@ -18,8 +18,8 @@ if not django.conf.settings.configured:
 
 from kmd_ntx_api.logger import logger
 from kmd_ntx_api.table import get_notary_ntx_season_table_data
-from kmd_ntx_api.notary_seasons import get_seasons_info, get_notary_list, get_page_season
-from kmd_ntx_api.helper import get_or_none
+from kmd_ntx_api.notary_seasons import get_seasons_info, get_page_season
+from kmd_ntx_api.helper import get_notary_list
 
 
 def main():
