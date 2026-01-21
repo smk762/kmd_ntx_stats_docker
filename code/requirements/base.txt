@@ -1,5 +1,5 @@
 testresources==2.0.1
-Django==3.2.23
+Django==3.2.25
 psycopg2>=2.7,<3.0
 mysql-connector-python==8.0.30
 djangorestframework==3.11.2
